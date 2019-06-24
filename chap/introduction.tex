@@ -1,0 +1,165 @@
+\section{Introduction}
+\label{sec:intro}
+
+
+%第一段：
+%SSO的特点
+%SSO的现状
+%当前主流的SSO协议
+Single Sign-On (SSO) systems enable users access multiple services (called relying parties, RP) with the single authentication performed at the Identity Provider (IdP). To remember each user's interests and provide individual services, service providers need to identify each user. It requires that users need to be authenticated repeatedly when using multiple online services. However, with the help of SSO system, a user only needs to be authenticated by an IdP which can offer trustful user identities to RPs instead of being identified by each specific RP. Once a user has already been authenticated by the IdP, he/she can easily use the services of other RPs with just the simple permission granting.
+Moreover, SSO systems are also convenient for RPs as they doesn't need to maintain their own authentication systems any more. This is why SSO solutions are widely deployed. 
+%实际数据
+The survey on the top 100 websites demonstrates that 24 websites serve as the IdP while 63 websites integrate the SSO service. The leading internet companies such as Google, Facebook and Twitter all provide SSO services.
+Various protocol standards, e.g., OAuth 2.0~\cite{rfc6749}, SAML~\cite{SAML} and OpenID Connect~\cite{OpenIDConnect}, are proposed to define the interchanges between the user, RP and IdP.
+%第二段：
+%引出要讨论的问题
+%流行协议的现状
+
+%Due to the importance of SSO, the security of SSO protocols and implementations are systematically analyzed.
+%SAML, OAuth and OIDC are formally analyzed based on the web infrastructure model.
+%The typical SSO solutions, e.g. Google, Facebook and Twitter, has been analyzed and the security has been improved significantly.
+
+%整理逻辑
+%Although the security of SSO protocols and implementations has been systematically analyzed and user's privacy is considered in the design of SSO protocols, user's privacy has not been protected well yet. 
+Security and privacy are important in SSO systems.
+The security of SSO protocols and implementations are systematically analyzed~\cite{WangCW12}~\cite{FettKS16}~\cite{ZhouE14}~\cite{WangZLG16}.
+SAML, OAuth and OIDC are formally analyzed based on the web infrastructure model.
+The typical SSO solutions, e.g. Google, Facebook and Twitter, has been analyzed and the security has been improved significantly.
+As for the privacy of SSO systems, NIST SP800-63C~\cite{NIST2017draft} issues following informative advisement for federation of digital identity: (1) SSO systems should protect users from being tracked and profiled which means that: a. IdP is unable to know which RP a user has logged in; b. RP is also unable to know its user's identity in other RPs; (2) IdP should make users' personally identifiable information (PII) accessible only with user's consent; (3) IdP should enable the data exposed to an RP to be minimized. Current SSO protocols adopts several measures to protect users' privacy. For example, in OpenID Connect, IdP sends the user's PII to the RP only when the RP has obtained the user's consent for certain attributes, and provides the access logs for the user to monitor who accessed his/her PII. 
+
+However, no existing SSO protocols is able to protect users from being tracked and profiled absolutely. 
+Current widely adopted SSO protocols (e.g., OpenID Connect) protect the user from a possible correlation among RPs by using Pairwise Pseudonymous Identifier (PPID)~\cite{OpenIDConnect}. 
+%But they are not designed to protect user from being tracked by IdP. For security consideration a token in OpenID Connect for authentication issued by IdP should be bound with specific RP and user. It has been discussed in ~\cite{ChenPCTKT14}. 
+Some work, such as~\cite{ChenPCTKT14} has issued that for security consideration the identity proof offered by IdP should be bound with specific RP and user so that RP's identity has to be provided to IdP.
+As a result IdP is always able to know which RP a user has logged in. 
+
+
+%To guarantee the security, SAML, OAuth 2.0 and OpenID Connect are formally analyzed based on the web infrastructure model. And the typical SSO solutions, e.g. Google, Facebook and Twitter, has been analyzed and the security has been improved significantly. To protect user's privacy, for example, in OpenID Connect, IdP sends the user's personally identifiable information (PII) to the RP only when the RP has obtained the user's consent, and provides the access logs for the user to monitor who accessed his/her PII. Moreover, to protect the user from a possible correlation among RPs, IdP should provide each RP separate pseudonym for a user as the identifier. 
+%单独
+%There is, however, no existing popular SSO protocol being designed to protect user from being tracked by IdP.     
+
+%In addition to security, the privacy has been well considered in the design of SSO protocols.
+%For example, in OIDC, IdP sends the user's personally identifiable information (PII) to the RP only when the RP has obtained the user's consent,
+ %and provides the access logs for the user to monitor who accessed his/her PII.
+%Moreover, to protect the user from a possible correlation among RPs, IdP should use a pairwise pseudonymous %identifier as the user's identifier (i.e., \verb+sub+) returned to the RP.
+
+
+%However, current SSO systems still allow the IdP to track the users .
+%For security consideration, the ticket in OAuth and OIDC,  issued by the IdP should contain the identity of RP, to send the ticket or ticket index, the IdP should construct the rediect URL which contains the  RP URL.
+%第三段
+%现有研究
+%现有研究的缺点
+%能否提供统一的隐私要求
+In addition to widely adopted SSO systems, various SSO schemes are proposed to protect user's privacy. 
+These protocols can be classified by their objective:
+(1) preventing the IdP from obtaining the user's identity and (2) avoiding the IdP learning at which RP the user logins in.
+Anonymous SSO schemes belong to the first one and apply to the RPs who do not require the user's identity nor PII, and just need to check whether the user is authorized or not. 
+These anonymous schemes, such as the anonymous scheme proposed by Han et al.~\cite{HanCSTW18}, allow user to obtain a token from IdP by proving that he/she is someone who has registered in the Central Authority based on  Zero-Knowledge Proof. RP is only able to check the validation of the token but unable to identify the user.
+%These schemes, such as  allow users to access a service protected by a verifier without revealing their identities to the RPs.
+However, to provide the continuous and personalized service, RP needs to obtain the unique pseudonym for each user.
+In this case, the solutions belong to the the other case is more suitable, as the IdP doesn't know which RP the user accesses.
+
+Vairous SSO protocols are proposed to hide the users' accessing to RPs from the IdP. 
+In the BrowserID system~\cite{persona}, a user firstly generates a asymmetric key pair. The IdP authenticates the user and offers a user certificate (UC) which contains the user's email address with the user's public key. User is to sign the origin of the RP with the corresponding private key as the identity assertion (IA). RP is able to identify the user by UC and IA. 
+%the user sends RP the user certificate (i.e. combing the user's email address with the user's public key) and identity assertion (i.e., the origin of the RP signed by the user with the corresponding private key) to complete the authentication, and is formally analyzed and found severe attacks~\cite{BrowserID}.
+SPRESSO~\cite{SPRESSO} is designed based on the standard HTML5 and web features, and formally analyzed based on the expressive Dolev-Yao style model of the web infrastructure~\cite{webmodel}. But for RPs to identify a user, both BrowserID and SPRESSO need to provide user's real identity (or a constant pseudonym) to each RP. Communication among multiple RPs would allow RPs to profile the user.  
+%If a user logs in multiple RPs, these RPs are able to draw his/her trace. 
+
+Therefore there are no SSO protocols so far that protect users from tracking by both IdP and RPs simultaneously. NIST publication has issued that proxy is able to protect users' privacy in SSO system. It is defined that when the proxy can keep IdP and RP anonymous to each other and itself the proxy is called the triple blind proxy. But no existing proxy has achieved this goal. 
+%that the triple blind proxy can protect users from being tracked, but there is no existing systems achieved this goal. 
+Moreover, the protocols protecting user's privacy (such as, SPRESSO and BrowserID) are quite distinct from the widely adopted protocols. There is to be a huge cost if IdP developers migrate their systems into a totally brand-new architecture.
+%第四段
+%IdP钓鱼网站问题
+%转移到安全分析
+%Besides tracking user, IdP in traditional SSO system is not expected to protect users from phishing attack either. Imagine that you visit \emph{phishingsite.com} which is established by a malicious opponent and allows user to log in using a Google account. Google SSO allows web application to direct user to Google's login web page and user need log in Google. However, \emph{phishingsite} directs you to a phishing site totally same as Google's web page instead of the real one. That is, while you accomplish the authentication, e.g., inputting your password, your password is to be stolen by malicious opponent. 
+
+%Phishing attack in SSO systems has been considered by OAuth 2.0~\cite{rfc6749} and several papers~\cite{anti_phishing}~\cite{devil_phishing}~\cite{mechanism_phishing} are proposed to discuss it. There is, however, no existing schemes can be adopted to enhance the security of popular protocols, e.g., OpenID Connect. 
+ 
+
+
+
+%第⑤段：
+%我们的目标
+%建立一套新的单点登录系统，满足：
+%1 满足NIST的隐私需求
+%2 便于现有系统的迁移
+
+Therefore the goal of this work is to design a novel SSO system which provides the following features: 
+(1) it should protect users from being tracked by both IdP and multiple RPs at the same time; 
+(2) it should be convenient for developers to complete system migration from traditional SSO system.
+
+%加入基本的解决方案 challenges
+\textbf{Challenge}. 
+It is discussed that a user's identity proof provided by IdP should be bound with specific RP and the user\cite{rfc6749}\cite{ChenPCTKT14}\cite{WangZLG16}. Moreover, the proof should be linked with a unique RP id and user id. As for current widely adopted SSO protocols, for example, OpenID Connect provides an id token for user which contains RP's id (named \verb+aud+) and user's id (named \verb+sub+). 
+Firstly RP sends its \verb+aud+ to IdP and IdP finds out the \verb+sub+ of user solely correlated with the \verb+aud+. Then IdP generates the id token with the \verb+aud+ and \verb+sub+ and sends it RP. RP is going to identify the user by \verb+sub+. 
+So while RP doesn't provide it's identity to IdP, IdP is unable to find out the correlated \verb+sub+ so that RP cannot identify the user. 
+%The \verb+aud+ is the identity of RP user offers to IdP and \verb+sub+ is the user's PPID generated by IdP. To keep RP anonymous at IdP the aud should be random for each authentication. However, in consideration of privacy \verb+sub+ should solely correlate a unique \verb+aud+. It means random \verb+aud+ is to result in random \verb+sub+ which prevents RP from offering continuous and personalized service to user. 
+The challenge is how to identify a specific user without exposing the identity of RP to IdP.
+To achieve this goal, we propose the new id generating algorithm of RP and user for OpenID Connect. It enables RP to generate a random \verb+aud+ for each authentication and IdP generates \verb+sub+ with this pseudonym. RP is able to translate the random \verb+sub+ into a constant user identity.  
+
+%第六段
+%我们的贡献
+%提出协议
+%考虑能否根据模型进行分析
+%实现原型系统
+\textbf{Contributions.} 
+1. We have designed a practical Enhanced OpenID Connect 1.0 Protocol called PriOIDC which is the first SSO protocol that protect users from being tracked by both IdP and multiple RPs at the same time. 
+In this system IdP only knows a user wants to log in an RP but never knows which RP it is. 
+And IdP offers a user separate pseudonym in different RPs as user's identifier so that multi-RP collusion cannot deduce the user's login trace either.
+2. We have provided the prototype, and its overhead is proved to be modest (less than 50ms of each login on average). 
+
+%第七段
+%文章结构
+This paper is organized as follows: Section~\ref{sec:back} provides the knowledge of OpenID Connect. Section~\ref{sec:overview} gives the overview of this scheme and its attack surface. Section~\ref{sec:protocol} describes the construction and details of this scheme. Section~\ref{sec:analysis} provides the detailed analysis of the new scheme. Section~\ref{sec:evaluation} offers a performance evaluation of our prototype system. Section~\ref{sec:related} discusses the related works. In Section~\ref{sec:conclusion}, a conclusion is given.
+
+
+
+\begin{comment}
+%These protocols are classified into two classes according to the objective:
+%(1) preventing the RP obtaining the user's identity and (2) avoiding the IdP learning at which RP the user logins in.
+Anonymous SSO authentications schemes belonging to the first one and apply to the RPs who do not require the user's identity nor PII, and just  need to check whether the user is authorised or not. These schemes allow users to access a service protected by a verifier without revealing their identities to the RPs.
+
+However, to provide the continuous and preconized service, RP needs to obtain the unique pseudonym for each user.
+In this case, the solutions belong to the class 2 is more suitable, as the IdP doesn't know which RP the user access while the RP only knows the user's pseudonym but not the real identity.
+Vairous SSO protocols are proposed to hide the users accessed RPs from the IdP. 
+In the BrowserID system~\cite{persona}, the user sends RP the user certificate (i.e. combing the user's email address with the user's public key) and identity assertion (i.e., the origin of the RP signed by the user with the corresponding private key) to complete the authentication, and is formally analyzed and found severe attacks~\cite{BrowserID}.
+SPRESSO~\cite{SPRESSO} is proposed based on the standard HTML5 and web features, and formally analyzed based on the expressive Dolev-Yao style model of the web infrastructure~\cite{webmodel}.
+
+
+
+
+
+For security consideration, the ticket issued by the IdP should contain the identity of RP, to send the ticket or ticket index, the IdP should construct the rediect URL which contains the  RP URL.
+
+%大量工作来提升协议的安全性，包括1.协议本身的安全性；2. 具体实现的安全性。
+The security of SSO systems is improved by .
+The OAuth 2.0 and OpenId-Connect protocol are formally analyzed under the web model.
+The implementations have been evaluated and various vulnerabilities are found which
+%Authentication is the first line to protect the user information,
+
+%SSO引入了新的隐私问题，目前已有多项工作1. 协议规范要求IdP在向RP传输PII时，需要得到用户明确授权；2.用户在不同RP使用的不同的标识，防止串联 3.匿名SSO，防止RP获取用户信息
+
+
+%但是SSO引入了一个明显的问题，即IdP将获取用户访问的RP信息，从而能够***
+
+
+%本文提出了一种匿名方案，通过集成***，实现了。可以描述该工作的难点
+
+
+
+
+
+A Single Sign-On (SSO) system contains Identity Provider (IdP), Relying Parties (RP) and users. It allows users to log in the IdP once and then user can use RPs' service without extra login. Currently internet services have been an essential part of people's life. To provide their users with personalized services, many web application developers manage to authenticate users. Traditional authentication system requires users to keep individual accounts and passwords.
+
+%SSO引入了新的安全问题 However, SSO introduces new risk to the user's privacy.
+Introduce the flaws of current sso system. All the popular sso protocols can't hide the login information , who login in which web application. And even the specification of some protocols advise the IdP should keep the user identity unique in each RP, but may sso service providers haven't confirm the rule, such as Google.
+
+%现有的缓解方法
+Introduce what we want about the sso system. When the user logs in a RP with the sso service, the IdP will get nothing can link the user an the RP. And even the multi-RP collusion cannot deduces the user's login trace.
+
+%但是现有解决方法还不够，引入我们的问题
+Our contributions:
+
+%我们方法的基本原理
+
+\end{comment}
