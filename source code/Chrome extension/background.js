@@ -20,6 +20,7 @@ var point4;
 var tokenStart;
 var tokenEnd;
 var RPCert;
+var count = 0;
 
 chrome.extension.onMessage.addListener(
     function(request, sender, sendResponse) {
@@ -40,9 +41,13 @@ chrome.webRequest.onBeforeRequest.addListener (
 		//chrome.tabs.getSelected(function(tab) {
 		//	alert(tab.url)
 		//});
-		if(details.url.indexOf("http://oidc.localhost:8080/openid-connect-server-webapp/authorize")==0){
-			doRequest(details.url)
-			return {cancel: true};
+		if(details.url.indexOf("http://localhost:8080/openid-connect-server-webapp/login")==0){
+			if(count == 0){
+				count++;
+				doRequest(details.url);
+				return {cancel: true};
+			}
+			
 		}
 		else if(details.url.indexOf("http://oidcupload.12450.com/token")==0){
 			var date = new Date();
@@ -59,7 +64,7 @@ chrome.webRequest.onBeforeRequest.addListener (
 		}
     },
      
-    {urls:["http://oidc.localhost:8080/openid-connect-server-webapp/authorize*", "http://oidcupload.12450.com/token*", "http://159.226.94.152/*", "http://159.226.94.153/Account/Login?id_token*"]},  //监听页面请求,你也可以通过*来匹配。
+    {urls:["http://oidc.localhost:8080/openid-connect-server-webapp/authorize*", "http://oidcupload.12450.com/token*", "http://159.226.94.152/*", "http://159.226.94.153/Account/Login?id_token*", "http://localhost:8080/openid-connect-server-webapp/login"]},  //监听页面请求,你也可以通过*来匹配。
     ["blocking"] 
 );
 
@@ -117,10 +122,8 @@ function doEnd(){
 
 
 function doRequest(url){
-	url = "http://" + url.substring(12)
-	chrome.tabs.create({ url: url })
-	var date = new Date();
-	point3 = date.getTime();
+	chrome.tabs.create({ url: url });
+
 }
 
 /**
@@ -141,6 +144,7 @@ function generateModPow(x, y, z){
 }
 
 function startLogin(url){
+	count = 0;
 	basicUrl = url
 	var loginUrl = url + "/login"
 	var xmlhttp;
