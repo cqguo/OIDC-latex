@@ -1,16 +1,33 @@
 \section{Introduction}
 \label{sec:intro}
-
-
 %第一段：
 %SSO的特点
 %SSO的现状
 %当前主流的SSO协议
-Single Sign-On (SSO) systems enable users access multiple services (called relying parties, RP) with the single authentication performed at the Identity Provider (IdP). To remember each user's interests and provide individual services, service providers need to identify each user. It requires that users need to be authenticated repeatedly when using multiple online services. However, with the help of SSO system, a user only needs to be authenticated by an IdP which can offer trustful user identities to RPs instead of being identified by each specific RP. Once a user has already been authenticated by the IdP, he/she can easily use the services of other RPs with just the simple permission granting.
-Moreover, SSO systems are also convenient for RPs as they doesn't need to maintain their own authentication systems any more. This is why SSO solutions are widely deployed. 
+To maintain each user's profile and provide individual services, each service provider needs to identify each user, which requires the users to be authenticated at multiple online services repeatedly. 
+Single Sign-On (SSO) systems enable users to access multiple services (called relying parties, RP) with the single authentication performed at the Identity Provider (IdP). With SSO system deployed, a user only needs to maintain the credential of the IdP, who offers user's attributes (i.e., identity proof) for each RP to accomplish the user's identification. 
+%Once a user has been authenticated by the IdP, he/she enjoys the services of the RP after the user has granted its attributes access permission to the corresponding RP.
+%with just the simple permission granting. 
+SSO system also brings the convenience to RPs, as the risks in the users' authentication are shifted to the IdP, for example, RPs don't need to consider to leakage of users' credentials. 
+Therefore, SSO systems are widely deployed and integrated. 
+%their own authentication systems, 
 %实际数据
-The survey on the top 100 websites demonstrates that 24 websites serve as the IdP while 63 websites integrate the SSO service. The leading internet companies such as Google, Facebook and Twitter all provide SSO services.
-Various protocol standards, e.g., OAuth 2.0~\cite{rfc6749}, SAML~\cite{SAML} and OpenID Connect~\cite{OpenIDConnect}, are proposed to define the interchanges between the user, RP and IdP.
+The survey on the top 100 websites demonstrates that 24 websites (e.g., Google, Facebook and Twitter) serve as the IdP while 63 websites integrate the SSO service.  
+
+%第二段：
+%引出要讨论的问题
+%流行协议的现状
+
+%Due to the importance of SSO, the security of SSO protocols and implementations are systematically analyzed.
+%SAML, OAuth and OIDC are formally analyzed based on the web infrastructure model.
+%The typical SSO solutions, e.g. Google, Facebook and Twitter, has been analyzed and the security has been improved significantly.
+
+One basic requirement of SSO system is the security, which includes two aspects: 1) the attacker should not be able to access the honest RP with the honest users' identity; 2) the identity injection will never succeed, that is, the attacker should not be able to make the honest user access the RP with an incorrect identity. Plenty of works are proposed for the security of SSO systems. 
+Firstly, various standards,  OAuth 2.0~\cite{rfc6749}, SAML~\cite{SAML} and OpenID Connect (OIDC)~\cite{OpenIDConnect}, are proposed to formalize the handling at each entity (i.e.,  the user, RP and IdP)  and the information exchanges between the entities. 
+Secondly, the standards, SAML, OAuth and OIDC, are formally analyzed, for example, a general Dolev-Yao style web model is proposed for the web infrastructure~\cite{webmodel} and adopted to analyze the security of SAML, OAuth and OIDC~\cite{}.
+Moreover, the typical implementations of SSO systems, e.g. Google, Facebook, Twitter and the corresponding RPs, are systematically analyzed~\cite{WangCW12}~\cite{FettKS16}~\cite{ZhouE14}~\cite{WangZLG16}, which makes  the security of SSO systems improved significantly.
+
+
 %第二段：
 %引出要讨论的问题
 %流行协议的现状
@@ -21,17 +38,27 @@ Various protocol standards, e.g., OAuth 2.0~\cite{rfc6749}, SAML~\cite{SAML} and
 
 %整理逻辑
 %Although the security of SSO protocols and implementations has been systematically analyzed and user's privacy is considered in the design of SSO protocols, user's privacy has not been protected well yet. 
-Security and privacy are important in SSO systems.
-The security of SSO protocols and implementations are systematically analyzed~\cite{WangCW12}~\cite{FettKS16}~\cite{ZhouE14}~\cite{WangZLG16}.
-SAML, OAuth and OIDC are formally analyzed based on the web infrastructure model.
-The typical SSO solutions, e.g. Google, Facebook and Twitter, has been analyzed and the security has been improved significantly.
-As for the privacy of SSO systems, NIST SP800-63C~\cite{NIST2017draft} issues following informative advisement for federation of digital identity: (1) SSO systems should protect users from being tracked and profiled which means that: a. IdP is unable to know which RP a user has logged in; b. RP is also unable to know its user's identity in other RPs; (2) IdP should make users' personally identifiable information (PII) accessible only with user's consent; (3) IdP should enable the data exposed to an RP to be minimized. Current SSO protocols adopts several measures to protect users' privacy. For example, in OpenID Connect, IdP sends the user's PII to the RP only when the RP has obtained the user's consent for certain attributes, and provides the access logs for the user to monitor who accessed his/her PII. 
+%Security and privacy are important in SSO systems.
+%The security of SSO protocols and implementations are systematically analyzed~\cite{WangCW12}~\cite{FettKS16}~\cite{ZhouE14}~\cite{WangZLG16}.
+%SAML, OAuth and OIDC are formally analyzed based on the web infrastructure model. 
+The other important requirement of SSO systems is the privacy. As suggested in NIST SP800-63C~\cite{NIST2017draft}, in SSO systems,
+1) the user should be able to control the range of the attributes exposed to the RP, 2) multiple RPs should fail to link the user through collusion, 3) IdP should fail to obtain the trace of RPs accessed by a user. The first two properties are satisfied in the popular SSO systems. For example, in OAuth and OIDC, IdP exhibits the  attributes requested by the RP and sends the attributes to the RP only when the user has provided a clear consent, which may also minimize the exposed attributes as the user may disagree to provide partial attributes. To prevent a possible correlation among users from multiple RPs, a Pairwise Pseudonymous Identifier (PPID) is suggested to be generated by the IdP for the user in each RP, which requires that  the user's identifier in one RP should never be the same with or derivable from the ones of other RPs.
+%avoids the common identifier being used to link users. 
 
-However, no existing SSO protocols is able to protect users from being tracked and profiled absolutely. 
-Current widely adopted SSO protocols (e.g., OpenID Connect) protect the user from a possible correlation among RPs by using Pairwise Pseudonymous Identifier (PPID)~\cite{OpenIDConnect}. 
+
+%) IdP should make users' personally identifiable information (PII) accessible only with user's consent; (3) IdP should enable the data exposed to an RP to be minimized. Current SSO protocols adopts several measures to protect users' privacy. For example, in OpenID Connect, IdP sends the user's PII to the RP only when the RP has obtained the user's consent for certain attributes, and provides the access logs for the user to monitor who accessed his/her PII. 
+
+However, in widely deployed SSO systems, IdP knows which RP the user logs in, which reflects the service that user accesses and may be analyzed for various purposes, e.g., profiling and targeted advertising. In addition to the potential commercial purpose, exposing the 
+identifier of accessed RP to the IdP, is required  for security consideration in existing SSO systems~\cite{ChenPCTKT14}. The identity proof offered by IdP should be bound with a specific RP and user, ensuring the identity proof is only valid in the certain RP, which prevents the misuse of identity proof, for example, the adversary fails to  use the identity proof for a corrupted RP to  access another RP on behalf of the victim user.
+
+
+
+
+%However, no existing SSO protocols is able to protect users from being tracked and profiled absolutely. 
+%Current widely adopted SSO protocols (e.g., OpenID Connect) protect the user from a possible correlation among RPs by using Pairwise Pseudonymous Identifier (PPID)~\cite{OpenIDConnect}. 
 %But they are not designed to protect user from being tracked by IdP. For security consideration a token in OpenID Connect for authentication issued by IdP should be bound with specific RP and user. It has been discussed in ~\cite{ChenPCTKT14}. 
-Some work, such as~\cite{ChenPCTKT14} has issued that for security consideration the identity proof offered by IdP should be bound with specific RP and user so that RP's identity has to be provided to IdP.
-As a result IdP is always able to know which RP a user has logged in. 
+
+%Some work, such as has issued that for security consideration the identity proof offered by IdP should be bound with specific RP and user so that RP's identity has to be provided to IdP. As a result IdP is always able to know which RP a user has logged in. 
 
 
 %To guarantee the security, SAML, OAuth 2.0 and OpenID Connect are formally analyzed based on the web infrastructure model. And the typical SSO solutions, e.g. Google, Facebook and Twitter, has been analyzed and the security has been improved significantly. To protect user's privacy, for example, in OpenID Connect, IdP sends the user's personally identifiable information (PII) to the RP only when the RP has obtained the user's consent, and provides the access logs for the user to monitor who accessed his/her PII. Moreover, to protect the user from a possible correlation among RPs, IdP should provide each RP separate pseudonym for a user as the identifier. 
