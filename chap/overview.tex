@@ -1,17 +1,41 @@
 \section{System Overview}
 \label{sec:overview}
-PriOIDC allows user to conduct single sign on with out leaking login information to IdP. And even multi RPs' collusion can not trace the user. In this section, we are going to make an overview of our user privacy respecting protocol based on OpenID Connect 1.0.
+%PriOIDC allows user to conduct single sign on with out leaking login information to IdP. And even multi RPs' collusion can not trace the user. In this section, we are going to make an overview of our user privacy respecting protocol based on OpenID Connect 1.0.
+In OIDC, PRs' identifier is required in both authentication request and users' identifier proof generation. Moreover, as it has been described in Section~\ref{sec:introduction}, it is required to expose the identifier of users' accessed RP for security consideration. Therefore, hiding users' accessed RP from IdP is to introduce prominent challenges. To deal with the challenges, the procedure and parameters generation methods are required to be modified. However, this modification also introduces new attack surface, so that the attackers' ability in PriOIDC should be considered. 
  
-\subsection{Anonymity in OpenID Connect System}
+\subsection{Challenges of Privacy Protection}
 %单点登录系统中，IdP通过用户认证识别用户身份，通过client_id和redirect_uri识别RP身份。
 %在不改变单点登录系统结构的情况下，由于IdP要向RP提供用户的身份信息，所以向IdP隐藏用户身份是不可行的
 %向IdP隐藏RP身份要通过隐藏client_id和redirect_uri实现
 %The ability of IdP. Discribe the solution of protecting users' privacy.
-In OpenID Connect systems IdP gets RP's identity by client\_id or redirect\_uri in request (Figure~\ref{fig:OpenID} step 2) and gets user's identity when authenticating the user (Figure~\ref{fig:OpenID} step 3). 
-As IdP has to provide RP a user's authenticator bound with user's identity, it's not possible to keep user anonymous in IdP without modifying the structure of current SSO system. 
-So it is only feasible to protect user's privacy by keeping RP anonymous in IdP. But it introduces new challenges.
+%In OpenID Connect systems IdP gets RP's identity by client\_id or redirect\_uri in request (Figure~\ref{fig:OpenID} step 2) and gets user's identity when authenticating the user (Figure~\ref{fig:OpenID} step 3). 
+%As IdP has to provide RP a user's authenticator bound with user's identity, it's not possible to keep user anonymous in IdP without modifying the structure of current SSO system. 
+%So it is only feasible to protect user's privacy by keeping RP anonymous in IdP. But it introduces new challenges.
+In OIDC, the authentication request from RP to IdP exposes RPs' identity by the parameters, \verb+client_id+ (RP's identifier) and \verb+redirect_uri+ (RP's endpoint for token receiving). To hide accessed RP from IdP requires that \verb+client_id+ and \verb+redirect_uri+ should not represent an RP any more. As these parameters have played important roles in authentication, it introduces prominent challenges. 
 
-\subsubsection{Challenges}
+\noindent\textbf{Challenges in Authentication Procedure.} The \verb+client_id+ and \verb+redirect_uri+ are required in both authentication request and users' identifier proof generation, so that the omission of these parameters introduces challenges in authentication procedure. The challenges are as follows:
+\begin{itemize}
+\item OIDC is designed for the centralized systems. Therefore, prior coordination is required between RP and IdP so that RP registers its individual attributes (i.e., \verb+redirect_uris+) and gets client attributes (i.e., \verb+client_id+) issued by IdP. While the authentication request is transmitted from RP, IdP verifies the validation of \verb+client_id+ and \verb+redirect_uri+ because it only provide service to those RPs already registered. Therefore, if an RP builds the authentication request without \verb+client_id+ and \verb+redirect_uri+, IdP considers it invalid. 
+\item The identity proof issued (called \verb+id_token+) by IdP provides the PPID (called \verb+sub+) of the user for RP. It means that the \verb+sub+ is solely bound with an RP to avoid linking the user through RPs' collusion. However, once the IdP doesn't know the RP accessed by user, it is impossible for IdP to provide the corresponding PPID for RPs. Therefore, RP has no ability to identify a user any more. 
+\end{itemize}
+\noindent\textbf{Challenges in Security.} In addition to playing the important roles in authentication procedure, the \verb+client_id+ is required to avoid the misuse of \verb+id_token+ and the \verb+redirect_uri+ guarantees the \verb+id_token+ should be transmitted to corresponding  RP. The of \verb+client_id+ and \verb+redirect_uri+ introduces the following challenges:
+\begin{itemize}
+\item While RP registers with IdP, IdP gets the \verb+redirect_uris+ which lists all the endpoints of RP waiting for \verb+id_token+. Therefore, once IdP receives an authentication request from the RP, it compares the \verb+redirect_uri+ in request with the registered endpoints. If the \verb+redirect_uri+ has not been registered before, IdP considers this request malicious. This means if the user is honest and transmissions among user, IdP and RP are well protected (e.g., using TLS), the attacker has no possibility to get the \verb+id_token+. However, without the endpoint provided by RP, IdP is unable to guarantee the \verb+id_token+ is properly transmitted to the corresponding RP. 
+\item The \verb+id_token+ includes the RP's identifier (called \verb+aud+), user's PPID and IdP's identifier (called \verb+iss+), representing the \verb+id_token+ is issued by \verb+iss+ for \verb+aud+ to confirm that the owner's (of this \verb+id_token+) identity is \verb+sub+. Therefore, RP compares the \verb+aud+ with its own identifier to make sure whether this  \verb+id_token+ is issued for itself. However, once IdP doesn't know the correct identifier of RP, the \verb+id_token+ issued by IdP doesn't include the correct \verb+aud+ any more. It results in the misuse of \verb+id_token+.
+%This means an \verb+id_token+ is not bound with a specific RP which makes impersonation attack possible.
+\end{itemize}
+\noindent\textbf{Solutions.} To fulfill the requirement of \verb+client_id+ and \verb+redirect_uri+ when building the authentication request without exposing RP's identify, the simplest way is using random \verb+client_id+ and \verb+redirect_uri+. However, using the completely random parameters still faces the above challenges, so that several methods should be proposed to deal with these challenges.  The methods are as follows:
+\begin{itemize}
+\item The RP's identifier should be generated beyond any entities' control to avoid the misuse of user's identity proof, which only happens when different RPs use the same \verb+client_id+.  Attackers tries to obtain an honest user's \verb+id_token+ in an honest RP through various methods, such as leading the honest RP use the same  \verb+client_id+ with a corrupted one, which will be described detailedly in Section~\ref{sec:analysis}. Therefore, the appropriate method to generate the \verb+id_token+ is negotiation between the user and RP.
+
+\item To identify a user in different logins, RP should have the ability to transform the user's PPID into a constant user identifier for each user. Some OIDC systems only use a random  character string as the PPID (e.g., MITREid Connect). Therefore, the new user PPID generating algorithm should be created for user authentication while only the corresponding RP has the trapdoor to derive the unique identifier from PPID. To protect users from linkage by RPs' collusion, both the PPID and the unique identifier should be bound with the (not completely) random RP's identifier. The PPID generating algorithm and  RP's identifier generating algorithm will be described detailedly in Section~\ref{sec:protocol}.
+
+\item With dynamic registration, an RP has the ability to re-register the new \verb+client_id+ and \verb+redirect_uri+ with IdP. Therefore, it is needed that before the authentication request is transmitted to IdP, RP should re-register the newly generated \verb+client_id+ and completely random \verb+redirect_uri+ with IdP. The registration should be conducted by the user to avoid direct interactive between RP and IdP. However, the specification~\cite{DynamicRegistration} of OIDC dynamic registration requires the registration request should carry a bearer token as well as the new  \verb+client_id+ is generated by IdP. To avoid IdP finding out RP's identity through dynamic registration, the requirement of registration token should be omitted. It is also needed to enable RP to assign the specific \verb+client_id+. It is observed that although \verb+client_id+ is defined to be generated by IdP, some OIDC systems (e.g., MITREid Connect) enable the \verb+client_id+ be the input attribute. 
+
+\item Using the random \verb+redirect_uri+ makes the responsibility to check whether the \verb+redirect_uri+ has been registered is migrated to user's agent (e.g., browser) as it is impossible for IdP to guarantee the \verb+id_token+ is properly transmitted to the corresponding RP any more. However, to avoid the query for registered endpoints list from user agent exposing the RP's identity, IdP should issue the \verb+RP Certification+ for each RP which includes the RP's basic attributes and the registered endpoints list with a signature. User agent should have the ability to take the responsibility to check whether the \verb+redirect_uri+ has been registered through the \verb+RP Certification+.
+\end{itemize}
+
+
 %最直接的隐藏RP的方法是在登录过程中使用随机的client_id与redirect_uri
 %简单的修改会带来两个方面的问题：流程问题与安全问题 
 %流程问题：IdP只识别注册过的client_id与redirect_uri；client_id与uid绑定，随机的client_id使每次的uid都不同
@@ -19,54 +43,24 @@ So it is only feasible to protect user's privacy by keeping RP anonymous in IdP.
 %Security problems. The secure rules of sso system summarized from the previous research. And the simple solution will disobey which rules.
 %Function problems. How the simple solution make the sso system failed.
 %描述为何不能用户匿名
-The simplest way to make RP anonymous in IdP is using random client\_id and redirect\_uri in each authentication. But the simple method will introduce some problems in two fields. 
 
-%关键句子表明问题的分类
-Using random client\_id and redirect\_uri results in the failure of authentication. In OpneID Connect system, IdP only accepts a request when the client\_id and redirect\_uri have been registered at IdP. So IdP will drop the request with random client\_id and redirect\_uri, in another word unregistered parameters, as the invalid request. Additionally to protect user's privacy from RPs' collusion attack, it's required that IdP should provide different user\_ids for different RPs\cite{OpenIDConnect}. It means that user\_id is bound to client\_id, so random client\_id means the user\_id is random too. As RP wants to provide a user personalize service it must identify a user with a constant identity. So randomness of client\_id is not appropriate for widely used SSO systems.  
-
-In the other field, anonymous RP with random client\_id and redirect\_uri causes secure problems. To avoid the misuse of id\_token among different RPs, RP checks the validation of id\_token. An client\_id represents a specific RP's identity, a id\_token with this client\_id is only valid in this specific RP. But when using a random client\_id, different RPs may share the same client\_id. When a user log in a malicious RP, this RP possibly logs in other RPs with the user's id\_token if they have the same client\_id. Additionally redirect\_uri is the address where RP waits for the id\_token. Before issuing a id\_token, IdP will check the validation of redirect\_uri to avoid attacker getting the id\_token. If the redirect\_uri is random, IdP can no more protect user from sending id\_token to an attacker.
-\subsubsection{Solutions against the problems}
 %通过协商生成client_id，任何一方无法控制client_id的生成
 %用户代理控制token的发送，保证发送给对应的RP
 %使用OpenID Connect 1.0的动态注册功能保证client_id与redirect_uri的有效性
 %设计client_id与user id 的生成算法，使RP能够识别用户
-With dynamic registration, a RP can register new random client\_id and redirect\_uri before sending a request to IdP for id\_token. And to avoid IdP finding out RP's identity through dynamic registration, the requirement of registration token is omitted. IdP will delete the expired registration to reduce storage stress.
 
-To identify a user in different logins, RP must have the ability to transform the user\_id provided by IdP into a constant user identity for each user. Most of current SSO system generate user\_id as a random  character string. So a new user-id-generating algorithm has to be created for user authentication. As user\_id is required to be bound to random client\_id to protect from RPs' collusion, client\_id should be the primary input parameter to user-id-generating algorithm. To make user\_id able to be transformed into a constant user identity, it is a feasible way that generating client\_id through a client-id-generating algorithm. The user-id-generating algorithm and client-id-generating algorithm will be described detailedly in Section~\ref{sec:protocol}. 
-
-Misuse of id\_token only happens when different RPs use the same client\_id. Although IdP will keep the registered client\_id unique, an attacker is possible to be the executor of registration (RP or user) and tamper with the failed registration result. So victim will regard the repetitive client\_id as a validate one. To prevent misuse of id\_token, client-id-generating algorithm should require two random parameters respectively generated by RP and user. So even if an attacker possesses a user's id\_token (or negotiates a client\_id with RP), he is unable to negotiate the same client\_id with a RP (or get the id\_token with same client\_id from user). 
-
-As redirect\_uri is random, IdP is going to send id\_token to the invalidate address. User agent must intercept the id\_token redirection from IdP and send id\_token to RP. In PRISSO system IdP issues RP certification for each RP. A RP certification contains RP's identity and its address for token acceptance.  User gets the real acceptance address of RP from certification and makes sure that the id\_token is going to be sent to the RP. RP certification is also useful in defending phishing attack.
- 
-\subsection{Overview of proposed scheme}
-The procedure of PRIOIDC can be divided into two parts: Initiating registration and Login procedure. Login procedure contains user login, client\_id negotiation, dynamic registration and token obtaining. The overview is shown in Figure~\ref{fig:overview}
-\begin{figure}
-  \centering
-  \includegraphics[width=\linewidth]{fig/prioidc.pdf}\label{fig:overview}
-  %\subfigure[Authorization Code Flow]{\includegraphics[width=\linewidth]{fig/openidconnect2.pdf}\label{fig:OpenID_code}}
-  %\subfigure[Hybrid Flow]{\includegraphics[width=\linewidth]{fig/openidconnect3.pdf}\label{fig:OpenID_hybrid}}
-  \caption{Overview of System}
-  \label{fig:overview}
-\end{figure}
+  
+\subsection{Entities}
+To achieve the goals outlined in Section~\ref{sec:intro}, the requirements and restrictions of abilities owned by each entities in single-sign-on system is defined as follows: %要做的内容，总的角色能力描述
 \begin{itemize}
-\item[---] Initiating Registration: RPs and users register at IdP. IdP generates unique basic\_client\_id for each RP and unique user id for each user.
-\item[---] User Login: User starts log in an RP. If user is labeled as logged in, RP is going to offer service to user. Otherwise RP requires user to start SSO procedure. 
-\item[---] Client\_id Negotiation: For each SSO procedure, RP is going to start client\_id negotiation with user. Client\_id is a random number generated by client-id-generating algorithm unrelated with any RP. A client\_id represents login from a user to an RP.
-\item[---] Dynamic Registration: To make the client\_id generated by negotiation between user and RP, user is going to register client\_id at IdP by the dynamic registration API provided by IdP. IdP is going to check whether client\_id is unique and ask RP to restart client\_id negotiation for another client\_id.
-\item[---] Token Obtaining: After dynamic registration success, RP is going to redirect token request to IdP. IdP firstly authenticates user and then generates id token for RP. Id token contains RP's client\_id and user id. Client\_id is provided by RP and user id is generated through sser-id-generating algorithm by IdP. RP is able to get the constant user identity from user id.
+    \item \textbf{User} is the entity to be authenticated in this system who holds the credentials for the IdP. User takes part in the the system through the user agent. 
+    \item \textbf{User agent} is the software used by the user, such as browser and the application on the mobile device. User agent negotiates the RP's identifier with the RP and dynamically registers the newly generated identifier with a random endpoint for identity proof with IdP. Besides, user agent also guarantees the user's identity proof is only transmitted to the corresponding RP by tampering and modifying the transmission through it. To make user able to use PriOIDC conveniently in any devices, user agent should not store any data persistently. 
+    \item \textbf{RP} is the entity who provides the service and need to identify the user. RP negotiates the RP's identifier with the user agent and builds the authentication request to IdP with the newly created identifier. RP identifies a user through a identity proof by deriving a constant user identifier from PPID. To avoid the user linkage by multiple RPs, RP should be unable to derive the real user's identity from PPID.
+    \item \textbf{IdP} is the entity who authenticates the user and provide the identity proof. IdP allows user and RP's registration, initiates the entities' attributes and offers the initial configuration, such as \verb+RP Certification+. IdP provides the endpoint for RP's dynamic registration. Besides, IdP authenticates the user, verifies the authentication request, generates user's PPID and issues the identity proof. To avoid IdP from tracking the user, IdP should not be able to find out RP's identity by RP identifier nor the relevance between an RP's  different identifier. 
 \end{itemize}
- 
-\subsection{Roles in PriOIDC}
-To achieve the goals outlined in Section~\ref{sec:intro}, the requirements and restrictions of abilities owned by each roles in single-sign-on system is defined as following: %要做的内容，总的角色能力描述
-\begin{itemize}
-    \item \textbf{User} is able to generate RP's client\_id with RP by key data exchanging. User is able to register client\_id in IdP. User is able to modify redirect\_uri in token request and redirect token response to the correct RP's redirect\_uri. User need not to store any data in its computer so that user is able to conduct single sign on in any computer.
-    \item \textbf{RP} is able to generate client\_id with user by key data exchanging. RP is able to check the client\_id registration result. RP is able to get a constant user identity from id\_token generated by IdP. RP is unable to find out its user's identity in other RPs even through RPs' collusion. 
-    \item \textbf{IdP} is able to generate user's id for specific login by client\_id and user's unique id in IdP. IdP is unable to find out RP's identity by client\_id. IdP is unable to find out the relevance between an RP's  different client\_ids. 
-    \item \textbf{User agent} is the software used by the user, such as browser and the application on the mobile device.
-\end{itemize}
-More detailedly, the enhanced protocol is going to provide new client-id-generating and user-id-generating algorithm: Client\_id is random in each logins to make RP anonymous in IdP. There is a one-to-one correspondence between client\_id and user\_id provided by IdP so that user id is random. So RP is able to transform user\_id IdP into constant user identity and RPs are unable to find the relationship between one user's user\_ids for different RPs. 
 \subsection{Threat Model}
-Considered different attack scenarios, malicious opponent can be divided into following situations: malicious IdP, malicious RP, malicious user and external attacker. In different situations malicious owns different abilities.
+%Considered different attack scenarios, malicious opponent can be divided into following situations: malicious IdP, malicious RP, malicious user and external attacker. In different situations malicious owns different abilities.
+
 %敌手能力假设：
 %作为IdP
 %不能够以用户的身份登录RP
@@ -84,17 +78,39 @@ Considered different attack scenarios, malicious opponent can be divided into fo
 %能够构造动态注册的请求
 %作为外部攻击者
 %能够监听和篡改单点登录过程中的网络流量
+In PriOIDC, the adversaries' goals are shown as follows:
+\begin{itemize}
+\item Privacy undermining: Adversaries know user's login trace. 
+\item Impersonation attack: Adversaries log in to the honest RP as the honest user.
+\item Abduction attack: Honest user logs in to the honest RP under adversaries' identity. 
+\end{itemize}
+
+As PriOIDC is designed centralized, IdP has the max authority in this system. Therefore, IdP should be considered honest but curious. Otherwise, an malicious IdP has the ability to log in to any RP as any honest user (impersonation attack) and enforce any honest user to log in honest RP under an adversary's identity (identity injection). It is considered that any RP could be corrupted and any user may be the adversary. User agent is considered completely honest but under control of the user. Therefore, the user agent is seemed as a part of user. Network attackers are also considered. 
+
+\begin{itemize}
+\item \textbf{Curious IdP} acts an as completely honest IdP.
+
+%As IdP service is usually provided by a leading internet company. In consideration of in consideration of, Idp is considered secure but curious. Phishing attack on IdP is not considered. It means IdP would not try to do the impersonation attack or abduction attack. But an IdP is probably interested in user's login trace in RPs so that it is able to deduce user's interests and behavioral traits. During SSO login, as IdP need authenticate the user, so IdP has the ability to collect the user's information. And IdP is able to get client\_id and redirect\_uri from token request. IdP is also able to store each user's login history and analyze each client\_id and redirect\_uri to find out the relevance among each login.
 
 
-\textbf{Curious IdP} As IdP service is usually provided by a leading internet company. In consideration of in consideration of, Idp is considered secure but curious. Phishing attack on IdP is not considered. It means IdP would not try to do the impersonation attack or abduction attack. But an IdP is probably interested in user's login trace in RPs so that it is able to deduce user's interests and behavioral traits. During SSO login, as IdP need authenticate the user, so IdP has the ability to collect the user's information. And IdP is able to get client\_id and redirect\_uri from token request. IdP is also able to store each user's login history and analyze each client\_id and redirect\_uri to find out the relevance among each login.
+\item \textbf{Malicious RP} has the ability to build any response in \verb+client_id+ negotiation and build any authentication request it need.
 
 
-\textbf{Malicious RP} There are two kinds of malicious RPs. The first is the legal RP owned by malicious opponent and the other is phishing site. Because everyone is able to register as an RP at IdP, it is considered that RP can be fully controlled by malicious. A malicious RP is going to conduct impersonation attack and privacy undermining attack on user. As some attack methods require attacker act as both RP and user, to avoid the repetitive description malicious RP and malicious user is defined: If attacker acts as an RP in attack, attacker is considered as malicious RP. If attacker only acts as a user, it's malicious user. 
-A malicious RP's goals include: 1) Getting id\_token from user which is validate in other RPs. 2) Deducing user's login trace by colluding with other RPs. 
-Malicious RP is able to make fake basic\_rp\_id and conduct client\_id negotiation with user. Malicious RP is also able to construct the id\_token request to IdP and receive id\_token from IdP. In phishing attack, it is considered that user trusts attacker completely. 
+
+%There are two kinds of malicious RPs. The first is the legal RP owned by malicious opponent and the other is phishing site. Because everyone is able to register as an RP at IdP, it is considered that RP can be fully controlled by malicious. A malicious RP is going to conduct impersonation attack and privacy undermining attack on user. As some attack methods require attacker act as both RP and user, to avoid the repetitive description malicious RP and malicious user is defined: If attacker acts as an RP in attack, attacker is considered as malicious RP. If attacker only acts as a user, it's malicious user. 
+%A malicious RP's goals include: 1) Getting id\_token from user which is validate in other RPs. 2) Deducing user's login trace by colluding with other RPs. 
+%Malicious RP is able to make fake basic\_rp\_id and conduct client\_id negotiation with user. Malicious RP is also able to construct the id\_token request to IdP and receive id\_token from IdP. In phishing attack, it is considered that user trusts attacker completely. 
 
 
-\textbf{Malicious User} A malicious user is only going to conduct impersonation attack. In the attack malicious opponent acts as both user and RP, user is able to conduct client\_id negotiation, construct dynamic registration request. User is also able to temper all the data transformed through itself. It is considered that the user agent is trustful, but there are external attacker trying to exploit the flaw of user agent.
+\item \textbf{Malicious User} has the ability to build any request in \verb+client_id+ negotiation, build any dynamic registration request it need. Besides, User is also able to temper and modify all the data transmitted through itself.
+%A malicious user is only going to conduct impersonation attack. In the attack malicious opponent acts as both user and RP, user is able to conduct client\_id negotiation, construct dynamic registration request. User is also able to temper all the data transformed through itself. It is considered that the user agent is trustful, but there are external attacker trying to exploit the flaw of user agent.
+
+\item \textbf{Network Attacker} has the ability to listen all the IP address on the Internet and tamper all the network flow.
+\end{itemize}
+
+\noindent\textbf{Adversary. }  To explicitly illustrate how an adversary works in the SSO system, the \verb+authentication group+ is created to defined the group of specific IdP,  RP and user. For example, now there are $IdP$, $User_{A}$, $User_{B}$, $RP_{A}$ and $RP_{B}$. They are able to form 4 \verb+authentication group+s, ($IdP$, $User_{A}$, $RP_{A}$), ($IdP$, $User_{A}$, $RP_{B}$), ($IdP$, $User_{B}$, $RP_{A}$) and ($IdP$, $User_{B}$, $RP_{B}$). An adversary has the ability to act one or more entities in single or multiple \verb+authentication group+s. That is, an adversary is able to act as, ii) the single entity in one \verb+authentication group+, such as the curious IdP; b) the same entity in multiple \verb+authentication group+s, such as acting as different RPs for the same honest user ; iii) the different entities in multiple \verb+authentication group+s, such as acting as the RP for the honest user and the user for the honest RP at the same time. It is considered an adversary should not act as both the IdP and RP in single \verb+authentication group+.
+
+
 
 
 %\textbf{External Attacker} External attacker's targets include impersonation attack, abduction attack and privacy undermining attack. External attacker is able to capture and temper all the network flow through user, RP and IdP. 
