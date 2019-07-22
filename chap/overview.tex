@@ -1,6 +1,36 @@
-\section{System Overview}
-\label{sec:overview}
+\section{Challenges and Solutions}
+\label{sec:challenge}
 %PriOIDC allows user to conduct single sign on with out leaking login information to IdP. And even multi RPs' collusion can not trace the user. In this section, we are going to make an overview of our user privacy respecting protocol based on OpenID Connect 1.0.
+As SSO systems introduce the novel way for the RPs to identify the user, the authentication security and users' privacy should be considered. 
+
+\subsection{Threat Model}
+In SSO systems, an adversary tries to break the authentication security in following ways:
+\begin{itemize}
+\item Impersonation Attack: Adversaries log in to the honest RP as the honest user.
+\item Identity Injection: Honest user logs in to the honest RP under adversaries' identity. 
+\end{itemize}
+Besides, the adversary also has the interests in users' login traces, the private issues introduced by SSO systems. To undermine a user's privacy, 
+the adversary tries to achieve the following goals:
+\begin{itemize}
+\item Adversary finds out which RP a user has accessed by acting as the honest IdP.
+\item Adversary links the same user in multiple RPs by controlling these RPs.  
+\end{itemize}
+
+In SSO systems, IdP has the max authority in this system. Therefore, IdP should be considered honest but curious. Otherwise, an malicious IdP has the ability to log in to any RP as any honest user (impersonation attack) and enforce any honest user to log in honest RP under an adversary's identity (identity injection). Moreover, a user's login trace is never able to be hidden from collusion between IdP and RP. It is considered that any RP could be corrupted and any user may be the adversary. User agent is considered completely honest but under control of the user. Therefore, the user agent is seemed as a part of user. Network attackers are also considered. The ability of each entity acted by adversary are shown as follows:
+\begin{itemize}
+\item \textbf{Curious IdP} acts as an completely honest IdP.
+\item \textbf{Malicious RP} has the ability to build any response, as well as the authentication request, for user's requestion. 
+\item \textbf{Malicious User} is able to intercept and tamper all the data transmitted through itself.
+\item \textbf{Network Attacker} has the ability to listen all the IP address on the Internet and tamper all the network flows.
+\end{itemize}
+
+However, Identity Injection and Network Attacker
+
+
+
+
+
+
 In OIDC, PRs' identifier is required in both authentication request and users' identifier proof generation. Moreover, as it has been described in Section~\ref{sec:intro}, it is required to expose the identifier of users' accessed RP for security consideration. Therefore, hiding users' accessed RP from IdP is to introduce prominent challenges. To deal with the challenges, the procedure and parameters generation methods are required to be modified. However, this modification also introduces new attack surface, so that the attackers' ability in PriOIDC should be considered. 
  
 \subsection{Challenges of Privacy Protection}
