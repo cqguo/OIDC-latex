@@ -16,24 +16,38 @@ the adversary tries to achieve the following goals:
 \item Adversary links the same user in multiple RPs by controlling these RPs.  
 \end{itemize}
 
-In SSO systems, IdP has the max authority in this system. Therefore, IdP should be considered honest but curious. Otherwise, an malicious IdP has the ability to log in to any RP as any honest user (impersonation attack) and enforce any honest user to log in honest RP under an adversary's identity (identity injection). Moreover, a user's login trace is never able to be hidden from collusion between IdP and RP. It is considered that any RP could be corrupted and any user may be the adversary. User agent is considered completely honest but under control of the user. Therefore, the user agent is seemed as a part of user. Network attackers are also considered. The ability of each entity acted by adversary are shown as follows:
+In SSO systems, IdP has the max authority in this system. Therefore, IdP should be considered honest but curious. Otherwise, an malicious IdP has the ability to log in to any RP as any honest user (impersonation attack) and enforce any honest user to log in honest RP under an adversary's identity (identity injection). Moreover, a user's login trace is never able to be hidden from collusion between IdP and RP. It is considered that any RP could be corrupted and any user may be the adversary. User agent is considered completely honest but under control of the user. Therefore, the user agent is seemed as a part of user. The ability of each entity acted by adversary are shown as follows:
 \begin{itemize}
 \item \textbf{Curious IdP} acts as an completely honest IdP.
 \item \textbf{Malicious RP} has the ability to build any response, as well as the authentication request, for user's requestion. 
 \item \textbf{Malicious User} is able to intercept and tamper all the data transmitted through itself.
-\item \textbf{Network Attacker} has the ability to listen all the IP address on the Internet and tamper all the network flows.
+\item \textbf{Network Attacker} has the ability to listen all the IP address on the Internet but unable to tamper any the network flows as they are protected by various ways, such as TLS.
 \end{itemize}
 
-However, Identity Injection and Network Attacker
+However, Identity Injection only occurs when 1) IdP is dishonest; 2) the transmission between RP and IdP is corrupted by either corrupted user agent or unprotected network flows. Therefore, Identity Injection is not considered. 
 
+\subsection{Challenges}
+%In SSO systems, PRs' identifier is required in both authentication request and users' identifier proof generation. Moreover, as it has been described in Section~\ref{sec:intro}, it is required to expose the identifier of users' accessed RP for security consideration. Therefore, hiding users' accessed RP from IdP is to introduce prominent challenges. To deal with the challenges, the procedure and parameters generation methods are required to be modified. However, this modification also introduces new attack surface, so that the attackers' ability in Recluse should be considered. 
+To protect users from the privacy issues introduced by SSO system, the scheme should simultaneously achieve the following goals:
+\begin{itemize}
+\item Hiding RP's identity from IdP.
+\item Providing distinct user identifier for each RP.
+\end{itemize}
+However, it will introduce prominent challenges. 
 
+As it has been described in Section~\ref{sec:intro}, it is required to expose the identifier of users' accessed RP for security consideration. Hiding RP's identity from IdP breaks the security considerations listed in Section~\ref{sec:background}. 
+\begin{itemize}
+\item \textbf{Break Binding: }To hide RP's identity, IdP is unable to know the identity proof is issued for which RP. Therefore, the identity proof is no longer bound with the specific RP, which results in the misuse of identity proof. An adversary has the ability to achieve an honest user's identity proof by various ways, for example, once the user logs in the corrupted RP controlled by the adversary with his/her identity proof, the adversary is able to access other honest RPs with the honest users' identity by using this identity proof (Impersonation Attack).
+\item \textbf{Break Confidentiality: }To hide RP's identity, IdP is unable to know the correct endpoint which is offered by the RP to receive the identity proof. For example, in OIDC, IdP holds the list of all the endpoints of RP waiting for \verb+id_token+, so IdP is able to guarantee that the identity proof is only to be sent to the endpoint in the list. Without the endpoint representing RP's identity, an RP controlled by the adversary has the ability to build the authentication request by setting another honest RP's identifier (if RP's identifier is used in a way without exposing RP's identity) and the adversary's endpoint. Therefore, the adversary has the ability to achieve the identity proof issued for other honest RPs, which results in Impersonation Attack. 
+\item \textbf{Break Content Checking: }
+\end{itemize}
+Additionally, it introduces another challenge to provide distinct user identifier while hiding RP's identity
+\begin{itemize}
+\item \textbf{RP is unable to identify the user: }
+\end{itemize}
 
-
-
-
-In OIDC, PRs' identifier is required in both authentication request and users' identifier proof generation. Moreover, as it has been described in Section~\ref{sec:intro}, it is required to expose the identifier of users' accessed RP for security consideration. Therefore, hiding users' accessed RP from IdP is to introduce prominent challenges. To deal with the challenges, the procedure and parameters generation methods are required to be modified. However, this modification also introduces new attack surface, so that the attackers' ability in PriOIDC should be considered. 
  
-\subsection{Challenges of Privacy Protection}
+
 %单点登录系统中，IdP通过用户认证识别用户身份，通过client_id和redirect_uri识别RP身份。
 %在不改变单点登录系统结构的情况下，由于IdP要向RP提供用户的身份信息，所以向IdP隐藏用户身份是不可行的
 %向IdP隐藏RP身份要通过隐藏client_id和redirect_uri实现
@@ -79,12 +93,14 @@ In OIDC, the authentication request from RP to IdP exposes RPs' identity by the 
 %使用OpenID Connect 1.0的动态注册功能保证client_id与redirect_uri的有效性
 %设计client_id与user id 的生成算法，使RP能够识别用户
 
+
+\begin{comment}
   
 \subsection{Entities}
 To achieve the goals outlined in Section~\ref{sec:intro}, the requirements and restrictions of abilities owned by each entities in single-sign-on system is defined as follows: %要做的内容，总的角色能力描述
 \begin{itemize}
     \item \textbf{User} is the entity to be authenticated in this system who holds the credentials for the IdP. User takes part in the the system through the user agent. 
-    \item \textbf{User agent} is the software used by the user, such as browser and the application on the mobile device. User agent negotiates the RP's identifier with the RP and dynamically registers the newly generated identifier with a random endpoint for identity proof with IdP. Besides, user agent also guarantees the user's identity proof is only transmitted to the corresponding RP by tampering and modifying the transmission through it. To make user able to use PriOIDC conveniently in any devices, user agent should not store any data persistently. 
+    \item \textbf{User agent} is the software used by the user, such as browser and the application on the mobile device. User agent negotiates the RP's identifier with the RP and dynamically registers the newly generated identifier with a random endpoint for identity proof with IdP. Besides, user agent also guarantees the user's identity proof is only transmitted to the corresponding RP by tampering and modifying the transmission through it. To make user able to use Recluse conveniently in any devices, user agent should not store any data persistently. 
     \item \textbf{RP} is the entity who provides the service and need to identify the user. RP negotiates the RP's identifier with the user agent and builds the authentication request to IdP with the newly created identifier. RP identifies a user through a identity proof by deriving a constant user identifier from PPID. To avoid the user linkage by multiple RPs, RP should be unable to derive the real user's identity from PPID.
     \item \textbf{IdP} is the entity who authenticates the user and provide the identity proof. IdP allows user and RP's registration, initiates the entities' attributes and offers the initial configuration, such as \verb+RP Certification+. IdP provides the endpoint for RP's dynamic registration. Besides, IdP authenticates the user, verifies the authentication request, generates user's PPID and issues the identity proof. To avoid IdP from tracking the user, IdP should not be able to find out RP's identity by RP identifier nor the relevance between an RP's  different identifier. 
 \end{itemize}
@@ -108,14 +124,14 @@ To achieve the goals outlined in Section~\ref{sec:intro}, the requirements and r
 %能够构造动态注册的请求
 %作为外部攻击者
 %能够监听和篡改单点登录过程中的网络流量
-In PriOIDC, the adversaries' goals are shown as follows:
+In Recluse, the adversaries' goals are shown as follows:
 \begin{itemize}
 \item Privacy undermining: Adversaries know user's login trace. 
 \item Impersonation attack: Adversaries log in to the honest RP as the honest user.
 \item Identity Injection: Honest user logs in to the honest RP under adversaries' identity. 
 \end{itemize}
 
-As PriOIDC is designed centralized, IdP has the max authority in this system. Therefore, IdP should be considered honest but curious. Otherwise, an malicious IdP has the ability to log in to any RP as any honest user (impersonation attack) and enforce any honest user to log in honest RP under an adversary's identity (identity injection). It is considered that any RP could be corrupted and any user may be the adversary. User agent is considered completely honest but under control of the user. Therefore, the user agent is seemed as a part of user. Network attackers are also considered. 
+As Recluse is designed centralized, IdP has the max authority in this system. Therefore, IdP should be considered honest but curious. Otherwise, an malicious IdP has the ability to log in to any RP as any honest user (impersonation attack) and enforce any honest user to log in honest RP under an adversary's identity (identity injection). It is considered that any RP could be corrupted and any user may be the adversary. User agent is considered completely honest but under control of the user. Therefore, the user agent is seemed as a part of user. Network attackers are also considered. 
 
 \begin{itemize}
 \item \textbf{Curious IdP} acts as an completely honest IdP.
@@ -142,6 +158,7 @@ As PriOIDC is designed centralized, IdP has the max authority in this system. Th
 
 
 
+\end{comment}
 
 %\textbf{External Attacker} External attacker's targets include impersonation attack, abduction attack and privacy undermining attack. External attacker is able to capture and temper all the network flow through user, RP and IdP. 
 
