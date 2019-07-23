@@ -9,26 +9,26 @@ In SSO systems, an adversary tries to break the authentication security in follo
 \item Impersonation Attack: Adversaries log in to the honest RP as the honest user.
 \item Identity Injection: Honest user logs in to the honest RP under adversaries' identity. 
 \end{itemize}
-Besides, the adversary also has the interests in users' login traces, the private issues introduced by SSO systems. To undermine a user's privacy, 
+Besides, the adversary also has the interests in users' login traces, the private issue introduced by SSO systems. To undermine a user's privacy, 
 the adversary tries to achieve the following goals:
 \begin{itemize}
 \item Adversary finds out which RP a user has accessed by acting as the honest IdP.
-\item Adversary links the same user in multiple RPs by controlling these RPs.  
+\item Adversary links the same user in multiple RPs which is controlled by adversary.  
 \end{itemize}
 
-In SSO systems, IdP has the max authority in this system. Therefore, IdP should be considered honest but curious. Otherwise, an malicious IdP has the ability to log in to any RP as any honest user (impersonation attack) and enforce any honest user to log in honest RP under an adversary's identity (identity injection). Moreover, a user's login trace is never able to be hidden from collusion between IdP and RP. It is considered that any RP could be corrupted and any user may be the adversary. User agent is considered completely honest but under control of the user. Therefore, the user agent is seemed as a part of user. The ability of each entity acted by adversary are shown as follows:
+In SSO systems, IdP has the max authority in this system. Therefore, IdP should be considered honest but curious. Otherwise, an malicious IdP has the ability to log in to any RP as any honest user (impersonation attack) and enforce any honest user to log in honest RP under an adversary's identity (identity injection). Moreover, a user's login trace is never hidden from collusion between IdP and RP. It is considered that any RP could be corrupted and any user may be the adversary. User agent is considered completely honest but under control of the user. Therefore, the user agent is seemed as a part of user. Moreover, as network flows are protected by various ways, such as TLS, the network attacker is not considered. The ability of each entity acted by adversary are shown as follows:
 \begin{itemize}
 \item \textbf{Curious IdP} acts as an completely honest IdP.
 \item \textbf{Malicious RP} has the ability to build any response, as well as the authentication request, for user's requestion. 
 \item \textbf{Malicious User} is able to intercept and tamper all the data transmitted through itself.
-\item \textbf{Network Attacker} has the ability to listen all the IP address on the Internet but unable to tamper any the network flows as they are protected by various ways, such as TLS.
+%\item \textbf{Network Attacker} has the ability to listen all the IP address on the Internet but unable to tamper any the network flows as they are protected by various ways, such as TLS.
 \end{itemize}
 
 However, Identity Injection only occurs when 1) IdP is dishonest; 2) the transmission between RP and IdP is corrupted by either corrupted user agent or unprotected network flows. Therefore, Identity Injection is not considered. 
 
 \subsection{Challenges}
 %In SSO systems, PRs' identifier is required in both authentication request and users' identifier proof generation. Moreover, as it has been described in Section~\ref{sec:intro}, it is required to expose the identifier of users' accessed RP for security consideration. Therefore, hiding users' accessed RP from IdP is to introduce prominent challenges. To deal with the challenges, the procedure and parameters generation methods are required to be modified. However, this modification also introduces new attack surface, so that the attackers' ability in Recluse should be considered. 
-To protect users from the privacy issues introduced by SSO system, the scheme should simultaneously achieve the following goals:
+To protect users from the privacy issues introduced by SSO systems, the scheme should simultaneously achieve the following goals:
 \begin{itemize}
 \item Hiding RP's identity from IdP.
 \item Providing distinct user identifier for each RP.
@@ -37,16 +37,40 @@ However, it will introduce prominent challenges.
 
 As it has been described in Section~\ref{sec:intro}, it is required to expose the identifier of users' accessed RP for security consideration. Hiding RP's identity from IdP breaks the security considerations listed in Section~\ref{sec:background}. 
 \begin{itemize}
-\item \textbf{Break Binding: }To hide RP's identity, IdP is unable to know the identity proof is issued for which RP. Therefore, the identity proof is no longer bound with the specific RP, which results in the misuse of identity proof. An adversary has the ability to achieve an honest user's identity proof by various ways, for example, once the user logs in the corrupted RP controlled by the adversary with his/her identity proof, the adversary is able to access other honest RPs with the honest users' identity by using this identity proof (Impersonation Attack).
-\item \textbf{Break Confidentiality: }To hide RP's identity, IdP is unable to know the correct endpoint which is offered by the RP to receive the identity proof. For example, in OIDC, IdP holds the list of all the endpoints of RP waiting for \verb+id_token+, so IdP is able to guarantee that the identity proof is only to be sent to the endpoint in the list. Without the endpoint representing RP's identity, an RP controlled by the adversary has the ability to build the authentication request by setting another honest RP's identifier (if RP's identifier is used in a way without exposing RP's identity) and the adversary's endpoint. Therefore, the adversary has the ability to achieve the identity proof issued for other honest RPs, which results in Impersonation Attack. 
-\item \textbf{Break Content Checking: }
+\item \textbf{Break Binding: }To hide RP's identity, IdP is unable to know which RP the identity proof is issued for. Therefore, the identity proof is no longer bound with the specific RP, which results in the misuse of identity proof. An adversary has the ability to achieve an honest user's identity proof by various ways, for example, once the user logs in the corrupted RP controlled by the adversary with his/her identity proof, the adversary is able to access other honest RPs with the honest user's identity by using this identity proof (Impersonation Attack).
+\item \textbf{Break Confidentiality: }To hide RP's identity, IdP is unable to know the correct endpoint provided by the RP to receive the identity proof. For example, in OIDC, IdP holds the list of all the endpoints of RP waiting for \verb+id_token+, so IdP is able to guarantee that the identity proof is only to be sent to the endpoint in this list. Without the endpoint representing RP's identity, an RP controlled by the adversary has the ability to build the authentication request by setting another honest RP's identifier (if RP's identifier is used in a way without exposing RP's identity) and the adversary's endpoint. IdP is to send the identity proof issued for the honest RP to the adversary. Therefore, the adversary has the ability to achieve the identity proof valid in honest RPs, which results in Impersonation Attack. 
+
+%Content Check不是SSO引入的问题
+%NIST对于notification和consent的要求是RP从IdP获取信息
+%所以这个challenge应该是根据OIDC需求引入的，应该放到最后与动态注册一起讨论
+%\item \textbf{Break Content Checking: }As RP's identity is hidden from IdP, IdP is unable to notify user with the unique RP's name while authenticating, which means user does not know the real identity of RP he/she logs in.
 \end{itemize}
-Additionally, it introduces another challenge to provide distinct user identifier while hiding RP's identity
+Additionally, to 
+it introduces another challenge to provide distinct user identifier while hiding RP's identity
 \begin{itemize}
-\item \textbf{RP is unable to identify the user: }
+\item \textbf{RP is unable to identify the user: }To hide RP's identity, the single RP's multiple authentication requests should be considered from different RPs by IdP. However, the user identifier provided by IdP is solely bound with an RP to avoid linking the user through RPs' collusion. It means that the single user's multiple identifiers for one RP will never be constant. Therefore, RP is unable to identify the user no longer. 
 \end{itemize}
 
- 
+\subsection{Solutions}
+To deal with the challenges introduced by hiding RP's identity from IdP, the following methods are proposed correspondingly: 
+\begin{itemize}
+\item \textbf{Providing the RP identifier which is only valid in corresponding RP without exposing RP's real identity.} The RP identifier should be generated in a way so that for each authentication the identifiers are different. Moreover, the generation should be beyond any entities' control to avoid the misuse of user's identity proof, which happens when different RPs use the same identifier. Therefore, we propose the scheme that the identifier should be generated under the negotiation between the user and RP. However, in this way, the malicious RP and user have the ability to build any negotiation requests and responses they need. Adversaries try to the honest RP use the same identifier with a corrupted one to obtain an honest user's identity proof valid in other honest RPs, which will be analysed detailedly in Section~\ref{sec:analysis}. Moreover, the curious IdP tries to derive the real identity of RP from the RP identifier. It is also to be analysed in Section~\ref{sec:analysis}.
+\item \textbf{Providing the distinct user identifier which make RP able to identify the user. } It is required that the user identifier provided by IdP (named \verb+user_idp_id+) should be different in each authentication, but RP is able to derive the specific user identifier for each RP (named \verb+user_rp_id+) which is constant for each RP with the \verb+user_idp_id+. However, the current ways to generate user identifier, such as using random character string as user identifier and binding it with specific RP identifier in database, is not appropriate. Therefore, we proposed a novel \verb+user_idp_id+ generating algorithm associated with RP identifier generating which allows only the corresponding RP has the trapdoor to derive the \verb+user_rp_id+ from \verb+user_idp_id+. In this way, malicious RPs try to link the user by the \verb+user_idp_id+, which is also to be analysed in Section~\ref{sec:analysis}.
+%通过RP构造的authentication使不同的用户最终推导出相同的user identifier,攻击者如何获益？
+\item \textbf{Binding the RP identifier with correct endpoint. } It is required that the identity proof issued for specific RP identifier should be sent to the corresponding endpoint. However, RP identifier is generated temporarily by user and RP unrelated with any RP, so that IdP is unable to decide which endpoint the identity proof should be sent to. Therefore, the enhanced user agent is required to guarantee the identity proof's transmission without introducing new trustful entity into SSO system. It is required that the RP identifier generation should be based on the basic identifier element (named \verb+basic_rp_id+) issued by RP, as well as the \verb+basic_rp_id+ should be bound with specific endpoint. Moreover, if IdP publishes the relationship of all the RPs on its website, unless user agent caches all the relationship, the access for specific RP's relationship is to expose the user's accessed RP. Therefore, IdP should offer the certification signed with its private key for each RP, which contains the RP's \verb+basic_rp_id+ and endpoint list. User agent should have the ability to verify this certification. 
+\end{itemize}
+
+
+\subsection{Challenges and Solutions in OIDC}
+OIDC is designed for the centralized systems. Therefore, prior coordination is required between RP and IdP so that RP registers its individual attributes (i.e., \verb+redirect_uris+) and gets client attributes (i.e., \verb+client_id+) issued by IdP. While the authentication request is transmitted from RP, IdP verifies the validation of \verb+client_id+ and \verb+redirect_uri+ because it only provide service to those RPs already registered. Therefore, if an RP builds the authentication request without \verb+client_id+ and \verb+redirect_uri+, IdP considers it invalid.
+
+With dynamic registration, an RP has the ability to re-register the new \verb+client_id+ and \verb+redirect_uri+ with IdP. Therefore, it is needed that before the authentication request is transmitted to IdP, RP should re-register the newly generated \verb+client_id+ and completely random \verb+redirect_uri+ with IdP. The registration should be conducted by the user to avoid direct interactive between RP and IdP. However, the specification~\cite{DynamicRegistration} of OIDC dynamic registration requires the registration request should carry a bearer token as well as the new  \verb+client_id+ is generated by IdP. To avoid IdP finding out RP's identity through dynamic registration, the requirement of registration token should be omitted. It is also needed to enable RP to assign the specific \verb+client_id+. It is observed that although \verb+client_id+ is defined to be generated by IdP, some OIDC systems (e.g., MITREid Connect) enable the \verb+client_id+ be the input attribute.
+
+Additionally, in OIDC, the contents in the identity proof are generated under a clear consent of the user. The contents include the RP's information and the range of exposed attributes. However, to hide RP from IdP, IdP no longer knows the RP's real name. Therefore, the responsibility of notifying user with RP's identity should be shifted to user agent. Same as binding the RP identifier with correct endpoint, RP's certification should contains RP's name and user agent should show it to user clearly while authenticating. 
+
+
+
+\begin{comment}
 
 %单点登录系统中，IdP通过用户认证识别用户身份，通过client_id和redirect_uri识别RP身份。
 %在不改变单点登录系统结构的情况下，由于IdP要向RP提供用户的身份信息，所以向IdP隐藏用户身份是不可行的
@@ -94,7 +118,6 @@ In OIDC, the authentication request from RP to IdP exposes RPs' identity by the 
 %设计client_id与user id 的生成算法，使RP能够识别用户
 
 
-\begin{comment}
   
 \subsection{Entities}
 To achieve the goals outlined in Section~\ref{sec:intro}, the requirements and restrictions of abilities owned by each entities in single-sign-on system is defined as follows: %要做的内容，总的角色能力描述
