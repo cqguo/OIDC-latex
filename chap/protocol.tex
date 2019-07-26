@@ -26,7 +26,7 @@ Besides, the prior registration between RP and IdP is required for IdP to verify
 
 \subsection{Rp-id-generating and User-id-generating algorithm}
 The rp-id-generating and user-id-generating algorithm are created based on Discrete Logarithm problem\cite{shiu2007cryptography:}.
-IdP carefully chooses a big prime $P$\footnotetext[1]{$P$ is generated as $P=p\cdot q\cdot 2+1$, while $p$ and $q$ are primes.} and its primitive root \verb+g+ as generator for system. When the RP registers with IdP, IdP provides a unique primitive root as the RP's root identifier (called \verb+basic_rp_id+). 
+IdP carefully chooses a big prime $P$\footnotetext[1]{$P$ is generated as $P=q\cdot 2+1$, while $q$ is prime as well.} and its primitive root \verb+g+ as generator for system. When the RP registers with IdP, IdP provides a unique primitive root as the RP's root identifier (called \verb+basic_rp_id+). 
 
 The define of computation is shown as Figure~\ref{fig:define}, based on which the generation of \verb+rp_id+ and \verb+user_id+ is shown as Figure~\ref{fig:generating}, as well as the trapdoor for RP to derive \verb+user_rp_id+ is as shown.
 \begin{figure}
@@ -49,21 +49,21 @@ $$rp\_id=basic\_rp\_id^r mod P$$
 such that $rp_id$ is another primitive element module \emph{p}. And $r^{-1}$ is generated through Extended Euclidean algorithm.
 
 IdP labels each user at IdP with the unique identifier called $baisc\_user\_id$. To generate the specific user identifier for each $rp\_id$, the algorithm is 
-$$user\_id=rp\_id^{id} mod P$$
+$$user\_id=rp\_id^{basic\_user\_id} mod P$$
 so
-$$user\_id=basic\_rp\_id^{r\cdot id}modP$$
+$$user\_id=basic\_rp\_id^{r\cdot basic\_user\_id}modP$$
 While receiving $user\_id$ from IdP, RP can derive the constant user identifier from if
 $$user\_rp\_id=user\_id^{r^{-1}} mod P$$
 so
-$$user\_rp\_id=basic\_rp\_id^{(1 mod \phi(P))\cdot id} mod P$$
+$$user\_rp\_id=basic\_rp\_id^{(1 mod \phi(P))\cdot basic\_user\_id} mod P$$
 so
-$$user\_rp\_id=basic\_rp\_id^{id} mod P$$
+$$user\_rp\_id=basic\_rp\_id^{basic\_user\_id} mod P$$
 For single user in a RP, $user\_rp\_id$ is unchanged. However, $user\_rp\_id$s are distinct in each RP because $basic\_rp\_id$s are different in each RP.
 
 
 
 \subsection{Login Flow}
-User firstly logs in an RP. If RP find that user is unauthenticated, RP is going to negotiate a new client\_id with user. Then user starts dynamic registration and forward the registration result from IdP to RP. If registration succeeds RP will construct a token request and redirect user to IdP. IdP authenticates user and generates an id\_token of user for RP. Id\_token is sent to RP and RP gets user\_rp\_id from id\_token. RP is going to identify the user through user\_rp\_id. The login flow is shown as Figure~\ref{fig:process}
+The login flow is shown as Figure~\ref{fig:process}.
 \begin{figure*}
   \centering
   \includegraphics[width=\linewidth]{fig/process.pdf}
@@ -78,19 +78,15 @@ User firstly logs in an RP. If RP find that user is unauthenticated, RP is going
 
 %如果由RP选择basic_rp_id，那么多个rp之间的basic_rp_id有幂次关系，那么就可以关联用户
 
-\subsubsection{Client\_id Negotiation}
-An attacker is able to be the man in the middle between RP and user in client\_id negotiation using phishing attack. When a user logs in attacker's website, attacker logs in another RP as a user. In client\_id negotiation, attacker just transmits user and RP's requests and responses to each other. As a result, attacker shares the same client\_id with user and RP and gets a id\_token valid in RP from user.
-So besides of generating client\_id, RP has to send its rp\_certificate to user in this phase. It protects user from sending id\_token to malicious opponent. As rp\_certificate contains RP's name, it allows user can identify the real RP's identity when doing login.
+\subsubsection{RP Identifier Negotiation}
+RP identifier negotiation starts form step 1 to step 4. The user accesses the service provided by RP in his/her browser. To log in this RP, user needs to click the login button offered by Recluse. 
+Firstly, the user agent sends the \verb+Start Negotiation+ request to RP, so that RP generates the random $sk\_rp$ and $pk\_rp=g^{sk\_rp}modP$ as the private key and public key for DH Key exchanging. 
+Secondly, RP builds the \verb+Negotiation Response+ with newly generated $pk\_rp$ as well as the \verb+RP_Cert+ issued by IdP. User agent similarly generates random $sk\_user$ and $pk\_user$, and $r=pk\_rp^{sk\_user}modP$. However, to make sure that $r$ is the relative prime of $\phi(P)$, it is required that $r$ should be odd and the greatest common divisor of $r$ and $\phi(P)$ is 1. 
+Then user agent continues the \verb+Negotiation+ sending $pk\_user$ and $r$ to RP. RP generates the local $r$ in the same way as user agent and compares the local $r$ and user agent generated $r$. If $r$s are equal, RP generates $rp\_id=basic\_rp\_id^rmodP$, as well as $r^{-1}$ through Extend Euclidean algorithm, which meets $r\cdot r^{-1}=1mod\phi(P)$.
+Finally RP transmits the $rp\_id$ to user agent. 
 \subsubsection{Dynamic Registration}
-User generates IdP's registration URL by \emph{iss} from rp\_certificate. 
-The client\_id negotiation is described in user-id-generating algorithm. Dynamic registration starts after client\_id negotiation. User generates a random redirect\_uri and sends it to IdP as well as client\_id. IdP checks the uniqueness of client\_id and sends the result success or fail back. If registration fails, user is going to restart client\_id negotiation. Otherwise user will forward the registration response to RP.  
+Dynamic registration is from step 5 to step 7. While user agent receives teh $rp\_id$ from RP, it is required the $rp\_id$ from RP should be equal with it generated by user agent. Then user agent generates the \verb+fake\_uri+ which contains the random string and keeps it for further identity proof transmission. User agent sends the \verb+Dynamic Registration+ request to IdP with newly generated $rp\_id$ and \verb+fake_uri+ and redirects the \verb+Dynamic Registration Response+ to RP.
 \subsubsection{Obtaining Token}
-Token Obtaining: After dynamic registration, RP builds the authentication request and redirects it to IdP through user agent. User agent verifies the validation of the endpoint for identity proof and replaces it with the fake one. After receiving the request, IdP firstly authenticates user and then issues identity proof for RP. Identity proof contains the user id which is generated by IdP through the user-id-generating algorithm. Then IdP redirects the identity to the fake endpoint through user agent, who is to intercept the transmission and transmit it to the endpoint claimed in authentication request. 
-Id token contains RP's client\_id and user id. Client\_id is provided by RP and user id is generated through sser-id-generating algorithm by IdP. RP is able to get the constant user identity from user id.
+Obtaining Token is from step 8 to step 12. After dynamic registration,  RP builds the \verb+Authentication Request+ including $rp\_id$ as well as the \verb+redirect_uri+ representing the endpoint, and redirects it to IdP through user agent. User agent tampers the authentication request, compares $rp\_id$ with the local one, verifies the validation of the \verb+redirect_uri+ and replaces it with the fake one. Then user agent transmits the \verb+Authentication Request+ to IdP. After receiving the request, IdP firstly authenticates user and then generates $user\_id=rp\_id^{basic\_user\_id}modP$. The identity proof signed with IdP's private key including the $user\_id$ is redirected to the \verb+fake_uri+ through user agent, who intercepts the transmission and transmit it to the endpoint \verb+redirect_uri+ in authentication request. Finally, RP derives the constant $user\_rp\_id$ from $user\_id$. If the $user\_rp\_id$ has already been registered, RP send \verb+Authentication Finished+ with the message \verb+success+ to user agent.
 
 
-
-RP firstly redirects user to IdP with its token request. User generates IdP's authenticate URL by \emph{iss} from rp\_certificate and compared it with RP's redirect location. If they point the same address, user is going to continue the login.
-To keep the advanced protocol same as OpenID Connect 1.0, after authenticating a user IdP is going to redirect the user to the redirect\_uri of RP with id\_token as parameter. As redirect\_uri is random, user stops the redirection. User then sends id\_token to the URL received from client\_token negotiation to defend man-in-the-middle attack. RP gets user\_id from id\_token and gets user\_rp\_id computed from user\_id. If it's the first time user logs in RP, RP is going to finish the registration. Otherwise RP searches user profile through user\_rp\_id. 
-%\subsection{Roles' Ability Demands}
-%\emph{Demands on IdP}. 
