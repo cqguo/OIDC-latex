@@ -1,1 +1,15 @@
 \section{Implementation}
+The Recluse prototype consists of the IdP modified from the traditional OIDC IdP, the user agent and the RP using the SDK of Recluse. 
+
+The implementation of Recluse IdP is based on the MITREid Connect, which is the open-source OpenID Connect implementation in Java on the Spring framework, one of the most popular MVC frame work. Until July 30, 2019, the project of MITREid Connect on github owns 233 uses and 994 stars. It has already been certified by the OpenID Foundation as well. 
+
+The implementation of user agent is based on the Chrome extension, the function provided by Google for developers to create the plug-in for Chrome browser. The main programming language of Chrome extension is JavaScript. The cryptographic computing of user agent is provided by the jsrsasign, which has 6878 uses and 1986 stars on github. 
+
+The implementation of RP SDK is also based on the Spring framework and the cryptographic computing is provided by the Java Platform, Standard Edition. An RP is able to use the service provided by the Recluse conveniently with this SDK. However, to make it convenient to evaluate the time cost of prototype system, we build the RP based on the Spring frame work instead of modifying the open-source RP implementation.
+
+The modification of IdP introduces about 5 lines of code changing, including deleting 1 line about verifying the authority of dynamic registration, deleting 1 lines about getting user identifier from database which is replaced by 3 lines about generating it through the user-id-generating algorithm. The implementation of user agent contains about 330 lines of code which imports 3 libraries and about 30 lines of configuration. The implementation of RP SDK is about 1100 lines. However, we easily build the simple RP with only 30 lines of code based on the RP SDK ignoring the auto generated code by Spring framework.
+
+\noindent\textbf{CORS (Cross-Origin Resource Sharing).} 
+
+
+
