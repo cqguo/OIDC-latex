@@ -42,6 +42,19 @@ The implicit flow of OIDC achieves the binding between the identity proof and th
 \noindent\textbf{Dynamic Registration.} The id token (also, the authorization code) is bound with the RP's identifier. OIDC provides the dynamic registration\cite{DynamicRegistration} mechanism to register the RP dynamically. After the first successful registration, RP obtains a registration token from the IdP, and is able to update its information (e.g., the \verb+redirect URI+ and the  response type) by a dynamic registration process with the  registration token. One successful dynamic registration process  will make the IdP assign a new unique client id for this RP.
 
 \subsection{Security Consideration}
+
+In SSO systems, an adversary tries to break the authentication security in following ways:
+\begin{itemize}
+\item Impersonation Attack: Adversaries log in to the honest RP as the honest user.
+\item Identity Injection: Honest user logs in to the honest RP under adversaries' identity. 
+\end{itemize}
+Besides, the adversary also has the interests in users' login traces, the private issue introduced by SSO systems. To undermine a user's privacy, 
+the adversary tries to achieve the following goals:
+\begin{itemize}
+\item Adversary finds out which RP a user has accessed by acting as the honest IdP.
+\item Adversary links the same user in multiple RPs controlled by adversary.  
+\end{itemize}
+
 Widely deployed SSO systems, such OIDC, are designed with the following security considerations, and various implementations of IdP and RP are also analyzed with the same security principles under the assumption that IdP is trusted. Here, we list the security considerations:
 \begin{itemize}
     \item \textbf{Content Checking: }The contents in the identity proof are generated under a clear consent of the user. The contents include the RP's information and the range of exposed attributes.

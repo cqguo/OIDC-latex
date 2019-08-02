@@ -13,8 +13,6 @@
 %
 In order to prove the privacy and security properties of Recluse system, we firstly demonstrate that for any adversary in the system, a user's access to an specific  RP untraceable from it to another one. Besides, we illustrate the potential attacks discussed in the previous work about SSO security and the security issues introduced by Recluse. 
 
-Firstly, to explicitly illustrate how an adversary works in the SSO system, the \verb+authentication flow+ is created to defined the authentication of specific IdP,  RP and user. For example, now there are $IdP$, $User_{A}$, $User_{B}$, $RP_{A}$ and $RP_{B}$, who are able to form 4 \verb+authentication flow+s, ($IdP$, $User_{A}$, $RP_{A}$), ($IdP$, $User_{A}$, $RP_{B}$), ($IdP$, $User_{B}$, $RP_{A}$) and ($IdP$, $User_{B}$, $RP_{B}$). An adversary has the ability to act one or more entities in single or multiple \verb+authentication flow+s. That is, an adversary is able to act as, i) the single entity in one \verb+authentication flow+, such as the curious IdP; ii) the same entity in multiple \verb+authentication flow+s, such as acting as different RPs for the same honest user ; iii) the different entities in multiple \verb+authentication flow+s, such as acting as the RP for the honest user and the user for the honest RP at the same time. However, it is considered an adversary should not act as both the IdP and RP in single \verb+authentication flow+.
-
 
 \subsection{Privacy}
 We now define the untraceability of SSO system. It is in the SSO system, for an adversary controlling curious IdP, it is impossible to inspect whether two \verb+authentication flow+s are to same RP or not, however, for an adversary controlling malicious RPs, it is impossible to inspect whether two \verb+authentication flow+s are from same user or not.
@@ -30,6 +28,39 @@ $$user\_rp\_id_1=user\_rp\_id_2^\alpha\eqno(9)$$
 and
 $$user\_id_1=user\_id_2^{\alpha\cdot r_1/r_2}\eqno(10)$$ 
 The $\alpha$ is unknown to the malicious, so that the adversary is unable to  inspect whether the two \verb+authentication flow+s are from the same user. However, the malicious also tries to lead the same user in two \verb+authentication flow+s using the same $user\_rp\_id$ or $user\_id$. According to formula (2) and (4), the user should use the same $basic\_rp\_id$ or $rp\_id$ in two \verb+authentication flow+s. So the $user\_rp\_id$ is impossible to be same as $basic\_rp\_id$ is issued by IdP and verified by user agent. And $rp\_id$ is generated through the negotiation between user and RP, so that RP is unable to lead the user to use the same $rp\_id$ in different \verb+authentication flow+s.
+
+\subsection{Security Consideration in OpenID Connect}
+As it has been defined in ~\cite{OpenIDConnect} Section 16, the security consideration of the OIDC design contains authentication and authorization. Now we list the security consideration of authentication and prove that Recluse achieves this goals. 
+\begin{enumerate}
+\item \textbf{Server Masquerading. } The malicious server might masquerade as the RP or IdP using various ways through which user might leak its identity proof for RP or credentials on IdP. The Recluse mitigate this threat in following ways. 1) The server visited through user agent is authenticated by HTTPS; 2) The user agent verifies the RP certification which makes sure that the token is only sent to the corresponding RP instead of the masqueraded one; 3) The user agent only visit the IdP's endpoint listed in the RP certification which avoid the access to the masqueraded IdP. 
+\item \textbf{Token Manufacture/Modification. } The adversary might generate a bogus token or tamper the contents in the existing token, which enables the adversary log in any RP as any honest user. The receiver of token must have the ability to verify whether the token is issued by IdP without any modification or not. The token used in Recluse is signed by IdP with its private key, so that the token is unable to be constructed or modified. 
+\item \textbf{Access/ID Token Disclosure. } The adversary might try to obtain an honest user's token to the honest RP through various ways, which enables the adversary log in this RP as the honest user. It is required the tokenisi never exposed to anyone except the corresponding user and RP. 
+\item \textbf{Access/ID Token Redirect. } The malicious RP might use the token from an honest user to access other RPs as this user only if the token is also valid in other RPs. It is required the token issued for specific RP should bound with this RP which means the RP has the ability to verify whether a token is valid in itself. The token used in Recluse containing the $rp\_id$ and $user\_id$ is solely bound with specific RP and user, which is checked by the RP.
+\item \textbf{Issuer Identifier. } The issuer identifier contained in the token should be completely same as it provided by the IdP, so that the verifier of token has the ability to obtain the corresponding public key. It is also implemented in Recluse.
+\item \textbf{TLS Requirements. } To avoid network attacker the transmission in OIDC system should be protected by TLS. It is implemented in Recluse.
+\item \textbf{Implicit Flow Threats. } In OIDC implicit flow, token is transmitted through user agent and the TLS protections are only between user agent and IdP, and between user agent and RP. It is required the token should not be leaked to the adversary by the user agent. The user agent of Recluse is deployed based on the Chrome browser as the trust base.
+\end{enumerate}
+
+It is discovered that the security consideration of authentication in OIDC can be included into the security consideration in Section~\ref{sec:background} as table ~\ref{tab:security-consideration}. however, the threats introduced by Recluse which breaks the security consideration and the methods to mitigate these threats has also been discussed in Section~\ref{sec:overview}.
+
+\begin{tabular}{|c|c|}% 通过添加 | 来表示是否需要绘制竖线
+\caption{Security Consideration}
+\hline  % 在表格最上方绘制横线
+Security Consideration of SSO & Security Consideration of OIDC\\
+\hline  %在第一行和第二行之间绘制横线
+Content Checking& Server Masquerading\\
+Confidentiality& Server Masquerading, Access/ID Token Disclosure, TLS Requirements, Implicit Flow Threats\\
+Integrity& Token Manufacture/Modification, Issuer Identifier\\
+Binding& Access/ID Token Redirect\\
+\hline % 在表格最下方绘制横线
+\label{tab:security-consideration}
+\end{tabular}
+
+\subsection{Related Security Analysis}
+\noindent{\textbf{307 Redirect. }} It has been discussed in~\cite{FettKS16} that IdP might redirect the user to the RP immediately after the user inputs the credentials. For example, the HTTP response to the user's POST message with \verb+username+ and \verb+password+ might be the redirection to RP carrying user's identity proof. That is, as long as the 307 status code is used for this redirection, the user's credentials are also transmitted to the RP. However, in Recluse the redirections are intercepted by the user agent and rebuild the HTTP GET request to RP or IdP which is unable to leak the POST data of the user.  
+\noindent\textbf{IdP Mix-Up. }} It has been illustrated in~\cite{FettKS16} that the adversary might intercept the the user's access to RP and modify the user's choice of IdP, assuming that RP integrates the SSO service provided by both the honest IdP (named \verb+HIdP+) and malicious IdP (named \verb+MIdP+). The user obtains the \verb+access token+ and \verb+authorization code+ from the \verb+HIdP+ and uploads them to the RP, however, the RP considers that the \verb+access token+ and \verb+authorization code+ are issued by the \verb+MIdP+. Therefore, the RP tries to exchange for the protected resources using the \verb+access token+ and \verb+authorization code+ with \verb+MIdP+. With this, the adversary carries the honest user's \verb+access token+ and \verb+authorization code+ which make the adversary able to log in this RP as the identity of the honest user. However, the threat is mitigated by the OIDC implicit flow, as the \verb+ID token+ issued by IdP contains the issuer identifier, so that RP is able to find out which IdP the token is from.
+\noindent\textbf{Cross-Site Request Forgery (CSRF). }} The CSRF attack on the RP makes the identity injection possible, through which the adversary might lead the honest user to upload the adversary's \verb+ID token+ to the RP. However, in Recluse the cross origin request should be repudiated by both RP and IdP excepted the request from the origin of the user agent. Therefore the CSRF attack on Recluse is impossible.
+ 
  
 \begin{comment}
 PRIOIDC tries to protect user's privacy by keeping RP anonymous to IdP. IdP is able to get client\_id and redirect\_uri. As redirect\_uri is generated by user, it will show nothing about RP. IdP can only undermine user's privacy by get RP's identity from client\_id. It's described in Client-id-generating algorithm: $client\_id=basic\_rp\_id^r mod p$. $p$ is a large prime and basic\_rp\_id is a primitive element module $p$. And $r$ is the random number generated by user and RP. IdP can only find out RP's real identity by finding out $r^{-1}$ and let $1=r\cdot r^{-1} mod (p-1)$, so that $$basic\_rp\_id=client\_id^{r^{-1}}modp$$
@@ -40,7 +71,6 @@ So that only when knowing $r_1$ and $r_2$ IdP can find out the relevance between
 RPs try to find out user's login trace in three ways: 1) Getting the user's unique id in IdP. 2) Finding the relevance among user\_rp\_ids. 3) Deducing user's login trace from IP address. As user's id is used in generating user\_id in id\_token, RP is able to obtain $user\_id=client\_id^{id}modp$. Client\_id is primitive element module $p$. Although client\_id, user\_id and $p$ are known by RP, according to \textbf{Discrete Logarithm} problem calculating id from user\_id is difficult. For different RPs, they are able to get user's user\_rp\_id. User\_rp\_ids from different RPs can be marked as $user\_rp\_id_1=basic\_rp\_id_1^{id}modp$ and $user\_rp\_id_2=basic\_rp\_id_2^{id}modp$. As basic\_rp\_id$_1$ and basic\_rp\_id$_2$ are primitive element module $p$, there is $0<\alpha<p$ and $basic\_rp\_id_1=basic\_rp\_id_2^\alpha modp$.So user\_rp\_id$_1$ and user\_rp\_id$_2$ meet the following formula
 $$user\_rp\_id_1=user\_rp\_id_2^\alpha modp$$
 So RP is able to deduce the relevance between user\_rp\_id$_1$ and user\_rp\_id$_2$ only when knowing $\alpha$. As basic\_rp\_id is generated by IdP and calculating $\alpha$ from basic\_rp\_ids, RP is never able to find the relevance. If an RP does not use the basic\_rp\_id from IdP, user is able to find it dishonest through rp\_certificate and stop the login. Most of current users use dynamic IPs so that it is impossible to get user's login trace from user's IP.
-\end{comment}
 
 
 \subsection{Impersonation attack}
@@ -60,6 +90,7 @@ Phishing attack on RP in SSO system is quite different from it in normal website
 
 %External attacker is willing to conduct abduction attack. Attacker is going to make the attack by temper user's id\_token into attacker's id\_token when id\_token is transformed on the network. But all the network flows are protected by https so that user's id\_token is secure.
 %如果不同RP之间Basic_Client_ID 找到幂次的关系，那么就可以对应到同一个用户的身份
+\end{comment}
 
 \subsection{Discussion}
 An external attacker is also taken into account in SSO system. External attacker is able to capture and temper all the network flow through user, RP and IdP. External attacker's targets include impersonation attack, abduction attack and privacy undermining attack. 
