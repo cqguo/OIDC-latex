@@ -43,23 +43,30 @@ As it has been defined in ~\cite{OpenIDConnect} Section 16, the security conside
 
 It is discovered that the security consideration of authentication in OIDC can be included into the security consideration in Section~\ref{sec:background} as table ~\ref{tab:security-consideration}. however, the threats introduced by Recluse which breaks the security consideration and the methods to mitigate these threats has also been discussed in Section~\ref{sec:overview}.
 
-\begin{tabular}{|c|c|}% 通过添加 | 来表示是否需要绘制竖线
+
+\begin{table}\label{tab:security-consideration}
 \caption{Security Consideration}
+\begin{tabular}{|c|c|}
 \hline  % 在表格最上方绘制横线
 Security Consideration of SSO & Security Consideration of OIDC\\
 \hline  %在第一行和第二行之间绘制横线
-Content Checking& Server Masquerading\\
-Confidentiality& Server Masquerading, Access/ID Token Disclosure, TLS Requirements, Implicit Flow Threats\\
-Integrity& Token Manufacture/Modification, Issuer Identifier\\
-Binding& Access/ID Token Redirect\\
-\hline % 在表格最下方绘制横线
-\label{tab:security-consideration}
+Content Checking& \multicolumn{1}{p{120pt}|}{Server Masquerading}\\
+\hline
+Confidentiality& \multicolumn{1}{p{120pt}|}{Server Masquerading, Access/ID Token Disclosure, TLS Requirements, Implicit Flow Threats}\\
+\hline
+Integrity& \multicolumn{1}{p{120pt}|}{Token Manufacture/Modification, Issuer Identifier}\\
+\hline
+Binding& \multicolumn{1}{p{120pt}|}{Access/ID Token Redirect}\\
+\hline
 \end{tabular}
+\end{table}
 
 \subsection{Related Security Analysis}
-\noindent{\textbf{307 Redirect. }} It has been discussed in~\cite{FettKS16} that IdP might redirect the user to the RP immediately after the user inputs the credentials. For example, the HTTP response to the user's POST message with \verb+username+ and \verb+password+ might be the redirection to RP carrying user's identity proof. That is, as long as the 307 status code is used for this redirection, the user's credentials are also transmitted to the RP. However, in Recluse the redirections are intercepted by the user agent and rebuild the HTTP GET request to RP or IdP which is unable to leak the POST data of the user.  
-\noindent\textbf{IdP Mix-Up. }} It has been illustrated in~\cite{FettKS16} that the adversary might intercept the the user's access to RP and modify the user's choice of IdP, assuming that RP integrates the SSO service provided by both the honest IdP (named \verb+HIdP+) and malicious IdP (named \verb+MIdP+). The user obtains the \verb+access token+ and \verb+authorization code+ from the \verb+HIdP+ and uploads them to the RP, however, the RP considers that the \verb+access token+ and \verb+authorization code+ are issued by the \verb+MIdP+. Therefore, the RP tries to exchange for the protected resources using the \verb+access token+ and \verb+authorization code+ with \verb+MIdP+. With this, the adversary carries the honest user's \verb+access token+ and \verb+authorization code+ which make the adversary able to log in this RP as the identity of the honest user. However, the threat is mitigated by the OIDC implicit flow, as the \verb+ID token+ issued by IdP contains the issuer identifier, so that RP is able to find out which IdP the token is from.
-\noindent\textbf{Cross-Site Request Forgery (CSRF). }} The CSRF attack on the RP makes the identity injection possible, through which the adversary might lead the honest user to upload the adversary's \verb+ID token+ to the RP. However, in Recluse the cross origin request should be repudiated by both RP and IdP excepted the request from the origin of the user agent. Therefore the CSRF attack on Recluse is impossible.
+\noindent\textbf{307 Redirect. }It has been discussed in~\cite{FettKS16} that IdP might redirect the user to the RP immediately after the user inputs the credentials. For example, the HTTP response to the user's POST message with \verb+username+ and \verb+password+ might be the redirection to RP carrying user's identity proof. That is, as long as the 307 status code is used for this redirection, the user's credentials are also transmitted to the RP. However, in Recluse the redirections are intercepted by the user agent and rebuild the HTTP GET request to RP or IdP which is unable to leak the POST data of the user.  
+
+\noindent\textbf{IdP Mix-Up. } It has been illustrated in~\cite{FettKS16} that the adversary might intercept the the user's access to RP and modify the user's choice of IdP, assuming that RP integrates the SSO service provided by both the honest IdP (named \verb+HIdP+) and malicious IdP (named \verb+MIdP+). The user obtains the \verb+access token+ and \verb+authorization code+ from the \verb+HIdP+ and uploads them to the RP, however, the RP considers that the \verb+access token+ and \verb+authorization code+ are issued by the \verb+MIdP+. Therefore, the RP tries to exchange for the protected resources using the \verb+access token+ and \verb+authorization code+ with \verb+MIdP+. With this, the adversary carries the honest user's \verb+access token+ and \verb+authorization code+ which make the adversary able to log in this RP as the identity of the honest user. However, the threat is mitigated by the OIDC implicit flow, as the \verb+ID token+ issued by IdP contains the issuer identifier, so that RP is able to find out which IdP the token is from.
+
+\noindent\textbf{Cross-Site Request Forgery (CSRF). } The CSRF attack on the RP makes the identity injection possible, through which the adversary might lead the honest user to upload the adversary's \verb+ID token+ to the RP. However, in Recluse the cross origin request should be repudiated by both RP and IdP excepted the request from the origin of the user agent. Therefore the CSRF attack on Recluse is impossible.
  
  
 \begin{comment}
@@ -90,7 +97,7 @@ Phishing attack on RP in SSO system is quite different from it in normal website
 
 %External attacker is willing to conduct abduction attack. Attacker is going to make the attack by temper user's id\_token into attacker's id\_token when id\_token is transformed on the network. But all the network flows are protected by https so that user's id\_token is secure.
 %如果不同RP之间Basic_Client_ID 找到幂次的关系，那么就可以对应到同一个用户的身份
-\end{comment}
+
 
 \subsection{Discussion}
 An external attacker is also taken into account in SSO system. External attacker is able to capture and temper all the network flow through user, RP and IdP. External attacker's targets include impersonation attack, abduction attack and privacy undermining attack. 
@@ -98,3 +105,4 @@ An external attacker is also taken into account in SSO system. External attacker
 If an attacker keeps its eye on a specific user, it is able to find that the user's login on different RPs. So it is easy for an external attacker to draw a user's login trace. Privacy protection is not effective for external attacker.
 To protect user from privacy leaking a proxy is probably a appropriate scheme. Proxy is able to mix multi-user's request and keep user's login trace invisible to attacker. User's dynamic IP makes proxy impossible to get user's login trace from user's IP
 External attacker is going to steal user's id\_token from network flow to make the attack and it is also going to make the attack by temper user's id\_token into attacker's id\_token when id\_token is transformed on the network. As all the network flows are protected by https, external attacker is unable to conduct the attacks.
+\end{comment}
