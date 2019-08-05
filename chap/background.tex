@@ -55,13 +55,32 @@ The implicit flow of OIDC achieves the binding between the identity proof and th
 \noindent\textbf{Dynamic Registration.} The id token (also, the authorization code) is bound with the RP's identifier (i.e., \verb+client_id+). OIDC provides the dynamic registration~\cite{DynamicRegistration} mechanism to register the RP for a new \verb+client_id+, dynamically. After the first successful registration, RP obtains a registration token from the IdP, and is able to update its information (e.g., the \verb+redirect URI+ and the  response type) by a dynamic registration process with the  registration token. One successful dynamic registration process  will make the IdP assign a new unique \verb+client_id+ for this RP.
 
 \subsection{Security Consideration}
+As described in~\cite{SPRESSO}, the design of SSO systems is challenging, as the adversary may adopt various attacks~\cite{ChenPCTKT14, FettKS16, WangCW12, WangZLG16, ZhouE14, rfc6819, YangLLZH16} to achieve:
+\begin{itemize}
+\item Impersonation attack: Adversaries login to a RP as the victim user. Then, the adversary obtains the full control of user's account in the RP, and behaves arbitrarily under the victim's identity.
+\item Identity injection: Honest user logins to a RP with the adversaries' identity. Then, the privacy of the victim users may be leaked. For example, the victim user may upload the private data to the OneDrive or iCloud under the adversary's account.
+\end{itemize}
 
+To deal with the threat of the adversary, widely deployed SSO systems, such OIDC, are designed with the following security considerations, and various implementations of IdP and RP are also analysed with the same security principles under the assumption that IdP is trusted. Here, we list the security considerations:
+\begin{itemize}
+    \item \textbf{Content Checking: }The contents in the identity proof are generated under a clear consent of the user. The contents include the RP's information and the range of exposed attributes. For example, it has been described in~\cite{ChenPCTKT14} that the content checking provides a way for user to check the identity of the RP which is able to avoid the leaking of user's authentication information. It can be utilized by the adversary while the Binding (described later) is also broken to obtain the user's identity proof which makes the impersonation attack possible.
+    \item \textbf{Confidentiality: }The confidentiality of the identity proof is ensured, that is, only the target RP obtains the identity proof which will never be leaked by the honest RP. The HTTPS connection is used to protect the identity proof between the IdP and the user, while the trusted user agent (e.g., the browser) ensures the identity proof only sent to the correct URL (of RP) which is confirmed by the user and the IdP. For example, it has been illustrated in~\cite{ChenPCTKT14, FettKS16} the SSO systems must transmitted the identity proof to the corresponding RP and illustrated in~\cite{WangZLG16} that teh transmission must be protected by various ways such as TLS. Otherwise, it also results the leakage of user's identity proof.
+    \item  \textbf{Integrity: }No one except the IdP is able to construct a valid identity proof. And any modification in the identity proof makes the identity proof invalid. The analysis in ~\cite{WangZLG16} claims that the identity proof in SSO systems must be the private and unforgeable information provided by the IdP to avoid the impersonate attack. It is also required that the identity proof should not be tampered during transmission to avoid the identity injection.
+%, as only the IdP has the private key to generate a valid signature for the id token.
+%Any modification in the identity proof makes the identity proof invalid.
+    \item  \textbf{Binding: }The identity proof is only valid for the target RP, as it is bound with only the target RP, and the honest RP has the ability to verify the consistency. It has been described in Section~\ref{sec:introduction} that the binding of RP and identity proof avoid the adversary to use the identity proof of an honest user received by the corrupted RP to log in other honest RPs (impersonation attack).
+    %, and the honest RP checks the consistency of the identifier in the id token with the one stored locally.
+\end{itemize}
+
+
+\begin{comment}
 It has been described in~\cite{SPRESSO} that in SSO systems, an adversary tries to break the authentication security in following ways:
 \begin{itemize}
 \item Impersonation Attack: Adversaries login to the honest RP as the honest user.
 \item Identity Injection: Honest user logsin to the honest RP under adversaries' identity.
 \end{itemize}
 It is proved by the analysis of current widely deployed SSO systems ~\cite{ChenPCTKT14, FettKS16, WangCW12, WangZLG16, ZhouE14, rfc6819, YangLLZH16} as the attacks on the authentication illustrated in these works should be classified into these two categories.
+
 
 The impersonation attack allows the adversary obtain the full control of user's account in the RP so that adversary has the ability to do anything it wants in the identity of the user. The identity injection leads the honest user log in an honest RP in the identity of the adversary which might leak the privacy of the user, for example, the user might log in the file hosting service such as OneDrive or iCloud as the adversary unconsciously and uploads the personal files to the adversary's account. To deal with the threat of the adversary, widely deployed SSO systems, such OIDC, are designed with the following security considerations, and various implementations of IdP and RP are also analysed with the same security principles under the assumption that IdP is trusted. Here, we list the security considerations:
 \begin{itemize}
@@ -73,7 +92,7 @@ The impersonation attack allows the adversary obtain the full control of user's 
     \item  \textbf{Binding: }The identity proof is only valid for the target RP, as it is bound with only the target RP, and the honest RP has the ability to verify the consistency. It has been described in Section~\ref{sec:introduction} that the binding of RP and identity proof avoid the adversary to use the identity proof of an honest user received by the corrupted RP to log in other honest RPs (impersonation attack).
     %, and the honest RP checks the consistency of the identifier in the id token with the one stored locally.
 \end{itemize}
-
+\end{comment}
 \begin{comment}
 Widely deployed SSO systems, such OIDC, are designed with the following security considerations, and various implementations of IdP and RP are also analyzed with the same security principles under the assumption that IdP is trusted. Here, we list the security considerations:
 \begin{itemize}
