@@ -1,0 +1,29 @@
+\section{Assumption and Threat Model}
+\label{sec:assumptionandthreatmodel}
+Recluse contains only three entities, i.e., the user, IdP and RP; and doesn't introduce any other (trusted) entity. In addition to the conventional processes (described in Section~\ref{subsec:OIDC}) as in the typical SSO systems~\cite{SAMLIdentifier,OpenIDConnect}, extra processes are required on the entities in Recluse for preserving the user's privacy:
+\begin{itemize}
+  \item User.
+  \item IdP
+  \item RP. 
+\end{itemize}
+
+\noindent\textbf{Assumption.}
+
+\noindent\textbf{Threat model}
+\begin{itemize}
+  \item Security.
+  \item Privacy
+\end{itemize}
+
+under which the adversary attempts to break the security and privacy of SSO systems
+In SSO systems, IdP has the max authority in this system. Therefore, IdP should be considered honest but curious. Otherwise, an malicious IdP has the ability to log in to any RP as any honest user (impersonation attack) and enforce any honest user to log in honest RP under an adversary's identity (identity injection). Moreover, a user's login trace is never hidden from collusion between IdP and RP. It is considered that any RP could be corrupted and any user may be the adversary. User agent is considered completely honest but under control of the user. Therefore, the user agent is seemed as a part of user. Moreover, as network flows are protected by various ways, such as TLS, the network attacker is not considered. The ability of each entity acted by adversary are shown as follows:
+\begin{itemize}
+\item \textbf{Curious IdP} acts as an completely honest IdP.
+\item \textbf{Malicious RP} has the ability to build any response, as well as the authentication request, for user's requestion.
+\item \textbf{Malicious User} is able to intercept and tamper all the data transmitted through itself.
+%\item \textbf{Network Attacker} has the ability to listen all the IP address on the Internet but unable to tamper any the network flows as they are protected by various ways, such as TLS.
+\end{itemize}
+
+To explicitly illustrate how an adversary works in the SSO system, the \verb+authentication flow+ is created to defined the authentication of specific IdP,  RP and user. For example, now there are $IdP$, $User_{A}$, $User_{B}$, $RP_{A}$ and $RP_{B}$, who are able to form 4 \verb+authentication flow+s, ($IdP$, $User_{A}$, $RP_{A}$), ($IdP$, $User_{A}$, $RP_{B}$), ($IdP$, $User_{B}$, $RP_{A}$) and ($IdP$, $User_{B}$, $RP_{B}$). An adversary has the ability to act one or more entities in single or multiple \verb+authentication flow+s. That is, an adversary is able to act as, i) the single entity in one \verb+authentication flow+, such as the curious IdP; ii) the same entity in multiple \verb+authentication flow+s, such as acting as different RPs for the same honest user ; iii) the different entities in multiple \verb+authentication flow+s, such as acting as the RP for the honest user and the user for the honest RP at the same time. However, it is considered an adversary should not act as both the IdP and RP in single \verb+authentication flow+.
+
+%However, Identity Injection only occurs when 1) IdP is dishonest; 2) the transmission between RP and IdP is corrupted by either corrupted user agent or unprotected network flows. Therefore, Identity Injection is not considered.
