@@ -1,10 +1,10 @@
 \section{Assumption and Threat Model}
 \label{sec:assumptionandthreatmodel}
-Recluse contains only three entities, i.e., the user, IdP and RP; and doesn't introduce any other (trusted) entity. In addition to the conventional processes (described in Section~\ref{subsec:OIDC}) as in the typical SSO systems~\cite{SAMLIdentifier,OpenIDConnect}, extra processes are required on the entities in Recluse for preserving the user's privacy:
+Recluse contains only three entities, i.e., the user, IdP and RP; and doesn't introduce any other (trusted) entity. In addition to the conventional processes (described in Section~\ref{subsec:OIDC}) as in the typical SSO systems~\cite{SAMLIdentifier,OpenIDConnect}, extra processes are required on the entities in Recluse to include the solutions provided in section~\ref{subsec:solutions}:
 \begin{itemize}
-  \item User.
-  \item IdP
-  \item RP. 
+  \item User. The user verifies the received RP certificate, generates a nonce to participate in the generation of RP's transformation identifier with the RP's original identifier extracted from the certificate, sends the transformation to the IdP, and relays the identity proof to the URL extracted from the RP certificate.
+  \item IdP. In the initial registration of RP,  IdP checks the correctness of RP's URL,  assigns an unique original identifier, and generates the RP certificate with its private key. For each identity proof request, IdP calculates the PPID based on the provided RP's transformation identifier.
+  \item RP. The RP applies the RP certificate from the IdP with correct URL, provides it to the user on each login request, generates a nonce to participate in the generation of RP's transformation identifier, calculates the trapdoor of the transformation, and uses it to derive the user's unique account.  
 \end{itemize}
 
 \noindent\textbf{Assumption.}
