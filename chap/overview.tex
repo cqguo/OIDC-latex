@@ -2,11 +2,24 @@
 \label{sec:challenge}
 %PriOIDC allows user to conduct single sign on with out leaking login information to IdP. And even multi RPs' collusion can not trace the user. In this section, we are going to make an overview of our user privacy respecting protocol based on OpenID Connect 1.0.
 %As SSO systems introduce the novel way for the RPs to identify the user, the authentication security and users' privacy should be considered.
-In this section, we describe  the main challenges to hide the user's traces from both IdP and RP, and present the solutions of Recluse briefly.
+In this section, we describe  the main challenges in hiding the user's traces from both IdP and colluded RPs, and present the solutions of Recluse briefly.
 
 
 \subsection{Challenges}
+\label{subsec:challenges}
 %In SSO systems, PRs' identifier is required in both authentication request and users' identifier proof generation. Moreover, as it has been described in Section~\ref{sec:intro}, it is required to expose the identifier of users' accessed RP for security consideration. Therefore, hiding users' accessed RP from IdP is to introduce prominent challenges. To deal with the challenges, the procedure and parameters generation methods are required to be modified. However, this modification also introduces new attack surface, so that the attackers' ability in Recluse should be considered.
+To prevent the IdP from inferring the user's trace, it is straightforward that IdP should never obtain any information identifying the user-accessed RP. The identifying information includes the RP's identifier and URL. However, it conflicts with the security requirements on identity proof described in Section~\ref{subsec:securityconsideration}:
+\begin{itemize}
+    \item \textbf{Confidentiality.} The confidentiality of identity proof is corrupted, and the leaked identity proof may result in the impersonation attacks~\cite{ChenPCTKT14,FettKS16,WangZLG16}. The potential leakage is due to: (1) no reliable checks (from the IdP and user) during the generation of identity proof, as the IdP lacks the correct RP identifier to retrieve the exact information from the local storage, while the user fails to obtain the correct URL (or RP name) from IdP for the check. Therefore, the malicious RP may request the identity proof for another RP without being found by the IdP and user. (2) the lack of correct URL for the transmit, as without the correct RP identifier, IdP fails to extract the correct (locally stored) URL.  The trusted user agent transmit the identity proof to the incorrect URL (provided by IdP) which is controlled by the adversary.
+    \item  \textbf{Binding.} IdP fails to bind the identity proof with a specified RP, as it lacks the correct RP identifier for binding. The correct RP accepts the identity proof without checking whether the proof is bound to it or not, otherwise the service will be stopped as no identity proof is bound to it. Therefore, one identity proof  will be accepted by multiple RPs, which results in the misuse of identity proof for impersonation attacks and identity injection~\cite{ChenPCTKT14,FettKS16,WangZLG16}.
+\end{itemize}
+
+Additionally, it introduces another challenge to provide distinct user identifier while hiding RP's identity
+\begin{itemize}
+\item \textbf{RP is unable to identify the user: }To hide RP's identity, the single RP's multiple authentication requests should be considered from different RPs by IdP. However, the user identifier provided by IdP is solely bound with an RP to avoid linking the user through RPs' collusion. It means that the single user's multiple identifiers for one RP will never be constant. Therefore, RP is unable to identify the user no longer.
+\end{itemize}
+
+\begin{comment}
 To protect users from the privacy issues introduced by SSO systems, the scheme should simultaneously achieve the following goals:
 \begin{itemize}
 \item Hiding RP's identity from IdP.
@@ -26,8 +39,10 @@ Additionally, it introduces another challenge to provide distinct user identifie
 \begin{itemize}
 \item \textbf{RP is unable to identify the user: }To hide RP's identity, the single RP's multiple authentication requests should be considered from different RPs by IdP. However, the user identifier provided by IdP is solely bound with an RP to avoid linking the user through RPs' collusion. It means that the single user's multiple identifiers for one RP will never be constant. Therefore, RP is unable to identify the user no longer.
 \end{itemize}
+\end{comment}
 
 \subsection{Solutions}
+\label{subsec:solutions}
 To deal with the challenges introduced by hiding RP's identity from IdP, the following methods are proposed:
 \begin{itemize}
 \item \textbf{Providing the RP identifier which is only valid in corresponding RP without exposing RP's real identity.} The RP identifier should be generated in a way so that for each authentication the identifiers are different. Moreover, the generation should be beyond any entities' control to avoid the misuse of user's identity proof, which happens when different RPs use the same identifier. Therefore, we propose the scheme that the identifier should be generated under the negotiation between the user and RP. However, in this way, the malicious RP and user have the ability to build any negotiation requests and responses they need. Adversaries try to the honest RP use the same identifier with a corrupted one to obtain an honest user's identity proof valid in other honest RPs, which will be analysed detailedly in Section~\ref{sec:analysis}. Moreover, the curious IdP tries to derive the real identity of RP from the RP identifier. It is also to be analysed in Section~\ref{sec:analysis}.
