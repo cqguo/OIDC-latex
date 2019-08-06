@@ -1,51 +1,65 @@
-\section{Challenges and Solutions}
-\label{sec:challenge}
-%PriOIDC allows user to conduct single sign on with out leaking login information to IdP. And even multi RPs' collusion can not trace the user. In this section, we are going to make an overview of our user privacy respecting protocol based on OpenID Connect 1.0.
-As SSO systems introduce the novel way for the RPs to identify the user, the authentication security and users' privacy should be considered. 
+\section{Assumption and Threat Model}
+\label{sec:assumptionandthreatmodel}
+Recluse contains only three entities, i.e., the user, IdP and RP; and doesn't introduce other entities. In addition to the conventional processes (described in Section~\ref{subsec:OIDC}) as in the typical SSO systems~\cite{SAMLIdentifier,OpenIDConnect}, extra processes are required on the entities in Recluse for preserving the user's privacy:
+\begin{itemize}
+  \item User.
+  \item IdP
+  \item RP. 
+\end{itemize}
 
+\noindent\textbf{Assumption.}
 
-\subsection{Threat Model}
+under which the adversary attempts to break the security and privacy of SSO systems
 In SSO systems, IdP has the max authority in this system. Therefore, IdP should be considered honest but curious. Otherwise, an malicious IdP has the ability to log in to any RP as any honest user (impersonation attack) and enforce any honest user to log in honest RP under an adversary's identity (identity injection). Moreover, a user's login trace is never hidden from collusion between IdP and RP. It is considered that any RP could be corrupted and any user may be the adversary. User agent is considered completely honest but under control of the user. Therefore, the user agent is seemed as a part of user. Moreover, as network flows are protected by various ways, such as TLS, the network attacker is not considered. The ability of each entity acted by adversary are shown as follows:
 \begin{itemize}
 \item \textbf{Curious IdP} acts as an completely honest IdP.
-\item \textbf{Malicious RP} has the ability to build any response, as well as the authentication request, for user's requestion. 
+\item \textbf{Malicious RP} has the ability to build any response, as well as the authentication request, for user's requestion.
 \item \textbf{Malicious User} is able to intercept and tamper all the data transmitted through itself.
 %\item \textbf{Network Attacker} has the ability to listen all the IP address on the Internet but unable to tamper any the network flows as they are protected by various ways, such as TLS.
 \end{itemize}
 
 To explicitly illustrate how an adversary works in the SSO system, the \verb+authentication flow+ is created to defined the authentication of specific IdP,  RP and user. For example, now there are $IdP$, $User_{A}$, $User_{B}$, $RP_{A}$ and $RP_{B}$, who are able to form 4 \verb+authentication flow+s, ($IdP$, $User_{A}$, $RP_{A}$), ($IdP$, $User_{A}$, $RP_{B}$), ($IdP$, $User_{B}$, $RP_{A}$) and ($IdP$, $User_{B}$, $RP_{B}$). An adversary has the ability to act one or more entities in single or multiple \verb+authentication flow+s. That is, an adversary is able to act as, i) the single entity in one \verb+authentication flow+, such as the curious IdP; ii) the same entity in multiple \verb+authentication flow+s, such as acting as different RPs for the same honest user ; iii) the different entities in multiple \verb+authentication flow+s, such as acting as the RP for the honest user and the user for the honest RP at the same time. However, it is considered an adversary should not act as both the IdP and RP in single \verb+authentication flow+.
 
-%However, Identity Injection only occurs when 1) IdP is dishonest; 2) the transmission between RP and IdP is corrupted by either corrupted user agent or unprotected network flows. Therefore, Identity Injection is not considered. 
+%However, Identity Injection only occurs when 1) IdP is dishonest; 2) the transmission between RP and IdP is corrupted by either corrupted user agent or unprotected network flows. Therefore, Identity Injection is not considered.
+
+
+
+\section{Challenges and Solutions}
+\label{sec:challenge}
+%PriOIDC allows user to conduct single sign on with out leaking login information to IdP. And even multi RPs' collusion can not trace the user. In this section, we are going to make an overview of our user privacy respecting protocol based on OpenID Connect 1.0.
+%As SSO systems introduce the novel way for the RPs to identify the user, the authentication security and users' privacy should be considered.
+In this section, we describe  the main challenges to hide the user's traces from both IdP and RP, and present the solutions of Recluse briefly.
+
 
 \subsection{Challenges}
-%In SSO systems, PRs' identifier is required in both authentication request and users' identifier proof generation. Moreover, as it has been described in Section~\ref{sec:intro}, it is required to expose the identifier of users' accessed RP for security consideration. Therefore, hiding users' accessed RP from IdP is to introduce prominent challenges. To deal with the challenges, the procedure and parameters generation methods are required to be modified. However, this modification also introduces new attack surface, so that the attackers' ability in Recluse should be considered. 
+%In SSO systems, PRs' identifier is required in both authentication request and users' identifier proof generation. Moreover, as it has been described in Section~\ref{sec:intro}, it is required to expose the identifier of users' accessed RP for security consideration. Therefore, hiding users' accessed RP from IdP is to introduce prominent challenges. To deal with the challenges, the procedure and parameters generation methods are required to be modified. However, this modification also introduces new attack surface, so that the attackers' ability in Recluse should be considered.
 To protect users from the privacy issues introduced by SSO systems, the scheme should simultaneously achieve the following goals:
 \begin{itemize}
 \item Hiding RP's identity from IdP.
 \item Providing distinct user identifier for each RP.
 \end{itemize}
-However, it will introduce prominent challenges. 
+However, it will introduce prominent challenges.
 
-As it has been described in Section~\ref{sec:intro}, it is required to expose the identifier of users' accessed RP for security consideration. Hiding RP's identity from IdP breaks the security considerations listed in Section~\ref{sec:background}. 
+As it has been described in Section~\ref{sec:intro}, it is required to expose the identifier of users' accessed RP for security consideration. Hiding RP's identity from IdP breaks the security considerations listed in Section~\ref{sec:background}.
 \begin{itemize}
 \item \textbf{Breaking Binding: }To hide RP's identity, IdP is unable to know which RP the identity proof is issued for. Therefore, the identity proof is no longer bound with the specific RP, which results in the misuse of identity proof. An adversary has the ability to achieve an honest user's identity proof by various ways, for example, once the user logs in the corrupted RP controlled by the adversary with his/her identity proof, the adversary is able to access other honest RPs with the honest user's identity by using this identity proof (Impersonation Attack).
-\item \textbf{Breaking Confidentiality: }To hide RP's identity, IdP is unable to know the correct endpoint provided by the RP to receive the identity proof. For example, in OIDC, IdP holds the list of all the endpoints of RP waiting for \verb+id_token+, so IdP is able to guarantee that the identity proof is only to be sent to the endpoint in this list. Without the endpoint representing RP's identity, an RP controlled by the adversary has the ability to build the authentication request by setting another honest RP's identifier (if RP's identifier is used in a way without exposing RP's identity) and the adversary's endpoint. IdP is to send the identity proof issued for the honest RP to the adversary. Therefore, the adversary has the ability to achieve the identity proof valid in honest RPs, which results in Impersonation Attack. 
-\item \textbf{Ignoring Content Checking: }To hide RP's identity, IdP is unable to know the RP's unique real name, which represents the RP. Therefore, the notification of target RP's identity to user is no longer provided by IdP. An adversary has the ability to utilize this vulnerability as well as breaking confidentiality to achieve honest user's valid identity proof for other honest RPs (Impersonation Attack). Additionally, as SSO systems require user's clear consent for certain login to specific RP, the phishing attack can be avoided in some situations by RP's name checking. The ignoring of content checking breaks the protection from phishing attack. 
+\item \textbf{Breaking Confidentiality: }To hide RP's identity, IdP is unable to know the correct endpoint provided by the RP to receive the identity proof. For example, in OIDC, IdP holds the list of all the endpoints of RP waiting for \verb+id_token+, so IdP is able to guarantee that the identity proof is only to be sent to the endpoint in this list. Without the endpoint representing RP's identity, an RP controlled by the adversary has the ability to build the authentication request by setting another honest RP's identifier (if RP's identifier is used in a way without exposing RP's identity) and the adversary's endpoint. IdP is to send the identity proof issued for the honest RP to the adversary. Therefore, the adversary has the ability to achieve the identity proof valid in honest RPs, which results in Impersonation Attack.
+\item \textbf{Ignoring Content Checking: }To hide RP's identity, IdP is unable to know the RP's unique real name, which represents the RP. Therefore, the notification of target RP's identity to user is no longer provided by IdP. An adversary has the ability to utilize this vulnerability as well as breaking confidentiality to achieve honest user's valid identity proof for other honest RPs (Impersonation Attack). Additionally, as SSO systems require user's clear consent for certain login to specific RP, the phishing attack can be avoided in some situations by RP's name checking. The ignoring of content checking breaks the protection from phishing attack.
 
 %\item \textbf{Break Content Checking: }As RP's identity is hidden from IdP, IdP is unable to notify user with the unique RP's name while authenticating, which means user does not know the real identity of RP he/she logs in.
 \end{itemize}
 Additionally, it introduces another challenge to provide distinct user identifier while hiding RP's identity
 \begin{itemize}
-\item \textbf{RP is unable to identify the user: }To hide RP's identity, the single RP's multiple authentication requests should be considered from different RPs by IdP. However, the user identifier provided by IdP is solely bound with an RP to avoid linking the user through RPs' collusion. It means that the single user's multiple identifiers for one RP will never be constant. Therefore, RP is unable to identify the user no longer. 
+\item \textbf{RP is unable to identify the user: }To hide RP's identity, the single RP's multiple authentication requests should be considered from different RPs by IdP. However, the user identifier provided by IdP is solely bound with an RP to avoid linking the user through RPs' collusion. It means that the single user's multiple identifiers for one RP will never be constant. Therefore, RP is unable to identify the user no longer.
 \end{itemize}
 
 \subsection{Solutions}
-To deal with the challenges introduced by hiding RP's identity from IdP, the following methods are proposed: 
+To deal with the challenges introduced by hiding RP's identity from IdP, the following methods are proposed:
 \begin{itemize}
 \item \textbf{Providing the RP identifier which is only valid in corresponding RP without exposing RP's real identity.} The RP identifier should be generated in a way so that for each authentication the identifiers are different. Moreover, the generation should be beyond any entities' control to avoid the misuse of user's identity proof, which happens when different RPs use the same identifier. Therefore, we propose the scheme that the identifier should be generated under the negotiation between the user and RP. However, in this way, the malicious RP and user have the ability to build any negotiation requests and responses they need. Adversaries try to the honest RP use the same identifier with a corrupted one to obtain an honest user's identity proof valid in other honest RPs, which will be analysed detailedly in Section~\ref{sec:analysis}. Moreover, the curious IdP tries to derive the real identity of RP from the RP identifier. It is also to be analysed in Section~\ref{sec:analysis}.
 \item \textbf{Providing the distinct user identifier which make RP able to identify the user. } It is required that the user identifier provided by IdP (named \verb+user_id+) should be different in each authentication, but RP is able to derive the specific user identifier for each RP (named \verb+user_rp_id+) which is constant for each RP with the \verb+user_id+. However, the current ways to generate user identifier, such as using random character string as user identifier and binding it with specific RP identifier in database, is not appropriate. Therefore, we proposed a novel \verb+user_id+ generating algorithm associated with RP identifier generating which allows only the corresponding RP has the trapdoor to derive the \verb+user_rp_id+ from \verb+user_id+. In this way, malicious RPs try to link the user by the \verb+user_id+, which is also to be analysed in Section~\ref{sec:analysis}.
 %通过RP构造的authentication使不同的用户最终推导出相同的user identifier,攻击者如何获益？
-\item \textbf{Binding the RP identifier with RP's attributes. } It is required that the identity proof issued for specific RP identifier should be sent to the corresponding endpoint. However, RP identifier is generated temporarily by user and RP unrelated with any RP, so that IdP is unable to decide which endpoint the identity proof should be sent to. Therefore, the enhanced user agent is required to guarantee the identity proof's transmission without introducing new trustful entity into SSO system. It is required that the RP identifier generation should be based on the basic identifier element (named \verb+basic_rp_id+) issued by RP, as well as the \verb+basic_rp_id+ should be bound with specific endpoint. Moreover, if IdP publishes the relationship of all the RPs on its website, unless user agent caches all the relationship, the access for specific RP's relationship is to expose the user's accessed RP. Therefore, IdP should offer the certification signed with its private key for each RP, which contains the RP's \verb+basic_rp_id+ and endpoint list. User agent should have the ability to verify this certification. 
+\item \textbf{Binding the RP identifier with RP's attributes. } It is required that the identity proof issued for specific RP identifier should be sent to the corresponding endpoint. However, RP identifier is generated temporarily by user and RP unrelated with any RP, so that IdP is unable to decide which endpoint the identity proof should be sent to. Therefore, the enhanced user agent is required to guarantee the identity proof's transmission without introducing new trustful entity into SSO system. It is required that the RP identifier generation should be based on the basic identifier element (named \verb+basic_rp_id+) issued by RP, as well as the \verb+basic_rp_id+ should be bound with specific endpoint. Moreover, if IdP publishes the relationship of all the RPs on its website, unless user agent caches all the relationship, the access for specific RP's relationship is to expose the user's accessed RP. Therefore, IdP should offer the certification signed with its private key for each RP, which contains the RP's \verb+basic_rp_id+ and endpoint list. User agent should have the ability to verify this certification.
 Similarly, the responsibility of notifying user with RP's identity should be shifted to user agent. Same as binding the RP identifier with correct endpoint, RP's certification should contains RP's name and user agent should show it to user clearly while authenticating.
 \end{itemize}
 
@@ -65,19 +79,19 @@ With dynamic registration, an RP has the ability to re-register the new \verb+cl
 %在不改变单点登录系统结构的情况下，由于IdP要向RP提供用户的身份信息，所以向IdP隐藏用户身份是不可行的
 %向IdP隐藏RP身份要通过隐藏client_id和redirect_uri实现
 %The ability of IdP. Discribe the solution of protecting users' privacy.
-%In OpenID Connect systems IdP gets RP's identity by client\_id or redirect\_uri in request (Figure~\ref{fig:OpenID} step 2) and gets user's identity when authenticating the user (Figure~\ref{fig:OpenID} step 3). 
-%As IdP has to provide RP a user's authenticator bound with user's identity, it's not possible to keep user anonymous in IdP without modifying the structure of current SSO system. 
+%In OpenID Connect systems IdP gets RP's identity by client\_id or redirect\_uri in request (Figure~\ref{fig:OpenID} step 2) and gets user's identity when authenticating the user (Figure~\ref{fig:OpenID} step 3).
+%As IdP has to provide RP a user's authenticator bound with user's identity, it's not possible to keep user anonymous in IdP without modifying the structure of current SSO system.
 %So it is only feasible to protect user's privacy by keeping RP anonymous in IdP. But it introduces new challenges.
-In OIDC, the authentication request from RP to IdP exposes RPs' identity by the parameters, \verb+client_id+ (RP's identifier) and \verb+redirect_uri+ (RP's endpoint for token receiving). To hide accessed RP from IdP requires that \verb+client_id+ and \verb+redirect_uri+ should not represent an RP any more. As these parameters have played important roles in authentication, it introduces prominent challenges. 
+In OIDC, the authentication request from RP to IdP exposes RPs' identity by the parameters, \verb+client_id+ (RP's identifier) and \verb+redirect_uri+ (RP's endpoint for token receiving). To hide accessed RP from IdP requires that \verb+client_id+ and \verb+redirect_uri+ should not represent an RP any more. As these parameters have played important roles in authentication, it introduces prominent challenges.
 
 \noindent\textbf{Challenges in Authentication Procedure.} The \verb+client_id+ and \verb+redirect_uri+ are required in both authentication request and users' identifier proof generation, so that the omission of these parameters introduces challenges in authentication procedure. The challenges are as follows:
 \begin{itemize}
-\item OIDC is designed for the centralized systems. Therefore, prior coordination is required between RP and IdP so that RP registers its individual attributes (i.e., \verb+redirect_uris+) and gets client attributes (i.e., \verb+client_id+) issued by IdP. While the authentication request is transmitted from RP, IdP verifies the validation of \verb+client_id+ and \verb+redirect_uri+ because it only provide service to those RPs already registered. Therefore, if an RP builds the authentication request without \verb+client_id+ and \verb+redirect_uri+, IdP considers it invalid. 
-\item The identity proof issued (called \verb+id_token+) by IdP provides the PPID (called \verb+sub+) of the user for RP. It means that the \verb+sub+ is solely bound with an RP to avoid linking the user through RPs' collusion. However, once the IdP doesn't know the RP accessed by user, it is impossible for IdP to provide the corresponding PPID for RPs. Therefore, RP has no ability to identify a user any more. 
+\item OIDC is designed for the centralized systems. Therefore, prior coordination is required between RP and IdP so that RP registers its individual attributes (i.e., \verb+redirect_uris+) and gets client attributes (i.e., \verb+client_id+) issued by IdP. While the authentication request is transmitted from RP, IdP verifies the validation of \verb+client_id+ and \verb+redirect_uri+ because it only provide service to those RPs already registered. Therefore, if an RP builds the authentication request without \verb+client_id+ and \verb+redirect_uri+, IdP considers it invalid.
+\item The identity proof issued (called \verb+id_token+) by IdP provides the PPID (called \verb+sub+) of the user for RP. It means that the \verb+sub+ is solely bound with an RP to avoid linking the user through RPs' collusion. However, once the IdP doesn't know the RP accessed by user, it is impossible for IdP to provide the corresponding PPID for RPs. Therefore, RP has no ability to identify a user any more.
 \end{itemize}
 \noindent\textbf{Challenges in Security.} In addition to playing the important roles in authentication procedure, the \verb+client_id+ is required to avoid the misuse of \verb+id_token+ and the \verb+redirect_uri+ guarantees the \verb+id_token+ should be transmitted to corresponding  RP. The of \verb+client_id+ and \verb+redirect_uri+ introduces the following challenges:
 \begin{itemize}
-\item While RP registers with IdP, IdP gets the \verb+redirect_uris+ which lists all the endpoints of RP waiting for \verb+id_token+. Therefore, once IdP receives an authentication request from the RP, it compares the \verb+redirect_uri+ in request with the registered endpoints. If the \verb+redirect_uri+ has not been registered before, IdP considers this request malicious. This means if the user is honest and transmissions among user, IdP and RP are well protected (e.g., using TLS), the attacker has no possibility to get the \verb+id_token+. However, without the endpoint provided by RP, IdP is unable to guarantee the \verb+id_token+ is properly transmitted to the corresponding RP. 
+\item While RP registers with IdP, IdP gets the \verb+redirect_uris+ which lists all the endpoints of RP waiting for \verb+id_token+. Therefore, once IdP receives an authentication request from the RP, it compares the \verb+redirect_uri+ in request with the registered endpoints. If the \verb+redirect_uri+ has not been registered before, IdP considers this request malicious. This means if the user is honest and transmissions among user, IdP and RP are well protected (e.g., using TLS), the attacker has no possibility to get the \verb+id_token+. However, without the endpoint provided by RP, IdP is unable to guarantee the \verb+id_token+ is properly transmitted to the corresponding RP.
 \item The \verb+id_token+ includes the RP's identifier (called \verb+aud+), user's PPID and IdP's identifier (called \verb+iss+), representing the \verb+id_token+ is issued by \verb+iss+ for \verb+aud+ to confirm that the owner's (of this \verb+id_token+) identity is \verb+sub+. Therefore, RP compares the \verb+aud+ with its own identifier to make sure whether this  \verb+id_token+ is issued for itself. However, once IdP doesn't know the correct identifier of RP, the \verb+id_token+ issued by IdP doesn't include the correct \verb+aud+ any more. It results in the misuse of \verb+id_token+.
 %This means an \verb+id_token+ is not bound with a specific RP which makes impersonation attack possible.
 \end{itemize}
@@ -87,14 +101,14 @@ In OIDC, the authentication request from RP to IdP exposes RPs' identity by the 
 
 \item To identify a user in different logins, RP should have the ability to transform the user's PPID into a constant user identifier for each user. Some OIDC systems only use a random  character string as the PPID (e.g., MITREid Connect). Therefore, the new user PPID generating algorithm should be created for user authentication while only the corresponding RP has the trapdoor to derive the unique identifier from PPID. To protect users from linkage by RPs' collusion, both the PPID and the unique identifier should be bound with the (not completely) random RP's identifier. The PPID generating algorithm and  RP's identifier generating algorithm will be described detailedly in Section~\ref{sec:protocol}.
 
-\item With dynamic registration, an RP has the ability to re-register the new \verb+client_id+ and \verb+redirect_uri+ with IdP. Therefore, it is needed that before the authentication request is transmitted to IdP, RP should re-register the newly generated \verb+client_id+ and completely random \verb+redirect_uri+ with IdP. The registration should be conducted by the user to avoid direct interactive between RP and IdP. However, the specification~\cite{DynamicRegistration} of OIDC dynamic registration requires the registration request should carry a bearer token as well as the new  \verb+client_id+ is generated by IdP. To avoid IdP finding out RP's identity through dynamic registration, the requirement of registration token should be omitted. It is also needed to enable RP to assign the specific \verb+client_id+. It is observed that although \verb+client_id+ is defined to be generated by IdP, some OIDC systems (e.g., MITREid Connect) enable the \verb+client_id+ be the input attribute. 
+\item With dynamic registration, an RP has the ability to re-register the new \verb+client_id+ and \verb+redirect_uri+ with IdP. Therefore, it is needed that before the authentication request is transmitted to IdP, RP should re-register the newly generated \verb+client_id+ and completely random \verb+redirect_uri+ with IdP. The registration should be conducted by the user to avoid direct interactive between RP and IdP. However, the specification~\cite{DynamicRegistration} of OIDC dynamic registration requires the registration request should carry a bearer token as well as the new  \verb+client_id+ is generated by IdP. To avoid IdP finding out RP's identity through dynamic registration, the requirement of registration token should be omitted. It is also needed to enable RP to assign the specific \verb+client_id+. It is observed that although \verb+client_id+ is defined to be generated by IdP, some OIDC systems (e.g., MITREid Connect) enable the \verb+client_id+ be the input attribute.
 
 \item Using the random \verb+redirect_uri+ makes the responsibility to check whether the \verb+redirect_uri+ has been registered is migrated to user's agent (e.g., browser) as it is impossible for IdP to guarantee the \verb+id_token+ is properly transmitted to the corresponding RP any more. However, to avoid the query for registered endpoints list from user agent exposing the RP's identity, IdP should issue the \verb+RP Certification+ for each RP which includes the RP's basic attributes and the registered endpoints list with a signature. User agent should have the ability to take the responsibility to check whether the \verb+redirect_uri+ has been registered through the \verb+RP Certification+.
 \end{itemize}
 
 
 %最直接的隐藏RP的方法是在登录过程中使用随机的client_id与redirect_uri
-%简单的修改会带来两个方面的问题：流程问题与安全问题 
+%简单的修改会带来两个方面的问题：流程问题与安全问题
 %流程问题：IdP只识别注册过的client_id与redirect_uri；client_id与uid绑定，随机的client_id使每次的uid都不同
 %安全问题：随机的client_id导致了不同RP之间的token可以混用；随机的redirect_uri导致IdP无法保证token只发送给对应的RP
 %Security problems. The secure rules of sso system summarized from the previous research. And the simple solution will disobey which rules.
@@ -107,14 +121,14 @@ In OIDC, the authentication request from RP to IdP exposes RPs' identity by the 
 %设计client_id与user id 的生成算法，使RP能够识别用户
 
 
-  
+
 \subsection{Entities}
 To achieve the goals outlined in Section~\ref{sec:intro}, the requirements and restrictions of abilities owned by each entities in single-sign-on system is defined as follows: %要做的内容，总的角色能力描述
 \begin{itemize}
-    \item \textbf{User} is the entity to be authenticated in this system who holds the credentials for the IdP. User takes part in the the system through the user agent. 
-    \item \textbf{User agent} is the software used by the user, such as browser and the application on the mobile device. User agent negotiates the RP's identifier with the RP and dynamically registers the newly generated identifier with a random endpoint for identity proof with IdP. Besides, user agent also guarantees the user's identity proof is only transmitted to the corresponding RP by tampering and modifying the transmission through it. To make user able to use Recluse conveniently in any devices, user agent should not store any data persistently. 
+    \item \textbf{User} is the entity to be authenticated in this system who holds the credentials for the IdP. User takes part in the the system through the user agent.
+    \item \textbf{User agent} is the software used by the user, such as browser and the application on the mobile device. User agent negotiates the RP's identifier with the RP and dynamically registers the newly generated identifier with a random endpoint for identity proof with IdP. Besides, user agent also guarantees the user's identity proof is only transmitted to the corresponding RP by tampering and modifying the transmission through it. To make user able to use Recluse conveniently in any devices, user agent should not store any data persistently.
     \item \textbf{RP} is the entity who provides the service and need to identify the user. RP negotiates the RP's identifier with the user agent and builds the authentication request to IdP with the newly created identifier. RP identifies a user through a identity proof by deriving a constant user identifier from PPID. To avoid the user linkage by multiple RPs, RP should be unable to derive the real user's identity from PPID.
-    \item \textbf{IdP} is the entity who authenticates the user and provide the identity proof. IdP allows user and RP's registration, initiates the entities' attributes and offers the initial configuration, such as \verb+RP Certification+. IdP provides the endpoint for RP's dynamic registration. Besides, IdP authenticates the user, verifies the authentication request, generates user's PPID and issues the identity proof. To avoid IdP from tracking the user, IdP should not be able to find out RP's identity by RP identifier nor the relevance between an RP's  different identifier. 
+    \item \textbf{IdP} is the entity who authenticates the user and provide the identity proof. IdP allows user and RP's registration, initiates the entities' attributes and offers the initial configuration, such as \verb+RP Certification+. IdP provides the endpoint for RP's dynamic registration. Besides, IdP authenticates the user, verifies the authentication request, generates user's PPID and issues the identity proof. To avoid IdP from tracking the user, IdP should not be able to find out RP's identity by RP identifier nor the relevance between an RP's  different identifier.
 \end{itemize}
 \subsection{Threat Model}
 %Considered different attack scenarios, malicious opponent can be divided into following situations: malicious IdP, malicious RP, malicious user and external attacker. In different situations malicious owns different abilities.
@@ -138,12 +152,12 @@ To achieve the goals outlined in Section~\ref{sec:intro}, the requirements and r
 %能够监听和篡改单点登录过程中的网络流量
 In Recluse, the adversaries' goals are shown as follows:
 \begin{itemize}
-\item Privacy undermining: Adversaries know user's login trace. 
+\item Privacy undermining: Adversaries know user's login trace.
 \item Impersonation attack: Adversaries log in to the honest RP as the honest user.
-\item Identity Injection: Honest user logs in to the honest RP under adversaries' identity. 
+\item Identity Injection: Honest user logs in to the honest RP under adversaries' identity.
 \end{itemize}
 
-As Recluse is designed centralized, IdP has the max authority in this system. Therefore, IdP should be considered honest but curious. Otherwise, an malicious IdP has the ability to log in to any RP as any honest user (impersonation attack) and enforce any honest user to log in honest RP under an adversary's identity (identity injection). It is considered that any RP could be corrupted and any user may be the adversary. User agent is considered completely honest but under control of the user. Therefore, the user agent is seemed as a part of user. Network attackers are also considered. 
+As Recluse is designed centralized, IdP has the max authority in this system. Therefore, IdP should be considered honest but curious. Otherwise, an malicious IdP has the ability to log in to any RP as any honest user (impersonation attack) and enforce any honest user to log in honest RP under an adversary's identity (identity injection). It is considered that any RP could be corrupted and any user may be the adversary. User agent is considered completely honest but under control of the user. Therefore, the user agent is seemed as a part of user. Network attackers are also considered.
 
 \begin{itemize}
 \item \textbf{Curious IdP} acts as an completely honest IdP.
@@ -155,9 +169,9 @@ As Recluse is designed centralized, IdP has the max authority in this system. Th
 
 
 
-%There are two kinds of malicious RPs. The first is the legal RP owned by malicious opponent and the other is phishing site. Because everyone is able to register as an RP at IdP, it is considered that RP can be fully controlled by malicious. A malicious RP is going to conduct impersonation attack and privacy undermining attack on user. As some attack methods require attacker act as both RP and user, to avoid the repetitive description malicious RP and malicious user is defined: If attacker acts as an RP in attack, attacker is considered as malicious RP. If attacker only acts as a user, it's malicious user. 
-%A malicious RP's goals include: 1) Getting id\_token from user which is validate in other RPs. 2) Deducing user's login trace by colluding with other RPs. 
-%Malicious RP is able to make fake basic\_rp\_id and conduct client\_id negotiation with user. Malicious RP is also able to construct the id\_token request to IdP and receive id\_token from IdP. In phishing attack, it is considered that user trusts attacker completely. 
+%There are two kinds of malicious RPs. The first is the legal RP owned by malicious opponent and the other is phishing site. Because everyone is able to register as an RP at IdP, it is considered that RP can be fully controlled by malicious. A malicious RP is going to conduct impersonation attack and privacy undermining attack on user. As some attack methods require attacker act as both RP and user, to avoid the repetitive description malicious RP and malicious user is defined: If attacker acts as an RP in attack, attacker is considered as malicious RP. If attacker only acts as a user, it's malicious user.
+%A malicious RP's goals include: 1) Getting id\_token from user which is validate in other RPs. 2) Deducing user's login trace by colluding with other RPs.
+%Malicious RP is able to make fake basic\_rp\_id and conduct client\_id negotiation with user. Malicious RP is also able to construct the id\_token request to IdP and receive id\_token from IdP. In phishing attack, it is considered that user trusts attacker completely.
 
 
 \item \textbf{Malicious User} has the ability to build any request in \verb+client_id+ negotiation, build any dynamic registration request it need. Besides, User is also able to temper and modify all the data transmitted through itself.
@@ -172,6 +186,6 @@ As Recluse is designed centralized, IdP has the max authority in this system. Th
 
 \end{comment}
 
-%\textbf{External Attacker} External attacker's targets include impersonation attack, abduction attack and privacy undermining attack. External attacker is able to capture and temper all the network flow through user, RP and IdP. 
+%\textbf{External Attacker} External attacker's targets include impersonation attack, abduction attack and privacy undermining attack. External attacker is able to capture and temper all the network flow through user, RP and IdP.
 
 
