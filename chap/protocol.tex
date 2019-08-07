@@ -7,6 +7,19 @@
   \label{fig:overview}
 \end{figure}
 
+In Recluse, the user and RP corporately calculate a transformation of the RP's identifier based on Discrete Logarithm Problem, which is sent to the IdP for binding with the identity proof while preventing the IdP from inferring the original RP identifier. The PPIDs (in the identity proof) for a user in various RPs are different, to avoid the identity linkage. Moreover, only the RP (and the user) can calculate the trapdoor of the transformation, to transfer the PPID into a unchanged account for the user. 
+
+In details, Recluse contains the following 6 phases, in which the IdP setup needs to be executed only once for a IdP, RP initial registration  needs to be invoked only once for a RP, while all the other phases will be invoked repeatedly, for each user's login request at each RP.
+\begin{itemize}
+  \item IdP setup: generating correct public parameters;
+  \item RP initial registration: Applying RP certificate (denoted as $Cert_{RP}$) from IdP (Step 1 in Figure~\ref{fig:overview});
+  \item RP identifier transforming: Generating transformation (denoted as $RPID_T$) of RP's original identifier (denoted as $RPID_O$) (Step 2 in Figure~\ref{fig:overview});
+  \item Dynamic registration: Checking the global uniqueness of $RPID_T$ (Step 3 in Figure~\ref{fig:overview});
+  \item PPID:  generating PPID at the IdP, and transferring PPID to the RP (Step 4 and 5 in in Figure~\ref{fig:overview});
+  \item Account:  calculating the user's account in the RP (Step 6 in Figure~\ref{fig:overview}).
+\end{itemize}
+
+\begin{comment}
 
 The overview of login flow is shown in Figure~\ref{fig:overview}, which contains RP identifier negotiation, dynamic registration and token obtaining.
 
@@ -20,7 +33,7 @@ The of each phase in login flow is shown as follows:
 
 However, in addition to the login flow in each authentication, the initial registration is required before the RP and user integrates the Recluse service. The initial registration allows the RP to achieve the necessary parameters from the IdP and user to sign on in the IdP. In Recluse system, the initial registration is conducted by each RP and user only once, however, the login flow is conducted in each authentication integrally each time.
 
-
+\end{comment}
 
 \subsection{Initial Registration}
 The initial registration between RP and IdP is shown as Figure~\ref{fig:registration}.
