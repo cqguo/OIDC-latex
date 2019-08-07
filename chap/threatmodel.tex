@@ -1,21 +1,33 @@
 \section{Assumption and Threat Model}
 \label{sec:assumptionandthreatmodel}
-Recluse contains only three entities, i.e., the user, IdP and RP; and doesn't introduce any other (trusted) entity. In addition to the conventional processes (described in Section~\ref{subsec:OIDC}) as in the typical SSO systems~\cite{SAMLIdentifier,OpenIDConnect}, extra processes are required on the entities in Recluse to include the solutions provided in section~\ref{subsec:solutions}:
+Recluse contains only three entities, i.e., the user, IdP and RP; and doesn't introduce any other (trusted) entity. 
+
+\begin{comment}
+In addition to the conventional processes (described in Section~\ref{subsec:OIDC}) as in the typical SSO systems~\cite{SAMLIdentifier,OpenIDConnect}, extra processes are required on the entities in Recluse to include the solutions provided in section~\ref{subsec:solutions}:
 \begin{itemize}
-  \item User. The user verifies the received RP certificate, generates a nonce to participate in the generation of RP's transformation identifier with the RP's original identifier extracted from the certificate, sends the transformation to the IdP, and relays the identity proof to the URL extracted from the RP certificate.
   \item IdP. In the initial registration of RP,  IdP checks the correctness of RP's URL,  assigns an unique original identifier, and generates the RP certificate with its private key. For each identity proof request, IdP calculates the PPID based on the provided RP's transformation identifier.
-  \item RP. The RP applies the RP certificate from the IdP with correct URL, provides it to the user on each login request, generates a nonce to participate in the generation of RP's transformation identifier, calculates the trapdoor of the transformation, and uses it to derive the user's unique account.  
+  \item User. The user verifies the received RP certificate, generates a nonce to participate in the generation of RP's transformation identifier with the RP's original identifier extracted from the certificate, sends the transformation to the IdP, and relays the identity proof to the URL extracted from the RP certificate.
+  \item RP. The RP applies the RP certificate from the IdP with correct URL, provides it to the user on each login request, generates a nonce to participate in the generation of RP's transformation identifier, calculates the trapdoor of the transformation, and uses it to derive the user's unique account.
 \end{itemize}
+\end{comment}
 
-\noindent\textbf{Assumption.} In Recluse, we assume the user agent deployed at the honest user is correct, and will transmit the messages to the correct destination without leakage. The TLS is correctly implemented at the user agent, IdP and RP, which ensures the confidentiality and integrity of the network traffic. We also assume the nonce is unpredictable by using  a secure random number generator; and the adopted cryptographic algorithms, including the RSA and SHA-256 for the RP certificate, are secure and implemented correctly, that is, no one with the IdP's private key can produce a valid certificate, and the adversary fails to infer the private key. Moreover, the transformation of the RP's identifier and the user's account calculation are based on the Discrete Logarithm Problem, we assumes the adversary fails to infer $r$ from $g^r mod P$, where $P$ is a large prime and $g$ is the generator. 
+\noindent\textbf{Assumption.} In Recluse, we assume the user agent deployed at the honest user is correct, and will transmit the messages to the correct destination without leakage. The TLS is correctly implemented at the user agent, IdP and RP, which ensures the confidentiality and integrity of the network traffic. We also assume the nonce is unpredictable by using  a secure random number generator; and the adopted cryptographic algorithms, including the RSA and SHA-256 for the RP certificate, are secure and implemented correctly, that is, no one with the IdP's private key can produce a valid certificate, and the adversary fails to infer the private key. Moreover, the transformation of the RP's identifier and the user's account calculation are based on the Discrete Logarithm Problem, we assumes the adversary fails to infer $r$ from $g^r mod P$, where $P$ is a large prime and $g$ is the generator.
 
-\noindent\textbf{Threat model}
-\begin{itemize}
-  \item Security.
-  \item Privacy
-\end{itemize}
+\subsection{Threat Model}
+\label{subsec:threatmodel}
+In Recluse, the adversary attempts to break the security and user's privacy under the following threat model.
 
-under which the adversary attempts to break the security and privacy of SSO systems
+\noindent\textbf{Security.} The adversary attempts to break the confidentiality, integrity or binding of the identity proof, for impersonating the victim user to access a RP, or making the user access a RP under an incorrect account. Same as traditional SSO systems~\cite{SAMLIdentifier,OpenIDConnect,persona,SPRESSO}, we assume the IdP is honest, while the user and RP may be malicious as they may be controlled by the adversary. The details are as follows:
+
+\textbf{Honest IdP.} The IdP is well protected and the private keys for signing the RP certificate and identity proof are not leaked. In the initial registration of RP,  IdP checks the correctness of RP's URL,  assigns an unique original identifier, and generates the correct signature. For identity proof, IdP generates the proof only for the authenticated user, calculates the PPID based on the user's unique identifier and the user-provided transformation of RP identifer, binds the proof with the transformation, generates the signature correctly, and sends it only to the user.
+
+\textbf{Malicious User.} The adversary may obtain the victim user's credential through various attacks, or register a valid account at the IdP and RP. The user controlled by the adversary may behave arbitrarily. For example, the malicious user may send illegal login request to the RP, transmit a modified or forged identity proof request to the IdP, reply a corrupted or forged identity proof to the RP, or perform the replay attacks. The user may also accept an invalid RP certificate, choose a non-random nonce to participate in the generation of RP's transformation identifier, or send the proof to an incorrect (victim) RP.
+
+\textbf{Malicious RP.} The adversary may work as RPs and behave arbitrarily, by controlling one or more compromised RPs, or registering as multiple valid RPs at the IdP. The malicious RP may attempt to obtain the identity proof bound with it accept by other RPs by using one or more chosen nonce for the RP's transformation identifiers, or receive an identity proof bound with other RP by sending another valid or invalid RP certificate instead of its own one, or providing an incorrect identity proof request (e.g. CSRF).
+
+
+\noindent\textbf{Privacy.}
+
 In SSO systems, IdP has the max authority in this system. Therefore, IdP should be considered honest but curious. Otherwise, an malicious IdP has the ability to log in to any RP as any honest user (impersonation attack) and enforce any honest user to log in honest RP under an adversary's identity (identity injection). Moreover, a user's login trace is never hidden from collusion between IdP and RP. It is considered that any RP could be corrupted and any user may be the adversary. User agent is considered completely honest but under control of the user. Therefore, the user agent is seemed as a part of user. Moreover, as network flows are protected by various ways, such as TLS, the network attacker is not considered. The ability of each entity acted by adversary are shown as follows:
 \begin{itemize}
 \item \textbf{Curious IdP} acts as an completely honest IdP.
