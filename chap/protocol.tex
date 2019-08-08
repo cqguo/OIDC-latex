@@ -24,7 +24,7 @@ Recluse achieves these 5 goals using 5 phases as described in Figure~\ref{fig:ov
   \item RP identifier transforming: Generating transformation (denoted as $RPID_T$) of RP's original identifier (denoted as $RPID_O$), (Step 2, Goal 2);
   \item Dynamic registration: Checking the global uniqueness of $RPID_T$, (Step 3, Goal 3);
   \item PPID:  Generating PPID at the IdP, and transferring PPID to the RP, (Step 4 and 5, Goal 4);
-  \item Account: Calculating the user's account in the RP, Step 6 in Figure~\ref{fig:overview}, (Step 6, Goal 5).
+  \item Account: Calculating the user's account in the RP, (Step 6, Goal 5).
 \end{itemize}
 
 \begin{comment}
@@ -41,7 +41,8 @@ To achieve these goals, Recluse contains the following 6 phases, in which the Id
 \end{itemize}
 \end{comment}
 
-In Recluse, the IdP needs to be initialized during the IdP setup, for generating the public parameters for the users and RPs; the RP has to perform the initial registration at the RP setup; and  the user triggers the Step 2-6 in Figure~\ref{fig:overview} for each login at a RP.
+In Recluse, the IdP needs to be initialized during the IdP setup, for generating the public parameters for the users and RPs; the RP has to perform only one initial registration at the RP setup; and  the user triggers the Step 2-6 in Figure~\ref{fig:overview} for each login at a RP. IdP setup is performed at the very beginning of Recluse, and will be invoked by the IdP to update the leaked $SK_{Cert}$ or $SK_{ID}$, while $g$ and $P$ will never be modified. Recluse does not support multiple initial registrations for one RP, as the RP does not know the $UIID$ and fails to derive the user's new account  from the old one under the Discrete Logarithm problem.
+
 
 \begin{table}[tb]
     \caption{The notations used in Recluse.}
@@ -81,6 +82,8 @@ In Recluse, the IdP needs to be initialized during the IdP setup, for generating
     \end{tabular}
     \label{tbl:notations}
 \end{table}
+
+\noindent\textbf{IdP setup.} 
 
 \begin{comment}
 
