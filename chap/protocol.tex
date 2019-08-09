@@ -179,6 +179,21 @@ Finally, RP derives the user's unchanged $Account$ from $PPID$ as follows. \text
 
 \subsection{Compatible with OIDC}
 \label{subsec:compatible}
+Recluse is compatible with the implicit protocol flow of OIDC (authorization code flow is discussed in Section~\ref{sec:discussion}).
+
+In Recluse, the formats of identity proof request and identity proof are the same as the ones in OIDC. The identity proof request in Recluse is the same as the one in OIDC, which contains the RP's identifier ($RPID_T$ in Recluse), the endpoint (one-time endpoint in the request from the user in Recluse) and the set of required attributes (also supported by Recluse although not listed in the description). The identity proof in Recluse is also exactly the same as the one in Recluse, which includes RP's identifer ($PPID_T$ in Recluse), the user's PPID, validity period, issuing time, other requested attributes and a signature using the IdP's private key.
+
+The same format of identity proof request and identity proof makes the verification same in OIDC and Recluse. The IdP, in both Recluse and OIDC, verifies the identity proof request, by checking whether the mapping of RP's identifier and endpoint exists in the registered ones. The RP, in both Recluse and OIDC, checks the correctness of identity proof, by checking that the signature is correct, the consistency of RP's identifer in the identity proof and the one it owns, the validity period and issuing time and the freshness, which is checked based on a nonce in  OIDC, while  $RPID_T$ serves as the nonce in Recluse.
+
+The RP's extra processes needed in Recluse may be achieved using the existing interfaces defined in OIDC.  Recluse requires that $RPID_T$ is globally unique, which can be achieved through the dynamic registration (described in Section~\ref{sec:background}) provided by IdP in OIDC. In Recluse, the dynamic registration is invoked by the user instead of the RP to prevent the curious IdP infers the user's traces by analyzing the between the dynamic registration and identity proof request. Moreover, the endpoint in the dynamic registration request is replaced with an one-time endpoint, to avoid the RP's identifying information to be leaked to the IdP.
+
+
+The modification required by Recluse at the RP may be achieved using existing interface provided by the implementations of OIDC. Based on the software development kit (SDK) in existing OIDC implementations for RP, the Steps 2,3, 6, 12 (in Figure~\ref{fig:process}) in RP may be integrated in the interface for constructing identity proof request;
+Step 18 in Figure~\ref{fig:process} may be combined with the interface for verifying and parsing identity proof. 
+
+The processes at the user may be achieved through an extension at the user agent, described in Section~\ref{sec:implementation}, while only the RP initial registration and Step 15 in Figure~\ref{fig:process} requires a modification at IdP.
+
+
 
 \begin{comment}
 
