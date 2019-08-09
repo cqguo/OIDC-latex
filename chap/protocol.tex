@@ -11,14 +11,14 @@ As analyzed in Section~\ref{subsec:solutions}, to ensure the security and privac
 \begin{itemize}
   \item 1. Providing a self-verifying value for the user-centric check, to ensure the correct construction and transmission of identity proof (i.e., user-centric confidentiality);
   \item 2. Providing a RP identifier transforming algorithm, to ensure the security by binding the identity proof with this transformation, and preserve user's privacy by preventing the IdP from inferring the original RP identifier;
-  \item 3. Checking the uniqueness of the transformation, to avoid one identity proof being accepted by two or more RPs, which will harm the security of SSO systems; 
+  \item 3. Checking the uniqueness of the transformation, to avoid one identity proof being accepted by two or more RPs, which will harm the security of SSO systems;
   \item 4. Unlinkable PPID, for one user, the PPIDs for different RPs should vary, to prevent identity linkage;
   \item 5. Unchange account, to allow only the destination RP having the trapdoor to derive the unchanged account for one user from varying PPIDs, which is necessary for providing the consecutive and individual services.
 \end{itemize}
 
 %To hide the user's traces from both the IdP and colluded RPs without breaking the security, Recluse has to achieve these : (1) the user and RP corporately calculate a transformation of the RP's identifier based on Discrete Logarithm Problem, which is sent to the IdP for binding with the identity proof while preventing the IdP from inferring the original RP identifier. The PPIDs (in the identity proof) for a user in various RPs are different, to avoid the identity linkage. Moreover, only the RP (and the user) can calculate the trapdoor of the transformation, to transfer the PPID into a unchanged account for the user.
 
-Recluse achieves these 5 goals using 5 phases as described in Figure~\ref{fig:overview}, while the used notations are listed in Table~\ref{tbl:notations}. The details are as follows, and the step refers to the one in Figure~\ref{fig:overview}: 
+Recluse achieves these 5 goals using 5 phases as described in Figure~\ref{fig:overview}, while the used notations are listed in Table~\ref{tbl:notations}. The details are as follows, and the step refers to the one in Figure~\ref{fig:overview}:
 \begin{itemize}
   \item RP initial registration: Applying for a RP certificate ($Cert_{RP}$), a self-verifying value,  (Step 1, Goal 1);
   \item RP identifier transforming: Generating transformation (denoted as $RPID_T$) of RP's original identifier (denoted as $RPID_O$), (Step 2, Goal 2);
@@ -30,7 +30,7 @@ Recluse achieves these 5 goals using 5 phases as described in Figure~\ref{fig:ov
 \begin{comment}
 A RP certificate (denoted as $Cert_{RP}$) is the self-verifying value required in Goal 1, which is  generated in the \textbf{RP initial registration} (phase 1). A transformation (denoted as $RPID_T$) of RP's original identifier (denoted as $RPID_O$) is generated in the \textbf{RP identifier transforming} (phase 2) for Goal 2. The global uniqueness of $RPID_T$ is checked in the \textbf{dynamic registration} (phase 3) for Goal 3. The unlinkable \textbf{PPID} is generated and transmitted to RP in the step 4 and 5 in Figure~\ref{fig:overview}, for Goal 4.
 
-To achieve these goals, Recluse contains the following 6 phases, in which the IdP setup needs to be executed only once for a IdP, RP initial registration  needs to be invoked only once for a RP, while all the other phases will be invoked repeatedly for each user's login request at each RP. To make the decryption of Recluse clear, we list 
+To achieve these goals, Recluse contains the following 6 phases, in which the IdP setup needs to be executed only once for a IdP, RP initial registration  needs to be invoked only once for a RP, while all the other phases will be invoked repeatedly for each user's login request at each RP. To make the decryption of Recluse clear, we list
 \begin{itemize}
   \item IdP setup: Generating correct public parameters;
   \item RP initial registration: Applying RP certificate (denoted as $Cert_{RP}$) from IdP (Step 1 in Figure~\ref{fig:overview});
@@ -88,9 +88,9 @@ In Recluse, the IdP needs to be initialized during the IdP setup, for generating
 \subsection{Initial Registration}
 The RP invokes initial registration to apply a valid and self-verifying $Cert_{RP}$ from IdP (\textbf{Goal 1}) as provided in Figure~\ref{fig:registration}, which contains three steps:
 \begin{itemize}
-\item 1. RP sends IdP a $Cert_{RP}$ request $Req_{Cert_{RP}}$, which contains the distinguished name $Name_{RP}$ (e.g., DNS name) and the endpoint to receive the identity proof. 
+\item 1. RP sends IdP a $Cert_{RP}$ request $Req_{Cert_{RP}}$, which contains the distinguished name $Name_{RP}$ (e.g., DNS name) and the endpoint to receive the identity proof.
 \item 2. IdP calculates $RPID_O = g^r mod \ P$ with a random chosen r which is coprime to $P-1$ and different from the ones for other RPs,  generates the signature ($Sig_{SK_{Cert}}$) of [$RPID_O, Name_{RP}$] using $SK_{Cert}$, and returns [$RPID_O, Name_{RP}, Sig_{SK_{Cert}}$] as $Cert_{RP}$.
-\item 3. IdP sends $Cert_{RP}$ to the RP who verifies $Cert_{RP}$ using $PK_{Cert}$. 
+\item 3. IdP sends $Cert_{RP}$ to the RP who verifies $Cert_{RP}$ using $PK_{Cert}$.
 \end{itemize}
 
 \begin{figure}
@@ -102,10 +102,10 @@ The RP invokes initial registration to apply a valid and self-verifying $Cert_{R
 
 %1. r which is coprime to $P-1$来保证$RPID_O$是一个本原根，从而保证adversary无法从PPID中获取UID, ---
 %2. $RPID_O$不能相同，保证RP无法进行identity linkage。 ---RP可以借助类似CT的方案来保证， 没有两个合法证书被颁发给同一个RPID_O
-Here, we further explain the two requirements in the generation of $RPID_O$ for \textbf{Goal 4}: 
+Here, we further explain the two requirements in the generation of $RPID_O$ for \textbf{Goal 4}:
 \begin{itemize}
   \item $r$ should be coprime to $P-1$. This makes $RPID_O$ be another primitive root, and satisfies the requirement of Discrete Logarithm problem to prevent the RP  inferring $UID$ from $Account$.
-  \item $r$ should be different with the ones for other RPs. Otherwise, the RPs who are assigned the same $RPID_O$, obtain the same PPID for a user, which makes identity linkage possible. 
+  \item $r$ should be different with the ones for other RPs. Otherwise, the RPs who are assigned the same $RPID_O$, obtain the same PPID for a user, which makes identity linkage possible.
 \end{itemize}
 
 The honest IdP is assumed to generate the correct $RPID_O$. However, we may perform an external check on $Cert_{RP}$ and $RPID_O$, based on the idea of Certificate transparency. That is, IdP is required to provide the $Cert_{RP}$ to a log server, while a monitor checks the correctness of $Cert_{RP}$, i.e., no two valid $Cert_{RP}$ assigned to a same $RPID_O$ and $RPID_O$ is a primitive root modulo $P$ based on the *** algorithm. Moreover, $Cert_{RP}$ is compatible with a X.509 certificate which is discussed in Section~\ref{sec:discussion}.
@@ -126,7 +126,7 @@ Therefore, $RPID_T$ is denoted as Equation~\ref{equ:RPIDT}. The IdP fails to inf
    RPID_T = {Y_{RP}}^{n_{u}} = {RPID_O}^{n_{u}* n_{RP}} mod \ P
    \label{equ:RPIDT}
    \end{equation}
-   
+
 The generation ensures that $RPID_T$ cannot be determined by neither (malicious) user nor RP, which prevents the adversary from constructing a identity proof to be accepted by two or more RPs (\textbf{Security in Goal 2}). RP fails to control the $RPID_T$ generation, as it provides $Y_{RP}$ before obtaining $n_{u}$ and the modification of $Y_{RP}$ will trigger the user to generate another different  $n_{u}$. The Discrete Logarithm problem prevents the user from choosing a $n_{u}$ for a specified $RPID_T$ on the received $Y_{RP}$.
 
 Both $n_{RP}$ and $n_{u}$ are odd numbers, therefore $n_{RP}*n_{u}$ is an odd number and coprime to the even $P-1$, ensuring:
@@ -160,7 +160,7 @@ The login flow is shown as Figure~\ref{fig:process}, in which the $rp\_id$ is ge
 \begin{figure*}
   \centering
   \includegraphics[width=\linewidth]{fig/process.pdf}
-  \caption{Login Flow}
+  \caption{Process for each user's login.}
   \label{fig:process}
 \end{figure*}
 
