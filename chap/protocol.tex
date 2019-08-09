@@ -1,5 +1,9 @@
 \section{Recluse}
 \label{sec:Recluse}
+In this section, we firstly provide an overview of Recluse with the design goals and main process phases; then present initial Registration of RP, following with the description of algorithms for calculating the RP identifier transformation, PPID and Account. The detailed processing for each user's login is provided corresponding to the main process phases. Finally, we present how Recluse to be compatible with OIDC.
+
+\subsection{Overview}
+\label{subsec:overview}
 \begin{figure}
   \centering
   \includegraphics[width=\linewidth]{fig/Overview.pdf}
@@ -83,9 +87,10 @@ In Recluse, the IdP needs to be initialized during the IdP setup, for generating
     \label{tbl:notations}
 \end{table}
 
-\noindent\textbf{IdP setup.} In the setup, the IdP generates two random asymmetric key pairs, ($PK_{ID}$, $SK_{ID}$) and ($PK_{Cert}$, $SK_{Cert}$), for calculating the signatures in the identity proof and $Cert_{RP}$, respectively; and provides $PK_{ID}$ and $PK_{Cert}$ as the public parameters for the verification of identity proof and $Cert_{RP}$. Moreover, IdP generates a strong prime $P$, calculates  a primitive root ($g$) using ** algorithm[], and provides $P$ and $g$ as the public parameters. For $P$, we firstly randomly choose a large prime $Q$, and accept  $2Q+1$ as $P$ if $2Q+1$ is a prime. The strong prime $P$ makes it easier to choose $n_{u}$ and $n_{RP}$ as descried in Section~\ref{subsec:identifier-generation}. With $g$, we obtain all the integers less than $P$, by calculating $g^i mod \ P$ for $0 \leq i \leq (P-1)$.
+\noindent\textbf{IdP setup.} In the setup, the IdP generates two random asymmetric key pairs, ($PK_{ID}$, $SK_{ID}$) and ($PK_{Cert}$, $SK_{Cert}$), for calculating the signatures in the identity proof and $Cert_{RP}$, respectively; and provides $PK_{ID}$ and $PK_{Cert}$ as the public parameters for the verification of identity proof and $Cert_{RP}$. Moreover, IdP generates a strong prime $P$, calculates  a primitive root ($g$) as described in Section~\ref{subsec:primitive}, and provides $P$ and $g$ as the public parameters. For $P$, we firstly randomly choose a large prime $Q$, and accept  $2Q+1$ as $P$ if $2Q+1$ is a prime. The strong prime $P$ makes it easier to choose $n_{u}$ and $n_{RP}$ as descried in Section~\ref{subsec:identifier-generation}. With $g$, we obtain all the integers less than $P$, by calculating $g^i mod \ P$ for $0 \leq i \leq (P-1)$.
 
 \subsection{Initial Registration}
+\label{subsec:intialreg}
 The RP invokes initial registration to apply a valid and self-verifying $Cert_{RP}$ from IdP (\textbf{Goal 1}) as provided in Figure~\ref{fig:registration}, which contains three steps:
 \begin{itemize}
 \item 1. RP sends IdP a $Cert_{RP}$ request $Req_{Cert_{RP}}$, which contains the distinguished name $Name_{RP}$ (e.g., DNS name) and the endpoint to receive the identity proof.
@@ -108,7 +113,7 @@ Here, we further explain the two requirements in the generation of $RPID_O$ for 
   \item $r$ should be different with the ones for other RPs. Otherwise, the RPs who are assigned the same $RPID_O$, obtain the same PPID for a user, which makes identity linkage possible.
 \end{itemize}
 
-The honest IdP is assumed to generate the correct $RPID_O$. However, we may perform an external check on $Cert_{RP}$ and $RPID_O$, based on the idea of Certificate transparency. That is, IdP is required to provide the $Cert_{RP}$ to a log server, while a monitor checks the correctness of $Cert_{RP}$, i.e., no two valid $Cert_{RP}$ assigned to a same $RPID_O$ and $RPID_O$ is a primitive root modulo $P$ based on the *** algorithm. Moreover, $Cert_{RP}$ is compatible with a X.509 certificate which is discussed in Section~\ref{sec:discussion}.
+The honest IdP is assumed to generate the correct $RPID_O$. However, we may perform an external check on $Cert_{RP}$ and $RPID_O$, based on the idea of Certificate transparency. The external check needs to be performed by a third party instead of RP who will obtain the $UID$ for identity linkage with incorrect $RPID_O$. To perform the external check, IdP is required to provide the $Cert_{RP}$ to a log server, while a monitor checks the correctness of $Cert_{RP}$, i.e., no two valid $Cert_{RP}$ assigned to a same $RPID_O$ and $RPID_O$ is a primitive root modulo $P$ as descried in Section~\ref{subsec:primitive}. Moreover, $Cert_{RP}$ is compatible with a X.509 certificate which is discussed in Section~\ref{sec:discussion}.
 
 \subsection{RP identifier transformation and Account calculation}
 \label{subsec:identifier-generation}
@@ -154,9 +159,8 @@ Both $n_{RP}$ and $n_{u}$ are odd numbers, therefore $n_{RP}*n_{u}$ is an odd nu
 
 \subsection{User Login Process}
 \label{sebsec:loginprocess}
-In this section, we present the detailed process for each user's login.
+In this section, we present the detailed process for each user's login as shown in Figure~\ref{fig:process}. The process corresponds to the four phases defined in Section~\ref{subsec:overview}. 
 
-The login flow is shown as Figure~\ref{fig:process}, in which the $rp\_id$ is generated in step 6, the $user\_id$ is generated in step 15 and the RP derives the $user\_rp\_id$ in step 18.
 \begin{figure*}
   \centering
   \includegraphics[width=\linewidth]{fig/process.pdf}
@@ -164,27 +168,17 @@ The login flow is shown as Figure~\ref{fig:process}, in which the $rp\_id$ is ge
   \label{fig:process}
 \end{figure*}
 
-%抵抗phishing攻击：一定需要正确的RP参与，攻击者作为中间人
-%1.使用IdP提供应用basic_rp_id与url的绑定，user agent保存映射
-%缺点：占用空间，user agent需要缓存整个映射
-%2.RP与用户通过加密的通道传输redirect_uri
+For RP identifer transforming, the user and RP corporately process as follows. \textbf{(1)} The user sends a login request to trigger the negotiation of $RPID_T$. \textbf{(2)} RP chooses the random $n_{RP}$, and calculates $Y_{RP}$ as described in Section~\ref{subsec:identifier-generation}. \textbf{(3)} RP sends $Cert_{RP}$ with $Y_{RP}$ to the user.  \textbf{(4)} The user halts the login process if the provided $Cert_{RP}$ is invalid; otherwise, it extracts $PPID_O$ from $Cert_{RP}$, and calculates $RPID_T$ with a random chosen $n_u$ as in Section~\ref{subsec:identifier-generation}. \textbf{(5)} The user sends $n_u$ and $RPID_T$ to the RP. \textbf{(6)} RP calculates $RPID_T$ using the received $n_u$ with $Y_{RP}$ as in Section~\ref{subsec:identifier-generation}, and rejects the user's login request if the calculated $RPID_T$ is inconsistent with the received one. After that, RP derives the trapdoor $t$ as in Section~\ref{subsec:identifier-generation}, which will be used in calculating $Account$. \textbf{(7)} RP sends the calculated $RPID_T$ to the user, who will halt the login if the received $RPID_T$ is different from the cached one.
 
-%如果由RP选择basic_rp_id，那么多个rp之间的basic_rp_id有幂次关系，那么就可以关联用户
+For dynamic registration, the user registers the RP at the IdP instead of RP as follows. \textbf{(8)} The user generates an one-time endpoint (used in Section~\ref{subsec:compatible}) if the received $RPID_T$ is accepted. \textbf{(9)} Then, the user registers the RP with the $RPID_T$ and one-time endpoint. \textbf{(10)} If $RPID_T$ is globally unique, IdP sets the flag $RegRes$ as $OK$ (otherwise $FAIL$), and constructs the reply in the form of [$RegRes$, $timestamp$, $RPID_T$, $Sig_{SK_ID}$] where $timestamp$ is the time generating this reply and $Sig_{SK_ID}$ is the signature of the other elements using the private key $SK_{ID}$. \textbf{(11)} The user forwards the registering result to the RP. The user obtains $RegRes$ directly as the connection between the user and IdP is secure, while the RP accepts the $RegRes$ only when $Sig_{SK_ID}$ is valid, $timestamp$ is correct and $RPID_T$ is the same as the cached one. The user and RP will negotiate a new $RPID_T$ if $RegRes$ is $FAIL$.
 
-\subsubsection{RP Identifier Negotiation}
-RP identifier negotiation starts form step 1 to step 7. The user accesses the service provided by RP in his/her browser. To log in this RP, user needs to click the login button offered by Recluse.
-Firstly, the user agent sends the \verb+Start Negotiation+ request to RP, so that RP generates the random $sk\_rp$ and $pk\_rp=g^{sk\_rp}modP$ as the private key and public key for DH Key exchanging.
-Secondly, RP builds the \verb+Negotiation Response+ with newly generated $pk\_rp$ as well as the \verb+RP_Cert+ issued by IdP. User agent similarly generates random $sk\_user$ and $pk\_user$, and $r=pk\_rp^{sk\_user}modP$. However, to make sure that $r$ is the relative prime of $\phi(P)$, it is required that $r$ should be odd and the greatest common divisor of $r$ and $\phi(P)$ is 1.
-Then user agent continues the \verb+Negotiation+ sending $pk\_user$ and $r$ to RP. RP generates the local $r$ in the same way as user agent and compares the local $r$ and user agent generated $r$. If $r$s are equal, RP generates $rp\_id=basic\_rp\_id^rmodP$, as well as $r^{-1}$ through Extend Euclidean algorithm, which meets $r\cdot r^{-1}=1mod\phi(P)$.
-Finally RP transmits the $rp\_id$ to user agent.
-\subsubsection{Dynamic Registration}
-Dynamic registration is from step 8 to step 13. While user agent receives teh $rp\_id$ from RP, it is required the $rp\_id$ from RP should be equal with it generated by user agent. Then user agent generates the \verb+fake_uri+ which contains the random string and keeps it for further identity proof transmission. User agent sends the \verb+Dynamic Registration+ request to IdP with newly generated $rp\_id$ and \verb+fake_uri+ and redirects the \verb+Dynamic Registration Response+ to RP.
-\subsubsection{Authentication}
-Authentication is from step 14 to step 19. After dynamic registration,  RP builds the \verb+Authentication Request+ including $rp\_id$ as well as the \verb+redirect_uri+ representing the endpoint, and redirects it to IdP through user agent. User agent tampers the authentication request, compares $rp\_id$ with the local one, verifies the validation of the \verb+redirect_uri+ and replaces it with the fake one. Then user agent transmits the \verb+Authentication Request+ to IdP. After receiving the request, IdP firstly authenticates user and then generates $user\_id=rp\_id^{basic\_user\_id}modP$. The identity proof signed with IdP's private key including the $user\_id$ is redirected to the \verb+fake_uri+ through user agent, who intercepts the transmission and transmit it to the endpoint \verb+redirect_uri+ in authentication request. Finally, RP derives the constant $user\_rp\_id$ from $user\_id$. If the $user\_rp\_id$ has already been registered, RP send \verb+Authentication Finished+ with the message \verb+success+ to user agent.
+To acquire the PPID, the user corporates with the RP and IdP as follows. \textbf{(12)} RP constructs an identity proof request with the correctly registered $RPID_T$ and the endpoint (the form of the request is detailed in Section~\ref{subsec:compatible}). \textbf{(13)} The user halts the login process if the received $RPID_T$ is different from the previous one. \textbf{(14)} The user replaces the endpoint with the registered one-time endpoint, and sends it with the identity proof request to the IdP. \textbf{(15)} IdP requires the user to provided the correct credentials if the user hasn't been unauthenticated; and rejects the request if the binding of $RPID_T$ and the one-time endpoint doesn't exist in the registered ones. Then, IdP generates the $PPID$ as in Section~\ref{subsec:identifier-generation}, and constructs the identity proof with $RPID_T$, $PPID$, the valid time, issuing time and other attribute values, by attaching a signature of these elements using the private key $SK_{ID}$. \textbf{(16)} IdP sends the identity proof with the one-time endpoint to the user. \textbf{(17)} The user forwards the identity proof to the RP's endpoint corresponding to the the one-time endpoint.
 
-%描述user_id, rp_id and user_rp_id的生成
+Finally, RP derives the user's unchanged $Account$ from $PPID$ as follows. \textbf{(18)} RP accepts the identity proof only when the signature is correctly verified with $PK_{ID}$, $RPID_T$ is the same as the negotiated one, the issuing time is larger than current time, and the current time is in the validity period. If the identity proof is incorrect, RP returns login fail to the user who will trigger another login request. Otherwise, RP calculates the $Account$ as in Section~\ref{subsec:identifier-generation}. \textbf{(19)}, After obtaining the user's unchanged $Account$, RP sends the login result to the user and begins to provide the individual service.
+
 
 \subsection{Compatible with OIDC}
+\label{subsec:compatible}
 
 \begin{comment}
 
