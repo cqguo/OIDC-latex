@@ -74,6 +74,26 @@ In addition to the above security considerations, some other conventional checks
 
 Beside the security, the privacy is also considered in SSO systems. For example, the user should be able to control the range of attributes exposed to the RP, which is achieved by one extra user's consent required by IdP.
 
+\subsection{Primitive Roots}
+It is a classical result that for any prime number $P$, there is a number $0<g<P$
+such that $g$ is a primitive root mod $P$ in the sense that: given a number $0<y<P$, there is
+a (unique) number $0\le x <P-1$ such that $y=g^x \pmod P$. One usually writes $x=\log_g y$ and
+calls $x$ the discrete logarithm of $y$ modulo $p$. If we denote ${\mathbb F}_P$ the finite field
+$\{0, 1, \cdots, P-1\}$ and let $\mathbb{F}_P^*=\{1, \cdots, P-1\}$, then 
+${\mathbb F}_P^*$ is a cyclic group (under multiplication mod $P$) with $g$ being a generator. 
+
+Assume the prime $P$ has the form $P=2q+1$ with $q$ being a large prime, then given $y\in {\mathbb F}_P^*$, finding its
+discrete logarithm $x$ is computationally infeasible. This is because the order of $g$ (which is $2q$) has a large prime factor.
+The hardness of solving discrete logarithm has been a base of the security of several security primitives, including 
+Diffie-Hellman key exchange and Digital Signature Algorithm. See \cite{WXWM} for more detail.
+
+Under our assumption, an integer $1<\mu <P-1$ is a primitive root if and only if 
+$\mu^2\neq 1 \pmod P$ and $\mu^q\neq 1 \pmod P$. Usually we choose $g$ to be the least primitive root mod $P$. There
+Some algorithms for searching the least primitive root mod $P$ (under
+the Extended Riemann Hypothesis) can be found in \cite{Shoup,Wang}.
+
+It is easy to verify that for any integer $1\le t <P-1$ with $\gcd(t, P-1)=1, \ g^t\pmod P$ is also a primitive root.
+
 
 \begin{comment}
 It has been described in~\cite{SPRESSO} that in SSO systems, an adversary tries to break the authentication security in following ways:
