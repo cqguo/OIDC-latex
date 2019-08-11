@@ -1,7 +1,9 @@
 \section{Discussion}
 \label{sec:discussion}
+In this section, we provide some discussion about Recluse.
+
 %RP certificate
+\noindent{\textbf{RP Certificate.}} In Recluse, the RP certificate $Cert_{RP}$ is used to provide the trusted binding between the $RPID_O$ and the RP's endpoint. RP certificate is compatible with the X.509 certificate. To integrate RP certificate in X.509 certificate, the CA generates the $RPID_O$ for the RP, and combines it in the subject  filed (in detail, the common name)  of the certificate while the endpoint is already contained. Instead of sending  in Step 3 in Figure~\ref{fig:process}, $Cert_{RP}$  is sent to the user during the key agreement in TLS. Moreover, the mechanisms (e.g., the Certificate Transparency) to avoiding illegal certificate issued by the CA may be adopted to ensure the correctness of $RPID_O$, i.e., gloally unique and being the primitive root.
+
 %SPRESSO跨平台:我们目前的方案只在browser实现
-%兼容:目前只提供隐式模式,对其他模式与协议的兼容方法
-%Dos attack to RP:
-%side channel attack: for example the RPID negotation
+\noindent{\textbf{Platform.}} Recluse doesn't store any persistent  information in the platform and may be implemented to be platform independent. Firstly, all the information (e.g., $Cert_{RP}$, $RPID_T$, $n_u$, $PPID$ and one-time endpoint) processed and cached in the user's platform is only correlated with the current session, which allows the user to login at any RP with a new platform without any synchronization. Secondly, in the current implementation of Recluse, a browser extension is adopted to capture the redirection from the RP and IdP, to reduce the modification at the RP and IdP. However, Recluse is able to be implemented without based on HTML5, avoiding the use of any no browser extensions, or plug-ins. The redirect URL is placed as one element in the response which triggers the JavaScript a the user to send a message to this URL. The functions at the user are processed in the JavaScript running in a Shadow DOM.
