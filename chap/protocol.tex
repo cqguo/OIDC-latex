@@ -53,7 +53,7 @@ In Recluse, the IdP needs to be initialized during the IdP setup, for generating
     \centering
     \begin{tabular}{|c|c|}
     \hline
-    {Notations} & {Definition} \\
+    {Notation} & {Definition} \\
     \hline
     {$P$} & {A large prime.} \\
     \hline
@@ -159,7 +159,7 @@ Both $n_{RP}$ and $n_{u}$ are odd numbers, therefore $n_{RP}*n_{u}$ is an odd nu
 
 \subsection{User Login Process}
 \label{sebsec:loginprocess}
-In this section, we present the detailed process for each user's login as shown in Figure~\ref{fig:process}. The process corresponds to the four phases defined in Section~\ref{subsec:overview}. 
+In this section, we present the detailed process for each user's login as shown in Figure~\ref{fig:process}. The process corresponds to the four phases defined in Section~\ref{subsec:overview}.
 
 \begin{figure*}
   \centering
@@ -170,7 +170,12 @@ In this section, we present the detailed process for each user's login as shown 
 
 For RP identifer transforming, the user and RP corporately process as follows. \textbf{(1)} The user sends a login request to trigger the negotiation of $RPID_T$. \textbf{(2)} RP chooses the random $n_{RP}$, and calculates $Y_{RP}$ as described in Section~\ref{subsec:identifier-generation}. \textbf{(3)} RP sends $Cert_{RP}$ with $Y_{RP}$ to the user.  \textbf{(4)} The user halts the login process if the provided $Cert_{RP}$ is invalid; otherwise, it extracts $PPID_O$ from $Cert_{RP}$, and calculates $RPID_T$ with a random chosen $n_u$ as in Section~\ref{subsec:identifier-generation}. \textbf{(5)} The user sends $n_u$ and $RPID_T$ to the RP. \textbf{(6)} RP calculates $RPID_T$ using the received $n_u$ with $Y_{RP}$ as in Section~\ref{subsec:identifier-generation}, and rejects the user's login request if the calculated $RPID_T$ is inconsistent with the received one. After that, RP derives the trapdoor $t$ as in Section~\ref{subsec:identifier-generation}, which will be used in calculating $Account$. \textbf{(7)} RP sends the calculated $RPID_T$ to the user, who will halt the login if the received $RPID_T$ is different from the cached one.
 
-For dynamic registration, the user registers the RP at the IdP instead of RP as follows. \textbf{(8)} The user generates an one-time endpoint (used in Section~\ref{subsec:compatible}) if the received $RPID_T$ is accepted. \textbf{(9)} Then, the user registers the RP with the $RPID_T$ and one-time endpoint. \textbf{(10)} If $RPID_T$ is globally unique and is a primitive root module $P$, IdP sets the flag $RegRes$ as $OK$ (otherwise $FAIL$), and constructs the reply in the form of [$RegRes$, $timestamp$, $RPID_T$, $Sig_{SK_ID}$] where $timestamp$ is the time generating this reply and $Sig_{SK_ID}$ is the signature of the other elements using the private key $SK_{ID}$ (satisfying \textbf{Goal 3}). \textbf{(11)} The user forwards the registering result to the RP. The user obtains $RegRes$ directly as the connection between the user and IdP is secure, while the RP accepts the $RegRes$ only when $Sig_{SK_ID}$ is valid, $timestamp$ is correct and $RPID_T$ is the same as the cached one. The user and RP will negotiate a new $RPID_T$ if $RegRes$ is $FAIL$.
+For dynamic registration, the user registers the RP at the IdP instead of RP as follows. \textbf{(8)} The user generates an one-time endpoint (used in Section~\ref{subsec:compatible}) if the received $RPID_T$ is accepted. \textbf{(9)} Then, the user registers the RP with the $RPID_T$ and one-time endpoint. \textbf{(10)} If $RPID_T$ is globally unique and is a primitive root module $P$, IdP sets the flag $RegRes$ as $OK$ (otherwise $FAIL$), and constructs the reply in the form of 
+[$RegRes$, $RegMes$, $Sig_{SK_{ID}}$] 
+%[$RegRes$, $timestamp$, $RPID_T$, $Sig_{SK_ID}$] where $timestamp$ is the time generating this reply and
+where $RegMes$ is the response to traditional dynamic registration containing $RPID_T$, issuing time with other attributes and $Sig_{SK_{ID}}$ is the signature of the other elements using the private key $SK_{ID}$ (satisfying \textbf{Goal 3}). \textbf{(11)} The user forwards the registering result to the RP. The user obtains $RegRes$ directly as the connection between the user and IdP is secure, while the RP accepts the $RegRes$ only when $Sig_{SK_{ID}}$ is valid
+%, $timestamp$ is correct and $RPID_T$ is the same as the cached one.
+and $RegMes$ is issued for the $RPID_T$ within the expiration date. The user and RP will negotiate a new $RPID_T$ if $RegRes$ is $FAIL$.
 
 To acquire the PPID, the user corporates with the RP and IdP as follows. \textbf{(12)} RP constructs an identity proof request with the correctly registered $RPID_T$ and the endpoint (the form of the request is detailed in Section~\ref{subsec:compatible}). \textbf{(13)} The user halts the login process if the received $RPID_T$ is different from the previous one. \textbf{(14)} The user replaces the endpoint with the registered one-time endpoint, and sends it with the identity proof request to the IdP. \textbf{(15)} IdP requires the user to provide the correct credentials if the user hasn't been unauthenticated; and rejects the request if the binding of $RPID_T$ and the one-time endpoint doesn't exist in the registered ones. Then, IdP generates the $PPID$ as in Section~\ref{subsec:identifier-generation}, and constructs the identity proof with $RPID_T$, $PPID$, the valid period, issuing time and other attribute values, by attaching a signature of these elements using the private key $SK_{ID}$. \textbf{(16)} IdP sends the identity proof with the one-time endpoint to the user. \textbf{(17)} The user forwards the identity proof to the RP's endpoint corresponding to the one-time endpoint.
 
@@ -185,13 +190,15 @@ In Recluse, the formats of identity proof request and identity proof are the sam
 
 The same format of identity proof request and identity proof makes the verification same in OIDC and Recluse. The IdP, in both Recluse and OIDC, verifies the identity proof request, by checking whether the mapping of RP's identifier and endpoint exists in the registered ones. The RP, in both Recluse and OIDC, checks the correctness of identity proof, by checking that the signature is correct, the consistency of RP's identifer in the identity proof and the one it owns, the validity period, issuing time and the freshness (which is checked based on a nonce in  OIDC, while  $RPID_T$ serves as the nonce in Recluse).
 
-The RP's extra processes needed in Recluse may be achieved using the existing interfaces defined in OIDC.  Recluse requires that $RPID_T$ is globally unique, which can be achieved through the dynamic registration (described in Section~\ref{sec:background}) provided by IdP in OIDC. In Recluse, the dynamic registration is invoked by the user instead of the RP to prevent the curious IdP infers the user's traces by analyzing the between the dynamic registration and identity proof request. Moreover, the endpoint in the dynamic registration request is replaced with an one-time endpoint, to avoid the RP's identifying information to be leaked to the IdP.
+The RP's extra processes needed in Recluse may be achieved using the existing interfaces defined in OIDC.  Recluse requires that $RPID_T$ is globally unique, which can be achieved through the dynamic registration (described in Section~\ref{sec:background}) provided by IdP in OIDC. In Recluse, the dynamic registration is invoked by the user instead of the RP to prevent the curious IdP infers the user's traces by analyzing the between the dynamic registration and identity proof request. To avoid the IdP to infer the RP's identity through the registration token in dynamic registration, the access control of the endpoint for dynamic registration is deleted in Recluse. As the registration response is transmitted through the user instead of server-to-server transmission between RP and IdP, the extra signature is required to guarantee the integrity of response. Moreover, the endpoint in the dynamic registration request is replaced with an one-time endpoint, to avoid the RP's identifying information to be leaked to the IdP.
 
 
 The modification required by Recluse at the RP may be achieved using existing interface provided by the implementations of OIDC. Based on the software development kit (SDK) in existing OIDC implementations for RP, the Steps 2,3, 6, 12 (in Figure~\ref{fig:process}) in RP may be integrated in the interface for constructing identity proof request;
-Step 18 in Figure~\ref{fig:process} may be combined with the interface for verifying and parsing identity proof. 
+Step 18 in Figure~\ref{fig:process} may be combined with the interface for verifying and parsing identity proof.
 
-The processes at the user may be achieved through an extension at the user agent, which captures the identity proof (and request) for process  without modifying existing message transmission at the IdP and RP (i.e., redirection mechanism), as described in Section~\ref{sec:implementation}. 
+The processes at the user may be achieved through an extension at the user agent, which captures the identity proof (and request) for process  without modifying existing message transmission at the IdP and RP (i.e., redirection mechanism), as described in Section~\ref{sec:implementation}.
+
+
 Only the RP initial registration and Step 15 in Figure~\ref{fig:process} requires a modification at IdP.
 
 \begin{comment}
