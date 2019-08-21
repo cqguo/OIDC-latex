@@ -36,6 +36,16 @@ OpenID Connect (current version 1.0), a typical SSO standard,  defines the proce
 
 OIDC is designed to extend OAuth for user authentication by binding the identity proof for authentication with the information of RP. OIDC provides three protocol flows: authorization code flow, implicit flow and hybrid flow (i.e., a mix-up of the previous two flows). In the authorization code flow, the identity proof is the authorization code sent by the IdP, which is bound with the RP, as only the target RP is able to obtain the user's attributes with this authorization code and the corresponding secret (distributed in the RP's registration).
 
+The implicit flow of OIDC achieves the binding between the identity proof and the RP, by using the new id token as the identity proof. In details, id token includes the user's PPID, the RP's identifier (RPID), the issuer, issuing time, the validity period and the other requested attributes. The IdP completes the construction of the id token by generating the signature of these elements with its private key, and sends it to the RP previously registered endpoint. The RP validates the id token, by verifying the signature with the IdP's public key, checking the correctness of the valid period and the consistency of RPID with the identifier stored locally. Figure~\ref{fig:OpenID} provides the details in the implicit flow of OIDC. The detailed processes are as follows:
+\begin{itemize}
+    \item Step 1: User attempts to login at one RP.
+    \item Step 2: The RP redirects the user to the corresponding IdP with a newly constructed request of identity proof. The request contains RPID, the registered endpoint, and the set of requested attributes. 
+    \item Step 3: If the user hasn't been authenticated, an extra authentication process is performed.
+    \item Step 4, 5: The IdP generates the identity proof for the user who has been authenticated already and constructs the response with endpoint in request if it is the same with the registered one for the RP. 
+    \item Step 6, 7: The RP verifies the id token, identifies the user with PPID in the id token, and returns the authentication result to user.
+\end{itemize}
+
+\begin{comment}
 The implicit flow of OIDC achieves the binding between the identity proof and the RP, by introducing a new token (i.e., id token). In details, id token includes the user's PPID (i.e., \verb+sub+), the RP's identifier (i.e., \verb+aud+), the issuer, issuing time, the validity period and the other requested attributes. The IdP completes the construction of the id token by generating the signature of these elements with its private key, and sends it to the correct RP through the redirect URL registered previously.  The RP validates the id token, by verifying the signature with the IdP's public key, checking the correctness of the valid period and the consistency of \verb+aud+ with the identifier stored locally. Figure~\ref{fig:OpenID} provides the details in the implicit flow of OIDC, where the dashed lines represent the message transmission  in  the browser while the solid lines denote the network traffic. The detailed processes are as follows:
 \begin{itemize}
     \item Step 1: User attempts to login at one RP.
@@ -43,6 +53,7 @@ The implicit flow of OIDC achieves the binding between the identity proof and th
     \item Step 3: The IdP generates the id token and the access token for the user who has been authenticated already, and constructs the response with  endpoint (i.e., \verb+redirect_uri+)  in request if it is the same with the registered one for the RP. If the user hasn't been authenticated, an extra authentication process is performed.
     \item Step 4, 5: The RP verifies the id token, identifies the user with \verb+sub+ in the id token, and requests the other attributes from IdP with the access token.
 \end{itemize}
+\end{comment}
 \begin{figure}
   \centering
   \includegraphics[width=\linewidth]{fig/OIDC.pdf}
@@ -61,8 +72,24 @@ The implicit flow of OIDC achieves the binding between the identity proof and th
   \label{fig:Recluse}
 \end{figure}
 
-\noindent\textbf{Dynamic Registration.} The id token (also, the authorization code) is bound with the RP's identifier (i.e., \verb+client_id+). OIDC provides the dynamic registration~\cite{DynamicRegistration} mechanism to register the RP for a new \verb+client_id+, dynamically. After the first successful registration, RP obtains a registration token from the IdP, and is able to update its information (e.g., the \verb+redirect URI+ and the  response type) by a dynamic registration process with the  registration token. One successful dynamic registration process  will make the IdP assign a new unique \verb+client_id+ for this RP.
+\noindent\textbf{Dynamic Registration.} OIDC provides the dynamic registration~\cite{DynamicRegistration} mechanism to register the RP for a new RPID, dynamically. After the first successful registration, RP obtains a registration token from the IdP, and is able to update its information (e.g., the endpoint) by a dynamic registration process with the  registration token. One successful dynamic registration process will make the IdP assign a new unique RPID for this RP.
 
+
+\subsection{Basic Requirements of SSO}
+Based on the desiring function and the security analysis of SSO systems, we conclude the basic requirements of SSO. As our work is focused on the implicit flow of OIDC, the following requirements are illustrated based on the implicit flow of OIDC.
+The requirements are shown as follows:
+\begin{itemize}
+\item[1.] Identification. Identification is the main feature of SSO system, which enables the RP to identify the user. Moreover, for web application, it is necessary to provide continuous and personalize service, which requires the RP to link the user with the specific account in RP. Therefore, the identity proof provided by the IdP must be linkable in the destination RP. That is, some of the existing SSO systems provide the pairwise identifier (e.g., PPID in OIDC) and others provide the unchanged identifier (e.g., email in SPRESSO) within the identity proof. 
+\item[2.] Binding. The identity proof should be bound with only one RP and accepted only by this RP, no other honest RP may accept this identity proof. Otherwise, the adversary may impersonate as the victim user, for example, by pretending as a RP to collect the victim's identity proof and using it at any other honest RP. 
+        Currently, the binding is achieved based on the claim in the identity proof, IdP claims the destination RP's identifier in the identity proof and avoids the modification on it by generating a signature, while the RP checks the RP's identifier and only accepts the identity proof for it. 
+\item[3.] Confidentiality. The identity proof should only be obtained by the correct RP (and the user), no one else may get the identity proof~\cite{ChenPCTKT14,FettKS16,WangZLG16}. Otherwise, the adversary may use the obtained identity proof to login as the victim user on the specified RP. To avoid the unauthorized leakage of identity proof, (1) the  user and IdP should perform additional checks  in its generation and transmit to ensure that the identity proof is generated for the correct RP (i.e., the correct identifier) and sent to the exact RP (i.e., correct URL); (2) TLS is adopted to ensure the confidentiality during transmit; (3) a trusted user agent is deployed to ensure the identity proof is only sent to the URL specified by the IdP.
+\item[4.] Integrity. The valid identity proof should only be generated by the IdP, no one else may forge or modify a valid proof~\cite{WangZLG16}. Otherwise, the adversary may replace the user's identifier in the proof for either impersonation attack and identity injection. 
+        The solution to ensure the integrity of identity proof is based on signature, IdP generates the signature  for each identity proof with the un-leaked private key, while RP  only accepts the information protected by the valid signature as the others may be tampered~\cite{WangCW12, SomorovskyMSKJ12}.
+\end{itemize}
+
+
+
+\begin{comment}
 \subsection{Security Consideration}
 \label{subsec:securityconsideration}
 As described in~\cite{SPRESSO}, the design of SSO systems is challenging, as the adversary may adopt various attacks~\cite{ChenPCTKT14, FettKS16, WangCW12, WangZLG16, ZhouE14, rfc6819, YangLLZH16} to achieve:
@@ -87,7 +114,9 @@ To prevent impersonation attack and identity injection, SSO systems are designed
 In addition to the above security considerations, some other conventional checks are required in the RP to ensure the security. For example, the identity proof should be considered valid only in the specified period; the replayed identity proof needs to be rejected.
 
 Beside the security, the privacy is also considered in SSO systems. For example, the user should be able to control the range of attributes exposed to the RP, which is achieved by one extra user's consent required by IdP.
+\end{comment}
 
+\begin{comment}
 \subsection{Primitive Root}
 \label{subsec:primitive}
 A number $g$ ($0<g<P$) is called a primitive root modular a prime $P$, if for ${\forall}y$ ($0<y<P$), there is a (unique) number $x$ ($0\le x <P-1$) satisfying $y=g^x \pmod P$. Here, $x$ is called the discrete logarithm of $y$ modulo $P$. Given a large prime $P$ and a number $y$, it is computationally infeasible to derive the discrete logarithm (here $x$) of $y$ (detailed in~\cite{WXWM}), which is called  Discrete Logarithm Problem. The hardness of solving discrete logarithm has been a base of the security of several security primitives, including
@@ -96,7 +125,7 @@ Diffie-Hellman key exchange and Digital Signature Algorithm.
 To calculate the primitive root for a given large prime $P$,  we first search the least primitive root $g_m$  mod $P$, and then calculate the primitive root $g = g_{m}^{t} mod \ P$, where $t$ is an integer coprime to $P-1$.
 We checks whether a integrity $\mu$ is the primitive root modulo $P$ where $P=2Q+1$ ($Q$ is a prime), based on the lemma that an integer $1<\mu <P-1$ is a primitive root if and only if $\mu^2\neq 1 \pmod P$ and $\mu^Q\neq 1 \pmod P$.
 The details are provided in~\cite{Shoup,Wang}.
-
+\end{comment}
 
 
 \begin{comment}
