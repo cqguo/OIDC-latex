@@ -5,24 +5,32 @@
 %第一段：
 %SSO的特点
 %SSO的现状
-To maintain each user's profile and provide individual services, each service provider needs to identify each user, which requires the users to be authenticated at multiple online services repeatedly.
-Single Sign-On (SSO) systems enable users to access multiple services (called relying parties, RP) with the single authentication performed at the Identity Provider (IdP). With SSO system deployed, a user only needs to maintain the credential of the IdP, who offers user's attributes (i.e., identity proof) for each RP to accomplish the user's identification.
-SSO system also brings the convenience to RPs, as the risks in the users' authentication are shifted to the IdP, for example, RPs don't need to consider the leakage of users' credentials.
-Therefore, SSO systems are widely deployed and integrated.
+
+%To maintain each user's profile and provide individual services, each service provider needs to identify each user, which requires the users to be authenticated at multiple online services repeatedly. Single Sign-On (SSO) systems enable users to access multiple services (called relying parties, RP) with the single authentication performed at the Identity Provider (IdP).
+
+Single sign-on (SSO) systems, such as OAuth, OpenID and SAML, have been widely adopted nowadays as a convenient web authentication mechanism. SSO delegates user authentication on websites to a third party, so-called identity providers (IdPs), so that users can access different services on cooperating sites, so-called relying parties (RPs), via a single authentication process. Using SSO, a user no long needs to maintain multiple credentials for different RPs, instead, she only maintains the credential for the IdP, which further provides identity proofs to RPs.
+%offers user's attributes (i.e., identity proof) for each RP to accomplish the user's identification.
+%SSO system also brings the convenience to RPs, as the risks in the users' authentication are shifted to the IdP, for example, RPs don't need to consider the leakage of users' credentials.
+For RPs, SSO shifts the burden of user authentication to IdPs and therefore reduces their own security risks and costs. As a result, SSO has been widely integrated with modern web systems.
 %实际数据
-The survey on the top 100 websites from SimilarWeb~\cite{similarweb} demonstrates that only 25 websites (excluding the ones not for browser accessing) do not integrate the SSO service.
+%The survey on the top 100 websites from SimilarWeb~\cite{similarweb} demonstrates that only 25 websites (excluding the ones not for browser accessing) do not integrate the SSO service.
+According to SimilarWeb~\cite{similarweb}, 75 websites among the top-100 websites integrate SSO services. Meanwhile, many email and social networking providers such as Google, Facebook, Twitter, etc. have been actively serving as social identity providers to support social login.
+
 
 %第二段：
 %SSO 引入新的隐私问题
 %IdP知道用户登录哪个RP
 %RP之间可以合谋知道同一个用户登录哪些RP
-In addition to the convenience for both the users and RPs, current SSO systems introduce a new privacy leakage risk for the users.
-Instead of maintaining the user's information (including identifier) independently in those systems not integrating the SSO service,  the IdP maintains the user's attributes  and identity proof in SSO systems, which allows the IdP or the colluded RPs to infer the access trace of a specified user~\cite{NIST}. In details, the privacy leakage risks include:
+%In addition to the convenience for both the users and RPs, current SSO systems introduce a new privacy leakage risk for the users.
+However, the wide adoption of SSO also raises new privacy concerns~\cite{NIST2017draft,persona,SPRESSO}. In a typical SSO-based authentication session, such as the OpenID Connect (OIDC) example shown in Fig.~\ref{fig:OpenID}, when a user attempts to log in to an RP, the authentication request is redirected from the RP to the IdP, who authenticates the user and creates an identify proof accordingly for the particular user and the particular RP. This identity proof contains information about both the user (e.g., user identifier) and the RP (e.g., RP identifier, URL, etc.). When a user leverages the identity issued by the IdP across multiple RPs, the IdP acquires a central role in web authentication, which enables it to collect information about the user's logins on different sites. We refer to this as {\em IdP-based access tracing}. Moreover, if user identifiers issued by the IsP for the same user across different RPs are unique or can be derived from each other, which is the case in most of the existing SSO systems~[add citations], colluding RPs can not only track her online traces but also aggregate her attributes from these sites. We refer to this as {\em RP-based identity linkage}.
+
+%Instead of maintaining the user's information (including identifier) independently in those systems not integrating the SSO service,  the IdP maintains the user's attributes  and identity proof in SSO systems, which allows the IdP or the colluded RPs to infer the access trace of a specified user~\cite{NIST}. In details, the privacy leakage risks include:
 %It has already been discussed in the NIST Special Publication 800-63C~\cite{NIST}. In details, the privacy leakage risks include:
-\begin{itemize}
-\item Identity linkage~\cite{SAMLIdentifier,OpenIDConnect,NIST2017draft}, the colluded RPs may link a user if the user's identifiers (generated by the IdP) in these RPs are the same or derivable from the others, and use the attributes maintained in each RP to profile a user.
-\item Access tracing~\cite{NIST2017draft,persona,SPRESSO}, the IdP knows which RP a specified user has accessed, as the construction and transmission of the identity proof provide the IdP the identifiers and URLs of the user's accessed RPs.
-\end{itemize}
+
+%\begin{itemize}
+%\item Identity linkage~\cite{SAMLIdentifier,OpenIDConnect,NIST2017draft}, the colluded RPs may link a user if the user's identifiers (generated by the IdP) in these RPs are the same or derivable from the others, and use the attributes maintained in each RP to profile a user.
+%\item Access tracing~\cite{NIST2017draft,persona,SPRESSO}, the IdP knows which RP a specified user has accessed, as the construction and transmission of the identity proof provide the IdP the identifiers and URLs of the user's accessed RPs.
+%\end{itemize}
 
 %SSO systems introduces new privacy issues in authentication which exposes the users' login traces which can be easily avoided in traditional authentication systems by using different usernames for multiple services. An adversary has the ability to track users' login trace in multiple ways. It is described more detailedly:
 %\begin{itemize}
@@ -34,11 +42,13 @@ Instead of maintaining the user's information (including identifier) independent
 %google and facebook的负面新闻
 %1. service provider（如DNS）知道你访问了，可以带来很多问题。但是还是不同的，DNS里profile需要评估的是two behavior vectors的similarities，而IdP中都不需要，因为IdP能够区分two behavior vectors 是否来自相同节点。
 
-The privacy leakage allows the widely deployed SSO systems (e.g., Google Identity and Facebook Login) to perform the long-term profile of the users based on the information of accessed RPs. Firstly, Google and Facebook collect the accessed RPs' identifiers without any limit, as the RP's information is necessary in  the construction of identity proof;
-Secondly, it's feasible for Google and Facebook to model the user's behaviours and monitor the specified users, unlike the user session re-identification in DNS queries where the similarities is needed to classify the user's queries~\cite{DNS}, IdP (e.g., Google and Facebook) may classify the multiple access traces based on the maintained user's unique identity.
+Both IdP-based access tracing and RP-based identity linkage can lead to more severe privacy risks such as web tracking, online user profiling, etc. Large IdPs, especially social IdPs like Google, Facebook, etc., are accused of being interested in collecting users' online behavioral information for various purposes (e.g., Screenwise Meter~\cite{googlenews}, Onavo~\cite{Onavo}). Meanwhile, many IdPs are service providers themselves, hosting a variety of web services (i.e., RPs). By integrating data from their own services, they may obtain rich information to profile a user. On the contrary, unlike other privacy risks, such as user session re-identification that requires to compute the similarity between users' DNS queries~\cite{DNS}, any interested IdP can easily discover the RPs accessed by a user since the information of the RP is necessary in  the construction of identity proof, and associate a user's access traces by her unique identifier.
+
+%The privacy leakage allows the widely deployed SSO systems (e.g., Google Identity and Facebook Login) to perform the long-term profile of the users based on the information of accessed RPs. Firstly, Google and Facebook collect the accessed RPs' identifiers without any limit, as the RP's information is necessary in  the construction of identity proof;
+%Secondly, it's feasible for Google and Facebook to model the user's behaviours and monitor the specified users, unlike the user session re-identification in DNS queries where the similarities is needed to classify the user's queries~\cite{DNS}, IdP (e.g., Google and Facebook) may classify the multiple access traces based on the maintained user's unique identity.
 %which is much easier than the user session re-identification in DNS queries, which needs to classify the user's queries based on similarities, while Google and Facebook may classify the multiple access traces based on the maintained user's unique identity.
-Thirdly, Google and Facebook are curious about users' behaviours in each RP (may be the competitors), for example, Screenwise Meter~\cite{googlenews} and Onavo~\cite{Onavo} are provided to collect all the traffic of the victim.
-Moreover, the users' attributes are analysed for various purposes, for example, 50 million people's profiles were leaked by Facebook and utilized by Cambridge Analytica to build the portrait of voters for personalised political advertisements~\cite{facebooknews}.
+%Thirdly, Google and Facebook are curious about users' behaviours in each RP (may be the competitors), for example, Screenwise Meter~\cite{googlenews} and Onavo~\cite{Onavo} are provided to collect all the traffic of the victim.
+%Moreover, the users' attributes are analysed for various purposes, for example, 50 million people's profiles were leaked by Facebook and utilized by Cambridge Analytica to build the portrait of voters for personalised political advertisements~\cite{facebooknews}.
 
 %The privacy leakage is even worse in the widely deployed SSO systems (e.g., Google Identity and Facebook Login). Google and Facebook may
 %Google and Facebook seem to become the real Mr. Know It All, as they know who you are, where you live, what you have interest in and so on, as long as you use (or even have used) the provided (SSO) service.
@@ -70,7 +80,7 @@ To prevent the colluded RPs from performing the identity linkage, the straightfo
 
 %Several schemes are proposed to protect users' privacy. To avoid users from being linked by multiple RPs, it requires that the user's identifier in one RP should never be the same with or derivable from the ones of other RPs to prevent a possible correlation among users from multiple RPs. For example, in OIDC and SAML a Pairwise Pseudonymous Identifier (PPID) or named Pairwise Subject Identifier is suggested to be generated by the IdP for the user in each RP~\cite{OpenIDConnect, SAMLIdentifier}. It is not defined by neither OIDC nor SAML how to generate the distinct user identifier. For example, in MITREid Connect, the open OIDC implementation, PPID is generated by the \verb+Java.Util.UUID+ provided since JAVA 1.5 and specifically bound with corresponding RP identifier.
 %没有规定怎么生成，主流的开源如何生成
-To prevent IdP from tracing the RPs accessed by the user, two SSO systems (BrowserID~\cite{FettKS14} and SPRESSO~\cite{SPRESSO}) are proposed to hide the user's accessed RPs from IdP in the construction and transmission of identity proof. In BrowserID, the identity proof is signed with the private key generated by user, and transmitted to the RP through the user directly,  while the corresponding  public key is bound with users' email by IdP who need not obtain the information of accessed RP. In SPRESSO, RP encrypts its domain and a nonce as the identifier, so that the real identity of RP is never exposed to IdP, while the identity proof is transmitted to the RP through a trusted entity (named FWD) who doesn't know the user's identity.
+To prevent IdP from tracing the RPs accessed by the user, two SSO systems (BrowserID~\cite{persona} and SPRESSO~\cite{SPRESSO}) are proposed to hide the user's accessed RPs from IdP in the construction and transmission of identity proof. In BrowserID, the identity proof is signed with the private key generated by user, and transmitted to the RP through the user directly,  while the corresponding  public key is bound with users' email by IdP who need not obtain the information of accessed RP. In SPRESSO, RP encrypts its domain and a nonce as the identifier, so that the real identity of RP is never exposed to IdP, while the identity proof is transmitted to the RP through a trusted entity (named FWD) who doesn't know the user's identity.
 
 %To prevent IdP tracing the RPs accessed by the user, two SSO systems (BrowserID~\cite{persona} and SPRESSO~\cite{SPRESSO}) are proposed to hide the user's accessed RPs from IdP who fails to obtain the information of accessed RP. In BrowserID, the identity proof is signed with the private key generated by user while the corresponding  public key is bound with users' email by IdP who need not obtain the information of accessed RP. In SPRESSO, RP uses the encrypted RP domain and a nonce as the identifier, so that the real identity of RP is never exposed to IdP.
 
