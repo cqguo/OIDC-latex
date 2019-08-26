@@ -12,6 +12,7 @@ To calculate the primitive root for a given large prime $P$,  we first search th
 We checks whether a integrity $\mu$ is the primitive root modulo $P$ where $P=2Q+1$ ($Q$ is a prime), based on the lemma that an integer $1<\mu <P-1$ is a primitive root if and only if $\mu^2\neq 1 \pmod P$ and $\mu^Q\neq 1 \pmod P$.
 The details are provided in~\cite{Shoup,Wang}.
 
+\begin{comment}
 \subsection{Overview}
 \label{subsec:overview}
 \begin{figure}
@@ -20,7 +21,9 @@ The details are provided in~\cite{Shoup,Wang}.
   \caption{Overview of Recluse.}
   \label{fig:overview}
 \end{figure}
+\end{comment}
 
+\subsection{Goals}
 As analyzed in Section~\ref{subsec:solutions}, to enhanced requirements of SSO systems, Recluse has to allow only the exact RP to derive the user's unchanged account with a trapdoor, bind the proof with a transformation of RP’s identifier, and achieve user-centric confidentiality of the identity proof. We further divide these three requirements into 5 goals and achieve these 5 goals using 5 phases which is formed as the process flow in Recluse:
 \begin{itemize}
   \item 1. Providing a self-verifying value for the user-centric check (for \textbf{User-centric Confidentiality}), to ensure the correct construction and transmission of identity proof (i.e., user-centric confidentiality), which is achieved in RP initial registration (step a, b in Figure~\ref{fig:overview}), applying for a RP certificate ($Cert_{RP}$), a self-verifying value;
@@ -68,7 +71,7 @@ To achieve these goals, Recluse contains the following 6 phases, in which the Id
 \end{itemize}
 \end{comment}
 
-In Recluse, the IdP needs to be initialized during the IdP setup, for generating the public parameters for the users and RPs; the RP has to perform only one initial registration at the RP setup; and  the user triggers the Step 2-6 in Figure~\ref{fig:overview} for each login at a RP. IdP setup is performed at the very beginning of Recluse, and will be invoked by the IdP to update the leaked $SK_{Cert}$ or $SK_{ID}$, while $g$ and $P$ will never be modified. Recluse does not support multiple initial registrations for one RP, as the RP does not know the $UID$ nor the discrete logarithm of $RPID$ and fails to derive the user's new account  from the old one under the Discrete Logarithm problem.
+In Recluse, the IdP needs to be initialized during the IdP setup, for generating the public parameters for the users and RPs; the RP has to perform only one initial registration at the RP setup; and  the user triggers the Step 2-7 in Figure~\ref{fig:overview} for each login at a RP. IdP setup is performed at the very beginning of Recluse, and will be invoked by the IdP to update the leaked $SK_{Cert}$ or $SK_{ID}$, while $g$ and $P$ will never be modified. Recluse does not support multiple initial registrations for one RP, as the RP does not know the $UID$ nor the discrete logarithm of $RPID$ and fails to derive the user's new account  from the old one under the Discrete Logarithm problem.
 
 
 \begin{table}[tb]
