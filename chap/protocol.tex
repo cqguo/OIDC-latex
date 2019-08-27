@@ -84,7 +84,7 @@ The details are provided in~\cite{Shoup,Wang}.
 %2. $RPID$不能相同，保证RP无法进行identity linkage。 ---RP可以借助类似CT的方案来保证， 没有两个合法证书被颁发给同一个RPID
 Here, we further explain the two requirements in the generation of $RPID$ for \textbf{Goal 4}:
 \begin{itemize}
-  \item $r$ should be coprime to $P-1$. This makes $RPID$ be another primitive root, and satisfies the requirement of Discrete Logarithm problem to prevent the RP inferring $UID$ from $Account$.
+  \item $r$ should be coprime to $p-1$. This makes $RPID$ be another primitive root, and satisfies the requirement of Discrete Logarithm problem to prevent the RP inferring $UID$ from $Account$.
   \item $r$ should be different with the ones for other RPs. Otherwise, the RPs who are assigned the same $RPID$, obtain the same PUID for a user, which makes identity linkage possible.
 \end{itemize}
 
@@ -93,6 +93,7 @@ The honest IdP is assumed to generate the correct $RPID$. However, we may perfor
 
 
 
+\begin{comment}
 \begin{comment}
 \subsection{Primitive Root}
 \label{subsec:primitive}
@@ -103,7 +104,6 @@ To calculate the primitive root for a given large prime $p$,  we first search th
 We checks whether a integrity $\mu$ is the primitive root modulo $p$ where $P=2Q+1$ ($Q$ is a prime), based on the lemma that an integer $1<\mu <P-1$ is a primitive root if and only if $\mu^2\neq 1 \pmod P$ and $\mu^Q\neq 1 \pmod P$.
 The details are provided in~\cite{Shoup,Wang}.
 
-\begin{comment}
 \subsection{Overview}
 \label{subsec:overview}
 \begin{figure}
@@ -112,7 +112,6 @@ The details are provided in~\cite{Shoup,Wang}.
   \caption{Overview of Recluse.}
   \label{fig:overview}
 \end{figure}
-\end{comment}
 
 \subsection{Goals}
 As analyzed in Section~\ref{subsec:solutions}, to enhanced requirements of SSO systems, Recluse has to allow only the exact RP to derive the user's unchanged account with a trapdoor, bind the proof with a transformation of RP’s identifier, and achieve user-centric confidentiality of the identity proof. We further divide these three requirements into 5 goals and achieve these 5 goals using 5 phases which is formed as the process flow in Recluse:
@@ -123,9 +122,7 @@ As analyzed in Section~\ref{subsec:solutions}, to enhanced requirements of SSO s
   \item 4. Unlinkable PUID (for \textbf{Trapdoor-existing Identification}), for one user, the PUIDs for different RPs should vary, to prevent identity linkage, which is achieved in $PUID$ generation (step 4 in Figure~\ref{fig:overview}), generating PUID at the IdP, and transferring PUID to the RP;
   \item 5. Unchanged account (for \textbf{Trapdoor-existing Identification}), to allow only the destination RP (with the trapdoor) to derive the unchanged account for one user from varying PUIDs, which is necessary for providing the consecutive and individual services, achieved in $Account$ verifying (step 6 in Figure~\ref{fig:overview}), calculating the user's account in the RP.
 \end{itemize}
-\end{comment}
 
-\begin{comment}
 As analyzed in Section~\ref{subsec:solutions}, to ensure the security and privacy of SSO systems, Recluse has to achieve user-centric confidentiality of the identity proof, bind the proof with a transformation of RP’s identifier, and allow only the exact RP to derive the user's unchange account with a trapdoor. We further divide these three solutions into 5 goals to be achieved in the design in Recluse:
 \begin{itemize}
   \item 1. Providing a self-verifying value for the user-centric check, to ensure the correct construction and transmission of identity proof (i.e., user-centric confidentiality);
@@ -136,9 +133,8 @@ As analyzed in Section~\ref{subsec:solutions}, to ensure the security and privac
 \end{itemize}
 
 %To hide the user's traces from both the IdP and colluded RPs without breaking the security, Recluse has to achieve these : (1) the user and RP corporately calculate a transformation of the RP's identifier based on Discrete Logarithm Problem, which is sent to the IdP for binding with the identity proof while preventing the IdP from inferring the original RP identifier. The PIDs (in the identity proof) for a user in various RPs are different, to avoid the identity linkage. Moreover, only the RP (and the user) can calculate the trapdoor of the transformation, to transfer the PID into a unchanged account for the user.
-\end{comment}
 
-\begin{comment}
+
 Recluse achieves these 5 goals using 5 phases as described in Figure~\ref{fig:overview}, while the used notations are listed in Table~\ref{tbl:notations}. The details are as follows, and the step refers to the one in Figure~\ref{fig:overview}:
 \begin{itemize}
   \item RP initial registration: Applying for a RP certificate ($Cert_{RP}$), a self-verifying value,  (Step 1, Goal 1);
@@ -147,9 +143,7 @@ Recluse achieves these 5 goals using 5 phases as described in Figure~\ref{fig:ov
   \item PID:  Generating PID at the IdP, and transferring PID to the RP, (Step 4 and 5, Goal 4);
   \item Account: Calculating the user's account in the RP, (Step 6, Goal 5).
 \end{itemize}
-\end{comment}
 
-\begin{comment}
 A RP certificate (denoted as $Cert_{RP}$) is the self-verifying value required in Goal 1, which is  generated in the \textbf{RP initial registration} (phase 1). A transformation (denoted as $PRPID$) of RP's original identifier (denoted as $RPID$) is generated in the \textbf{RP identifier transforming} (phase 2) for Goal 2. The global uniqueness of $PRPID$ is checked in the \textbf{dynamic registration} (phase 3) for Goal 3. The unlinkable \textbf{PID} is generated and transmitted to RP in the step 4 and 5 in Figure~\ref{fig:overview}, for Goal 4.
 
 To achieve these goals, Recluse contains the following 6 phases, in which the IdP setup needs to be executed only once for a IdP, RP initial registration  needs to be invoked only once for a RP, while all the other phases will be invoked repeatedly for each user's login request at each RP. To make the decryption of Recluse clear, we list
@@ -161,9 +155,7 @@ To achieve these goals, Recluse contains the following 6 phases, in which the Id
   \item PID:  Generating PID at the IdP, and transferring PID to the RP (Step 4 and 5 in in Figure~\ref{fig:overview});
   \item Account:  Calculating the user's account in the RP (Step 6 in Figure~\ref{fig:overview}).
 \end{itemize}
-\end{comment}
 
-\begin{comment}
 In Recluse, the IdP needs to be initialized during the IdP setup, for generating the public parameters for the users and RPs; the RP has to perform only one initial registration at the RP setup; and  the user triggers the Step 2-6 in Figure~\ref{fig:overview} for each login at a RP. IdP setup is performed at the very beginning of Recluse, and will be invoked by the IdP to update the leaked $SK_{Cert}$ or $SK_{ID}$, while $g$ and $p$ will never be modified. Recluse does not support multiple initial registrations for one RP, as the RP does not know the $UID$ nor the discrete logarithm of $RPID$ and fails to derive the user's new account  from the old one under the Discrete Logarithm problem.
 
 
@@ -322,7 +314,6 @@ The processes at the user may be achieved through an extension at the user agent
 Only the RP initial registration and Step 15 in Figure~\ref{fig:process} requires a modification at IdP.
 
 \begin{comment}
-
 The overview of login flow is shown in Figure~\ref{fig:overview}, which contains RP identifier negotiation, dynamic registration and token obtaining.
 
 The of each phase in login flow is shown as follows:
