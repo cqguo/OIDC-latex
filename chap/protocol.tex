@@ -1,9 +1,10 @@
 \section{Recluse}
 \label{sec:Recluse}
-In this section, we firstly introduce the principle of Recluse, which introduces the goals in Recluse and the requirements. Then we describe the initialization of Recluse, including system initialization and initial registration of RP, following with the description of algorithms for calculating the RP identifier transformation, user identifier and account. The detailed processing for each user's login is provided corresponding to the main process phases. Finally, we present how Recluse to be compatible with OIDC.
+In this section, we firstly introduce the principle of Recluse, which includes the goals in Recluse. Then we describe the initialization of Recluse, including system initialization and initial registration of RP, following with the description of algorithms for calculating the RP identifier transformation, user identifier and account. The detailed processing for each user's login is provided corresponding to the main process phases. Finally, we present how Recluse to be compatible with OIDC.
 
 \subsection{Principle}
-\noindent\textbf{Goals in Recluse.} As analyzed in Section~\ref{subsec:solutions}, to enhanced requirements of SSO systems, Recluse has to allow only the exact RP to derive the user's unchanged account with a trapdoor, bind the proof with a transformation of RP’s identifier, and achieve user-centric confidentiality of the identity proof. We further divide these three requirements into 5 goals and achieve these 5 goals using 5 phases which is formed as the process flow in Recluse:
+\label{subsec:overview}
+\noindent\textbf{Goals in Recluse.} As analyzed in Section~\ref{subsec:solutions}, to enhanced requirements of SSO systems, Recluse has to allow only the exact RP to derive the user's unchanged account with a trapdoor, bind the proof with a transformation of RP’s identifier, and achieve user-centric confidentiality of the identity proof. We further divide these three requirements into 5 goals and achieve these 5 goals using 5 phases which is formed as the process flow in Recluse described in Figure~\ref{fig:overview}, while the used notations are listed in Table~\ref{tbl:notations}.
 \begin{itemize}
   \item 1. Providing a self-verifying value for the user-centric check (for \textbf{User-centric Confidentiality}), to ensure the correct construction and transmission of identity proof (i.e., user-centric confidentiality), which is achieved in RP initial registration (step a, b in Figure~\ref{fig:overview}), applying for a RP certificate ($Cert_{RP}$), a self-verifying value;
   \item 2. Providing a RP identifier transformation (for \textbf{Transformed Binding}), to ensure the security by binding the identity proof with this transformation, and preserve user's privacy by preventing the IdP from inferring the original RP identifier from this transformation in the request, achieved in RP identifier transforming (step 2.1 in Figure~\ref{fig:overview}) generating transformation (denoted as $PRPID$) of RP's original identifier (denoted as $RPID$);
@@ -12,7 +13,7 @@ In this section, we firstly introduce the principle of Recluse, which introduces
   \item 5. Unchanged account (for \textbf{Trapdoor-existing Identification}), to allow only the destination RP (with the trapdoor) to derive the unchanged account for one user from varying PUIDs, which is necessary for providing the consecutive and individual services, achieved in $Account$ verifying (step 6 in Figure~\ref{fig:overview}), calculating the user's account in the RP.
 \end{itemize}
 
-To achieve the above goals, the main features in Recluse is the transformed RP identifier and pairwise user identifier generation which is described detailedly in Section~\ref{subsec:identifier-generation}. $PRPID$ is the transformed RP identifier transmitted to IdP based on the $RPID$ (presenting the unique identity of RP), an one-time random number $N$ as the large prime number $p$ ($RPID$ is the primitive root of $p$) as $PRPID = {RPID}^{N} \ mod \ p$. $PUID$ is the user identifier provided by IdP to RP, which is generated as $PUID = {PRPID}^{UID} \ mod \ p$ where $UID$ is the unique user identifier stored and only known by IdP. The non-derivability of $RPID$ and $UID$ is based on the Discrete Logarithm Problem.
+The core feature in Recluse is the transformed RP identifier and pairwise user identifier generation which is described detailedly in Section~\ref{subsec:identifier-generation}. $PRPID$ is the transformed RP identifier transmitted to IdP based on the $RPID$ (presenting the unique identity of RP), an one-time random number $N$ as the large prime number $p$ ($RPID$ is the primitive root of $p$) as $PRPID = {RPID}^{N} \ mod \ p$. $PUID$ is the user identifier provided by IdP to RP, which is generated as $PUID = {PRPID}^{UID} \ mod \ p$ where $UID$ is the unique user identifier stored and only known by IdP. The non-derivability of $RPID$ and $UID$ is based on the Discrete Logarithm Problem.
 
 \noindent\textbf{Discrete Logarithm Problem.} A number $g$ ($0<g<P$) is called a primitive root modular a prime $p$, if for ${\forall}y$ ($0<y<P$), there is a (unique) number $x$ ($0\le x <P-1$) satisfying $y=g^x \pmod P$. Here, $x$ is called the discrete logarithm of $y$ modulo $p$. Given a large prime $p$ and a number $y$, it is computationally infeasible to derive the discrete logarithm (here $x$) of $y$ (detailed in~\cite{WXWM}), which is called  Discrete Logarithm Problem. The hardness of solving discrete logarithm has been a base of the security of several security primitives, including Diffie-Hellman key exchange and Digital Signature Algorithm.
 
@@ -31,7 +32,7 @@ In Recluse, the IdP needs to be initialized during the IdP setup, for generating
     \hline
     {$g$} & {A primitive root  modulo $p$.} \\
     \hline
-    {$Cert_{RP}$} & {A RP certificate.} \\
+    {$Cert_{RP}$} & {An RP certificate.} \\
     \hline
     {$SK_{Cert}$, $PK_{Cert}$} & {The private / public key for $Cert_{RP}$.} \\
     \hline
@@ -41,7 +42,7 @@ In Recluse, the IdP needs to be initialized during the IdP setup, for generating
     \hline
     {$PUID$} & {User's privacy-preserving id in the identity proof.} \\
     \hline
-    {$Account$} & {User's identifier at a RP.} \\
+    {$Account$} & {User's identifier at an RP.} \\
     \hline
     {$RPID$} & {RP's original identifier.} \\
     \hline
@@ -59,7 +60,7 @@ In Recluse, the IdP needs to be initialized during the IdP setup, for generating
     \label{tbl:notations}
 \end{table}
 
-\noindent\textbf{IdP setup.} In the setup, the IdP generates two random asymmetric key pairs, ($PK_{ID}$, $SK_{ID}$) and ($PK_{Cert}$, $SK_{Cert}$), for calculating the signatures in the identity proof and $Cert_{RP}$, respectively; and provides $PK_{ID}$ and $PK_{Cert}$ as the public parameters for the verification of identity proof and $Cert_{RP}$. Moreover, IdP generates a strong prime $p$, calculates  a primitive root ($g$) as described in Section~\ref{subsec:primitive}, and provides $p$ and $g$ as the public parameters. For $p$, we firstly randomly choose a large prime $q$, and accept  $2q+1$ as $p$ if $2q+1$ is a prime. The strong prime $p$ makes it easier to choose $n_{u}$ and $n_{RP}$. %With $g$, we obtain all the integers less than $p$, by calculating $g^i mod \ P$ for $0 \leq i \leq (P-1)$.
+\noindent\textbf{IdP setup.} In the setup, the IdP generates two random asymmetric key pairs, ($PK_{ID}$, $SK_{ID}$) and ($PK_{Cert}$, $SK_{Cert}$), for calculating the signatures in the identity proof and $Cert_{RP}$, respectively; and provides $PK_{ID}$ and $PK_{Cert}$ as the public parameters for the verification of identity proof and $Cert_{RP}$. Moreover, IdP generates a strong prime $p$, calculates  a primitive root ($g$), and provides $p$ and $g$ as the public parameters. For $p$, we firstly randomly choose a large prime $q$, and accept  $2q+1$ as $p$ if $2q+1$ is a prime. The strong prime $p$ makes it easier to choose $n_{u}$ and $n_{RP}$. %With $g$, we obtain all the integers less than $p$, by calculating $g^i mod \ P$ for $0 \leq i \leq (P-1)$.
 
 The IdP setup and following RP initial registration are based on the features of primitive root. To calculate the primitive root for a given large prime $p$,  we first search the least primitive root $g_m$  mod $p$, and then calculate the primitive root $g = g_{m}^{t} mod \ P$, where $t$ is an integer coprime to $P-1$.
 We checks whether a integrity $\mu$ is the primitive root modulo $p$ where $p=2q+1$ ($q$ is a prime), based on the lemma that an integer $1<\mu <P-1$ is a primitive root if and only if $\mu^2\neq 1 \pmod p$ and $\mu^q\neq 1 \pmod p$.
@@ -85,7 +86,7 @@ The details are provided in~\cite{Shoup,Wang}.
 Here, we further explain the two requirements in the generation of $RPID$ for \textbf{Goal 4}:
 \begin{itemize}
   \item $r$ should be coprime to $p-1$. This makes $RPID$ be another primitive root, and satisfies the requirement of Discrete Logarithm problem to prevent the RP inferring $UID$ from $Account$.
-  \item $r$ should be different with the ones for other RPs. Otherwise, the RPs who are assigned the same $RPID$, obtain the same PUID for a user, which makes identity linkage possible.
+  \item $r$ should be different with the ones for other RPs. Otherwise, the RPs who are assigned the same $RPID$, obtain the same $PUID$ for a user, which makes identity linkage possible.
 \end{itemize}
 
 The honest IdP is assumed to generate the correct $RPID$. However, we may perform an external check on $Cert_{RP}$ and $RPID$, based on the idea of Certificate transparency. The external check needs to be performed by a third party instead of RP who will be able to perform identity linkage with incorrect $RPID$. To perform the external check, IdP is required to provide the $Cert_{RP}$ to a log server, while a monitor checks the correctness of $Cert_{RP}$, i.e., no two valid $Cert_{RP}$ assigned to a same $RPID$ and $RPID$ is a primitive root modulo $p$. Moreover, $Cert_{RP}$ is compatible with a X.509 certificate which is discussed in Section~\ref{sec:discussion}.
@@ -93,7 +94,6 @@ The honest IdP is assumed to generate the correct $RPID$. However, we may perfor
 
 
 
-\begin{comment}
 \begin{comment}
 \subsection{Primitive Root}
 \label{subsec:primitive}
@@ -229,7 +229,7 @@ The honest IdP is assumed to generate the correct $RPID$. However, we may perfor
 
 \subsection{RP identifier transformation and Account calculation}
 \label{subsec:identifier-generation}
-In this section, we provide the calculation of $PRPID$, $PUID$ and $Account$ separately, which is the foundation of each user's login process that described in Section~\ref{sebsec:loginprocess}.
+In this section, we provide the calculation of $PRPID$, $PUID$ and $Account$ separately, which is the foundation of each user's login process described in Section~\ref{sebsec:loginprocess}.
 
 {$PRPID$}. Similar to Diffie-Hellman key Exchange\cite{DiffieH76}, the RP and user generate the  $PRPID$ cooperatively as follows:
 \begin{itemize}
@@ -271,7 +271,7 @@ Both $n_{RP}$ and $n_{u}$ are odd numbers, therefore $n_{RP}*n_{u}$ is an odd nu
 
 \subsection{User Login Process}
 \label{sebsec:loginprocess}
-In this section, we present the detailed process for each user's login as shown in Figure~\ref{fig:process}. The process corresponds to the four phases defined in Section~\ref{subsec:overview}.
+In this section, we present the detailed process for each user's login as shown in Figure~\ref{fig:process}. The process corresponds to the goals 2-5 defined in Section~\ref{subsec:overview}.
 
 \begin{figure*}
   \centering
@@ -298,20 +298,20 @@ Finally, RP derives the user's unchanged $Account$ from $PUID$ as follows. \text
 \label{subsec:compatible}
 Recluse is compatible with the implicit protocol flow of OIDC (authorization code flow is discussed in Section~\ref{sec:discussion}).
 
-In Recluse, the formats of identity proof request and identity proof are the same as the ones in OIDC. In details, each element of the identity proof request in OIDC is contained in Recluse as follows: the RP's identifier ($PRPID$ in Recluse), the endpoint (one-time endpoint in the request from the user in Recluse) and the set of required attributes (also supported by Recluse although not listed in the description). The identity proof in Recluse is also exactly the same as the one in Recluse, which includes RP's identifer ($PRPID$ in Recluse), the user's PUID, the issuer, validity period, issuing time, other requested attributes and a signature using the IdP's private key.
+In Recluse, the formats of identity proof request and identity proof are the same as the ones in OIDC. In details, each element of the identity proof request in OIDC is contained in Recluse as follows: the RP's identifier ($PRPID$ in Recluse), the endpoint (one-time endpoint in the request from the user in Recluse) and the set of required attributes (also supported by Recluse although not listed in the description). The identity proof in Recluse is also exactly the same as the one in OIDC, which includes RP's identifer ($PRPID$ in Recluse), the user's PPID ($PUID$ in Recluse), the issuer, validity period, issuing time, other requested attributes and a signature using the IdP's private key.
 
 The same format of identity proof request and identity proof makes the verification same in OIDC and Recluse. The IdP, in both Recluse and OIDC, verifies the identity proof request, by checking whether the mapping of RP's identifier and endpoint exists in the registered ones. The RP, in both Recluse and OIDC, checks the correctness of identity proof, by checking that the signature is correct, the consistency of RP's identifer in the identity proof and the one it owns, the validity period, issuing time and the freshness (which is checked based on a nonce in  OIDC, while  $PRPID$ serves as the nonce in Recluse).
 
 The RP's extra processes needed in Recluse may be achieved using the existing interfaces defined in OIDC.  Recluse requires that $PRPID$ is globally unique, which can be achieved through the dynamic registration (described in Section~\ref{sec:background}) provided by IdP in OIDC. In Recluse, the dynamic registration is invoked by the user instead of the RP to prevent the curious IdP infers the user's traces by analyzing the between the dynamic registration and identity proof request. To avoid the IdP to infer the RP's identity through the registration token in dynamic registration, the access control of the endpoint for dynamic registration is deleted in Recluse. As the registration response is transmitted through the user instead of server-to-server transmission between RP and IdP, the extra signature is required to guarantee the integrity of response. Moreover, the endpoint in the dynamic registration request is replaced with an one-time endpoint, to avoid the RP's identifying information to be leaked to the IdP.
 
 
-The modification required by Recluse at the RP may be achieved using existing interface provided by the implementations of OIDC. Based on the software development kit (SDK) in existing OIDC implementations for RP, the Steps 2,3, 6, 12 (in Figure~\ref{fig:process}) in RP may be integrated in the interface for constructing identity proof request;
+The modification required by Recluse at the RP may be achieved using existing interface provided by the implementations of OIDC. Based on the software development kit (SDK) in existing OIDC implementations for RP, the Steps 2-3, 5-7, 12 (in Figure~\ref{fig:process}) in RP may be integrated in the interface for constructing identity proof request;
 Step 18 in Figure~\ref{fig:process} may be combined with the interface for verifying and parsing identity proof.
 
 The processes at the user may be achieved through an extension at the user agent, which captures the identity proof (and request) for process  without modifying existing message transmission at the IdP and RP (i.e., redirection mechanism), as described in Section~\ref{sec:implementation}.
 
 
-Only the RP initial registration and Step 15 in Figure~\ref{fig:process} requires a modification at IdP.
+Only the RP initial registration, step 10 and Step 15 in Figure~\ref{fig:process} requires a modification at IdP.
 
 \begin{comment}
 The overview of login flow is shown in Figure~\ref{fig:overview}, which contains RP identifier negotiation, dynamic registration and token obtaining.

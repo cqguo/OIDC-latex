@@ -5,9 +5,9 @@ Recluse contains only three entities, i.e., the user, IdP and RP; and doesn't in
 
 \subsection{Threat Model}
 
-\textbf{Honest but Curious IdP.} All the action performed by IdP fulfils the requirements of Recluse and none of action undefined is conducted. 
+\textbf{Honest but Curious IdP.} All the actions performed by IdP fulfil the requirements of Recluse and none of action undefined is conducted. 
 But the IdP might try to achieve the additional information which is not defined to be exposed to IdP passively without breaking the rule of Recluse.
-The IdP is well protected and the private keys for signing the RP certificate and identity proof are not leaked. In the initial registration of RP,  IdP checks the correctness of RP's URL,  assigns an unique original identifier, and generates the correct signature. For identity proof, IdP generates the proof only for the authenticated user, calculates the PPID based on the user's unique identifier and the user-provided transformation of RP identifer, binds the proof with the transformation, generates the signature correctly, and sends it only to the user. Moreover, the curious IdP may attempt to infer the user's access traces (i.e., which RPs are accessed by one user), by analyzing the content and timing of received messages, for example, inferring RP's identifiers in (or the receivers of) the identity proof. 
+The IdP is well protected and the private keys for signing the RP certificate and identity proof are not leaked. In the initial registration of RP,  IdP checks the correctness of RP's URL,  assigns an unique original identifier, and generates the correct signature. For identity proof, IdP generates the proof only for the authenticated user, calculates the user identifier based on the user's unique identifier and the user-provided transformation of RP identifer, binds the proof with the transformation, generates the signature correctly, and sends it only to the user. Moreover, the curious IdP may attempt to infer the user's access traces (i.e., which RPs are accessed by one user), by analyzing the content and timing of received messages, for example, inferring RP's identifiers in (or the receivers of) the identity proof. 
 %But IdP will never collude with RPs.
 
 \textbf{Malicious User.} The user might be under the full control of adversaries, so that the malicious user is able to conduct any action defined or not defined in the Recluse. 
@@ -16,13 +16,13 @@ The adversary may obtain the user's credential through various attacks, or regis
 
 \textbf{Malicious RP.} The RP might be corrupted by the adversary or just built by the adversary, which is able to perform any action desired by the adversary for any purpose. 
 The adversary may work as RPs and behave arbitrarily, by controlling one or more compromised RPs, or registering as multiple valid RPs at the IdP. The malicious RP may attempt to make the identity proof bound with it be  accepted by other RPs, by using one or more chosen nonce for the RP's transformation identifiers; or receive an identity proof bound with other RP, by sending another valid or invalid RP certificate instead of its own one, or providing an incorrect identity proof request. 
-RPs may link the accounts in each RP actively (providing incorrect messages) and passively (combining the received messages),  using the same (or derivable) PPID in the identity proof.
+
 
 Moreover, the conclusion is also considered available in Recluse, of which the details are shown as follows:
 
 \textbf{Conclusion between RP and user.} The malicious users and RPs may collude to perform the impersonation attack and identity injection. For example, (1) to login at the uncorrupted RP under the uncontrolled user's account, the adversary firstly attracts the uncontrolled user to access the malicious RP, then attempts to make the identity proof also valid for the uncorrupted RP, and finally pretends as a user to access this RP with the received identity proof; (2) To make the uncontrolled user login at the uncorrupted RP under an controlled account, the adversary acts as a user to obtain an identity proof for itself by accessing the uncorrupted RP, and works as a RP to redirect the uncontrolled user to the uncorrupted RP with this proof (e.g. CSRF).
 
-\textbf{Conclusion among RPs.} The colluded (malicious) RPs may link the accounts in each RP actively (providing incorrect messages) and passively (combining the received messages),  using the same (or derivable) PPID in the identity proof. But the user linkage based on other attributes and the global network traffic analysis are not considered in this work, which may be prevented by limiting the attributes exposed to each RPs and proving the mixed traffic by accessing unwanted RPs.
+\textbf{Conclusion among RPs.} The colluded (malicious) RPs may link the accounts in each RP actively (providing incorrect messages) and passively (combining the received messages),  using the same (or derivable) user identifier in the identity proof. But the user linkage based on other attributes and the global network traffic analysis are not considered in this work, which may be prevented by limiting the attributes exposed to each RPs and proving the mixed traffic by accessing unwanted RPs.
 
 
 \subsection{Assumptions}
