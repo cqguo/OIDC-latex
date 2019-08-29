@@ -1,4 +1,4 @@
-\section{Challenges and Solutions}
+\section{Problems in Privacy-Preserving SSO}
 \label{sec:challenge}
 %PriOIDC allows user to conduct single sign on with out leaking login information to IdP. And even multi RPs' collusion can not trace the user. In this section, we are going to make an overview of our user privacy respecting protocol based on OpenID Connect 1.0.
 %As SSO systems introduce the novel way for the RPs to identify the user, the authentication security and users' privacy should be considered.
@@ -14,7 +14,7 @@ In this section, we firstly describe the conflicts between the basic requirement
 \label{subsec:challenges}
 %In SSO systems, PRs' identifier is required in both authentication request and users' identifier proof generation. Moreover, as it has been described in Section~\ref{sec:intro}, it is required to expose the identifier of users' accessed RP for security consideration. Therefore, hiding users' accessed RP from IdP is to introduce prominent challenges. To deal with the challenges, the procedure and parameters generation methods are required to be modified. However, this modification also introduces new attack surface, so that the attackers' ability in Recluse should be considered.
 
-To prevent the IdP from inferring the user's trace, it is straightforward that IdP should never obtain any information identifying the user-accessed RP. The identifying information includes the RP's identifier and URL. To prevent the RPs's linkage of the single user, the user identifiers provided by IdP for one user should never be same or derivable to each other. However, it conflicts with the basic requirements on identity proof described in Section~\ref{subsec:securityconsideration}, resulting in the following problems in SSO systems:
+To prevent the IdP from inferring the user's trace, it is straightforward that IdP should never obtain any information identifying the user-accessed RP. The identifying information includes the RP's identifier and URL. To prevent the RPs's linkage of the single user, the user identifiers provided by IdP for one user should never be same or derivable to each other. However, it conflicts with the basic requirements on identity proof described in Section~\ref{subsec:basicrequirements}, resulting in the following problems in SSO systems:
 
 \begin{itemize}
 	\item \textbf{No Identification.} User account is the unique identifier  for the RP to provide the individual services for each user. In SSO systems, RP derives the user account from the identifier (i.e., PPID in OIDC) provided by the identity proof. However, in privacy-preserving SSO systems, IdP must provides the pairwise user identifier (never same for different RPs) without knowing the identity of RP. Therefore, IdP is only able to provide different user identifier for user's multiple logins at the same RP, which makes RP fail to provide the consecutive and individual services.
@@ -61,6 +61,7 @@ Additionally, it introduces another challenge to provide distinct user identifie
 
 
 \subsection{Recluse Overview}
+\label{subsec:solutions}
 Recluse aims to hide the users' traces from both the IdP and colluded RPs, without violating the basic requirements of SSO systems. Therefore, we propose the privacy-preserving requirements of SSO systems and illustrate the methods to fulfil the requirements.
 
 \begin{itemize}
