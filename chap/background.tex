@@ -39,6 +39,14 @@ OpenID Connect (current version 1.0), a typical SSO standard,  defines the proce
 OIDC is designed to extend OAuth for user authentication,
 % by binding the identity proof for authentication with the information of RP.
  which provides three protocol flows: authorization code flow, implicit flow and hybrid flow (i.e., a mix-up of the previous two flows). In the authorization code flow, the identity proof is the authorization code sent by the IdP, which is bound with the RP, as only the target RP is able to obtain the user's attributes with this authorization code and the corresponding secret (distributed in the RP's registration) which is performed in the similar way as the authentication in OAuth 2.0.
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\linewidth]{fig/OIDC1.pdf}
+  %\subfigure[Authorization Code Flow]{\includegraphics[width=\linewidth]{fig/openidconnect2.pdf}\label{fig:OpenID_code}}
+  %\subfigure[Hybrid Flow]{\includegraphics[width=\linewidth]{fig/openidconnect3.pdf}\label{fig:OpenID_hybrid}}
+  \caption{The implicit protocol flow of OIDC.}
+  \label{fig:OpenID}
+\end{figure}
 
 The implicit flow of OIDC achieves the binding between the identity proof and the RP, by using the new id token as the identity proof. In details, id token includes the user's PPID, the RP's identifier (RPID), the issuer, issuing time, the validity period and the other requested attributes. The IdP completes the construction of the id token by generating the signature of these elements with its private key, and sends it to the RP previously registered endpoint. The RP validates the id token, by verifying the signature with the IdP's public key, checking the correctness of the valid period and the consistency of RPID with the identifier stored locally. Figure~\ref{fig:OpenID} provides the details in the implicit flow of OIDC. The detailed processes are as follows:
 \begin{itemize}
@@ -58,16 +66,8 @@ The implicit flow of OIDC achieves the binding between the identity proof and th
     \item Step 4, 5: The RP verifies the id token, identifies the user with \verb+sub+ in the id token, and requests the other attributes from IdP with the access token.
 \end{itemize}
 \end{comment}
-\begin{figure}
-  \centering
-  \includegraphics[width=\linewidth]{fig/OIDC1.pdf}
-  %\subfigure[Authorization Code Flow]{\includegraphics[width=\linewidth]{fig/openidconnect2.pdf}\label{fig:OpenID_code}}
-  %\subfigure[Hybrid Flow]{\includegraphics[width=\linewidth]{fig/openidconnect3.pdf}\label{fig:OpenID_hybrid}}
-  \caption{The implicit protocol flow of OIDC.}
-  \label{fig:OpenID}
-\end{figure}
 
-\begin{figure}
+\begin{figure}[t]
   \centering
   \includegraphics[width=\linewidth]{fig/overview1.pdf}
   %\subfigure[Authorization Code Flow]{\includegraphics[width=\linewidth]{fig/openidconnect2.pdf}\label{fig:OpenID_code}}
