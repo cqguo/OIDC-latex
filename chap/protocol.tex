@@ -61,7 +61,11 @@ To make the description clear, we list the used notations  in Table~\ref{tbl:not
 Discrete logarithm problem is adopted in Recluse, to prevent IdP from inferring $RPID$ from $PRPID$, and allow the RP to derive $Account$ from $PUID$ without obtaining the $UID$. 
 Here, we provide a brief description of the discrete logarithm problem.
 A number $g$ ($0<g<p$) is called a primitive root modular a prime $p$, if for ${\forall}y$ ($0<y<p$), there is a  number $x$ ($0\le x <p-1$) satisfying $y=g^x \pmod p$. 
-And, $x$ is called the discrete logarithm of $y$ modulo $p$. Given a large prime $p$ and a number $y$, it is computationally infeasible to derive the discrete logarithm (here $x$) of $y$ (detailed in~\cite{WXWM}), which is called  Discrete Logarithm Problem. The hardness of solving discrete logarithm has been a base of the security of several security primitives, including Diffie-Hellman key exchange and Digital Signature Algorithm.
+And, $x$ is called the discrete logarithm of $y$ modulo $p$. Given a large prime $p$ and a number $y$, it is computationally infeasible to derive the discrete logarithm (here $x$) of $y$ (detailed in~\cite{WXWM}), which is called discrete logarithm problem. The hardness of solving discrete logarithm has been a base of the security of several security primitives, including Diffie-Hellman key exchange and Digital Signature Algorithm (DSA).
+To calculate the primitive root for a given large prime $p$,  we retrieve the least primitive root $g_m$  mod $p$, 
+and then calculate the primitive root $g = g_{m}^{t} mod \ P$, where $t$ is an integer coprime to $p-1$.
+A lemma is proposed to check whether an integrity $\mu$ is the primitive root modulo $p$ where $p=2q+1$ ($q$ is a prime), that is,  an integer $1<\mu <p-1$ is a primitive root if and only if $\mu^2\neq 1 \pmod p$ and $\mu^q\neq 1 \pmod p$~\cite{Shoup,Wang}.
+%The details are provided in~\cite{Shoup,Wang}.
 
 \subsection{System Initialization and RP Initial Registration}
 In Recluse, the IdP needs to be initialized during the IdP setup, for generating the public parameters for the users and RPs; the RP has to perform only one initial registration at the RP setup; and  the user triggers the Step 2-6 in Figure~\ref{fig:Recluse} for each login at a RP. IdP setup is performed at the very beginning of Recluse, and will be invoked by the IdP to update the leaked $SK_{Cert}$ or $SK_{ID}$, while $g$ and $p$ will never be modified. Recluse does not support multiple initial registrations for one RP, as the RP does not know the $UID$ nor the discrete logarithm of $RPID$ and fails to derive the user's new account from the old one under the Discrete Logarithm problem.
@@ -109,9 +113,6 @@ In Recluse, the IdP needs to be initialized during the IdP setup, for generating
 \noindent\textbf{IdP Setup.} In the setup, the IdP generates two random asymmetric key pairs, ($PK_{ID}$, $SK_{ID}$) and ($PK_{Cert}$, $SK_{Cert}$), for calculating the signatures in the identity proof and $Cert_{RP}$, respectively; and provides $PK_{ID}$ and $PK_{Cert}$ as the public parameters for the verification of identity proof and $Cert_{RP}$. Moreover, IdP generates a strong prime $p$, calculates  a primitive root ($g$), and provides $p$ and $g$ as the public parameters. For $p$, we firstly randomly choose a large prime $q$, and accept  $2q+1$ as $p$ if $2q+1$ is a prime. The strong prime $p$ makes it easier to choose $n_{u}$ and $n_{RP}$. %With $g$, we obtain all the integers less than $p$, by calculating $g^i mod \ P$ for $0 \leq i \leq (P-1)$.
 The IdP setup and following RP initial registration are based on the features of primitive root.
 
-\noindent\textbf{Primitive Root.} To calculate the primitive root for a given large prime $p$,  we first search the least primitive root $g_m$  mod $p$, and then calculate the primitive root $g = g_{m}^{t} mod \ P$, where $t$ is an integer coprime to $p-1$.
-We checks whether a integrity $\mu$ is the primitive root modulo $p$ where $p=2q+1$ ($q$ is a prime), based on the lemma that an integer $1<\mu <p-1$ is a primitive root if and only if $\mu^2\neq 1 \pmod p$ and $\mu^q\neq 1 \pmod p$.
-The details are provided in~\cite{Shoup,Wang}.
 
 
 \noindent\textbf{RP Initial Registration.} The RP invokes initial registration to apply a valid and self-verifying $Cert_{RP}$ from IdP (\textbf{Goal 1})
