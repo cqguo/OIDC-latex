@@ -1,32 +1,63 @@
 \section{Threat Model and Assumption}
 \label{sec:assumptionandthreatmodel}
-Recluse contains only three entities, i.e., the user, IdP and RP; and doesn't introduce any other (trusted) entity. 
+Recluse contains only three entities, i.e., the user, IdP and RP; and doesn't introduce any other (trusted) entity.
 
 
 \subsection{Threat Model}
+In Recluse, the adversary attempts to break the security and user's privacy under the following threat model.
 
-\textbf{Honest but Curious IdP.} All the actions performed by IdP fulfil the requirements of Recluse and none of action undefined is conducted. 
-But the IdP might try to achieve the additional information which is not defined to be exposed to IdP passively without breaking the rule of Recluse.
-The IdP is well protected and the private keys for signing the RP certificate and identity proof are not leaked. In the initial registration of RP,  IdP checks the correctness of RP's URL,  assigns an unique original identifier, and generates the correct signature. For identity proof, IdP generates the proof only for the authenticated user, calculates the user identifier based on the user's unique identifier and the user-provided transformation of RP identifer, binds the proof with the transformation, generates the signature correctly, and sends it only to the user. Moreover, the curious IdP may attempt to infer the user's access traces (i.e., which RPs are accessed by one user), by analyzing the content and timing of received messages, for example, inferring RP's identifiers in (or the receivers of) the identity proof. 
+\textbf{Honest but Curious IdP.}
+%All the actions performed by IdP fulfil the requirements of Recluse and none of action undefined is conducted.
+%But the IdP might try to achieve the additional information which is not defined to be exposed to IdP passively without breaking the rule of Recluse.
+The honest IdP processes each messages correctly and never collude with others, while is curious about the user's privacy information.
+In details, the IdP is well protected and the private keys for signing the RP certificate and identity proof are not leaked.
+In the initial registration of RP,  IdP checks the correctness of RP's URL,  assigns an unique original identifier, and generates the correct signature.
+For identity proof, IdP generates the proof only for the authenticated user, calculates the user identifier based on the user's unique identifier
+and the user-provided transformation of RP identifer, binds the proof with the transformation, generates the signature correctly,
+and sends it only to the user.
+However, the curious IdP may attempt to infer the user's access traces (i.e., which RPs accessed by one user),
+by analyzing the content and timing of received messages, for example, inferring RP's identifiers in (or receivers of) the identity proof.
 %But IdP will never collude with RPs.
 
-\textbf{Malicious User.} The user might be under the full control of adversaries, so that the malicious user is able to conduct any action defined or not defined in the Recluse. 
-The adversary may obtain the user's credential through various attacks, or register a valid account at the IdP and RP. The user controlled by the adversary may behave arbitrarily. For example, to login at a RP under a uncontrolled user's account, the adversary may send illegal login request to the RP, transmit a modified or forged identity proof request to the IdP, reply a corrupted or forged identity proof to the RP,  choose a non-random nonce to participate in the generation of RP's transformation identifier.
+\textbf{Malicious User.} %The user might be under the full control of adversaries, so that the malicious user is able to conduct any action defined or not defined in the Recluse.
+The adversary may obtain the user's credential through various attacks, or register a valid account at the IdP and RP.
+The user controlled by the adversary may behave arbitrarily, attempting to perform the impersonation attacks and identity injection.
+For example, the malicious user  may send illegal login request to the RP,
+transmit a modified or forged identity proof request to the IdP,
+reply a corrupted or forged identity proof to the RP,
+ choose a non-random nonce to participate in the generation of RP's transformation identifier.
+%to login at a RP under a uncontrolled user's account,
 
+\textbf{Malicious RP.} %The RP might be corrupted by the adversary or just built by the adversary, which is able to perform any action desired by the adversary for any purpose.
+The adversary may work as RPs, by controlling one or more compromised RPs, or registering as multiple valid RPs at the IdP.
+The malicious RP may behave arbitrarily, and attempt to break the integrity, confidentiality and binding of the identity proof.
+For example, they may attempt to use one or more chosen nonces for the RP  identifier transformations to make the corresponding identity proof be  accepted by other RPs;
+provide an incorrect identity proof request with incorrect RP identifiers;
+and send the invalid or other RP's valid certificate instead of its own.
 
-\textbf{Malicious RP.} The RP might be corrupted by the adversary or just built by the adversary, which is able to perform any action desired by the adversary for any purpose. 
-The adversary may work as RPs and behave arbitrarily, by controlling one or more compromised RPs, or registering as multiple valid RPs at the IdP. The malicious RP may attempt to make the identity proof bound with it be  accepted by other RPs, by using one or more chosen nonce for the RP's transformation identifiers; or receive an identity proof bound with other RP, by sending another valid or invalid RP certificate instead of its own one, or providing an incorrect identity proof request. 
+%Moreover, the conclusion is also considered available in Recluse, of which the details are shown as follows:
+%The malicious users and RPs may collude as follows:
 
+\textbf{Colluded RP and users.} The malicious users and RPs may collude to perform the impersonation attack and identity injection.
+For example, (1) to login at the correct RP under the uncontrolled user's account, the adversary firstly attracts the uncontrolled user to access the malicious RP, then attempts to make the identity proof also valid for the correct RP, and finally pretends as a user to access this RP with the received identity proof;
+(2) To make the uncontrolled user login at the correct RP under an controlled account, the adversary acts as a user to obtain an identity proof for itself by accessing the correct RP, and works as a RP to redirect the uncontrolled user to the correct RP with this proof (e.g. CSRF).
 
-Moreover, the conclusion is also considered available in Recluse, of which the details are shown as follows:
-
-\textbf{Conclusion between RP and user.} The malicious users and RPs may collude to perform the impersonation attack and identity injection. For example, (1) to login at the uncorrupted RP under the uncontrolled user's account, the adversary firstly attracts the uncontrolled user to access the malicious RP, then attempts to make the identity proof also valid for the uncorrupted RP, and finally pretends as a user to access this RP with the received identity proof; (2) To make the uncontrolled user login at the uncorrupted RP under an controlled account, the adversary acts as a user to obtain an identity proof for itself by accessing the uncorrupted RP, and works as a RP to redirect the uncontrolled user to the uncorrupted RP with this proof (e.g. CSRF).
-
-\textbf{Conclusion among RPs.} The colluded (malicious) RPs may link the accounts in each RP actively (providing incorrect messages) and passively (combining the received messages),  using the same (or derivable) user identifier in the identity proof. But the user linkage based on other attributes and the global network traffic analysis are not considered in this work, which may be prevented by limiting the attributes exposed to each RPs and proving the mixed traffic by accessing unwanted RPs.
-
+\textbf{Colluded RPs.} The colluded (malicious) RPs may attempt to break the user's privacy, linking the accounts in each RP actively by providing incorrect messages
+and passively by combining the received messages.
+%using the same (or derivable) user identifier in the identity proof.
+However, the user linkage based on other attributes and the global network traffic analysis are not considered in this work,
+which may be prevented by limiting the attributes exposed to each RPs and providing the mixed traffic by accessing unwanted RPs.
 
 \subsection{Assumptions}
-In Recluse, we assume the user agent deployed at the honest user is correct, and will transmit the messages to the correct destination without leakage. The TLS is correctly implemented at the user agent, IdP and RP, which ensures the confidentiality and integrity of the network traffic between correct entities. We also assume the nonce is unpredictable by using  a secure random number generator; and the adopted cryptographic algorithms, including the RSA and SHA-256 for the RP certificate, are secure and implemented correctly, that is, no one without the IdP's private key can produce a valid certificate, and the adversary fails to infer the private key. Moreover, the transformation of the RP's identifier and the user's account calculation are based on the Discrete Logarithm Problem, we assume the adversary fails to infer $r$ from $g^r mod p$, where $p$ is a large prime and $g$ is the primitive root. However, although IdPs are interested in the user's login trace, IdP will never collude with RPs.
+In Recluse, we assume the user agent deployed at the honest user is correct,
+and will transmit the messages to the correct destination without leakage.
+The TLS is correctly implemented at the user agent, IdP and RP, which ensures the confidentiality and integrity of the network traffic between correct entities.
+We also assume the nonce is unpredictable by using  a secure random number generator;
+and the adopted cryptographic algorithms, including the RSA and SHA-256 for the RP certificate, are secure and implemented correctly, that is, no one without the IdP's private key can produce a valid certificate,
+and the adversary fails to infer the private key.
+Moreover, the transformation of the RP's identifier and the user's account calculation are based on the Discrete Logarithm Problem,
+we assume the adversary fails to infer $r$ from $g^r mod\ p$, where $p$ is a large prime and $g$ is the primitive root.
+However, although IdPs are interested in the user's login trace, IdP will never collude with RPs.
 
 
 
