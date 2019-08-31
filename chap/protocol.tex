@@ -1,64 +1,64 @@
-\section{Design of Recluse}
-\label{sec:Recluse}
-In this section, we firstly introduce the principle of Recluse with the design goals and main process phases.
+\section{Design of UPRESSO}
+\label{sec:UPRESSO}
+In this section, we firstly introduce the principle of UPRESSO with the design goals and main process phases.
 Then, we describe the system initialization and initial registration of RP, following with the description of algorithms for calculating the RP identifier transformation, user identifier and account.
 The detailed processing for each user's login is provided corresponding to the main process phases.
-Finally, we present that Recluse is compatible with OIDC.
+Finally, we present that UPRESSO is compatible with OIDC.
 
 \subsection{Principles}
 \label{subsec:overview}
-\noindent\textbf{Goals in Recluse.}
-As analyzed in Section~\ref{subsec:solutions}, Recluse needs to provide trapdoor identification, transformed binding and user-centric confidentiality,
-to achieve the privacy-preserving identification, binding and confidentiality.
-While, the integrity is provided based on the signature inherited from existing SSO systems.
-%to comfort the privacy-preserving requirements of SSO systems, Recluse has to allow only the exact RP to derive the user's unchanged account with a trapdoor, bind the proof with a transformation of RP’s identifier, and achieve user-centric confidentiality of the identity proof.
+\noindent\textbf{Goals in UPRESSO.}
+As analyzed in Section~\ref{subsec:solutions}, UPRESSO needs to provide trapdoor identification, transformed binding and user-centric confidentiality,
+to achieve the privacy-preserving identification, binding and confidentiality,
+while, the integrity is provided based on the signature inherited from existing SSO systems.
+%to comfort the privacy-preserving requirements of SSO systems, UPRESSO has to allow only the exact RP to derive the user's unchanged account with a trapdoor, bind the proof with a transformation of RP’s identifier, and achieve user-centric confidentiality of the identity proof.
 We %further divide these three requirements into three goals and
-achieve these three requirements (goals) using five phases as described in Figure~\ref{fig:Recluse}.
+achieve these three requirements (goals) using five phases as described in Figure~\ref{fig:UPRESSO}.
 To make the description clear, we list the used notations  in Table~\ref{tbl:notations}.
 \begin{itemize}
  \item Goal 1: Generating a self-verifying value for each RP, to provide the correct information for the user-centric check.
-  In Recluse, each RP applies a certificate ($Cert_{RP}$) in the \emph{RP initial registration} phase (Steps a and b in Figure~\ref{fig:Recluse}),
+  In UPRESSO, each RP applies a certificate ($Cert_{RP}$) in the \emph{RP initial registration} phase (Steps a and b in Figure~\ref{fig:UPRESSO}),
   and sends it to the user in each login processing,
   to provide the exact information for  correct construction and transmission of identity proof,
              and therefore achieving \textbf{User-centric Confidentiality}.
   %self-verifying value for the user-centric check (for \textbf{User-centric Confidentiality}),
   % to ensure the correct construction and transmission of identity proof,
-  %which is achieved in RP initial registration (step a, b in Figure~\ref{fig:Recluse}), applying for a RP certificate ($Cert_{RP}$), a self-verifying value;
+  %which is achieved in RP initial registration (step a, b in Figure~\ref{fig:UPRESSO}), applying for a RP certificate ($Cert_{RP}$), a self-verifying value;
 
 
 
 
     \item Goal 2: Transforming the RP identifer, to bind the identity proof with the unique RP identifier transformation that is \emph{not controlled by the adversary}.
-  In Recluse, the RP and user corporately negotiate a transformation (denoted as $PRPID$) of RP's original identifier (denoted as $RPID$), in the \emph{RP identifier transforming} phase (Step 2.1 in Figure~\ref{fig:Recluse}).
-  IdP checks the uniqueness of $PRPID$ in the \emph{dynamic registration} phase (Step 2.2 in Figure~\ref{fig:Recluse}),  to avoid one identity proof being accepted by two or more RPs.
+  In UPRESSO, the RP and user corporately negotiate a transformation (denoted as $PRPID$) of RP's original identifier (denoted as $RPID$), in the \emph{RP identifier transforming} phase (Step 2.1 in Figure~\ref{fig:UPRESSO}).
+  IdP checks the uniqueness of $PRPID$ in the \emph{dynamic registration} phase (Step 2.2 in Figure~\ref{fig:UPRESSO}),  to avoid one identity proof being accepted by two or more RPs.
   Then, IdP  \emph{binds the identity proof with the unique $PRPID$}, and  can \emph{ never infer $RPID$ from $PRPID$},
    therefore achieving \textbf{Transformed Binding}.
   %Providing a RP identifier transformation (for \textbf{Transformed Binding}),
   %to ensure the security by binding the identity proof with this transformation,
   %and preserve user's privacy by preventing the IdP from inferring the original RP identifier from this transformation in the request,
-  %achieved in RP identifier transforming (step 2.1 in Figure~\ref{fig:Recluse}) generating transformation (denoted as $PRPID$) of RP's original identifier (denoted as $RPID$);
+  %achieved in RP identifier transforming (step 2.1 in Figure~\ref{fig:UPRESSO}) generating transformation (denoted as $PRPID$) of RP's original identifier (denoted as $RPID$);
 
   \item Goal 3: Providing algorithms for calculating the user's identifier ($PUID$) in identity proof and the user's account ($Account$) at the RP,
-   to allow the RP to identify the user.
+   allows the RP to identify the user.
    %different $PUID$ generated for different RPs, while a unique $Account$ derived at the RP with the trapdoor.
-  In Recluse, IdP calculates $PUID$ based on $PRPID$ and user's unique identifier ($UID$) in the \emph{$PUID$ generation} phase (Step 4 in Figure~\ref{fig:Recluse}), which results in \emph{unrelated $PUID$  for different RPs};
-  and,  the \emph{RP derives the user's unique $Account$  from $PUID$ with the  trapdoor}, i.e., the secret parameters of the RP identifier transformation,   in the \emph{$Account$ processing} phase (Step 6 in Figure~\ref{fig:Recluse}); while  \emph{RP fails to derive $UID$ from either $PUID$ or $Account$}, and \emph{the $Accounts$ of a user are different among RPs};
+  In UPRESSO, IdP calculates $PUID$ based on $PRPID$ and user's unique identifier ($UID$) in the \emph{$PUID$ generation} phase (Step 4 in Figure~\ref{fig:UPRESSO}), which results in \emph{unrelated $PUID$  for different RPs};
+  and,  the \emph{RP derives the user's unique $Account$  from $PUID$ with the  trapdoor}, i.e., the secret parameters of the RP identifier transformation,   in the \emph{$Account$ processing} phase (Step 6 in Figure~\ref{fig:UPRESSO}); while  \emph{RP fails to derive $UID$ from either $PUID$ or $Account$}, and \emph{the $Accounts$ of a user are different among RPs};
    therefore, achieving \textbf{Trapdoor Identification}.
-   %\item 3. Checking the uniqueness of the transformation (for \textbf{Transformed Binding}), to avoid one identity proof being accepted by two or more RPs, which will harm the security of SSO systems, achieved in Dynamic registration (step 2.2 in Figure~\ref{fig:Recluse}), checking the global uniqueness of $RPID$;
+   %\item 3. Checking the uniqueness of the transformation (for \textbf{Transformed Binding}), to avoid one identity proof being accepted by two or more RPs, which will harm the security of SSO systems, achieved in Dynamic registration (step 2.2 in Figure~\ref{fig:UPRESSO}), checking the global uniqueness of $RPID$;
 
- % \item Unlinkable PUID (for \textbf{Trapdoor Identification}), for one user, the $PUID$s for different RPs should vary, to prevent identity linkage, which is achieved in $PUID$ generation (step 4 in Figure~\ref{fig:Recluse}), generating $PUID$ at the IdP, and transferring $PUID$ to the RP;
- % \item Unchanged account (for \textbf{Trapdoor Identification}), to allow only the destination RP (with the trapdoor) to derive the unchanged account for one user from varying $PUID$s, which is necessary for providing the consecutive and individual services, achieved in $Account$ verifying (step 6 in Figure~\ref{fig:Recluse}), calculating the user's account in the RP.
+ % \item Unlinkable PUID (for \textbf{Trapdoor Identification}), for one user, the $PUID$s for different RPs should vary, to prevent identity linkage, which is achieved in $PUID$ generation (step 4 in Figure~\ref{fig:UPRESSO}), generating $PUID$ at the IdP, and transferring $PUID$ to the RP;
+ % \item Unchanged account (for \textbf{Trapdoor Identification}), to allow only the destination RP (with the trapdoor) to derive the unchanged account for one user from varying $PUID$s, which is necessary for providing the consecutive and individual services, achieved in $Account$ verifying (step 6 in Figure~\ref{fig:UPRESSO}), calculating the user's account in the RP.
 
 
 
 \end{itemize}
 
-%The core factor in Recluse is the transformation of RP identifier and pairwise user identifier generation which is described detailedly in Section~\ref{subsec:identifier-generation}.
+%The core factor in UPRESSO is the transformation of RP identifier and pairwise user identifier generation which is described detailedly in Section~\ref{subsec:identifier-generation}.
 %$PRPID$ is the transformed RP identifier transmitted to IdP based on the $RPID$ (presenting the unique identity of RP), an one-time random number $N$ and the large prime number $p$ ($RPID$ is the primitive root of $p$) in the function $PRPID = {RPID}^{N} \ mod \ p$.
 %$PUID$ is the user identifier provided by IdP to RP, which is generated in the function $PUID = {PRPID}^{UID} \ mod \ p$ where $UID$ is the unique user identifier stored and only known by IdP.
 %The non-derivability of $RPID$ and $UID$ is based on the Discrete Logarithm Problem.
 
-Discrete logarithm problem is adopted in Recluse, to prevent IdP from inferring $RPID$ from $PRPID$, and allow the RP to derive $Account$ from $PUID$ without obtaining the $UID$.
+Discrete logarithm problem is adopted in UPRESSO, to prevent IdP from inferring $RPID$ from $PRPID$, and allow the RP to derive $Account$ from $PUID$ without obtaining the $UID$.
 Here, we provide a brief description of the discrete logarithm problem.
 A number $g$ ($0<g<p$) is called a primitive root modular a prime $p$, if for ${\forall}y$ ($0<y<p$), there is a  number $x$ ($0\le x <p-1$) satisfying $y=g^x \pmod p$.
 And, $x$ is called the discrete logarithm of $y$ modulo $p$. Given a large prime $p$ and a number $y$, it is computationally infeasible to derive the discrete logarithm (here $x$) of $y$ (detailed in~\cite{WXWM}), which is called discrete logarithm problem. The hardness of solving discrete logarithm has been a base of the security of several security primitives, including Diffie-Hellman key exchange and Digital Signature Algorithm (DSA).
@@ -68,18 +68,18 @@ A lemma is proposed to check whether an integrity $\mu$ is the primitive root mo
 %The details are provided in~\cite{Shoup,Wang}.
 
 
-In Recluse, a system initialization is performed to initialize the IdP, which generates $g$, $p$, $PK_{Cert}$, $SK_{Cert}$, $PK_{ID}$ and $SK_{ID}$, 
+In UPRESSO, a system initialization is performed to initialize the IdP, which generates $g$, $p$, $PK_{Cert}$, $SK_{Cert}$, $PK_{ID}$ and $SK_{ID}$, 
 and provides  $g$, $p$, $PK_{Cert}$ and $PK_{ID}$ as the public parameters.
 Only one initial registration is performed by each RP to apply  $Cert_{RP}$ and $RPID$ from IdP.
 %the IdP needs to be initialized during at its setup, to generate the public parameters for the users and RPs.
 %The RP has to perform only one initial registration at the RP setup.
-The user triggers Steps 1-7 in Figure~\ref{fig:Recluse} for each login at a RP.
-%IdP setup is performed at the very beginning of Recluse, and will be invoked by the IdP to update the leaked $SK_{Cert}$ or $SK_{ID}$, while $g$ and $p$ will never be modified. 
-%Recluse does not support multiple initial registrations for one RP, as the RP does not know the $UID$ nor the discrete logarithm of $RPID$ and fails to derive the user's new account from the old one under the Discrete Logarithm problem.
+The user triggers Steps 1-7 in Figure~\ref{fig:UPRESSO} for each login at a RP.
+%IdP setup is performed at the very beginning of UPRESSO, and will be invoked by the IdP to update the leaked $SK_{Cert}$ or $SK_{ID}$, while $g$ and $p$ will never be modified. 
+%UPRESSO does not support multiple initial registrations for one RP, as the RP does not know the $UID$ nor the discrete logarithm of $RPID$ and fails to derive the user's new account from the old one under the Discrete Logarithm problem.
 
 \subsection{System Initialization and RP Initial Registration}
 \begin{table}[tb]
-    \caption{The notations used in Recluse.}
+    \caption{The notations used in UPRESSO.}
     \centering
     \begin{tabular}{|c|c|}
     \hline
@@ -103,7 +103,7 @@ The user triggers Steps 1-7 in Figure~\ref{fig:Recluse} for each login at a RP.
     \hline
     {$RPID$} & {RP's original identifier.} \\
     \hline
-    {$PRPID$} & {The privacy-preserving $RPID$.} \\
+    {$PRPID$} & {The privacy-preserving $RPID$ transformation.} \\
     \hline
     {$n_u$} & {User-generated random nonce for $PRPID$. } \\
     \hline
@@ -182,12 +182,12 @@ The details are provided in~\cite{Shoup,Wang}.
 \begin{figure}
   \centering
   \includegraphics[width=\linewidth]{fig/Overview.pdf}
-  \caption{Overview of Recluse.}
+  \caption{Overview of UPRESSO.}
   \label{fig:overview}
 \end{figure}
 
 \subsection{Goals}
-As analyzed in Section~\ref{subsec:solutions}, to enhanced requirements of SSO systems, Recluse has to allow only the exact RP to derive the user's unchanged account with a trapdoor, bind the proof with a transformation of RP’s identifier, and achieve user-centric confidentiality of the identity proof. We further divide these three requirements into 5 goals and achieve these 5 goals using 5 phases which is formed as the process flow in Recluse:
+As analyzed in Section~\ref{subsec:solutions}, to enhanced requirements of SSO systems, UPRESSO has to allow only the exact RP to derive the user's unchanged account with a trapdoor, bind the proof with a transformation of RP’s identifier, and achieve user-centric confidentiality of the identity proof. We further divide these three requirements into 5 goals and achieve these 5 goals using 5 phases which is formed as the process flow in UPRESSO:
 \begin{itemize}
   \item 1. Providing a self-verifying value for the user-centric check (for \textbf{User-centric Confidentiality}), to ensure the correct construction and transmission of identity proof (i.e., user-centric confidentiality), which is achieved in RP initial registration (step a, b in Figure~\ref{fig:overview}), applying for a RP certificate ($Cert_{RP}$), a self-verifying value;
   \item 2. Providing a RP identifier transformation (for \textbf{Transformed Binding}), to ensure the security by binding the identity proof with this transformation, and preserve user's privacy by preventing the IdP from inferring the original RP identifier from this transformation in the request, achieved in RP identifier transforming (step 2.1 in Figure~\ref{fig:overview}) generating transformation (denoted as $PRPID$) of RP's original identifier (denoted as $RPID$);
@@ -196,7 +196,7 @@ As analyzed in Section~\ref{subsec:solutions}, to enhanced requirements of SSO s
   \item 5. Unchanged account (for \textbf{Trapdoor-existing Identification}), to allow only the destination RP (with the trapdoor) to derive the unchanged account for one user from varying PUIDs, which is necessary for providing the consecutive and individual services, achieved in $Account$ verifying (step 6 in Figure~\ref{fig:overview}), calculating the user's account in the RP.
 \end{itemize}
 
-As analyzed in Section~\ref{subsec:solutions}, to ensure the security and privacy of SSO systems, Recluse has to achieve user-centric confidentiality of the identity proof, bind the proof with a transformation of RP’s identifier, and allow only the exact RP to derive the user's unchange account with a trapdoor. We further divide these three solutions into 5 goals to be achieved in the design in Recluse:
+As analyzed in Section~\ref{subsec:solutions}, to ensure the security and privacy of SSO systems, UPRESSO has to achieve user-centric confidentiality of the identity proof, bind the proof with a transformation of RP’s identifier, and allow only the exact RP to derive the user's unchange account with a trapdoor. We further divide these three solutions into 5 goals to be achieved in the design in UPRESSO:
 \begin{itemize}
   \item 1. Providing a self-verifying value for the user-centric check, to ensure the correct construction and transmission of identity proof (i.e., user-centric confidentiality);
   \item 2. Providing a RP identifier transformation, to ensure the security by binding the identity proof with this transformation, and preserve user's privacy by preventing the IdP from inferring the original RP identifier from this transformation in the request;
@@ -205,10 +205,10 @@ As analyzed in Section~\ref{subsec:solutions}, to ensure the security and privac
   \item 5. Unchange account, to allow only the destination RP (with the trapdoor) to derive the unchanged account for one user from varying PUIDs, which is necessary for providing the consecutive and individual services.
 \end{itemize}
 
-%To hide the user's traces from both the IdP and colluded RPs without breaking the security, Recluse has to achieve these : (1) the user and RP corporately calculate a transformation of the RP's identifier based on Discrete Logarithm Problem, which is sent to the IdP for binding with the identity proof while preventing the IdP from inferring the original RP identifier. The PIDs (in the identity proof) for a user in various RPs are different, to avoid the identity linkage. Moreover, only the RP (and the user) can calculate the trapdoor of the transformation, to transfer the PID into a unchanged account for the user.
+%To hide the user's traces from both the IdP and colluded RPs without breaking the security, UPRESSO has to achieve these : (1) the user and RP corporately calculate a transformation of the RP's identifier based on Discrete Logarithm Problem, which is sent to the IdP for binding with the identity proof while preventing the IdP from inferring the original RP identifier. The PIDs (in the identity proof) for a user in various RPs are different, to avoid the identity linkage. Moreover, only the RP (and the user) can calculate the trapdoor of the transformation, to transfer the PID into a unchanged account for the user.
 
 
-Recluse achieves these 5 goals using 5 phases as described in Figure~\ref{fig:overview}, while the used notations are listed in Table~\ref{tbl:notations}. The details are as follows, and the step refers to the one in Figure~\ref{fig:overview}:
+UPRESSO achieves these 5 goals using 5 phases as described in Figure~\ref{fig:overview}, while the used notations are listed in Table~\ref{tbl:notations}. The details are as follows, and the step refers to the one in Figure~\ref{fig:overview}:
 \begin{itemize}
   \item RP initial registration: Applying for a RP certificate ($Cert_{RP}$), a self-verifying value,  (Step 1, Goal 1);
   \item RP identifier transforming: Generating transformation (denoted as $RPID_T$) of RP's original identifier (denoted as $RPID$), (Step 2, Goal 2);
@@ -219,7 +219,7 @@ Recluse achieves these 5 goals using 5 phases as described in Figure~\ref{fig:ov
 
 A RP certificate (denoted as $Cert_{RP}$) is the self-verifying value required in Goal 1, which is  generated in the \textbf{RP initial registration} (phase 1). A transformation (denoted as $PRPID$) of RP's original identifier (denoted as $RPID$) is generated in the \textbf{RP identifier transforming} (phase 2) for Goal 2. The global uniqueness of $PRPID$ is checked in the \textbf{dynamic registration} (phase 3) for Goal 3. The unlinkable \textbf{PID} is generated and transmitted to RP in the step 4 and 5 in Figure~\ref{fig:overview}, for Goal 4.
 
-To achieve these goals, Recluse contains the following 6 phases, in which the IdP setup needs to be executed only once for a IdP, RP initial registration  needs to be invoked only once for a RP, while all the other phases will be invoked repeatedly for each user's login request at each RP. To make the decryption of Recluse clear, we list
+To achieve these goals, UPRESSO contains the following 6 phases, in which the IdP setup needs to be executed only once for a IdP, RP initial registration  needs to be invoked only once for a RP, while all the other phases will be invoked repeatedly for each user's login request at each RP. To make the decryption of UPRESSO clear, we list
 \begin{itemize}
   \item IdP setup: Generating correct public parameters;
   \item RP initial registration: Applying RP certificate (denoted as $Cert_{RP}$) from IdP (Step 1 in Figure~\ref{fig:overview});
@@ -229,11 +229,11 @@ To achieve these goals, Recluse contains the following 6 phases, in which the Id
   \item Account:  Calculating the user's account in the RP (Step 6 in Figure~\ref{fig:overview}).
 \end{itemize}
 
-In Recluse, the IdP needs to be initialized during the IdP setup, for generating the public parameters for the users and RPs; the RP has to perform only one initial registration at the RP setup; and  the user triggers the Step 2-6 in Figure~\ref{fig:overview} for each login at a RP. IdP setup is performed at the very beginning of Recluse, and will be invoked by the IdP to update the leaked $SK_{Cert}$ or $SK_{ID}$, while $g$ and $p$ will never be modified. Recluse does not support multiple initial registrations for one RP, as the RP does not know the $UID$ nor the discrete logarithm of $RPID$ and fails to derive the user's new account  from the old one under the Discrete Logarithm problem.
+In UPRESSO, the IdP needs to be initialized during the IdP setup, for generating the public parameters for the users and RPs; the RP has to perform only one initial registration at the RP setup; and  the user triggers the Step 2-6 in Figure~\ref{fig:overview} for each login at a RP. IdP setup is performed at the very beginning of UPRESSO, and will be invoked by the IdP to update the leaked $SK_{Cert}$ or $SK_{ID}$, while $g$ and $p$ will never be modified. UPRESSO does not support multiple initial registrations for one RP, as the RP does not know the $UID$ nor the discrete logarithm of $RPID$ and fails to derive the user's new account  from the old one under the Discrete Logarithm problem.
 
 
 \begin{table}[tb]
-    \caption{The notations used in Recluse.}
+    \caption{The notations used in UPRESSO.}
     \centering
     \begin{tabular}{|c|c|}
     \hline
@@ -321,11 +321,11 @@ As denoted in Equation~\ref{equ:RPIDT}, ${RPID}$ cannot be derived from $PRPID$,
 
 To ensure \emph{$PRPID$ not controlled by the adversary} in \textbf{Goal 2},
  $PRPID$ should not be determined by  either the RP or user. %, as the adversary may control either the RP or user.
-Otherwise, malicious users may make the victim RP accept an identity proof bound with another RP; or colluded RPs may provide the correlated $PRPID$ for potential identity linkage.    
+Otherwise, malicious users may make the victim RP accept an identity proof issued for another RP; or colluded RPs may provide the correlated $PRPID$ for potential identity linkage.    
 %The generation ensures that $PRPID$ cannot be determined by neither (malicious) user nor RP, which prevents the adversary from constructing a identity proof to be accepted by two or more RPs (\textbf{Security in Goal 2}).
-In Recluse, RP fails to control the $PRPID$ generation, as it provides $Y_{RP}$ before obtaining $n_{u}$ and the modification of $Y_{RP}$ will trigger the user to generate another different  $n_{u}$. The Discrete Logarithm problem prevents the user from choosing an $n_{u}$ for a specified $PRPID$ on the received $Y_{RP}$.
+In UPRESSO, RP fails to control the $PRPID$ generation, as it provides $Y_{RP}$ before obtaining $n_{u}$ and the modification of $Y_{RP}$ will trigger the user to generate another different  $n_{u}$. The Discrete Logarithm problem prevents the user from choosing an $n_{u}$ for a specified $PRPID$ on the received $Y_{RP}$.
 
-In Recluse, both $n_{RP}$ and $n_{u}$ are odd numbers, therefore $n_{RP}*n_{u}$ is an odd number and coprime to the even $p-1$, which ensures that the inverse $(n_{RP}*n_{u})^{-1}$ always exists, where  $(n_{RP}*n_{u})^{-1} * (n_{RP}*n_{u}) = 1 \ mod \ (p-1)$. The inverse  serves as  the trapdoor $t$ for $Accout$, which makes:
+In UPRESSO, both $n_{RP}$ and $n_{u}$ are odd numbers, therefore $n_{RP}*n_{u}$ is an odd number and coprime to the even $p-1$, which ensures that the inverse $(n_{RP}*n_{u})^{-1}$ always exists, where  $(n_{RP}*n_{u})^{-1} * (n_{RP}*n_{u}) = 1 \ mod \ (p-1)$. The inverse  serves as  the trapdoor $t$ for $Accout$, which makes:
 \begin{equation}
 (PRPID)^t = RPID \ mod \ p
 \label{equ:trapdoor}
@@ -361,10 +361,10 @@ In this section, we present the detailed process for each user's login as shown 
 
 In RP identifer transforming phase, the user and RP corporately process as follows. \textbf{(1)} The user sends a login request to trigger the negotiation of $PRPID$. \textbf{(2)} RP chooses the random $n_{RP}$, and calculates $Y_{RP}$ as described in Section~\ref{subsec:identifier-generation}. \textbf{(3)} RP sends $Cert_{RP}$ with $Y_{RP}$ to the user.  \textbf{(4)} The user halts the login process if the provided $Cert_{RP}$ is invalid; otherwise, it extracts $RPID$ from $Cert_{RP}$, and calculates $PRPID$ with a random chosen $n_u$ as in Section~\ref{subsec:identifier-generation}. \textbf{(5)} The user sends $n_u$ and $PRPID$ to the RP. \textbf{(6)} RP calculates $PRPID$ using the received $n_u$ with $Y_{RP}$ as in Section~\ref{subsec:identifier-generation}, and rejects the user's login request if the calculated $PRPID$ is inconsistent with the received one. After that, RP derives the trapdoor $t$ as in Section~\ref{subsec:identifier-generation}, which will be used in calculating $Account$. \textbf{(7)} RP sends the calculated $PRPID$ to the user, who will halt the login if the received $PRPID$ is different from the cached one.
 
-In the dynamic registration phase, the user registers the RP at the IdP instead of RP as follows. \textbf{(8)} The user generates an one-time endpoint (used in Section~\ref{subsec:compatible}) if the received $PRPID$ is accepted. \textbf{(9)} Then, the user registers the RP with the $PRPID$ and one-time endpoint. \textbf{(10)} If $PRPID$ is globally unique and is a primitive root module $p$, IdP sets the flag $RegRes$ as $OK$ (otherwise $FAIL$), and constructs the reply in the form of
+In the dynamic registration phase, the user registers the newly generated $PRPID$ at the IdP as follows. \textbf{(8)} The user generates an one-time endpoint (used in Section~\ref{subsec:compatible}) if the received $PRPID$ is accepted. \textbf{(9)} Then, the user registers the RP with the $PRPID$ and one-time endpoint. \textbf{(10)} If $PRPID$ is globally unique and is a primitive root module $p$, IdP sets the flag $RegRes$ as $OK$ (otherwise $FAIL$), and constructs the reply in the form of
 [$RegRes$, $RegMes$, $Sig_{SK_{ID}}$]
 %[$RegRes$, $timestamp$, $PRPID$, $Sig_{SK_ID}$] where $timestamp$ is the time generating this reply and
-where $RegMes$ is the response to traditional dynamic registration containing $PRPID$, issuing time with other attributes and $Sig_{SK_{ID}}$ is the signature of the other elements using the private key $SK_{ID}$ (ensuring unique $PRPID$ for binding in \textbf{Goal 2}). \textbf{(11)} The user forwards the registering result to the RP. The user obtains $RegRes$ directly as the connection between the user and IdP is secure, while the RP accepts the $RegRes$ only when $Sig_{SK_{ID}}$ is valid
+where $RegMes$ is the response to traditional dynamic registration containing $PRPID$, issuing time as well as other attributes and $Sig_{SK_{ID}}$ is the signature of the other elements using the private key $SK_{ID}$ (ensuring unique $PRPID$ for binding in \textbf{Goal 2}). \textbf{(11)} The user forwards the registration result to the RP. The user obtains $RegRes$ directly as the connection between the user and IdP is secure, while the RP accepts the $RegRes$ only when $Sig_{SK_{ID}}$ is valid
 %, $timestamp$ is correct and $PRPID$ is the same as the cached one.
 and $RegMes$ is issued for the $PRPID$ within the valid period. The user and RP will negotiate a new $PRPID$ if $RegRes$ is $FAIL$.
 
@@ -375,21 +375,21 @@ Finally, RP derives the user's  $Account$ from $PUID$ as follows. \textbf{(18)} 
 
 \subsection{Compatibility with OIDC}
 \label{subsec:compatible}
-Recluse is compatible with the implicit protocol flow of OIDC (authorization code flow is discussed in Section~\ref{sec:discussion}).
+UPRESSO is compatible with the implicit protocol flow of OIDC (authorization code flow is discussed in Section~\ref{sec:discussion}).
 
-In Recluse, the formats of identity proof request and identity proof are the same as the ones in OIDC. In details, each element of the identity proof request in OIDC is contained in Recluse as follows: the RP's identifier ($PRPID$ in Recluse), the endpoint (one-time endpoint in the request from the user in Recluse) and the set of required attributes (also supported by Recluse but not listed here). The identity proof in Recluse is also exactly the same as the one in OIDC, which includes RP's identifer ($PRPID$ in Recluse), the user's PPID ($PUID$ in Recluse), the issuer, validity period, issuing time, other requested attributes and a signature generated by $SK_{ID}$. % the IdP's private key.
+In UPRESSO, the formats of identity proof request and identity proof are the same as the ones in OIDC. In details, each element of the identity proof request in OIDC is contained in UPRESSO as follows: the RP's identifier ($PRPID$ in UPRESSO), the endpoint (one-time endpoint in the request from the user in UPRESSO) and the set of required attributes (also supported by UPRESSO but not listed here). The identity proof in UPRESSO is also exactly the same as the one in OIDC, which includes RP's identifer ($PRPID$ in UPRESSO), the user's PPID ($PUID$ in UPRESSO), the issuer, validity period, issuing time, other requested attributes and a signature generated by $SK_{ID}$. % the IdP's private key.
 
-The same formats of identity proof request and identity proof make the verification same in OIDC and Recluse. The IdP, in both Recluse and OIDC, verifies the identity proof request, by checking whether the mapping of RP's identifier and endpoint exists in the registered ones. The RP, in both Recluse and OIDC, verifies the identity proof, by checking the signature, the consistency of RP's identifer in the identity proof and the one it owns, the validity period, issuing time and the freshness (which is checked based on a nonce in  OIDC, while  $PRPID$ serves as the nonce in Recluse).
+The same formats of identity proof request and identity proof make the verification same in OIDC and UPRESSO. The IdP, in both UPRESSO and OIDC, verifies the identity proof request, by checking whether the mapping of RP's identifier and endpoint exists in the registered ones. The RP, in both UPRESSO and OIDC, verifies the identity proof, by checking the signature, the consistency of RP's identifer in the identity proof and the one it owns, the validity period, issuing time and the freshness (which is checked based on a nonce in  OIDC, while  $PRPID$ serves as the nonce in UPRESSO).
 
-The RP's extra processes needed in Recluse may be achieved using the existing interfaces defined in OIDC.  
-Recluse requires that $PRPID$ is globally unique, which can be achieved through the dynamic registration (described in Section~\ref{sec:background}) provided by IdP in OIDC. 
-In Recluse, the dynamic registration is invoked by the user instead of the RP to prevent the curious IdP linking  the dynamic registration from RP with the identity proof request sent by the user.
+The RP's extra processes needed in UPRESSO may be achieved using the existing interfaces defined in OIDC.  
+UPRESSO requires that $PRPID$ is globally unique, which can be achieved through the dynamic registration (described in Section~\ref{sec:background}) provided by IdP in OIDC. 
+In UPRESSO, the dynamic registration is invoked by the user instead of the RP to prevent the curious IdP linking  the dynamic registration from RP with the identity proof request sent by the user.
 To avoid the IdP to infer the RP's identity through the registration token in dynamic registration, 
-a common  registration token is used in Recluse. 
+a common  registration token is used in UPRESSO. 
 As the registration response is transmitted through the user instead of server-to-server transmission between RP and IdP, the extra signature is required to guarantee the integrity of response. Moreover, the endpoint in the dynamic registration request is replaced with an one-time endpoint, to avoid the RP's identifying information to be leaked to the IdP.
 
 
-The modification required by Recluse at the RP may be achieved using existing interfaces provided by the implementations of OIDC. 
+The modification of the RP required by UPRESSO may be achieved only using the existing interfaces provided by the current implementations of OIDC. 
 Based on the software development kit (SDK) in existing OIDC implementations for RP, the Steps 2-3, 5-7, 12 (in Figure~\ref{fig:process}) in RP may be integrated in the interface for constructing identity proof request;
 Step 18 in Figure~\ref{fig:process} may be combined with the interface for  parsing identity proof.
 
@@ -397,7 +397,7 @@ The processes at the user may be achieved through an extension at the user agent
 which captures the identity proof (and request)  without modifying existing message transmission at the IdP and RP (i.e., redirection mechanism). % as described in Section~\ref{sec:implementation}.
 
 
-Only the RP initial registration, step 10 and Step 15 in Figure~\ref{fig:process} requires a modification at IdP.
+Only the RP initial registration, step 10 and Step 15 in Figure~\ref{fig:process} require the modification at IdP.
 
 \begin{comment}
 The overview of login flow is shown in Figure~\ref{fig:overview}, which contains RP identifier negotiation, dynamic registration and token obtaining.
@@ -405,12 +405,12 @@ The overview of login flow is shown in Figure~\ref{fig:overview}, which contains
 The of each phase in login flow is shown as follows:
 \begin{itemize}
 \item[1.] RP Identifier Negotiation: The negotiation is required to generate the RP identifier. For each SSO procedure, user is going to start negotiation with user. RP identifier is a random number which does not represent any RP, generated by rp-id-generating algorithm. However, the identifier is bound with specific authentication which is able to be confirmed by user and RP. The details of identifier generation is shown in Section~\ref{sec:identifier-generation}.
-\item[2.] Dynamic Registration: Dynamic registration is required to in Recluse to make sure the identifier generated by negotiation is valid in IdP. In OIDC system, RP should register its attributes (e.g., the endpoint for identity proof) with IdP and obtain the RP identifier generated by IdP so that IdP is able to authenticate the user for specific RP. Therefore, to make sure the newly generated RP identifier in RP Identifier Negotiation is valid in IdP, the dynamic registration is required before the authentication request is transmitted to IdP. IdP is to check whether the identifier is unique and require RP to restart identifier negotiation if the identifier has be used by another RP.
+\item[2.] Dynamic Registration: Dynamic registration is required to in UPRESSO to make sure the identifier generated by negotiation is valid in IdP. In OIDC system, RP should register its attributes (e.g., the endpoint for identity proof) with IdP and obtain the RP identifier generated by IdP so that IdP is able to authenticate the user for specific RP. Therefore, to make sure the newly generated RP identifier in RP Identifier Negotiation is valid in IdP, the dynamic registration is required before the authentication request is transmitted to IdP. IdP is to check whether the identifier is unique and require RP to restart identifier negotiation if the identifier has be used by another RP.
 %To make the RP identifier generated by negotiation is valid in IdP, user is to register this identifier with IdP through the dynamic registration API provided by IdP. IdP is going to check whether the identifier is unique and require RP to restart identifier negotiation if the identifier has be used by another RP.
 \item[3.] Authentication: After dynamic registration, RP builds the authentication request and redirects it to IdP through user agent. After receiving the request, IdP firstly authenticates user and then issues identity proof for RP, which contains the user id generated through the user-id-generating algorithm. Then IdP redirects the identity to RP through user agent, and RP identify the user through identity proof. The methods of user identifier generation and RP identifying the user are shown in Section~\ref{sec:identifier-generation}.
 \end{itemize}
 
-However, in addition to the login flow in each authentication, the initial registration is required before the RP and user integrates the Recluse service. The initial registration allows the RP to achieve the necessary parameters from the IdP and user to sign on in the IdP. In Recluse system, the initial registration is conducted by each RP and user only once, however, the login flow is conducted in each authentication integrally each time.
+However, in addition to the login flow in each authentication, the initial registration is required before the RP and user integrates the UPRESSO service. The initial registration allows the RP to achieve the necessary parameters from the IdP and user to sign on in the IdP. In UPRESSO system, the initial registration is conducted by each RP and user only once, however, the login flow is conducted in each authentication integrally each time.
 
 
 
@@ -479,7 +479,7 @@ The login flow is shown as Figure~\ref{fig:process}, in which the $rp\_id$ is ge
 %如果由RP选择basic_rp_id，那么多个rp之间的basic_rp_id有幂次关系，那么就可以关联用户
 
 \subsubsection{RP Identifier Negotiation}
-RP identifier negotiation starts form step 1 to step 7. The user accesses the service provided by RP in his/her browser. To log in this RP, user needs to click the login button offered by Recluse.
+RP identifier negotiation starts form step 1 to step 7. The user accesses the service provided by RP in his/her browser. To log in this RP, user needs to click the login button offered by UPRESSO.
 Firstly, the user agent sends the \verb+Start Negotiation+ request to RP, so that RP generates the random $sk\_rp$ and $pk\_rp=g^{sk\_rp}modP$ as the private key and public key for DH Key exchanging.
 Secondly, RP builds the \verb+Negotiation Response+ with newly generated $pk\_rp$ as well as the \verb+RP_Cert+ issued by IdP. User agent similarly generates random $sk\_user$ and $pk\_user$, and $r=pk\_rp^{sk\_user}modP$. However, to make sure that $r$ is the relative prime of $\phi(P)$, it is required that $r$ should be odd and the greatest common divisor of $r$ and $\phi(P)$ is 1.
 Then user agent continues the \verb+Negotiation+ sending $pk\_user$ and $r$ to RP. RP generates the local $r$ in the same way as user agent and compares the local $r$ and user agent generated $r$. If $r$s are equal, RP generates $rp\_id=basic\_rp\_id^rmodP$, as well as $r^{-1}$ through Extend Euclidean algorithm, which meets $r\cdot r^{-1}=1mod\phi(P)$.
