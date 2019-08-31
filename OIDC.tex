@@ -13,7 +13,7 @@
 %\usepackage{geometry}
 %\usepackage{subfigure}
 \usepackage{url}
-\usepackage{multirow} 
+\usepackage{multirow}
 \usepackage{listings}
 \usepackage{cite}
 \usepackage{array}
@@ -38,7 +38,21 @@
 \maketitle
 \begin{abstract}
 %(e.g., shifting the risks for managing the user's credentials) (e.g., reducing the number of credentials)
- The Single Sign-On (SSO) System is widely deployed to bring the convenience to both the relying party (RP) and the users, by shifting the users' credentials to the identity provider (IdP) and reducing the user's maintained  credentials. However, the privacy leakage is the obstacle to the users' adoption of SSO, as the curious IdP knows the user's accessed RPs while the RPs may link the user with the non-independent  identifiers provided by the IdP. Existing solutions preserve the user's privacy either from the curious IdP or the colluded RPs, but fails to hide the user from the both entities. In this paper, we provide a SSO system, named Recluse, for the first time to hide the user's accessed RPs from the curious IdP and prevent the identity linkage by colluded RPs, based on the transformation of the RP identifiers and user's accounts on Discrete Logarithm Problem. Recluse doesn't introduce any other entities, and  is compatible with OpenID Connect, the widely deployed and analyzed SSO systems. Recluse is proved to provide the privacy without any degradation on the security of OpenID Connect. The evaluation demonstrates that Recluse is efficient, about 200 ms for one user's login at a RP in our environment.
+ The Single Sign-On (SSO) service, provided by identity provider (IdP),  is widely deployed and integrated to bring the convenience to both the relying party (RP) and the users.
+% by shifting the users' credentials to the identity provider (IdP) and reducing the user's maintained  credentials.
+ However, the privacy leakage is an obstacle to the users' adoption of SSO, as the curious IdP knows which RPs to be accessed by a user  
+ while the RPs may link the user with the non-independent identifiers in the identity proof provided by the IdP.
+ Existing solutions preserve the user's privacy either from the curious IdP or the colluded RPs, but never from the both entities. 
+In this paper, we provide a SSO system, named Recluse, to hide the user's accessed RPs from the curious IdP 
+and prevent the identity linkage by colluded RPs. 
+In Recluse, IdP binds the identity proof with a transformation of the RP identifier, without obtaining the exact RP identifier.
+Each RP uses a trapdoor to derive the user's unique account from the  privacy-preserving ID (PUID) in the identity proof, 
+while the accounts and PUIDs are unrelated among the RPs.
+%based on the transformation of the RP identifiers and user's accounts on the discrete logarithm problem. 
+Recluse doesn't introduce any other entities, and  is compatible with OpenID Connect, a widely deployed and well analyzed SSO system. 
+The analysis shows that user's privacy is preserved in Recluse without any degradation on the security of OpenID Connect.
+%Recluse is proved to preserve the user's privacy without any degradation on the security of OpenID Connect. 
+While, the evaluation demonstrates that Recluse is efficient, and only needs 208 ms for a user to login at a RP in our environment.
 \end{abstract}
 \begin{IEEEkeywords}
 Single Sign-On, security, privacy, trace, linkage
