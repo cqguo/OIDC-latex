@@ -3,17 +3,17 @@
 %PriOIDC allows user to conduct single sign on with out leaking login information to IdP. And even multi RPs' collusion can not trace the user. In this section, we are going to make an overview of our user privacy respecting protocol based on OpenID Connect 1.0.
 %As SSO systems introduce the novel way for the RPs to identify the user, the authentication security and users' privacy should be considered.
 
-%In this section, we describe  the main challenges in hiding the user's traces from both IdP and colluded RPs, and present the solutions of Recluse briefly.
+%In this section, we describe  the main challenges in hiding the user's traces from both IdP and colluded RPs, and present the solutions of UPRESSO briefly.
 
-%In this section, we firstly describe the challenges in designing the privacy-preserving SSO system which fulfils the basic requirements and privacy at the same time.  Then we propose and fulfil the enhanced requirements in Recluse which is based on the basic requirements and privacy issues.
+%In this section, we firstly describe the challenges in designing the privacy-preserving SSO system which fulfils the basic requirements and privacy at the same time.  Then we propose and fulfil the enhanced requirements in UPRESSO which is based on the basic requirements and privacy issues.
 
-In this section, we describe the challenges in achieving a privacy-preserving SSO, and provide the overview of the solutions in Recluse.
-% conflicts between the basic requirements and privacy of SSO systems. Then we propose the privacy-preserving requirements which combines the basic requirements and privacy with no conflicts. And we also roughly describe how the requirements are fulfilled in Recluse.
+In this section, we describe the challenges in achieving a privacy-preserving SSO, and provide the overview of the solutions in UPRESSO.
+% conflicts between the basic requirements and privacy of SSO systems. Then we propose the privacy-preserving requirements which combines the basic requirements and privacy with no conflicts. And we also roughly describe how the requirements are fulfilled in UPRESSO.
 
 
 \subsection{The Problem}
 \label{subsec:challenges}
-%In SSO systems, PRs' identifier is required in both authentication request and users' identifier proof generation. Moreover, as it has been described in Section~\ref{sec:intro}, it is required to expose the identifier of users' accessed RP for security consideration. Therefore, hiding users' accessed RP from IdP is to introduce prominent challenges. To deal with the challenges, the procedure and parameters generation methods are required to be modified. However, this modification also introduces new attack surface, so that the attackers' ability in Recluse should be considered.
+%In SSO systems, PRs' identifier is required in both authentication request and users' identifier proof generation. Moreover, as it has been described in Section~\ref{sec:intro}, it is required to expose the identifier of users' accessed RP for security consideration. Therefore, hiding users' accessed RP from IdP is to introduce prominent challenges. To deal with the challenges, the procedure and parameters generation methods are required to be modified. However, this modification also introduces new attack surface, so that the attackers' ability in UPRESSO should be considered.
 A privacy-preserving SSO needs to prevent both IdP-based access tracing and RP-based identity linkage.
 To prevent IdP-based access tracing,  IdP should never obtain any information identifying the user-accessed RP.
 The identifying information includes the RP's identifier and URL.
@@ -21,7 +21,7 @@ To prevent RP-based identity linkage, the colluded RPs should never find the cor
 %the user's identifiers provided by IdP for one user should never be same or derivable to each other.
 However, these two requirements for privacy preservation,  conflict with the basic requirements on SSO as follows: %, resulting in the following problems in SSO systems:
 \begin{itemize}
-	\item \textbf{No Identification.} In the privacy-preserving SSO, IdP doesn't know the RP's identifier,  therefore fails to provide the  unchanging user's identifier (e.g. PPID in OIDC and SAML~\cite{OpenIDConnect,SAMLIdentifier}) for the RP. Also, the user's unique identifier (e.g., the email address in BrowserID~\cite{BrowserID} and SPRESSO~\cite{SPRESSO}) should not be sent to the RP, otherwise the colluded RPs may perform the identity linkage with the same identifier.
+	\item \textbf{No Identification.} In the privacy-preserving SSO, IdP doesn't know the RP's identifier, therefore fails to provide the  pairwise user's identifier which is unchanged in one RP but different in different RPs (e.g. PPID in OIDC and SAML~\cite{OpenIDConnect,SAMLIdentifier}). Also, the user's unique identifier (e.g., the email address in BrowserID~\cite{BrowserID} and SPRESSO~\cite{SPRESSO}) should not be sent to the RP, otherwise the colluded RPs may perform the identity linkage with the same identifier.
 %User account is the unique identifier for the RP to provide the individual services for each user.
 %In SSO systems, RP derives the user account from the identifier (i.e., PPID in OIDC) provided by the identity proof.
 %However, in privacy-preserving SSO systems, IdP must provides the pairwise user identifier (never same for different RPs) without knowing the identity of RP.
@@ -36,9 +36,9 @@ The second case will make  one identity proof  be accepted by multiple RPs, whic
     The potential leakage of the identity proof exists, as:
     (1) No reliable checks (from the IdP and user) during the generation of identity proof, as the IdP lacks the correct RP identifier to retrieve the exact information from the local storage,
      while the user fails to obtain the correct RP name (or URL) from IdP for the check.
-     Therefore, the malicious RP may request the identity proof for another RP without being found by the IdP and user.
-     (2) Lack of correct URL for the transmission, as without the correct RP identifier, IdP fails to extract the correct (locally stored) URL hold by the adversary.
-      The trusted user agent may transmit the identity proof to the incorrect URL.
+     Therefore, the malicious RP may cheat user about its identity to request the identity proof for another RP without being found by the IdP and user.
+     (2) Lack of correct URL for the transmission, as without the correct RP identifier, IdP fails to extract the correct (locally stored) URL.
+      The trusted user agent may transmit the identity proof to the incorrect URL hold by the adversary.
     The leakage of identity proof may result in the impersonation attacks~\cite{ChenPCTKT14,FettKS16,WangZLG16}.
 \end{itemize}
 
@@ -83,29 +83,30 @@ Additionally, it introduces another challenge to provide distinct user identifie
 \end{comment}
 
 
-\subsection{Recluse Overview}
+\subsection{UPRESSO Overview}
 \label{subsec:solutions}
-%Recluse aims to hide the users' traces from both the IdP and colluded RPs, without violating the basic requirements of SSO systems. Therefore, we propose the privacy-preserving requirements of SSO systems and illustrate the methods to fulfil the requirements.
-Recluse prevents both IdP-based access tracing and RP-based identity linkage, without violating the basic requirements of SSO systems.
+%UPRESSO aims to hide the users' traces from both the IdP and colluded RPs, without violating the basic requirements of SSO systems. Therefore, we propose the privacy-preserving requirements of SSO systems and illustrate the methods to fulfil the requirements.
+UPRESSO prevents both IdP-based access tracing and RP-based identity linkage, without violating the basic requirements of SSO systems.
 The integrity requirement on the identity proof  does not conflict with the privacy requirements, therefore the mechanism for integrity is inherited.
-Here, we provide an overview of the privacy-preserving identification, binding and confidentiality in Recluse:
+Here, we provide an overview of the privacy-preserving identification, binding and confidentiality in UPRESSO:
 %Besides, as the \textbf{Integrity} is ensured by the signature generated by IdP, which is not related with the identity of RP, it is not the challenge in designing privacy-preserving SSO system to avoid the identity proof to be tampered.
 \begin{itemize}
 \item \textbf{Trapdoor Identification.} The entity who has the trapdoor, 
-may derive the user's unique account at an RP, from different identities in the identity proof for a user's multiple logins at the same RP.
+may derive the user's unique account at an RP, from different identifiers in the identity proof for a user's multiple logins at the same RP.
 %The trapdoor-existing identification requires that the user identifier generated by IdP should be never same in each authentication as the RP's identity is unknown to IdP and the identifier should be derivable to the specific account unchanged in RP with the trapdoor.
-In Recluse, the user's account at an RP is a function of the RP's original identifier and the user's unique identifier. 
+In UPRESSO, the user's account at an RP is a function of the RP's original identifier and the user's unique identifier. 
 The calculation of the user's unique account is split into two steps which are executed at the IdP and RP independently, 
  to prevent the IdP from obtaining the RP's identifier and avoid the RP to infer the user's unique identifier. 
-In the first step, IdP generates the PPID with the user's unique identifier and  the RP identifier's transformation, which results in different PIDs for multiple logins at a RP as various transformations are adopted.
-While, in the second step, the destination RP adopts the trapdoor of the RP identifier's transformation to derive the unique account from the PIDs. 
+In the first step, IdP generates the PPID with the user's unique identifier and the RP identifier transformation. As the RP identifier transformations are independent in multiple login flows, the PPIDs generated by IdP in these flows are different. 
+%which results in different PPIDs for multiple logins at a RP as various transformations are adopted.
+While, in the second step, the destination RP adopts the trapdoor of the RP identifier's transformation to derive the unique account from the PPIDs. 
 Moreover, the accounts of a user in various RPs are different, as the original RP identifiers are different, which prevents the identity linkage.
 
 \item \textbf{Transformed Binding.} 
 The identity proof is bound with a RP identifer's transformation, 
     which allows the RP to check whether the identity proof is for it, and prevents the IdP from inferring the exact original RP identifier.
 %The transformed binding requires that the RP should provide the one-time transformed identifier, unlinkable to the RP's unique identifier without trapdoor and the identity proof should be bound with the one-time identifier.
-In Recluse, the transformation of RP identifier is generated corporately by the user and RP, preventing the adversary from constructing a same transformation for various RPs.
+In UPRESSO, the transformation of RP identifier is generated corporately by the user and RP, preventing the adversary from constructing a same or related transformation for various RPs.
 IdP receives the RP identifier's transformation, and binds it with the identity proof.
 %the identity proof is bound with a transformation of the RP's identifier by the IdP, who cannot infer the original identifier from the transformation. 
 And, the RP only accepts the identity proof which is bound to a fresh transformation of its identifier. 
@@ -115,27 +116,27 @@ And, the RP only accepts the identity proof which is bound to a fresh transforma
 \item \textbf{User-centric Confidentiality.} 
 Instead of relying on the check at the IdP, the confidentiality is ensured by a user-side check based on the trusted information extracted from the RP certificate.
 %The user-centric confidentiality requires the checking of RP's endpoint and notification of RP's information should be shifted from IdP, who does not know the RP's identity to user.
-%In Recluse, IdP does not know the RP's identity, therefore fails to retrieve the exact information for check. 
-In Recluse, the certificate is issued for each RP by a trusted entity (e.g., IdP), which protects the RP's correct identifying information (e.g., URL, name and RP identifier)
+%In UPRESSO, IdP does not know the RP's identity, therefore fails to retrieve the exact information for check. 
+In UPRESSO, the certificate is issued for each RP by a trusted entity (e.g., IdP), which protects the RP's correct identifying information (e.g., URL, name and RP identifier)
  with a signature from the trusted entity to avoid the modification and forging. 
 %instead of checking the information provided by the RP with the ones stored in the IdP, the user directly extracts from a RP certificate for the trusted necessary information in the generation and transmitting of identity proof, which ensures the confidentiality. The RP certificate  
-The user provides IdP a transformation of the correct RP identifier in the generation of identity proof; and sends the proof to the URL specified in the RP certificate. 
+The user transmits IdP the request with the correct RP identifier  transformation for generating identity proof; and sends the proof to the URL specified in the RP certificate. 
 Therefore, the adversary fails to request the identity proof using others' identifiers, or obtain others' proof with its URL.
 \end{itemize}
 
 \begin{comment}
 \subsection{Solutions}
 \label{subsec:solutions}
-Recluse aims to hide the users' traces from both the IdP and colluded RPs, without violating the security of SSO systems and interrupting RP's the consecutive and individual service. That is, Recluse ensures the confidentiality and binding of identity proof without leaking the RP's identifer to the IdP, and provides the unique and un-linkable PPID
+UPRESSO aims to hide the users' traces from both the IdP and colluded RPs, without violating the security of SSO systems and interrupting RP's the consecutive and individual service. That is, UPRESSO ensures the confidentiality and binding of identity proof without leaking the RP's identifer to the IdP, and provides the unique and un-linkable PPID
 %{\color{blue} PPID solely bound with the user's account at RP}
 to the RP for the user's multiple logins.
 
 \noindent\textbf{User-centric confidentiality.}
-In Recluse, instead of checking the information provided by the RP with the ones stored in the IdP, the user directly extracts from a RP certificate for the trusted necessary information in the generation and transmitting of identity proof, which ensures the confidentiality. The RP certificate contains the RP's correct identifying information (URL, name and RP identifier), and a signature from the IdP to ensure no modification nor forging on it. The user provides IdP a transformation of the correct RP identifier in the generation of identity proof; and sends the proof to the URL specified in the RP certificate. Therefore, the adversary fails to request the identity proof using others' identifiers, or obtain others' proof with its URL.
+In UPRESSO, instead of checking the information provided by the RP with the ones stored in the IdP, the user directly extracts from a RP certificate for the trusted necessary information in the generation and transmitting of identity proof, which ensures the confidentiality. The RP certificate contains the RP's correct identifying information (URL, name and RP identifier), and a signature from the IdP to ensure no modification nor forging on it. The user provides IdP a transformation of the correct RP identifier in the generation of identity proof; and sends the proof to the URL specified in the RP certificate. Therefore, the adversary fails to request the identity proof using others' identifiers, or obtain others' proof with its URL.
 
 \noindent\textbf{Binding with a transformation of RP's identifier.} The identity proof is bound with a transformation of the RP's identifier by the IdP, who cannot infer the original identifier from the transformation. RP only accepts the identity proof which is bound to a fresh transformation of its identifier. Moreover, the transformation of RP's identifier is generated corporately by the user and RP, preventing the adversary from constructing a same transformation for various RPs. Otherwise, the identity proof will be accepted by multiple RPs, which results in the misuse of the proof for the impersonate attack.
 
-\noindent\textbf{Deriving the unique account with the trapdoor.} In Recluse, the user's account in a RP is a function of the RP's original identifier and the user's unique identifier. The calculation of the user's unique account is split into two steps, to prevent the IdP from obtaining the RP's identifier and avoid the RP to infer the user's unique identifier. In the first setp, IdP generates the PPID with the user's unique identifier and  the transformation of the RP's identifier, which results in different PPIDs for multiple logins at a RP as various transformations are adopted. While, in the second step, the destination RP adopts the trapdoor of the RP's identifier transformation to derive the unique account from the PPIDs. Moreover, the accounts of a user in various RPs are different, as the original RP identifiers are different, which prevents the identity linkage.
+\noindent\textbf{Deriving the unique account with the trapdoor.} In UPRESSO, the user's account in a RP is a function of the RP's original identifier and the user's unique identifier. The calculation of the user's unique account is split into two steps, to prevent the IdP from obtaining the RP's identifier and avoid the RP to infer the user's unique identifier. In the first setp, IdP generates the PPID with the user's unique identifier and  the transformation of the RP's identifier, which results in different PPIDs for multiple logins at a RP as various transformations are adopted. While, in the second step, the destination RP adopts the trapdoor of the RP's identifier transformation to derive the unique account from the PPIDs. Moreover, the accounts of a user in various RPs are different, as the original RP identifiers are different, which prevents the identity linkage.
 \end{comment}
 
 
@@ -213,7 +214,7 @@ In OIDC, the authentication request from RP to IdP exposes RPs' identity by the 
 To achieve the goals outlined in Section~\ref{sec:intro}, the requirements and restrictions of abilities owned by each entities in single-sign-on system is defined as follows: %要做的内容，总的角色能力描述
 \begin{itemize}
     \item \textbf{User} is the entity to be authenticated in this system who holds the credentials for the IdP. User takes part in the the system through the user agent.
-    \item \textbf{User agent} is the software used by the user, such as browser and the application on the mobile device. User agent negotiates the RP's identifier with the RP and dynamically registers the newly generated identifier with a random endpoint for identity proof with IdP. Besides, user agent also guarantees the user's identity proof is only transmitted to the corresponding RP by tampering and modifying the transmission through it. To make user able to use Recluse conveniently in any devices, user agent should not store any data persistently.
+    \item \textbf{User agent} is the software used by the user, such as browser and the application on the mobile device. User agent negotiates the RP's identifier with the RP and dynamically registers the newly generated identifier with a random endpoint for identity proof with IdP. Besides, user agent also guarantees the user's identity proof is only transmitted to the corresponding RP by tampering and modifying the transmission through it. To make user able to use UPRESSO conveniently in any devices, user agent should not store any data persistently.
     \item \textbf{RP} is the entity who provides the service and need to identify the user. RP negotiates the RP's identifier with the user agent and builds the authentication request to IdP with the newly created identifier. RP identifies a user through a identity proof by deriving a constant user identifier from PPID. To avoid the user linkage by multiple RPs, RP should be unable to derive the real user's identity from PPID.
     \item \textbf{IdP} is the entity who authenticates the user and provide the identity proof. IdP allows user and RP's registration, initiates the entities' attributes and offers the initial configuration, such as \verb+RP Certification+. IdP provides the endpoint for RP's dynamic registration. Besides, IdP authenticates the user, verifies the authentication request, generates user's PPID and issues the identity proof. To avoid IdP from tracking the user, IdP should not be able to find out RP's identity by RP identifier nor the relevance between an RP's  different identifier.
 \end{itemize}
@@ -237,14 +238,14 @@ To achieve the goals outlined in Section~\ref{sec:intro}, the requirements and r
 %能够构造动态注册的请求
 %作为外部攻击者
 %能够监听和篡改单点登录过程中的网络流量
-In Recluse, the adversaries' goals are shown as follows:
+In UPRESSO, the adversaries' goals are shown as follows:
 \begin{itemize}
 \item Privacy undermining: Adversaries know user's login trace.
 \item Impersonation attack: Adversaries log in to the honest RP as the honest user.
 \item Identity Injection: Honest user logs in to the honest RP under adversaries' identity.
 \end{itemize}
 
-As Recluse is designed centralized, IdP has the max authority in this system. Therefore, IdP should be considered honest but curious. Otherwise, an malicious IdP has the ability to log in to any RP as any honest user (impersonation attack) and enforce any honest user to log in honest RP under an adversary's identity (identity injection). It is considered that any RP could be corrupted and any user may be the adversary. User agent is considered completely honest but under control of the user. Therefore, the user agent is seemed as a part of user. Network attackers are also considered.
+As UPRESSO is designed centralized, IdP has the max authority in this system. Therefore, IdP should be considered honest but curious. Otherwise, an malicious IdP has the ability to log in to any RP as any honest user (impersonation attack) and enforce any honest user to log in honest RP under an adversary's identity (identity injection). It is considered that any RP could be corrupted and any user may be the adversary. User agent is considered completely honest but under control of the user. Therefore, the user agent is seemed as a part of user. Network attackers are also considered.
 
 \begin{itemize}
 \item \textbf{Curious IdP} acts as an completely honest IdP.
