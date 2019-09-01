@@ -16,7 +16,7 @@ and the basic requirements of SSO systems.
 
 \subsection{OpenID Connect}
 \label{subsec:OIDC}
-Typical SSO systems~\cite{SAMLIdentifier,OpenIDConnect,SPRESSO} contain following entities:
+Typical SSO systems~\cite{SAMLIdentifier,OpenIDConnect,SPRESSO} contain the following entities:
 %The OIDC or OAuth systems contains following entities:
 \begin{itemize}
     \item \textbf{IdP}. IdP maintains the user's attributes and credentials, performs the user authentication,
@@ -104,7 +104,8 @@ And, the RP validates the id token, by verifying the signature with the IdP's pu
     \item Step 4, 5: If the
     %user has been authenticated already, and the
     endpoint in the request is the same with RP's registered one,
-     IdP generates the identity proof and sends it to the endpoint; otherwise, IdP triggers another user authentication or provides a warning to the user for the potential leakage of identity proof.
+     IdP generates the identity proof and sends it to the endpoint; otherwise, IdP %triggers another user authentication or 
+     sends a warning to the user for the potential leakage of identity proof.
     %The IdP generates the identity proof for the user who has been authenticated already and constructs the response with the endpoint in request, if the endpoint is the same with RP's registered one.
     \item Step 6, 7: The RP verifies the id token, identifies the user with PPID in the id token, and returns the authentication result to user.
 \end{itemize}
@@ -128,8 +129,11 @@ The implicit flow of OIDC achieves the binding between the identity proof and th
   \label{fig:UPRESSO}
 \end{figure}
 
-\noindent\textbf{Dynamic Registration.} OIDC provides the dynamic registration~\cite{DynamicRegistration} mechanism to register the RP for a new RPID dynamically, shown in Figure~\ref{fig:OpenID}.
-After the successful initial registration, which enables the RP to integrate the service provided by IdP, RP obtains a registration token from the IdP, and is able to update its information (e.g., the endpoint) by a dynamic registration process with the  registration token.
+\noindent\textbf{Dynamic Registration.} OIDC provides the dynamic registration~\cite{DynamicRegistration} mechanism to register the RP for a new RPID dynamically. % shown in Figure~\ref{fig:OpenID}.
+An RP obtains a registration token from the IdP, when it has registered at the IdP for the first time. 
+With this registration token, the  RP invokes the dynamic registration to
+%After a successful initial registration, RP obtains a registration token from the IdP, and 
+ updates its information (e.g., the endpoint). % by a dynamic registration process with the  registration token. %which enables the RP to integrate the service provided by IdP,
 One successful dynamic registration will make the IdP assign a new unique RPID for this RP.
 
 
@@ -145,9 +149,11 @@ we conclude the basic requirements of SSO as follows:
 \item \textbf{Identification}. %Identification is the main feature of SSO system, which enables the RP to identify the user.
 RP needs to identify the user during her multiple login flows,
 as RP has to provide the continuous and personalized service based on the user's identity.
-Therefore, RP should be able to derive the user's  unique identifer from multiple identity proofs for the same user.
+Therefore, RP should be able to derive a same identifer from multiple identity proofs for one user.
 %the identity proof provided by the IdP must be linkable in the destination RP.
-Currently, two types of identifiers are provide in the identity proof for RP to identify the user: (1) a user's identifier which is bound with the RP and never changes, (e.g., PPID in OIDC); and (2) the user's unique identifier (e.g., the email address in BrowserID~\cite{BrowserID} and SPRESSO~\cite{SPRESSO}), which introduces the risk of the identity linkage.
+Currently, two types of identifiers are provided in the identity proof: 
+(1) the user's unique identifier (e.g., the email address in BrowserID~\cite{BrowserID} and SPRESSO~\cite{SPRESSO}), which introduces the risk of the identity linkage;
+and (2) an identifier (e.g., PPID in OIDC), which is different among RPs but remains the same for  one RP.
 %That is, some of the existing SSO systems provide the pairwise identifier (e.g., PPID in OIDC) and
 %others provide the unchanged identifier (e.g., email in SPRESSO) within the identity proof, all of which are unchanged for one user in one RP.
 
