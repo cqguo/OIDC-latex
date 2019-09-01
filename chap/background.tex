@@ -1,8 +1,10 @@
 \section{Background}
 \label{sec:background}
-Recluse aims to preserve the users' privacy by hiding the users' traces from both IdPs and RPs in SSO systems, 
-with the basic requirements of SSO systems under consideration. 
-In this section, we adopt OIDC, a widely deployed SSO system, as an example to present the necessary background information  and the basic requirements of SSO systems.
+UPRESSO aims to address both RP-based identity linkage and IdP-based access tracing privacy problems, % at the same time,
+ %preserve the users' privacy by hiding the users' traces from both IdPs and RPs in SSO systems,
+with the basic requirements of SSO systems under consideration.
+In this section, we adopt OIDC as an example to present the authentication flows %the necessary background information  
+and the basic requirements of SSO systems.
 
 %This section adopts OIDC as the example to present the necessary background information  and the security consideration of SSO sytems.
 
@@ -17,26 +19,33 @@ In this section, we adopt OIDC, a widely deployed SSO system, as an example to p
 Typical SSO systems~\cite{SAMLIdentifier,OpenIDConnect,SPRESSO} contain following entities:
 %The OIDC or OAuth systems contains following entities:
 \begin{itemize}
-    \item \textbf{IdP}. IdP maintains the user's attributes and credentials, performs the user authentication, generates the identity proof, binds it with the RP
-    and sends the poof  to the correct RP through the user.
-    The generation of identity proof is processed differently in various SSO systems.
-    For example, in OIDC, IdP generates a PPID for the user's first login at an RP,
-    checks the consistency of the RP's information (the URL and identifier) between ones from the maintained database and the request,
-    and requires the  consent from the user about the exposed attributes.
+    \item \textbf{IdP}. IdP maintains the user's attributes and credentials, performs the user authentication, 
+    issues the identity proof, binds it with the RP
+    and sends the proof  to the correct RP through the user.
+    IdP includes the user's identifier (e.g., PPID in OIDC), attributes and the RP's identity in the identity proof.
+    Before issuing the identity proof, IdP should require the user to consent on what attributes are included and which RP these attributes are sent to.
+    Then, IdP sends the identity proof to the correct RP based on the endpoint (e.g., URL) registered for the RP identity.
+    %The identity proof generation varies in different SSO systems.
+    %For example, in OIDC, IdP generates a PPID for the user's first login at an RP,
+    %checks the consistency of the RP's information (the URL and identifier) between ones from the maintained database and the request,
+    %and requires user's  consent about the range of exposed attributes.
 
-     \item \textbf{User}. Each user completes the authentication at the IdP with securely maintained credentials,
-     initiates an SSO process by requiring to login at an RP,
-     relays the identity proof request from RP to IdP,
+     \item \textbf{User}. Each user completes the authentication at the IdP with the private credentials,
+     initiates an SSO process by requiring to log in at an RP,
+     redirects the identity proof request from RP to IdP,
      checks the scope of attributes exposed to RP,
      and transmits the identity proof from IdP to RP correctly.
-     Usually, these processes are handled at the user agent (e.g., browser),  a user-controlled software. % (e.g., the ), called user agent.
+     Usually, the redirections of identity proof request and identity proof  are handled by the user agent (e.g., browser),  a user-controlled software.
+   %  these processes are handled at the user agent (e.g., browser),  a user-controlled software. % (e.g., the ), called user agent.
 
-    \item \textbf{RP}. RP provides the personalized services to user based on the identifier from the identity proof.
-    In details, RP constructs the identity proof request, sends the request to the IdP through the user, checks the correctness of the received identity proof,
-    and parses the proof for necessary information.
-    The detailed process varies in different systems.
-     For example, in OIDC, RP needs to register at the IdP for the RP identifier to be used in the construction of the identity proof request,
-     and derives the user's account based on PPID.
+    \item \textbf{RP}. RP provides the continuous and personalized services to user based on the identifier in the identity proof.
+    Before integrating with the SSO service provided by an IdP, RP has to register at the IdP to provide its correct endpoint and obtain the assigned RP identity.
+    To obtain the user's correct identifier, 
+    RP constructs the identity proof request with the RP identity, sends the request to the IdP through the user, checks the correctness of the received identity proof,
+    and parses the proof for user's information. 
+   % The detailed process varies in different systems.
+   %  For example, in OIDC, RP needs to register at the IdP for the RP identifier to be used in the construction of the identity proof request,
+   %  and derives the user's account based on PPID.
 \end{itemize}
 \begin{comment}
 \begin{itemize}
@@ -47,13 +56,13 @@ Typical SSO systems~\cite{SAMLIdentifier,OpenIDConnect,SPRESSO} contain followin
 \end{comment}
 
 
-OpenID Connect, a typical SSO standard,  defines the process at each entity and the protocol flows between entities,
-which is  an extension of OAuth 2.0. 
-OAuth is originally designed for authorizing the RP to obtain the user's protected resources stored at the resource holder. 
-That is, IdP issues an access token for a RP after the IdP obtains a clear consent from the user;
+OIDC, a typical SSO standard,  defines both the process at each entity and the protocol flows between entities.
+OIDC is  an extension of OAuth 2.0. %to extend OAuth for user authentication.
+OAuth is originally designed for authorizing the RP to obtain the user's protected resources stored at the resource holder.
+In OAuth, IdP issues an access token for an RP after the IdP obtains a clear consent from the user;
  the RP uses this access token to obtain the specified resources of the user from the resource holder.
-However, plenty of RPs adopt OAuth 2.0 in the user authentication, which is not formally defined in the specifications~\cite{rfc6749,rfc6750}, and makes the impersonation attack possible~\cite{ChenPCTKT14, WangZLG16}.
-For example, the access token isn't required to be bound with the RP, the adversary may act as an RP to obtain the access token and use it to impersonate the victim user in another RP.
+However, plenty of RPs adopt OAuth 2.0 in the user authentication, which is not formally defined in the specifications~\cite{rfc6749,rfc6750}, and results in the impersonation attack~\cite{ChenPCTKT14, WangZLG16}.
+For example, the access token isn't required to be bound with the RP, the adversary may act as an RP to obtain the access token and use it to impersonate the victim user at another RP.
 
 %OpenID Connect (current version 1.0) is an extension of OAuth (current version 2.0). OAuth is originally designed for authorizing the RP to obtain the user's personal protected resources stored at the resource holder. That is, the RP obtains an access token generated by the resource holder after a clear consent from the user, and  uses the access token to obtain the specified resources of the user from the resource holder. However, plenty of RPs adopt OAuth 2.0 in the user authentication, which is not formally defined in the specifications~\cite{rfc6749,rfc6750}, and makes impersonation attack possible~\cite{ChenPCTKT14, WangZLG16}. For example, the access token isn't required tp be bound with the RP, the adversary may act as a RP to obtain the access token and use it to impersonate as the victim user in another RP.
 
@@ -62,11 +71,13 @@ For example, the access token isn't required to be bound with the RP, the advers
 
 %OpenID Connect 1.0 is an extension of OAuth 2.0. OAuth 2.0 is specifically designed for user authorization. It allows third party to access user's personal protected resources from resource holder. In OAuth 2.0 system everyone carrying user's access token is able to achieve user's protected resources from resource holder. Access token is not bound with any RP so that it is not appropriate for authentication. OpenID Connect offers an additional id token for user identifying so that it can be used in both authentication and authorization.
 
-OIDC is designed to extend OAuth for user authentication,
+OIDC is designed to extend OAuth for user authentication.
 % by binding the identity proof for authentication with the information of RP.
- which provides three protocol flows: authorization code flow, implicit flow and hybrid flow (i.e., a mix-up of the previous two flows).
+ OIDC provides three SSO  processes: authorization code flow, implicit flow and hybrid flow (i.e., a mix-up of the previous two flows).
 In the authorization code flow, the identity proof is the authorization code sent by the IdP.
- The authorization code is bound with the RP, as only the target RP who has the corresponding secret assigned by IdP in the RP registration, is able to obtain the user's attributes with this  code. % and the corresponding secret, which is obtained from IdP in the RP's registration. % which is performed in the similar way as the authentication in OAuth 2.0.
+ The authorization code is bound with the RP, as only the target RP who has the corresponding secret can obtain the user's attributes. % with this  code. % and the corresponding secret, which is obtained from IdP in the RP's registration. % which is performed in the similar way as the authentication in OAuth 2.0.
+The secret is assigned to the RP  in its registration at the IdP.
+%The secret is assigned by IdP in the RP registration.
 \begin{figure}[t]
   \centering
   \includegraphics[width=\linewidth]{fig/OIDC1.pdf}
@@ -76,10 +87,11 @@ In the authorization code flow, the identity proof is the authorization code sen
   \label{fig:OpenID}
 \end{figure}
 
-The new identity proof, id token, bound with the RP is introduced in the implicit flow of OIDC.
+The implicit flow of OIDC introduces a new token, named id token, which works as an identity proof.
+%The new identity proof, id token, bound with the RP is introduced in the implicit flow of OIDC.
 %The implicit flow of OIDC binds the  identity proof with the RP, by introducing a new token, i.e., id token.
 %achieves the binding between the identity proof and the RP, by using the new id token as the identity proof.
-In details, id token includes the user's PPID, the RP's identifier (RPID), the issuer, issuing time, the validity period and other requested attributes.
+In details, id token includes the user's PPID, the RP's identity (RPID), the issuer (i.e., IdP), issuing time, the validity period and other requested attributes.
 The integrity of the id token is protected with a signature generated by the IdP with its private key.
 IdP
 %The IdP completes the construction of the id token by generating the signature of these elements with its private key, and
@@ -142,14 +154,14 @@ Otherwise, the adversary may impersonate the victim user,
 for example, by pretending as a RP to collect the victim's identity proofs and using it at any other honest RPs~\cite{ChenPCTKT14, WangZLG16}.
  In the implicit protocol flow of OIDC, IdP claims the destination RP's identifier in the identity proof and uses its private key to generate a signature to  avoid the modification on it;
  while the RP checks the RP's identifier and only accepts the identity proof containing its RP identifier.
- 
+
 \item[3.] \textbf{Confidentiality}. The identity proof should only be obtained by the correct RP (and user), no one else may get the identity proof~\cite{ChenPCTKT14,FettKS16,WangZLG16}.
- Otherwise, the adversary may misuse the identity proof to login as the victim user on the RP specified by the RP identifier in the proof. 
- To avoid the unauthorized leakage of identity proof, 
- (1) the user and IdP should perform additional checks in its generation and 
- transmission to ensure that the identity proof should only be generated valid for the request RP and sent to the binding RP's registered endpoint;   
- %is generated for the correct RP (i.e., identifier) and sent to the exact RP (i.e., URL); 
- (2) TLS is adopted to ensure the confidentiality during the transmission; 
+ Otherwise, the adversary may misuse the identity proof to login as the victim user on the RP specified by the RP identifier in the proof.
+ To avoid the unauthorized leakage of identity proof,
+ (1) the user and IdP should perform additional checks in its generation and
+ transmission to ensure that the identity proof should only be generated valid for the request RP and sent to the binding RP's registered endpoint;
+ %is generated for the correct RP (i.e., identifier) and sent to the exact RP (i.e., URL);
+ (2) TLS is adopted to ensure the confidentiality during the transmission;
  (3) a trusted user agent is deployed to ensure the identity proof only sent to the URL specified by  IdP.
 
 \item \textbf{Integrity}. The valid identity proof should only be generated by the IdP,
