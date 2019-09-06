@@ -13,12 +13,30 @@ In this section, we describe the challenges in achieving a privacy-preserving SS
 
 \subsection{The Problem}
 \label{subsec:challenges}
+
+In UPRESSO, the adversaries' goals to break the secure authentication are shown as follows:
+\begin{itemize}
+\item Impersonation attack: Adversary logs in to the honest RP as an honest user. The adversary might achieve the goal by obtaining a user's identity proof in the ways, such as stealing the proof (from the unprotected HTTP transmission), forging the valid proof (if the integrity is not guaranteed), leading the user to upload a proof valid for other RPs (the proof is unbound with specific RP). 
+\item Identity Injection: Honest user logs in to the honest RP under adversaries' identity. The adversary might achieve this goal by replacing the identity transmitted from IdP to RP or lead the user uploads the malicious identity proof in various ways (e.g., CSRF).
+\end{itemize}
+
+
+
 %In SSO systems, PRs' identifier is required in both authentication request and users' identifier proof generation. Moreover, as it has been described in Section~\ref{sec:intro}, it is required to expose the identifier of users' accessed RP for security consideration. Therefore, hiding users' accessed RP from IdP is to introduce prominent challenges. To deal with the challenges, the procedure and parameters generation methods are required to be modified. However, this modification also introduces new attack surface, so that the attackers' ability in UPRESSO should be considered.
 A privacy-preserving SSO needs to prevent both IdP-based access tracing and RP-based identity linkage.
 To prevent IdP-based access tracing,  IdP should never obtain any information identifying the user-accessed RP.
 The identifying information includes the RP's identifier and URL.
 To prevent RP-based identity linkage, the colluded RPs should never find the correlation among the user's identifiers for different RPs in the identity proof.
 %the user's identifiers provided by IdP for one user should never be same or derivable to each other.
+
+{\color{red} The root conflicts between secure authentication and privacy are caused the binding requirements of SSO systems. The bindings required by secure authentication includes: 
+\begin{itemize}
+\item Binding between identity proof and RP's identity. The identity proof must be only valid in one RP and never accepted by other RPs to avoid the impersonation attack, which requires the IdP must bind the identity proof with the unique identifier representing one RP. For example, in OIDC the identity proof contains the unique RPID and in SPRESSO it contains the encrypted RP domain (which prevents the IdP from knowing the identity of RP).
+\item Binding between identity proof and user's identity. The identity proof must represent one user and the binding must be known by the RP as RP has to identify the user to provide the personalize service. It requires that the identity proof must provide the identifier to RP, which is unchanged or derivable from each other for one RP. For example, in OIDC the identity proof contains the PPID (which are not changed in one RP but distinct in different RPs) and in SPRESSO the identity proof provides the user's email. 
+\item Binding between identity proof transmission and RP's identity. Based on the assumption that transmission channel is secure (e.g., transmission is protected by TLS), IdP must guarantee that the identity proof only be sent to the address hold by the honest RP. For example, in OIDC IdP only sends the identity proof to the endpoint registered by the RP and in SPRESSO the FWD ensures that the identity proof is only sent to the same origin with the encrypted RP domain. 
+\end{itemize} 
+ }
+
 However, these two requirements for privacy preservation,  conflict with the basic requirements on SSO as follows: %, resulting in the following problems in SSO systems:
 \begin{itemize}
 	\item \textbf{No Identification.} In the privacy-preserving SSO, IdP doesn't know the RP's identifier, therefore fails to provide the  pairwise user's identifier which is unchanged in one RP but different in different RPs (e.g. PPID in OIDC and SAML~\cite{OpenIDConnect,SAMLIdentifier}). Also, the user's unique identifier (e.g., the email address in BrowserID~\cite{BrowserID} and SPRESSO~\cite{SPRESSO}) should not be sent to the RP, otherwise the colluded RPs may perform the identity linkage with the same identifier.
