@@ -13,13 +13,13 @@ In this section, we describe the challenges in achieving a privacy-preserving SS
 
 \subsection{The Problem}
 \label{subsec:challenges}
-
+\begin{comment}
 In UPRESSO, the adversaries' goals to break the secure authentication are as follows:
 \begin{itemize}
 \item Impersonation attack: Adversary logs in to the honest RP as an honest user. The adversary might achieve the goal by obtaining a user's identity proof in the ways, such as stealing the proof (from the unprotected HTTP transmission), forging the valid proof (if the integrity is not guaranteed), leading the user to upload a proof valid for other RPs (the proof is not bound with specific RP). 
 \item Identity Injection: Honest user logs in to the honest RP under adversaries' identity. The adversary might achieve this goal by replacing the identity transmitted from IdP to RP or lead the user uploads the malicious identity proof in various ways (e.g., CSRF).
 \end{itemize}
-
+\end{comment}
 
 
 %In SSO systems, PRs' identifier is required in both authentication request and users' identifier proof generation. Moreover, as it has been described in Section~\ref{sec:intro}, it is required to expose the identifier of users' accessed RP for security consideration. Therefore, hiding users' accessed RP from IdP is to introduce prominent challenges. To deal with the challenges, the procedure and parameters generation methods are required to be modified. However, this modification also introduces new attack surface, so that the attackers' ability in UPRESSO should be considered.
@@ -31,7 +31,7 @@ To prevent RP-based identity linkage, the colluded RPs should never find the cor
 
 {\color{blue}
 The root reason why the current schemes for privacy-preserving SSO systems cannot deal with the IdP-based access tracing and RP-based identity linkage at the same time is that no existing SSO systems satisfy all the requirements of secure authentication and privacy. 
-It is required by the SSO systems for secure authentication that (1) the identity proof should be bound to the specific RPID and (2) the identity proof should be also bound to the user identifier. The secure authentication requirements must be satisfied by all the SSO systems to avoid the potential attacks. However, the privacy-preserving SSO systems requires that (1) the RPID should be one-time and not represent the RP uniquely to IdP and (2) the user identifier provided by IdP should not be globally unique but RP-specific unique. The ignoring of any privacy requirements is to eventually result in the user being tracked.
+It is required by the SSO systems for secure authentication that, (1) the identity proof should be bound to the specific RPID and, (2) the identity proof should be also bound to the user identifier. The secure authentication requirements must be satisfied by all the SSO systems to avoid the potential attacks. However, the privacy-preserving SSO systems requires that, (1) the RPID should be one-time and not represent the RP uniquely to IdP and, (2) the user identifier provided by IdP should not be globally unique but RP-specific unique. The ignoring of any privacy requirements is to eventually result in the user being tracked.
 
 
 Several privacy-preserving schemes are proposed to satisfy the privacy requirements, for example, the PPID in OIDC as RP-specific unique user identifier and encrypted RP domain in SPRESSO as the one-time RPID not representing the RP identity. But it is impossible to avoid IdP-based tracing for OIDC as it use the unique RPID to generate the identity proof. Similarly, the SPRESSO using unchanged user identifier are not immune to the RP-based linkage.
