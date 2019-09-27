@@ -29,6 +29,8 @@ The identifying information includes the RP's identifier and URL.
 To prevent RP-based identity linkage, the colluded RPs should never find the correlation among the user's identifiers for different RPs in the identity proof.
 %the user's identifiers provided by IdP for one user should never be same or derivable to each other.
 
+==========================================
+
 {\color{blue}
 The root reason why the current schemes for privacy-preserving SSO systems cannot deal with the IdP-based access tracing and RP-based identity linkage at the same time is that no existing SSO systems satisfy all the requirements of secure authentication and privacy. 
 It is required by the SSO systems for secure authentication that, (1) the identity proof should be bound to the specific RPID and, (2) the identity proof should be also bound to the user identifier. The secure authentication requirements must be satisfied by all the SSO systems to avoid the potential attacks. However, the privacy-preserving SSO systems requires that, (1) the RPID should be one-time and not represent the RP uniquely to IdP and, (2) the user identifier provided by IdP should not be globally unique but RP-specific unique. The ignoring of any privacy requirements is to eventually result in the user being tracked.
@@ -37,10 +39,11 @@ It is required by the SSO systems for secure authentication that, (1) the identi
 Several privacy-preserving schemes are proposed to satisfy the privacy requirements, for example, the PPID in OIDC as RP-specific unique user identifier and encrypted RP domain in SPRESSO as the one-time RPID not representing the RP identity. But it is impossible to avoid IdP-based tracing for OIDC as it use the unique RPID to generate the identity proof. Similarly, the SPRESSO using unchanged user identifier are not immune to the RP-based linkage.
 However, is there a simple way to satisfy the privacy requirements by combining the exiting schemes together, for example using one-time encrypted RPID in OIDC or using PPID in SPRESSO?
  
-The root conflict is there is no simple way to bind the identity proof to user's identity without exposing RP's identity to IdP. 
-IdP always fails to provide the pairwise user identifier which is unchanged in one RP but different in different RPs without knowing the RP's identifier. 
-The pairwise user identifier should be uniquely bound to the specific RP identifier (unknown to IdP), so that the pairwise user identifier changes and underivable even in the same RP. 
+The root problem is there is no simple way to bind the identity proof to user's identity without exposing RP's identity to IdP. 
+IdP always fails to provide the RP-specific unique user identifier which cannot be uniquely bound to the specific RP identifier (the constant RPID unknown to IdP), but bound to the one-time RPID (not related to the constant RPID) instead, as the user identifiers are changing and underivable even in the same RP because the bounded RPID is always changing. 
 }
+
+==========================================
 
 {\color{red} 
 The root reason why the current existing schemes for privacy-preserving SSO systems cannot deal with the IdP-based access tracing and RP-based identity linkage at the same time is that there is the essential conflict between secure authentication and privacy. The conflict is that the relating between identity proof and RP as well as user, which is asked by the the basic requirements of SSO systems, is broken by the privacy requirements. The relating required by secure authentication includes: 
@@ -61,7 +64,7 @@ Additionally, the IdP should transmit the identity proof to RP securely by \text
 %However, the bindings for secure authentication, conflict with the privacy requirements on SSO systems. Firstly, to avoid the \textbf{IdP-based access tracing}, as well as to \textbf{bind the identity proof with specific RP}, it either results in breaking of \textbf{binding between identity proof and user's identity} (e.g., using one-time RPID in OIDC and generating PPID) or the user identifier cannot be distinct in each RP (e.g., email in SPRESSO), which causes the \textbf{RP-based identity linkage}. Secondly, the IdP should transmit the identity proof to RP securely by \textbf{binding the identity proof transmission with RP's identity} to prevent the impersonation attack, which requires either the IdP knows the correct RP's endpoint resulting the \textbf{IdP-based access tracing} (e.g., hiding endpoint in OIDC), or the introducing the extra trusted party (FWD in SPRESSO) expanding the attack interface.
 
  }
-
+===========================================
 \begin{comment}
 However, these two requirements for privacy preservation,  conflict with the basic requirements on SSO as follows: %, resulting in the following problems in SSO systems:
 \begin{itemize}

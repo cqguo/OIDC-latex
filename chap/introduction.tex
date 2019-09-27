@@ -23,8 +23,8 @@ Meanwhile, many email and social networking providers such as Google, Facebook, 
 %完整性：使用公开的为受保护的信息作为identity proof
 %机密性：保证由IdP发送给对应的RP，并且传输过程中通道、user agent都是受到保护的
 %绑定性：identity proof一定要与对应的RP实现绑定
-The secure authentication is the fundamental requirement of SSO systems for which it must be ensured that (1) the adversary must never log in to an honest RP as the honest user, and (2) the honest user must never log in to the honest RP in other roles' identity~\cite{SPRESSO}. Extensive analysis have been performed, concluding the vulnerabilities in the SSO systems: (1) The identity proof must never be tampered or forged, for example the Google used to use the user's attributes with a signature as the identity proof, however make the adversary able to bypass the verification of part of attributes in the identity proof; (2) The identity proof must only be obtained by the requesting RP, for example some of the SSO systems are implemented based on the WebView on the Android devices, which allows the adversary to steal the honest user's identity proof for an honest RP only when the user conducts the SSO authentication in the adversary's app; 
-(3) The identity proof must be only valid in the requesting RP, for example the parts of IdP developer choose the data (e.g., access token in OAuth 2.0) unbound with specific RP as the identity proof, which results in that the malicious RP is able to collect user's identity proof and use it to log in to other RPs. 
+The secure authentication is the fundamental requirement of SSO systems for which it must be ensured that (1) the adversary must never log in to an honest RP as the honest user, and (2) the honest user must never log in to the honest RP in other roles' identity~\cite{SPRESSO}. Extensive analysis have been performed, concluding the vulnerabilities in the SSO systems: (1) The identity proof must never be tampered or forged, for example the Google used to use the user's attributes with a signature as the identity proof, however make the adversary able to bypass the verification of part of attributes in the identity proof~\cite{WangCW12}; (2) The identity proof must only be obtained by the requesting RP, for example some of the SSO systems are implemented based on the WebView on the Android devices, which allows the adversary to steal the honest user's identity proof for an honest RP only when the user conducts the SSO authentication in the adversary's app~\cite{ChenPCTKT14, MohsenS16}; 
+(3) The identity proof must be only valid in the requesting RP, for example the parts of IdP developer choose the data (e.g., access token in OAuth 2.0) unbound with specific RP as the identity proof, which results in that the malicious RP is able to collect user's identity proof and use it to log in to other RPs~\cite{ChenPCTKT14, WangZLG16}. 
 
 %第二段：
 %SSO 引入新的隐私问题
@@ -101,9 +101,11 @@ However, PPID-based approaches cannot prevent the IdPs from tracking at which RP
 %However, there is no existing SSO system which prevents both the access tracing and identity linkage. The implementations of OIDC and SAML prevent the identity linkage, but allow the IdP to obtain the identifiers of accessed RPs, while BrowserID and SPRESSO are designed to avoid the IdP to obtain the access tracing, but the colluded RPs may still link the user as the unique email address is used as the identifier in all RPs.
 %However, there is no existing SSO system protecting users' privacy comprehensively. Currently proposed designs for privacy protection are only available in dealing with one privacy leaking problem, none of these systems are able to deal with the both privacy issues at the same time. Therefore, it means that the adversary always have at least one way to track users.
 
-Unfortunately, none of the existing approaches provides sufficient and comprehensive protection for user security and privacy in SSO. For example, \cite{BrowserID} reported that BrowserID suffered from a severe privacy attack in which malicious IdPs could check users' login status at any RP. We also find that the security of SPRESSO highly relies on the third-party forwarder and therefore it is vulnerable to the impersonation attacks once the chosen forwarder is compromised.
+Unfortunately, 
+%none of the existing approaches provides sufficient and comprehensive protection for user security and privacy in SSO. For example, \cite{BrowserID} reported that BrowserID suffered from a severe privacy attack in which malicious IdPs could check users' login status at any RP. We also find that the security of SPRESSO highly relies on the third-party forwarder and therefore it is vulnerable to the impersonation attacks once the chosen forwarder is compromised.
  %a malicious RP can easily recruit a malicious forwarder to assist its attack (see the discussion in Section~).
-Moreover, none of the existing SSO systems could address both RP-based identity linkage and IdP-based access tracing privacy problems at the same time. In BrowserID and SPRESSO, colluding RPs could link a user's multiple logins from the common user identifier.
+%Moreover, 
+none of the existing SSO systems could address both RP-based identity linkage and IdP-based access tracing privacy problems at the same time. In BrowserID and SPRESSO, colluding RPs could link a user's multiple logins from the common user identifier.
 
 %hide the user's trace from both the IdP and colluded RPs, the curious IdP obtains the users' traces in OIDC and SAML~\cite{SAMLIdentifier, OpenIDConnect}, while the colluded RPs link the user with the same email address in BrowserID~\cite{persona} and SPRESSO~\cite{SPRESSO}.
 
@@ -239,11 +241,11 @@ Unlike previous approaches that require non-trivial re-design of the existing SS
 %实现原型系统
 The main contributions of UPRESSO are as follows:
 \begin{itemize}
-\item We systematically analyze the privacy issues in SSO systems and propose a comprehensive protection solution to hide users' traces from both curious IdPs and colluding RPs, for the first time.
+\item We systematically analyze the privacy issues in SSO systems and propose a comprehensive protection solution to hide users' traces from both curious IdPs and colluding RPs, for the first time, for which we provide a systematic analysis to show that it achieves the same level of security as existing SSO systems.
 %deals with all the privacy issues introduced by SSO comprehensively. It has the ability to prevent IdP from tracking users' login trace, as well as multiple RPs are unable to link the users either.
 %pratical extension for OIDC, which inherits the systematically and thoroughly analyzed  security and privacy mechanisms of OIDC, and achieves the full privacy for users by hiding the accessed RPs from IdP.
 \item We develop a prototype of UPRESSO that is compatible with OIDC and demonstrate its effectiveness and efficiency with experiment evaluations.
-\item We provide a systematic analysis to show that UPRESSO achieves the same level of security as existing SSO systems while providing a stronger privacy protection.
+%\item We provide a systematic analysis to show that UPRESSO achieves the same level of security as existing SSO systems while providing a stronger privacy protection.
 \end{itemize}
 
 
