@@ -1,7 +1,18 @@
 \section{Threat Model and Assumption}
 \label{sec:assumptionandthreatmodel}
-UPRESSO contains only three entities, i.e., the user, IdP and RP; and doesn't introduce any other (trusted) entity.
+UPRESSO contains only three entities, i.e., the IdP, group users and group RPs; and doesn't introduce any other (trusted) entity.
 
+The group users are consisted of parts of malicious users and other honest users, and similarly there are also malicious and honest RPs. It must be ensured to protect the honest users from, (1) being impersonated by malicious users to log in to the honest RPs; (2) logging in to the honest RPs as the malicious users, even with the participating of malicious RPs and users in the login flows. 
+
+\subsection{Assumptions}
+In UPRESSO, we assume the user agent deployed at the honest user is correct,
+and will transmit the messages to the correct destination without leakage.
+The TLS is correctly implemented at the user agent, IdP and RP, which ensures the confidentiality and integrity of the network traffic between correct entities.
+We also assume the random numbers in UPRESSO are unpredictable by using  a secure random number generator;
+and the adopted cryptographic algorithms, including the RSA and SHA-256 required in UPRESSO, are secure and implemented correctly, that is, no one without private key can forge the signature,
+and the adversary fails to infer the private key.
+Moreover, according to the Discrete Logarithm Problem,
+we assume the adversary fails to infer $r$ from $g^r mod\ p$, where $p$ is a large prime and $g$ is the primitive root, which is required by the the transformation of the RP's identifier and trapdoor identification.
 
 \subsection{Threat Model}
 In UPRESSO, the adversary attempts to break the security and user's privacy under the following threat model.
@@ -33,7 +44,7 @@ The adversary may work as RPs, by controlling one or more compromised RPs, or re
 The malicious RP may behave arbitrarily, and attempt to break the integrity, confidentiality and binding of the identity proof.
 For example, they may attempt to use one or more chosen nonces for the RP  identifier transformations to make the corresponding identity proof be  accepted by other RPs;
 provide an incorrect identity proof request with incorrect RP identifiers;
-and send the invalid or other RP's valid certificate instead of its own.
+and send the invalid or other RP's valid certificate instead of its own. Moreover, the RPs will never collude with the IdP.
 
 %Moreover, the conclusion is also considered available in UPRESSO, of which the details are shown as follows:
 %The malicious users and RPs may collude as follows:
@@ -48,6 +59,7 @@ and passively by combining the received messages.
 However, the user linkage based on other attributes and the global network traffic analysis are not considered in this work,
 which may be prevented by limiting the attributes exposed to each RPs and providing the mixed traffic by accessing unwanted RPs.
 
+\begin{comment}
 \subsection{Assumptions}
 In UPRESSO, we assume the user agent deployed at the honest user is correct,
 and will transmit the messages to the correct destination without leakage.
@@ -58,6 +70,7 @@ and the adversary fails to infer the private key.
 Moreover, the transformation of the RP's identifier and the user's account calculation are based on the Discrete Logarithm Problem,
 we assume the adversary fails to infer $r$ from $g^r mod\ p$, where $p$ is a large prime and $g$ is the primitive root.
 %However, although IdPs are interested in the user's login trace, IdP will never collude with RPs.
+\end{comment}
 
 
 

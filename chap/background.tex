@@ -64,6 +64,11 @@ Typical SSO systems~\cite{SAMLIdentifier,OpenIDConnect,SPRESSO} contain the foll
 OIDC supports three processes for SSO, known as {\em authorization code flow}, {\em implicit flow} and {\em hybrid flow} (i.e., a mix-up of the previous two).
 
 %****** Add discussion about why implicit flow is used in this work
+\noindent\textbf{Single Sign-on.} 
+In the implicit flow of OIDC, a new token, known as {\em id token}, is introduced as the identity proof, which contains user identifier (i.e., PPID), RP identifier (i.e., RPID), the issuer (i.e., IdP), issuing time, the validity period, and other requested attributes. The IdP signs the id token by its private key to ensure integrity.
+Moreover, in the authorization code flow, the identity proof is an authorization code bound to the RP. Only the RP with the corresponding secret obtained during the registration at the IdP can extract the user attributes from the identify proof.
+
+\begin{comment}
 In the authorization code flow, the identity proof is an authorization code bound to the RP. Only the RP with the corresponding secret obtained during the registration at the IdP can extract the user attributes from the identify proof. % with this  code. % and the corresponding secret, which is obtained from IdP in the RP's registration. % which is performed in the similar way as the authentication in OAuth 2.0.
 %The secret is assigned to the RP in its registration at the IdP.
 That is, the exchanging authorization code for identity proof requires the strait server-to-server transmission between RP and IdP which introduces the extra possibility for IdP to identify the RP. The discussion about authorization code is shown in section~\ref{sec:discussion}.
@@ -76,6 +81,8 @@ which contains user identifier (i.e., PPID), RP identifier (i.e., RPID), the iss
 %The IdP completes the construction of the id token by generating the signature of these elements with its private key, and
 %IdP sends the id token to RP's previously registered endpoint.
 %And, the RP validates the id token, by verifying the signature with the IdP's public key, checking the correctness of the valid period and the consistency of RPID with the locally stored identifier.
+\end{comment}
+
 
 \begin{figure}[t]
   \centering
@@ -133,14 +140,16 @@ After each successful dynamic registration, the RP obtains a new unique RPID fro
 \label{subsec:basicrequirements}
 
 SSO allows users to leverage their existing accounts in the IdP to access services at the RPs.
-{\color{red}However, in SSO systems, the adversaries' goals to break the secure authentication are:
+{\color{red}However, in SSO systems, the adversaries' goals described in~\cite{SPRESSO} to break the secure authentication are:
 (1) \textbf{Impersonation attack}: Adversary logs in to the honest RP as an honest user. The adversary might achieve the goal by obtaining a user's identity proof in the ways, such as stealing the proof (from the unprotected HTTP transmission), forging the valid proof (if the integrity is not guaranteed), leading the user to upload a proof valid for other RPs (the proof is not bound with specific RP). 
-(2) \textbf{Identity Injection}: Honest user logs in to the honest RP under adversaries' identity. The adversary might achieve this goal by replacing the identity transmitted from IdP to RP or lead the user uploads the malicious identity proof in various ways (e.g., CSRF).} 
-{\color{red} Therefore, building} such a system is considered challenging~\cite{SPRESSO}, as several design and implementation flaws of SSO systems have been discovered, which led to a plethora of attacks~\cite{SomorovskyMSKJ12,WangCW12,ArmandoCCCPS13,ZhouE14,WangZLLYLG15,WangZLG16,YangLLZH16,MainkaMS16,MohsenS16,MainkaMSW17,YangLCZ18,YangLS17,ShiWL19}. 
+(2) \textbf{Identity Injection}: Honest user logs in to the honest RP under adversaries' identity. The adversary might achieve this goal by replacing the identity transmitted from IdP to RP or lead the user uploads the malicious identity proof in various ways (e.g., CSRF).}  
+{\color{red} Therefore, building} such a system is considered challenging~\cite{SPRESSO}, as several design and implementation flaws of SSO systems have been discovered, which led to a plethora of attacks~\cite{SomorovskyMSKJ12,WangCW12,ArmandoCCCPS13,ZhouE14,WangZLLYLG15,WangZLG16,YangLLZH16,MainkaMS16,MohsenS16,MainkaMSW17,YangLCZ18,YangLS17,ShiWL19}.  
 Based on the formal analysis of SAML, OAuth and OIDC~\cite{ArmandoCCCT08,FettKS16, FettKS17} and the study of existing attacks, we summarize basic requirements that we believe a secure SSO platform should meet.
 
 \vspace{1mm}\noindent\textbf{Identification.} %Identification is the main feature of SSO system, which enables the RP to identify the user.
 After a successful SSO authentication, the RP should be able to uniquely identify the user. When a user logs in to a same RP multiple times, the RP should be able to associate these logins to provide a continuous and personalized service to that user. This is an essential requirement for any authentication mechanism. In SSO, this indicates that a same unique user identifier should be derived from multiple identity proofs of the user by the RP. In OIDC, for example, a user obtains different PPIDs from the IdP, each for a different RP.
+
+{\color{red}Additionally, the anonymous SSO schemes~\cite{ElmuftiWRR08,WangWS13,HanCSTW18} are also proposed to achieve that the user's identity is unknown the neither the IdP nor the RP. However, these schemes are not focally concerned in this paper as the completely anonymous SSO systems are not suitable to the currently web application where the RP need to know the user's identity to provide the personally service. The anonymous SSO schemes are discussed in Section~\ref{sec:related}.}
 
 \vspace{1mm}\noindent\textbf{Binding.} Each identity proof should be bound to one RP so that it will be accepted only by that RP. Otherwise, the identity proof may be abused to impersonate the victim user at other honest RPs~\cite{ChenPCTKT14, WangZLG16}. To achieve such binding in OIDC, the IdP embeds the identifier of the target RP in the identity proof and signs it with its private key. When receiving an identity proof, the RP needs to check if it is the intended receiver.
 
