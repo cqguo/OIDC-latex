@@ -1,63 +1,44 @@
 ﻿\section{Design of UPRESSO}
 \label{sec:UPRESSO}
-In this section, we firstly introduce the principle of UPRESSO with the design goals and main process phases.
-Then, we describe the system initialization and initial registration of RP, following with the description of algorithms for calculating the RP identifier transformation, user identifier and account.
-The detailed processing for each user's login is provided corresponding to the main process phases.
-Finally, we present that UPRESSO is compatible with OIDC.
+In this section, we first present the design goals of UPRESSO with the main process phases. Then, we describe system initialization and initial registration of RP, followed by the description of algorithms for calculating the RP identifier transformation, user identifier and account. The detailed processing for each user's login is provided corresponding to the main process phases. Finally, we discuss the compatibility of UPRESSO with OIDC.
 
-\subsection{Principles}
+\subsection{Design Goals}
 \label{subsec:overview}
-\noindent\textbf{Goals in UPRESSO.}
-As analyzed in Section~\ref{subsec:solutions}, UPRESSO needs to provide trapdoor identification, transformed binding and user-centric confidentiality,
-to achieve the privacy-preserving identification, binding and confidentiality,
-while, the integrity is provided based on the signature inherited from existing SSO systems.
+
+%As analyzed in Section~\ref{subsec:solutions}, UPRESSO needs to provide trapdoor identification, transformed binding and user-centric confidentiality, to achieve the privacy-preserving identification, binding and confidentiality, while, the integrity is provided based on the signature inherited from existing SSO systems.
 %to comfort the privacy-preserving requirements of SSO systems, UPRESSO has to allow only the exact RP to derive the user's unchanged account with a trapdoor, bind the proof with a transformation of RP’s identifier, and achieve user-centric confidentiality of the identity proof.
-We %further divide these three requirements into three goals and
-achieve these three requirements (goals) using five phases as described in Figure~\ref{fig:UPRESSO}.
-To make the description clear, we list the used notations  in Table~\ref{tbl:notations}.
-\begin{itemize}
- \item Goal 1: Generating a self-verifying value for each RP, to provide the correct information for the user-centric check.
-  In UPRESSO, each RP applies a certificate ($Cert_{RP}$) in the \emph{RP initial registration} phase (Steps a and b in Figure~\ref{fig:UPRESSO}),
-  and sends it to the user in each login processing,
-  to provide the exact information for  correct construction and transmission of identity proof,
-             and therefore achieving \textbf{User-centric Confidentiality}.
-  %self-verifying value for the user-centric check (for \textbf{User-centric Confidentiality}),
-  % to ensure the correct construction and transmission of identity proof,
-  %which is achieved in RP initial registration (step a, b in Figure~\ref{fig:UPRESSO}), applying for a RP certificate ($Cert_{RP}$), a self-verifying value;
+In Section~\ref{subsec:solutions}, we highlight three design features of UPRESSO, namely trapdoor identification, transformed binding and user-centric confidentiality, to develop a secure and privacy-preserving SSO.
+Next, we will discuss three design goals that directly support these features, and explain how each goal is achieved correspondingly along the authentication flow of UPRESSO, as shown in Figure~\ref{fig:UPRESSO}.
+%further divide these three requirements into three goals and
+%achieve these three requirements (goals) using five phases as described in Figure~\ref{fig:UPRESSO}.
+To ease the presentation, we list the notations used in this paper in Table~\ref{tbl:notations}.
 
+\vspace{1mm}\noindent {\bf Goal 1:} {\em Generating an unforgeable and self-verifiable information for each RP to provide correct information for user-centric checking.}
 
+In UPRESSO, such information is contained in the RP certificate ($Cert_{RP}$), which is issued by the IdP in the \emph{RP initial registration} phase (Steps a and b in Figure~\ref{fig:UPRESSO}). In each login process, the user compares the information about the RP extracted from the RP certificate and the identity proof and verifies that the identity proof issued by the IdP is generated for the requesting RP. This provides \textbf{user-centric confidentiality}.
 
+\vspace{1mm}\noindent {\bf Goal 2:} {\em Generating a unique, session-specific and privacy-preserving RP identifier for the IdP to bind the identity proof to it.}
 
-    \item Goal 2: Transforming the RP identifer, to bind the identity proof with the unique RP identifier transformation that is \emph{not controlled by the adversary}.
-  In UPRESSO, the RP and user corporately negotiate a transformation (denoted as $PID_{RP}$) of RP's original identifier (denoted as $ID_{RP}$), in the \emph{RP identifier transforming} phase (Step 2.1 in Figure~\ref{fig:UPRESSO}).
-  IdP checks the uniqueness of $PID_{RP}$ in the \emph{dynamic registration} phase (Step 2.2 in Figure~\ref{fig:UPRESSO}),  to avoid one identity proof being accepted by two or more RPs.
-  Then, IdP  \emph{binds the identity proof with the unique $PID_{RP}$}, and  can \emph{ never infer $ID_{RP}$ from $PID_{RP}$},
-   therefore achieving \textbf{Transformed Binding}.
-  %Providing a RP identifier transformation (for \textbf{Transformed Binding}),
-  %to ensure the security by binding the identity proof with this transformation,
-  %and preserve user's privacy by preventing the IdP from inferring the original RP identifier from this transformation in the request,
-  %achieved in RP identifier transforming (step 2.1 in Figure~\ref{fig:UPRESSO}) generating transformation (denoted as $PID_{RP}$) of RP's original identifier (denoted as $ID_{RP}$);
+In UPRESSO, this privacy-preserving RP identifier (denoted as $PID_{RP}$) is generated from the original identifier of the RP (denoted as $ID_{RP}$) through a transformation negotiated between a pair of cooperating RP and user in the \emph{RP identifier transforming} phase (Step 2.1 in Figure~\ref{fig:UPRESSO}). As a result, non-colluding adversaries cannot view or forge this identifier, nor tamper or control its generation. Meanwhile, UPRESSO requires IdP to check the uniqueness of every $PID_{RP}$ it receives in the \emph{dynamic registration} phase (Step 2.2 in Figure~\ref{fig:UPRESSO}), so that each identity proof is bound to one unique $PID_{RP}$. In this way, UPRESSO supports \textbf{transformed binding}.
 
-  \item Goal 3: Providing algorithms for calculating the user's identifier ($PID_U$) in identity proof and the user's account ($Account$) at the RP,
-   allows the RP to identify the user.
-   %different $PID_U$ generated for different RPs, while a unique $Account$ derived at the RP with the trapdoor.
-  In UPRESSO, IdP calculates $PID_U$ based on $PID_{RP}$ and user's unique identifier ($ID_U$) in the \emph{$PID_U$ generation} phase (Step 4 in Figure~\ref{fig:UPRESSO}), which results in \emph{unrelated $PID_U$  for different RPs};
-  and,  the \emph{RP derives the user's unique $Account$  from $PID_U$ with the  trapdoor}, i.e., the secret parameters of the RP identifier transformation,   in the \emph{$Account$ processing} phase (Step 6 in Figure~\ref{fig:UPRESSO}); while  \emph{RP fails to derive $ID_U$ from either $PID_U$ or $Account$}, and \emph{the $Accounts$ of a user are different among RPs};
-   therefore, achieving \textbf{Trapdoored Identification}.
-   %\item 3. Checking the uniqueness of the transformation (for \textbf{Transformed Binding}), to avoid one identity proof being accepted by two or more RPs, which will harm the security of SSO systems, achieved in Dynamic registration (step 2.2 in Figure~\ref{fig:UPRESSO}), checking the global uniqueness of $ID_{RP}$;
+%to avoid one identity proof being accepted by two or more RPs. Then, IdP  \emph{binds the identity proof with the unique $PID_{RP}$}, and  can \emph{ never infer $ID_{RP}$ from $PID_{RP}$}, therefore achieving
 
- % \item Unlinkable PID_U (for \textbf{Trapdoor Identification}), for one user, the $PID_U$s for different RPs should vary, to prevent identity linkage, which is achieved in $PID_U$ generation (step 4 in Figure~\ref{fig:UPRESSO}), generating $PID_U$ at the IdP, and transferring $PID_U$ to the RP;
- % \item Unchanged account (for \textbf{Trapdoor Identification}), to allow only the destination RP (with the trapdoor) to derive the unchanged account for one user from varying $PID_U$s, which is necessary for providing the consecutive and individual services, achieved in $Account$ verifying (step 6 in Figure~\ref{fig:UPRESSO}), calculating the user's account in the RP.
+\vspace{1mm}\noindent {\bf Goal 3:} {\em Generating a unique privacy-preserving user identifier based on the original user identifier and the privacy-preserving RP identifier in a way that a same user account can be derived from multiple privacy-preserving user identifiers for the same user at different RPs.}
 
+%Providing algorithms for calculating the user's identifier ($PID_U$) in identity proof and the user's account ($Account$) at the RP, allows the RP to identify the user.
+%different $PID_U$ generated for different RPs, while a unique $Account$ derived at the RP with the trapdoor.
 
+In UPRESSO, IdP computes a unique privacy-preserving user identifier (denoted as $PID_U$) based on the original user identifier (i.e., $ID_U$) and the privacy-preserving RP identifier (i.e., $PID_{RP}$) in the \emph{$PID_U$ generation} phase (Step 4 in Figure~\ref{fig:UPRESSO}). From each $PID_U$, an RP can derive a value (denoted as $Account$) with the trapdoor, i.e., the secret parameters of the RP identifier transformation, in the \emph{$Account$ processing} phase (Step 6 in Figure~\ref{fig:UPRESSO}). $Account$ uniquely identifies the user at this RP, so that it can be used to link all $PID_U$ converted from the same $ID_U$. It is worth noting that $Account$ is different from $ID_U$ and it provides no clue to derive $ID_U$, therefore, the RP still does not know the real user associated with the identity proof. Moreover, to colluding RPs, the $PID_U$s for a same user are seemingly irrelevant to each other, since they are associated with different $Account$s at these RPs. Therefore, UPRESSO supports \textbf{trapdoor identification}.
 
-\end{itemize}
+%the \emph{RP derives the user's unique $Account$  from $PID_U$ with the  trapdoor}, ; while  \emph{RP fails to derive $ID_U$ from either $PID_U$ or $Account$}, and \emph{the $Accounts$ of a user are different among RPs}.
+
 
 %The core factor in UPRESSO is the transformation of RP identifier and pairwise user identifier generation which is described detailedly in Section~\ref{subsec:identifier-generation}.
 %$PID_{RP}$ is the transformed RP identifier transmitted to IdP based on the $ID_{RP}$ (presenting the unique identity of RP), an one-time random number $N$ and the large prime number $p$ ($ID_{RP}$ is the primitive root of $p$) in the function $PID_{RP} = {ID_{RP}}^{N} \ mod \ p$.
 %$PID_U$ is the user identifier provided by IdP to RP, which is generated in the function $PID_U = {PID_{RP}}^{ID_U} \ mod \ p$ where $ID_U$ is the unique user identifier stored and only known by IdP.
 %The non-derivability of $ID_{RP}$ and $ID_U$ is based on the Discrete Logarithm Problem.
 
+{\color{red}
 Discrete logarithm problem is adopted in UPRESSO, to prevent IdP from inferring $ID_{RP}$ from $PID_{RP}$, and allow the RP to derive $Account$ from $PID_U$ without obtaining the $ID_U$.
 Here, we provide a brief description of the discrete logarithm problem.
 A number $g$ ($0<g<p$) is called a primitive root modular a prime $p$, if for ${\forall}y$ ($0<y<p$), there is a  number $x$ ($0\le x <p-1$) satisfying $y=g^x \pmod p$.
@@ -66,7 +47,6 @@ To calculate the primitive root for a given large prime $p$,  we retrieve the le
 and then calculate the primitive root $g = g_{m}^{t} mod \ P$, where $t$ is an integer coprime to $p-1$.
 A lemma is proposed to check whether an integrity $\mu$ is the primitive root modulo $p$ where $p=2q+1$ ($q$ is a prime), that is,  an integer $\mu \in (1, p-1)$ is a primitive root if and only if $\mu^2\neq 1 \ mod \ p$ and $\mu^q\neq 1 \ mod \ p$~\cite{Shoup,Wang}.
 %The details are provided in~\cite{Shoup,Wang}.
-
 
 In UPRESSO, a system initialization is performed to initialize the IdP, which generates $g$, $p$, $PK_{Cert}$, $SK_{Cert}$, $PK_{ID}$ and $SK_{ID}$,
 and provides  $g$, $p$, $PK_{Cert}$ and $PK_{ID}$ as the public parameters.
@@ -78,10 +58,8 @@ The user triggers Steps 1-7 in Figure~\ref{fig:UPRESSO} for each login at a RP.
 %UPRESSO does not support multiple initial registrations for one RP, as the RP does not know the $ID_U$ nor the discrete logarithm of $ID_{RP}$ and fails to derive the user's new account from the old one under the Discrete Logarithm problem.
 
 In UPRESSO, a system initialization is performed to initialize the IdP only once at the very beginning of system construction and generates the strong prime $p$, the primitive root $g$, and the key pairs ($PK_{Cert}$, $SK_{Cert}$, $PK_{ID}$ and $SK_{ID}$) for RP certificate and identity proof generation. The initial registration is performed by RP to apply $Cert_{RP}$ (for user to verify the attributes of RP) and $ID_{RP}$ (for the transformation of $ID_RP$) from IdP only when the new RP is built.
-Besides, only the user login process are conducted in each login flow, containing the transformation ($PID_RP$) negotiation, the dynamic registration and the modified OIDC implicit flow.
+Besides, only the user login process are conducted in each login flow, containing the transformation ($PID_RP$) negotiation, the dynamic registration and the modified OIDC implicit flow.}
 
-
-\subsection{System Initialization and RP Initial Registration}
 \begin{table}[tb]
     \caption{The notations used in UPRESSO.}
     \centering
@@ -121,7 +99,10 @@ Besides, only the user login process are conducted in each login flow, containin
     \label{tbl:notations}
 \end{table}
 
-\textbf{System initialization.} The IdP generates two random asymmetric key pairs, ($PK_{ID}$, $SK_{ID}$) and ($PK_{Cert}$, $SK_{Cert}$),
+\subsection{System Initialization and RP Initial Registration}
+
+
+\vspace{1mm}\noindent \textbf{System initialization.} The IdP generates two random asymmetric key pairs, ($PK_{ID}$, $SK_{ID}$) and ($PK_{Cert}$, $SK_{Cert}$),
 for calculating the signatures in the identity proof and $Cert_{RP}$, respectively;
 and provides $PK_{ID}$ and $PK_{Cert}$ as the public parameters for the verification of identity proof and $Cert_{RP}$.
 Moreover, IdP generates a strong prime $p$, calculates  a primitive root ($g$), and provides $p$ and $g$ as the public parameters.
@@ -132,17 +113,16 @@ However, $g$ and $p$ will never be modified, otherwise, the RPs fail to link the
 %The IdP setup and following RP initial registration are based on the features of primitive root.
 
 
-
-\noindent\textbf{RP Initial Registration.}
+\vspace{1mm}\noindent\textbf{RP Initial Registration.}
 The RP invokes an initial registration to apply a valid and self-verifying $Cert_{RP}$ from IdP (\textbf{Goal 1}),
 % as provided in Figure~\ref{fig:registration}
  which contains three steps:
 
-\begin{itemize}
-\item 1. RP sends IdP a $Cert_{RP}$ request $Req_{Cert_{RP}}$, which contains the distinguished name $Name_{RP}$ (e.g., DNS name) and the endpoint to receive the identity proof.
-\item 2. IdP calculates $ID_{RP} = g^r mod \ p$ with a random chosen $r$ which is coprime to $p-1$ and different from the ones for other RPs,  generates the signature ($Sig_{SK_{Cert}}$) of [$ID_{RP}, Name_{RP}$] with $SK_{Cert}$, and returns [$ID_{RP}, Name_{RP}, Sig_{SK_{Cert}}$] as $Cert_{RP}$.
-\item 3. IdP sends $Cert_{RP}$ to the RP who verifies $Cert_{RP}$ using $PK_{Cert}$.
-\end{itemize}
+\begin{enumerate}
+\item RP sends IdP a $Cert_{RP}$ request $Req_{Cert_{RP}}$, which contains the distinguished name $Name_{RP}$ (e.g., DNS name) and the endpoint to receive the identity proof.
+\item IdP calculates $ID_{RP} = g^r mod \ p$ with a random chosen $r$ which is coprime to $p-1$ and different from the ones for other RPs,  generates the signature ($Sig_{SK_{Cert}}$) of [$ID_{RP}, Name_{RP}$] with $SK_{Cert}$, and returns [$ID_{RP}, Name_{RP}, Sig_{SK_{Cert}}$] as $Cert_{RP}$.
+\item IdP sends $Cert_{RP}$ to the RP who verifies $Cert_{RP}$ using $PK_{Cert}$.
+\end{enumerate}
 
 %\begin{figure}
 %  \centering

@@ -1,0 +1,324 @@
+﻿\section{Problems in Privacy-Preserving SSO}
+\label{sec:challenge}
+%PriOIDC allows user to conduct single sign on with out leaking login information to IdP. And even multi RPs' collusion can not trace the user. In this section, we are going to make an overview of our user privacy respecting protocol based on OpenID Connect 1.0.
+%As SSO systems introduce the novel way for the RPs to identify the user, the authentication security and users' privacy should be considered.
+
+%In this section, we describe  the main challenges in hiding the user's traces from both IdP and colluded RPs, and present the solutions of UPRESSO briefly.
+
+%In this section, we firstly describe the challenges in designing the privacy-preserving SSO system which fulfils the basic requirements and privacy at the same time.  Then we propose and fulfil the enhanced requirements in UPRESSO which is based on the basic requirements and privacy issues.
+
+In this section, we describe the challenges for developing privacy-preserving SSO systems and provide an overview of the solutions proposed in UPRESSO.
+% conflicts between the basic requirements and privacy of SSO systems. Then we propose the privacy-preserving requirements which combines the basic requirements and privacy with no conflicts. And we also roughly describe how the requirements are fulfilled in UPRESSO.
+
+
+\subsection{The Problem}
+\label{subsec:challenges}
+\begin{comment}
+In UPRESSO, the adversaries' goals to break the secure authentication are as follows:
+\begin{itemize}
+\item Impersonation attack: Adversary logs in to the honest RP as an honest user. The adversary might achieve the goal by obtaining a user's identity proof in the ways, such as stealing the proof (from the unprotected HTTP transmission), forging the valid proof (if the integrity is not guaranteed), leading the user to upload a proof valid for other RPs (the proof is not bound with specific RP).
+\item Identity Injection: Honest user logs in to the honest RP under adversaries' identity. The adversary might achieve this goal by replacing the identity transmitted from IdP to RP or lead the user uploads the malicious identity proof in various ways (e.g., CSRF).
+\end{itemize}
+\end{comment}
+
+
+%In SSO systems, PRs' identifier is required in both authentication request and users' identifier proof generation. Moreover, as it has been described in Section~\ref{sec:intro}, it is required to expose the identifier of users' accessed RP for security consideration. Therefore, hiding users' accessed RP from IdP is to introduce prominent challenges. To deal with the challenges, the procedure and parameters generation methods are required to be modified. However, this modification also introduces new attack surface, so that the attackers' ability in UPRESSO should be considered.
+%A privacy-preserving SSO needs to prevent both IdP-based access tracing and RP-based identity linkage.
+Besides the basic requirements discussed in Section~\ref{subsec:basicrequirements}, an SSO system should also provide protection to user privacy against the IdP-based access tracing and RP-based identity linkage. To prevent the former,  IdP should not be able to obtain any information identifying the RP accessed by the user (e.g., RP's identifier and URL). To prevent the latter, the colluding RPs should not be able to correlate the identifiers of the user at different RPs in the identity proof.
+%the user's identifiers provided by IdP for one user should never be same or derivable to each other.
+
+
+{\color{red}
+The root reason that existing SSO systems suffer from privacy attacks is that they cannot meet secure authentication and privacy protection requirements
+%why the current schemes for privacy-preserving SSO systems cannot deal with the IdP-based access tracing and RP-based identity linkage
+at the same time. %is that no existing SSO systems satisfy all the requirements of secure authentication and privacy.
+For secure authentication, the identity proof should be bound to a specific RP identifier and a specific user identifier. %The secure authentication requirements must be satisfied by all the SSO systems to avoid the potential attacks.
+However, for privacy protection, the privacy-preserving SSO systems require (i) the RP identifier to be one-time and indistinguishable to IdP, and (ii) the user identifier to be globally indistinguishable to IdP but identifiable to the RP. %The ignoring of any privacy requirements is to eventually result in the user being tracked.
+
+Several privacy-preserving schemes have been proposed to meet the privacy requirements while supporting secure authentication, however, they cannot satisfy both privacy requirements at the same time. For example, OIDC adopts PPID as an RP-specific user identifier, but for secure authentication, it has to use a unique RPID to generate the identity proof and thus suffers from IdP-based tracing. On the contrary, SPRESSO encrypts the RP domain to generate a one-time RPID that hides the RP identity against IdP, but it uses static user identifier in identity proof and thus is vulnerable to RP-based linkage. BrowserID takes a different approach by binding the globally unique user identifier with an asymmetric key pair and letting the user to sign RP's domain with the private key. However, the unique signature can be used to link the RPs accessed by the same user in RP-based linkage.
+%However, is there a simple way to satisfy the privacy requirements by combining the exiting schemes together, for example using one-time encrypted RPID in OIDC or using PPID in SPRESSO?
+
+The key challenge is that there is no simple way to bind the identity proof to a user's identity without exposing the requesting RP's identity to IdP. To tackle this problem, it requires the IdP to generate pairwise identifiers for a user and bind them to pseudo RP identifiers that seem random to IdP, in a way that user identifiers are unique at one RP but different at different RPs and user identifiers bound to pseudo identifiers of the same RP can be associated by that RP.
+%without knowing the RP identifier. Such pairwise user identifiers should be uniquely bound to an .
+%so that the pairwise user identifier changes and underivable even in the same RP.
+}
+
+\begin{comment}
+{\color{red}
+The root reason why the current existing schemes for privacy-preserving SSO systems cannot deal with the IdP-based access tracing and RP-based identity linkage at the same time is that there is the essential conflict between secure authentication and privacy. The conflict is that the relating between identity proof and RP as well as user, which is asked by the the basic requirements of SSO systems, is broken by the privacy requirements. The relating required by secure authentication includes:
+\begin{itemize}
+\item Relating between identity proof and RP's identity required by binding. The identity proof must be only valid in one RP and never accepted by other RPs to avoid the impersonation attack, which requires the IdP must bind the identity proof with the unique identifier representing one RP. For example, in OIDC the identity proof contains the unique RPID and in SPRESSO it contains the encrypted RP domain (which prevents the IdP from knowing the identity of RP).
+\item Relating between identity proof and user's identity required by identification. The identity proof must represent one user and the binding must be known by the RP as RP has to identify the user to provide the personalize service. It requires that the identity proof must provide the identifier to RP, which is unchanged or derivable from each other for one RP. For example, in OIDC the identity proof contains the PPID (which are not changed in one RP but distinct in different RPs) and in SPRESSO the identity proof provides the user's email.
+\item Relating between identity proof transmission and RP's identity required by confidentiality. Based on the assumption that transmission channel is secure (e.g., transmission is protected by TLS), IdP must guarantee that the identity proof only be sent to the address hold by the honest RP. For example, in OIDC IdP only sends the identity proof to the endpoint registered by the RP and in SPRESSO the FWD ensures that the identity proof is only sent to the same origin with the encrypted RP domain.
+\end{itemize}
+
+That is, it is impossible to avoid IdP-based tracing for the SSO systems who use the unique RPID to generate the identity proof. Similarly, the SSO systems using unchanged user identifier are not immune to the RP-based linkage. However, is there a simple way to satisfy the privacy requirements by combining the exiting schemes together, for example using one-time RPID in OIDC or using PPID in SPRESSO? The root conflict is there is no simple way to bind the identity proof to user's identity without exposing RP's identity to IdP.
+IdP always fails to provide the pairwise user identifier which is unchanged in one RP but different in different RPs without knowing the RP's identifier.
+The pairwise user identifier should be uniquely bound to the specific RP identifier (unknown to IdP), so that the pairwise user identifier changes and underivable even in the same RP.
+
+Additionally, the IdP should transmit the identity proof to RP securely by \textbf{binding the identity proof transmission with RP's identity} to prevent the impersonation attack, which requires either the IdP knows the correct RP's endpoint resulting the \textbf{IdP-based access tracing} (e.g., hiding endpoint in OIDC), or the introducing the extra trusted party (FWD in SPRESSO) expanding the attack interface.
+
+%To avoid the \textbf{IdP-based access tracing}, as well as to \textbf{bind the identity proof with specific RP}, it either results in breaking of \textbf{relating between identity proof and user's identity} (e.g., using one-time RPID in OIDC and generating PPID) or the user identifier cannot be distinct in each RP (e.g., email in SPRESSO), which causes the \textbf{RP-based identity linkage}
+
+%However, the bindings for secure authentication, conflict with the privacy requirements on SSO systems. Firstly, to avoid the \textbf{IdP-based access tracing}, as well as to \textbf{bind the identity proof with specific RP}, it either results in breaking of \textbf{binding between identity proof and user's identity} (e.g., using one-time RPID in OIDC and generating PPID) or the user identifier cannot be distinct in each RP (e.g., email in SPRESSO), which causes the \textbf{RP-based identity linkage}. Secondly, the IdP should transmit the identity proof to RP securely by \textbf{binding the identity proof transmission with RP's identity} to prevent the impersonation attack, which requires either the IdP knows the correct RP's endpoint resulting the \textbf{IdP-based access tracing} (e.g., hiding endpoint in OIDC), or the introducing the extra trusted party (FWD in SPRESSO) expanding the attack interface.
+
+ }
+ \end{comment}
+
+\begin{comment}
+However, these two requirements for privacy preservation,  conflict with the basic requirements on SSO as follows: %, resulting in the following problems in SSO systems:
+\begin{itemize}
+	\item \textbf{No Identification.} In the privacy-preserving SSO, IdP doesn't know the RP's identifier, therefore fails to provide the  pairwise user's identifier which is unchanged in one RP but different in different RPs (e.g. PPID in OIDC and SAML~\cite{OpenIDConnect,SAMLIdentifier}). Also, the user's unique identifier (e.g., the email address in BrowserID~\cite{BrowserID} and SPRESSO~\cite{SPRESSO}) should not be sent to the RP, otherwise the colluded RPs may perform the identity linkage with the same identifier.
+%User account is the unique identifier for the RP to provide the individual services for each user.
+%In SSO systems, RP derives the user account from the identifier (i.e., PPID in OIDC) provided by the identity proof.
+%However, in privacy-preserving SSO systems, IdP must provides the pairwise user identifier (never same for different RPs) without knowing the identity of RP.
+%Therefore, IdP is only able to provide different user identifier for user's multiple logins at the same RP, which makes RP fail to provide the consecutive and individual services.
+
+%Each RP provides the individual services for each user based on the unique account. In SSO systems, RP derives the user account from the identifier (i.e., PPID in OIDC) in the identity proof. With the correct RP identifier, IdP ensures the PPID is unique for the user's multiple logins at the same RP. However, when IdP fails to obtain the exact RP identifier, IdP is only able to provide different PPIDs for user's multiple logins at the same RP, which makes RP fail to provide the consecutive and individual services.
+	\item \textbf{No Binding.} IdP, who doesn't know the RP's identifier, fails to bind the identity proof with a specified RP.
+On receiving the identity proof not bound to it, the RP either (1) rejects the proof and halts its service; or (2) accepts the proof.
+The second case will make  one identity proof  be accepted by multiple RPs, which results in the misuse of identity proof for impersonation attacks and identity injection~\cite{ChenPCTKT14,FettKS16,WangZLG16}.
+    \item \textbf{No Confidentiality.}
+    The potential leakage of the identity proof exists, as:
+    (1) No reliable checks (from the IdP and user) during the generation of identity proof, as the IdP lacks the correct RP identifier to retrieve the exact information from the local storage,
+     while the user fails to obtain the correct RP name (or URL) from IdP for the check.
+     Therefore, the malicious RP may cheat user about its identity to request the identity proof for another RP without being found by the IdP and user.
+     (2) Lack of correct URL for the transmission, as without the correct RP identifier, IdP fails to extract the correct (locally stored) URL.
+      The trusted user agent may transmit the identity proof to the incorrect URL hold by the adversary.
+    The leakage of identity proof may result in the impersonation attacks~\cite{ChenPCTKT14,FettKS16,WangZLG16}.
+\end{itemize}
+Due to these conflicts, no existing SSO systems satisfy the two privacy requirements.
+IdP-based access tracing exists in the implementations based on SAML, OAuth, and OIDC, as IdP knows identifiers accessed by the user.
+RP-based identity linkage is not prevented in BrowserID~\cite{BrowserID} and SPRESSO~\cite{SPRESSO}, as the email address is sent to all the RPs.
+\end{comment}
+
+
+%Besides, as the \textbf{Integrity} is ensured by the signature generated by IdP, which is not related with the identity of RP, it is not the challenge in designing privacy-preserving SSO system to avoid the identity proof to be tampered.
+
+\begin{comment}
+To prevent the IdP from inferring the user's trace, it is straightforward that IdP should never obtain any information identifying the user-accessed RP. The identifying information includes the RP's identifier and URL. However, it conflicts with the security requirements on identity proof described in Section~\ref{subsec:securityconsideration}:
+\begin{itemize}
+    \item \textbf{Leakage.} The confidentiality of identity proof is corrupted, and the leaked identity proof may result in the impersonation attacks~\cite{ChenPCTKT14,FettKS16,WangZLG16}. The potential leakage is due to: (1) no reliable checks (from the IdP and user) during the generation of identity proof, as the IdP lacks the correct RP identifier to retrieve the exact information from the local storage, while the user fails to obtain the correct URL (or RP name) from IdP for the check. Therefore, the malicious RP may request the identity proof for another RP without being found by the IdP and user. (2) the lack of correct URL for the transmitting, as without the correct RP identifier, IdP fails to extract the correct (locally stored) URL.  The trusted user agent may transmit the identity proof to the incorrect URL (provided by IdP) which is controlled by the adversary.
+    \item  \textbf{No Binding.} IdP fails to bind the identity proof with a specified RP, as it lacks the correct RP identifier for binding. On receiving the identity proof not bound to it, the RP either (1) rejects the proof and halts its service as no identity proof  is bound to it, or (2) accepts the proof. The second case will make  one identity proof  be accepted by multiple RPs, which results in the misuse of identity proof for impersonation attacks and identity injection~\cite{ChenPCTKT14,FettKS16,WangZLG16}.
+\end{itemize}
+
+In addition to challenges from the security considerations, providing no RP's identifying information to the IdP also brings the challenge in preventing the identity linkage and RP's consecutive running, as:
+
+\noindent\textbf{No user's account satisfying (1) unique for one RP and (2) different from ones for other RPs.}  Each RP provides the individual services for each user based on the unique account. In SSO systems, RP derives the  account from the identifier (i.e., PPID in OIDC) in the identity proof. With the correct RP identifier, IdP  ensures the PPID is unique for the user's multiple logins at the same RP. However, when IdP fails to obtain the exact RP identifier, IdP may provide (1) different PPIDs for user's multiple logins at the same RP, which makes RP fail to provide the consecutive and individual services; or (2) the same user identifier (e.g., user's email address) for various RPs, which makes the identity linkage be possible for colluded RPs.
+\end{comment}
+
+\begin{comment}
+To protect users from the privacy issues introduced by SSO systems, the scheme should simultaneously achieve the following goals:
+\begin{itemize}
+\item Hiding RP's identity from IdP.
+\item Providing distinct user identifier for each RP.
+\end{itemize}
+However, it will introduce prominent challenges.
+
+As it has been described in Section~\ref{sec:intro}, it is required to expose the identifier of users' accessed RP for security consideration. Hiding RP's identity from IdP breaks the security considerations listed in Section~\ref{sec:background}.
+\begin{itemize}
+\item \textbf{Breaking Binding: }To hide RP's identity, IdP is unable to know which RP the identity proof is issued for. Therefore, the identity proof is no longer bound with the specific RP, which results in the misuse of identity proof. An adversary has the ability to achieve an honest user's identity proof by various ways, for example, once the user logs in the corrupted RP controlled by the adversary with his/her identity proof, the adversary is able to access other honest RPs with the honest user's identity by using this identity proof (Impersonation Attack).
+\item \textbf{Breaking Confidentiality: }To hide RP's identity, IdP is unable to know the correct endpoint provided by the RP to receive the identity proof. For example, in OIDC, IdP holds the list of all the endpoints of RP waiting for \verb+id_token+, so IdP is able to guarantee that the identity proof is only to be sent to the endpoint in this list. Without the endpoint representing RP's identity, an RP controlled by the adversary has the ability to build the authentication request by setting another honest RP's identifier (if RP's identifier is used in a way without exposing RP's identity) and the adversary's endpoint. IdP is to send the identity proof issued for the honest RP to the adversary. Therefore, the adversary has the ability to achieve the identity proof valid in honest RPs, which results in Impersonation Attack.
+\item \textbf{Ignoring Content Checking: }To hide RP's identity, IdP is unable to know the RP's unique real name, which represents the RP. Therefore, the notification of target RP's identity to user is no longer provided by IdP. An adversary has the ability to utilize this vulnerability as well as breaking confidentiality to achieve honest user's valid identity proof for other honest RPs (Impersonation Attack). Additionally, as SSO systems require user's clear consent for certain login to specific RP, the phishing attack can be avoided in some situations by RP's name checking. The ignoring of content checking breaks the protection from phishing attack.
+
+%\item \textbf{Break Content Checking: }As RP's identity is hidden from IdP, IdP is unable to notify user with the unique RP's name while authenticating, which means user does not know the real identity of RP he/she logs in.
+\end{itemize}
+Additionally, it introduces another challenge to provide distinct user identifier while hiding RP's identity
+\begin{itemize}
+\item \textbf{RP is unable to identify the user: }To hide RP's identity, the single RP's multiple authentication requests should be considered from different RPs by IdP. However, the user identifier provided by IdP is solely bound with an RP to avoid linking the user through RPs' collusion. It means that the single user's multiple identifiers for one RP will never be constant. Therefore, RP is unable to identify the user no longer.
+\end{itemize}
+\end{comment}
+
+
+\subsection{UPRESSO Overview}
+\label{subsec:solutions}
+%UPRESSO aims to hide the users' traces from both the IdP and colluded RPs, without violating the basic requirements of SSO systems. Therefore, we propose the privacy-preserving requirements of SSO systems and illustrate the methods to fulfil the requirements.
+In this work, we present UPRESSO to defend against both IdP-based access tracing and RP-based identity linkage privacy attacks with enhanced security for identification, binding and confidentiality. %to satisfy the basic requirements of SSO systems.
+Since the integrity requirement for identity proof is orthogonal to the privacy requirement, UPRESSO adopts the same signature-based integrity mechanism of OIDC.
+%The integrity requirement on the identity proof  does not conflict with the privacy requirements, therefore the mechanism for integrity is inherited.
+Next, we overview the new privacy-preserving identification, binding and confidentiality schemes in UPRESSO.
+%Besides, as the \textbf{Integrity} is ensured by the signature generated by IdP, which is not related with the identity of RP, it is not the challenge in designing privacy-preserving SSO system to avoid the identity proof to be tampered.
+
+\vspace{1mm}\noindent \textbf{Trapdoor Identification.} The entity with the trapdoor can derive the unique user account associated with an RP from different identifiers in multiple identity proofs generated when the user logs in to that RP multiple times.
+%The trapdoor-existing identification requires that the user identifier generated by IdP should be never same in each authentication as the RP's identity is unknown to IdP and the identifier should be derivable to the specific account unchanged in RP with the trapdoor.
+In UPRESSO, the user's account at an RP is a function of the RP's original identifier and the user's unique identifier.
+The generation of this unique user account consists of two steps executed by the IdP and RP independently to prevent not only the IdP from obtaining the RP identifier but also the RP from inferring the unique user identifier.
+In the first step, IdP generates a PPID with the user identifier and the RP identifier transformation. Since the RP identifier transformations are independent in multiple login flows, the PPIDs generated by the IdP in these flows are different.
+%which results in different PPIDs for multiple logins at a RP as various transformations are adopted.
+In the second step, the requesting RP adopts the trapdoor of the transformation of the RP identifier to derive the unique user account from the PPIDs. Moreover, the accounts of a user at various RPs are different, as the original RP identifiers are different, which prevents the identity linkage.
+
+\vspace{1mm}\noindent \textbf{Transformed Binding.}
+The identity proof is bound to the transformation of a RP identifier, which allows the RP to check whether the identity proof is for it while preventing the IdP from inferring the original RP identifier. Only the identity proof bound to a fresh transformation of its identifier will be accepted by the RP.
+%The transformed binding requires that the RP should provide the one-time transformed identifier, unlinkable to the RP's unique identifier without trapdoor and the identity proof should be bound with the one-time identifier.
+In UPRESSO, the transformation of the RP identifier is generated by the user and RP cooperatively, which prevents the adversary from constructing a same or related transformation for different RPs. The IdP obtains the transformation of an RP identifier and binds it to the identity proof.
+%the identity proof is bound with a transformation of the RP's identifier by the IdP, who cannot infer the original identifier from the transformation.
+
+%Moreover,
+%Otherwise, the identity proof will be accepted by multiple RPs, which results in the misuse of the proof for the impersonate attack.
+
+\vspace{1mm}\noindent \textbf{User-centric Confidentiality.}
+In UPRESSO, the user sends the authentication request to the IdP to generate an identity proof for the requested RP identifier transformation. To ensure the identity proof is securely returned to the requesting RP, UPRESSO adopts a user-centric confidentiality check, which requires the user to extract RP's identifying information (e.g., URL, name and RP identifier) from the RP certificate issued by a trusted entity (e.g., IdP). Therefore, it is impossible for an adversary to request the identity proof on behalf of others or intercept others' identify proofs with a forged return URL.
+
+\begin{comment}
+Instead of relying on the check at the IdP, the confidentiality is ensured by a user-side check based on the trusted information extracted from the RP certificate.
+%The user-centric confidentiality requires the checking of RP's endpoint and notification of RP's information should be shifted from IdP, who does not know the RP's identity to user.
+%In UPRESSO, IdP does not know the RP's identity, therefore fails to retrieve the exact information for check.
+In UPRESSO, a certificate is issued for each RP by a trusted entity (e.g., IdP) to protect the identifying information of the RP (e.g., URL, name and RP identifier) with a signature from the trusted entity to avoid the modification and forging.
+%instead of checking the information provided by the RP with the ones stored in the IdP, the user directly extracts from a RP certificate for the trusted necessary information in the generation and transmitting of identity proof, which ensures the confidentiality. The RP certificate
+The user transmits IdP the request with the correct RP identifier  transformation for generating identity proof; and sends the proof to the URL specified in the RP certificate.
+\end{comment}
+
+
+\begin{comment}
+\subsection{Solutions}
+\label{subsec:solutions}
+UPRESSO aims to hide the users' traces from both the IdP and colluded RPs, without violating the security of SSO systems and interrupting RP's the consecutive and individual service. That is, UPRESSO ensures the confidentiality and binding of identity proof without leaking the RP's identifer to the IdP, and provides the unique and un-linkable PPID
+%{\color{blue} PPID solely bound with the user's account at RP}
+to the RP for the user's multiple logins.
+
+\noindent\textbf{User-centric confidentiality.}
+In UPRESSO, instead of checking the information provided by the RP with the ones stored in the IdP, the user directly extracts from a RP certificate for the trusted necessary information in the generation and transmitting of identity proof, which ensures the confidentiality. The RP certificate contains the RP's correct identifying information (URL, name and RP identifier), and a signature from the IdP to ensure no modification nor forging on it. The user provides IdP a transformation of the correct RP identifier in the generation of identity proof; and sends the proof to the URL specified in the RP certificate. Therefore, the adversary fails to request the identity proof using others' identifiers, or obtain others' proof with its URL.
+
+\noindent\textbf{Binding with a transformation of RP's identifier.} The identity proof is bound with a transformation of the RP's identifier by the IdP, who cannot infer the original identifier from the transformation. RP only accepts the identity proof which is bound to a fresh transformation of its identifier. Moreover, the transformation of RP's identifier is generated corporately by the user and RP, preventing the adversary from constructing a same transformation for various RPs. Otherwise, the identity proof will be accepted by multiple RPs, which results in the misuse of the proof for the impersonate attack.
+
+\noindent\textbf{Deriving the unique account with the trapdoor.} In UPRESSO, the user's account in a RP is a function of the RP's original identifier and the user's unique identifier. The calculation of the user's unique account is split into two steps, to prevent the IdP from obtaining the RP's identifier and avoid the RP to infer the user's unique identifier. In the first setp, IdP generates the PPID with the user's unique identifier and  the transformation of the RP's identifier, which results in different PPIDs for multiple logins at a RP as various transformations are adopted. While, in the second step, the destination RP adopts the trapdoor of the RP's identifier transformation to derive the unique account from the PPIDs. Moreover, the accounts of a user in various RPs are different, as the original RP identifiers are different, which prevents the identity linkage.
+\end{comment}
+
+
+\begin{comment}
+%20190806
+To deal with the challenges introduced by hiding RP's identity from IdP, the following methods are proposed:
+\begin{itemize}
+\item \textbf{Providing the RP identifier which is only valid in corresponding RP without exposing RP's real identity.} The RP identifier should be generated in a way so that for each authentication the identifiers are different. Moreover, the generation should be beyond any entities' control to avoid the misuse of user's identity proof, which happens when different RPs use the same identifier. Therefore, we propose the scheme that the identifier should be generated under the negotiation between the user and RP. However, in this way, the malicious RP and user have the ability to build any negotiation requests and responses they need. Adversaries try to the honest RP use the same identifier with a corrupted one to obtain an honest user's identity proof valid in other honest RPs, which will be analysed detailedly in Section~\ref{sec:analysis}. Moreover, the curious IdP tries to derive the real identity of RP from the RP identifier. It is also to be analysed in Section~\ref{sec:analysis}.
+\item \textbf{Providing the distinct user identifier which make RP able to identify the user. } It is required that the user identifier provided by IdP (named \verb+user_id+) should be different in each authentication, but RP is able to derive the specific user identifier for each RP (named \verb+user_rp_id+) which is constant for each RP with the \verb+user_id+. However, the current ways to generate user identifier, such as using random character string as user identifier and binding it with specific RP identifier in database, is not appropriate. Therefore, we proposed a novel \verb+user_id+ generating algorithm associated with RP identifier generating which allows only the corresponding RP has the trapdoor to derive the \verb+user_rp_id+ from \verb+user_id+. In this way, malicious RPs try to link the user by the \verb+user_id+, which is also to be analysed in Section~\ref{sec:analysis}.
+%通过RP构造的authentication使不同的用户最终推导出相同的user identifier,攻击者如何获益？
+\item \textbf{Binding the RP identifier with RP's attributes. } It is required that the identity proof issued for specific RP identifier should be sent to the corresponding endpoint. However, RP identifier is generated temporarily by user and RP unrelated with any RP, so that IdP is unable to decide which endpoint the identity proof should be sent to. Therefore, the enhanced user agent is required to guarantee the identity proof's transmission without introducing new trustful entity into SSO system. It is required that the RP identifier generation should be based on the basic identifier element (named \verb+basic_rp_id+) issued by RP, as well as the \verb+basic_rp_id+ should be bound with specific endpoint. Moreover, if IdP publishes the relationship of all the RPs on its website, unless user agent caches all the relationship, the access for specific RP's relationship is to expose the user's accessed RP. Therefore, IdP should offer the certification signed with its private key for each RP, which contains the RP's \verb+basic_rp_id+ and endpoint list. User agent should have the ability to verify this certification.
+Similarly, the responsibility of notifying user with RP's identity should be shifted to user agent. Same as binding the RP identifier with correct endpoint, RP's certification should contains RP's name and user agent should show it to user clearly while authenticating.
+\end{itemize}
+\end{comment}
+
+\begin{comment}
+\subsection{Challenges and Solutions in OIDC}
+OIDC is designed for the centralized systems. Therefore, prior coordination is required between RP and IdP so that RP registers its individual attributes (i.e., \verb+redirect_uris+) and gets client attributes (i.e., \verb+client_id+) issued by IdP. While the authentication request is transmitted from RP, IdP verifies the validation of \verb+client_id+ and \verb+redirect_uri+ because it only provide service to those RPs already registered. Therefore, if an RP builds the authentication request without \verb+client_id+ and \verb+redirect_uri+, IdP considers it invalid.
+
+With dynamic registration, an RP has the ability to re-register the new \verb+client_id+ and \verb+redirect_uri+ with IdP. Therefore, it is needed that before the authentication request is transmitted to IdP, RP should re-register the newly generated \verb+client_id+ and completely random \verb+redirect_uri+ with IdP. The registration should be conducted by the user to avoid direct interactive between RP and IdP. However, the specification~\cite{DynamicRegistration} of OIDC dynamic registration requires the registration request should carry a bearer token as well as the new  \verb+client_id+ is generated by IdP. To avoid IdP finding out RP's identity through dynamic registration, the requirement of registration token should be omitted. It is also needed to enable RP to assign the specific \verb+client_id+. It is observed that although \verb+client_id+ is defined to be generated by IdP, some OIDC systems (e.g., MITREid Connect) enable the \verb+client_id+ be the input attribute.
+\end{comment}
+
+
+
+\begin{comment}
+
+%单点登录系统中，IdP通过用户认证识别用户身份，通过client_id和redirect_uri识别RP身份。
+%在不改变单点登录系统结构的情况下，由于IdP要向RP提供用户的身份信息，所以向IdP隐藏用户身份是不可行的
+%向IdP隐藏RP身份要通过隐藏client_id和redirect_uri实现
+%The ability of IdP. Discribe the solution of protecting users' privacy.
+%In OpenID Connect systems IdP gets RP's identity by client\_id or redirect\_uri in request (Figure~\ref{fig:OpenID} step 2) and gets user's identity when authenticating the user (Figure~\ref{fig:OpenID} step 3).
+%As IdP has to provide RP a user's authenticator bound with user's identity, it's not possible to keep user anonymous in IdP without modifying the structure of current SSO system.
+%So it is only feasible to protect user's privacy by keeping RP anonymous in IdP. But it introduces new challenges.
+In OIDC, the authentication request from RP to IdP exposes RPs' identity by the parameters, \verb+client_id+ (RP's identifier) and \verb+redirect_uri+ (RP's endpoint for token receiving). To hide accessed RP from IdP requires that \verb+client_id+ and \verb+redirect_uri+ should not represent an RP any more. As these parameters have played important roles in authentication, it introduces prominent challenges.
+
+\noindent\textbf{Challenges in Authentication Procedure.} The \verb+client_id+ and \verb+redirect_uri+ are required in both authentication request and users' identifier proof generation, so that the omission of these parameters introduces challenges in authentication procedure. The challenges are as follows:
+\begin{itemize}
+\item OIDC is designed for the centralized systems. Therefore, prior coordination is required between RP and IdP so that RP registers its individual attributes (i.e., \verb+redirect_uris+) and gets client attributes (i.e., \verb+client_id+) issued by IdP. While the authentication request is transmitted from RP, IdP verifies the validation of \verb+client_id+ and \verb+redirect_uri+ because it only provide service to those RPs already registered. Therefore, if an RP builds the authentication request without \verb+client_id+ and \verb+redirect_uri+, IdP considers it invalid.
+\item The identity proof issued (called \verb+id_token+) by IdP provides the PPID (called \verb+sub+) of the user for RP. It means that the \verb+sub+ is solely bound with an RP to avoid linking the user through RPs' collusion. However, once the IdP doesn't know the RP accessed by user, it is impossible for IdP to provide the corresponding PPID for RPs. Therefore, RP has no ability to identify a user any more.
+\end{itemize}
+\noindent\textbf{Challenges in Security.} In addition to playing the important roles in authentication procedure, the \verb+client_id+ is required to avoid the misuse of \verb+id_token+ and the \verb+redirect_uri+ guarantees the \verb+id_token+ should be transmitted to corresponding  RP. The of \verb+client_id+ and \verb+redirect_uri+ introduces the following challenges:
+\begin{itemize}
+\item While RP registers with IdP, IdP gets the \verb+redirect_uris+ which lists all the endpoints of RP waiting for \verb+id_token+. Therefore, once IdP receives an authentication request from the RP, it compares the \verb+redirect_uri+ in request with the registered endpoints. If the \verb+redirect_uri+ has not been registered before, IdP considers this request malicious. This means if the user is honest and transmissions among user, IdP and RP are well protected (e.g., using TLS), the attacker has no possibility to get the \verb+id_token+. However, without the endpoint provided by RP, IdP is unable to guarantee the \verb+id_token+ is properly transmitted to the corresponding RP.
+\item The \verb+id_token+ includes the RP's identifier (called \verb+aud+), user's PPID and IdP's identifier (called \verb+iss+), representing the \verb+id_token+ is issued by \verb+iss+ for \verb+aud+ to confirm that the owner's (of this \verb+id_token+) identity is \verb+sub+. Therefore, RP compares the \verb+aud+ with its own identifier to make sure whether this  \verb+id_token+ is issued for itself. However, once IdP doesn't know the correct identifier of RP, the \verb+id_token+ issued by IdP doesn't include the correct \verb+aud+ any more. It results in the misuse of \verb+id_token+.
+%This means an \verb+id_token+ is not bound with a specific RP which makes impersonation attack possible.
+\end{itemize}
+\noindent\textbf{Solutions.} To fulfill the requirement of \verb+client_id+ and \verb+redirect_uri+ when building the authentication request without exposing RP's identify, the simplest way is using random \verb+client_id+ and \verb+redirect_uri+. However, using the completely random parameters still faces the above challenges, so that several methods should be proposed to deal with these challenges.  The methods are as follows:
+\begin{itemize}
+\item The RP's identifier should be generated beyond any entities' control to avoid the misuse of user's identity proof, which only happens when different RPs use the same \verb+client_id+.  Attackers tries to obtain an honest user's \verb+id_token+ in an honest RP through various methods, such as leading the honest RP use the same  \verb+client_id+ with a corrupted one, which will be described detailedly in Section~\ref{sec:analysis}. Therefore, the appropriate method to generate the \verb+id_token+ is negotiation between the user and RP.
+
+\item To identify a user in different logins, RP should have the ability to transform the user's PPID into a constant user identifier for each user. Some OIDC systems only use a random  character string as the PPID (e.g., MITREid Connect). Therefore, the new user PPID generating algorithm should be created for user authentication while only the corresponding RP has the trapdoor to derive the unique identifier from PPID. To protect users from linkage by RPs' collusion, both the PPID and the unique identifier should be bound with the (not completely) random RP's identifier. The PPID generating algorithm and  RP's identifier generating algorithm will be described detailedly in Section~\ref{sec:protocol}.
+
+\item With dynamic registration, an RP has the ability to re-register the new \verb+client_id+ and \verb+redirect_uri+ with IdP. Therefore, it is needed that before the authentication request is transmitted to IdP, RP should re-register the newly generated \verb+client_id+ and completely random \verb+redirect_uri+ with IdP. The registration should be conducted by the user to avoid direct interactive between RP and IdP. However, the specification~\cite{DynamicRegistration} of OIDC dynamic registration requires the registration request should carry a bearer token as well as the new  \verb+client_id+ is generated by IdP. To avoid IdP finding out RP's identity through dynamic registration, the requirement of registration token should be omitted. It is also needed to enable RP to assign the specific \verb+client_id+. It is observed that although \verb+client_id+ is defined to be generated by IdP, some OIDC systems (e.g., MITREid Connect) enable the \verb+client_id+ be the input attribute.
+
+\item Using the random \verb+redirect_uri+ makes the responsibility to check whether the \verb+redirect_uri+ has been registered is migrated to user's agent (e.g., browser) as it is impossible for IdP to guarantee the \verb+id_token+ is properly transmitted to the corresponding RP any more. However, to avoid the query for registered endpoints list from user agent exposing the RP's identity, IdP should issue the \verb+RP Certification+ for each RP which includes the RP's basic attributes and the registered endpoints list with a signature. User agent should have the ability to take the responsibility to check whether the \verb+redirect_uri+ has been registered through the \verb+RP Certification+.
+\end{itemize}
+
+
+%最直接的隐藏RP的方法是在登录过程中使用随机的client_id与redirect_uri
+%简单的修改会带来两个方面的问题：流程问题与安全问题
+%流程问题：IdP只识别注册过的client_id与redirect_uri；client_id与uid绑定，随机的client_id使每次的uid都不同
+%安全问题：随机的client_id导致了不同RP之间的token可以混用；随机的redirect_uri导致IdP无法保证token只发送给对应的RP
+%Security problems. The secure rules of sso system summarized from the previous research. And the simple solution will disobey which rules.
+%Function problems. How the simple solution make the sso system failed.
+%描述为何不能用户匿名
+
+%通过协商生成client_id，任何一方无法控制client_id的生成
+%用户代理控制token的发送，保证发送给对应的RP
+%使用OpenID Connect 1.0的动态注册功能保证client_id与redirect_uri的有效性
+%设计client_id与user id 的生成算法，使RP能够识别用户
+
+
+
+\subsection{Entities}
+To achieve the goals outlined in Section~\ref{sec:intro}, the requirements and restrictions of abilities owned by each entities in single-sign-on system is defined as follows: %要做的内容，总的角色能力描述
+\begin{itemize}
+    \item \textbf{User} is the entity to be authenticated in this system who holds the credentials for the IdP. User takes part in the the system through the user agent.
+    \item \textbf{User agent} is the software used by the user, such as browser and the application on the mobile device. User agent negotiates the RP's identifier with the RP and dynamically registers the newly generated identifier with a random endpoint for identity proof with IdP. Besides, user agent also guarantees the user's identity proof is only transmitted to the corresponding RP by tampering and modifying the transmission through it. To make user able to use UPRESSO conveniently in any devices, user agent should not store any data persistently.
+    \item \textbf{RP} is the entity who provides the service and need to identify the user. RP negotiates the RP's identifier with the user agent and builds the authentication request to IdP with the newly created identifier. RP identifies a user through a identity proof by deriving a constant user identifier from PPID. To avoid the user linkage by multiple RPs, RP should be unable to derive the real user's identity from PPID.
+    \item \textbf{IdP} is the entity who authenticates the user and provide the identity proof. IdP allows user and RP's registration, initiates the entities' attributes and offers the initial configuration, such as \verb+RP Certification+. IdP provides the endpoint for RP's dynamic registration. Besides, IdP authenticates the user, verifies the authentication request, generates user's PPID and issues the identity proof. To avoid IdP from tracking the user, IdP should not be able to find out RP's identity by RP identifier nor the relevance between an RP's  different identifier.
+\end{itemize}
+\subsection{Threat Model}
+%Considered different attack scenarios, malicious opponent can be divided into following situations: malicious IdP, malicious RP, malicious user and external attacker. In different situations malicious owns different abilities.
+
+%敌手能力假设：
+%作为IdP
+%不能够以用户的身份登录RP
+%能够获得登录过程中用户的身份信息
+%能够获得RP的client_id与redirect_uri信息
+%能够长时间留存登录中的信息，并对多次登录信息进行比对
+%作为RP
+%能够与用户协商client_id
+%能够获得用户上传的认证凭据
+%能够构造对IdP申请token的请求
+%能够获得IdP返回的token
+%作为User
+%能够与rp协商client_id
+%能够篡改经过user转发的数据
+%能够构造动态注册的请求
+%作为外部攻击者
+%能够监听和篡改单点登录过程中的网络流量
+In UPRESSO, the adversaries' goals are shown as follows:
+\begin{itemize}
+\item Privacy undermining: Adversaries know user's login trace.
+\item Impersonation attack: Adversaries log in to the honest RP as the honest user.
+\item Identity Injection: Honest user logs in to the honest RP under adversaries' identity.
+\end{itemize}
+
+As UPRESSO is designed centralized, IdP has the max authority in this system. Therefore, IdP should be considered honest but curious. Otherwise, an malicious IdP has the ability to log in to any RP as any honest user (impersonation attack) and enforce any honest user to log in honest RP under an adversary's identity (identity injection). It is considered that any RP could be corrupted and any user may be the adversary. User agent is considered completely honest but under control of the user. Therefore, the user agent is seemed as a part of user. Network attackers are also considered.
+
+\begin{itemize}
+\item \textbf{Curious IdP} acts as an completely honest IdP.
+
+%As IdP service is usually provided by a leading internet company. In consideration of in consideration of, Idp is considered secure but curious. Phishing attack on IdP is not considered. It means IdP would not try to do the impersonation attack or abduction attack. But an IdP is probably interested in user's login trace in RPs so that it is able to deduce user's interests and behavioral traits. During SSO login, as IdP need authenticate the user, so IdP has the ability to collect the user's information. And IdP is able to get client\_id and redirect\_uri from token request. IdP is also able to store each user's login history and analyze each client\_id and redirect\_uri to find out the relevance among each login.
+
+
+\item \textbf{Malicious RP} has the ability to build any response in \verb+client_id+ negotiation and build any authentication request it need.
+
+
+
+%There are two kinds of malicious RPs. The first is the legal RP owned by malicious opponent and the other is phishing site. Because everyone is able to register as an RP at IdP, it is considered that RP can be fully controlled by malicious. A malicious RP is going to conduct impersonation attack and privacy undermining attack on user. As some attack methods require attacker act as both RP and user, to avoid the repetitive description malicious RP and malicious user is defined: If attacker acts as an RP in attack, attacker is considered as malicious RP. If attacker only acts as a user, it's malicious user.
+%A malicious RP's goals include: 1) Getting id\_token from user which is validate in other RPs. 2) Deducing user's login trace by colluding with other RPs.
+%Malicious RP is able to make fake basic\_rp\_id and conduct client\_id negotiation with user. Malicious RP is also able to construct the id\_token request to IdP and receive id\_token from IdP. In phishing attack, it is considered that user trusts attacker completely.
+
+
+\item \textbf{Malicious User} has the ability to build any request in \verb+client_id+ negotiation, build any dynamic registration request it need. Besides, User is also able to temper and modify all the data transmitted through itself.
+%A malicious user is only going to conduct impersonation attack. In the attack malicious opponent acts as both user and RP, user is able to conduct client\_id negotiation, construct dynamic registration request. User is also able to temper all the data transformed through itself. It is considered that the user agent is trustful, but there are external attacker trying to exploit the flaw of user agent.
+
+\item \textbf{Network Attacker} has the ability to listen all the IP address on the Internet and tamper all the network flow.
+\end{itemize}
+
+\noindent\textbf{Adversary.} To explicitly illustrate how an adversary works in the SSO system, the \verb+authentication group+ is created to defined the group of specific IdP,  RP and user. For example, now there are $IdP$, $User_{A}$, $User_{B}$, $RP_{A}$ and $RP_{B}$. They are able to form 4 \verb+authentication group+s, ($IdP$, $User_{A}$, $RP_{A}$), ($IdP$, $User_{A}$, $RP_{B}$), ($IdP$, $User_{B}$, $RP_{A}$) and ($IdP$, $User_{B}$, $RP_{B}$). An adversary has the ability to act one or more entities in single or multiple \verb+authentication group+s. That is, an adversary is able to act as, i) the single entity in one \verb+authentication group+, such as the curious IdP;ii) the same entity in multiple \verb+authentication group+s, such as acting as different RPs for the same honest user ; iii) the different entities in multiple \verb+authentication group+s, such as acting as the RP for the honest user and the user for the honest RP at the same time. It is considered an adversary should not act as both the IdP and RP in single \verb+authentication group+.
+
+
+
+\end{comment}
+
+%\textbf{External Attacker} External attacker's targets include impersonation attack, abduction attack and privacy undermining attack. External attacker is able to capture and temper all the network flow through user, RP and IdP.
+
+
