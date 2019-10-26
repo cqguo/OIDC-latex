@@ -37,24 +37,27 @@ or send the invalid or other RP's valid certificate instead of its own. %Moreove
 %Moreover, the conclusion is also considered available in UPRESSO, of which the details are shown as follows:
 %The malicious users and RPs may collude as follows:
 
-\vspace{1mm}\noindent \textbf{Colluded RPs and users.} The malicious users and RPs may collude to perform the impersonation or identity injection attacks.
+\subsection{Assumptions}
+% 这2个合谋的特例，其实就是在上面的Malicious RP and User的引申，所以，我把它放在这里了；不和上面并列。
+
+%\vspace{1mm}\noindent \textbf{Collusive RPs and users.} 
+In particular, the malicious users and RPs may collude to perform the impersonation or identity injection attacks.
 For example, %to log in to the honest RP under the victim user's account,
 the adversary may first attract the victim user to access a malicious RP to initiate an authentication request for identity proof that is also valid to honest RPs, and then pretend to be the victim user to access these RPs using the received identity proof. %To make the victim user log in to the honest RP under an malicious account,
 The adversary may also act as a user to obtain an identity proof for herself to access an honest RP, and then work as an RP to redirect the victim user to the honest RP using her proof (e.g. CSRF).
 
-\vspace{1mm}\noindent \textbf{Colluded RPs.} To break user's privacy, the colluding RPs may link user accounts across them by actively returning incorrect messages, or passively combining the received messages.
+%\vspace{1mm}\noindent \textbf{Collusive RPs.}
+To break user's privacy, the collusive RPs may link user accounts across them by actively returning incorrect messages, or passively combining the received messages.
 %using the same (or derivable) user identifier in the identity proof.
 However, user linkage based on other attributes in user accounts and the global network traffic analysis are not considered in this work, which may be prevented by limiting the attributes exposed to each RP and introducing cover traffic by accessing irrelevant RPs.
 
-\subsection{Assumptions}
-In UPRESSO, we assume the user agent deployed at the honest user is correct,
+We assume the user agent deployed at the honest user is correct,
 and will transmit the messages to the correct destination without leakage.
 The TLS is correctly implemented at the user agent, IdP and RP, which ensures the confidentiality and integrity of the network traffic between correct entities.
 We also assume the random numbers in UPRESSO are unpredictable by using  a secure random number generator;
 and the adopted cryptographic algorithms, including the RSA and SHA-256 required in UPRESSO, are secure and implemented correctly, that is, no one without private key can forge the signature,
 and the adversary fails to infer the private key.
-Moreover, according to the Discrete Logarithm Problem,
-we assume the adversary fails to infer $r$ from $g^r mod\ p$, where $p$ is a large prime and $g$ is the primitive root, which is required by the the transformation of the RP's identifier and trapdoor identification.
+Moreover, also the Discrete Logarithm Problem in Section \ref{sec:dlp}.
 
 \begin{comment}
 \subsection{Assumptions}
@@ -106,7 +109,7 @@ In UPRESSO, the adversary attempts to break the security and user's privacy unde
 \textbf{Collusion.} The malicious users and RPs may collude to perform the impersonation attack and identity injection. For example, (1) to login at the uncorrupted RP under the uncontrolled user's account, the adversary firstly attracts the uncontrolled user to access the malicious RP, then attempts to make the identity proof also valid for the uncorrupted RP, and finally pretends as a user to access this RP with the received identity proof; (2) To make the uncontrolled user login at the uncorrupted RP under an controlled account, the adversary acts as a user to obtain an identity proof for itself by accessing the uncorrupted RP, and works as a RP to redirect the uncontrolled user to the uncorrupted RP with this proof (e.g. CSRF).
 
 
-\noindent\textbf{Privacy.} The curious IdP may attempt to infer the user's access traces (i.e., which RPs are accessed by one user), by analyzing the content and timing of received messages, for example, inferring RP's identifiers in (or the receivers of) the identity proof. The colluded (malicious) RPs may link the accounts in each RP actively (providing incorrect messages) and passively (combining the received messages),  using the same (or derivable) PPID in the identity proof. Same as SPRESSO~\cite{SPRESSO}, we assume that IdP will never collude with RPs; the user linkage based on other attributes and the global network traffic analysis are not considered in this work, which may be prevented by limiting the attributes exposed to each RPs and proving the mixed traffic by accessing unwanted RPs.
+\noindent\textbf{Privacy.} The curious IdP may attempt to infer the user's access traces (i.e., which RPs are accessed by one user), by analyzing the content and timing of received messages, for example, inferring RP's identifiers in (or the receivers of) the identity proof. The collusive (malicious) RPs may link the accounts in each RP actively (providing incorrect messages) and passively (combining the received messages),  using the same (or derivable) PPID in the identity proof. Same as SPRESSO~\cite{SPRESSO}, we assume that IdP will never collude with RPs; the user linkage based on other attributes and the global network traffic analysis are not considered in this work, which may be prevented by limiting the attributes exposed to each RPs and proving the mixed traffic by accessing unwanted RPs.
 
 
 In SSO systems, IdP has the max authority in this system. Therefore, IdP should be considered honest but curious. Otherwise, an malicious IdP has the ability to log in to any RP as any honest user (impersonation attack) and enforce any honest user to log in honest RP under an adversary's identity (identity injection). Moreover, a user's login trace is never hidden from collusion between IdP and RP. It is considered that any RP could be corrupted and any user may be the adversary. User agent is considered completely honest but under control of the user. Therefore, the user agent is seemed as a part of user. Moreover, as network flows are protected by various ways, such as TLS, the network attacker is not considered. The ability of each entity acted by adversary are shown as follows:

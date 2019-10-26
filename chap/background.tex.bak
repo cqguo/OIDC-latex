@@ -65,7 +65,7 @@ Typical SSO systems~\cite{SAMLIdentifier,OpenIDConnect,SPRESSO} contain the foll
 OIDC supports three processes for SSO, known as {\em authorization code flow}, {\em implicit flow} and {\em hybrid flow} (i.e., a mix-up of the previous two).
 
 %****** Add discussion about why implicit flow is used in this work
-\noindent\textbf{Single User Login.}
+\noindent\textbf{Implicit Flow of User Login.}
 In the implicit flow of OIDC, a new token, known as {\em id token}, is introduced as the identity proof, which contains user identifier (i.e., PPID), RP identifier (i.e., RPID), the issuer (i.e., IdP), issuing time, the validity period, and other requested attributes. The IdP signs the id token by its private key to ensure integrity.
 Moreover, in the authorization code flow, the identity proof is an authorization code bound to the RP. Only the RP with the corresponding secret obtained during the registration at the IdP can extract the user attributes from the identify proof.
 
@@ -130,7 +130,7 @@ The implicit flow of OIDC achieves the binding between the identity proof and th
   \label{fig:UPRESSO}
 \end{figure}
 
-\noindent\textbf{Dynamic Registration.} OIDC provides a dynamic registration mechanism~\cite{DynamicRegistration} for the RP to renew its RPID dynamically. % shown in Figure~\ref{fig:OpenID}.
+\noindent\textbf{RP Dynamic Registration.} OIDC provides a dynamic registration mechanism~\cite{DynamicRegistration} for the RP to renew its RPID dynamically. % shown in Figure~\ref{fig:OpenID}.
 When an RP first registers at the IdP, it obtains a registration token, with which the  RP can invoke the dynamic registration process to
 %After a successful initial registration, RP obtains a registration token from the IdP, and
 update its information (e.g., the endpoint). % by a dynamic registration process with the  registration token. %which enables the RP to integrate the service provided by IdP,
@@ -138,6 +138,8 @@ After each successful dynamic registration, the RP obtains a new unique RPID fro
 
 
 \subsection{Discrete logarithm problem}
+\label{dlp}
+
 Discrete logarithm problem is adopted in UPRESSO, to prevent IdP from inferring $ID_{RP}$ from $PID_{RP}$, and allow the RP to derive $Account$ from $PID_U$ without obtaining the $ID_U$.
 Here, we provide a brief description of the discrete logarithm problem.
 A number $g$ ($0<g<p$) is called a primitive root modular a prime $p$, if for ${\forall}y$ ($0<y<p$), there is a  number $x$ ($0\le x <p-1$) satisfying $y=g^x \pmod p$.

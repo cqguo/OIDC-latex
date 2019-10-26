@@ -28,7 +28,7 @@ In UPRESSO, this privacy-preserving RP identifier (denoted as $PID_{RP}$) is gen
 %Providing algorithms for calculating the user's identifier ($PID_U$) in identity proof and the user's account ($Account$) at the RP, allows the RP to identify the user.
 %different $PID_U$ generated for different RPs, while a unique $Account$ derived at the RP with the trapdoor.
 
-In UPRESSO, IdP computes a unique privacy-preserving user identifier (denoted as $PID_U$) based on the original user identifier (i.e., $ID_U$) and the privacy-preserving RP identifier (i.e., $PID_{RP}$) in the \emph{$PID_U$ generation} phase (Step 4 in Figure~\ref{fig:UPRESSO}). From each $PID_U$, an RP can derive a value (denoted as $Account$) with the trapdoor, i.e., the secret parameters of the RP identifier transformation, in the \emph{$Account$ processing} phase (Step 6 in Figure~\ref{fig:UPRESSO}). $Account$ uniquely identifies the user at this RP, so that it can be used to link all $PID_U$ converted from the same $ID_U$. It is worth noting that $Account$ is different from $ID_U$ and it provides no clue to derive $ID_U$, therefore, the RP still does not know the real user associated with the identity proof. Moreover, to colluding RPs, the $PID_U$s for a same user are seemingly irrelevant to each other, since they are associated with different $Account$s at these RPs.
+In UPRESSO, IdP computes a unique privacy-preserving user identifier (denoted as $PID_U$) based on the original user identifier (i.e., $ID_U$) and the privacy-preserving RP identifier (i.e., $PID_{RP}$) in the \emph{$PID_U$ generation} phase (Step 4 in Figure~\ref{fig:UPRESSO}). From each $PID_U$, an RP can derive a value (denoted as $Account$) with the trapdoor, i.e., the secret parameters of the RP identifier transformation, in the \emph{$Account$ processing} phase (Step 6 in Figure~\ref{fig:UPRESSO}). $Account$ uniquely identifies the user at this RP, so that it can be used to link all $PID_U$ converted from the same $ID_U$. It is worth noting that $Account$ is different from $ID_U$ and it provides no clue to derive $ID_U$, therefore, the RP still does not know the real user associated with the identity proof. Moreover, to collusive RPs, the $PID_U$s for a same user are seemingly irrelevant to each other, since they are associated with different $Account$s at these RPs.
 
 %the \emph{RP derives the user's unique $Account$  from $PID_U$ with the  trapdoor}, ; while  \emph{RP fails to derive $ID_U$ from either $PID_U$ or $Account$}, and \emph{the $Accounts$ of a user are different among RPs}.
 
@@ -173,7 +173,7 @@ As analyzed in Section~\ref{subsec:solutions}, to ensure the security and privac
   \item 5. Unchange account, to allow only the destination RP (with the trapdoor) to derive the unchanged account for one user from varying PID_Us, which is necessary for providing the consecutive and individual services.
 \end{itemize}
 
-%To hide the user's traces from both the IdP and colluded RPs without breaking the security, UPRESSO has to achieve these : (1) the user and RP corporately calculate a transformation of the RP's identifier based on Discrete Logarithm Problem, which is sent to the IdP for binding with the identity proof while preventing the IdP from inferring the original RP identifier. The PIDs (in the identity proof) for a user in various RPs are different, to avoid the identity linkage. Moreover, only the RP (and the user) can calculate the trapdoor of the transformation, to transfer the PID into a unchanged account for the user.
+%To hide the user's traces from both the IdP and collusive RPs without breaking the security, UPRESSO has to achieve these : (1) the user and RP corporately calculate a transformation of the RP's identifier based on Discrete Logarithm Problem, which is sent to the IdP for binding with the identity proof while preventing the IdP from inferring the original RP identifier. The PIDs (in the identity proof) for a user in various RPs are different, to avoid the identity linkage. Moreover, only the RP (and the user) can calculate the trapdoor of the transformation, to transfer the PID into a unchanged account for the user.
 
 
 UPRESSO achieves these 5 goals using 5 phases as described in Figure~\ref{fig:overview}, while the used notations are listed in Table~\ref{tbl:notations}. The details are as follows, and the step refers to the one in Figure~\ref{fig:overview}:
@@ -289,7 +289,7 @@ As denoted in Equation~\ref{equ:RPIDT}, ${ID_{RP}}$ cannot be derived from $PID_
 
 To ensure $PID_{RP}$ not controlled by the adversary in \textbf{Goal 2},
  $PID_{RP}$ should not be determined by  either the RP or user. %, as the adversary may control either the RP or user.
-Otherwise, malicious users may make the victim RP accept an identity proof issued for another RP; or colluded RPs may provide the correlated $PID_{RP}$ for potential identity linkage.
+Otherwise, malicious users may make the victim RP accept an identity proof issued for another RP; or collusive RPs may provide the correlated $PID_{RP}$ for potential identity linkage.
 %The generation ensures that $PID_{RP}$ cannot be determined by neither (malicious) user nor RP, which prevents the adversary from constructing a identity proof to be accepted by two or more RPs (\textbf{Security in Goal 2}).
 In UPRESSO, RP fails to control the $PID_{RP}$ generation, as it provides $Y_{RP}$ before obtaining $n_{u}$ and the modification of $Y_{RP}$ will trigger the user to generate another different  $n_{u}$. The Discrete Logarithm problem prevents the user from choosing an $n_{u}$ for a specified $PID_{RP}$ on the received $Y_{RP}$.
 
@@ -323,7 +323,7 @@ In this section, we present the detailed process for each user's login as shown 
 \begin{figure*}
   \centering
   \includegraphics[width=0.85\linewidth]{fig/process.pdf}
-  \caption{Process for each user's login.}
+  \caption{Process for each user login.}
   \label{fig:process}
 \end{figure*}
 

@@ -3,7 +3,7 @@
 %PriOIDC allows user to conduct single sign on with out leaking login information to IdP. And even multi RPs' collusion can not trace the user. In this section, we are going to make an overview of our user privacy respecting protocol based on OpenID Connect 1.0.
 %As SSO systems introduce the novel way for the RPs to identify the user, the authentication security and users' privacy should be considered.
 
-%In this section, we describe  the main challenges in hiding the user's traces from both IdP and colluded RPs, and present the solutions of UPRESSO briefly.
+%In this section, we describe  the main challenges in hiding the user's traces from both IdP and collusive RPs, and present the solutions of UPRESSO briefly.
 
 %In this section, we firstly describe the challenges in designing the privacy-preserving SSO system which fulfils the basic requirements and privacy at the same time.  Then we propose and fulfil the enhanced requirements in UPRESSO which is based on the basic requirements and privacy issues.
 
@@ -30,7 +30,7 @@ After a successful SSO authentication, the RP should be able to uniquely identif
     and no entity should be able to modify or forge it~\cite{WangZLG16}. Otherwise, an adversary could modify user identifier in the proof to launch impersonation or identity injection attacks. In OIDC, for example, the IdP signs identity proofs with its private key to provide integrity~\cite{WangCW12, SomorovskyMSKJ12}.
 
 
-However, breaking the above requirements will lead to some attacks.
+\vspace{1mm}Breaking the above requirements will lead to some attacks.
 in SSO systems, the adversaries' goals described in~\cite{SPRESSO} to break the secure authentication are:
 (1) \textbf{Impersonation}: Adversary logs in to the honest RP as an honest user. The adversary might achieve the goal by obtaining a user's identity proof in the ways, such as stealing the proof (from the unprotected HTTP transmission), forging the valid proof (if the integrity is not guaranteed), leading the user to upload a proof valid for other RPs (the proof is not bound with specific RP).
 (2) \textbf{Identity Injection}: Honest user logs in to the honest RP under adversaries' identity. The adversary might achieve this goal by replacing the identity transmitted from IdP to RP or lead the user uploads the malicious identity proof in various ways (e.g., CSRF).
@@ -51,7 +51,7 @@ In UPRESSO, the adversaries' goals to break the secure authentication are as fol
 
 %In SSO systems, PRs' identifier is required in both authentication request and users' identifier proof generation. Moreover, as it has been described in Section~\ref{sec:intro}, it is required to expose the identifier of users' accessed RP for security consideration. Therefore, hiding users' accessed RP from IdP is to introduce prominent challenges. To deal with the challenges, the procedure and parameters generation methods are required to be modified. However, this modification also introduces new attack surface, so that the attackers' ability in UPRESSO should be considered.
 %A privacy-preserving SSO needs to prevent both IdP-based access tracing and RP-based identity linkage.
-Besides the basic requirements discussed in Section~\ref{subsec:basicrequirements}, an SSO system should also provide protection to user privacy against the IdP-based access tracing and RP-based identity linkage. To prevent the former,  IdP should not be able to obtain any information identifying the RP accessed by the user (e.g., RP's identifier and URL). To prevent the latter, the colluding RPs should not be able to correlate the identifiers of the user at different RPs in the identity proof.
+Besides the basic requirements discussed in Section~\ref{subsec:basicrequirements}, an SSO system should also provide protection to user privacy against the IdP-based access tracing and RP-based identity linkage. To prevent the former,  IdP should not be able to obtain any information identifying the RP accessed by the user (e.g., RP's identifier and URL). To prevent the latter, the collusive RPs should not be able to correlate the identifiers of the user at different RPs in the identity proof.
 %the user's identifiers provided by IdP for one user should never be same or derivable to each other.
 
 
@@ -95,7 +95,7 @@ Additionally, the IdP should transmit the identity proof to RP securely by \text
 \begin{comment}
 However, these two requirements for privacy preservation,  conflict with the basic requirements on SSO as follows: %, resulting in the following problems in SSO systems:
 \begin{itemize}
-	\item \textbf{No Identification.} In the privacy-preserving SSO, IdP doesn't know the RP's identifier, therefore fails to provide the  pairwise user's identifier which is unchanged in one RP but different in different RPs (e.g. PPID in OIDC and SAML~\cite{OpenIDConnect,SAMLIdentifier}). Also, the user's unique identifier (e.g., the email address in BrowserID~\cite{BrowserID} and SPRESSO~\cite{SPRESSO}) should not be sent to the RP, otherwise the colluded RPs may perform the identity linkage with the same identifier.
+	\item \textbf{No Identification.} In the privacy-preserving SSO, IdP doesn't know the RP's identifier, therefore fails to provide the  pairwise user's identifier which is unchanged in one RP but different in different RPs (e.g. PPID in OIDC and SAML~\cite{OpenIDConnect,SAMLIdentifier}). Also, the user's unique identifier (e.g., the email address in BrowserID~\cite{BrowserID} and SPRESSO~\cite{SPRESSO}) should not be sent to the RP, otherwise the collusive RPs may perform the identity linkage with the same identifier.
 %User account is the unique identifier for the RP to provide the individual services for each user.
 %In SSO systems, RP derives the user account from the identifier (i.e., PPID in OIDC) provided by the identity proof.
 %However, in privacy-preserving SSO systems, IdP must provides the pairwise user identifier (never same for different RPs) without knowing the identity of RP.
@@ -131,7 +131,7 @@ To prevent the IdP from inferring the user's trace, it is straightforward that I
 
 In addition to challenges from the security considerations, providing no RP's identifying information to the IdP also brings the challenge in preventing the identity linkage and RP's consecutive running, as:
 
-\noindent\textbf{No user's account satisfying (1) unique for one RP and (2) different from ones for other RPs.}  Each RP provides the individual services for each user based on the unique account. In SSO systems, RP derives the  account from the identifier (i.e., PPID in OIDC) in the identity proof. With the correct RP identifier, IdP  ensures the PPID is unique for the user's multiple logins at the same RP. However, when IdP fails to obtain the exact RP identifier, IdP may provide (1) different PPIDs for user's multiple logins at the same RP, which makes RP fail to provide the consecutive and individual services; or (2) the same user identifier (e.g., user's email address) for various RPs, which makes the identity linkage be possible for colluded RPs.
+\noindent\textbf{No user's account satisfying (1) unique for one RP and (2) different from ones for other RPs.}  Each RP provides the individual services for each user based on the unique account. In SSO systems, RP derives the  account from the identifier (i.e., PPID in OIDC) in the identity proof. With the correct RP identifier, IdP  ensures the PPID is unique for the user's multiple logins at the same RP. However, when IdP fails to obtain the exact RP identifier, IdP may provide (1) different PPIDs for user's multiple logins at the same RP, which makes RP fail to provide the consecutive and individual services; or (2) the same user identifier (e.g., user's email address) for various RPs, which makes the identity linkage be possible for collusive RPs.
 \end{comment}
 
 \begin{comment}
@@ -159,7 +159,7 @@ Additionally, it introduces another challenge to provide distinct user identifie
 
 \subsection{The Principles of UPRESSO}
 \label{subsec:solutions}
-%UPRESSO aims to hide the users' traces from both the IdP and colluded RPs, without violating the basic requirements of SSO systems. Therefore, we propose the privacy-preserving requirements of SSO systems and illustrate the methods to fulfil the requirements.
+%UPRESSO aims to hide the users' traces from both the IdP and collusive RPs, without violating the basic requirements of SSO systems. Therefore, we propose the privacy-preserving requirements of SSO systems and illustrate the methods to fulfil the requirements.
 In this work, we present UPRESSO to defend against both IdP-based access tracing and RP-based identity linkage privacy attacks with enhanced security for identification, binding and confidentiality. %to satisfy the basic requirements of SSO systems.
 Since the integrity requirement for identity proof is orthogonal to the privacy requirement, UPRESSO adopts the same signature-based integrity mechanism of OIDC.
 %The integrity requirement on the identity proof  does not conflict with the privacy requirements, therefore the mechanism for integrity is inherited.
@@ -204,7 +204,7 @@ The user transmits IdP the request with the correct RP identifier  transformatio
 \begin{comment}
 \subsection{Solutions}
 \label{subsec:solutions}
-UPRESSO aims to hide the users' traces from both the IdP and colluded RPs, without violating the security of SSO systems and interrupting RP's the consecutive and individual service. That is, UPRESSO ensures the confidentiality and binding of identity proof without leaking the RP's identifer to the IdP, and provides the unique and un-linkable PPID
+UPRESSO aims to hide the users' traces from both the IdP and collusive RPs, without violating the security of SSO systems and interrupting RP's the consecutive and individual service. That is, UPRESSO ensures the confidentiality and binding of identity proof without leaking the RP's identifer to the IdP, and provides the unique and un-linkable PPID
 %{\color{blue} PPID solely bound with the user's account at RP}
 to the RP for the user's multiple logins.
 
@@ -335,7 +335,7 @@ As UPRESSO is designed centralized, IdP has the max authority in this system. Th
 
 
 %There are two kinds of malicious RPs. The first is the legal RP owned by malicious opponent and the other is phishing site. Because everyone is able to register as an RP at IdP, it is considered that RP can be fully controlled by malicious. A malicious RP is going to conduct impersonation attack and privacy undermining attack on user. As some attack methods require attacker act as both RP and user, to avoid the repetitive description malicious RP and malicious user is defined: If attacker acts as an RP in attack, attacker is considered as malicious RP. If attacker only acts as a user, it's malicious user.
-%A malicious RP's goals include: 1) Getting id\_token from user which is validate in other RPs. 2) Deducing user's login trace by colluding with other RPs.
+%A malicious RP's goals include: 1) Getting id\_token from user which is validate in other RPs. 2) Deducing user's login trace by collusive with other RPs.
 %Malicious RP is able to make fake basic\_rp\_id and conduct client\_id negotiation with user. Malicious RP is also able to construct the id\_token request to IdP and receive id\_token from IdP. In phishing attack, it is considered that user trusts attacker completely.
 
 
