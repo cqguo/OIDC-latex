@@ -1,4 +1,4 @@
-\section{Design of UPRESSO}
+﻿\section{Design of UPRESSO}
 \label{sec:UPRESSO}
 In this section, we first present the design goals of UPRESSO with the main process phases. Then, we describe system initialization and initial registration of RP, followed by the description of algorithms for calculating the RP identifier transformation, user identifier and account. The detailed processing for each user's login is provided corresponding to the main process phases. Finally, we discuss the compatibility of UPRESSO with OIDC.
 
@@ -38,27 +38,6 @@ In UPRESSO, IdP computes a unique privacy-preserving user identifier (denoted as
 %$PID_U$ is the user identifier provided by IdP to RP, which is generated in the function $PID_U = {PID_{RP}}^{ID_U} \ mod \ p$ where $ID_U$ is the unique user identifier stored and only known by IdP.
 %The non-derivability of $ID_{RP}$ and $ID_U$ is based on the Discrete Logarithm Problem.
 
-{\color{red}
-Discrete logarithm problem is adopted in UPRESSO, to prevent IdP from inferring $ID_{RP}$ from $PID_{RP}$, and allow the RP to derive $Account$ from $PID_U$ without obtaining the $ID_U$.
-Here, we provide a brief description of the discrete logarithm problem.
-A number $g$ ($0<g<p$) is called a primitive root modular a prime $p$, if for ${\forall}y$ ($0<y<p$), there is a  number $x$ ($0\le x <p-1$) satisfying $y=g^x \pmod p$.
-And, $x$ is called the discrete logarithm of $y$ modulo $p$. Given a large prime $p$ and a number $y$, it is computationally infeasible to derive the discrete logarithm (here $x$) of $y$ (detailed in~\cite{WXWM}), which is called discrete logarithm problem. The hardness of solving discrete logarithm has been a base of the security of several security primitives, including Diffie-Hellman key exchange and Digital Signature Algorithm (DSA).
-To calculate the primitive root for a given large prime $p$,  we retrieve the least primitive root $g_m$  mod $p$,
-and then calculate the primitive root $g = g_{m}^{t} mod \ P$, where $t$ is an integer coprime to $p-1$.
-A lemma is proposed to check whether an integrity $\mu$ is the primitive root modulo $p$ where $p=2q+1$ ($q$ is a prime), that is,  an integer $\mu \in (1, p-1)$ is a primitive root if and only if $\mu^2\neq 1 \ mod \ p$ and $\mu^q\neq 1 \ mod \ p$~\cite{Shoup,Wang}.
-%The details are provided in~\cite{Shoup,Wang}.
-
-In UPRESSO, a system initialization is performed to initialize the IdP, which generates $g$, $p$, $PK_{Cert}$, $SK_{Cert}$, $PK_{ID}$ and $SK_{ID}$,
-and provides  $g$, $p$, $PK_{Cert}$ and $PK_{ID}$ as the public parameters.
-Only one initial registration is performed by each RP to apply  $Cert_{RP}$ and $ID_{RP}$ from IdP.
-%the IdP needs to be initialized during at its setup, to generate the public parameters for the users and RPs.
-%The RP has to perform only one initial registration at the RP setup.
-The user triggers Steps 1-7 in Figure~\ref{fig:UPRESSO} for each login at a RP.
-%IdP setup is performed at the very beginning of UPRESSO, and will be invoked by the IdP to update the leaked $SK_{Cert}$ or $SK_{ID}$, while $g$ and $p$ will never be modified.
-%UPRESSO does not support multiple initial registrations for one RP, as the RP does not know the $ID_U$ nor the discrete logarithm of $ID_{RP}$ and fails to derive the user's new account from the old one under the Discrete Logarithm problem.
-
-In UPRESSO, a system initialization is performed to initialize the IdP only once at the very beginning of system construction and generates the strong prime $p$, the primitive root $g$, and the key pairs ($PK_{Cert}$, $SK_{Cert}$, $PK_{ID}$ and $SK_{ID}$) for RP certificate and identity proof generation. The initial registration is performed by RP to apply $Cert_{RP}$ (for user to verify the attributes of RP) and $ID_{RP}$ (for the transformation of $ID_{RP}$) from IdP only when the new RP is built.
-Besides, only the user login process are conducted in each login flow, containing the transformation ($PID_{RP}$) negotiation, the dynamic registration and the modified OIDC implicit flow.}
 
 \begin{table}[tb]
     \caption{The notations used in UPRESSO.}
@@ -101,6 +80,17 @@ Besides, only the user login process are conducted in each login flow, containin
 
 \subsection{System Initialization and RP Initial Registration}
 
+In UPRESSO, a system initialization is performed to initialize the IdP, which generates $g$, $p$, $PK_{Cert}$, $SK_{Cert}$, $PK_{ID}$ and $SK_{ID}$,
+and provides  $g$, $p$, $PK_{Cert}$ and $PK_{ID}$ as the public parameters.
+Only one initial registration is performed by each RP to apply  $Cert_{RP}$ and $ID_{RP}$ from IdP.
+%the IdP needs to be initialized during at its setup, to generate the public parameters for the users and RPs.
+%The RP has to perform only one initial registration at the RP setup.
+The user triggers Steps 1-7 in Figure~\ref{fig:UPRESSO} for each login at a RP.
+%IdP setup is performed at the very beginning of UPRESSO, and will be invoked by the IdP to update the leaked $SK_{Cert}$ or $SK_{ID}$, while $g$ and $p$ will never be modified.
+%UPRESSO does not support multiple initial registrations for one RP, as the RP does not know the $ID_U$ nor the discrete logarithm of $ID_{RP}$ and fails to derive the user's new account from the old one under the Discrete Logarithm problem.
+
+In UPRESSO, a system initialization is performed to initialize the IdP only once at the very beginning of system construction and generates the strong prime $p$, the primitive root $g$, and the key pairs ($PK_{Cert}$, $SK_{Cert}$, $PK_{ID}$ and $SK_{ID}$) for RP certificate and identity proof generation. The initial registration is performed by RP to apply $Cert_{RP}$ (for user to verify the attributes of RP) and $ID_{RP}$ (for the transformation of $ID_{RP}$) from IdP only when the new RP is built.
+Besides, only the user login process are conducted in each login flow, containing the transformation ($PID_{RP}$) negotiation, the dynamic registration and the modified OIDC implicit flow.
 
 \vspace{1mm}\noindent \textbf{System initialization.} The IdP generates two random asymmetric key pairs, ($PK_{ID}$, $SK_{ID}$) and ($PK_{Cert}$, $SK_{Cert}$),
 for calculating the signatures in the identity proof and $Cert_{RP}$, respectively;
