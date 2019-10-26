@@ -1,6 +1,5 @@
 ﻿\section{Background and Preliminary}
 \label{sec:background}
-To be compatible with existing SSO systems, UPRESSO is designed on top of OpenID Connect (OIDC)~\cite{OpenIDConnect}, one of the most prominent SSO authentication protocols~\cite{SAMLIdentifier}. In this section, we introduce OIDC and its implicit flow as an example to describe the authentication flows in SSO, and overview the basic security requirements for general SSO systems.
 
 %Recluse is an extension of OIDC to prevent the IdP from inferring the user's accessed RP, with the security of SSO systems under consideration.
 %provides the necessary background information about OIDC and  the security consideration of SSO systems.
@@ -9,6 +8,8 @@ To be compatible with existing SSO systems, UPRESSO is designed on top of OpenID
 
 \subsection{OpenID Connect}
 \label{subsec:OIDC}
+
+To be compatible with existing SSO systems, UPRESSO is designed on top of OpenID Connect (OIDC)~\cite{OpenIDConnect}, one of the most prominent SSO authentication protocols~\cite{SAMLIdentifier}. In this section, we introduce OIDC and its implicit flow as an example to describe the authentication flows in SSO.
 
 OIDC is an extension of OAuth 2.0 to support user authentication. As a typical SSO authentication protocol, OIDC involves three entities, i.e., {\em users}, {\em identity provider (IdP)}, and {\em relying parties (RPs)}. Users register at the IdP to create credentials, which are securely maintained by the IdP. During an SSO process, a user is also responsible for redirecting the identity proof request from the RP to the IdP, checking the scope of user attributes in the identity proof returned by the IdP, and forwarding it to the RP. Usually, the redirection and checking are handled by a user-controlled software, called {\em user agent} (e.g., browser). The IdP maintains user credentials and attributes. Once requested, it authenticates the user and generates the identity proof, which contains user identifier (e.g., PPID in OIDC), RP identifier, and a set of user attributes that the user consents to share with the RP. The identity proof is then returned to the registered endpoint of the RP (e.g., URL). RP can be any web server that provides continuous and personalized services to its users. In SSO, an RP also has to register at the IdP with its endpoint information. When a user attempts to log in, the RP sends an identity proof request to the IdP through the user, and parses the received identity proof to authenticate and authorize the user.
 
@@ -64,7 +65,7 @@ Typical SSO systems~\cite{SAMLIdentifier,OpenIDConnect,SPRESSO} contain the foll
 OIDC supports three processes for SSO, known as {\em authorization code flow}, {\em implicit flow} and {\em hybrid flow} (i.e., a mix-up of the previous two).
 
 %****** Add discussion about why implicit flow is used in this work
-\noindent\textbf{Single Sign-on.}
+\noindent\textbf{Implicit Flow of User Login.}
 In the implicit flow of OIDC, a new token, known as {\em id token}, is introduced as the identity proof, which contains user identifier (i.e., PPID), RP identifier (i.e., RPID), the issuer (i.e., IdP), issuing time, the validity period, and other requested attributes. The IdP signs the id token by its private key to ensure integrity.
 Moreover, in the authorization code flow, the identity proof is an authorization code bound to the RP. Only the RP with the corresponding secret obtained during the registration at the IdP can extract the user attributes from the identify proof.
 
@@ -129,7 +130,7 @@ The implicit flow of OIDC achieves the binding between the identity proof and th
   \label{fig:UPRESSO}
 \end{figure}
 
-\noindent\textbf{Dynamic Registration.} OIDC provides a dynamic registration mechanism~\cite{DynamicRegistration} for the RP to renew its RPID dynamically. % shown in Figure~\ref{fig:OpenID}.
+\noindent\textbf{RP Dynamic Registration.} OIDC provides a dynamic registration mechanism~\cite{DynamicRegistration} for the RP to renew its RPID dynamically. % shown in Figure~\ref{fig:OpenID}.
 When an RP first registers at the IdP, it obtains a registration token, with which the  RP can invoke the dynamic registration process to
 %After a successful initial registration, RP obtains a registration token from the IdP, and
 update its information (e.g., the endpoint). % by a dynamic registration process with the  registration token. %which enables the RP to integrate the service provided by IdP,

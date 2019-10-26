@@ -1,14 +1,15 @@
-﻿\section{Background}
+﻿\section{Background and Preliminary}
 \label{sec:background}
-To be compatible with existing SSO systems, UPRESSO is designed on top of OpenID Connect (OIDC)~\cite{OpenIDConnect}, one of the most prominent SSO authentication protocols~\cite{SAMLIdentifier}. In this section, we introduce OIDC and its implicit flow as an example to describe the authentication flows in SSO, and overview the basic security requirements for general SSO systems.
 
 %Recluse is an extension of OIDC to prevent the IdP from inferring the user's accessed RP, with the security of SSO systems under consideration.
 %provides the necessary background information about OIDC and  the security consideration of SSO systems.
 %Most of current IdPs\cite{Facebook} for web application use OAuth 2.0 authorization code flow. Because authorization code flow requires RP's secret for token exchanging. It actually achieves the binding of RP and access token. Although OAuth 2.0 implicit flow is not secure in authentication, many IdPs also use its modified version designed by each IdP for authentication.
 %In this section, we firstly describe how OpenID Connect is defined. Then the discussion of SSO system is to illustrate that why OpenID Connect is chosen and the challenges and solutions of protecting user's privacy.
 
-\subsection{OpenID Connect (OIDC)}
+\subsection{OpenID Connect}
 \label{subsec:OIDC}
+
+To be compatible with existing SSO systems, UPRESSO is designed on top of OpenID Connect (OIDC)~\cite{OpenIDConnect}, one of the most prominent SSO authentication protocols~\cite{SAMLIdentifier}. In this section, we introduce OIDC and its implicit flow as an example to describe the authentication flows in SSO.
 
 OIDC is an extension of OAuth 2.0 to support user authentication. As a typical SSO authentication protocol, OIDC involves three entities, i.e., {\em users}, {\em identity provider (IdP)}, and {\em relying parties (RPs)}. Users register at the IdP to create credentials, which are securely maintained by the IdP. During an SSO process, a user is also responsible for redirecting the identity proof request from the RP to the IdP, checking the scope of user attributes in the identity proof returned by the IdP, and forwarding it to the RP. Usually, the redirection and checking are handled by a user-controlled software, called {\em user agent} (e.g., browser). The IdP maintains user credentials and attributes. Once requested, it authenticates the user and generates the identity proof, which contains user identifier (e.g., PPID in OIDC), RP identifier, and a set of user attributes that the user consents to share with the RP. The identity proof is then returned to the registered endpoint of the RP (e.g., URL). RP can be any web server that provides continuous and personalized services to its users. In SSO, an RP also has to register at the IdP with its endpoint information. When a user attempts to log in, the RP sends an identity proof request to the IdP through the user, and parses the received identity proof to authenticate and authorize the user.
 
@@ -64,7 +65,7 @@ Typical SSO systems~\cite{SAMLIdentifier,OpenIDConnect,SPRESSO} contain the foll
 OIDC supports three processes for SSO, known as {\em authorization code flow}, {\em implicit flow} and {\em hybrid flow} (i.e., a mix-up of the previous two).
 
 %****** Add discussion about why implicit flow is used in this work
-\noindent\textbf{Single Sign-on.}
+\noindent\textbf{Single User Login.}
 In the implicit flow of OIDC, a new token, known as {\em id token}, is introduced as the identity proof, which contains user identifier (i.e., PPID), RP identifier (i.e., RPID), the issuer (i.e., IdP), issuing time, the validity period, and other requested attributes. The IdP signs the id token by its private key to ensure integrity.
 Moreover, in the authorization code flow, the identity proof is an authorization code bound to the RP. Only the RP with the corresponding secret obtained during the registration at the IdP can extract the user attributes from the identify proof.
 
@@ -136,27 +137,17 @@ update its information (e.g., the endpoint). % by a dynamic registration process
 After each successful dynamic registration, the RP obtains a new unique RPID from the IdP.
 
 
-\subsection{Basic Requirements of a Secure SSO System}
-\label{subsec:basicrequirements}
+\subsection{Discrete logarithm problem}
+Discrete logarithm problem is adopted in UPRESSO, to prevent IdP from inferring $ID_{RP}$ from $PID_{RP}$, and allow the RP to derive $Account$ from $PID_U$ without obtaining the $ID_U$.
+Here, we provide a brief description of the discrete logarithm problem.
+A number $g$ ($0<g<p$) is called a primitive root modular a prime $p$, if for ${\forall}y$ ($0<y<p$), there is a  number $x$ ($0\le x <p-1$) satisfying $y=g^x \pmod p$.
+And, $x$ is called the discrete logarithm of $y$ modulo $p$. Given a large prime $p$ and a number $y$, it is computationally infeasible to derive the discrete logarithm (here $x$) of $y$ (detailed in~\cite{WXWM}), which is called discrete logarithm problem. The hardness of solving discrete logarithm has been a base of the security of several security primitives, including Diffie-Hellman key exchange and Digital Signature Algorithm (DSA).
+To calculate the primitive root for a given large prime $p$,  we retrieve the least primitive root $g_m$  mod $p$,
+and then calculate the primitive root $g = g_{m}^{t} mod \ P$, where $t$ is an integer coprime to $p-1$.
+A lemma is proposed to check whether an integrity $\mu$ is the primitive root modulo $p$ where $p=2q+1$ ($q$ is a prime), that is,  an integer $\mu \in (1, p-1)$ is a primitive root if and only if $\mu^2\neq 1 \ mod \ p$ and $\mu^q\neq 1 \ mod \ p$~\cite{Shoup,Wang}.
+%The details are provided in~\cite{Shoup,Wang}.
 
-SSO allows users to leverage their existing accounts in the IdP to access services at the RPs.
-{\color{red}However, in SSO systems, the adversaries' goals described in~\cite{SPRESSO} to break the secure authentication are:
-(1) \textbf{Impersonation}: Adversary logs in to the honest RP as an honest user. The adversary might achieve the goal by obtaining a user's identity proof in the ways, such as stealing the proof (from the unprotected HTTP transmission), forging the valid proof (if the integrity is not guaranteed), leading the user to upload a proof valid for other RPs (the proof is not bound with specific RP).
-(2) \textbf{Identity Injection}: Honest user logs in to the honest RP under adversaries' identity. The adversary might achieve this goal by replacing the identity transmitted from IdP to RP or lead the user uploads the malicious identity proof in various ways (e.g., CSRF).}
-{\color{red} Therefore, building} such a system is considered challenging~\cite{SPRESSO}, as several design and implementation flaws of SSO systems have been discovered, which led to a plethora of attacks~\cite{SomorovskyMSKJ12,WangCW12,ArmandoCCCPS13,ZhouE14,WangZLLYLG15,WangZLG16,YangLLZH16,MainkaMS16,MohsenS16,MainkaMSW17,YangLCZ18,YangLS17,ShiWL19}.
-Based on the formal analysis of SAML, OAuth and OIDC~\cite{ArmandoCCCT08,FettKS16, FettKS17} and the study of existing attacks, we summarize basic requirements that we believe a secure SSO platform should meet.
 
-\vspace{1mm}\noindent\textbf{Identification.} %Identification is the main feature of SSO system, which enables the RP to identify the user.
-After a successful SSO authentication, the RP should be able to uniquely identify the user. When a user logs in to a same RP multiple times, the RP should be able to associate these logins to provide a continuous and personalized service to that user. This is an essential requirement for any authentication mechanism. In SSO, this indicates that a same unique user identifier should be derived from multiple identity proofs of the user by the RP. In OIDC, for example, a user obtains different PPIDs from the IdP, each for a different RP.
-
-{\color{red}Additionally, the anonymous SSO schemes~\cite{ElmuftiWRR08,WangWS13,HanCSTW18} are also proposed to achieve that the user's identity is unknown the neither the IdP nor the RP. However, these schemes are not focally concerned in this paper as the completely anonymous SSO systems are not suitable to the currently web application where the RP need to know the user's identity to provide the personally service. The anonymous SSO schemes are discussed in Section~\ref{sec:related}.}
-
-\vspace{1mm}\noindent\textbf{Binding.} Each identity proof should be bound to one RP so that it will be accepted only by that RP. Otherwise, the identity proof may be abused to impersonate the victim user at other honest RPs~\cite{ChenPCTKT14, WangZLG16}. To achieve such binding in OIDC, the IdP embeds the identifier of the target RP in the identity proof and signs it with its private key. When receiving an identity proof, the RP needs to check if it is the intended receiver.
-
-\vspace{1mm}\noindent\textbf{Confidentiality.} The identity proof should be securely returned to the requesting RP (and the user). Otherwise, an adversary who obtains an identity proof can impersonate the user at the RP specified in the identity proof~\cite{ChenPCTKT14,FettKS16,WangZLG16}. Currently, OIDC adopts TLS to ensure the confidentiality during the transmission. However, additional checking should be performed during the generation of the identity proof by the IdP and the transmission of the identity proof by the user and its trusted user agent.
-
-\vspace{1mm}\noindent\textbf{Integrity.} Only the IdP is able to generate a valid identity proof,
-    and no entity should be able to modify or forge it~\cite{WangZLG16}. Otherwise, an adversary could modify user identifier in the proof to launch impersonation or identity injection attacks. In OIDC, for example, the IdP signs identity proofs with its private key to provide integrity~\cite{WangCW12, SomorovskyMSKJ12}.
 
 %时间、重放等常规需要简单描述下么？
 %In addition to the above security considerations, some other conventional checks are required in the RP to ensure the security. For example, the identity proof should be considered valid only in the specified period; the replayed identity proof needs to be rejected.

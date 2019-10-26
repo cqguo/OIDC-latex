@@ -1,4 +1,4 @@
-﻿\section{Problems in Privacy-Preserving SSO}
+﻿\section{The Privacy Dilemma in Single Sign-On}
 \label{sec:challenge}
 %PriOIDC allows user to conduct single sign on with out leaking login information to IdP. And even multi RPs' collusion can not trace the user. In this section, we are going to make an overview of our user privacy respecting protocol based on OpenID Connect 1.0.
 %As SSO systems introduce the novel way for the RPs to identify the user, the authentication security and users' privacy should be considered.
@@ -11,20 +11,16 @@ In this section, we describe the challenges for developing privacy-preserving SS
 % conflicts between the basic requirements and privacy of SSO systems. Then we propose the privacy-preserving requirements which combines the basic requirements and privacy with no conflicts. And we also roughly describe how the requirements are fulfilled in UPRESSO.
 
 
-\subsection{Basic Requirements of a Secure SSO System}
+\subsection{Basic Security Requirements of SSO}
 \label{subsec:basicrequirements}
 
 SSO allows users to leverage their existing accounts in the IdP to access services at the RPs.
-{\color{red}However, in SSO systems, the adversaries' goals described in~\cite{SPRESSO} to break the secure authentication are:
-(1) \textbf{Impersonation}: Adversary logs in to the honest RP as an honest user. The adversary might achieve the goal by obtaining a user's identity proof in the ways, such as stealing the proof (from the unprotected HTTP transmission), forging the valid proof (if the integrity is not guaranteed), leading the user to upload a proof valid for other RPs (the proof is not bound with specific RP).
-(2) \textbf{Identity Injection}: Honest user logs in to the honest RP under adversaries' identity. The adversary might achieve this goal by replacing the identity transmitted from IdP to RP or lead the user uploads the malicious identity proof in various ways (e.g., CSRF).}
-{\color{red} Therefore, building} such a system is considered challenging~\cite{SPRESSO}, as several design and implementation flaws of SSO systems have been discovered, which led to a plethora of attacks~\cite{SomorovskyMSKJ12,WangCW12,ArmandoCCCPS13,ZhouE14,WangZLLYLG15,WangZLG16,YangLLZH16,MainkaMS16,MohsenS16,MainkaMSW17,YangLCZ18,YangLS17,ShiWL19}.
+Therefore, building such a system is considered challenging~\cite{SPRESSO}, as several design and implementation flaws of SSO systems have been discovered, which led to a plethora of attacks~\cite{SomorovskyMSKJ12,WangCW12,ArmandoCCCPS13,ZhouE14,WangZLLYLG15,WangZLG16,YangLLZH16,MainkaMS16,MohsenS16,MainkaMSW17,YangLCZ18,YangLS17,ShiWL19}.
 Based on the formal analysis of SAML, OAuth and OIDC~\cite{ArmandoCCCT08,FettKS16, FettKS17} and the study of existing attacks, we summarize basic requirements that we believe a secure SSO platform should meet.
 
 \vspace{1mm}\noindent\textbf{Identification.} %Identification is the main feature of SSO system, which enables the RP to identify the user.
 After a successful SSO authentication, the RP should be able to uniquely identify the user. When a user logs in to a same RP multiple times, the RP should be able to associate these logins to provide a continuous and personalized service to that user. This is an essential requirement for any authentication mechanism. In SSO, this indicates that a same unique user identifier should be derived from multiple identity proofs of the user by the RP. In OIDC, for example, a user obtains different PPIDs from the IdP, each for a different RP.
 
-{\color{red}Additionally, the anonymous SSO schemes~\cite{ElmuftiWRR08,WangWS13,HanCSTW18} are also proposed to achieve that the user's identity is unknown the neither the IdP nor the RP. However, these schemes are not focally concerned in this paper as the completely anonymous SSO systems are not suitable to the currently web application where the RP need to know the user's identity to provide the personally service. The anonymous SSO schemes are discussed in Section~\ref{sec:related}.}
 
 \vspace{1mm}\noindent\textbf{Binding.} Each identity proof should be bound to one RP so that it will be accepted only by that RP. Otherwise, the identity proof may be abused to impersonate the victim user at other honest RPs~\cite{ChenPCTKT14, WangZLG16}. To achieve such binding in OIDC, the IdP embeds the identifier of the target RP in the identity proof and signs it with its private key. When receiving an identity proof, the RP needs to check if it is the intended receiver.
 
@@ -33,7 +29,16 @@ After a successful SSO authentication, the RP should be able to uniquely identif
 \vspace{1mm}\noindent\textbf{Integrity.} Only the IdP is able to generate a valid identity proof,
     and no entity should be able to modify or forge it~\cite{WangZLG16}. Otherwise, an adversary could modify user identifier in the proof to launch impersonation or identity injection attacks. In OIDC, for example, the IdP signs identity proofs with its private key to provide integrity~\cite{WangCW12, SomorovskyMSKJ12}.
 
-\subsection{The Privacy Problem}
+
+However, breaking the above requirements will lead to some attacks.
+in SSO systems, the adversaries' goals described in~\cite{SPRESSO} to break the secure authentication are:
+(1) \textbf{Impersonation}: Adversary logs in to the honest RP as an honest user. The adversary might achieve the goal by obtaining a user's identity proof in the ways, such as stealing the proof (from the unprotected HTTP transmission), forging the valid proof (if the integrity is not guaranteed), leading the user to upload a proof valid for other RPs (the proof is not bound with specific RP).
+(2) \textbf{Identity Injection}: Honest user logs in to the honest RP under adversaries' identity. The adversary might achieve this goal by replacing the identity transmitted from IdP to RP or lead the user uploads the malicious identity proof in various ways (e.g., CSRF).
+
+Or break identification will lead to \textbf{anonymity}. the anonymous SSO schemes~\cite{ElmuftiWRR08,WangWS13,HanCSTW18} are also proposed to achieve that the user's identity is unknown the neither the IdP nor the RP. However, these schemes are not focally concerned in this paper as the completely anonymous SSO systems are not suitable to the currently web application where the RP need to know the user's identity to provide the personally service. The anonymous SSO schemes are discussed in Section~\ref{sec:related}.
+
+
+\subsection{The Privacy Dilemma and Existing Attempts}
 \label{subsec:challenges}
 \begin{comment}
 In UPRESSO, the adversaries' goals to break the secure authentication are as follows:
@@ -152,7 +157,7 @@ Additionally, it introduces another challenge to provide distinct user identifie
 \end{comment}
 
 
-\subsection{UPRESSO Overview}
+\subsection{The Principles of UPRESSO}
 \label{subsec:solutions}
 %UPRESSO aims to hide the users' traces from both the IdP and colluded RPs, without violating the basic requirements of SSO systems. Therefore, we propose the privacy-preserving requirements of SSO systems and illustrate the methods to fulfil the requirements.
 In this work, we present UPRESSO to defend against both IdP-based access tracing and RP-based identity linkage privacy attacks with enhanced security for identification, binding and confidentiality. %to satisfy the basic requirements of SSO systems.
@@ -181,6 +186,11 @@ In UPRESSO, the transformation of the RP identifier is generated by the user and
 \vspace{1mm}\noindent \textbf{User-centric Confidentiality.}
 In UPRESSO, the user sends the authentication request to the IdP to generate an identity proof for the requested RP identifier transformation. To ensure the identity proof is securely returned to the requesting RP, UPRESSO adopts a user-centric confidentiality check, which requires the user to extract RP's identifying information (e.g., URL, name and RP identifier) from the RP certificate issued by a trusted entity (e.g., IdP). Therefore, it is impossible for an adversary to request the identity proof on behalf of others or intercept others' identify proofs with a forged return URL.
 
+\vspace{1mm} \textbf{xxx xxxxx xxxxxxx
+(1) How to combine these three principles into one system?
+(2) Why these principles protect privacy while ensure security?
+(3) we do not explain how to finish each principle here, it will be explained in Section \ref{subsec:overview}.}
+ 
 \begin{comment}
 Instead of relying on the check at the IdP, the confidentiality is ensured by a user-side check based on the trusted information extracted from the RP certificate.
 %The user-centric confidentiality requires the checking of RP's endpoint and notification of RP's information should be shifted from IdP, who does not know the RP's identity to user.
