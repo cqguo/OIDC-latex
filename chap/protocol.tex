@@ -78,7 +78,7 @@ In UPRESSO, IdP computes a unique privacy-preserving user identifier (denoted as
     \label{tbl:notations}
 \end{table}
 
-\subsection{System Initialization and RP Registration}
+\subsection{System Initialization and RP Initial Registration}
 
 %In UPRESSO, a system initialization is performed to initialize the IdP, which generates $g$, $p$, $PK_{Cert}$, $SK_{Cert}$, $PK_{ID}$ and $SK_{ID}$,
 %and provides  $g$, $p$, $PK_{Cert}$ and $PK_{ID}$ as the public parameters.
@@ -92,7 +92,7 @@ In UPRESSO, IdP computes a unique privacy-preserving user identifier (denoted as
 In UPRESSO, a system initialization is performed to initialize the IdP only once at the very beginning of system construction and generates the strong prime $p$, the primitive root $g$, and the key pairs ($PK_{Cert}$, $SK_{Cert}$, $PK_{ID}$ and $SK_{ID}$) for RP certificate and identity proof generation. The initial registration is performed by RP to apply $Cert_{RP}$ (for user to verify the attributes of RP) and $ID_{RP}$ (for the transformation of $ID_{RP}$) from IdP only when the new RP is built.
 Besides, only the user login process are conducted in each login flow, containing the transformation ($PID_{RP}$) negotiation, the dynamic registration and the modified OIDC implicit flow.
 
-\vspace{1mm}\noindent \textbf{System Initialization.} The IdP generates two random asymmetric key pairs, ($PK_{ID}$, $SK_{ID}$) and ($PK_{Cert}$, $SK_{Cert}$),
+\vspace{1mm}\noindent \textbf{System initialization.} The IdP generates two random asymmetric key pairs, ($PK_{ID}$, $SK_{ID}$) and ($PK_{Cert}$, $SK_{Cert}$),
 for calculating the signatures in the identity proof and $Cert_{RP}$, respectively;
 and provides $PK_{ID}$ and $PK_{Cert}$ as the public parameters for the verification of identity proof and $Cert_{RP}$.
 Moreover, IdP generates a strong prime $p$, calculates  a primitive root ($g$), and provides $p$ and $g$ as the public parameters.
@@ -103,7 +103,7 @@ However, $g$ and $p$ will never be modified, otherwise, the RPs fail to link the
 %The IdP setup and following RP initial registration are based on the features of primitive root.
 
 
-\vspace{1mm}\noindent\textbf{RP Registration.}
+\vspace{1mm}\noindent\textbf{RP initial registration.}
 The RP invokes an initial registration to apply a valid and self-verifying $Cert_{RP}$ from IdP (\textbf{Goal 1}),
 % as provided in Figure~\ref{fig:registration}
  which contains three steps:
@@ -268,7 +268,7 @@ Here, we further explain the two requirements in the generation of $ID_{RP}$ for
 The honest IdP is assumed to generate the correct $ID_{RP}$. However, we may perform an external check on $Cert_{RP}$ and $ID_{RP}$, based on the idea of Certificate transparency. The external check needs to be performed by a third party instead of RP who will be able to perform identity linkage with incorrect $ID_{RP}$. To perform the external check, IdP is required to provide the $Cert_{RP}$ to a log server, while a monitor checks the correctness of $Cert_{RP}$, i.e., no two valid $Cert_{RP}$ assigned to a same $ID_{RP}$ and $ID_{RP}$ is a primitive root modulo $p$ as descried in Section~\ref{subsec:primitive}. Moreover, $Cert_{RP}$ is compatible with a X.509 certificate which is discussed in Section~\ref{sec:discussion}.
 \end{comment}
 
-\subsection{RP identifier transformation and Account calculation}
+\subsection{RP Identifier Transformation and Account Calculation}
 \label{subsec:identifier-generation}
 In this section, we provide the algorithms for  calculating  $PID_{RP}$, $PID_U$ and $Account$,
 which are the foundations to process each user's login. %  described in Section~\ref{sebsec:loginprocess}.
@@ -308,7 +308,7 @@ The corporative generation of $PID_{RP}$, ensures unrelated $PID_U$  for differe
  \label{equ:PID_U}
 \end{equation}
 
-\noindent\textbf{Account}. The RP calculates $PID_U^t mod \ p$ as the  user's account, where $PID_U$ is received from the user and $t$ is derived in the generation of $PID_{RP}$. Equation~\ref{equ:account} demonstrates that $Account$ is unchanged to the RP during a user's multiple logins, satisfying RP derives the user's unique $Account$  from $PID_U$ with the  trapdoor and  RP fails to derive $ID_U$ from either $Account$ in \textbf{Goal 3}. The different $ID_{RP}$ ensures the $Accounts$ of a user are different among RPs in \textbf{Goal 3}.
+Finally, the RP calculates $PID_U^t mod \ p$ as the  user's account, where $PID_U$ is received from the user and $t$ is derived in the generation of $PID_{RP}$. Equation~\ref{equ:account} demonstrates that $Account$ is unchanged to the RP during a user's multiple logins, satisfying RP derives the user's unique $Account$  from $PID_U$ with the  trapdoor and  RP fails to derive $ID_U$ from either $Account$ in \textbf{Goal 3}. The different $ID_{RP}$ ensures the $Accounts$ of a user are different among RPs in \textbf{Goal 3}.
 
  \begin{equation}
    Account = ({PID_{RP}}^{ID_U})^t = {ID_{RP}}^{ID_U} mod \ p
