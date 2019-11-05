@@ -15,12 +15,13 @@ In SSO systems, the adversaries' goals described in~\cite{SPRESSO} to break the 
 (2) \textbf{Identity injection}: Honest user logs in to the honest RP under adversaries' identity. The adversary might achieve this goal by replacing the identity transmitted from IdP to RP or lead the user uploads the malicious identity proof in various ways (e.g., CSRF).
 Based on the formal analysis of SAML, OAuth and OIDC~\cite{ArmandoCCCT08,FettKS16, FettKS17} and the study of existing attacks, we summarize basic requirements that we believe a secure SSO platform should meet.
 
-{\color{red} 
-User identification. When a user logs in to a same RP multiple times, the RP should be able to associate these logins to provide a continuous and personalized service to that user. The anonymous SSO schemes~\cite{ElmuftiWRR08,WangWS13,HanCSTW18} are also proposed to achieve that the user's identity is unknown the neither the IdP nor the RP. However, these schemes are not focally concerned in this paper as the completely anonymous SSO systems are not suitable to the currently web application where the RP need to know the user's identity to provide the personally service. The anonymous SSO schemes are discussed in Section~\ref{sec:related}.
 
-Receiver  designation. The receiver  designation requires that the identity proof should be bound to one RP so that it will be accepted only by that RP, and be securely transmitted to the requesting RP (through the user). 
-}
+\vspace{1mm}\noindent\textbf{User identification.} When a user logs in to a same RP multiple times, the RP should be able to associate these logins to provide a continuous and personalized service to that user. The anonymous SSO schemes~\cite{ElmuftiWRR08,WangWS13,HanCSTW18} are also proposed to achieve that the user's identity is unknown the neither the IdP nor the RP. However, these schemes are not focally concerned in this paper as the completely anonymous SSO systems are not suitable to the currently web application where the RP need to know the user's identity to provide the personally service. The anonymous SSO schemes are discussed in Section~\ref{sec:related}.
 
+\vspace{1mm}\noindent\textbf{Receiver  designation.} The receiver  designation requires that the identity proof should be bound to one RP so that it will be accepted only by that RP, and be securely transmitted to the requesting RP (through the user). 
+
+
+\begin{comment}
 \vspace{1mm}\noindent\textbf{Identification.} %Identification is the main feature of SSO system, which enables the RP to identify the user.
 After a successful SSO authentication, the RP should be able to uniquely identify the user. When a user logs in to a same RP multiple times, the RP should be able to associate these logins to provide a continuous and personalized service to that user. This is an essential requirement for any authentication mechanism. In SSO, this indicates that a same unique user identifier should be derived from multiple identity proofs of the user by the RP. In OIDC, for example, a user obtains different PPIDs from the IdP, each for a different RP.
 
@@ -31,6 +32,7 @@ After a successful SSO authentication, the RP should be able to uniquely identif
 
 \vspace{1mm}\noindent\textbf{Integrity.} Only the IdP is able to generate a valid identity proof,
     and no entity should be able to modify or forge it~\cite{WangZLG16}. Otherwise, an adversary could modify user identifier in the proof to launch impersonation or identity injection attacks. In OIDC, for example, the IdP signs identity proofs with its private key to provide integrity~\cite{WangCW12, SomorovskyMSKJ12}.
+\end{comment}
 
 \begin{comment}
 \vspace{1mm}Breaking the above requirements will lead to some attacks.
@@ -68,7 +70,31 @@ In traditional SSO systems, the tuple is always exposed to both IdP and RP, so t
 The key challenge is that there is no simple way to hide the full tuple to both IdP and RP. To tackle this problem, it requires the IdP to generate pairwise identifiers for a user and bind them to pseudo RP identifiers that seem random to IdP, in a way that user identifiers are unique at one RP but different at different RPs and user identifiers bound to pseudo identifiers of the same RP can be associated by that RP.
 
 
-
+\begin{figure}
+  \centering
+  \includegraphics[width=\linewidth]{fig/link1.pdf}
+  \caption{Traditional SSO.}
+  \label{fig:TraditionalSSO}
+\end{figure}
+\begin{figure}
+  \centering
+  \includegraphics[width=\linewidth]{fig/link4.pdf}
+  \caption{PPID.}
+  \label{fig:PPID}
+\end{figure}
+\begin{figure}
+  \centering
+  \includegraphics[width=\linewidth]{fig/link3.pdf}
+  \caption{SPRESSO.}
+  \label{fig:SPRESSO}
+\end{figure}
+\begin{figure}
+  \centering
+  \includegraphics[width=\linewidth]{fig/link2.pdf}
+  \caption{Our scheme.}
+  \label{fig:Ourscheme}
+\end{figure}
+\begin{comment}
 
 {\color{red}
 The root reason that existing SSO systems suffer from privacy attacks is that they cannot meet secure authentication and privacy protection requirements
@@ -84,7 +110,7 @@ The key challenge is that there is no simple way to bind the identity proof to a
 %without knowing the RP identifier. Such pairwise user identifiers should be uniquely bound to an .
 %so that the pairwise user identifier changes and underivable even in the same RP.
 }
-
+\end{comment}
 
 \begin{comment}
 However, these two requirements for privacy preservation,  conflict with the basic requirements on SSO as follows: %, resulting in the following problems in SSO systems:
@@ -123,11 +149,12 @@ In this work, we present UPRESSO to defend against both IdP-based access tracing
 Since the integrity requirement for identity proof is orthogonal to the privacy requirement, UPRESSO adopts the same signature-based integrity mechanism of OIDC.
 Next, we overview the new privacy-preserving user identification and receiver designation schemes in UPRESSO.
 
-{\color{red} 
-Trapdoor user identification. The trapdoor identification make the RP possible to transform the user's identity proof into the constant Account in RP, even the ID_U^Proof (user identifier in identity proof) is changing with the PID_RP, which is to prevent the RP-based identity linkage.
-Transformed receiver designation. The pseudonymous receiver uniqueness allows the IdP to generate the identity proof bound to specific RP without knowing any straightforward RP information but a transformed RP identifier, and the identity proof is bound to the transformed identifier. As the IdP does not the RP’s identity, responsibility of url checking should be shifted from IdP to RP, which guarantees the identity proof is only sent to the bound RP.
-}
 
+\vspace{1mm}\noindent \textbf{Trapdoor user identification.} The trapdoor identification make the RP possible to transform the user's identity proof into the constant Account in RP, even the $ID_U^{Proof}$ (user identifier in identity proof) is changing with the $PID_{RP}$, which is to prevent the RP-based identity linkage.
+
+\vspace{1mm}\noindent \textbf{Transformed receiver designation.} The pseudonymous receiver uniqueness allows the IdP to generate the identity proof bound to specific RP without knowing any straightforward RP information but a transformed RP identifier, and the identity proof is bound to the transformed identifier. As the IdP does not the RP’s identity, responsibility of url checking should be shifted from IdP to RP, which guarantees the identity proof is only sent to the bound RP.
+
+\begin{comment}
 \vspace{1mm}\noindent \textbf{Trapdoor identification.} 
 The trapdoor identification make the RP possible to transform the user's identity proof into the constant $Account$ in RP, even the $ID_U^{Proof}$ (user identifier in identity proof) is changing with the $PID_RP$, which is to prevent the RP-based identity linkage.
 The entity with the trapdoor can derive the unique user account associated with an RP from different identifiers in multiple identity proofs generated when the user logs in to that RP multiple times.
@@ -151,6 +178,7 @@ The identity proof is bound to the transformation of a RP identifier, which allo
 \vspace{1mm}\noindent \textbf{User-centric confidentiality.}
 User-centric confidentiality shifts the responsibility of url checking from IdP to user agent, which guarantees the identity proof is only sent to the bound RP. The user-centric confidentiality should relies on the trustful user agent and IdP issued RP identity certificate. 
 %In UPRESSO, the user sends the authentication request to the IdP to generate an identity proof for the requested RP identifier transformation. To ensure the identity proof is securely returned to the requesting RP, UPRESSO adopts a user-centric confidentiality check, which requires the user to extract RP's identifying information (e.g., URL, name and RP identifier) from the RP certificate issued by a trusted entity (e.g., IdP). Therefore, it is impossible for an adversary to request the identity proof on behalf of others or intercept others' identify proofs with a forged return URL.
+\end{comment}
 
 To combine these three principles into one system, we propose novel identifier generation schemes to dynamically generate transformed RP identifier and trapdoor identity proof, which makes the RP's information never exposed to the IdP during the authentication and RP able to derive the unique user $Account$ from identity proof. Moreover, both the RP identifier transforming and identity proof transformation (including url check) require the trustful user agent. We do not explain how to finish each principle here, it will be explained in Section \ref{subsec:overview}.
 %\vspace{1mm} \textbf{xxx xxxxx xxxxxxx
