@@ -2,7 +2,7 @@
 \label{sec:UPRESSO}
 In this section, we first present the design principle of UPRESSO with the main process phases. Then, we describe system initialization and initial registration of RP, followed by the description of algorithms for calculating the RP identifier transformation, user identifier and account. The detailed processing for each user's login is provided corresponding to the main process phases. Finally, we discuss the compatibility of UPRESSO with OIDC.
 
-\subsection{Design Overview}
+\subsection{Features}
 \label{subsec:overview}
 
 %As analyzed in Section~\ref{subsec:solutions}, UPRESSO needs to provide trapdoor identification, transformed binding and user-centric confidentiality, to achieve the privacy-preserving identification, binding and confidentiality, while, the integrity is provided based on the signature inherited from existing SSO systems.
@@ -13,6 +13,9 @@ Next, we will discuss three design goals that directly support these features, a
 %achieve these three requirements (goals) using five phases as described in Figure~\ref{fig:UPRESSO}.
 To ease the presentation, we list the notations used in this paper in Table~\ref{tbl:notations}.
 
+{\color{red} The features to deal with the principles.}
+
+\begin{comment}
 \vspace{1mm}\noindent {\bf User-centric confidentiality:} {\em Generating an unforgeable and self-verifiable information for each RP to provide correct information for user-centric checking.}
 
 In UPRESSO, such information is contained in the RP certificate ($Cert_{RP}$), which is issued by the IdP in the \emph{RP initial registration} phase (Steps a and b in Figure~\ref{fig:UPRESSO}). In each login process, the user compares the information about the RP extracted from the RP certificate and the identity proof and verifies that the identity proof issued by the IdP is generated for the requesting RP.
@@ -25,11 +28,13 @@ In UPRESSO, this privacy-preserving RP identifier (denoted as $PID_{RP}$) is gen
 
 \vspace{1mm}\noindent {\bf Trapdoor identification:} {\em Generating a unique privacy-preserving user identifier based on the original user identifier and the privacy-preserving RP identifier in a way that a same user account can be derived from multiple privacy-preserving user identifiers for the same user at same RP.}
 
+
+
 %Providing algorithms for calculating the user's identifier ($PID_U$) in identity proof and the user's account ($Account$) at the RP, allows the RP to identify the user.
 %different $PID_U$ generated for different RPs, while a unique $Account$ derived at the RP with the trapdoor.
 
 In UPRESSO, IdP computes a unique privacy-preserving user identifier (denoted as $PID_U$) based on the original user identifier (i.e., $ID_U$) and the privacy-preserving RP identifier (i.e., $PID_{RP}$) in the \emph{$PID_U$ generation} phase (Step 4 in Figure~\ref{fig:UPRESSO}). From each $PID_U$, an RP can derive a value (denoted as $Account$) with the trapdoor, i.e., the secret parameters of the RP identifier transformation, in the \emph{$Account$ processing} phase (Step 6 in Figure~\ref{fig:UPRESSO}). $Account$ uniquely identifies the user at this RP, so that it can be used to link all $PID_U$ converted from the same $ID_U$. It is worth noting that $Account$ is different from $ID_U$ and it provides no clue to derive $ID_U$, therefore, the RP still does not know the real user associated with the identity proof. Moreover, to collusive RPs, the $PID_U$s for a same user are seemingly irrelevant to each other, since they are associated with different $Account$s at these RPs.
-
+\end{comment}
 
 
 \begin{table*}[tb]
@@ -71,7 +76,7 @@ In UPRESSO, IdP computes a unique privacy-preserving user identifier (denoted as
     \label{tbl:notations}
 \end{table*}
 
-\subsection{System Initialization and RP Initial Registration}
+\subsection{The implementations of UPRESSO}
 
 %In UPRESSO, a system initialization is performed to initialize the IdP, which generates $g$, $p$, $PK_{Cert}$, $SK_{Cert}$, $PK_{ID}$ and $SK_{ID}$,
 %and provides  $g$, $p$, $PK_{Cert}$ and $PK_{ID}$ as the public parameters.
@@ -122,9 +127,9 @@ To satisfy RP fails to derive $ID_U$ from $Account$ and the $Accounts$ of a user
 
 
 
-\subsection{RP Identifier Transformation and Account Calculation}
-\label{subsec:identifier-generation}
-In this section, we provide the algorithms for  calculating  $PID_{RP}$, $PID_U$ and $Account$,
+%\subsection{RP Identifier Transformation and Account Calculation}
+%\label{subsec:identifier-generation}
+Moreover, we provide the algorithms for  calculating  $PID_{RP}$, $PID_U$ and $Account$,
 which are the foundations to process each user's login. %  described in Section~\ref{sebsec:loginprocess}.
 
 \noindent\textbf{$PID_{RP}$}. Similar to Diffie-Hellman key exchange\cite{DiffieH76}, the RP and user negotiate the  $PID_{RP}$ as follows:
