@@ -13,12 +13,12 @@ However, building such a system is considered challenging~\cite{SPRESSO}, as sev
 In SSO systems, the adversaries' goals described in~\cite{SPRESSO} to break the secure authentication are:
 (1) \textbf{Impersonation}: Adversary logs in to the honest RP as an honest user. The adversary might achieve the goal by obtaining a user's identity proof in the ways, such as stealing the proof (from the unprotected HTTP transmission), forging the valid proof (if the integrity is not guaranteed), leading the user to upload a proof valid for other RPs (the proof is not bound with specific RP).
 (2) \textbf{Identity injection}: Honest user logs in to the honest RP under adversaries' identity. The adversary might achieve this goal by replacing the identity transmitted from IdP to RP or lead the user uploads the malicious identity proof in various ways (e.g., CSRF).
-Based on the formal analysis of SAML, OAuth and OIDC~\cite{ArmandoCCCT08,FettKS16, FettKS17} and the study of existing attacks, we summarize basic requirements that we believe a secure SSO platform should meet.
+Based on the formal analysis of SAML, OAuth and OIDC~\cite{ArmandoCCCT08,FettKS16, FettKS17} and the study of existing attacks, we summarize basic requirements that we believe a secure SSO platform which means, 1)RP is always able to identify the user; 2)the system should be protected from forementioned attacks, should meet.
 
 
 \vspace{1mm}\noindent\textbf{User identification.} When a user logs in to a same RP multiple times, the RP should be able to associate these logins to provide a continuous and personalized service to that user. The anonymous SSO schemes~\cite{ElmuftiWRR08,WangWS13,HanCSTW18} are also proposed to achieve that the user's identity is unknown the neither the IdP nor the RP. However, these schemes are not focally concerned in this paper as the completely anonymous SSO systems are not suitable to the currently web application where the RP need to know the user's identity to provide the personally service. The anonymous SSO schemes are discussed in Section~\ref{sec:related}.
 
-\vspace{1mm}\noindent\textbf{Receiver  designation.} The receiver  designation requires that the identity proof should be bound to one RP so that it will be accepted only by that RP, and be securely transmitted to the requesting RP (through the user). 
+\vspace{1mm}\noindent\textbf{Receiver designation.} The receiver designation requires that the identity proof should be bound to one RP so that it will be accepted only by that RP, and be securely transmitted to the requesting RP (through the user). Otherwise, the adversaries who is able to achieve honest user's identity proof for honest RP, have the ability to conduct impersonation attack~\cite{ChenPCTKT14, WangZLG16}
 
 
 \begin{comment}
@@ -73,25 +73,25 @@ The key challenge is that there is no simple way to hide the full tuple to both 
 
 \begin{figure}
   \centering
-  \includegraphics[width=\linewidth]{fig/link1.pdf}
+  \includegraphics[width=\linewidth]{fig/mapping1.pdf}
   \caption{Traditional SSO.}
   \label{fig:TraditionalSSO}
 \end{figure}
 \begin{figure}
   \centering
-  \includegraphics[width=\linewidth]{fig/link4.pdf}
+  \includegraphics[width=\linewidth]{fig/mapping2.pdf}
   \caption{PPID.}
   \label{fig:PPID}
 \end{figure}
 \begin{figure}
   \centering
-  \includegraphics[width=\linewidth]{fig/link3.pdf}
+  \includegraphics[width=\linewidth]{fig/mapping3.pdf}
   \caption{SPRESSO.}
   \label{fig:SPRESSO}
 \end{figure}
 \begin{figure}
   \centering
-  \includegraphics[width=\linewidth]{fig/link2.pdf}
+  \includegraphics[width=\linewidth]{fig/mapping5.pdf}
   \caption{Our scheme.}
   \label{fig:Ourscheme}
 \end{figure}

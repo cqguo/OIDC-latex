@@ -57,9 +57,9 @@ In UPRESSO, IdP computes a unique privacy-preserving user identifier (denoted as
     \hline
     {$Cert_{RP}$} & {An RP certificate. } & {System-unique} \\
     \hline
-    {$SK_{Cert}$, $PK_{Cert}$} & {The private/public key to sign/verify $Cert_{RP}$. } & {System-unique} \\
-    \hline
-    {$SK_{ID}$, $PK_{ID}$} & {The private/public key to sign/verify identity proof.} & {System-unique} \\
+    {$SK$, $PK$} & {The private/public key of IdP. } & {System-unique} \\
+   % \hline
+    %{$SK_{ID}$, $PK$} & {The private/public key to sign/verify identity proof.} & {System-unique} \\
     \hline
     {$ID_U$} & {User's unique identifier at IdP.} & {System-unique} \\
     \hline
@@ -85,27 +85,27 @@ In UPRESSO, IdP computes a unique privacy-preserving user identifier (denoted as
 
 \subsection{The implementations of UPRESSO}
 
-%In UPRESSO, a system initialization is performed to initialize the IdP, which generates $g$, $p$, $PK_{Cert}$, $SK_{Cert}$, $PK_{ID}$ and $SK_{ID}$,
-%and provides  $g$, $p$, $PK_{Cert}$ and $PK_{ID}$ as the public parameters.
+%In UPRESSO, a system initialization is performed to initialize the IdP, which generates $g$, $p$, $PK$, $SK$, $PK$ and $SK_{ID}$,
+%and provides  $g$, $p$, $PK$ and $PK$ as the public parameters.
 %Only one initial registration is performed by each RP to apply  $Cert_{RP}$ and $ID_{RP}$ from IdP.
 %%the IdP needs to be initialized during at its setup, to generate the public parameters for the users and RPs.
 %%The RP has to perform only one initial registration at the RP setup.
 %The user triggers Steps 1-7 in Figure~\ref{fig:UPRESSO} for each login at a RP.
-%%IdP setup is performed at the very beginning of UPRESSO, and will be invoked by the IdP to update the leaked $SK_{Cert}$ or $SK_{ID}$, while $g$ and $p$ will never be modified.
+%%IdP setup is performed at the very beginning of UPRESSO, and will be invoked by the IdP to update the leaked $SK$ or $SK_{ID}$, while $g$ and $p$ will never be modified.
 %%UPRESSO does not support multiple initial registrations for one RP, as the RP does not know the $ID_U$ nor the discrete logarithm of $ID_{RP}$ and fails to derive the user's new account from the old one under the Discrete Logarithm problem.
 
-%In UPRESSO, a system initialization is performed to initialize the IdP only once at the very beginning of system construction and generates the strong prime $p$, the primitive root $g$, and the key pairs ($PK_{Cert}$, $SK_{Cert}$, $PK_{ID}$ and $SK_{ID}$) for RP certificate and identity proof generation. The initial registration is performed by RP to apply $Cert_{RP}$ (for user to verify the attributes of RP) and $ID_{RP}$ (for the transformation of $ID_{RP}$) from IdP only when the new RP is built.
+%In UPRESSO, a system initialization is performed to initialize the IdP only once at the very beginning of system construction and generates the strong prime $p$, the primitive root $g$, and the key pairs ($PK$, $SK$, $PK$ and $SK_{ID}$) for RP certificate and identity proof generation. The initial registration is performed by RP to apply $Cert_{RP}$ (for user to verify the attributes of RP) and $ID_{RP}$ (for the transformation of $ID_{RP}$) from IdP only when the new RP is built.
 
 
 To lead the forementioned features be implemented in UPRESSO, it requires the system initialization is performed to initialize the IdP only once at the very beginning of system construction and generates key parameters for further initiation and login process. Moreover, the RP should be initiated before it attaches the UPRESSO system, when the IdP provides the $ID_{RP}$ and unforgeable RP proof (denoted as $Cert_{RP}$). Next, we will describe the System initialization, RP initial registration and the algorithms for calculating  $PID_{RP}$, $PID_U$ and $Account$.
 
-\vspace{1mm}\noindent \textbf{System initialization.} The IdP generates two random asymmetric key pairs, ($PK_{ID}$, $SK_{ID}$) and ($PK_{Cert}$, $SK_{Cert}$),
+\vspace{1mm}\noindent \textbf{System initialization.} The IdP generates the random asymmetric key pair, ($SK, PK$),
 for calculating the signatures in the identity proof and $Cert_{RP}$, respectively;
-and provides $PK_{ID}$ and $PK_{Cert}$ as the public parameters for the verification of identity proof and $Cert_{RP}$.
+and provides $PK$ and $PK$ as the public parameters for the verification of identity proof and $Cert_{RP}$.
 Moreover, IdP generates a strong prime $p$, calculates  a primitive root ($g$), and provides $p$ and $g$ as the public parameters.
 For $p$, we firstly randomly choose a large prime $q$, and accept  $2q+1$ as $p$ if $2q+1$ is a prime.
 The strong prime $p$ makes it easier to choose $n_{u}$ and $n_{RP}$ at the user and RP for the RP identifier transformation (detailed in  Section~\ref{subsec:identifier-generation}). %With $g$, we obtain all the integers less than $p$, by calculating $g^i mod \ P$ for $0 \leq i \leq (P-1)$.
-Once $SK_{Cert}$ or $SK_{ID}$ leaked, IdP may update these two asymmetric key pairs.
+Once $SK$ leaked, IdP may update this asymmetric key pair.
 However, $g$ and $p$ will never be modified, otherwise, the RPs fail to link the user's accounts between two different $p$ (or $g$).
 %The IdP setup and following RP initial registration are based on the features of primitive root.
 
@@ -117,8 +117,8 @@ The RP invokes an initial registration to apply a valid and self-verifying $Cert
 
 \begin{enumerate}
 \item RP sends IdP a $Cert_{RP}$ request $Req_{Cert_{RP}}$, which contains the distinguished name $Name_{RP}$ (e.g., DNS name) and the endpoint to receive the identity proof.
-\item IdP calculates $ID_{RP} = g^r mod \ p$ with a random chosen $r$ which is coprime to $p-1$ and different from the ones for other RPs,  generates the signature ($Sig_{SK_{Cert}}$) of [$ID_{RP}, Name_{RP}$] with $SK_{Cert}$, and returns [$ID_{RP}, Name_{RP}, Sig_{SK_{Cert}}$] as $Cert_{RP}$.
-\item IdP sends $Cert_{RP}$ to the RP who verifies $Cert_{RP}$ using $PK_{Cert}$.
+\item IdP calculates $ID_{RP} = g^r mod \ p$ with a random chosen $r$ which is coprime to $p-1$ and different from the ones for other RPs,  generates the signature ($Sig_{SK}$) of [$ID_{RP}, Name_{RP}$] with $SK$, and returns [$ID_{RP}, Name_{RP}, Sig_{SK}$] as $Cert_{RP}$.
+\item IdP sends $Cert_{RP}$ to the RP who verifies $Cert_{RP}$ using $PK$.
 \end{enumerate}
 
 
@@ -199,15 +199,15 @@ In this section, we present the detailed process for each user's login as shown 
 In RP identifer transforming phase, the user and RP corporately process as follows. \textbf{(1)} The user sends a login request to trigger the negotiation of $PID_{RP}$. \textbf{(2.1.1)} RP chooses the random $n_{RP}$, and calculates $Y_{RP}$ as described in Section~\ref{subsec:identifier-generation}. \textbf{(2.1.2)} RP sends $Cert_{RP}$ with $Y_{RP}$ to the user.  \textbf{(2.1.3)} The user halts the login process if the provided $Cert_{RP}$ is invalid; otherwise, it extracts $ID_{RP}$ from $Cert_{RP}$, and calculates $PID_{RP}$ with a random chosen $n_U$ as in Section~\ref{subsec:identifier-generation}. \textbf{(2.1.4)} The user sends $n_U$ to the RP. \textbf{(2.1.5)} RP calculates $PID_{RP}$ using the received $n_U$ with $Y_{RP}$ as in Section~\ref{subsec:identifier-generation}. After that, RP derives the trapdoor $t$ as in Section~\ref{subsec:identifier-generation}, which will be used in calculating $Account$. \textbf{(2.1.6)} RP sends the calculated $PID_{RP}$ to the user, who will halt the login if the received $PID_{RP}$ is different from the cached one.
 
 In the RP identifier renewal phase, the user registers the newly generated $PID_{RP}$ at the IdP as follows. \textbf{(2.2.1)} The user generates an one-time endpoint (used in Section~\ref{subsec:compatible}) if the received $PID_{RP}$ is accepted. \textbf{(2.2.2)} Then, the user registers the RP with the $PID_{RP}$ and one-time endpoint. \textbf{(2.2.3)} If $PID_{RP}$ is globally unique and is a primitive root module $p$, IdP sets the flag $RegRes$ as $OK$ (otherwise $FAIL$), and constructs the reply in the form of
-[$RegRes$, $RegMes$, $Sig_{SK_{ID}}$]
+[$RegRes$, $RegMes$, $Sig_{SK}$]
 %[$RegRes$, $timestamp$, $PID_{RP}$, $Sig_{SK_ID}$] where $timestamp$ is the time generating this reply and
-where $RegMes$ is the response to original dynamic registration containing $PID_{RP}$, issuing time as well as other attributes and $Sig_{SK_{ID}}$ is the signature of the other elements using the private key $SK_{ID}$ (ensuring unique $PID_{RP}$ for binding in \textbf{Goal 2}). \textbf{(2.2.4)} The user forwards the registration result to the RP. The user obtains $RegRes$ directly as the connection between the user and IdP is secure, while the RP accepts the $RegRes$ only when $Sig_{SK_{ID}}$ is valid
+where $RegMes$ is the response to original dynamic registration containing $PID_{RP}$, issuing time as well as other attributes and $Sig_{SK}$ is the signature of the other elements using the private key $SK_{ID}$ (ensuring unique $PID_{RP}$ for binding in \textbf{Goal 2}). \textbf{(2.2.4)} The user forwards the registration result to the RP. The user obtains $RegRes$ directly as the connection between the user and IdP is secure, while the RP accepts the $RegRes$ only when $Sig_{SK}$ is valid
 %, $timestamp$ is correct and $PID_{RP}$ is the same as the cached one.
 and $RegMes$ is issued for the $PID_{RP}$ within the valid period. The user and RP will negotiate a new $PID_{RP}$ if $RegRes$ is $FAIL$.
 
-To acquire the $PID_U$, the user corporates with the RP and IdP as follows. \textbf{(2.3)} RP constructs an identity proof request with the correctly registered $PID_{RP}$ and the endpoint (the form of the request is detailed in Section~\ref{subsec:compatible}). \textbf{(2.4)} The user halts the login process if the received $PID_{RP}$ is different from the previous one. \textbf{(2.5)} The user replaces the endpoint with the registered one-time endpoint, and sends it with the identity proof request to the IdP. \textbf{(3)} IdP requires the user to provide the correct credentials if the user hasn't been unauthenticated. \textbf{(4)} IdP rejects the request if the binding of $PID_{RP}$ and the one-time endpoint doesn't exist in the registered ones. Then, IdP generates the $PID_U$ as in Section~\ref{subsec:identifier-generation}, and constructs the identity proof with $PID_{RP}$, $PID_U$, the valid period, issuing time and other attribute values, by attaching a signature of these elements using the private key $SK_{ID}$. \textbf{(5.1)} IdP sends the identity proof with the one-time endpoint to the user. \textbf{(5.2)} User agent replaces the one-time endpoint with the correct endpoint. \textbf{(5.3)} The user forwards the identity proof to the RP's endpoint corresponding to the one-time endpoint.
+To acquire the $PID_U$, the user corporates with the RP and IdP as follows. \textbf{(2.3)} RP constructs an identity proof request with the correctly registered $PID_{RP}$ and the endpoint (the form of the request is detailed in Section~\ref{subsec:compatible}). \textbf{(2.4)} The user halts the login process if the received $PID_{RP}$ is different from the previous one. \textbf{(2.5)} The user replaces the endpoint with the registered one-time endpoint, and sends it with the identity proof request to the IdP. \textbf{(3)} IdP requires the user to provide the correct credentials if the user hasn't been unauthenticated. \textbf{(4)} IdP rejects the request if the binding of $PID_{RP}$ and the one-time endpoint doesn't exist in the registered ones. Then, IdP generates the $PID_U$ as in Section~\ref{subsec:identifier-generation}, and constructs the identity proof with $PID_{RP}$, $PID_U$, the valid period, issuing time and other attribute values, by attaching a signature of these elements using the private key $SK$. \textbf{(5.1)} IdP sends the identity proof with the one-time endpoint to the user. \textbf{(5.2)} User agent replaces the one-time endpoint with the correct endpoint. \textbf{(5.3)} The user forwards the identity proof to the RP's endpoint corresponding to the one-time endpoint.
 
-Finally, RP derives the user's  $Account$ from $PID_U$ as follows. \textbf{(6)} RP accepts the identity proof only when the signature is correctly verified with $PK_{ID}$, $PID_{RP}$ is the same as the negotiated one, the issuing time is less than current time, and the current time is in the validity period. If the identity proof is incorrect, RP returns login fail to the user who will trigger another login request. Otherwise, RP calculates the $Account$ as in Section~\ref{subsec:identifier-generation}. \textbf{(7)} RP sends the login result to the user and begins to provide the personalized service.
+Finally, RP derives the user's  $Account$ from $PID_U$ as follows. \textbf{(6)} RP accepts the identity proof only when the signature is correctly verified with $PK$, $PID_{RP}$ is the same as the negotiated one, the issuing time is less than current time, and the current time is in the validity period. If the identity proof is incorrect, RP returns login fail to the user who will trigger another login request. Otherwise, RP calculates the $Account$ as in Section~\ref{subsec:identifier-generation}. \textbf{(7)} RP sends the login result to the user and begins to provide the personalized service.
 
 
 \subsection{Compatibility with OIDC}
@@ -239,7 +239,7 @@ Compared with OIDC, the RP identifier transforming phase is added in UPRESSO to 
 Moreover, the negotiation conducted by user in RP identifier transforming phase, the one-time endpoint generating and storing in RP identifier renewal phase and the $PID_{RP}$ checking in $PID_U$ generation phase depends on the trusted user agent requires the more functional user agent in UPRESSO. 
 
 \begin{comment}
-In UPRESSO, the formats of identity proof request and identity proof are the same as the ones in OIDC. In details, each element of the identity proof request in OIDC is contained in UPRESSO as follows: the RP's identifier ($PID_{RP}$ in UPRESSO), the endpoint (one-time endpoint in the request from the user in UPRESSO) and the set of required attributes (also supported by UPRESSO but not listed here). The identity proof in UPRESSO is also exactly the same as the one in OIDC, which includes RP's identifer ($PID_{RP}$ in UPRESSO), the user's PPID ($PID_U$ in UPRESSO), the issuer, validity period, issuing time, other requested attributes and a signature generated by $SK_{ID}$. % the IdP's private key.
+In UPRESSO, the formats of identity proof request and identity proof are the same as the ones in OIDC. In details, each element of the identity proof request in OIDC is contained in UPRESSO as follows: the RP's identifier ($PID_{RP}$ in UPRESSO), the endpoint (one-time endpoint in the request from the user in UPRESSO) and the set of required attributes (also supported by UPRESSO but not listed here). The identity proof in UPRESSO is also exactly the same as the one in OIDC, which includes RP's identifer ($PID_{RP}$ in UPRESSO), the user's PPID ($PID_U$ in UPRESSO), the issuer, validity period, issuing time, other requested attributes and a signature generated by $SK$. % the IdP's private key.
 
 The same formats of identity proof request and identity proof make the verification same in OIDC and UPRESSO. The IdP, in both UPRESSO and OIDC, verifies the identity proof request, by checking whether the mapping of RP's identifier and endpoint exists in the registered ones. The RP, in both UPRESSO and OIDC, verifies the identity proof, by checking the signature, the consistency of RP's identifer in the identity proof and the one it owns, the validity period, issuing time and the freshness (which is checked based on a nonce in  OIDC, while  $PID_{RP}$ serves as the nonce in UPRESSO).
 
