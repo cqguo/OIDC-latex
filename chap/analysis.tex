@@ -40,28 +40,60 @@ accepted by another honest RP. As the honest RP only accepts the valid identity 
 
 \subsection{Privacy}
 \label{subsec:privacy}
-\noindent{\textbf{Curious IdP.}} The curious IdP might be interested in the user accessed RP or infer the correlation of RPs in two or more login flows by performing the analysis on the content and timing of received messages. However, it fails to obtain the user's accessed RPs directly, nor classifies the accessed RPs for RP's information indirectly.
+\noindent{\textbf{Curious IdP.}} 
+%The curious IdP might be interested in the user accessed RP or for less infer the correlation of RPs in two or more login flows by performing the analysis on the content 
+%and timing 
+%of received messages. 
+In the SSO schemes that do not protect user's privacy form IdP, e.g. OIDC, IdP is able to know the user accessed RP directly from the RP identifier (known as $client id$). However, it fails to obtain the user's accessed RPs directly in UPRESSO. The curious IdP always fails to derive RP's identifying information (i.e., $ID_{RP}$ and correct endpoint) through a single login flow as IdP only receives $PID_{RP}$ and one-time endpoint, and fails to infer the $ID_{RP}$ from $PID_{RP}$ without the  trapdoor $t$
+%  due to hardness of solving discrete logarithm,
+or the RP's endpoint from the independent one-time endpoint.
+
+Moreover, IdP might also try to infer the correlation of RPs in two or more login flows, but fails to classify the accessed RPs for RP's information indirectly. IdP always fails to achieve the relationship between the $PID_{RP}$s as the secure random number generator ensures the random for generating $PID_{RP}$ and the random string for one-time endpoint are independent in multiple login flows. Therefore, curious IdP fails to classify the RPs based on $PID_{RP}$ and one-time endpoint.
+
+%However, it fails to obtain the user's accessed RPs directly, nor classifies the accessed RPs for RP's information indirectly.
 %The curious IdP can only perform the analysis on the content and timing of received messages, however it fails to obtain the user's accessed RPs directly, nor infer classifies the accessed RPs for RP's information indirectly.
-\begin{itemize}
+\begin{comment}
   \item The curious IdP might be interested in the RP's identity but fails to derive RP's identifying information (i.e., $ID_{RP}$ and correct endpoint) through a single login flow. IdP only receives $PID_{RP}$ and one-time endpoint, and fails to infer the $ID_{RP}$ from $PID_{RP}$ without the  trapdoor $t$
 %  due to hardness of solving discrete logarithm,
   or the RP's endpoint from the independent one-time endpoint.
   \item It also might try to infer the correlation of RPs in two or more login flows but fails achieve the relationship between the $PID_{RP}$s. The secure random number generator ensures the random for generating $PID_{RP}$ and the random string for one-time endpoint are independent in multiple login flows. Therefore, curious IdP fails to classify the RPs based on $PID_{RP}$ and one-time endpoint.
   %It also might try to achieve the relationship between the $PRPID$s but fails to infer the correlation of RPs in two or more login flows from a single user or multiple users. The secure random number generator ensures the random for generating $PRPID$ and the random string for one-time endpoint are independent in multiple login flows. Therefore, curious IdP fails to classify the RPs based on $PRPID$ and one-time endpoint.
   \item It even fails to obtain the correlation of RPs through analyzing the timing of received messages. IdP fails to map user's accessed RP in the identity proof to the origin of dynamic registration based on  timing, as both the dynamic registration and the identity proof request are sent by the user instead of the RP.
+\end{comment}
+
+\noindent{\textbf{Malicious RP.}} 
+%The malicious RPs may attempt to link the user passively by combining the $PID_U$s received by the collusive RPs, or for less actively by tampering with the provided elements (i.e., $Cert_{RP}$, $Y_{RP}$ and $PID_{RP}$). 
+In the SSO schemes that do not protect user's privacy form collusive RPs, e.g. SPRESSO, collusive RPs are always able to link the same user in multiple RPs through the user identifier (unchanged in different RP) passively. However, these RPs fail to obtain the $ID_U$ directly in UPRESSO.
+\begin{itemize}
+\item These RPs might try to find out the $ID_U$ presenting the unchanged user identity but fails to infer the user's unique information (e.g., $ID_U$ or other similar ones) in the passive way. The $PID_U$ is the only element received by RP that contains the user's unique information. However, RP fails to infer (1) $ID_U$ (the discrete logarithm) from $PID_U$, due to hardness of solving discrete logarithm; (2) or $g^{ID_U}$ as the $r$ in $ID_{RP}=g^r$ is only known by IdP and never leaked, which prevents the RP from calculating $r^{-1}$ to transfer $Account=ID_{RP}^{ID_U}$ into  $g^{ID_U}$. 
+\item Collusive RPs might try to find out whether the $Account$s in each RP are belong to one user or not but fail to link the user in the passive way. The analysis can only be performed based on $Account$ and $PID_U$. However, the $Account$ is independent among RPs, as the $ID_{RP}$ chosen by honest IdP is random and unique and the $PID_U$s are  also independent due to the unrelated $PID_{RP}$
 \end{itemize}
 
-\noindent{\textbf{Malicious RP.}} The malicious RPs may attempt to link the user passively by combining the $PID_U$s received by the collusive RPs, or actively by tampering with the provided elements (i.e., $Cert_{RP}$, $Y_{RP}$ and $PID_{RP}$). However, these RPs still fail to obtain the $ID_U$ directly, or trigger the IdP to generate a same or derivable $PID_U$s.
-%The malicious RPs may attempt to link the user passively by combining the PPIDs received by the collusive RPs, or actively by tampering with the provided elements (i.e., $Cert_{RP}$, $Y_{RP}$ and $PRPID$). However, these RPs still fail to obtain the user's unique identifier directly, or trigger the IdP to generate a same or derivable PPIDs.
+Moreover, the malicious RPs may attempt to link the user actively by tampering with the provided elements (i.e., $Cert_{RP}$, $Y_{RP}$ and $PID_{RP}$), these RPs still fail to trigger the IdP to generate a same or derivable $PID_U$s in multiple authentication flows. 
 \begin{itemize}
+\item These RPs fail to actively tamper with the messages to make $ID_U$ leaked. IdP fails to lead the $PID_U$ be generated based on the incorrect $ID_{RP}$, as the modification of  $Cert_{RP}$ will make the signature invalid and be found by the user. The malicious RP fails to manipulate  the calculation of $PID_{RP}$ by providing an incorrect $Y_{RP}$ as another element $n_U$ is  controlled by the user. Also, the malicious RP fails to make an incorrect $PID_{RP}$ (e.g., 1)  be used for $PID_U$, as the honest IdP only accepts a primitive root as the $PID_{RP}$ in the dynamic registration. The RP also fails to change the accepted $PID_{RP}$ in Step 2.3 in Figure~\ref{fig:process}, as the user checks it with the cached one.
+\item Collusive RPs also might lead IdP to generate the $PID_U$s same or  derivable into same $Account$ in each RP. Since the $PID_U$ is generated related with the $PID_{RP}$, corrupted RPs might choose the related $n_{RP}$ to correlate their $PID_{RP}$, however, the $PID_{RP}$ is also generated with the participation of $n_{U}$, so that RP does not have the ability to control the generation of $PID_{RP}$. Moreover, corrupted RPs might choose the same $ID_{RP}$ to lead the IdP to generate the $PID_U$ derivable into same $Account$, however, $ID_{RP}$ is verified by the user with through the $Cert_{RP}$, where the tampered $ID_{RP}$ is not acceptable to the honest user.
+%achieve it in the active way, by attempting to make $PRPID$ correlative by manipulating $n_{RP}$ or use the same $RPID$. However, the random $n_u$ chosen by the honest user will ensure the independence of $PRPID$ to protect its own privacy.
+\end{itemize}
+
+
+%However, these RPs still fail to obtain the $ID_U$ directly, or trigger the IdP to generate a same or derivable $PID_U$s.
+%The malicious RPs may attempt to link the user passively by combining the PPIDs received by the collusive RPs, or actively by tampering with the provided elements (i.e., $Cert_{RP}$, $Y_{RP}$ and $PRPID$). However, these RPs still fail to obtain the user's unique identifier directly, or trigger the IdP to generate a same or derivable PPIDs.
+\begin{comment}
 \item A single RP might try to find out the $ID_U$ presenting the unchanged user identity but fails to infer the user's unique information (e.g., $ID_U$ or other similar ones) in the passive way. The $PID_U$ is the only element received by RP that contains the user's unique information. However, RP fails to infer (1) $ID_U$ (the discrete logarithm) from $PID_U$, due to hardness of solving discrete logarithm; (2) or $g^{ID_U}$ as the $r$ in $ID_{RP}=g^r$ is only known by IdP and never leaked, which prevents the RP from calculating $r^{-1}$ to transfer $Account=ID_{RP}^{ID_U}$ into  $g^{ID_U}$.
 \item A single RP fails to actively tamper with the messages to make $ID_U$ leaked. IdP fails to lead the $PID_U$ be generated based on the incorrect $ID_{RP}$, as the modification of  $Cert_{RP}$ will make the signature invalid and be found by the user. The malicious RP fails to manipulate  the calculation of $PID_{RP}$ by providing an incorrect $Y_{RP}$ as another element $n_U$ is  controlled by the user. Also, the malicious RP fails to make an incorrect $PID_{RP}$ (e.g., 1)  be used for $PID_U$, as the honest IdP only accepts a primitive root as the $PID_{RP}$ in the dynamic registration. The RP also fails to change the accepted $PID_{RP}$ in Step 2.3 in Figure~\ref{fig:process}, as the user checks it with the cached one.
 \item Two or more RPs might try to find out whether the $Account$s in each RP are belong to one user or not but fail to link the user in the passive way. The analysis can only be performed based on $Account$ and $PID_U$. However, the $Account$ is independent among RPs, as the $ID_{RP}$ chosen by honest IdP is random and unique and the $PID_U$s are  also independent due to the unrelated $PID_{RP}$.
 \item Two or more RPs also might lead IdP to generate the $PID_U$s same or  derivable into same $Account$ in each RP. Since the $PID_U$ is generated related with the $PID_{RP}$, corrupted RPs might choose the related $n_{RP}$ to correlate their $PID_{RP}$, however, the $PID_{RP}$ is also generated with the participation of $n_{U}$, so that RP does not have the ability to control the generation of $PID_{RP}$. Moreover, corrupted RPs might choose the same $ID_{RP}$ to lead the IdP to generate the $PID_U$ derivable into same $Account$, however, $ID_{RP}$ is verified by the user with through the $Cert_{RP}$, where the tampered $ID_{RP}$ is not acceptable to the honest user.
 %achieve it in the active way, by attempting to make $PRPID$ correlative by manipulating $n_{RP}$ or use the same $RPID$. However, the random $n_u$ chosen by the honest user will ensure the independence of $PRPID$ to protect its own privacy.
 
-\end{itemize}
+\end{comment}
 
-Collusive RPs even fail to correlate the users based on the timing of users' requests, when the provided services are unrelated. For the related services, (e.g., the online payment accessed right after an order generated on the online shopping), the user may break this linking by adding an unpredicted time delay between the two accesses. The anonymous network may be adopted to prevent collusive RPs to classify the users based on IP addresses.
+%Collusive RPs even fail to correlate the users based on the timing of users' requests, when the provided services are unrelated. For the related services, (e.g., the online payment accessed right after an order generated on the online shopping), the user may break this linking by adding an unpredicted time delay between the two accesses. 
+
+
+The user can user the Tor network (or similar means) while accessing the RPs to hide her IP address
+which prevents collusive RPs to classify the users based on IP addresses, even though currently many network providers only provide user the dynamic IP address based on which the user is unable to be classified.
+
+%The anonymous network may be adopted to prevent collusive RPs to classify the users based on IP addresses.
 
 
