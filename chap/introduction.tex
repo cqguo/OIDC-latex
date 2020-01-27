@@ -21,13 +21,13 @@ To achieve this, the identity proof should be valid only for the RP that the use
   and never leaked to other entities except this RP and the user (i.e., confidentiality);
    while this RP should never accept any information from the corrupted identity proof (i.e., integrity).
 However, various attacks are found to exploit the vulnerabilities in the SSO systems to break at least one of these three principles~\cite{ChenPCTKT14, FettKS16,WangCW12,ZhouE14,WangZLG16,YangLLZH16,SomorovskyMSKJ12,MohsenS16}, and the adversary could impersonate the victim user at a RP or log in the browser of an honest user under an adversary’s identity (i.e., identity injection).
-For example, Friendcaster was found to blindly accept any received identity proof~\cite{ExplicatingSDK,ChenPCTKT14}, then a malicious RP could obtain the identity proof from a user, and use it to log in to Friendcaster as the victim user. 
-
-
-if an identity proof is generated with nonbinding data such as access tokens in OAuth 2.0, an adversary such as a malicious RP is able to log in to an honest RP as the honest user~\cite{ChenPCTKT14, WangZLG16}
+For example, Friendcaster was found to blindly accept any received identity proof~\cite{ExplicatingSDK,ChenPCTKT14} (i.e., not checking binding), then a malicious RP could obtain the identity proof from a user, and use it to log in to Friendcaster as the victim user;
+the attacker may use the obtained identity proof to log in at the RP as the victim user~\cite{MohsenS16};
+some RPs of Google ID SSO were found to accept the user's attributes from the corrupted identity proof, and therefore a malicious user could modify the fields (e.g., the email address) in the message redirected to the victim RP and act as any user at this RP~\cite{WangCW12}.
 
 %binding 原文描述 ChenPCTKT14 CCS14 Friendcaster(Friendcaster是一款Facebook的第三方应用，比官方版的功能更加全面) blindly accepting an access token received from a user's device then using this token to exchange for the user's Facebook ID. A malicious application could obtain a legitimate access token from a user, then use this access token to log into Friendcaster as the user. cause they thought Facebook's access tokens were bound to relying parties and checked with every API call: \From Facebook's perspective, the API calls wouldn't appear to be originating from Friendcaster, but the attacker's own app."
 %完整性原文描述 IEEE S&P2012~\cite{WangCW12}关于Google问题描述we found that the RPs of Google ID SSO often assume that message fields they require Google to sign would always be signed, which turns out to be a serious misunderstanding (Section 4.1). These problems make us believe that a complete answer to our question can only be found by analyzing SSO schemes on real websites.
+\begin{comment}
 *********************************
 
 A fundamental requirement of SSO systems is secure authentication~\cite{SPRESSO}, which should ensure that it is impossible (1) for an adversary to log in to an honest RP as an honest user (i.e., impersonation); and (2) for an honest user to log in to an honest RP as someone else such as an adversary (i.e., identity injection).
@@ -37,12 +37,28 @@ Extensive study have been performed on existing SSO systems exposing various vul
 (3) The identity proof should only be obtained by the requesting RP. For example, in some mobile SSO implementations using WebView~\cite{MohsenS16}, as the url check is not supported which the malicious RP app invokes the IdP's web site in its Webview, the adversary is able to steal the identify proof of an honest user when the app cheats her to consider it as another honest RP.
 
 **********************************
-
+\end{comment}
 %第二段：
 %SSO 引入新的隐私问题
 %IdP知道用户登录哪个RP
 %RP之间可以合谋知道同一个用户登录哪些RP
-The wide adoption of SSO also raises new privacy concerns regarding online user tracking and profiling~\cite{maler2008venn,NIST2017draft}. In a typical SSO authentication session, for example the OpenID Connect (OIDC) authentication flow as shown in Fig.~\ref{fig:OpenID}, when a user attempts to log in to an RP, the authentication request is redirected from the RP to the IdP, which generates an identify proof containing information about the user (e.g., user identifier and other authorized user attributes) and the requesting RP (e.g., RP identifier, URL, etc.). If a common user identifier is issued by the IdP for a same user across different RPs or a user's identifiers can be derived from each other, which is the case even in several widely deployed SSO systems~\cite{BrowserID,SPRESSO}, collusive RPs could not only track her online traces but also correlate her attributes across the sites~\cite{maler2008venn}. We refer to this as {\em RP-based identity linkage}. Moreover, when a user leverages the identity issued by one IdP across multiple RPs, the IdP acquires a central role in web authentication, which enables it to collect information about the user's logins at different sites~\cite{maler2008venn}. Since the information of the RP is necessary in the construction of identity proof to make sure it is bound with specific RP~\cite{ChenPCTKT14, WangZLG16}, any interested IdP can easily discover all the RPs accessed by a user and reconstruct her access traces by the unique user identifier. We refer to this as {\em IdP-based access tracing}. Both RP-based identity linkage and IdP-based access tracing could lead to more severe privacy violations.
+The wide adoption of SSO also raises new privacy concerns regarding online user tracking and profiling~\cite{maler2008venn,NIST2017draft}.
+Privacy leakage exists in all current SSO protocols and implementations.
+We adopt the SSO authentication session in the OpenID Connect (OIDC) (shown in Fig.~\ref{fig:OpenID})  as an example, to figure out the leakage. % Both RP-based identity linkage and IdP-based access tracing could lead to more severe privacy violations.
+When a user attempts to log in to an RP (Step 1), the authentication request containing the RP's identifier is redirected from the RP to the IdP (Step 2).
+Then, the IdP completes the user's authentication in Step 3,  generates an identify proof which is bound with the user and RP in Step 4, and redirects the identity proof to the RP confidentially in Step 5.
+Finally, the RP verifies the binding and integrity of identity proof and sends the result to the user. 
+From the authentication session, we find  collusive RPs and curious IdP could break the user's privacy  respectively.
+\begin{itemize}
+  \item {\em RP-based identity linkage}. %The IdP generates multiple identity proofs for a user across different RPs (Step 4 in Fig.~\ref{fig:OpenID}).
+If a common identifier is used in the identity proofs for a same user across different RPs or a user's identifiers can be derived from each other, which is the case even in several widely deployed SSO systems~\cite{BrowserID,SPRESSO}, collusive RPs could not only track her online traces but also correlate her attributes across the sites~\cite{maler2008venn}. 
+  \item {\em IdP-based access tracing}. IdP obtains the user's unique identifer in Step 3 and the identifers of the visited RPs in Step 2.
+ %and finds which RP the user visits in Step 2 which is required for secure authentication for binding the identity proof with the RP (Step 4) and achieving confidentiality (Step 5). 
+ Therefore, a curious IdP could easily discover all the RPs accessed by a user and reconstruct her access traces by the unique user identifier.
+\end{itemize}
+ 
+%original from chengqian guo
+%The wide adoption of SSO also raises new privacy concerns regarding online user tracking and profiling~\cite{maler2008venn,NIST2017draft}. In a typical SSO authentication session, for example the OpenID Connect (OIDC) authentication flow as shown in Fig.~\ref{fig:OpenID}, when a user attempts to log in to an RP, the authentication request is redirected from the RP to the IdP, which generates an identify proof containing information about the user (e.g., user identifier and other authorized user attributes) and the requesting RP (e.g., RP identifier, URL, etc.). If a common user identifier is issued by the IdP for a same user across different RPs or a user's identifiers can be derived from each other, which is the case even in several widely deployed SSO systems~\cite{BrowserID,SPRESSO}, collusive RPs could not only track her online traces but also correlate her attributes across the sites~\cite{maler2008venn}. We refer to this as {\em RP-based identity linkage}. Moreover, when a user leverages the identity issued by one IdP across multiple RPs, the IdP acquires a central role in web authentication, which enables it to collect information about the user's logins at different sites~\cite{maler2008venn}. Since the information of the RP is necessary in the construction of identity proof to make sure it is bound with specific RP~\cite{ChenPCTKT14, WangZLG16}, any interested IdP can easily discover all the RPs accessed by a user and reconstruct her access traces by the unique user identifier. We refer to this as {\em IdP-based access tracing}. Both RP-based identity linkage and IdP-based access tracing could lead to more severe privacy violations.
 
 
 
