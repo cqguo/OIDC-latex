@@ -21,7 +21,7 @@ To achieve this, the identity proof should be valid only for the RP that the use
   and never leaked to other entities except this RP and the user (i.e., confidentiality);
    while this RP should never accept any information from the corrupted identity proof (i.e., integrity).
 However, various attacks are found to exploit the vulnerabilities in the SSO systems to break at least one of these three principles~\cite{ChenPCTKT14, FettKS16,WangCW12,ZhouE14,WangZLG16,YangLLZH16,SomorovskyMSKJ12,MohsenS16}, and the adversary could impersonate the victim user at an RP or log in the browser of an honest user under an adversary’s identity (i.e., identity injection).
-For example, Friendcaster was found to blindly accept any received identity proof~\cite{ExplicatingSDK,ChenPCTKT14} (i.e., not checking binding), then a malicious RP could obtain the identity proof from a user, and use it to log in to Friendcaster as the victim user~\cite{MohsenS16};
+For example, Friendcaster was found to blindly accept any received identity proof~\cite{ExplicatingSDK,ChenPCTKT14} (i.e., not checking binding), then a malicious RP could obtain the identity proof from a user who attempts to log in to this malicious RP, and use it to log in to Friendcaster as the victim user~\cite{MohsenS16};
 some RPs of Google ID SSO were found to accept the user's attributes unprotected in the identity proof (i.e., out scope of  integrity protection), and therefore a malicious user could add incorrect attributes (e.g., the email address) in identity proof and then act as any user at the RP~\cite{WangCW12}.
 
 %binding 原文描述 ChenPCTKT14 CCS14 Friendcaster(Friendcaster是一款Facebook的第三方应用，比官方版的功能更加全面) blindly accepting an access token received from a user's device then using this token to exchange for the user's Facebook ID. A malicious application could obtain a legitimate access token from a user, then use this access token to log into Friendcaster as the user. cause they thought Facebook's access tokens were bound to relying parties and checked with every API call: \From Facebook's perspective, the API calls wouldn't appear to be originating from Friendcaster, but the attacker's own app."
@@ -44,7 +44,7 @@ Extensive study have been performed on existing SSO systems exposing various vul
 The wide adoption of SSO also raises new privacy concerns regarding online user tracking and profiling~\cite{maler2008venn,NIST2017draft}.
 Privacy leakage exists in all current SSO protocols and implementations.
 We adopt the SSO authentication session in the OpenID Connect (OIDC)  as an example, to figure out the leakage. % Both RP-based identity linkage and IdP-based access tracing could lead to more severe privacy violations.
-As shown in Fig.~\ref{fig:OpenID}, 
+As shown in Fig.~\ref{fig:OpenID},
 on receiving a login request from a user (Step 1), the RP uses the RP's identifier to construct an authentication request and redirects it to IdP (Step 2);
 then, the IdP completes the user's authentication in Step 3,  generates an identify proof for the user and binds it  with the  RP in Step 4, and redirects the identity proof to the RP confidentially in Step 5;
 finally, the RP verifies the binding and integrity of identity proof and sends the result to the user.
@@ -117,11 +117,11 @@ Here, we analyze these two privacy leakage problems formally.
 Each user has one identifier at the IdP and each RP respectively, which is denoted as $ID_U$ at the IdP and $Account$ at the RP.
 And, each RP has one unique identifier (denoted as $ID_{RP}$).
 %and may transform it to multiple identifiers (denoted as $PID_{RP}$) to  request for identity proof at IdP.
-A typical SSO authentication session is as follows: %n ideal privacy-preserving
+An ideal privacy-preserving SSO authentication session is as follows: %n ideal privacy-preserving
  on receiving the user's login request, the RP calculates $PID_{RP}=F_{PID_{RP}}(ID_{RP})$ to generate the authentication request;
   then IdP computes $PID_{U}=F_{PID_{U}}(ID_U, PID_{RP})$ and uses $PID_{U}$ with $PID_{RP}$ to construct the identity proof;
      finally, the RP obtains $Account$ using $Accout=F_{Accout}(PID_U, ID_{RP})$.
-A  privacy-preserving SSO system has to satisfy:
+While the functions $F_{PID_{U}}$, $F_{PID_{RP}}$ and $F_{Accout}$  have to satisfy:
 %The three functions $F_{PID_{RP}}$, $F_{PID_{U}}$ and $F_{Accout}$ need to be carefully constructed, to protect the user's privacy and ensure each RP obtains the unchanged $Account$ among the user's multiple logins.
 \begin{itemize}
   \item To prevent RP-based identity linkage, $F_{PID_{U}}$ needs to ensure that $PID_{U}$ are different and unlinkable among various RPs.
@@ -131,9 +131,9 @@ A  privacy-preserving SSO system has to satisfy:
    and therefore the output of $F_{Accout}(F_{PID_{U}}(ID_U, F_{PID_{RP}}(ID_{RP})), ID_{RP})$ will be unchanged for a user's multiple logins at an RP.
 \end{itemize}
 
-Existing privacy-preserving schemes adopt either the unsatisfying $F_{PID_{U}}$ or $F_{PID_{RP}}$, 
+Existing privacy-preserving schemes adopt either the unsatisfying $F_{PID_{U}}$ or $F_{PID_{RP}}$,
  which will simplify the construction of $F_{Accout}$, but fail to provide the complete user privacy.
-For example, 
+For example,
 in PPID~\cite{OpenIDConnect, SAMLIdentifier},
 $F_{PID_{RP}}$ outputs $ID_{RP}$ directly and $F_{Accout}$ outputs  $PID_{U}$ as $Accout$, then IdP knows which RP the user visits;
 in BrowserID~\cite{BrowserID} and SPRESSO~\cite{SPRESSO},
@@ -146,19 +146,19 @@ $F_{PID_{U}}$ outputs $ID_U$ directly and $F_{Accout}$ uses $ID_U$ as $Accout$ d
 %original by chengqian guo
 %Unfortunately, none of the existing SSO systems could address both RP-based identity linkage and IdP-based access tracing privacy problems at the same time. The user's identity is represented by several forms in different environments. In detail, the IdP and RP store the unique user identifier (denoted as $ID_U$ in IdP and $Account$ in RP) for each users solely, which are linked by the identity proof containing the junctional user identifier (denoted as $ID_U^{Proof}$) issued by IdP. Moreover, there is also the unique RP identifier (denoted as $ID_{RP}$) stored in IdP. In each authentication, the identity proof issued by IdP should contain the $ID_{RP}$ (making sure the identity proof is issued for specific RP) and $ID_U^{Proof}$ (for RP to identify the user). In some traditional SSO systems~\cite{rfc6749}, the $ID_U$ and $ID_U^{Proof}$ are the same one, which results in the RP-based identity linkage, and the $ID_{RP}$ is always exposed to IdP, which results in the IdP-based access tracing. However, to avoid the privacy problems in SSO systems, the $ID_U^{Proof}$ should not be the same as the RP (or the $ID_U^{Proof}$ should not be the same in different RPs) and the $ID_{RP}$ should not be exposed to the IdP (using a transformed $ID_{RP}$ representing the RP) in each authentication. The widely adopted SSO standards, such as OIDC and SAML, use $PPID$ as the $ID_U^{Proof}$ transformed from $ID_U$ which is constant in one RP but different in RPs, but expose the $ID_{RP}$ straightforward to the IdP. Otherwise, the SPRESSO adopts the encrypted $ID_{RP}$ (denoted as $enc(ID_{RP})$) and only the $enc(ID_{RP})$ is exposed to the IdP, however, the $ID_U^{Proof}$ is the same one as the $ID_U$ in SPRESSO. As for the BrowserID, the identity proof is generated by the cooperation between IdP and user so that it could avoid exposing $ID_{RP}$ to IdP, but uses same identifier for $ID_U$ and $ID_U^{Proof}$. The worse thing is there is not a simple way to combine the existing schemes together to protect user's privacy comprehensively (the details are described in Section~\ref{sec:challenge}).
 
-In this paper, we propose UPRESSO, an Unlinkable Privacy-REspecting Single Sign-On system, 
-which provides \textbf{all} the \textbf{satisfying} $F_{PID_{U}}$, $F_{PID_{RP}}$ and $F_{Accout}$, and prevents both the RP-based identity linkage and IdP-based access tracing.
-In UPRESSO, for each login, the RP invokes a one-way trapdoor function $F_{PID_{RP}}$ with a randomly chosen trapdoor ($t$) to generate a random $PID_{RP}$ and anonymously registers it at the IdP;
-then IdP invokes $F_{PID_{U}}$ to generate $PID_U$ with $PID_{RP}$ and $ID_U$, and issues the identity proof; 
+In this paper, we propose UPRESSO, an Unlinkable Privacy-REspecting Single Sign-On system,
+which provides \textbf{all} the \textbf{satisfying} $F_{PID_{U}}$, $F_{PID_{RP}}$ and $F_{Accout}$ based on the discrete logarithm problem, and prevents both the RP-based identity linkage and IdP-based access tracing.
+In UPRESSO, for each login, the RP invokes a one-way trapdoor function $F_{PID_{RP}}$ with a randomly chosen trapdoor ($t$) to generate a random $PID_{RP}$ and anonymously registers it at the IdP who checks the uniqueness of $PID_{RP}$;
+then IdP invokes a one-way function  $F_{PID_{U}}$ to generate $PID_U$ with $PID_{RP}$ and $ID_U$, and issues the identity proof;
 finally, RP checks the binding and integrity of the identity proof, and invokes $F_{Accout}$ with $PID_U$, $ID_{RP}$ and the trapdoor $t$ to obtain the unchanged $Accout$ for the user at this RP.
-Therefore,
- UPRESSO ensures: 
+Therefore, based on the discrete logarithm problem,
+ UPRESSO ensures:
  (1) when a  user logs in to an RP, the RP can derive a unchanged $Accout$ from different $PID_U$, but fails to infer $ID_U$;
- (2) when a user logs in to different RPs, random $PID_U$s are generated and collusive RPs fail to link the user's multiple logins; 
+ (2) when a user logs in to different RPs, various $PID_U$s are generated and collusive RPs fail to link the user's multiple logins;
  and (3) when a RP is visited during multiple logins, random $PID_{RP}$s are generated and the curious IdP cannot infer $ID_{RP}$ nor link these logins.
-  
 
- 
+
+
 %In this paper, we propose UPRESSO, an Unlinkable Privacy-REspecting Single Sign-On system, as a comprehensive solution to tackle the privacy problems in SSO. We propose novel identifier generation schemes to dynamically generate  privacy-preserving $ID_U^{Proof}$ and transformed $ID_{RP}$, denoted as $PID_U$ and $PID_{RP}$, to construct identity proofs for SSO. In our scheme, for each login, RP anonymously registers a random $ID_{RP}$ (denoted as $PID_{RP}$) with IdP, and exposes the $PID_{RP}$ for authentication. IdP generates the $PID_U$ with $PID_{RP}$ and $ID_U$ and issues the identity proof containing $PID_{RP}$ and $PID_U$. Finally, after RP validates the identity proof, it utilizes the trapdoor obtained when generating the $PID_{RP}$ to derive the $Account$ from $PID_U$. However the scheme must satisfy three properties: (1) when a same or differnt user(s) log in to a same RP, random $PID_{RP}$s are generated in different logins so that a curious IdP cannot infer the real identity of the RP or link multiple logins at that RP; (2) when a same user logs in to a same or different RPs, random $PID_U$s are generated so that collusive RPs cannot link the logins of that user; (3) when a same user logs in to a same RP, the RP can derive a unique user identifier from different PUIDs with a trapdoor so that it can provide a continuous service to the user during different logins.
 
 
@@ -173,12 +173,12 @@ Therefore,
 %from both the IdP and RPs, named {UPRESSO}. To achieve this, we rely on the user to achieve the trusted transmit and correctness check of identity proof (same as in BrowserID~\cite{persona}), and propose two algorithms to achieve:
 
 We have implemented a prototype of UPRESSO based on an open-source implementation of OIDC.
-UPRESSO inherits the security properties from OIDC by achieving the binding, integrity and confidentiality of identity proof, 
+UPRESSO inherits the security properties from OIDC by achieving the binding, integrity and confidentiality of identity proof,
   and only requires small modifications to add the three functions $F_{PID_{U}}$, $F_{PID_{RP}}$ and $F_{Accout}$ for privacy protection.
-Therefore, 
+Therefore,
  unlike  BrowserID and SPRESSO which are the non-trivial re-designs of the existing SSO systems,
 UPRESSO is compatible with existing SSO systems,
- and doesn't require a completely new and comprehensive formal security analysis. 
+ and doesn't require a completely new and comprehensive formal security analysis.
 %Unlike BrowserID and SPRESSO which require non-trivial re-design of the existing SSO systems, UPRESSO can be implemented over a widely used OIDC system with small modifications with the support of its dynamic registration function~\cite{DynamicRegistration}.
 
 %Reluse only requires the following modification on  OIDC implementations: (1) an additional web service at the IdP for providing a  set of public parameters; (2) the support for generating  the new RP identifier (at the user and RP), PPID (at the IdP) and user's account (at RP). The prototype demonstrates  that UPRESSO is incompatible with existing OIDC implementations.

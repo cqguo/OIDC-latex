@@ -5,7 +5,7 @@
 \subsection{OpenID Connect}
 \label{subsec:OIDC}
 
-To be compatible with existing SSO systems, UPRESSO is designed on top of OpenID Connect (OIDC)~\cite{OpenIDConnect}, one of the most prominent SSO authentication protocols~\cite{SAMLIdentifier}. In this section, we introduce OIDC and its implicit flow as an example to describe the authentication flows in SSO. Moreover, our proposed framework can also work for other flows with only micro modification.
+To be compatible with existing SSO systems, UPRESSO is designed on top of OpenID Connect (OIDC)~\cite{OpenIDConnect}, one of the most prominent SSO authentication protocols~\cite{SAMLIdentifier}. In this section, we introduce OIDC and its implicit flow as an example to describe the authentication flows in SSO. Moreover, our proposed framework can also work for other flows with only minor modifications.
 
 OIDC is an extension of OAuth 2.0 to support user authentication. As a typical SSO authentication protocol, OIDC involves three entities, i.e., {\em users}, {\em identity provider (IdP)}, and {\em relying parties (RPs)}. Users register at the IdP to create credentials and identifiers (e.g. $ID_U$), which are securely maintained by the IdP. Moreover, an RP also has to register at the IdP with its endpoint information to create its unique identifier. During an SSO process, a user is also responsible for redirecting the identity proof request from the RP to the IdP, checking the scope of user attributes in the identity proof returned by the IdP, and forwarding it to the RP. Usually, the redirection and checking are handled by a user-controlled software, called {\em user agent} (e.g., browser). The IdP maintains user credentials and attributes. Once requested, it authenticates the user and generates the identity proof, which contains user identifier (e.g., $PPID$ in OIDC), RP identifier (e.g. $ID_{RP}$), and a set of user attributes that the user consents to share with the RP. The identity proof is then returned to the registered endpoint of the RP (e.g., URL). RP can be any web server that provides continuous and personalized services to its users. When a user attempts to log in, the RP sends an identity proof request to the IdP through the user, and parses the received identity proof to authenticate and authorize the user.
 
@@ -46,17 +46,17 @@ When an RP first registers at the IdP, it obtains a registration token, with whi
 %After a successful initial registration, RP obtains a registration token from the IdP, and
 update its information (e.g., the endpoint). % by a dynamic registration process with the  registration token. %which enables the RP to integrate the service provided by IdP,
 After each successful dynamic registration, the RP obtains a new unique $ID_{RP}$ from the IdP.
-In this work we adopt dynamic registration to support the dynamic generated privacy-preserving RP identifier (e.g. $PID_{RP}$). 
+In this work we adopt dynamic registration to support the dynamic generated privacy-preserving RP identifier (e.g. $PID_{RP}$).
 
 
 \subsection{Discrete Logarithm Problem}
 \label{sec:dlp}
 
-Discrete logarithm problem is adopted in UPRESSO for privacy-preserving user identifier (e.g. $PID_U$) and RP identifier (e.g. $PID_{RP}$) generation. 
+Discrete logarithm problem is adopted in UPRESSO for privacy-preserving user identifier (e.g. $PID_U$) and RP identifier (e.g. $PID_{RP}$) generation.
 Here, we provide a brief description of the discrete logarithm problem.
 Given a large prime $p$, its primitive root $g$ and a number $y$, it is computationally infeasible to derive the discrete logarithm (here $x$ and $g^xmodp=y$) of $y$ (detailed in~\cite{WXWM}), which is called discrete logarithm problem.
 The hardness of solving discrete logarithm has been a base of the security of several security primitives, including Diffie-Hellman key exchange and Digital Signature Algorithm (DSA).
-The $PID_U$ and $PID_{RP}$ generation is based on the modular exponentiation, which requires the parameters, such as $ID_{RP}$ and $PID_{RP}$, should be the primitive root mod $p$ to prevent the user and RP' identity leakage.  
+The $PID_U$ and $PID_{RP}$ generation is based on the modular exponentiation, which requires the parameters, such as $ID_{RP}$ and $PID_{RP}$, should be the primitive root mod $p$ to prevent the user and RP' identity leakage.
 To calculate the primitive root for a given large prime $p$, we retrieve a primitive root $g_m$ mod $p$, and then calculate the $g = g_{m}^{t} mod \ P$, so that $g$ is another primitive root mod $p$ where $t$ is an integer coprime to $p-1$.
 
 
