@@ -18,7 +18,7 @@ while each RP registers at the IdP with its endpoint information to create its u
 IdP is assumed to securely maintain the attributes  of users and RPs.   
 Then, in the SSO authentication sessions, 
  each user is responsible to start a login request at an RP, redirect the messages between RP and IdP, and check the scope of user's attributes provided to the RP;
- IdP authenticates the user (if the user has not been authenticated), sets the $PPID$ for the user $ID_U$ at the RP $ID_{RP}$,
+ IdP authenticates the user, sets the $PPID$ for the user $ID_U$ at the RP $ID_{RP}$,
  constructs the identity proof with  $PPID$, $ID_{RP}$ and the user's attributes consented by the user, and finally transmits the identity proof to the RP's registered endpoint (e.g., URL);
  each RP constructs an identity proof request with its identifier and the requested scope of  user's attributes, sends an identity proof request to the IdP through the user, and parses the received identity proof to authenticate and authorize the user.
 Usually, the redirection and checking at the user are handled by a user-controlled software, called {\em user agent} (e.g., browser).
@@ -78,10 +78,10 @@ Here, we provide a brief description of the discrete logarithm problem.
 
 A number $g$ ($0<g<p$) is called a primitive root modular a prime $p$, if for ${\forall}y$ ($0<y<p$), there is a  number $x$ ($0\le x <p-1$) satisfying $y=g^x \pmod p$.
 And, $x$ is called the discrete logarithm of $y$ modulo $p$. Given a large prime $p$, a primitive root $g$ and a number $y$, it is computationally infeasible to derive the discrete logarithm (here $x$) of $y$ (detailed in~\cite{WXWM}), which is called discrete logarithm problem.
-The hardness of solving discrete logarithm has been a base of the security of several security primitives, including Diffie-Hellman key exchange and Digital Signature Algorithm (DSA).
+The hardness of solving discrete logarithm has been used to construct several security primitives, including Diffie-Hellman key exchange and Digital Signature Algorithm (DSA).
 
 In the process of $F_{PID_{RP}}$ and $F_{PID_U}$, we needs to calculate the primitive root for a  large prime $p$ as follows~\cite{Shoup,Wang}.
-First, we retrieve a primitive root $g_m$  modulo $p$ by performing the primitive root checking on all the integers one by one. 
+First, we retrieve a primitive root $g_m$  modulo $p$ from all the integers by finding the first integer passing  the primitive root checking.
  A lemma is propose to simply the checking, that if $p=2q+1$ ($q$ is a prime),  an integer $\mu \in (1, p-1)$ is a primitive root if and only if $\mu^2\neq 1 \ mod \ p$ and $\mu^q\neq 1 \ mod \ p$.
 Then, based on $g_m$, we can calculate a new primitive root $g = g_{m}^{t} mod \ p$, where $t$ is an integer coprime to $p-1$.
  
