@@ -7,18 +7,23 @@ In this section, we describe the challenges for developing privacy-preserving SS
 
 \subsection{Basic Security Requirements of SSO}
 \label{subsec:basicrequirements}
+Both the designs of SSO protocols and the implementations of SSO systems are challenging ~\cite{SPRESSO},
+%SSO allows users to leverage their existing accounts in the IdP to access services at the RPs.
+%However, building such a system is considered challenging~\cite{SPRESSO}, as several design and implementation 
+and various vulnerabilities have been found in existing systems~\cite{SomorovskyMSKJ12,WangCW12,ArmandoCCCPS13,ZhouE14,WangZLLYLG15,WangZLG16,YangLLZH16,MainkaMS16,MohsenS16,MainkaMSW17,YangLCZ18,YangLS17,ShiWL19}.
+With these vulnerabilities, the adversaries break the security of SSO systems and achieve the following two goals~\cite{SPRESSO}:
+%In SSO systems, the adversaries' goals described in~\cite{SPRESSO} to break the secure authentication are:
+\begin{itemize}
+\item \textbf{Impersonation}: Adversary logs in to an honest RP as the victim user. %The adversary might achieve the goal by obtaining a user's identity proof in the ways, such as stealing the proof (from the unprotected HTTP transmission), forging the valid proof (if the integrity is not guaranteed), leading the user to upload a proof valid for other RPs (the proof is not bound with specific RP).
+\item  \textbf{Identity injection}: A victim user logs in to an honest RP under the adversaries' identity. %The adversary might achieve this goal by replacing the identity transmitted from IdP to RP or lead the user uploads the malicious identity proof in various ways (e.g., CSRF).
+\end{itemize}
 
-SSO allows users to leverage their existing accounts in the IdP to access services at the RPs.
-However, building such a system is considered challenging~\cite{SPRESSO}, as several design and implementation flaws of SSO systems have been discovered, which led to a plethora of attacks~\cite{SomorovskyMSKJ12,WangCW12,ArmandoCCCPS13,ZhouE14,WangZLLYLG15,WangZLG16,YangLLZH16,MainkaMS16,MohsenS16,MainkaMSW17,YangLCZ18,YangLS17,ShiWL19}.
-In SSO systems, the adversaries' goals described in~\cite{SPRESSO} to break the secure authentication are:
-(1) \textbf{Impersonation}: Adversary logs in to the honest RP as an honest user. The adversary might achieve the goal by obtaining a user's identity proof in the ways, such as stealing the proof (from the unprotected HTTP transmission), forging the valid proof (if the integrity is not guaranteed), leading the user to upload a proof valid for other RPs (the proof is not bound with specific RP).
-(2) \textbf{Identity injection}: Honest user logs in to the honest RP under adversaries' identity. The adversary might achieve this goal by replacing the identity transmitted from IdP to RP or lead the user uploads the malicious identity proof in various ways (e.g., CSRF).
-Based on the formal analysis of SAML, OAuth and OIDC~\cite{ArmandoCCCT08,FettKS16, FettKS17} and the study of existing attacks, we summarize basic requirements that we believe a secure SSO platform which means, 1)RP is always able to identify the user; 2)the system should be protected from forementioned attacks, should meet.
+We summarize basic requirements of SSO systems based on existing theoretical analysis~\cite{ArmandoCCCT08,FettKS16, FettKS17} and practical attacks~\cite{SomorovskyMSKJ12,WangCW12,ArmandoCCCPS13,ZhouE14,WangZLLYLG15,WangZLG16,YangLLZH16,MainkaMS16,MohsenS16,MainkaMSW17,YangLCZ18,YangLS17,ShiWL19} on SSO systems. These basic requirements focus on  functions and security of SSO systems, and are as follows: %not considering privacy protection. They are as follows:
+%Based on the formal analysis~\cite{ArmandoCCCT08,FettKS16, FettKS17} of SSO protocls (e.g.,SAML, OAuth and OIDC) and the study of existing attacks, we summarize basic requirements that we believe a secure SSO platform which means, 1)RP is always able to identify the user; 2)the system should be protected from forementioned attacks, should meet.
 
+\vspace{1mm}\noindent\textbf{User identification.} When a user logs in to a same RP multiple times, the RP should be able to associate these logins to provide a continuous and personalized service to that user. %The anonymous SSO schemes~\cite{ElmuftiWRR08,WangWS13,HanCSTW18} are also proposed to achieve that the user's identity is unknown the neither the IdP nor the RP. However, these schemes are not focally concerned in this paper as the completely anonymous SSO systems are not suitable to the currently web application where the RP need to know the user's identity to provide the personally service. The anonymous SSO schemes are discussed in Section~\ref{sec:related}.
 
-\vspace{1mm}\noindent\textbf{User identification.} When a user logs in to a same RP multiple times, the RP should be able to associate these logins to provide a continuous and personalized service to that user. The anonymous SSO schemes~\cite{ElmuftiWRR08,WangWS13,HanCSTW18} are also proposed to achieve that the user's identity is unknown the neither the IdP nor the RP. However, these schemes are not focally concerned in this paper as the completely anonymous SSO systems are not suitable to the currently web application where the RP need to know the user's identity to provide the personally service. The anonymous SSO schemes are discussed in Section~\ref{sec:related}.
-
-\vspace{1mm}\noindent\textbf{Receiver designation.} The receiver designation requires that the identity proof should be bound to one RP so that it will be accepted only by that RP, and be securely transmitted to the requesting RP (through the user). Otherwise, the adversaries who is able to achieve honest user's identity proof for honest RP, have the ability to conduct impersonation attack~\cite{ChenPCTKT14, WangZLG16}
+\vspace{1mm}\noindent\textbf{Receiver designation.} The receiver designation requires that the identity proof should  be  transmitted only to the RP (and user) that the user visits, and be bound to this RP so that it will accepted only by this RP. %(through the user). Otherwise, the adversaries who is able to achieve honest user's identity proof for honest RP, have the ability to conduct impersonation attack~\cite{ChenPCTKT14, WangZLG16}
 
 
 \begin{comment}
@@ -32,9 +37,16 @@ After a successful SSO authentication, the RP should be able to uniquely identif
 \end{comment}
 
 \vspace{1mm}\noindent\textbf{Integrity.} Only the IdP is able to generate a valid identity proof,
-    and no entity should be able to modify or forge it~\cite{WangZLG16}. Otherwise, an adversary could modify user identifier in the proof to launch impersonation or identity injection attacks. In OIDC, for example, the IdP signs identity proofs with its private key to provide integrity~\cite{WangCW12, SomorovskyMSKJ12}.
+     no other entity should be able to modify or forge it~\cite{WangZLG16} without being found. And, the honest RP should only accept the valid identity proof.
+    %Otherwise, an adversary could modify user identifier in the proof to launch impersonation or identity injection attacks. In OIDC, for example, the IdP signs identity proofs with its private key to provide integrity~\cite{WangCW12, SomorovskyMSKJ12}.
 
-
+These basic requirements are the minimum properties that an SSO system has to provide.
+User identification is necessary for all services except the anonymous systems which will be discussed in Section~\ref{sec:related},
+ therefore RPs should be able to identify the user with the help from IdP.
+While either the receiver designation and integrity not satisfied, the impersonation and identity injection will exist in the SSO systems.
+For example, without the receiver designation,  the adversaries cloud use the leaked identity proof to impersonate the victim user at an honest RP~\cite{ChenPCTKT14,FettKS16,WangZLG16}, and  make the victim RP  incorrectly accept the identity proof intended for other RP, which allows the adversary to perform impersonation directly or inject the identity proof in the web session between the victim user and honest RP with other web attacks (e.g., CSRF);
+while without integrity, the impersonation and identity injection attacks will be more easier as an adversary could directly modify user's identifier in the identity proof. % to launch impersonation or identity injection attacks
+ 
 \begin{comment}
 \vspace{1mm}Breaking the above requirements will lead to some attacks.
 in SSO systems, the adversaries' goals described in~\cite{SPRESSO} to break the secure authentication are:
@@ -64,7 +76,7 @@ and RP-based identity linkage. To prevent the former,  IdP should not be able to
 To conform the requirements of user identification and receiver designation, which is to be validated by the RP, the identity proof must contains (or is related with) specific RP identifier (e.g. $ID_{RP}$) and user identifier (e.g. $ID_U$). However, as the identity proof is generated by the IdP, the $ID_{RP}$ and $ID_U$ allows the IdP to know which RP the user accessed. Moreover, as the identity proof is verified by the RP, the colluded RPs are able to link the same user.
 Therefore, the key point of privacy-preserving SSO system is to hide the $ID_{RP}$ and $ID_U$ while generating the identity proof.
 
-We define that the simplified identity proof model as the tuple $<ID_{RP}, ID_U>$. For each entity in the system, everyone knows the full tuple is able to trace the user (by IdP-based access tracing and RP-based identity linkage). It should be concerned that the RP always know the $ID_{RP}$. We can transform the problem into hiding the full tuple to IdP and RP. 
+We define that the simplified identity proof model as the tuple $<ID_{RP}, ID_U>$. For each entity in the system, everyone knows the full tuple is able to trace the user (by IdP-based access tracing and RP-based identity linkage). It should be concerned that the RP always know the $ID_{RP}$. We can transform the problem into hiding the full tuple to IdP and RP.
 
 In traditional SSO systems, the tuple is always exposed to both IdP and RP, so that they do not protect user from any kind of tracing. In OIDC, $PPID$ is adopted to hide the $ID_U$ from RP by using the RP-unique identifier. In SPRESSO, the identity proof is generated for a encrypted $ID_{RP}$ so that the IdP is unable to obtain the full tuple which avoids the IdP-based access tracing. In BrowserID, the generation of identity proof is split and the responsibility of binding it to RP is shifted to user, which also avoids the IdP-based access tracing. However OIDC allows the full tuple is exposed to IdP, while SPRESSO and BrowserID allows the RP obtains the full tuple, all of which cause the user to be tracked.
 
@@ -156,7 +168,7 @@ Next, we overview the new privacy-preserving user identification and receiver de
 \vspace{1mm}\noindent \textbf{Transformed receiver designation.} The pseudonymous receiver uniqueness allows the IdP to generate the identity proof bound to specific RP without knowing any straightforward RP information but a transformed RP identifier, and the identity proof is bound to the transformed identifier. As the IdP does not the RP’s identity, responsibility of url checking should be shifted from IdP to RP, which guarantees the identity proof is only sent to the bound RP.
 
 \begin{comment}
-\vspace{1mm}\noindent \textbf{Trapdoor identification.} 
+\vspace{1mm}\noindent \textbf{Trapdoor identification.}
 The trapdoor identification make the RP possible to transform the user's identity proof into the constant $Account$ in RP, even the $ID_U^{Proof}$ (user identifier in identity proof) is changing with the $PID_RP$, which is to prevent the RP-based identity linkage.
 The entity with the trapdoor can derive the unique user account associated with an RP from different identifiers in multiple identity proofs generated when the user logs in to that RP multiple times.
 %The trapdoor-existing identification requires that the user identifier generated by IdP should be never same in each authentication as the RP's identity is unknown to IdP and the identifier should be derivable to the specific account unchanged in RP with the trapdoor.
@@ -177,7 +189,7 @@ The identity proof is bound to the transformation of a RP identifier, which allo
 %Otherwise, the identity proof will be accepted by multiple RPs, which results in the misuse of the proof for the impersonate attack.
 
 \vspace{1mm}\noindent \textbf{User-centric confidentiality.}
-User-centric confidentiality shifts the responsibility of url checking from IdP to user agent, which guarantees the identity proof is only sent to the bound RP. The user-centric confidentiality should relies on the trustful user agent and IdP issued RP identity certificate. 
+User-centric confidentiality shifts the responsibility of url checking from IdP to user agent, which guarantees the identity proof is only sent to the bound RP. The user-centric confidentiality should relies on the trustful user agent and IdP issued RP identity certificate.
 %In UPRESSO, the user sends the authentication request to the IdP to generate an identity proof for the requested RP identifier transformation. To ensure the identity proof is securely returned to the requesting RP, UPRESSO adopts a user-centric confidentiality check, which requires the user to extract RP's identifying information (e.g., URL, name and RP identifier) from the RP certificate issued by a trusted entity (e.g., IdP). Therefore, it is impossible for an adversary to request the identity proof on behalf of others or intercept others' identify proofs with a forged return URL.
 \end{comment}
 
@@ -186,7 +198,7 @@ To combine these three principles into one system, we propose novel identifier g
 %(1) How to combine these three principles into one system?
 %(2) Why these principles protect privacy while ensure security?
 %(3) we do not explain how to finish each principle here, it will be explained in Section \ref{subsec:overview}.}
- 
+
 
 
 
