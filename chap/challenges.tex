@@ -71,7 +71,7 @@ In UPRESSO, the adversaries' goals to break the secure authentication are as fol
 %A privacy-preserving SSO needs to prevent both IdP-based access tracing and RP-based identity linkage.
 In addition to the basic requirements, a privacy-preserving SSO system should prevent the IdP-based access tracing %login tracing 和 access tracing 没有已经广泛使用的说法
 and RP-based identity linkage.
-In details, the privacy-preserving SSO system should prevent the curious IdP from obtaining any information that could identify or link the user's accessed RP (e.g., RP's identifier and URL),
+In details, the privacy-preserving SSO system should prevent the curious IdP from obtaining any information that could identify or link the user's accessed RP (for example, through RP's identifier and URL),
 and prevent  the collusive RPs from correlating the user's identifiers at different RPs. % in the identity proof.
 %the user's identifiers provided by IdP for one user should never be same or derivable to each other.
 
@@ -93,66 +93,66 @@ The privacy-preserving receiver designation requires IdP (or the user) to bind a
 The above analysis demonstrates that the identifers of the user and RP need to be carefully processed in SSO systems.
 Here, we systematically analyze the forms of the user and RP identifiers required by privacy protection.
 IdP, who knows the user's globally unique identifer ($ID_U$), should only obtain a privacy-preserving identifer for an RP ($PID_{RP}$);
- each RP, who knows its globally unique identifer ($ID_{RP}$), should only receive a privacy-preserving identifer for a user ($PID_{U}$) from the identity proof. 
+ each RP, who knows its globally unique identifer ($ID_{RP}$), should only receive a privacy-preserving identifer for a user ($PID_{U}$) from the identity proof.
 The $PID_{RP}$ may be null, it means IdP has no information about RP, for example in BrowserID~\cite{BrowserID}.
-The $PID_{U}$ can never be null, as RP has to derive the $Accout$ from it, which is the basic function of SSO systems. 
+The $PID_{U}$ can never be null, as RP has to derive the $Accout$ from it, which is the basic function of SSO systems.
 Here the  privacy-preserving identifers in multiple sessions will never leak the globally unique identifer nor link the sessions from an entity (the RP and user).
-That is, $PID_{RP}$s in multiple sessions for a same RP  should be independent from the view of the IdP,
- and for the collusive RPs, their obtained $PID_{U}$s for a same user should be independent. 
+That is, $PID_{RP}$s in multiple sessions for a same RP  should be independent from the view of the IdP;
+ and for the collusive RPs, their obtained $PID_{U}$s for a same user should be independent.
 
 Then, we analyze the generation and use of $PID_U$ and $PID_{RP}$ as in Figure~\ref{fig:IDCorrelation}, considering the basic requirements of SSO system.
 \begin{itemize}
-  \item %Who generates $PID_U$? 必须由IdP负责生成PID_U  
+  \item %Who generates $PID_U$? 必须由IdP负责生成PID_U
         IdP is the only trusted entity to control the generation of $PID_U$, as the user is not trusted by the RP and a malicious user may provide incorrect $PID_U$. Here, the ``control" means, IdP may generate $PID_U$ alone or with the corporation from the user, but it's the IdP who finally determines the value of $PID_U$. For clarity, we assume IdP generates $PID_U$ with the function $F_{PID_U}(ID_U, PID_{RP})$, without loss of generality.
-  
+
   \item %What's the requirement considering $PID_{U}$ and $PID_{RP}$ together? $PID_{U}$ and $PID_{RP}$一起考虑时需要满足的。
   The generation of $PID_{U}$ and $PID_{RP}$ must ensure the \textbf{user identification},
   that is, the RP could derive a same $Account$ with the $PID_{U}$ and $PID_{RP}$ from different logins. We assume RP calculates $Account$ with the function $F_{Account}(PID_U, ID_{RP}, PID_{RP})$.
-  
-  \item %Who generates $PID_{RP}$, and what's the requirement? PID_RP可以由RP或者user合作生成，但要保证唯一性。  
-  Each $PID_{RP}$ must be globally unique, i.e., only assigned to one RP,  for achieving the \textbf{receiver designation}. 
+
+  \item %Who generates $PID_{RP}$, and what's the requirement? PID_RP可以由RP或者user合作生成，但要保证唯一性。
+  Each $PID_{RP}$ must be globally unique, i.e., only assigned to one RP,  for achieving the \textbf{receiver designation}.
         The user and RP may generate the $PID_{RP}$ separately or cooperatively.
         However, both the user and RP must check the uniqueness of $PID_{RP}$.
         If either the user or the RP doesn't perform the check, the adversary could make it accept a $PID_{RP}$ same as an RP and then misuse the identity proof.
         %misuse the identity proof at the entity who doesn't check the uniqueness.
         $PID_{RP}$ is one form of the RP's identifer, and seems unrelated with the user's identifier.
         Although, the user may inject the user's information into $PID_{RP}$, these information will be treated as random values at the RP and never be used to calculate $Account$, as the user is not trusted by the RP.
-        Therefore, we can assume that $PID_{RP}$ is generated through a function $F_{PID_{RP}}(ID_{RP})$.
+        Therefore, we can assume that $PID_{RP}$ is generated through a function $F_{PID_{RP}}(ID_{RP})$.~\footnote{The $PID_{RP}$ may also be related with the previous $PID_{RP}$. We omit the previous $PID_{RP}$ in the equation as it is also a transform of $ID_{RP}$.}
   \item The \textbf{receiver designation} further requires that  $PID_{U}$ is bound with either a non-null $PID_{RP}$ or $ID_{RP}$ in identity proof.
-        When $PID_{RP}$  is non-null, IdP builds the identity proof separately and the \textbf{integrity} is ensured.
+        When $PID_{RP}$  is non-null, IdP builds the identity proof separately and the \textbf{integrity} is also ensured.
         When $PID_{RP}$  is null, only the user cloud bind $PID_{U}$ with an RP identifier (i.e., $ID_{RP}$) which is unique and checkable to the RP.
         In this case, the user who performs the binding, must have a publicly verifiable grant from the IdP, as required by \textbf{integrity}.
+        The binding and integrity cloud be achieved by existing public key infrastructure.
 \end{itemize}
 
-
-
-Then, we analyze the requirements on $PID_{RP}$ and $PID_{U}$     
-the design of a secure and privacy-preserving SSO system becomes a dilemma.
- We demonstrate this problem through an SSO authentication session, as shown in Figure~\ref{fig:IDCorrelation}.
-The IdP who knows $ID_U$ and $PID_{RP}$, generates $PID_{U}$, which is included in the identity proof;
- the  $PID_{U}$ is bound with the non-null $PID_{RP}$ or the $ID_{RP}$ in the identity proof;
-  and finally RP checks the binding and calculates $Account$.
-The $PID_{U}$ in the identity proof must be generated by the IdP, otherwise the adversary could act as a user to inject any incorrect user's identifier in the identity proof.
-The RP's identifier in the identity proof must be checkable to the RP,  otherwise the adversary could act as a RP to misuse the received identity proof to impersonate the user at any RP.
-Therefore, we assume that $PID_{U}$ is generated by IdP with the function $F_{PID_{U}}(ID_U, PID_{RP})$;
-  $PID_{RP}$ is generated by RP (or with the user) with the function $F_{PID_{RP}}(ID_{RP}$;
-  and the $Account$ is generated by the RP with the function $F_{Account}(PID_{U}, ID_{RP}$.
-
-$PID_{U}$ can never be null, otherwise user identification is not satisfied as RP fails to derive a local unique $Account$.
-$PID_{RP}$ may be null, then the identity proof should be bound with the $ID_{RP}$ to ensure that RP could perform the check, and the binding should be completed by the user under the grant by the IdP.
-
-For user identification,
-IdP should provide $PID_U$s for the user $ID_U$s with the null $PID_{RP}$ or different $PID_{RP}$s,
- and the  $PID_U$s could be used to derive one $Account$ for a user's multiple logins.
-
-
+Then, the dilemma in the design of a secure and privacy-preserving SSO system, could be transformed into finding the three functions  $F_{PID_{RP}}$,  $F_{PID_{U}}$ and $F_{Account}$, which satisfying:
+\begin{itemize}
+  \item For an RP, $F_{PID_{RP}}$ generates $PID_{RP}$s in multiple logins, and these  $PID_{RP}$s are independent to the IdP.
+  \item For a user, $F_{PID_{U}}$ generates $PID_{RP}$s in multiple logins at different RPs, and these $PID_{RP}$s are independent to these RPs.
+  \item For a user and an RP, $F_{Account}$ generates a unchanged $Account$ in multiple logins.
+\end{itemize}
 
 %We define that the simplified identity proof model as the tuple $<ID_{RP}, ID_U>$. For each entity in the system, everyone knows the full tuple is able to trace the user (by IdP-based access tracing and RP-based identity linkage). It should be concerned that the RP always know the $ID_{RP}$. We can transform the problem into hiding the full tuple to IdP and RP.
 
-In traditional SSO systems, the tuple is always exposed to both IdP and RP, so that they do not protect user from any kind of tracing. In OIDC, $PPID$ is adopted to hide the $ID_U$ from RP by using the RP-unique identifier. In SPRESSO, the identity proof is generated for a encrypted $ID_{RP}$ so that the IdP is unable to obtain the full tuple which avoids the IdP-based access tracing. In BrowserID, the generation of identity proof is split and the responsibility of binding it to RP is shifted to user, which also avoids the IdP-based access tracing. However OIDC allows the full tuple is exposed to IdP, while SPRESSO and BrowserID allows the RP obtains the full tuple, all of which cause the user to be tracked.
+Various solutions~\cite{OpenIDConnect, SAMLIdentifier,BrowserID,SPRESSO}, are proposed, attempting to construct a secure and privacy-preserving SSO system.
+However, these scheme provide at most two satisfying functions, and therefore fail to prevent either the IdP-based access tracing or RP-based identity linkage.
+\begin{itemize}
+  \item The traditional SSO systems provide only the satisfying $F_{Account}$, and therefore fail to protect the user's privacy.
+  \item SAML~\cite{SAMLIdentifier} and OIDC~\cite{OpenIDConnect} provide only the satisfying $F_{PID_{U}}$ and $F_{Account}$.
+        The IdP obtains the $ID_{RP}$ for an RP, and generates the unchanged $PID_{U}$ for the same couple $<ID_{U}$, $ID_{RP}>$,
+        while the $PID_{U}$ are independent for different $ID_{RP}$s.
+  \item BrowserID~\cite{BrowserID} and SPRESSO~\cite{SPRESSO} provide only the satisfying $F_{PID_{RP}}$ and $F_{Account}$.
+        In BrowserID, IdP obtains a null $PID_{RP}$ and provides $ID_U$ to the RP, therefore each RP obtains the unchanged $Accout$.
+        In SPRESSO, each RP generates $PID_{RP}$ by encrypting $ID_{RP}$ with a random nonce,
+        and IdP provides the unchanged $ID_U$ for a user's multiple logins no matter which RP the user is visiting.
+\end{itemize}
+
+Obliviously, existing attempts fail to provide the complete  privacy.
+The essential reason is that these schemes provide an unchanged value (e.g., $PID_{U}$ in SAML~\cite{SAMLIdentifier} and OIDC~\cite{OpenIDConnect}, or $ID_U$ in BrowserID~\cite{BrowserID} and SPRESSO~\cite{SPRESSO}) for the user's multiple logins at an RP.
+To provide unchanged $PID_{U}$, IdP will be able to identity or link the logins at an RP.
+Providing $ID_U$ to the RP, makes  the collusive RPs easily link the user's logins at different RPs.
 
 %The key challenge is that there is no simple way to hide the full tuple to both IdP and RP. To tackle this problem, it requires the IdP to generate pairwise identifiers for a user and bind them to pseudo RP identifiers that seem random to IdP, in a way that user identifiers are unique at one RP but different at different RPs and user identifiers bound to pseudo identifiers of the same RP can be associated by that RP.
-
 
 \begin{figure}
   \centering
