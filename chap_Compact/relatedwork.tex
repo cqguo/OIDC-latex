@@ -1,0 +1,95 @@
+\section{Related Works}%各个方向全都加入，例如安全分析
+\label{sec:related}
+Various SSO  standards have been proposed and widely deployed. For example, OIDC is adopted by Google, OAuth 2.0 is deployed in Facebook, SAML is implemented in the Shibboleth project~\cite{Shibboleth}, and Central Authentication Service (CAS)~\cite{aubry2004esup} is widely adopted by Java applications.
+Kerberos~\cite{Kerberos}, proposed by MIT, is now replaced by the SSO standards (e.g., OIDC, OAuth) who provide better privacy, as the users in Kerberos fail to control on the releasing of their private information.
+
+%破坏一个属性的尽量放在一起
+\subsection{Security consideration about SSO systems.} 
+\noindent\textbf{Analysis on SSO designing and implementation.} Even the user's account at IdP not compromised, various vulnerabilities in the SSO implementations were exploited for the impersonation attack and identity injection, by
+ breaking at least one of the requirements. %, i.e., confidentiality, integrity and binding of identity proof.
+(1) To break the confidentiality of identity proof,  Wang et al.~\cite{WangCW12} performed a traffic analysis/manipulation on SSO implementations provided by Google and Facebook; ~\cite{ZhouE14,WangZLG16,YangLLZH16} exploited the vulnerability at the RP's implementations of OAuth, i.e., the publicly accessible information is misused as the identity proof;
+Armando et al.~\cite{ArmandoCCCPS13} exploited the vulnerability at the user agent, to transmit the identity proof to the malicious RP.
+(2) The integrity is broken~\cite{SomorovskyMSKJ12,WangCW12,ZhouE14,WangZLG16,YangLLZH16,MainkaMS16, MainkaMSW17} in the implementations of  SAML, OAuth and OIDC.
+For example,~\cite{SomorovskyMSKJ12} exploited XML Signature wrapping (XSW) vulnerabilities to modify the identity proof without being found by RPs;
+the incomplete verification at the client allows the modification of the identity proof~\cite{ZhouE14,WangZLG16,YangLLZH16};
+ID spoofing and key confusion make the identity proof issued by the adversary be accepted by the victim RPs~\cite{MainkaMS16, MainkaMSW17}.
+(3) The designation is also broken~\cite{ZhouE14,WangZLG16,YangLLZH16,YangLCZ18}, as the RP may misuse the bearer token  as the identity proof~\cite{ZhouE14,WangZLG16,YangLLZH16}, and IdP may not bind the refresh/access token with RP which allows the refresh/access token injection~\cite{YangLCZ18}.
+Cao et al.~\cite{CaoSBKVC14} attempts to improve the confidentiality and integrity, by modifying the architecture of IdP and RP to build a dedicated, authenticated, bidirectional, secure channel between them.
+ 
+
+
+%以下内容被拆分到上面三点内容了，但是注释内容有对论文的详细表述
+\begin{comment}
+%Various attacks were proposed for the impersonation attack and identity injection, by breaking the confidentiality, integrity and binding of identity proof,
+%and extensive efforts have been devoted to the security considerations of SSO systems.
+%analysis of 14 major SAML frameworks and show that 11 of them, including Salesforce, Shibboleth, and IBM XS40, have critical XML Signature wrapping (XSW) vulnerabilities
+XML Signature wrapping (XSW) vulnerabilities were found in 11 major SAML implementations (e.g., the ones provided by Salesforce, Shibboleth, and IBM XS40)~\cite{SomorovskyMSKJ12}, which was used to break the integrity of identity proof.
+%Juraj et al.\cite{SomorovskyMSKJ12} breaks the integrity, by exploiting the XSW vulnerabilities to  insert malicious elements in 11 SAML frameworks.
+Wang et al.~\cite{WangCW12} performed a traffic analysis on SSO implementations provided by Google and Facebook, and broke the integrity and confidentiality to sign onto the victim's account.
+%, including bypassing the verification of signature (braking integrity), leaking of identity proof (breaking confidentiality) and so on.
+%In 2014 Zhou et al.~\cite{ZhouE14}, in 2016 Wang et al.~\cite{WangZLG16} and Yang et al.~\cite{YangLLZH16} built the automatic tester to analyse the implementations of existing applications and achieve the statistical result of these applications.
+%The usual vulnerabilities found in these works includes, 1) using bearer token for authentication (break binding); 2) using publicly accessible information as identity proof (breaking confidentiality); 3) client-side protocol logic (breaking integrity) and so on.
+The vulnerabilities~\cite{ZhouE14,WangZLG16,YangLLZH16} were found in the RP's implementations of OAuth, for example, the bearer token or publicly accessible information is misused as the identity proof which allows the breaking of binding or confidentiality, the incomplete verification at the client breaks the integrity.
+%MainkaMS16 针对OpenID，描述的是恶意的IdP影响到RP集成的其他正确IdP上的用户信息，主要是 ID Spoofing: 恶意的IdP以正确的IdP名义签发identity proof；Key Confusion 让RP以为恶意IdP的key是对应正确IdP的。
+%We found two novel classes of attacks, ID Spoofing (IDS) and Key Confusion (KC), on OpenID, which were not covered by previous research. Both attack classes allow compromising the security of all accounts on a vulnerable SP, even if those accounts were not allowed to use the malicious IdP.
+%MainkaMSW17 是将MainkaMS16 用到OpenID connect的自动化工具
+The integrity may be broken in OpenID connection implementations~\cite{MainkaMS16, MainkaMSW17}.
+%Christian et al.~\cite{MainkaMS16, MainkaMSW17} proposed the corrupted IdP might compromise the account in the RP associated with other IdPs, which break the confidentiality and integrity of SSO systems.
+%ArmandoCCCPS13 针对SAML和OpenID，攻击者利用浏览器的漏洞，将用户与RP之间的cookie发送给了恶意的RP，破坏机密性。具体地，就是讲恶意的js代码插在relaystate参数中，破坏同源策略。
+%As we can see in the figure, c requires a resource from a compromised SP i; i, acting in turn as a client, receives from sp an Authentication Request, and passes it back to c, with the malicious code injected into theRelayState. The client’s browser eventually executes the redirection to the maliciously-crafted URI, as if coming from the Google domain (thus circumventing the same origin policy). This redirection leads to the theft of theHID, HUSR, and ASIDAScookies by sp.
+Armando et al.~\cite{ArmandoCCCPS13} exploits the vulnerability at the user agent, to transmit the identity proof to the adversary.
+%Besides, other analysis about SSO systems in various directions, such as in 2013 Armando et al.~\cite{ArmandoCCCPS13} issued the specific code injection in Google SSO system results in the impersonate attack,
+%CaoSBKVC14 指出impersonation attacks的root cause是IdP和RP之间没有一个安全信道实现机密性和完整性，其introduce a dedicated, authenticated, bidirectional, secure channel，具体的是针对RP标识，不再使用一个随机的appid，而是 an unforgeable identifier to represent the identity of an RP（直接用他的域名 the identity of the RP is its web origin）；安全信道是按需建立类似于TLS的双向认证通道，且使用完之后销毁。
+Cao et al.~\cite{CaoSBKVC14} proposed a dedicated, authenticated, bidirectional, secure channel between RP and RP, to improve the confidentiality and integrity.
+%in 2014 Cao et al.~\cite{CaoSBKVC14} discussed about the security of communication channel between the RP and the IdP.
+%YangLCZ18 开发了一个针对OAuth SDK的分析工具，发现了包括Facebook在内的SDK，存在use-before-assignment of state variable，Bypass MAC key protection，refresh token injection，access token injection等漏洞。refresh token injection和access token injection 破坏了binding，token没有和RP绑定。use-before-assignment of state variable允许了CSRF攻击（making CSRF attack possible again），这个靠不上三个基本要求，是实现上的，替换了state，使得RP将攻击者请求（响应）和受害者响应（请求）关联了，即将一个session和非对应的实体绑定了。Bypass MAC key protection也是破坏了 MAC key和RP绑定。
+Yang et al.~\cite{YangLCZ18} analysed the SDK implementation of OAuth 2.0, and adopted the refresh/access token injection to break the binding.
+%which are concerned as the confidentiality vulnerabilities in SSO systems.
+%ChenPCTKT14分析了authentication与authorization的区别（authentication的token必需与RP进行绑定，binding），并提出了移动端与web端单点登录的区别：缺少浏览器的重定向机制作为安全传输。在移动端系统中，面临的安全问题包括：使用未与RP绑定的token （binding），使用app之间的消息传递或者webview都是不安全的 （confidentiality），client-side logic（将app secret存储在客户端，在应用端可以使用access token换取用户信息，之后使用用户信息向RP证明用户的身份，这个用户信息可能被攻击者篡改，导致integrity）， 缺少明确的用户授权行为 （confidentiality）
+\end{comment}
+
+\noindent\textbf{Analysis on mobile platform SSO systems.} Compared to web SSO systems, new vulnerabilities were found in the mobile SSO systems, due to the lack of trusted user agent (e.g., the browser)~\cite{WangZLLYLG15,MohsenS16}. The confidentiality of the identity proof may be broken due to the untrusted transmission. For example, the WebView is adopted to send the identity proof, however, the malicious application who integrates this WebView may steal the identity proof~\cite{MohsenS16}; the lack of authentication  between mobile applications may also make the identity proof (or index) be leaked to the malicious applications~\cite{WangZLLYLG15}.
+Various automatic tester were proposed to analyze the mobile SSO systems~\cite{MohsenS16,WangZLLYLG15,WangZLG16,YangLS17,ShiWL19}, for the traditional  vulnerabilities (e.g., inadequate transmission protection~\cite{WangZLLYLG15}, token replacement~\cite{ShiWL19}) and new ones in mobile platforms (webview~\cite{MohsenS16}, application logic error~\cite{YangLS17}).
+
+%MohsenS16分析了在移动端使用webview实现SSO会导致恶意RP可以向WebView中插入JS代码获取用户的token （confidentiality），同时提供了对WebView的保护防止恶意RP获得token
+%WangZLLYLG15 使用自动化工具对Android应用进行分析，总结了Android应用面临的安全问题：1 Vulnerability I (V1): Improper User-agent（使用WebView实现SSO）， 2 Vulnerabili ty II (V2): Lack of Authentication（使用app间消息传递实现SSO）， 3 Vulnerability III (V3): Inadequate transmission protection （网络传输缺少保护）， 4 Vulnerabili ty IV (V4): Insecure secret Management （上面的 client-side logic）， 5 Vulnerability V (V5): Problematical server-side validation （RP server与IdP server之间的消息传递没有受到保护，用户的信息可能被泄露，用户信息可能被篡改）， 6 Vulnerabili ty VI (V6): Wrong authentication proof （使用公开信息作为identity proof，破坏confidentiality ）
+%YangLS17 使用工具分析Android 应用OAuth实现的问题：1 Untrusted Identity Proof （使用server-to-server transmission保护，使用签名保护 integrity）， 2 Heavy Client-Side Logic（客户端逻辑）
+%ShiWL19 使用model-based的自动化工具，分析了Android应用OAuth实现的问题，包括：Access Token Replacement（替换token，破坏binding）， access token Disclosure （confidentiality）， code Disclosure （confidentiality），App Secret Disclosure （客户端逻辑，只曝露secret不会破坏安全性），Augmented Token Replacement （提供token与RP的绑定，但是可以被绕过， the attacker can extract the associated user information of victims from the IdP directly with either the stolen (i.e., network attacker) or obtained (i.e., malicious RP attacker) token, e.g., replaying Step 7 in Fig. 1. Consequently, the attacker can inject both the token and its corresponding user information in his own session），Profile Vulnerability（缺少用户明确授权，泄露用户的隐私数据）
+% In 2016 Mohsen et al.~\cite{MohsenS16} proposed the security of SSO systems implemented through WebView, one of the most important Android components, also facing the threaten of untrusted identity proof transmission.
+% Moreover, in 2016 Wang et al.~\cite{WangZLG16} analysed the design and implementation of SSO systems for multiple platforms with the automatic testing. In 2015 Wnag et al.~\cite{WangZLLYLG15}, in 2017 Yang et al.~\cite{YangLS17} and in 2019 Shi et al.~\cite{ShiWL19} issued the new vulnerabilities in mobile SSO systems and conducted security assessments for the top Android applications and and achieve the statistical result of these applications.
+
+%YeBWD15在facebook的webview实现中，通过第三方应用获得facebook的cookie，使攻击者能够以受害者的身份登录facebook应用。we build a dummy app using the Facebook Login and we authorize the app with public profile permission. Then we used adb tool kit with root privilege to access to storage of the mobile phone. We successfully locate the cookies c_user and xs as well as the credential access_token. The cookies are stored in an sqlite database in mobile phone’s storage at path /data/data/<Apps package name> /databases/webviewCookiesChromium.db and the access_token is stored in an xml file at path /data/data/<App’s package name> /com.facebook.AuthorizationClient. WebViewAuthHandler.TOKEN\_STORE\_KEY.xml.
+
+\noindent\textbf{Formal analysis on SSO systems.}The comprehensive formal security Analysis were performed on SAML, OAuth and OIDC. Armando et al.~\cite{ArmandoCCCT08} built the formal model for the Google's implementation of SAML,
+and found that  malicious RP might reuse the identity proof to impersonate the victim user at other RP, i.e., breaking the binding.
+Fett et al.~\cite{FettKS16, FettKS17} conducted the formal analysis of the OAuth 2.0 and OpenID Connect standards using an expressive Dolev-Yao style model,
+and proposed the 307 redirect attack and IdP Mix-Up attack.
+The 307 redirect attack makes the browser expose the user's  credential to RP.
+IdP Mix-Up attack allows the malicious IdP to receive the identity proof issued by the correct IdP for the correct RP (who integrates the malicious IdP), which breaks the confidentiality.
+Fett et al.~\cite{FettKS16, FettKS17} proved that OAuth 2.0 and OIDC  satisfy the authorization and authentication requirements, as the two bugs are fixed in the revisions of OAuth and OIDC.
+Ye et al.~\cite{YeBWD15} performed a formal analysis on the implementation of Android SSO systems,
+ and found a vulnerability in the existing Facebook Login implementation on Android system, as the session cookie between the user and Facebook may be obtained by the malicious RP application.
+
+\noindent\textbf{Analysis on malicious IdP.} One concern of SSO is that, the adversary  controls the user's accounts at the correlated RPs, once the user's account at IdP is compromised. A backwards-compatible extension (single sign-off) is proposed for OIDC, which revokes the adversary's access to the RPs~\cite{GhasemisharifRC18}.
+
+The requirements of security authentication are summarized based on the previous work about SSO security. Moreover, as UPRESSO is compatible with OIDC, the protection schemes against existing attacks are also available in UPRESSO.
+
+
+
+\subsection{Privacy consideration about SSO systems.} 
+Privacy is the another concern of  SSO systems.
+As suggested in NIST SP800-63C~\cite{NIST2017draft}, the user's privacy protection in SSO systems includes, 1) the user's control on the attributes exposed to the RP, 2) prevention of identity linkage, and 3) avoiding of IdP-based access tracing.
+
+\noindent\textbf{Privacy-preserving SSO systems.} OAuth and OIDC provide the user notification to achieve the user's control on its private information~\cite{ChenPCTKT14,YangLLZH16}.
+The pairwise user identifier is proposed to avoid the identity linkage performed by collusive RPs in SAML and OIDC~\cite{OpenIDConnect,SAML}.
+In SPRESSO~\cite{SPRESSO} and BrowserID~\cite{BrowserID} (adopted in Persona~\cite{persona} and its new version Firefox Accounts~\cite{FirefoxAccount}), IdP doesn't know which RP the user is accessing, however the user's email address is sent to the RP, which introduces the risk of identity linkage performed by the collusive RPs. Fett et al.~\cite{FettKS14, BrowserID} performed a formal analysis on the implementation of BrowserID and found that IdP may still know which RP is accessed by the user.
+
+However, none of existing SSO protocols are able to protect user from being tracked by both the collusive RPs and IdP at the same time.
+Compared with the existing schemes that only protect user's privacy in one side, UPRESSO is able to prevent user from being traces in both sides (being tracked by RPs and IdP). Moreover, UPRESSO is not the simple combining of existing schemes but the completely novel solution based on the OIDC standard.
+
+\noindent\textbf{Anonymous SSO systems.} Anonymous SSO scheme is proposed to hide the user's identity to both the IdP and RPs, which may only be applied to the anonymous services that do not identify the user.
+One of the earliest anonymous SSO system is proposed for Global System for Mobile (GSM) communication in 2008~\cite{ElmuftiWRR08}.
+In 2013, the notion of anonymous single sign-on is formalized~\cite{WangWS13}.
+Then, the various cryptographic primitives, e.g., group signatures and zero-knowledge proof, are adopted to build anonymous SSO scheme~\cite{WangWS13,HanCSTW18}.
+
+However, the anonymous SSO systems enable the user access the service provided by RP without providing her identity to both RP and IdP which avoids user being traced, therefore, RP is unable to distinguish whether multiple accesses are from the same user or not. For most web service providers, it means the personalized service for users are not available, which results the anonymous schemes are not useful. Compared with anonymous SSO schemes, in UPRESSO RP is able to transform the user's $PID_U$ into the constant $Account$, based on which the RP can distinguish the same user in multiple requests. 

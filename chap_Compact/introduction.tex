@@ -1,0 +1,145 @@
+\section{Introduction}
+\label{sec:intro}
+
+%SSO的特点
+%SSO的现状
+Single sign-on (SSO) systems, such as OAuth~\cite{rfc6749}, OpenID Connect~\cite{OpenIDConnect} and SAML~\cite{SAML}, have been widely adopted nowadays as a convenient web authentication mechanism. SSO delegates user authentication from websites, so-called relying parties (RPs), to a third party, so-called identity providers (IdPs), so that users can access different services at cooperating sites via a single authentication attempt. Using SSO, a user no longer needs to maintain multiple credentials for different RPs, instead, she maintains only the credential for the IdP, who in turn will generate corresponding \emph{identity proofs} for those RPs. Moreover, SSO shifts the burden of user authentication from RPs to IdPs and reduces security risks and costs at RPs. As a result, SSO has been widely integrated with modern web systems.
+We analyze the Alexa top-100 websites~\cite{Alexa} and find 80\% of them support SSO service,
+ and the analysis in~\cite{GhasemisharifRC18} identifies SSO support on 6.30\% of the Alexa top 1 million websites.
+Meanwhile, many email and social networking providers (such as Google, Facebook, Twitter, etc.) have been actively serving as social identity providers to support social login.
+
+
+%SSO系统的安全问题，需要保护identity proof的完整性，机密性，绑定性
+%完整性：使用公开的为受保护的信息作为identity proof
+%机密性：保证由IdP发送给对应的RP，并且传输过程中通道、user agent都是受到保护的
+%绑定性：identity proof一定要与对应的RP实现绑定
+%SPRESSO中关于impersonation和identity injection的描述。 Authentication is the most fundamental security property of an SSO system. That is, i) an adversary should not be able to log in to an RP, and hence, use the service of the RP, as an honest user, and ii) an adversary should not be able to log in the browser of an honest user under an adversary’s identity (identity injection).
+%这段描述两个事情：1.secure authentication 就是能防住impersonation和identity injection。 然而，现在有很多攻击使得这两个无法得到保证。经过分析主要是这三个方面的原因：1)RP接受了未被完整性保护的内容；2)未绑定；3)泄露。
+%binding 原文描述 ChenPCTKT14 CCS14 Friendcaster(Friendcaster是一款Facebook的第三方应用，比官方版的功能更加全面) blindly accepting an access token received from a user's device then using this token to exchange for the user's Facebook ID. A malicious application could obtain a legitimate access token from a user, then use this access token to log into Friendcaster as the user. cause they thought Facebook's access tokens were bound to relying parties and checked with every API call: \From Facebook's perspective, the API calls wouldn't appear to be originating from Friendcaster, but the attacker's own app."
+%完整性原文描述 IEEE S&P2012~\cite{WangCW12}关于Google问题描述we found that the RPs of Google ID SSO often assume that message fields they require Google to sign would always be signed, which turns out to be a serious misunderstanding (Section 4.1). These problems make us believe that a complete answer to our question can only be found by analyzing SSO schemes on real websites.
+
+SSO systems need to provide secure authentication~\cite{SPRESSO}, that is to ensure an honest user logs in to an honest RP under the correct identity (i.e., account).
+To achieve this, the identity proof should be valid only for the RP that the user requests to log in to (i.e., binding),
+  and never leaked to other entities except this RP and the user (i.e., confidentiality);
+   while this RP should never accept any information from the corrupted identity proof (i.e., integrity).
+However, various attacks are found to exploit the vulnerabilities in the SSO systems to break at least one of these three principles~\cite{ChenPCTKT14, FettKS16,WangCW12,ZhouE14,WangZLG16,YangLLZH16,SomorovskyMSKJ12,MohsenS16}, and the adversary could impersonate the victim user at an RP or log in the browser of an honest user under an adversary’s identity (i.e., identity injection).
+For example, Friendcaster was found to blindly accept any received identity proof~\cite{ExplicatingSDK,ChenPCTKT14} (i.e., not checking binding), then a malicious RP could obtain the identity proof from a user who attempts to log in to this malicious RP, and use it to log in to Friendcaster as the victim user~\cite{MohsenS16};
+some RPs of Google ID SSO were found to accept the user's attributes unprotected in the identity proof (i.e., out scope of  integrity protection), and therefore a malicious user could add incorrect attributes (e.g., the email address) in identity proof and then act as any user at the RP~\cite{WangCW12}.
+
+
+%SSO 引入新的隐私问题
+%IdP知道用户登录哪个RP
+%RP之间可以合谋知道同一个用户登录哪些RP
+The wide adoption of SSO also raises new privacy concerns regarding online user tracking and profiling~\cite{maler2008venn,NIST2017draft}.
+Privacy leakage exists in all current SSO protocols and implementations.
+We adopt the SSO authentication session in the OpenID Connect (OIDC)  as an example, to figure out the leakage. 
+As shown in Fig.~\ref{fig:OpenID},
+on receiving a login request from a user (Step 1), the RP uses the RP's identifier to construct an authentication request and redirects it to IdP (Step 2);
+then, the IdP completes the user's authentication in Step 3,  generates an identify proof for the user and binds it  with the  RP in Step 4, and redirects the identity proof to the RP confidentially in Step 5;
+finally, the RP verifies the binding and integrity of identity proof and sends the result to the user.
+From the authentication session, we find  collusive RPs and curious IdP could break the user's privacy  as follows.
+\begin{itemize}
+  \item {\em RP-based identity linkage}. 
+If the common (or derivable from others) identifiers are used in the identity proofs for a same user across different RPs, % or the user's identifiers can be derived from each other,
+which is the case even in several widely deployed SSO systems~\cite{BrowserID,SPRESSO}, collusive RPs could not only track her online traces but also correlate her attributes across the sites~\cite{maler2008venn}.
+  \item {\em IdP-based access tracing}. IdP obtains the user's unique identifer in Step 3 and the identifers of the visited RPs in Step 2.
+ Therefore, a curious IdP could easily discover all RPs accessed by a user and reconstruct her access traces. 
+\end{itemize}
+
+
+
+%google and facebook的负面新闻
+%1. service provider（如DNS）知道你访问了，可以带来很多问题。但是还是不同的，DNS里profile需要评估的是two behavior vectors的similarities，而IdP中都不需要，因为IdP能够区分two behavior vectors 是否来自相同节点。
+
+Meanwhile, large IdPs, especially social IdPs like Google and Facebook, are known to be interested in collecting users' online behavioral information for various purposes (e.g., Screenwise Meter~\cite{googlenews}, Onavo~\cite{Onavo}). By simply serving the IdP role, these companies can easily collect a large amount of continuous data to reconstruct users' online traces. 
+Moreover, many service providers are also hosting a variety of web services, which makes them easy to link the same user's multiple logins in each RP as the user's unique  identifier is contained in the identity proof. Through internal integration, they could obtain rich information from SSO data to profile their clients.
+
+
+
+While the privacy problems in SSO have been widely recognized~\cite{maler2008venn,NIST2017draft}, only a few solutions have been proposed to protect user privacy~\cite{persona,SPRESSO}. Among them, Pairwise Pseudonymous Identifier (PPID)~\cite{OpenIDConnect, SAMLIdentifier} is a most straightforward and commonly accepted solution to defend against RP-based identity linkage, which requires the IdP to create different identifiers for the user when she logs in to different RPs. In this way, even multiple malicious RPs collude with each other across the system, they cannot link the  pairwise pseudonymous identifiers of the user and track which RPs she has visited. As a recommended practice by NIST~\cite{NIST2017draft}, PPID has been specified in many widely adopted SSO standards including OIDC~\cite{OpenIDConnect} and SAML~\cite{SAMLIdentifier}.
+However, PPID-based approaches cannot prevent the IdP-based access tracing, as the IdP still knows which RP the user visits. 
+
+To the best of our knowledge, there are only two schemes (i.e., BrowserID~\cite{BrowserID} and SPRESSO~\cite{SPRESSO}) being proposed so far to prevent IdP-based access tracing.
+In BrowserID (and its prototype system known as Mozilla Persona~\cite{persona} and Firefox Accounts~\cite{FirefoxAccount}),
+ IdP generates a user certificate to bind the user's unique identifier (i.e., email address) with a public key;
+ while the user will use the corresponding private key to bind the identity proof (including the user certificate) with an RP, and send it to the correct RP confidentially.
+In SPRESSO, the RP chooses a third-party entity (named forwarder) as the proxy to receive the identity proof,
+ and generates a pseudonymous identifier for itself on each login;
+ IdP generates the identity proof for the user,  binds it with the RP's pseudonymous identifier and sends the encrypted proof to the forwarder;
+ while, the forwarder transmits the identity proof to the correct RP who performs the decryption and obtains the plain-text identity proof.
+In these two schemes, without the identifiers of the visiting RPs,
+the IdP needs to include the user's unique identifier (e.g., email address) in the identity proof,
+ which is necessary for  each RP to  obtain a common account during the user's multiple logins.
+Then, the collusive RPs could  perform RP-based identity linkage with the user's unique identifier.
+
+
+
+
+
+As described above, none of existing SSO systems could prevent both the RP-based identity linkage and IdP-based access tracing.
+Here, we analyze these two privacy leakage problems formally.
+Each user has one identifier at the IdP and each RP respectively, which is denoted as $ID_U$ at the IdP and $Account$ at the RP.
+Each RP has one global unique identifier (denoted as $ID_{RP}$), and a privacy-preserving identifier $PID_{RP}$ (may be null) at IdP for each login.
+$PID_{RP}$ is generated by the RP or the user, with the function $PID_{RP}=F_{PID_{RP}}(ID_{RP})$.
+And, IdP generates a  privacy-preserving user identifier ($PID_U$) with $ID_U$ and $PID_{RP}$, based on the function  $PID_{U}=F_{PID_{U}}(ID_U, PID_{RP})$.
+While,  RP calculates $Account$ with the function  $Accout=F_{Accout}(PID_U, ID_{RP}, PID_{RP})$.
+The three functions $F_{PID_{U}}$, $F_{PID_{RP}}$ and $F_{Accout}$  have to satisfy:
+\begin{itemize}
+  \item To prevent RP-based identity linkage, $F_{PID_{U}}$ needs to ensure that $PID_{U}$ are  unlinkable among various RPs.
+  \item To prevent IdP-based access tracing, $F_{PID_{RP}}$ needs to ensure that $PID_{RP}$ are  unlinkable for multiple logins at an RP.
+  \item To ensure each RP obtains the unchanged $Account$ among the user's multiple logins,
+  all the functions ($F_{PID_{RP}}$, $F_{PID_{U}}$ and $F_{Accout}$) need to be designed corporately,
+   and therefore the output of $F_{Accout}(F_{PID_{U}}(ID_U, F_{PID_{RP}}(ID_{RP})), ID_{RP})$ will be unchanged for a user's multiple logins at an RP.
+\end{itemize}
+
+
+Existing privacy-preserving schemes adopt either the unsatisfying $F_{PID_{U}}$ or $F_{PID_{RP}}$,
+ which will simplify the construction of $F_{Accout}$, but fail to provide the complete user privacy.
+For example,
+in PPID~\cite{OpenIDConnect, SAMLIdentifier},
+$F_{PID_{RP}}$ outputs $ID_{RP}$ directly and $F_{Accout}$ outputs  $PID_{U}$ as $Accout$, then IdP knows which RP the user visits;
+in BrowserID~\cite{BrowserID} and SPRESSO~\cite{SPRESSO},
+$F_{PID_{U}}$ outputs $ID_U$ directly and $F_{Accout}$ uses $ID_U$ as $Accout$ directly, then the collusive RPs could perform  RP-based identity linkage.
+
+
+
+
+In this paper, we propose UPRESSO, an Unlinkable Privacy-REspecting Single Sign-On system,
+which provides \textbf{all} the \textbf{satisfying} $F_{PID_{U}}$, $F_{PID_{RP}}$ and $F_{Accout}$ based on the discrete logarithm problem, and prevents both the RP-based identity linkage and IdP-based access tracing.
+In UPRESSO, for each login,   a one-way trapdoor function $F_{PID_{RP}}$ is invoked with a randomly chosen trapdoor ($t$) to generate a random and unique $PID_{RP}$ which is anonymously registered it at the IdP by the user;
+then IdP invokes a one-way function  $F_{PID_{U}}$ to generate $PID_U$ with $PID_{RP}$ and $ID_U$, and issues the identity proof;
+finally, RP checks the binding and integrity of the identity proof, and invokes $F_{Accout}$ with $PID_U$, $ID_{RP}$, $PID_{RP}$ and the trapdoor $t$ to obtain the unchanged $Accout$ for the user at this RP.
+Therefore, based on the discrete logarithm problem,
+ UPRESSO ensures:
+ (1) when a  user logs in to an RP, the RP can derive a unchanged $Accout$ from different $PID_U$, but fails to infer $ID_U$;
+ (2) when a user logs in to different RPs, various $PID_U$s are generated and collusive RPs fail to link the user's multiple logins;
+ and (3) when a RP is visited during multiple logins, random $PID_{RP}$s are generated and the curious IdP cannot infer $ID_{RP}$ nor link these logins.
+
+
+
+We have implemented a prototype of UPRESSO based on an open-source implementation of OIDC.
+UPRESSO inherits the security properties from OIDC by achieving the binding, integrity and confidentiality of identity proof,
+  and only requires small modifications to add the three functions $F_{PID_{U}}$, $F_{PID_{RP}}$ and $F_{Accout}$ for privacy protection.
+Therefore,
+ unlike  BrowserID and SPRESSO which are the non-trivial re-designs of the existing SSO systems,
+UPRESSO is compatible with existing SSO systems,
+ and doesn't require a completely new and comprehensive formal security analysis.
+
+
+%我们的贡献
+%提出协议
+%考虑能否根据模型进行分析
+%实现原型系统
+The main contributions of UPRESSO are as follows:
+\begin{itemize}
+\item We systematically analyze the privacy issues in SSO systems and propose a comprehensive protection solution to hide users' traces from both curious IdPs and collusive RPs, for the first time. We also provide a systematic analysis to show that UPRESSO achieves the same security level as existing SSO systems.
+\item We develop a prototype of UPRESSO that is compatible with OIDC and demonstrate its effectiveness and efficiency with experiment evaluations.
+\end{itemize}
+
+
+
+
+%文章结构
+The rest of this paper is organized as follows. We introduce the background in Sections~\ref{sec:background}, and the challenges with solutions briefly~\ref{sec:challenge}. Section~\ref{sec:related} and Section~\ref{sec:UPRESSO} describe the threat model and the design of UPRESSO. A systematical analysis is presented in Section~\ref{sec:analysis}. We provide the implementation specifics and evaluation in Section~\ref{sec:implementation}, then introduce the related works in Section~\ref{sec:related}, and draw the conclusion finally.
+
+
