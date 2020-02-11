@@ -32,18 +32,18 @@ some RPs of Google ID SSO were found to accept the user's attributes unprotected
 %RP之间可以合谋知道同一个用户登录哪些RP
 The wide adoption of SSO also raises new privacy concerns regarding online user tracking and profiling~\cite{maler2008venn,NIST2017draft}.
 Privacy leakage exists in all current SSO protocols and implementations.
-We adopt the SSO authentication session in the OpenID Connect (OIDC)  as an example, to figure out the leakage. 
+We adopt the SSO authentication session in the OpenID Connect (OIDC)  as an example, to figure out the leakage.
 As shown in Fig.~\ref{fig:OpenID},
 on receiving a login request from a user (Step 1), the RP uses the RP's identifier to construct an authentication request and redirects it to IdP (Step 2);
 then, the IdP completes the user's authentication in Step 3,  generates an identify proof for the user and binds it  with the  RP in Step 4, and redirects the identity proof to the RP confidentially in Step 5;
 finally, the RP verifies the binding and integrity of identity proof and sends the result to the user.
 From the authentication session, we find  collusive RPs and curious IdP could break the user's privacy  as follows.
 \begin{itemize}
-  \item {\em RP-based identity linkage}. 
+  \item {\em RP-based identity linkage}.
 If the common (or derivable from others) identifiers are used in the identity proofs for a same user across different RPs, % or the user's identifiers can be derived from each other,
 which is the case even in several widely deployed SSO systems~\cite{BrowserID,SPRESSO}, collusive RPs could not only track her online traces but also correlate her attributes across the sites~\cite{maler2008venn}.
   \item {\em IdP-based access tracing}. IdP obtains the user's unique identifer in Step 3 and the identifers of the visited RPs in Step 2.
- Therefore, a curious IdP could easily discover all RPs accessed by a user and reconstruct her access traces. 
+ Therefore, a curious IdP could easily discover all RPs accessed by a user and reconstruct her access traces.
 \end{itemize}
 
 
@@ -51,13 +51,13 @@ which is the case even in several widely deployed SSO systems~\cite{BrowserID,SP
 %google and facebook的负面新闻
 %1. service provider（如DNS）知道你访问了，可以带来很多问题。但是还是不同的，DNS里profile需要评估的是two behavior vectors的similarities，而IdP中都不需要，因为IdP能够区分two behavior vectors 是否来自相同节点。
 
-Meanwhile, large IdPs, especially social IdPs like Google and Facebook, are known to be interested in collecting users' online behavioral information for various purposes (e.g., Screenwise Meter~\cite{googlenews}, Onavo~\cite{Onavo}). By simply serving the IdP role, these companies can easily collect a large amount of continuous data to reconstruct users' online traces. 
+Meanwhile, large IdPs, especially social IdPs like Google and Facebook, are known to be interested in collecting users' online behavioral information for various purposes (e.g., Screenwise Meter~\cite{googlenews}, Onavo~\cite{Onavo}). By simply serving the IdP role, these companies can easily collect a large amount of continuous data to reconstruct users' online traces.
 Moreover, many service providers are also hosting a variety of web services, which makes them easy to link the same user's multiple logins in each RP as the user's unique  identifier is contained in the identity proof. Through internal integration, they could obtain rich information from SSO data to profile their clients.
 
 
 
 While the privacy problems in SSO have been widely recognized~\cite{maler2008venn,NIST2017draft}, only a few solutions have been proposed to protect user privacy~\cite{persona,SPRESSO}. Among them, Pairwise Pseudonymous Identifier (PPID)~\cite{OpenIDConnect, SAMLIdentifier} is a most straightforward and commonly accepted solution to defend against RP-based identity linkage, which requires the IdP to create different identifiers for the user when she logs in to different RPs. In this way, even multiple malicious RPs collude with each other across the system, they cannot link the  pairwise pseudonymous identifiers of the user and track which RPs she has visited. As a recommended practice by NIST~\cite{NIST2017draft}, PPID has been specified in many widely adopted SSO standards including OIDC~\cite{OpenIDConnect} and SAML~\cite{SAMLIdentifier}.
-However, PPID-based approaches cannot prevent the IdP-based access tracing, as the IdP still knows which RP the user visits. 
+However, PPID-based approaches cannot prevent the IdP-based access tracing, as the IdP still knows which RP the user visits.
 
 To the best of our knowledge, there are only two schemes (i.e., BrowserID~\cite{BrowserID} and SPRESSO~\cite{SPRESSO}) being proposed so far to prevent IdP-based access tracing.
 In BrowserID (and its prototype system known as Mozilla Persona~\cite{persona} and Firefox Accounts~\cite{FirefoxAccount}),
@@ -85,7 +85,7 @@ And, IdP generates a  privacy-preserving user identifier ($PID_U$) with $ID_U$ a
 While,  RP calculates $Account$ with the function  $Accout=F_{Accout}(PID_U, ID_{RP}, PID_{RP})$.
 The three functions $F_{PID_{U}}$, $F_{PID_{RP}}$ and $F_{Accout}$  have to satisfy:
 \begin{itemize}
-  \item To prevent RP-based identity linkage, $F_{PID_{U}}$ needs to ensure that $PID_{U}$ are  unlinkable among various RPs.
+  \item To prevent RP-based identity linkage, $F_{PID_{U}}$ needs to ensure that $PID_{U}$ are  unlinkable among various RPs, and $F_{Account}$ needs to ensure that $Account$ are unlinkable among different RPs.
   \item To prevent IdP-based access tracing, $F_{PID_{RP}}$ needs to ensure that $PID_{RP}$ are  unlinkable for multiple logins at an RP.
   \item To ensure each RP obtains the unchanged $Account$ among the user's multiple logins,
   all the functions ($F_{PID_{RP}}$, $F_{PID_{U}}$ and $F_{Accout}$) need to be designed corporately,

@@ -1,21 +1,68 @@
 \section{Design of UPRESSO}
 \label{sec:UPRESSO}
-In this section, we first present the features of UPRESSO to confirm the requirement of principles trapdoor user identification and transformed receiver designation. Then, we describe the implementations for these features , containing system initialization, initial registration of RP and the description of algorithms for calculating the RP identifier transformation, user identifier and account. The detailed processing for each user's login is provided corresponding to the main process phases. Finally, we discuss the compatibility of UPRESSO with OIDC.
+In this section, we provide designs of UPRESSO, a secure and privacy-preserving SSO system.
+First, we present how to achieve the trapdoor user identification and transformed receiver designation. Then, we describe the detailed protocol for providing the SSO service. Finally, we discuss the compatibility of UPRESSO with OIDC.
 
 \subsection{Features}
 \label{subsec:overview}
+%In Section~\ref{subsec:solutions}, we highlight the design principles of UPRESSO, namely trapdoor user identification and transformed receiver designation, to develop a secure and privacy-preserving SSO. Next, we will discuss the features to confirm these requirements. To ease the presentation, we list the notations used in this paper in Table~\ref{tbl:notations}.
+The three functions $F_{PID_{RP}}$, $F_{PID_U}$ and $F_{Account}$  are essential for trapdoor user identification and  the transformed receiver designation.
+In UPRESSO, these functions are constructed based on discrete logarithm cryptography with the public parameters $p$, $q$ and $g$,
+ where  $p$ is a large prime defines the finite field $GF(p)$,  the prime number $q$  is the order of a multiplicative
+subgroup of $GF(p)$, which is generated with the generator $g$ by $\{g\ mod\ p, g^2\ mod\ p, ..., g^{q-1}\ mod\ p, 1=g^q\ mod\ p\}$.
+
+In UPRESSO, IdP assigns a  random number as  $ID_U$ ($0 < ID_U <q $)  at the user's registration, and chooses a random number $r$ ($1 < r < q$) to generate $ID_{RP}$ at the RP's initial registration. The $r$ must  be different from the values chosen before, and $ID_{RP}$ is generated using Equation~\ref{equ:IDRP}.
+   \begin{equation}
+   ID_{RP} = g^{r} mod \ p
+   \label{equ:IDRP}
+   \end{equation}
+
+For each login, the RP chooses a random number $n_{RP}$ ($1 < n_{RP}<q $), the user chooses a random number $n_{U}$ ($1 < n_{U}<q $). Then, the RP and user cooperatively  generate $PID_{RP}$ using the function $F_{PID_{RP}}$ as Equation~\ref{equ:PIDRP}. The function $F_{PID_{RP}}$ satisfies the requirements described in Section~\ref{subsec:challenges}. That is, the function $F_{PID_{RP}}$ is invoked to generate $PID_{RP}$ for each login, while IdP  fails to derive $ID_{RP}$ from $PID_{RP}$ and cannot find the relation among ${PID_{RP}}$s for a same RP, which is ensured by the discrete logarithm cryptography.
+Moreover, $n_{U}$ and $n_{RP}$  serves as the nonce which ensures that the $PID_{RP}$ (also identity proof) is exactly constructed for this login, and
+the cooperation between the user and RP prevents the malicious user and RP from controlling the  $PID_{RP}$. For example, the malicious user fails to make a correct RP accept a $PID_{RP}$ used in another login, while the collusive RPs fail to use a same or correlated $PID_{RP}$s for different logins.
 
 
-In Section~\ref{subsec:solutions}, we highlight the design principles of UPRESSO, namely trapdoor user identification and transformed receiver designation, to develop a secure and privacy-preserving SSO. Next, we will discuss the features to confirm these requirements.
-To ease the presentation, we list the notations used in this paper in Table~\ref{tbl:notations}.
+ \begin{equation}
+    PID_{RP} = {ID_{RP}}^{n_{u}* n_{RP}} mod \ p
+   \label{equ:PIDRP}
+   \end{equation}
 
+For the user $ID_U$ to login at an RP with a privacy-preserving identifer $PID_{RP}$, IdP calculates the user's privacy-preserving identifer $PID_U$ using the function  $F_{PID_{U}}$ as Equation~\ref{equ:PIDU}. The function $F_{PID_{U}}$ satisfies the requirements described in Section~\ref{subsec:challenges}. 
+Combining Equation~\ref{equ:IDRP},~\ref{equ:PIDRP} and~\ref{equ:PIDU}, we get that  $PID_U$ equals to $g^{r*n_U*n_{RP}*ID_U}\ mod \ p$.
+The discrete logarithm cryptography ensures that the RPs fail to derive $ID_U$ from $PID_U$,
+nor link a user's $PID_U$s at different RPs who do not know $r$ and $ID_U$.
 
-\vspace{1mm}\noindent {\bf Using the novel one-time privacy-preserving RP identifier generating method for acquiring trapdoor and pseudonymous RP identifier in each authentication.} The novel RP identifier generation is based on the negotiation between RP and user to prevent potential attacks, which is to be described in Section~\ref{sec:analysis}. This privacy-preserving RP identifier (denoted as $PID_{RP}$) is generated from the original identifier of the RP (denoted as $ID_{RP}$) through a transformation negotiated between a pair of cooperating RP and user in the \emph{RP identifier transforming} phase (Step 2.1 in Figure~\ref{fig:UPRESSO}). Moreover, during $ID_{RP}$ negotiation, RP also acquires the trapdoor (denoted as $t$), which is to be used for further user identification.
+   
+\begin{equation}
+ PID_U = {PID_{RP}}^{ID_U} \ mod \ p
+ \label{equ:PIDU}
+\end{equation}
 
-\vspace{1mm}\noindent {\bf Using the novel RP-identifier-based user identifier generating method for authenticating the user through trapdoor.} IdP should generate the unique privacy-preserving user identifier based on the original user identifier and the privacy-preserving RP identifier in a way that a same user account can be derived through the trapdoor from multiple privacy-preserving user identifiers for the same user at same RP.
+Finally, the RP derives $Account$ for the user with the function $F_{Account}$ as Equation~\ref{equ:Account}. Here, the value $(n_U*n_{RP})^{-1} mod \ q$ is the trapdoor $t$. As $q$ is a prime number, $1< n_U < q$ and $1< n_{RP} < q$, therefore $q$ is coprime to $n_U*n_{RP}$, and the $t$ that satisfies $t*(n_U*n_{RP}) = 1\ mod \ q$ always exists. The function $F_{Account}$ satisfies the requirements described in Section~\ref{subsec:challenges}.  As shown in Equation~\ref{equ:AccountNotChanged},  $F_{Account}$ outputs an unchanged $Acount$ for a user's multiple logins at an RP. 
+Combining Equation~\ref{equ:IDRP},~\ref{equ:PIDRP}, ~\ref{equ:PIDU} and~\ref{equ:AccountNotChanged}, we get that $Account$ equals to $g^{r*ID_U} mod \ p$.
+Same as the analysis of $PID_U$s, the collusive RPs fail to derive $ID_U$ from $Account$ nor link a user's $Account$s at different RPs without knowing $r$ and $ID_U$.
 
-\vspace{1mm}\noindent {\bf Using user-centric verification for correct identity proof generating and transmitting.} The user agent should guarantee that the identity proof is only generated based on the legal $ID_{RP}$ and sent to the corresponding RP by checking the binding between $ID_{RP}$ and its endpoint. It requires that the IdP should provide the unforgeable proof for valid $ID_{RP}$ and endpoint.
+ \begin{equation}
+   Account = {PID_U}^{(n_U*n_{RP})^{-1} mod \ q} mod \ p
+   \label{equ:Account}
+   \end{equation}
 
+The \textbf{trapdoor user identification} is supported with these three functions.
+For a user's multiple logins, each PR obtains the different $PID_U$s and the corresponding $t$s , then derives the unchanged $Account$  as shown in Equation~\ref{equ:AccountNotChanged}.
+The function $F_{PID_{RP}}$ prevents the curious IdP from linking the $PID_{RP}$s of different logins at an RP, and therefore avoids  the  IdP-based access tracing.
+The functions $F_{PID_{U}}$ and $F_{Account}$ prevents the collusive RPs from linking a user's $PID_U$s and $Account$s at different RPs, and therefore avoids the RP-based identity linkage.
+ \begin{multline}\label{equ:AccountNotChanged}
+   Account =  {PID_{U}}^{t} mod \ p  \\
+   = {({PID_{RP}}^{ID_U})}^{{(n_U*n_{RP})^{-1} mod \ q}} mod \ p \\
+   = {ID_{RP}} ^ {ID_U * n_U * n_{RP} *t\ mod\ q} = {ID_{RP}}^{ID_U} mod \ p
+ \end{multline}
+
+The \textbf{transformed receiver designation} is also supported with the efficient functions $F_{PID_{RP}}$ and $F_{PID_U}$, together with  a user-centric verification.
+The $F_{PID_{RP}}$ ensures that the user and RP cooperatively generate a $PID_{RP}$  for a user's login,
+ while $F_{PID_U}$ ensures that the IdP generates the exact $PID_U$ for the $ID_U$ who logins at $PID_{RP}$.
+The IdP will bind $PID_{U}$ with $PID_{RP}$ in the identity proof, which designates this identity proof to $PID_{RP}$.
+In the user-centric verification,  the user checks that $PID_{RP}$ is global unique and exactly generated for the RP $ID_{RP}$,
+ and then sends the identity proof  only  to this RP. Therefore, the $PID_{RP}$ is designated to $ID_{RP}$, and finally the transformed receiver designation is provided.
 
 
 \begin{table*}[tb]
@@ -28,10 +75,6 @@ To ease the presentation, we list the notations used in this paper in Table~\ref
     {$p$} & {A large prime.} & {System-unique} \\
     \hline
     {$g$} & {A primitive root  modulo $p$. } & {System-unique} \\
-    \hline
-    {$Cert_{RP}$} & {An RP certificate. } & {System-unique} \\
-    \hline
-    {$SK$, $PK$} & {The private/public key of IdP. } & {System-unique} \\
    % \hline
     %{$SK_{ID}$, $PK$} & {The private/public key to sign/verify identity proof.} & {System-unique} \\
     \hline
@@ -53,6 +96,10 @@ To ease the presentation, we list the notations used in this paper in Table~\ref
     \hline
     {$t$} & {A trapdoor, $t=(n_U*n_{RP})^{-1} mod \ (p-1)$.} & {One-time} \\
     \hline
+    {$Cert_{RP}$} & {An RP certificate. } & {System-unique} \\
+    \hline
+    {$SK$, $PK$} & {The private/public key of IdP. } & {System-unique} \\
+     \hline
     \end{tabular}
     \label{tbl:notations}
 \end{table*}
@@ -95,7 +142,7 @@ To satisfy RP fails to derive $ID_U$ from $Account$ and the $Accounts$ of a user
 \end{itemize}
 
 \vspace{1mm}\noindent\textbf{Algorithms for calculating  $PID_{RP}$, $PID_U$ and $Account$.} Moreover, we provide the algorithms for calculating  $PID_{RP}$, $PID_U$ and $Account$,
-which are the foundations to process each user's login. 
+which are the foundations to process each user's login.
 
 \noindent\textbf{$PID_{RP}$}. Similar to Diffie-Hellman key exchange\cite{DiffieH76}, the RP and user negotiate the  $PID_{RP}$ as follows:
 \begin{itemize}
@@ -131,17 +178,17 @@ The corporative generation of $PID_{RP}$, ensures unrelated $PID_U$  for differe
  \label{equ:PID_U}
 \end{equation}
 
-Finally, the RP calculates $PID_U^t mod \ p$ as the  user's account, where $PID_U$ is received from the user and $t$ is derived in the generation of $PID_{RP}$. Equation~\ref{equ:account} demonstrates that $Account$ is unchanged to the RP during a user's multiple logins, satisfying RP derives the user's unique $Account$  from $PID_U$ with the  trapdoor and  RP fails to derive $ID_U$ from either $Account$ in \textbf{Goal 3}. The different $ID_{RP}$ ensures the $Accounts$ of a user are different among RPs in \textbf{Goal 3}.
+Finally, the RP calculates $(PID_U)^t mod \ p$ as the  user's account, where $PID_U$ is received from the user and $t$ is derived in the generation of $PID_{RP}$. Equation~\ref{equ:account} demonstrates that $Account$ is unchanged to the RP during a user's multiple logins, satisfying RP derives the user's unique $Account$  from $PID_U$ with the  trapdoor and  RP fails to derive $ID_U$ from either $Account$ in \textbf{Goal 3}. The different $ID_{RP}$ ensures the $Accounts$ of a user are different among RPs in \textbf{Goal 3}.
 
  \begin{equation}
-   Account = ({PID_{RP}}^{ID_U})^t = {ID_{RP}}^{ID_U} mod \ p
+   Account = (PID_U)^{(n_U*n_{RP})^(-1) mod \ q}
    \label{equ:account}
    \end{equation}
 
 
 \subsection{Overall protocol flow overview}
 \label{sebsec:loginprocess}
-In this section, we present the detailed process for each user's login as shown in Figure~\ref{fig:process}. 
+In this section, we present the detailed process for each user's login as shown in Figure~\ref{fig:process}.
 
 \begin{figure*}
   \centering
