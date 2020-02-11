@@ -8,11 +8,11 @@ Here, we provide a brief introduction on OIDC and the discrete logarithm problem
 OIDC~\cite{OpenIDConnect} is an extension of OAuth 2.0 to support user authentication,
  and becomes one of the most prominent SSO authentication protocols.
 Same as other SSO protocols~\cite{SAMLIdentifier}, OIDC involves three entities, i.e., {\em users}, {\em identity provider (IdP)}, and {\em relying parties (RPs)}.
-Both users and RPs have to register at the IdP,    
+Both users and RPs have to register at the IdP,
 the users register at the IdP to create credentials and identifiers (e.g. $ID_U$),
 while each RP registers at the IdP with its endpoint information to create its unique identifier (e.g., $ID_{RP}$) and the corresponding credential.
-IdP is assumed to securely maintain the attributes  of users and RPs.   
-Then, in the SSO authentication sessions, 
+IdP is assumed to securely maintain the attributes  of users and RPs.
+Then, in the SSO authentication sessions,
  each user is responsible to start a login request at an RP, redirect the messages between RP and IdP, and check the scope of user's attributes provided to the RP;
  IdP authenticates the user, sets the $PPID$ for the user $ID_U$ at the RP $ID_{RP}$,
  constructs the identity proof with  $PPID$, $ID_{RP}$ and the user's attributes consented by the user, and finally transmits the identity proof to the RP's registered endpoint (e.g., URL);
@@ -28,7 +28,7 @@ In the authorization code flow, IdP binds an authorization code with the RP, and
  then RP establishes an HTTPS connection with IdP to ensure the integrity and confidentiality of the identity proof, and  uses the authorization code with the RP's credential to obtain PPID and the user's other  attributes.
 
 UPRESSO is compatible to all the three flows.
-For brevity, we will present the application of UPRESSO in the implicit flow in details, and provide the integration with the authorization code flow briefly. 
+For brevity, we will present the application of UPRESSO in the implicit flow in details, and provide the integration with the authorization code flow briefly.
 Here, we first introduce the original processes in the implicit flow of OIDC.
 \begin{figure}[t]
   \centering
@@ -47,11 +47,11 @@ As shown in Figure~\ref{fig:OpenID}, the implicit flow of OIDC consists of 7 ste
   \label{fig:UPRESSO}
 \end{figure}
 
-\noindent\textbf{RP dynamic registration.} OIDC provides a dynamic registration mechanism~\cite{DynamicRegistration} for the RP to renew its $ID_{RP}$ dynamically. 
+\noindent\textbf{RP dynamic registration.} OIDC provides a dynamic registration mechanism~\cite{DynamicRegistration} for the RP to renew its $ID_{RP}$ dynamically.
 When an RP first registers at the IdP, it obtains a registration token, with which the  RP can invoke the dynamic registration process to
-update its information (e.g., the endpoint). 
+update its information (e.g., the endpoint).
 After each successful dynamic registration, the RP obtains a new unique $ID_{RP}$ from the IdP.
-In UPRESSO, we slightly modify dynamic registration to register $PID_{RP}$ at IdP. 
+In UPRESSO, we slightly modify dynamic registration to register $PID_{RP}$ at IdP.
 
 
 \subsection{Discrete Logarithm Problem}
@@ -60,14 +60,12 @@ Discrete logarithm problem is adopted in UPRESSO for the construction of $F_{PID
  which generate privacy-preserving user identifier (e.g. $PID_U$) and RP identifier (e.g. $PID_{RP}$) respectively.
 Here, we provide a brief description of the discrete logarithm problem.
 
-A number $g$ ($0<g<p$) is called a primitive root modular a prime $p$, if for ${\forall}y$ ($0<y<p$), there is a  number $x$ ($0\le x <p-1$) satisfying $y=g^x \pmod p$.
-And, $x$ is called the discrete logarithm of $y$ modulo $p$. Given a large prime $p$, a primitive root $g$ and a number $y$, it is computationally infeasible to derive the discrete logarithm (here $x$) of $y$ (detailed in~\cite{WXWM}), which is called discrete logarithm problem.
+%A number $g$ ($0<g<p$) is called a primitive root modular a prime $p$, if for ${\forall}y$ ($0<y<p$), there is a  number $x$ ($0\le x <p-1$) satisfying $y=g^x \pmod p$.
+For $GF(p)$ where $p$ is a large prime, a number $g$ is called a generator of order $q$, if it can be used to construct a cyclic  group of $q$ elements by calculating $y=g^x \ mod\ p$.
+And, $x$ is called the discrete logarithm of $y$ modulo $p$. Given a large prime $p$, a generator $g$ and a number $y$, it is computationally infeasible to derive the discrete logarithm (here $x$) of $y$ (detailed in~\cite{WXWM}), which is called discrete logarithm problem.
 The hardness of solving discrete logarithm has been used to construct several security primitives, including Diffie-Hellman key exchange and Digital Signature Algorithm (DSA).
 
-In the process of $F_{PID_{RP}}$ and $F_{PID_U}$, we needs to calculate the primitive root for a  large prime $p$ as follows~\cite{Shoup,Wang}.
-First, we retrieve a primitive root $g_m$  modulo $p$ from all the integers by finding the first integer passing  the primitive root checking.
- A lemma is propose to simply the checking, that if $p=2q+1$ ($q$ is a prime),  an integer $\mu \in (1, p-1)$ is a primitive root if and only if $\mu^2\neq 1 \ mod \ p$ and $\mu^q\neq 1 \ mod \ p$.
-Then, based on $g_m$, we can calculate a new primitive root $g = g_{m}^{t} mod \ p$, where $t$ is an integer coprime to $p-1$.
- 
+%In the process of $F_{PID_{RP}}$ and $F_{PID_U}$, we needs to calculate the primitive root for a  large prime $p$ as follows~\cite{Shoup,Wang}. First, we retrieve a primitive root $g_m$  modulo $p$ from all the integers by finding the first integer passing  the primitive root checking.  A lemma is propose to simply the checking, that if $p=2q+1$ ($q$ is a prime),  an integer $\mu \in (1, p-1)$ is a primitive root if and only if $\mu^2\neq 1 \ mod \ p$ and $\mu^q\neq 1 \ mod \ p$. Then, based on $g_m$, we can calculate a new primitive root $g = g_{m}^{t} mod \ p$, where $t$ is an integer coprime to $p-1$.
+
 
 
