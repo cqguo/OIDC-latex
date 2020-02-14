@@ -9,7 +9,7 @@ whose security  has been formally analyzed in~\cite{FettKS17}.
 
 UPRESSO only introduces small modifications to OIDC. As analyzed in Section~\ref{subsec:compatible}, UPRESSO doesn't modify the mechanisms (i.e., digital signature and HTTPS) for integrity and confidentiality of the identity proof; but only slightly modify the receiver designation and user identification.
 The detailed modifications include: (1) the $ID_{RP}$ and endpoint in the identity proof are replaced with $PID_{RP}$ and one-time endpoint, while the generation of $PID_{RP}$ further introduces  a negotiation process and a modified dynamic registration;
- (2) IdP generates $PID_U$ based on $PID_{RP}$ instead of $ID_{RP}$, (3) RP calculates $Account$ from the changing $PID_U$ instead of an unchanged value.
+ (2) IdP generates $PID_U$ based on $PID_{RP}$ instead of $ID_{RP}$ or $PPID$, (3) RP calculates $Account$ from the changing $PID_U$ instead of an unchanged value.
 
 For the first modification, the use of $PID_{RP}$ and one-time endpoint guarantee the same security as $ID_{RP}$ and RP's endpoint. To prove that, we first analyze the objectives of using $ID_{RP}$ and RP's endpoint in OIDC, then demonstrate that these objectives are also be achieved with the $PID_{RP}$ and one-time endpoint in UPRESSO.
 \begin{itemize}
@@ -28,8 +28,8 @@ For the first modification, the use of $PID_{RP}$ and one-time endpoint guarante
 
 The second and third modifications change the ways of user identification at an RP, and also introduce no security degradation.
 In OIDC, the correct RP uniquely identifies a user based on the identifier from the IdP, who provides a unique and unchanged identifier for a user $ID_U$ at an RP.
-In UPRESSO,  the correct RP  computes an unchanged value $Accout = {PID_U}^t = {ID_{RP}}^{ID_U}\ mod\ p$  for a user's multiple logins, as shown in Equation~\ref{equ:AccountNotChanged};
- and one $Accout$ is only assigned to one user at an RP,  as IdP ensures that one $ID_U$ is only assigned to one user.
+In UPRESSO,  the correct RP  computes an unchanged value $Accout = {PID_U}^t\ mod\ p = {ID_{RP}}^{ID_U}\ mod\ p$  for a user's multiple logins, as shown in Equation~\ref{equ:AccountNotChanged};
+ and one $Accout$ is only assigned to one user at an RP,  as IdP ensures that one $ID_U$ is only assigned to one user as well as one $ID_{RP}$ is only assigned to one user.
 Moreover, the calculation can never be tampered by the adversary,  as  $PID_U$ is provided by the IdP and protected in the identity proof, while $t$ is stored at the RP itself, and the calculation is performed at the RP.
 
 %CSRF有其他通用防御方案，这里谈不值得。 由于只有307，建议放到related work中
