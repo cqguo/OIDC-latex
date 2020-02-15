@@ -9,7 +9,7 @@ whose security  has been formally analyzed in~\cite{FettKS17}.
 
 UPRESSO only introduces small modifications to OIDC. As analyzed in Section~\ref{subsec:compatible}, UPRESSO doesn't modify the mechanisms (i.e., digital signature and HTTPS) for integrity and confidentiality of the identity proof; but only slightly modify the receiver designation and user identification.
 The detailed modifications include: (1) the $ID_{RP}$ and endpoint in the identity proof are replaced with $PID_{RP}$ and one-time endpoint, while the generation of $PID_{RP}$ further introduces  a negotiation process and a modified dynamic registration;
- (2) IdP generates $PID_U$ based on $PID_{RP}$ instead of $ID_{RP}$ or $PPID$, (3) RP calculates $Account$ from the changing $PID_U$ instead of an unchanged value.
+ (2) IdP generates $PID_U$ based on $PID_{RP}$ instead of $ID_{RP}$, (3) RP calculates $Account$ from the changing $PID_U$ instead of an unchanged value.
 
 For the first modification, the use of $PID_{RP}$ and one-time endpoint guarantee the same security as $ID_{RP}$ and RP's endpoint. To prove that, we first analyze the objectives of using $ID_{RP}$ and RP's endpoint in OIDC, then demonstrate that these objectives are also be achieved with the $PID_{RP}$ and one-time endpoint in UPRESSO.
 \begin{itemize}
@@ -29,7 +29,7 @@ For the first modification, the use of $PID_{RP}$ and one-time endpoint guarante
 The second and third modifications change the ways of user identification at an RP, and also introduce no security degradation.
 In OIDC, the correct RP uniquely identifies a user based on the identifier from the IdP, who provides a unique and unchanged identifier for a user $ID_U$ at an RP.
 In UPRESSO,  the correct RP  computes an unchanged value $Accout = {PID_U}^t\ mod\ p = {ID_{RP}}^{ID_U}\ mod\ p$  for a user's multiple logins, as shown in Equation~\ref{equ:AccountNotChanged};
- and one $Accout$ is only assigned to one user at an RP,  as IdP ensures that one $ID_U$ is only assigned to one user as well as one $ID_{RP}$ is only assigned to one user.
+ and one $Accout$ is only assigned to one user at an RP,  as IdP ensures that one $ID_U$ is only assigned to one user.
 Moreover, the calculation can never be tampered by the adversary,  as  $PID_U$ is provided by the IdP and protected in the identity proof, while $t$ is stored at the RP itself, and the calculation is performed at the RP.
 
 %CSRF有其他通用防御方案，这里谈不值得。 由于只有307，建议放到related work中
@@ -50,10 +50,10 @@ That is because,
 for any $PID_{RP}$, there always exists a $n=n_U*n_{RP}\ mod\ q$ for arbitrary $ID_{RP}$ making $PID_{RP}={ID_{RP}}^n \ mod\ p$.
 We prove it in two steps.
 First, for one arbitrary $PID_{RP}$ denoted  as $g^{r_1*n_1\ mod\ q}\ mod\ p$ and  an arbitrary  $ID_{RP}=g^{r_2}\ mod\ p$ ($r_2 \neq r_1$),  there always exists a $n_2$ satisfying $r_2*n_2=r_1*n_1\ mod\ q$, as $q$ is a prime.
-Second, for arbitrary $n_2$, there always exists two numbers $n_{U2}$ and $n_{RP2}$ satisfying $n_2= n_{U2}*n_{RP2}\ mod\ q$. 
+Second, for arbitrary $n_2$, there always exists two numbers $n_{U2}$ and $n_{RP2}$ satisfying $n_2= n_{U2}*n_{RP2}\ mod\ q$.
 That is because, $q$ is a prime, for one $n_{U2}$, there exists a number $y$ making $n_{U2}*y=1\ mod\ q$, and then exists $n_{RP2}= y*n_2\ mod\ q$ making $n_{U2}*n_{RP2}=n_2\ mod\ q$.
 
-   
+
 %对已分配的ID_{RP}中的每一个值, 需要遍历所有q个value，才能确定其是否能够生成相应的PID_{RP}，这是计算不可信的；而且对于一个PID_{RP}而言，可能有不止一个ID_{RP} 与之对应; 以下是针对乘法子群不同的可能，即不规定生成元的情况。
 %As the IdP doesn't know the value $n_U*n_{RP}$, the IdP has to calculate all the ${ID_{RP}}^x\ mod\ p, x\in[1, q-1]$ for each one of the already assigned $ID_{RP}$s, to determine whether this $ID_{RP}$ is a possible one corresponding to the received $PID_{RP}$. This is computational infeasible as $q$ is too large ($q>2^{N-1}$, $N\geq 256$). Moreover, there may be two or even more possible ones which  are indistinguishable to the IdP. For example, if the received $PID_{RP}$ is $g^{7}$ where $g$ is a generator and $q$ is 11, both $g^{2}$ and $g^{3}$ are the possible values for $ID_{RP}$ where the corresponding $n_U*n_{RP}$ are 9 and 6 respectively.
 
@@ -71,12 +71,12 @@ The RPs cannot derive $ID_U$ from any logins. In UPRESSO, the information relati
   \item For $Account$, it equals to ${ID_{RP}}^{ID_U}\ mod\ p=g^{r*ID_U\ mod\ q}\ mod\ p$. And it is also computational infeasible to compute $ID_U$ with the known $Account$ and $ID_{RP}$, or $r*ID_U$ with the known $Account$ and $g$, not matter which value is provided  as $n_{RP}$.
   \item The RPs can obtain no extra information by combining $PID_U$ and $Account$, as $Account= {PID_U}^t\ mod\ p$ while $t$ is already known to the RP.
 \end{itemize}
- 
+
 The collusive and malicious RPs cannot determine whether two or more logins are initiated by a same user. The only information  that can be used for this
-classification is $Account$ and $PID_U$. 
+classification is $Account$ and $PID_U$.
 However,  the $Account$ and $PID_U$ cannot be controlled by the RPs, and are independent to RPs.
 \begin{itemize}
-  \item For $Account$, it equals to ${ID_{RP}}^{ID_U}\ mod\ p=g^{r*ID_U\ mod\ q}\ mod\ p$. Obviously, no value is controlled by the RPs. And a user's $Account$s at different RPs are independent to these RPs, as the unknown $r$s are   random numbers generated by the IdP. 
+  \item For $Account$, it equals to ${ID_{RP}}^{ID_U}\ mod\ p=g^{r*ID_U\ mod\ q}\ mod\ p$. Obviously, no value is controlled by the RPs. And a user's $Account$s at different RPs are independent to these RPs, as the unknown $r$s are   random numbers generated by the IdP.
   \item For $PID_U$, it equals to ${PID_{RP}}^{ID_U}\ mod\ p=g^{r*n_U*n_{RP}*ID_U\ mod\ q}\ mod\ p$. The only value controlled by RPs is $n_{RP}$, however Diffie-Hellman key exchange protocol prevents the malicious RPs from controlling $PID_{RP}$. Therefore, the RPs cannot control $PID_U$. A user's $PID_U$s at different RPs are also independent to these RPs, due to the unknown and random $r$s.
 \end{itemize}
 
