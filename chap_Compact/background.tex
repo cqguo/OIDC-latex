@@ -2,7 +2,12 @@
 \label{sec:background}
 UPRESSO is compatible with OIDC, and achieves the privacy protection based on the discrete logarithm problem.
 Here, we provide a brief introduction on OIDC and the discrete logarithm problem.
-
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\linewidth]{fig/OIDC1.pdf}
+  \caption{The implicit protocol flow of OIDC.}
+  \label{fig:OpenID}
+\end{figure}
 \subsection{OpenID Connect}
 \label{subsec:OIDC}
 OIDC~\cite{OpenIDConnect} is an extension of OAuth 2.0 to support user authentication,
@@ -30,22 +35,9 @@ In the authorization code flow, IdP binds an authorization code with the RP, and
 UPRESSO is compatible to all the three flows.
 For brevity, we will present the application of UPRESSO in the implicit flow in details, and provide the integration with the authorization code flow briefly.
 Here, we first introduce the original processes in the implicit flow of OIDC.
-\begin{figure}[t]
-  \centering
-  \includegraphics[width=\linewidth]{fig/OIDC1.pdf}
-  \caption{The implicit protocol flow of OIDC.}
-  \label{fig:OpenID}
-\end{figure}
+
 As shown in Figure~\ref{fig:OpenID}, the implicit flow of OIDC consists of 7 steps: when a user attempts to log in to an RP (Step 1), the RP constructs a request for identity proof, which is redirected by the user to the corresponding IdP (Step 2). The request contains $ID_{RP}$, RP's endpoint and a set of requested user attributes. If the user has not been authenticated yet, the IdP performs an authentication process (Step 3). If the RP's endpoint in the request matches the one registered at the IdP, it generates an identity proof (Step 4) and sends it back to the RP (Step 5). Otherwise, IdP generates a warning to notify the user about potential identity proof leakage. The RP verifies the id token (Step 6), extracts user identifier from the id token and returns the authentication result to the user (Step 7).
 
-
-
-\begin{figure}[t]
-  \centering
-  \includegraphics[width=\linewidth]{fig/overview1.pdf}
-  \caption{The UPRESSO.}
-  \label{fig:UPRESSO}
-\end{figure}
 
 \noindent\textbf{RP dynamic registration.} OIDC provides a dynamic registration mechanism~\cite{DynamicRegistration} for the RP to update its $ID_{RP}$ dynamically.
 When an RP first registers at the IdP, it obtains a registration token, with which the  RP can invoke the dynamic registration process to
