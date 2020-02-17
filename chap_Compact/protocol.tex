@@ -61,8 +61,7 @@ The \textbf{transformed receiver designation} is also supported with the efficie
 The $\mathcal{F}_{ID_{RP} \mapsto PID_{RP}}$ ensures that the user and RP cooperatively generate a fresh $PID_{RP}$  for a user's login,
  while $\mathcal{F}_{ID_{U} \mapsto PID_{U}}$ ensures that the IdP generates the exact $PID_U$ for the $ID_U$ who logins at $PID_{RP}$.
 The IdP will bind $PID_{U}$ with $PID_{RP}$ in the identity proof, which designates this identity proof to $PID_{RP}$.
-In the user-centric verification,  the user checks that $PID_{RP}$ is global unique and exactly generated for the RP $ID_{RP}$,
- and then sends the identity proof  only  to this RP. Therefore, the $PID_{RP}$ is designated to $ID_{RP}$.
+In the user-centric verification,  both the user and RP checks the uniqueness of $PID_{RP}$, while the user further checks that $PID_{RP}$ is exactly generated for the RP $ID_{RP}$,  and then sends the identity proof  only  to this RP. Therefore, the $PID_{RP}$ is designated to $ID_{RP}$.
 Finally, the transformed receiver designation is provided through the two-step designations.
 
 
@@ -197,7 +196,7 @@ Finally, RP derives the user's  $Account$ and completes the user's login as foll
 \begin{figure}[t]
   \centering
   \includegraphics[width=\linewidth]{fig/overview1.pdf}
-  \caption{The UPRESSO.}
+  \caption{UPRESSO compatibility with OIDC.}
   \label{fig:UPRESSO}
 \end{figure}
 
@@ -205,12 +204,30 @@ Finally, RP derives the user's  $Account$ and completes the user's login as foll
 \label{subsec:compatible}
 UPRESSO could be integrated in the traditional SSO systems, to  prevent the IdP-based access tracing and RP-based identity linkage.
 The integration doesn't degrade the security and only requires minimal modification.
-Here, we use the implicit protocol flow of OIDC as an example to demonstrate the compatibility of UPRESSO with the traditional SSO systems.
+Here, we use the implicit protocol flow of OIDC as an example to demonstrate the compatibility of UPRESSO with the traditional SSO systems, as shown in Figure~\ref{fig:UPRESSO}.
 The further analysis, such as integration with the authorization code flow of OIDC,  is provided in Section~\ref{sec:discussion}.
 
+UPRESSO doesn't introduce any new role, nor change the security assumptions on each role (i.e., user, IdP and RP).
 
+As shown in Figure~\ref{fig:UPRESSO}, in UPRESSO, the SSO protocol for identity proof  (Steps between 2.3 and 7) is the same as in OIDC (Steps between 2 and 7); the formats of identity proof and corresponding request are the same as in OIDC; the correctness checks on the identity proof request at the IdP (i.e., consistency of RP' identifier and endpoint with the registered one) are the same as in OIDC; the correctness checks on the identity proof (i.e., consistency of RP' identifier with the one in the request, integrity, validity time, freshness, and etc.) at the RP are the same as in OIDC.
+
+%以下为描述Step 2.3到7的详细内容.
+%That is, the RP construct a request for identity proof (Step 2.3); the user redirects this request to the IdP (Step 2.5); the IdP generates the identity proof (Step 4), and sends it to the user (Step 5.1) who redirects it to the RP (Step 5.3); and finally the RP verifies the identity proof (Step 6).
+
+However, UPRESSO achieves privacy preservation by integrating  $\mathcal{F}_{ID_{U} \mapsto PID_{U}}$, $\mathcal{F}_{ID_{RP} \mapsto PID_{RP}}$ and $\mathcal{F}_{PID_{U} \mapsto Account}$, and  introduces the following modifications on OIDC.
+
+\begin{enumerate}
+  \item The identity proof is bound with $PID_{RP}$ instead of $ID_{RP}$, which introduces the RP identifier transforming (Step 2.1)  and RP identifier refreshing (Step 2.2). 
+  \item The identity proof is designated to one-time endpoint instead of RP's identifying endpoint, which requires the user to register the one-time endpoint in Step 2.2 and replace it with the original endpoint in Step 5.2.
+  \item IdP generates $PID_U$ based on ($PID_{RP}$, $ID_U$) instead of ($ID_{RP}$, $ID_U$).
+  \item The RP calculates $Account$ from the changing $PID_U$ instead of an unchanged one.
+\end{enumerate}
+
+Moreover, the RP identifier refreshing is compatible with the dynamic registration in OIDC, with the following modifications, that it is triggered by the user instead of the RP, adds $PID_{RP}$ in the request and includes a signature $Sig_{Res}$ in the response.
+
+\begin{comment}
 \vspace{1mm}\noindent \textbf{Consistency with OIDC.}
-As shown in Figure~\ref{fig:UPRESSO}, the architecture of UPRESSO is the same as the one in OIDC. UPRESSO does not introduce any new entity, but only integrates the three function $F_{PID_U}$, $F_{PID_{RP}}$ and $F_{Account}$ into the processes at the IdP, RP, and user.
+As shown in Figure~\ref{fig:UPRESSO}, the architecture of UPRESSO is the same as the one in OIDC. UPRESSO does not introduce any new entity, but only integrates the three function $\mathcal{F}_{ID_{U} \mapsto PID_{U}}$, $\mathcal{F}_{ID_{RP} \mapsto PID_{RP}}$ and $\mathcal{F}_{PID_{U} \mapsto Account}$ into the processes at the IdP, RP, and user.
 
 The formats of the  identity proof and corresponding request, and the verification of the identity proof,  are almost same in OIDC and UPRESSO.
 The only difference is that $ID_{RP}$ and endpoint are replaced with the privacy-preserving versions, i.e., $PID_{RP}$ and one-time endpoint, in UPRESSO.
@@ -218,13 +235,13 @@ As $PID_{RP}$ is also unique and corresponds exactly to $ID_{RP}$, and one-time 
  the binding, integrity and confidentiality of identity proof will also be ensured in UPRESSO, and there is no degradation on the security of OIDC.
 
 \vspace{1mm}\noindent \textbf{Minimal modification to OIDC.}
-UPRESSO only requires small modification on OIDC to integrate $F_{PID_U}$, $F_{PID_{RP}}$ and $F_{Account}$.
-For $F_{PID_U}$ and $F_{Account}$ , we directly use them to replace original functions for $PPID$ at the IdP and the $Account$ at the RP.
-For $F_{PID_{RP}}$, we inject a negotiation process and a dynamic registration for each SSO login,
+UPRESSO only requires small modification on OIDC to integrate $\mathcal{F}_{ID_{U} \mapsto PID_{U}}$, $\mathcal{F}_{ID_{RP} \mapsto PID_{RP}}$ and $\mathcal{F}_{PID_{U} \mapsto Account}$.
+For $\mathcal{F}_{ID_{U} \mapsto PID_{U}}$ and $\mathcal{F}_{PID_{U} \mapsto Account}$, we directly use them to replace original functions for $PPID$ at the IdP and the $Account$ at the RP.
+For $\mathcal{F}_{ID_{RP} \mapsto PID_{RP}}$, we inject a negotiation process and a dynamic registration for each SSO login,
  where the negotiation process between the user and RP generates a $PID_{RP}$,
   while the dynamic registration is used to check the uniqueness of $PID_{RP}$.
 In UPRESSO, the dynamic registration is slightly modified as follows: an RP identifer ($PID_{RP}$)  is added in the request, and a signature ($Sig_{Res}$)  is included in the response for its verification at the RP.
-
+\end{comment}
 
 
 
