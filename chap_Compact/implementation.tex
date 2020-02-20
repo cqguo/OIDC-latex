@@ -1,6 +1,6 @@
 \section{Implementation and Performance Evaluation}
 \label{sec:implementation}
-We have implemented a prototype of UPRESSO, and evaluated its performance by comparing with the original OIDC and a privacy-preserving SSO, SPRESSO.
+We have implemented a prototype of UPRESSO, and evaluated its performance by comparing with the original OIDC and SPRESSO which only prevents IdP-based access tracing.
 
 \subsection{Implementation}
 We adopt SHA-256 for digest generation, and  RSA-2048 for the signature generation. %in  the $Cert_{RP}$, identity proof and RP identifier refreshing result.
@@ -19,7 +19,7 @@ Here, the cross-origin HTTPS requests sent by this chrome extension to the RP an
 To avoid this block, UPRESSO modifies the IdP and RP, and sets \verb+chrome-extension://chrome-id+ (\verb+chrome-id+ is uniquely assigned by Google) in the HTTPS header \verb+Access-Control-Allow-Origin+ of the IdP's and RP's responses.
 %Moreover, the chrome extension needs to construct cross-origin requests to communicate with the RP and IdP, which is forbidden by the default same-origin security policy. Therefore it is required to add the HTTP header \verb+Access-Control-Allow-Origin+ in the response of IdP and RP to accept only the request from the origin \verb+chrome-extension://chrome-id+ (\verb+chrome-id+ is uniquely assigned by the Google).
 
-We provide a Java SDK for an RP to integrate UPRESSO. 
+We provide a Java SDK for RPs to integrate UPRESSO. 
 The SDK provides 2 functions to encapsulate RP's processings: one for  \emph{RP identifier transforming} and \emph{RP identifier refreshing} phases, and the other for \emph{$Account$ calculation} phase. %in Figure~\ref{fig:process}
 The SDK is implemented based on the Spring Boot framework  with about 1100 lines code, and cryptographic computations are implemented based on Spring Security library.
 An RP only needs to invoke these two functions for the integration.

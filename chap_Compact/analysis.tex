@@ -69,7 +69,7 @@ UPRESSO prevents the RP-based identity linkage, any malicious RPs cannot derive 
 The detailed proofs are as follows.
 
 %one RP:   直接从PIDu->IDu, Account->IDu, PIDu&Account -> IDu,
-An RP cannot derive $ID_U$ from $PID_U$ and $Account$ in one login, due to the one-way function $\mathcal{F}_{ID_{U} \mapsto PID_{U}}$. 
+An RP cannot derive $ID_U$ from $PID_U$ and $Account$ in one login, due to the one-way function $\mathcal{F}_{ID_{U} \mapsto PID_{U}}$.
 \begin{itemize}
   \item For $PID_U$, it equals to ${PID_{RP}}^{ID_U}\ mod\ p$ according to $\mathcal{F}_{ID_{U} \mapsto PID_{U}}$, and further transformed to $g^{r*N_U*N_{RP}*ID_U\ mod\ q}\ mod\ p$ by combining $\mathcal{F}_{ID_{U} \mapsto PID_{U}}$, $\mathcal{F}_{ID_{RP} \mapsto PID_{RP}}$ with Equation~\ref{equ:IDRP}.
       Here, $p$, $q$ and $g$ are public parameters, $PID_{RP}$, $N_{RP}$ and $N_U$ are known to the RP, while $r$ is secretly maintained by the IdP and never leaked to the RP.
@@ -92,13 +92,13 @@ The collusive RPs cannot associate a user's  $PID_U$s either, due to the unknown
 %一个RP在多个login中提供错误的N_{RP}，来直接推导ID_U （提供错误值）
 %Two or more RPs合作关联 ID_U，（提供错误值）
 %尽管不直接推导，Two or more RPs 合作associate user login （提供错误值、不提供错误值） provide an incorrect $N_{RP}$ in $\mathcal{F}_{ID_{RP} \mapsto PID_{RP}}$
-A malicious RP may attempt to manipulate $N_{RP}$s in one or multiple logins to make the generated $PID_U$s or $Account$s be vulnerable for deriving $ID_U$, 
+A malicious RP may attempt to manipulate $N_{RP}$s in one or multiple logins to make the generated $PID_U$s or $Account$s be vulnerable for deriving $ID_U$,
  and the collusive RPs may attempt to manipulate $N_{RP}$s cooperatively to make a user's $PID_U$s or $Account$s be correlated at these RPs and then to associate a user's multiple logins.
 Here, $N_{RP}$s are the only values controlled by the RPs.
 However, the manipulation on $N_{RP}$ is masked by $N_U$ in $PID_U$ due to cooperative function $\mathcal{F}_{ID_{RP} \mapsto PID_{RP}}$,
  and has no effect on $Account$ as shown in Equation~\ref{equ:AccountNotChanged}.
 \begin{itemize}
-  \item For $PID_U$, it equals to ${PID_{RP}}^{ID_U}\ mod\ p$ and $g^{r*N_U*N_{RP}*ID_U\ mod\ q}\ mod\ p$. The RP cannot control $PID_{RP}$ as it generates $N_{RP}$ before obtaining $N_U$ and cannot change $N_{RP}$ after obtaining $N_U$. The random and independent $N_U$ prevents the RPs from controlling $PID_U$.      
+  \item For $PID_U$, it equals to ${PID_{RP}}^{ID_U}\ mod\ p$ and $g^{r*N_U*N_{RP}*ID_U\ mod\ q}\ mod\ p$. The RP cannot control $PID_{RP}$ as it generates $N_{RP}$ before obtaining $N_U$ and cannot change $N_{RP}$ after obtaining $N_U$. The random and independent $N_U$ prevents the RPs from controlling $PID_U$.
   \item For $Account$, it equals to ${ID_{RP}}^{ID_U}\ mod\ p$ and $g^{r*ID_U\ mod\ q}\ mod\ p$. Obviously, $Account$ is independent with $N_{RP}$ and cannot be controlled by any RP.
 \end{itemize}
 
@@ -112,9 +112,9 @@ the adversary cannot derive the victim user's $ID_U$ (and then $ID_{m-v}$) for t
 
 %和恶意用户合谋，主动攻击
 The malicious RPs may collude with  malicious users and manipulate $N_{RP}$s in the sessions with the victim users for linking the victim user's logins at different RPs.
-However, same as the above analysis, malicious RPs cannot control the victim user's $PID_U$s and $Account$s due to the independent $N_U$s from the victim user.  
+However, same as the above analysis, malicious RPs cannot control the victim user's $PID_U$s and $Account$s due to the independent $N_U$s from the victim user.
 
- 
+
 %The user can user the Tor network (or similar means) while accessing the RPs to hide her IP address which prevents collusive RPs to classify the users based on IP addresses, even though currently many network providers only provide user the dynamic IP address based on which the user is unable to be classified.
 
 
