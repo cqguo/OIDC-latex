@@ -1,6 +1,6 @@
 \section{Analysis}
 \label{sec:analysis}
-In this section, we analyze the security and privacy of UPRESSO.
+Here, we analyze the security and privacy of UPRESSO.
 
 \subsection{Security}
 \label{subsec:security}
@@ -10,7 +10,7 @@ In the following, we analyze the affects of the modifications listed in Section~
 The first modification may affect the receiver designation, as the identity proof is bound with $PID_{RP}$ instead of $ID_{RP}$.
 However, in UPRESSO, $PID_{RP}$ provides the same binding as $ID_{RP}$, which is achieved by the \textbf{transformed receiver designation} through $\mathcal{F}_{ID_{RP} \mapsto PID_{RP}}$  with the protocols in  RP identifier transforming and RP identifier refreshing.
 In OIDC, $ID_{RP}$ is used to ensure that  identity proof is only valid to the designated RP, as the correct IdP ensures that one $ID_{RP}$ is only assigned to one RP, and the correct RP only accepts the identity proof which has a same $ID_{RP}$ with the assigned one.
-In UPRESSO, the $PID_{RP}$ is also unique~\footnote{This has no impact on scalability. In practice, we only need to ensure all $PID_{RP}$s are different among the unexpired identity proof (the number denoted as $n$). We calculates the probability that at least one $PID_{RP}$ is obtained more than once in RP identifier transforming. The probability is $1-\prod_{i=0}^{n-1}(1-i/q)$, increases with $n$. For  a 256-bit $q$, the probability is smaller than $2^{-183}$, when $n=2^{36}$ which means IdP's throughput is about $2*10^8$ req/s when valid period is 5 minutes.}
+In UPRESSO, the $PID_{RP}$ is also unique
 and one $PID_{RP}$ is  only assigned to one RP when at least a correct user or correct RP exists, then identity proof bound with a $PID_{RP}$ is only valid to this RP. The detailed proofs are:
 \begin{itemize}
   \item The correct IdP ensures the the uniqueness of $PID_{RP}$, while the correct user checks this uniqueness through the RP identifier refreshing directly, and the correct RP checks it based on the user-redirected RP identifier refreshing result, which is signed by the IdP.
