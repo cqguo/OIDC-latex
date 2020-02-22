@@ -35,7 +35,8 @@ Single sign-on (SSO) services
      are widely provided in the Internet by identity providers (IdPs) as the identity management
       and authentication infrastructure.
 After being authenticated by the IdP,
-    a user is allowed to sign onto all relying parties (RPs) trusting the IdP.
+    a user is allowed to log into relying parties (RPs) by submitting an \emph{identity proof}
+    (i.e., id token of OpenID Connect or SAML assertion).
 However,
     SSO introduces the potential leakage of user privacy,
         as (\emph{a}) a curious IdP could track a user's all visits to any RP
@@ -48,20 +49,32 @@ Existing privacy-preserving SSO solutions protect the users' activity profiles
     against either the curious IdP or the collusive RPs, but never prevent both of these threats.
 
 In this paper, we propose an SSO system, called \emph{UPRESSO},
-     to protect an user's activity profile of RP visits
+     to protect a user's activity profile of RP visits
         from both the curious IdP and the collusive RPs.
-
-
-In UPRESSO, IdP generates a different privacy-preserving ID ($PID_U$) for a user among RPs, and binds $PID_U$ with a transformation of the RP identifier ($PID_{RP}$), without obtaining the real RP identifier.
-Each RP uses a trapdoor to derive the user's unique account from $PID_U$,
-while a user's accounts are different among the RPs.
-UPRESSO  is compatible with OpenID Connect, a widely deployed and well analyzed SSO system;
-    where dynamic registration is utilized to make $PID_{RP}$ valid in the IdP.
-The analysis shows that user's privacy is preserved in UPRESSO without any degradation on the security of OpenID Connect.
-We have implemented a prototype of UPRESSO. The evaluation demonstrates that UPRESSO is efficient, and only needs 208 ms for a user to login at an RP in our environment.
+In each login process of UPRESSO,
+ the IdP that is aware of all users' identities,
+         computes the privacy-preserving pseudo-identity ($PID_U$) for a user,
+    based on the user's identity and the pseudo-identity ($PID_{RP}$) of the visited RP.
+$PID_{RP}$ bound along with $PID_U$ in the identity proof,
+   is transformed cooperatively by the user and the RP,
+    and then the IdP does not know the visited RPs.
+%  and binds $PID_U$ with a transformation of the RP identifier ($PID_{RP}$), without obtaining the real RP identifier.
+The visited RP thats obtain a trapdoor from the transformation of $PID_{RP}$,
+    is able to use this trapdoor to derive the user's unique account from $PID_U$,
+ while a user's accounts are different across the RPs.
+The login process of UPRESSO adopts the communication pattern of OpenID Connect, a widely deployed SSO system.
+  %  and $PID_{RP}$ is .
+% compatible这个词，说得比较勉强；因为不同的人，对于compatible会有不同的理解;
+% 至于PRI_{RP}如何放进来，感觉是个次要的事情，不知道单点拿出来说
+%UPRESSO is compatible with OpenID Connect, a widely deployed and well analyzed SSO system;
+%    where dynamic registration is utilized to make $PID_{RP}$ valid in the IdP.
+The analysis demonstrates that UPRESSO protects user privacy well, without any degradation on the security of OpenID Connect.
+We have implemented the prototype of UPRESSO and
+ the experimental evaluation shows that UPRESSO is efficient and
+  it takes only 208 ms for a user to log into an RP.
 \end{abstract}
 \begin{IEEEkeywords}
-Single Sign-On, security, privacy, trace, linkage
+Single sign-on, security, privacy. %, trace, linkage
 \end{IEEEkeywords}
 
 \input{chap_Compact/introduction.tex}
