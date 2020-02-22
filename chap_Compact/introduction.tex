@@ -22,7 +22,7 @@ SSO systems need to provide secure authentication~\cite{SPRESSO}, that is to ens
 To achieve this, the identity proof should be valid only for the RP that the user requests to log in to (i.e., binding),
   and never leaked to other entities except this RP and the user (i.e., confidentiality);
    while this RP should never accept any information from the corrupted identity proof (i.e., integrity).
-However, various attacks are found to exploit the vulnerabilities in the SSO systems to break at least one of these three principles~\cite{ChenPCTKT14, FettKS16,WangCW12,ZhouE14,WangZLG16,YangLLZH16,SomorovskyMSKJ12,MohsenS16}, and the adversary could impersonate the victim user at an RP or log in the browser of an honest user under an adversary’s identity (i.e., identity injection).
+However, various attacks are found to exploit the vulnerabilities in the SSO systems to break at least one of these three principles~\cite{ChenPCTKT14, FettKS16,WangCW12,ZhouE14,WangZLG16,YangLLZH16,SomorovskyMSKJ12,MohsenS16}, and the adversary could impersonate the victim user at an RP or log in the browser of an honest user under an adversary's identity (i.e., identity injection).
 For example, Friendcaster was found to blindly accept any received identity proof~\cite{ExplicatingSDK,ChenPCTKT14} (i.e., not checking binding), then a malicious RP could obtain the identity proof from a user who attempts to log in to this malicious RP, and use it to log in to Friendcaster as the victim user~\cite{MohsenS16};
 some RPs of Google ID SSO were found to accept the user's attributes unprotected in the identity proof (i.e., out scope of  integrity protection), and therefore a malicious user could add incorrect attributes (e.g., the email address) in identity proof and then act as any user at the RP~\cite{WangCW12}.
 
@@ -39,11 +39,11 @@ then, the IdP completes the user's authentication in Step 3,  generates an ident
 finally, the RP verifies the binding and integrity of identity proof and sends the result to the user.
 From the authentication session, we find  collusive RPs and curious IdP could break the user's privacy  as follows.
 \begin{itemize}
+  \item {\em IdP-based access tracing}. IdP obtains the user's unique identifer in Step 3 and the identifers of the visited RPs in Step 2.
+ Therefore, a curious IdP could easily discover all RPs accessed by a user and reconstruct her access traces.
   \item {\em RP-based identity linkage}.
 If the common (or derivable from others) identifiers are used in the identity proofs for a same user across different RPs, % or the user's identifiers can be derived from each other,
 which is the case even in several widely deployed SSO systems~\cite{BrowserID,SPRESSO}, collusive RPs could not only track her online traces but also correlate her attributes across the sites~\cite{maler2008venn}.
-  \item {\em IdP-based access tracing}. IdP obtains the user's unique identifer in Step 3 and the identifers of the visited RPs in Step 2.
- Therefore, a curious IdP could easily discover all RPs accessed by a user and reconstruct her access traces.
 \end{itemize}
 
 %表一的不同形式（横排、还是竖排）
