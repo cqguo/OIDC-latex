@@ -54,11 +54,14 @@ some RPs of Google ID SSO accepted the user's attributes unbound in the identity
 %RP之间可以合谋知道同一个用户登录哪些RP
 The adoption of SSO also raises privacy concerns regarding online user tracking and profiling~\cite{maler2008venn,NIST2017draft}.
 User privacy leaks in all existing SSO protocols and implementations.
-We adopt the SSO authentication session in the OpenID Connect (OIDC)  as an example, to figure out the leakage.
+We take the login process of OpenID Connect (OIDC) as an example, to demonstrate the leakage of user privacy.
 As shown in Fig.~\ref{fig:OpenID},
-on receiving a login request from a user (Step 1), the RP uses the RP's identifier to construct an authentication request and redirects it to IdP (Step 2);
-then, the IdP completes the user's authentication in Step 3,  generates an identify proof for the user and binds it  with the  RP in Step 4, and redirects the identity proof to the RP confidentially in Step 5;
-finally, the RP verifies the binding and integrity of identity proof and sends the result to the user.
+on receiving a login request from a user (Step 1),
+ the RP uses the RP's identifier to construct an authentication request and redirects it to IdP (Step 2).
+After authenticating the user,
+    the IdP  generates an identify proof binding the identities of the user and the RP in Step 4,
+     and the identify proof is forwarded by the user to the RP in Step 5.
+Finally, the RP verifies the identity proof and accepts the user.
 From the authentication session, we find  collusive RPs and curious IdP could break the user's privacy  as follows.
 \begin{itemize}
   \item {\em IdP-based visit tracing}. IdP obtains the user's unique identifer in Step 3 and the identifers of the visited RPs in Step 2.
