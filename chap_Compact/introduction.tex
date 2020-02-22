@@ -57,18 +57,20 @@ User privacy leaks in all existing SSO protocols and implementations.
 We take the login process of OpenID Connect (OIDC) as an example, to demonstrate the leakage of user privacy.
 As shown in Fig.~\ref{fig:OpenID},
 on receiving a login request from a user (Step 1),
- the RP uses the RP's identifier to construct an authentication request and redirects it to IdP (Step 2).
+ the RP constructs an authentication request with its identity and redirects it to the IdP (Step 2).
 After authenticating the user,
     the IdP  generates an identify proof binding the identities of the user and the RP in Step 4,
      and the identify proof is forwarded by the user to the RP in Step 5.
 Finally, the RP verifies the identity proof and accepts the user.
 From the authentication session, we find  collusive RPs and curious IdP could break the user's privacy  as follows.
 \begin{itemize}
-  \item {\em IdP-based visit tracing}. IdP obtains the user's unique identifer in Step 3 and the identifers of the visited RPs in Step 2.
- Therefore, a curious IdP could easily discover all RPs accessed by a user and reconstruct her access traces.
+  \item {\em IdP-based visit tracing}. The IdP collects the user's identity in Step 3 and the identities of visited RPs in Step 2.
+Therefore, a curious IdP could easily discover all RPs visited by a user and profile its activities.
   \item {\em RP-based identity linkage}.
-If the common (or derivable from others) identifiers are used in the identity proofs for a same user across different RPs, % or the user's identifiers can be derived from each other,
-which is the case even in several widely deployed SSO systems~\cite{BrowserID,SPRESSO}, collusive RPs could not only track her online traces but also correlate her attributes across the sites~\cite{maler2008venn}.
+If the same identifiers are enclosed in the identity proofs for a certain user across different RPs, % or the user's identifiers can be derived from each other,
+which is the case of several widely deployed SSO systems~\cite{BrowserID,SPRESSO},
+ collusive RPs could not only link the user's login on different RPs to track its online activities 
+ but also correlate its attributes across different RPs~\cite{maler2008venn}.
 \end{itemize}
 
 %表一的不同形式（横排、还是竖排）
@@ -115,7 +117,7 @@ which is the case even in several widely deployed SSO systems~\cite{BrowserID,SP
 %google and facebook的负面新闻
 %1. service provider（如DNS）知道你访问了，可以带来很多问题。但是还是不同的，DNS里profile需要评估的是two behavior vectors的similarities，而IdP中都不需要，因为IdP能够区分two behavior vectors 是否来自相同节点。
 
-Meanwhile, large IdPs, especially social IdPs like Google and Facebook, are known to be interested in collecting users' online behavioral information for various purposes (e.g., Screenwise Meter~\cite{googlenews}, Onavo~\cite{Onavo}). By simply serving the IdP role, these companies can easily collect a large amount of continuous data to reconstruct users' online traces.
+Large IdPs, especially social IdPs like Google and Facebook, are known to be interested in collecting users' online behavioral information for various purposes (e.g., Screenwise Meter~\cite{googlenews}, Onavo~\cite{Onavo}). By simply serving the IdP role, these companies can easily collect a large amount of continuous data to reconstruct users' online traces.
 Moreover, many service providers are also hosting a variety of web services, which makes them easy to link the same user's multiple logins in each RP as the user's unique  identifier is contained in the identity proof. Through internal integration, they could obtain rich information from SSO data to profile their clients.
 
 
