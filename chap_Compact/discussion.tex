@@ -2,14 +2,14 @@
 \label{sec:discussion}
 We provide some discussions about UPRESSO here.
 
-%å…¼å®¹:ç›®å‰åªæä¾›éšå¼æ¨¡å¼,å¯¹å…¶ä»–æ¨¡å¼ä¸åè®®çš„å…¼å®¹æ–¹æ³•
+%¼æÈİ:Ä¿Ç°Ö»Ìá¹©ÒşÊ½Ä£Ê½,¶ÔÆäËûÄ£Ê½ÓëĞ­ÒéµÄ¼æÈİ·½·¨
 \noindent{\textbf{OIDC authorization code flow support.}} The privacy-preserving functions $\mathcal{F}_{ID_{U} \mapsto PID_{U}}$, $\mathcal{F}_{ID_{RP} \mapsto PID_{RP}}$ and $\mathcal{F}_{PID_{U} \mapsto Account}$ can be integrated into OIDC authorization code flow directly, therefore  RP-based identity linkage and IdP-based access tracing are still prevented during the construction and parsing of identity proof.
 The only privacy leakage is introduced by the transmission, as RP servers obtain the identity proof directly from the IdP in this flow, which allows the IdP to obtain RP's network information (e.g., IP address).
 UPRESSO could integrate anonymous networks (e.g., Tor)  to prevent this leakage.
 
 
 
-%SPRESSOè·¨å¹³å°:æˆ‘ä»¬ç›®å‰çš„æ–¹æ¡ˆåªåœ¨browserå®ç°
+%SPRESSO¿çÆ½Ì¨:ÎÒÃÇÄ¿Ç°µÄ·½°¸Ö»ÔÚbrowserÊµÏÖ
 \noindent{\textbf{Platform independent.}}
 Firstly, a user could use any machine (the Chrome extension installed) to log in at RPs and need no extra processing (e.g., synchronization),
 as the user's machine doesn't need to store any persistent data and only caches $Cert_{RP}$, $PID_{RP}$ and one-time endpoint during the processing of one login.
@@ -25,10 +25,10 @@ Secondly, the implementation of UPRESSO could  be further improved, then the use
 \noindent{\textbf{Scalability on $\mathbf{ID_{RP}}$ and $\mathbf{PID_{RP}}$.}} The adversary cannot exhaust $ID_{RP}$ and $PID_{RP}$.
 For $ID_{RP}$, it is generated only in RP's initial registration, and existing DoS mitigation  could be adopted to mitigate malicious registration.
 For $PID_{RP}$,  in practice, we only need to ensure all $PID_{RP}$s are different among the unexpired identity proof (the number denoted as $n$). The probability
-that two or more  $PID_{RP}$s are same among the unexpired identity proof, is $1-\prod_{i=0}^{n-1}(1-i/q)$ which increases with $n$. 
+that two or more  $PID_{RP}$s are same among the unexpired identity proof, is $1-\prod_{i=0}^{n-1}(1-i/q)$ which increases with $n$.
 For an IdP with throughput $2*10^8$ req/s and valid period of identity proof set as 5 minutes, $n$ is less than $2^{36}$, then the probability is less than $2^{-183}$ for 256-bit $q$.
 
 \noindent{\textbf{Malicious IdP mitigation.}} The IdP is assumed to assign unique $ID_{RP}$ in $Cert_{RP}$ for each RP and generate the correct $PID_U$ for each login. The malicious IdP may attempt to provide incorrect $ID_{RP}$ and $PID_U$, which could be prevented by integrating certificate transparency~\cite{rfc6962} and user's identifier check~\cite{SPRESSO}. With certificate transparency~\cite{rfc6962}, the monitors  checks the uniqueness of $r$ among all the certificates stored in the log server. To prevent the malicious IdP from injecting a incorrect $PID_U$, the correct user could provide a nickname to the correct RP for an extra check as in SPRESSO~\cite{SPRESSO}.
-  
+
 
 
