@@ -76,14 +76,14 @@ An RP cannot derive $ID_U$ from $PID_U$ and $Account$ in one login, due to the o
       Then, it is computational infeasible to compute $ID_U$ from $PID_U$ with all the known values (e.g., $PID_{RP}$, $g$ and etc.) due to the discrete logarithm problem.
   \item For $Account$, it equals to ${ID_{RP}}^{ID_U}\ mod\ p$ according to Equation~\ref{equ:AccountNotChanged}, and further transformed to $g^{r*ID_U\ mod\ q}\ mod\ p$ with Equation~\ref{equ:IDRP}. Same as the above analysis, it is also computational infeasible to compute $ID_U$ from $Account$ with all the known values (e.g., $ID_{RP}$, $g$ and etc.).
   \item The RP cannot infer $ID_U$ by combining $Account$ and $PID_U$.
-        $Account$ and $PID_U$ are both generated from $ID_U$, however $Accout={PID_U}^t\ mod\ p$ where $t$ is a random value known to $t$ and independent with $ID_U$.
+        $Account$ and $PID_U$ are both generated from $ID_U$, however $Accout={PID_U}^t\ mod\ p$ where $t$ is a random value known to RP and independent with $ID_U$.
 \end{itemize}
 
 %one RP 多个login中的PIDu-> IDu, 多个login中的Account->IDu
-An RP cannot derive $ID_U$ from $PID_U$s and $Account$s obtained in multiple logins. All these $Account$s are equal,  while any $PID_{U}$ (e.g., $PID_{U1}$) can be computed from any other $PID_{U}$ (e.g., $PID_{U2}$),  $PID_{U1}$=$PID_{U2} * Account^{N_{U1}*N_{RP1}-N_{U2}*N_{RP2}}$, where $N_{U2}$, $N_{RP2}$, $N_{U2}$ and $N_{RP2}$ are values known to the RP and independent with $ID_U$.
+An RP cannot derive $ID_U$ from $PID_U$s and $Account$s obtained in multiple logins. All these $Account$s are equal,  while any $PID_{U}$ (e.g., $PID_{U1}$) can be computed from any other $PID_{U}$ (e.g., $PID_{U2}$),  $PID_{U1}$=$PID_{U2} * Account^{N_{U1}*N_{RP1}-N_{U2}*N_{RP2}}\ mod\ p$, where $N_{U2}$, $N_{RP2}$, $N_{U2}$ and $N_{RP2}$ are values known to the RP and independent with $ID_U$.
 
 %two or more RPs 合谋， 不提供错误值
-The collusive RPs may attempt to associate  a user's $Account$s by checking whether the equality $Account_2$=$(Account_1)^{r_2/r_1}\ mod\ p$ holds for $Account_1$ at an RP $g^{r_1}\ mod\ p$ and $Account_2$ at $g^{r_2}\ mod\ p$.
+The collusive RPs may attempt to associate  a user's $Account$s by checking whether the equality $Account_2$=$(Account_1)^{r_2/r_1}\ mod\ p$ holds for $Account_1$ at an RP $ID\_{RP1}\ =\ g^{r_1}\ mod\ p$ and $Account_2$ at another RP $ID\_{RP2}\ =\ g^{r_2}\ mod\ p$.
 But, the associating always fails, as RPs cannot derive $r$ (and therefore ${r_2/r_1}$) from $ID_{RP}$ due to the discrete logarithm problem.
 The collusive RPs cannot associate a user's  $PID_U$s either, due to the unknown $r$s.
 
