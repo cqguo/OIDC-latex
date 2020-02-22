@@ -1,35 +1,35 @@
 \section{Introduction}
 \label{sec:intro}
 
-%SSOçš„ç‰¹ç‚¹
-%SSOçš„ç°çŠ¶
+%SSOµÄÌØµã
+%SSOµÄÏÖ×´
 Single sign-on (SSO) systems, such as OAuth~\cite{rfc6749}, OpenID Connect~\cite{OpenIDConnect} and SAML~\cite{SAML}, have been widely adopted nowadays as a convenient web authentication mechanism. SSO delegates user authentication from websites, so-called relying parties (RPs), to a third party, so-called identity providers (IdPs), so that users can access different services at cooperating sites via a single authentication attempt. Using SSO, a user no longer needs to maintain multiple credentials for different RPs, instead, she maintains only the credential for the IdP, who in turn will generate corresponding \emph{identity proofs} for those RPs. Moreover, SSO shifts the burden of user authentication from RPs to IdPs and reduces security risks and costs at RPs. As a result, SSO has been widely integrated with modern web systems.
 We analyze the Alexa top-100 websites~\cite{Alexa} and find 80\% of them support SSO service,
  and the analysis in~\cite{GhasemisharifRC18} identifies SSO support on 6.30\% of the Alexa top 1 million websites.
 Meanwhile, many email and social networking providers (such as Google, Facebook, Twitter, etc.) have been actively serving as social identity providers to support social login.
 
 
-%SSOç³»ç»Ÿçš„å®‰å…¨é—®é¢˜ï¼Œéœ€è¦ä¿æŠ¤identity proofçš„å®Œæ•´æ€§ï¼Œæœºå¯†æ€§ï¼Œç»‘å®šæ€§
-%å®Œæ•´æ€§ï¼šä½¿ç”¨å…¬å¼€çš„ä¸ºå—ä¿æŠ¤çš„ä¿¡æ¯ä½œä¸ºidentity proof
-%æœºå¯†æ€§ï¼šä¿è¯ç”±IdPå‘é€ç»™å¯¹åº”çš„RPï¼Œå¹¶ä¸”ä¼ è¾“è¿‡ç¨‹ä¸­é€šé“ã€user agentéƒ½æ˜¯å—åˆ°ä¿æŠ¤çš„
-%ç»‘å®šæ€§ï¼šidentity proofä¸€å®šè¦ä¸å¯¹åº”çš„RPå®ç°ç»‘å®š
-%SPRESSOä¸­å…³äºimpersonationå’Œidentity injectionçš„æè¿°ã€‚ Authentication is the most fundamental security property of an SSO system. That is, i) an adversary should not be able to log in to an RP, and hence, use the service of the RP, as an honest user, and ii) an adversary should not be able to log in the browser of an honest user under an adversaryâ€™s identity (identity injection).
-%è¿™æ®µæè¿°ä¸¤ä¸ªäº‹æƒ…ï¼š1.secure authentication å°±æ˜¯èƒ½é˜²ä½impersonationå’Œidentity injectionã€‚ ç„¶è€Œï¼Œç°åœ¨æœ‰å¾ˆå¤šæ”»å‡»ä½¿å¾—è¿™ä¸¤ä¸ªæ— æ³•å¾—åˆ°ä¿è¯ã€‚ç»è¿‡åˆ†æä¸»è¦æ˜¯è¿™ä¸‰ä¸ªæ–¹é¢çš„åŸå› ï¼š1)RPæ¥å—äº†æœªè¢«å®Œæ•´æ€§ä¿æŠ¤çš„å†…å®¹ï¼›2)æœªç»‘å®šï¼›3)æ³„éœ²ã€‚
-%binding åŸæ–‡æè¿° ChenPCTKT14 CCS14 Friendcaster(Friendcasteræ˜¯ä¸€æ¬¾Facebookçš„ç¬¬ä¸‰æ–¹åº”ç”¨ï¼Œæ¯”å®˜æ–¹ç‰ˆçš„åŠŸèƒ½æ›´åŠ å…¨é¢) blindly accepting an access token received from a user's device then using this token to exchange for the user's Facebook ID. A malicious application could obtain a legitimate access token from a user, then use this access token to log into Friendcaster as the user. cause they thought Facebook's access tokens were bound to relying parties and checked with every API call: \From Facebook's perspective, the API calls wouldn't appear to be originating from Friendcaster, but the attacker's own app."
-%å®Œæ•´æ€§åŸæ–‡æè¿° IEEE S&P2012~\cite{WangCW12}å…³äºGoogleé—®é¢˜æè¿°we found that the RPs of Google ID SSO often assume that message fields they require Google to sign would always be signed, which turns out to be a serious misunderstanding (Section 4.1). These problems make us believe that a complete answer to our question can only be found by analyzing SSO schemes on real websites.
+%SSOÏµÍ³µÄ°²È«ÎÊÌâ£¬ĞèÒª±£»¤identity proofµÄÍêÕûĞÔ£¬»úÃÜĞÔ£¬°ó¶¨ĞÔ
+%ÍêÕûĞÔ£ºÊ¹ÓÃ¹«¿ªµÄÎªÊÜ±£»¤µÄĞÅÏ¢×÷Îªidentity proof
+%»úÃÜĞÔ£º±£Ö¤ÓÉIdP·¢ËÍ¸ø¶ÔÓ¦µÄRP£¬²¢ÇÒ´«Êä¹ı³ÌÖĞÍ¨µÀ¡¢user agent¶¼ÊÇÊÜµ½±£»¤µÄ
+%°ó¶¨ĞÔ£ºidentity proofÒ»¶¨ÒªÓë¶ÔÓ¦µÄRPÊµÏÖ°ó¶¨
+%SPRESSOÖĞ¹ØÓÚimpersonationºÍidentity injectionµÄÃèÊö¡£ Authentication is the most fundamental security property of an SSO system. That is, i) an adversary should not be able to log in to an RP, and hence, use the service of the RP, as an honest user, and ii) an adversary should not be able to log in the browser of an honest user under an adversary¡¯s identity (identity injection).
+%Õâ¶ÎÃèÊöÁ½¸öÊÂÇé£º1.secure authentication ¾ÍÊÇÄÜ·À×¡impersonationºÍidentity injection¡£ È»¶ø£¬ÏÖÔÚÓĞºÜ¶à¹¥»÷Ê¹µÃÕâÁ½¸öÎŞ·¨µÃµ½±£Ö¤¡£¾­¹ı·ÖÎöÖ÷ÒªÊÇÕâÈı¸ö·½ÃæµÄÔ­Òò£º1)RP½ÓÊÜÁËÎ´±»ÍêÕûĞÔ±£»¤µÄÄÚÈİ£»2)Î´°ó¶¨£»3)Ğ¹Â¶¡£
+%binding Ô­ÎÄÃèÊö ChenPCTKT14 CCS14 Friendcaster(FriendcasterÊÇÒ»¿îFacebookµÄµÚÈı·½Ó¦ÓÃ£¬±È¹Ù·½°æµÄ¹¦ÄÜ¸ü¼ÓÈ«Ãæ) blindly accepting an access token received from a user's device then using this token to exchange for the user's Facebook ID. A malicious application could obtain a legitimate access token from a user, then use this access token to log into Friendcaster as the user. cause they thought Facebook's access tokens were bound to relying parties and checked with every API call: \From Facebook's perspective, the API calls wouldn't appear to be originating from Friendcaster, but the attacker's own app."
+%ÍêÕûĞÔÔ­ÎÄÃèÊö IEEE S&P2012~\cite{WangCW12}¹ØÓÚGoogleÎÊÌâÃèÊöwe found that the RPs of Google ID SSO often assume that message fields they require Google to sign would always be signed, which turns out to be a serious misunderstanding (Section 4.1). These problems make us believe that a complete answer to our question can only be found by analyzing SSO schemes on real websites.
 
 SSO systems need to provide secure authentication~\cite{SPRESSO}, that is to ensure an honest user logs in to an honest RP under the correct identity (i.e., account).
 To achieve this, the identity proof should be valid only for the RP that the user requests to log in to (i.e., binding),
   and never leaked to other entities except this RP and the user (i.e., confidentiality);
    while this RP should never accept any information from the corrupted identity proof (i.e., integrity).
-However, various attacks are found to exploit the vulnerabilities in the SSO systems to break at least one of these three principles~\cite{ChenPCTKT14, FettKS16,WangCW12,ZhouE14,WangZLG16,YangLLZH16,SomorovskyMSKJ12,MohsenS16}, and the adversary could impersonate the victim user at an RP or log in the browser of an honest user under an adversaryâ€™s identity (i.e., identity injection).
+However, various attacks are found to exploit the vulnerabilities in the SSO systems to break at least one of these three principles~\cite{ChenPCTKT14, FettKS16,WangCW12,ZhouE14,WangZLG16,YangLLZH16,SomorovskyMSKJ12,MohsenS16}, and the adversary could impersonate the victim user at an RP or log in the browser of an honest user under an adversary¡¯s identity (i.e., identity injection).
 For example, Friendcaster was found to blindly accept any received identity proof~\cite{ExplicatingSDK,ChenPCTKT14} (i.e., not checking binding), then a malicious RP could obtain the identity proof from a user who attempts to log in to this malicious RP, and use it to log in to Friendcaster as the victim user~\cite{MohsenS16};
 some RPs of Google ID SSO were found to accept the user's attributes unprotected in the identity proof (i.e., out scope of  integrity protection), and therefore a malicious user could add incorrect attributes (e.g., the email address) in identity proof and then act as any user at the RP~\cite{WangCW12}.
 
 
-%SSO å¼•å…¥æ–°çš„éšç§é—®é¢˜
-%IdPçŸ¥é“ç”¨æˆ·ç™»å½•å“ªä¸ªRP
-%RPä¹‹é—´å¯ä»¥åˆè°‹çŸ¥é“åŒä¸€ä¸ªç”¨æˆ·ç™»å½•å“ªäº›RP
+%SSO ÒıÈëĞÂµÄÒşË½ÎÊÌâ
+%IdPÖªµÀÓÃ»§µÇÂ¼ÄÄ¸öRP
+%RPÖ®¼ä¿ÉÒÔºÏÄ±ÖªµÀÍ¬Ò»¸öÓÃ»§µÇÂ¼ÄÄĞ©RP
 The wide adoption of SSO also raises new privacy concerns regarding online user tracking and profiling~\cite{maler2008venn,NIST2017draft}.
 Privacy leakage exists in all current SSO protocols and implementations.
 We adopt the SSO authentication session in the OpenID Connect (OIDC)  as an example, to figure out the leakage.
@@ -46,7 +46,7 @@ which is the case even in several widely deployed SSO systems~\cite{BrowserID,SP
  Therefore, a curious IdP could easily discover all RPs accessed by a user and reconstruct her access traces.
 \end{itemize}
 
-%è¡¨ä¸€çš„ä¸åŒå½¢å¼ï¼ˆæ¨ªæ’ã€è¿˜æ˜¯ç«–æ’ï¼‰
+%±íÒ»µÄ²»Í¬ĞÎÊ½£¨ºáÅÅ¡¢»¹ÊÇÊúÅÅ£©
 \begin{comment}
 \begin{table}[tb]
     \caption{Three functions in privacy-preserving SSO.}
@@ -87,8 +87,8 @@ which is the case even in several widely deployed SSO systems~\cite{BrowserID,SP
     \label{tbl:compare}
 \end{table}
 
-%google and facebookçš„è´Ÿé¢æ–°é—»
-%1. service providerï¼ˆå¦‚DNSï¼‰çŸ¥é“ä½ è®¿é—®äº†ï¼Œå¯ä»¥å¸¦æ¥å¾ˆå¤šé—®é¢˜ã€‚ä½†æ˜¯è¿˜æ˜¯ä¸åŒçš„ï¼ŒDNSé‡Œprofileéœ€è¦è¯„ä¼°çš„æ˜¯two behavior vectorsçš„similaritiesï¼Œè€ŒIdPä¸­éƒ½ä¸éœ€è¦ï¼Œå› ä¸ºIdPèƒ½å¤ŸåŒºåˆ†two behavior vectors æ˜¯å¦æ¥è‡ªç›¸åŒèŠ‚ç‚¹ã€‚
+%google and facebookµÄ¸ºÃæĞÂÎÅ
+%1. service provider£¨ÈçDNS£©ÖªµÀÄã·ÃÎÊÁË£¬¿ÉÒÔ´øÀ´ºÜ¶àÎÊÌâ¡£µ«ÊÇ»¹ÊÇ²»Í¬µÄ£¬DNSÀïprofileĞèÒªÆÀ¹ÀµÄÊÇtwo behavior vectorsµÄsimilarities£¬¶øIdPÖĞ¶¼²»ĞèÒª£¬ÒòÎªIdPÄÜ¹»Çø·Ötwo behavior vectors ÊÇ·ñÀ´×ÔÏàÍ¬½Úµã¡£
 
 Meanwhile, large IdPs, especially social IdPs like Google and Facebook, are known to be interested in collecting users' online behavioral information for various purposes (e.g., Screenwise Meter~\cite{googlenews}, Onavo~\cite{Onavo}). By simply serving the IdP role, these companies can easily collect a large amount of continuous data to reconstruct users' online traces.
 Moreover, many service providers are also hosting a variety of web services, which makes them easy to link the same user's multiple logins in each RP as the user's unique  identifier is contained in the identity proof. Through internal integration, they could obtain rich information from SSO data to profile their clients.
@@ -165,10 +165,10 @@ UPRESSO is compatible with existing SSO systems,
  and doesn't require a completely new and comprehensive formal security analysis.
 
 
-%æˆ‘ä»¬çš„è´¡çŒ®
-%æå‡ºåè®®
-%è€ƒè™‘èƒ½å¦æ ¹æ®æ¨¡å‹è¿›è¡Œåˆ†æ
-%å®ç°åŸå‹ç³»ç»Ÿ
+%ÎÒÃÇµÄ¹±Ï×
+%Ìá³öĞ­Òé
+%¿¼ÂÇÄÜ·ñ¸ù¾İÄ£ĞÍ½øĞĞ·ÖÎö
+%ÊµÏÖÔ­ĞÍÏµÍ³
 The main contributions of UPRESSO are as follows:
 \begin{itemize}
 \item We systematically analyze the privacy issues in SSO systems and propose a comprehensive protection solution to hide users' traces from both curious IdPs and collusive RPs, for the first time. We also provide a systematic analysis to show that UPRESSO achieves the same security level as existing SSO systems.
@@ -178,7 +178,7 @@ The main contributions of UPRESSO are as follows:
 
 
 
-%æ–‡ç« ç»“æ„
+%ÎÄÕÂ½á¹¹
 The rest of this paper is organized as follows. We introduce the background in Sections~\ref{sec:background}, and the challenges with solutions briefly~\ref{sec:challenge}. Section~\ref{sec:related} and Section~\ref{sec:UPRESSO} describe the threat model and the design of UPRESSO. A systematical analysis is presented in Section~\ref{sec:analysis}. We provide the implementation specifics and evaluation in Section~\ref{sec:implementation}, then introduce the related works in Section~\ref{sec:related}, and draw the conclusion finally.
 
 
