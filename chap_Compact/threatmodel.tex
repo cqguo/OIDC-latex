@@ -2,7 +2,7 @@
 \label{sec:assumptionandthreatmodel}
 To be compatible the traditional SSO systems (e.g., SAML, OIDC), UPRESSO doesn't introduce any other entity, but only
   modifies the processes at existing entities,  i.e, one IdP, multiple RPs and users, to provide the secure and privacy-preserving SSO service.
-Here, we introduce the threat model and assumptions in UPRESSO. 
+Here, we introduce the threat model and assumptions in UPRESSO.
 
 
 \subsection{Threat Model}
@@ -15,15 +15,15 @@ The details are as follows.
 We assume the IdP is well-protected and will never leak any sensitive information.
 For example, the private key for generating the identity proof and RP certificate (used in Section~\ref{implementations}) will never be leaked,
  therefore the adversary fails to impersonate as the IdP to forge a valid identity proof or RP certificate.
-The honest IdP processes the requests of RP registration and identity proof correctly, 
+The honest IdP processes the requests of RP registration and identity proof correctly,
 and never colludes with others (e.g., malicious RPs and users).
 For example, IdP ensures the uniqueness of $ID_{RP}$ and $PID_{RP}$, and generates the correct RP certificate, $PID_U$ and identity proof.
 However, the curious IdP may attempt to break the user's privacy without violating the protocol.
-For example, the curious IdP may store and analyze the received messages, and perform the timing attacks, attempting to achieve the IdP-based linkage. 
+For example, the curious IdP may store and analyze the received messages, and perform the timing attacks, attempting to achieve the IdP-based linkage.
 
 
-%User's goal: å‘IdPå‘é€identity proofï¼Œä½¿IdPè®¤ä¸ºè‡ªå·±æ˜¯å¦ä¸€ä¸ªvictim
-%æ–¹å¼ï¼š1ï¼‰å·²ç»æ‹¥æœ‰æœ‰æ•ˆçš„identity proofï¼Œå¸Œæœ›ä¸IdPåå•†å‡ºç›¸åŒçš„PID_RPï¼›2ï¼‰é€šè¿‡ç¯¡æ”¹æˆ–è€…ä¼ªé€ identity proofæ¥å®ç°æ”»å‡»
+%User's goal: ÏòIdP·¢ËÍidentity proof£¬Ê¹IdPÈÏÎª×Ô¼ºÊÇÁíÒ»¸övictim
+%·½Ê½£º1£©ÒÑ¾­ÓµÓĞÓĞĞ§µÄidentity proof£¬Ï£ÍûÓëIdPĞ­ÉÌ³öÏàÍ¬µÄPID_RP£»2£©Í¨¹ı´Û¸Ä»òÕßÎ±Ôìidentity proofÀ´ÊµÏÖ¹¥»÷
 \vspace{1mm}\noindent \textbf{Malicious users.}
 The adversary could control a set of users, for example through stealing the users' credentials~\cite{WangZWYH16, SunCL12} or registering  at the IdP and RPs directly.
 These malicious users
@@ -32,8 +32,8 @@ That is, they  attempt to impersonate  an uncontrolled user at the victim RP, an
 To achieve this, they could behave arbitrarily~\cite{WangCW12, SomorovskyMSKJ12}.
 For example, the malicious users may forge the identity proof, modify the forwarding messages (requests of identity proof, identity proof,  RP registration request and result, and etc.), and provide incorrect values for negotiating $PID_{RP}$ (detailed in Section~\ref{implementations}).
 
-%RP's goal:1)è·å¾—ç›®å‰ç™»å½•ç”¨æˆ·åœ¨å…¶ä»–RPå¯ç”¨çš„identity proofï¼›2ï¼‰collusive RP å…³è”ç”¨æˆ·
-\vspace{1mm}\noindent \textbf{Malicious RPs.} 
+%RP's goal:1)»ñµÃÄ¿Ç°µÇÂ¼ÓÃ»§ÔÚÆäËûRP¿ÉÓÃµÄidentity proof£»2£©collusive RP ¹ØÁªÓÃ»§
+\vspace{1mm}\noindent \textbf{Malicious RPs.}
 The adversary could control a set of RPs, by registering an RP at the IdP or exploiting various vulneraries to attack RPs.
 These malicious RPs aim to break the security and privacy of the correct users, and could behave arbitrarily.
 For example, to break the security, the malicious RPs need to obtain an identity proof valid for other RP, and attempt to achieve this by behaving as follows:
@@ -47,7 +47,7 @@ For example, the RPs may attempt to derive the $ID_U$ from $PID_U$ by providing 
 
 \vspace{1mm}\noindent \textbf{Collusive users and RPs.} %In particular,
 The malicious users and RPs may collude and behave arbitrarily, attempting to break the security of UPRESSO.
-For example, 
+For example,
 the adversary may first act as a malicious RP, and make an incorrect identity proof generated for the visiting user,
   then act a malicious user, and use this identity proof to impersonate this victim user at another RP.
 The adversary could also first act as a user to login a correct RP and obtain an identity proof,
@@ -55,9 +55,9 @@ The adversary could also first act as a user to login a correct RP and obtain an
 
 
 \subsection{Assumption}
-In UPRESSO, 
+In UPRESSO,
 we assume that the user agent deployed at the honest user is correctly implemented,
-and will transmit the messages to the correct destination. 
+and will transmit the messages to the correct destination.
 The TLS is also correctly implemented at the user agent, IdP and RP, which ensures the confidentiality and integrity of the network traffic between correct entities.
 We also assume a secure random number generator is adopted in UPRESSO to provide the unpredictable random numbers;
 and the adopted cryptographic algorithms, including the RSA and SHA-256, are secure and implemented correctly.
@@ -68,8 +68,4 @@ The collusive RPs may attempt to link a user  based on the identifying attribute
 Here, we assume that the users refuse to provide these attributes to the RPs, and the correct RPs never collect these attributes as required by privacy laws (e.g., GDPR~\cite{wachter2017counterfactual}).
 Moreover, the global network traffic analysis may be adopted to correlate the user's logins at different RPs.
   However, UPRESSO may integrate existing defenses to prevent this attack.
-
-
-
-
 
