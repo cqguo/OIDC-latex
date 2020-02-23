@@ -1,45 +1,90 @@
 \section{The Identity-Transformation Approach of UPPRESSO}
 \label{sec:challenge}
 
-In this section, we analyze the challenges to design privacy-preserving SSO systems
+In this section, we analyze the challenges to design secure privacy-preserving SSO systems,
      and provide an overview of the identity-transformation approach proposed in UPRESSO.
 
 \subsection{Security Requirements of SSO}
 \label{subsec:basicrequirements}
-We summarize basic requirements of SSO systems based on existing theoretical analysis~\cite{ArmandoCCCT08,FettKS16, FettKS17} and practical attacks~\cite{SomorovskyMSKJ12,WangCW12,ArmandoCCCPS13,ZhouE14,WangZLLYLG15,WangZLG16,YangLLZH16,MainkaMS16,MohsenS16,MainkaMSW17,YangLCZ18,YangLS17,ShiWL19} on SSO systems. These basic requirements focus on  functions and security of SSO systems, and are as follows:
-
-\vspace{1mm}\noindent\textbf{User identification.} When a user logs in to a same RP multiple times, the RP should be able to associate these logins to provide a continuous and personalized service to that user.
-
-\vspace{1mm}\noindent\textbf{RP designation.} The receiver designation requires that the identity proof should  be  sent only to the RP (and user) that the user visits, and be bound to this RP so that it will accepted only by this RP.
-
-
-\vspace{1mm}\noindent\textbf{Integrity and confidentiality.} Only the trusted IdP is able to generate a valid identity proof,
-     no other entity should be able to modify or forge it~\cite{WangZLG16} without being found. And, the confidentiality of the identity proof is ensured during the transmission among the IdP, user and the designated RP. While, the correct RP should only accept the valid identity proof.
-
-
-These basic requirements are the minimum properties that an SSO system has to provide.
-User identification is necessary for all services except the anonymous systems which will be discussed in Section~\ref{sec:related},
- therefore RPs should be able to identify the user with the help from IdP.
-While either the receiver designation, integrity or confidentiality not satisfied, the impersonation and identity injection will exist in the SSO systems.
-For example, without the receiver designation, the adversaries cloud make the victim RP  incorrectly accept the identity proof intended for other RP, which allows the adversary to perform impersonation directly or inject the identity proof in the web session between the victim user and honest RP with other web attacks (e.g., CSRF~\cite{zeller2008cross}); and without integrity, the impersonation and identity injection attacks could be constructed easily  as an adversary could directly modify user's identifier in the identity proof; while without confidentiality, the adversaries cloud use the leaked identity proof to impersonate the victim user at an honest RP~\cite{ChenPCTKT14,FettKS16,WangZLG16}.
-
-Both the designs of SSO protocols and the implementations of SSO systems are challenging ~\cite{SPRESSO},
-and various vulnerabilities have been found in existing systems~\cite{SomorovskyMSKJ12,WangCW12,ArmandoCCCPS13,ZhouE14,WangZLLYLG15,WangZLG16,YangLLZH16,MainkaMS16,MohsenS16,MainkaMSW17,YangLCZ18,YangLS17,ShiWL19}.
-With these vulnerabilities, the adversaries break the security of SSO systems and achieve the following two goals~\cite{SPRESSO}:
+We summarize the basic requirements of SSO systems based on existing theoretical analyses~\cite{ArmandoCCCT08,FettKS16, FettKS17} and practical attacks~\cite{SomorovskyMSKJ12,WangCW12,ArmandoCCCPS13,ZhouE14,WangZLLYLG15,WangZLG16,YangLLZH16,MainkaMS16,MohsenS16,MainkaMSW17,YangLCZ18,YangLS17,ShiWL19}. These requirements enable an SSO system to provide qualified authentication services for RPs,
+    through identity proofs.
 \begin{itemize}
-\item \textbf{Impersonation}: Adversary logs in to an honest RP as the victim user.
-\item  \textbf{Identity injection}: A victim user logs in to an honest RP under the adversaries' identity.
+\item
+\textbf{User identification.} When a user logs into a certain RP for multiple times by submitting identity proofs,
+ the RP extracts the identical user identifier from these identity proofs,
+    to provide personalized services for this user.
+
+\item
+\textbf{RP designation.} The designated receiver (or RP) is specified in an identity proof,
+    so that this identity proof is accepted by the visited RP only.
+
+\item
+\textbf{Integrity and confidentiality.}
+ Only the IdP is trusted to generate identity proofs,
+ RPs do not accept an identity proof with any modification or a forged one.
+%RPs should only accept the valid identity proof.
+Meanwhile, a valid identity proof is transmitted only to the user and the designated RP.
+% confidentiality of the identity proof is ensured during the transmission among the IdP, user and the designated RP.
 \end{itemize}
 
 
+
+%These basic requirements are the minimum properties that an SSO system has to provide.
+% therefore RPs should be able to identify the user with the help from IdP.
+First of all,
+    user identification is necessary for common SSO systems to help the RPs to receive the user's identifier, except the anonymous services.
+Any violation of these requirements \cite{SomorovskyMSKJ12,WangCW12,ArmandoCCCPS13,ZhouE14,WangZLLYLG15,WangZLG16,YangLLZH16,MainkaMS16,MohsenS16,MainkaMSW17,YangLCZ18,YangLS17,ShiWL19}
+    result in
+    \emph{impersonation attacks} (i.e., the adversaries log into an honest RP as a victim user)
+     or \emph{identity injection attacks} (i.e., a victim user logs into an honest RP under some attacker's identity).
+Impersonation and identity injection attacks would be successfully launched,
+    if the attackers could arbitrarily modify the user identifiers in identity proofs.
+% and without integrity, the impersonation and identity injection attacks could be constructed easily
+% as an adversary could directly modify user's identifier in the identity proof;
+If the designated RP is not well specified or verified in identity proofs,
+    the adversaries could deceive an RP to accept the identity proofs generated for other RPs,
+        so that the adversaries would (\emph{a}) impersonate some victim user,
+                     by colluding with a malicious RP to obtain such an identity proof and submitting it to the RP,
+                     or (\emph{b}) inject such identity proofs in the communications between the victim user and some RP,
+                     for example, by CSRF~\cite{zeller2008cross}.
+Or,
+     the adversaries cloud impersonate the victim user by presenting any leaked identity proof~\cite{ChenPCTKT14,FettKS16,WangZLG16}.
+
 \subsection{The Identity Dilemma of Privacy-Preserving SSO}
 \label{subsec:challenges}
-In addition to the basic requirements, a privacy-preserving SSO system should prevent the IdP-based access tracing %login tracing 和 access tracing 没有已经广泛使用的说法
-and RP-based identity linkage.
-In details, the privacy-preserving SSO system should prevent the curious IdP from obtaining any information that could identify the user's accessed RP (for example, through RP's identifier and URL) or associate the logins at an RP,
-and prevent  the collusive RPs from associating a user's logins at different RPs.
+As mentioned in Section \ref{sec:intro},
+    the user privacy is leaked through IdP-based visit tracing or RP-based identity linkage.
+Thus, a privacy-preserving SSO system shall prevent these two kinds of user privacy leakage,
+    while satisfying four basic security requirements of SSO services.
+    
 
-The privacy-preserving requirements need to be integrated into the basic requirements, to protect the user privacy under the prerequisite that the correct functions and security of SSO systems are ensured.
+The pseudo-identifiers of users and RPs (denoted as $PID_U$ and $PID_{RP}$, respectively)
+    are introduced as we consider both the requirements of security and privacy.
+To prevent IdP-based visit tracing while ensure RP designation,
+    the IdP shall be aware of $PID_{RP}$ at most
+        and $ID_{RP}$ is not bound in identity proofs;
+    otherwise, if $ID_{RP}$ is disclosed to the IdP,
+     it enable IdP-based visit tracing because the user is authenticated by the IdP and $ID_U$ is automatically disclosed.
+Moreover, for a certain user,
+        in the multiple logins at an RP,
+    $PID_{RP}$s are different to prevent IdP-based visit tracing.
+In order to prevent RP-based identity linkage while ensure user identification,
+    only $PID_U$ but not $ID_U$ is enclosed in the identity proofs;
+        otherwise, collusive RPs will link a user's login activities based on $ID_U$ in received identity proofs.
+Moreover, $PID_U$s of a user are different, when the user visits different RPs.
+Finally,
+    only the pseudo-identifiers of users and RPs (i.e., $PID_U$ and $PID_{RP}$) are bound by the curious IdP in identity proofs.
+
+Therefore,
+    for commonly-adopted SSO services,
+    the identity proofs (i.e., $PID_U$ and $PID_{RP}$) submitted by a user in multiple logins at an RP,
+    shall enable the RP to extract the identical user identifier.
+This brings the identity dilemma as follows:
+    even when it is unaware of the visited RP,
+        the IdP binds multiple pairs of $PID_U$ and $PID_{RP}$ in the identity proofs 
+        and each pair of $PID_U$ and $PID_{RP}$ will be used to derive an \emph{identical} user identifier by this RP (denoted as $Account$).
+Moreover, $Account$s are different across RPs, for a certain user.
+
 The privacy-preserving user identification requires IdP to provide a user's identifier ($PID_U$) to help the RP in identifying the user locally,
  under the prerequisites that the curious IdP can never identify the visiting RP or classify logins based on RP and the collusive RPs cannot find the correlation between $PID_U$s for a user.
 The privacy-preserving receiver designation requires IdP (or the user) to bind an identity proof with an RP and send it only to this RP,
