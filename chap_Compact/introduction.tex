@@ -122,20 +122,26 @@ Moreover, many service providers are also hosting a variety of web services, whi
 
 
 
-While the privacy problems in SSO have been widely recognized~\cite{maler2008venn,NIST2017draft}, only a few solutions have been proposed to protect user privacy~\cite{persona,SPRESSO}. Among them, Pairwise Pseudonymous Identifier (PPID)~\cite{OpenIDConnect, SAMLIdentifier} is a most straightforward and commonly accepted solution to defend against RP-based identity linkage, which requires the IdP to create different identifiers for the user when she logs in to different RPs. In this way, even multiple malicious RPs collude with each other across the system, they cannot link the  pairwise pseudonymous identifiers of the user and track which RPs she has visited. As a recommended practice by NIST~\cite{NIST2017draft}, PPID has been specified in many widely adopted SSO standards including OIDC~\cite{OpenIDConnect} and SAML~\cite{SAMLIdentifier}.
-However, PPID-based approaches cannot prevent the IdP-based access tracing, as the IdP still knows which RP the user visits.
+While the privacy problems in SSO have been widely recognized~\cite{maler2008venn,NIST2017draft},
+ only a few privacy-preserving solutions have been proposed~\cite{persona,SPRESSO}.
+Pairwise pseudonymous identifier (PPID)~\cite{OpenIDConnect, SAMLIdentifier} is a most straightforward and commonly accepted solution
+ against RP-based identity linkage, which requires the IdP to create different identifiers for the user when she logs in to different RPs.
+In this way, even multiple malicious RPs collude with each other across the system, they cannot link the  pairwise pseudonymous identifiers of the user and track which RPs she has visited.
+As a recommended practice by NIST~\cite{NIST2017draft}, PPID has been specified in many widely adopted SSO standards including OIDC~\cite{OpenIDConnect} and SAML~\cite{SAMLIdentifier}.
+However, PPID-based approaches cannot prevent IdP-based visit tracing,
+ as the IdP still knows which RP the user visits.
 
-To the best of our knowledge, there are only two schemes (i.e., BrowserID~\cite{BrowserID} and SPRESSO~\cite{SPRESSO}) being proposed so far to prevent IdP-based access tracing.
+To the best of our knowledge, there are only two schemes (i.e., BrowserID~\cite{BrowserID} and SPRESSO~\cite{SPRESSO}) being proposed so far to prevent IdP-based visit tracing.
 In BrowserID (and its prototype system known as Mozilla Persona~\cite{persona} and Firefox Accounts~\cite{FirefoxAccount}),
  IdP generates a user certificate to bind the user's unique identifier (i.e., email address) with a public key;
- while the user will use the corresponding private key to bind the identity proof (including the user certificate) with an RP, and send it to the correct RP confidentially.
-In SPRESSO, the RP chooses a third-party entity (named forwarder) as the proxy to receive the identity proof,
+ while the user will use the corresponding private key to sign the identity proof (including the user certificate) with an RP, and send it to the target RP.
+In SPRESSO, the RP introduces another third-party entity (called forwarder) as the proxy to receive the identity proof,
  and generates a pseudonymous identifier for itself on each login;
  IdP generates the identity proof for the user,  binds it with the RP's pseudonymous identifier and sends the encrypted proof to the forwarder;
  while, the forwarder transmits the identity proof to the correct RP who performs the decryption and obtains the plain-text identity proof.
-In these two schemes, without the identifiers of the visiting RPs,
-the IdP needs to include the user's unique identifier (e.g., email address) in the identity proof,
- which is necessary for  each RP to  obtain a common account during the user's multiple logins.
+In these two schemes, without the identifiers of the visited RPs,
+the IdP needs to include the user's unique identifier (e.g., email address) in the identity proofs,
+ which is necessary for  each RP to obtain the account across the user's multiple logins.
 Then, the collusive RPs could  perform RP-based identity linkage with the user's unique identifier.
 
 
@@ -151,11 +157,12 @@ And, IdP generates a  privacy-preserving user identifier ($PID_U$) with $ID_U$ a
 While,  RP calculates $Account$ with the function  $\mathcal{F}_{PID_{U} \mapsto Account}$. %$Accout=F_{Accout}(PID_U, ID_{RP}, PID_{RP})$.
 The three functions   have to satisfy:
 \begin{itemize}
-  \item To prevent RP-based identity linkage, $\mathcal{F}_{ID_{U} \mapsto PID_{U}}$ needs to ensure that $PID_{U}$ are  unlinkable among various RPs, while $\mathcal{F}_{PID_{U} \mapsto Account}$ needs to ensure that $Account$ are unlinkable among different RPs.
-  \item To prevent IdP-based access tracing, $\mathcal{F}_{ID_{RP} \mapsto PID_{RP}}$ needs to ensure that $PID_{RP}$ are  unlinkable for multiple logins at an RP.
+  \item To prevent RP-based identity linkage, $\mathcal{F}_{ID_{U} \mapsto PID_{U}}$ needs to ensure that $PID_{U}$ are  unlinkable among multiple RPs, while $\mathcal{F}_{PID_{U} \mapsto Account}$ needs to ensure that $Account$ are also unlinkable among different RPs.
+  \item To prevent IdP-based access tracing, $\mathcal{F}_{ID_{RP} \mapsto PID_{RP}}$ needs to ensure that $PID_{RP}$ are 
+   unlinkable for multiple logins at a certain RP.
   \item To ensure each RP obtains the unchanged $Account$ among the user's multiple logins,
   all the three functions need to be designed corporately,
-   and therefore the output of $\mathcal{F}_{PID_{U} \mapsto Account}$ will be unchanged for a user's multiple logins at an RP.
+   and therefore the output of $\mathcal{F}_{PID_{U} \mapsto Account}$ will be unchanged for a user's multiple logins at a certain RP.
 \end{itemize}
 
 
