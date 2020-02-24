@@ -2,7 +2,7 @@
 \label{sec:challenge}
 
 In this section, we analyze the challenges to design secure privacy-preserving SSO systems,
-     and provide an overview of the identity-transformation approach proposed in UPRESSO.
+     and provide an overview of the identity-transformation approach proposed in UPPRESSO.
 
 \subsection{Security Requirements of SSO}
 \label{subsec:basicrequirements}
@@ -141,15 +141,15 @@ to design secure privacy-preserving SSO solutions
 which are denoted as $\mathcal{F}_{ID_{U} \mapsto PID_U}$,   $\mathcal{F}_{ID_{RP} \mapsto PID_{RP}}$,
   and $\mathcal{F}_{PID_{U} \mapsto Account}$, respectively.
 
-%We present UPRESSO, a secure and privacy-preserving SSO system,
+%We present UPPRESSO, a secure and privacy-preserving SSO system,
 %which prevents the IdP-based access tracing and RP-based identity linkage under the prerequisites that  the basic requirements of SSO systems are satisfied.
 First of all,
-    UPRESSO adopts the communication pattern of OpenID Connect,
+    UPPRESSO adopts the communication pattern of OpenID Connect,
     and then \emph{integrity} and \emph{confidentiality} of identity proofs are also implemented by digital signatures of the IdP
             and TLS communications in the system.
 
 In order to prevent \emph{IdP-based visit tracing},
-    the IdP of UPRESSO is aware of $PID_{RP}$ but not $ID_{RP}$,
+    the IdP of UPPRESSO is aware of $PID_{RP}$ but not $ID_{RP}$,
         and it is computationally impossible for the IdP to derive (any information about) $ID_{RP}$ from $PID_{RP}$ and $PID_{U}$;
 to prevent \emph{RP-based identity linkage},
     an RP accepts identity proofs including $PID_{U}$ but not $ID_{U}$,
@@ -224,7 +224,7 @@ Moreover, the RP obtains a private trapdoor in the negotiation,
 Existing SSO solutions always depend on constant $ID_U$ in all identity proofs,
     or RP-specific $PID_U$ that keeps constant for an RP,
     to identify an account in the RP.
-UPRESSO introduces trapdoor user identification,
+UPPRESSO introduces trapdoor user identification,
     while an RP holds a trapdoor to derive the identical $Accout$ from dynamic $PID_{U}$s in identity proofs.
 Intuitively,
 this trapdoor also works in the generations of $PID_{RP}$ and $PID_U$
@@ -246,10 +246,10 @@ $PID_{RP}$ is computed based on $ID_{RP}$ and the trapdoor,
             transformed $PID_{RP}$ but not $ID_{RP}$.
 
 
-%UPRESSO splits the receiver designation into two steps: IdP designates the identity proof to a transformed RP identifer (i.e., $PID_{RP}$), while the user and RP cooperatively designate a fresh and unique $PID_{RP}$ only to one $ID_{RP}$. Then, each RP only needs to check the designation based on $PID_{RP}$.
+%UPPRESSO splits the receiver designation into two steps: IdP designates the identity proof to a transformed RP identifer (i.e., $PID_{RP}$), while the user and RP cooperatively designate a fresh and unique $PID_{RP}$ only to one $ID_{RP}$. Then, each RP only needs to check the designation based on $PID_{RP}$.
 %\begin{itemize}
 %  \item In the first step, the IdP generates $PID_U$ for $PID_{RP}$ and achieves full privacy-preserving binding (i.e., $PID_U$ with $PID_{RP}$).
-%UPRESSO introduces an efficient one-way (trapdoor) function $\mathcal{F}_{ID_{U} \mapsto PID_{U}}$.
+%UPPRESSO introduces an efficient one-way (trapdoor) function $\mathcal{F}_{ID_{U} \mapsto PID_{U}}$.
 % It allows IdP to  compute $PID_U$ easily,  avoiding the generation of $PID_U$ to be the bottleneck at a high-throughput IdP;
 %   and also prevents the RP from finding any information about $ID_U$, which is required by preventing RP-based identity linkage.
 %  \item In the second step, the user and RP cooperatively generate a fresh $PID_{RP}$ based on $\mathcal{F}_{ID_{RP} \mapsto PID_{RP}}$ and check the uniqueness of the $PID_{RP}$, therefore a fresh and unique $PID_{RP}$ is only mapped to one RP, when at least a correct user or correct RP exists. Moreover, the user needs to extract the correct endpoint of $ID_{RP}$, to ensure that the  identity proof is sent to the only correct RP.
