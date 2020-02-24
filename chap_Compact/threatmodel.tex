@@ -4,7 +4,7 @@ UPPRESS follows the same service mode as traditional SSO systems (e.g., SAML and
     and it consists of an IdP, a number of RPs and users.
 The IdP provides user authentication services for all RPs.
 In this section,
-    we describe the threat model and assumptions of these components in UPPRESSO.
+    we describe the threat model and assumptions of these entities in UPPRESSO.
 
 \subsection{Threat Model}
 The IdP is assumed to be curious-but-honest,
@@ -62,27 +62,42 @@ For example, the RPs may attempt to derive $ID_U$ from $PID_U$ and $Account$ by 
         to link the user's multiple logins at different RPs. %by providing correlated values (e.g., $PID_{RP}$) to the IdP.
 
 \vspace{1mm}\noindent \textbf{Collusive users and RPs.} %In particular,
-Malicious users and RPs may collude and behave arbitrarily, attempting to break the security of UPPRESSO.
+Malicious users and RPs may collude and behave arbitrarily,
+ attempting to break the guarantees of security and privacy.
 For example,
-the adversary may first act as a malicious RP, and make an incorrect identity proof generated for the visiting user,
-  then act a malicious user, and use this identity proof to impersonate this victim user at another RP.
-The adversary could also first act as a user to login a correct RP and obtain an identity proof,
- then act a malicious RP to perform the identity injection attack, by injecting this identity proof to the session between the victim user and the correct RP with other web attacks (e.g., CSRF).
+    collusive malicious users and RPs may conduct impersonation or identity injection attacks,
+        by manipulating $PID_U$ and $PID_{RP}$ in an identity proof.
+%Or,
+%    they collude to
+
+%the adversary may first act as a malicious RP, and make an incorrect identity proof generated for the visiting user,
+%  then act a malicious user, and use this identity proof to impersonate this victim user at another RP.
+%The adversary could also first act as a user to login a correct RP and obtain an identity proof,
+% then act a malicious RP to perform the identity injection attack, by injecting this identity proof to the session between the victim user and the correct RP with other web attacks (e.g., CSRF).
 
 
 \subsection{Assumption}
-In UPPRESSO,
-we assume that the user agent deployed at the honest user is correctly implemented,
-and will transmit the messages to the correct destination.
-The TLS is also correctly implemented at the user agent, IdP and RP, which ensures the confidentiality and integrity of the network traffic between correct entities.
+We assume that the user agent deployed at an honest user is correctly implemented,
+    and transmit messages to the destination correctly.
+TLS is also correctly implemented at the IdP, (correct) RPs and users,
+        which ensures confidentiality and integrity of the communications among correct entities.
 
-We also assume a secure random number generator is adopted in UPPRESSO to provide the unpredictable random numbers;
-and the adopted cryptographic algorithms, including the RSA and SHA-256, are secure and implemented correctly.
-Therefore,  no one without private key can forge the signature, and the adversary fails to infer the private key during the computation.
-Moreover, we also assume the security of the discrete logarithm problem is ensured.
+The cryptographic algorithms (such as RSA and SHA-256)
+ and building blocks (such as random number generators and the discrete logarithm problem) used in UPPRESSO,
+    are assumed to be secure and correctly implemented.
 
-The collusive RPs may attempt to link a user  based on the identifying attributes, such as the telephone number and credit number.
-Here, we assume that the users refuse to provide these attributes to the RPs, and the correct RPs never collect these attributes as required by privacy laws (e.g., GDPR~\cite{wachter2017counterfactual}).
-Moreover, the global network traffic analysis may be adopted to correlate the user's logins at different RPs.
-  However, UPPRESSO may integrate existing defenses to prevent this attack.
+%We also assume a secure random number generator is adopted in UPPRESSO to provide the unpredictable random numbers;
+%and the adopted cryptographic algorithms, including the RSA and SHA-256, are secure and implemented correctly.
+%Therefore,  no one without private key can forge the signature, and the adversary fails to infer the private key during the computation.
+%Moreover, we also assume the security of the discrete logarithm problem is ensured.
+
+UPPRESSO considers the RP-based identity linkage based on the user identifiers at RPs,
+    so other RP-based identity linkage based on the distinctive user attributes at RPs (e.g., telephone number, address and driver license) are out of the scope of this paper.
+We prevent the IdP-based visit tracing based on the SSO protocols,
+    and we do not consider other network attacks (e.g., the network traffic analysis to correlate a user's logins at different RPs).
+
+%The collusive RPs may attempt to link a user  based on the identifying attributes, such as the telephone number and credit number.
+%Here, we assume that the users refuse to provide these attributes to the RPs, and the correct RPs never collect these attributes as required by privacy laws (e.g., GDPR~\cite{wachter2017counterfactual}).
+%Moreover, the global network traffic analysis may be adopted to correlate the user's logins at different RPs.
+%  However, UPPRESSO may integrate existing defenses to prevent this attack.
 
