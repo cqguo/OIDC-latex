@@ -1,6 +1,6 @@
 \section{Background and Preliminary}
 \label{sec:background}
-UPRESSO is compatible with OIDC, and achieves the privacy protection based on the discrete logarithm problem.
+UPPRESSO is compatible with OIDC, and achieves the privacy protection based on the discrete logarithm problem.
 Here, we provide a brief introduction on OIDC and the discrete logarithm problem.
 \begin{figure}[t]
   \centering
@@ -32,8 +32,8 @@ In the implicit flow of OIDC, a token, known as {\em id token}, is introduced as
 In the authorization code flow, IdP binds an authorization code with the RP, and redirects this code to the RP;
  then RP establishes an HTTPS connection with IdP to ensure the integrity and confidentiality of the identity proof, and  uses the authorization code with the RP's credential to obtain PPID and the user's other  attributes.
 
-UPRESSO is compatible to all the three flows.
-For brevity, we will present the application of UPRESSO in the implicit flow in details, and provide the integration with the authorization code flow briefly.
+UPPRESSO is compatible to all the three flows.
+For brevity, we will present the application of UPPRESSO in the implicit flow in details, and provide the integration with the authorization code flow briefly.
 Here, we first introduce the original processes in the implicit flow of OIDC.
 
 As shown in Figure~\ref{fig:OpenID}, the implicit flow of OIDC consists of 7 steps: when a user attempts to log in to an RP (Step 1), the RP constructs a request for identity proof, which is redirected by the user to the corresponding IdP (Step 2). The request contains $ID_{RP}$, RP's endpoint and a set of requested user attributes. If the user has not been authenticated yet, the IdP performs an authentication process (Step 3). If the RP's endpoint in the request matches the one registered at the IdP, it generates an identity proof (Step 4) and sends it back to the RP (Step 5). Otherwise, IdP generates a warning to notify the user about potential identity proof leakage. The RP verifies the id token (Step 6), extracts user identifier from the id token and returns the authentication result to the user (Step 7).
@@ -43,12 +43,12 @@ As shown in Figure~\ref{fig:OpenID}, the implicit flow of OIDC consists of 7 ste
 When an RP first registers at the IdP, it obtains a registration token, with which the  RP can invoke the dynamic registration process to
 update its information (e.g., the endpoint).
 After each successful dynamic registration, the RP obtains a new unique $ID_{RP}$ from the IdP.
-In UPRESSO, we slightly modify dynamic registration to register $PID_{RP}$ at IdP.
+In UPPRESSO, we slightly modify dynamic registration to register $PID_{RP}$ at IdP.
 
 
 \subsection{Discrete Logarithm Problem}
 \label{sec:dlp}
-Discrete logarithm problem is adopted in UPRESSO for the construction of $\mathcal{F}_{ID_{RP} \mapsto PID_{RP}}$ and $\mathcal{F}_{ID_{U} \mapsto PID_{U}}$,
+Discrete logarithm problem is adopted in UPPRESSO for the construction of $\mathcal{F}_{ID_{RP} \mapsto PID_{RP}}$ and $\mathcal{F}_{ID_{U} \mapsto PID_{U}}$,
  which generate privacy-preserving user identifier (e.g. $PID_U$) and RP identifier (e.g. $PID_{RP}$) respectively.
 Here, we provide a brief description of the discrete logarithm problem.
 
