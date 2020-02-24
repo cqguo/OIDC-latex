@@ -98,38 +98,39 @@ Moreover,
 
 
 We explain the relationship between the identifiers, the pseudo-identifiers and the identity proof in Figure \ref{fig:IDCorrelation}.
-The user knows both $ID_U$ and $ID_{RP}$.
-The IdP knows $ID_U$ after authenticating the user.
-One-time $PID_{RP}$ are generated for identity proof,
-as well as  $PID_U$.
-After verifying $PID_{RP}$, the RP accepts the identity proof,
-    and compute $Account$ from $PID_U$.
-This can also for no privacy requirement,
+In every login process,
+    the user knows both $ID_U$ and $ID_{RP}$.
+The IdP is aware of $ID_U$ after it authenticates the user.
+Variable $PID_{RP}$ and $PID_U$ are generated for the identity proof,
+    satisfying that $PID_{RP}$ enables the verification of RP designation and $PID_{U}$ enables the derivation of identical $Account$.
+It is worthy noting that when user privacy is not well considered,
+    this relationship is simplified.
+For example,
     $ID_U$ is assigned to $PID_U$ and $ID_{RP}$ is assigned to $PID_{RP}$,
-        so that $ID_U$ and $ID_{RP}$ are bound in identity proofs.
+        so $ID_U$ and $ID_{RP}$ are directly bound in identity proofs for commonly-used OIDC \cite{OpenIDConnect}.
 
 
-
-Then, to prevent RP-based identity linkage,
-    $ID_U$ is transformed into $PID_U$ by the IdP and then bound in identity proofs,
-    so that collusive RPs cannot link the user's login activities by comparing $PID_U$s.
-%For example,
-%    PPID follows this strategy to protect user privacy:
-Meanwhile, if RP-based identity linkage is not considered,
-        we assign $ID_U$ to $PID_U$.
-In order to prevent IdP-based visit tracing,
-    one-time $PID_{RP}$ is bound in every login attempt;
-    and $PID_{RP}$ is also known to the visited RP, to verify the specified receiver of identity proofs.
-It is worthy noting that, in this case, $PID_{RP}$ cannot be determined by the IdP which is unaware of the visited RP.
-%    so the user shall forward $PID_{RP}$ to the IdP.
-Again, if IdP-based visit tracing is not a threat,
-    $ID_{RP}$ is assigned to $PID_{RP}$ directly.
-Finally,
-    in any case,
-    $PID_U$s     in the identity proofs for a user in multiple logins at an RP, 
-            result in an identical user identifier (i.e., $Account$).
-
-%The above analysis demonstrates that the identifers of the user and RP need to be carefully processed in SSO systems.
+%
+%Then, to prevent RP-based identity linkage,
+%    $ID_U$ is transformed into $PID_U$ by the IdP and then bound in identity proofs,
+%    so that collusive RPs cannot link the user's login activities by comparing $PID_U$s.
+%%For example,
+%%    PPID follows this strategy to protect user privacy:
+%Meanwhile, if RP-based identity linkage is not considered,
+%        we assign $ID_U$ to $PID_U$.
+%In order to prevent IdP-based visit tracing,
+%    one-time $PID_{RP}$ is bound in every login attempt;
+%    and $PID_{RP}$ is also known to the visited RP, to verify the specified receiver of identity proofs.
+%It is worthy noting that, in this case, $PID_{RP}$ cannot be determined by the IdP which is unaware of the visited RP.
+%%    so the user shall forward $PID_{RP}$ to the IdP.
+%Again, if IdP-based visit tracing is not a threat,
+%    $ID_{RP}$ is assigned to $PID_{RP}$ directly.
+%Finally,
+%    in any case,
+%    $PID_U$s     in the identity proofs for a user in multiple logins at an RP,
+%            result in an identical user identifier (i.e., $Account$).
+%
+%%The above analysis demonstrates that the identifers of the user and RP need to be carefully processed in SSO systems.
 
 \subsection{The Principles of UPRESSO}
 \label{subsec:solutions}
