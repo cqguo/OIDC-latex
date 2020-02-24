@@ -162,7 +162,7 @@ Finally,
          (i.e., $\mathcal{F}_{ID_{U} \mapsto PID_U}$,   $\mathcal{F}_{ID_{RP} \mapsto PID_{RP}}$,
   and $\mathcal{F}_{PID_{U} \mapsto Account}$) as follows.
 \begin{itemize}
-\item 
+\item
 $\mathcal{F}_{ID_{U} \mapsto PID_U}$ and $\mathcal{F}_{PID_{U} \mapsto Account}$
     work together to ensure user identification,
     i.e.,
@@ -220,7 +220,7 @@ Moreover, the RP obtains a private trapdoor in the negotiation,
 %       As IdP doesn't know $ID_{RP}$, the user or a third party trusted by the correct RP will ensure this.
 %\end{itemize}
 
-\vspace{1mm}\noindent \textbf{Trapdoor user identification.} 
+\vspace{1mm}\noindent \textbf{Trapdoor user identification.}
 Existing SSO solutions always depend on constant $ID_U$ in all identity proofs,
     or RP-specific $PID_U$ that keeps constant for an RP,
     to identify an account in the RP.
@@ -259,8 +259,12 @@ $PID_{RP}$ is computed based on $ID_{RP}$ and the trapdoor,
 
 
 \subsection{Existing Solutions}
-The framework of identity transformation in Figure \ref{fig:IDCorrelation}
-    is applicable to explain the approaches of existing privacy-preserving SSO solutions,
+We use the framework of identity transformation in Figure \ref{fig:IDCorrelation}
+    to explain the designs of different SSO solutions.
+First of all,
+    when $PID_U = ID_U$ and $PID_{RP} = ID_{RP}$,
+    this framework describes commonly-adopted OpenID Connect.
+It is also applicable to explain the approaches of existing privacy-preserving SSO solutions,
     including PPID \cite{OpenIDConnect}, BrowserID \cite{BrowserID} and SPRESSO \cite{SPRESSO}.
 
 % and explain why they cannot prevent both IdP-based visit tracing and RP-based identity linkage.
@@ -272,10 +276,10 @@ The framework of identity transformation in Figure \ref{fig:IDCorrelation}
 % Various solutions~\cite{OpenIDConnect, SAMLIdentifier,BrowserID,SPRESSO}, are proposed, attempting to construct a secure and privacy-preserving SSO system.
 
 PPID prevents only RP-based identity linkage but not IdP-based visit tracing,
-    where 
+    where
     $PID_{RP} = ID_{RP}$.
 The IdP by itself maintains the deterministic mapping from $ID_U$ to $PID_U$ distinct for different RPs,
-    and $Account = PID_U$.  
+    and $Account = PID_U$.
 
 %However, these scheme provide at most two satisfying functions, and therefore fail to prevent either the IdP-based access tracing or RP-based identity linkage.
 %\begin{itemize}
@@ -318,4 +322,4 @@ One of the reasons is that
     they do not explicitly clarify three pseudo-identifiers (i.e., $PID_U$, $PID_{RP}$, and $Account$)
         and then design $\mathcal{F}_{ID_{U} \mapsto PID_U}$,   $\mathcal{F}_{ID_{RP} \mapsto PID_{RP}}$,
   and $\mathcal{F}_{PID_{U} \mapsto Account}$ comprehensively.
-    
+
