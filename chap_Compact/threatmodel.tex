@@ -8,7 +8,7 @@ In this section,
 
 \subsection{Threat Model}
 The IdP is assumed to be curious-but-honest,
- while some users and some RPs could be completely controlled by adversaries. % or even collude with each other.
+ while some malicious users and RPs could be completely compromised by adversaries. % or even collude with each other.
 Malicious users and RPs behave arbitrarily and may collude with each other,
      to break the guarantees of security and privacy for other correct users.
 %While, the IdP will follow the protocol correctly, and is only curious about the user's privacy.
@@ -16,30 +16,41 @@ Malicious users and RPs behave arbitrarily and may collude with each other,
 
 \vspace{1mm}\noindent \textbf{Curious-but-honest IdP.}
 The IdP strictly follows its specification, but is curious about the user privacy, especially the login activities at different RPs.
-The IdP is well-protected and will never leak any sensitive information.
-For example, the private key for generating the identity proof and RP certificate (used in Section~\ref{implementations}) will never be leaked,
- therefore the adversary fails to impersonate as the IdP to forge an identity proof or RP certificate.
-The honest IdP processes the requests of RP registration and identity proof correctly,
-and never colludes with others (e.g., malicious RPs and users).
-For example, IdP ensures the uniqueness of $ID_{RP}$ and $PID_{RP}$, and generates the correct RP certificate, $PID_U$ and identity proof.
+The IdP is well-protected and never leak any sensitive information.
+For example, the private key to sign identity proofs and RP certificates (see Section~\ref{implementations} for details)
+     is held by the IdP always,
+ so adversaries cannot forge an identity proof or RP certificate.
+The honest IdP follows the designed protocols to process the requests from users and RPs,
+    and never colludes with any others (e.g., malicious RPs or users).
+For example, IdP ensures the uniqueness of $ID_{RP}$ and $ID_{U}$ when an RP or a user registers, 
+    and computes the pseudo-identifier as the UPPRESSO protocol specifies.
 
-However, the curious IdP may attempt to break the user's privacy without violating the protocol.
-For example, the curious IdP may store and analyze the received messages, and perform the timing attacks, attempting to conduct visit tracing or identity linkage.
-
+However, the curious IdP attempts to break the user's privacy without violating the protocol.
+For example, the curious IdP may store all messages received and sent,
+    and tries to conduct attacks of visit tracing or identity linkage
+        by analyzing the relationship among $ID_U$, $ID_{RP}$, $PID_{U}$ and $PID_{RP}$.
 
 %User's goal: 向IdP发送identity proof，使IdP认为自己是另一个victim
 %方式：1）已经拥有有效的identity proof，希望与IdP协商出相同的PID_RP；2）通过篡改或者伪造identity proof来实现攻击
 \vspace{1mm}\noindent \textbf{Malicious users.}
-The adversary could control a set of users, for example through stealing the users' credentials~\cite{WangZWYH16, SunCL12} or registering  at the IdP and RPs directly.
+The adversaries could compromise a set of users, by stealing the users' credentials~\cite{WangZWYH16, SunCL12}
+ or registering sybil users at the IdP and RPs directly.
 These malicious users
- aim to break the security of the SSO system.
-That is, they  attempt to impersonate  an uncontrolled user at the victim RP, and  make  a victim user log in at the correct RP under a controlled identity.
-To achieve this, they could behave arbitrarily~\cite{WangCW12, SomorovskyMSKJ12}.
-For example, the malicious users may forge the identity proof, modify the forwarding messages (requests of identity proof, identity proof,  RP registration request and result, and etc.), and provide incorrect values for negotiating $PID_{RP}$ (detailed in Section~\ref{implementations}).
+     aim to break the security of UPPRESSO.
+That is, they  attempt to impersonate  an uncompromised user at some correct RP,
+ or trick a victim user to log into an correct RP under the identity of a compromised user.
+%To achieve this, they could behave arbitrarily~\cite{WangCW12, SomorovskyMSKJ12}.
+For example, the malicious users may %forge the identity proof,
+ modify, inject, drop and replay any messages,
+  and deviate arbitrarily from the specification when processing $ID_{RP}$, $PID_{RP}$ and identity proofs.
+ 
+% the forwarding messages (requests of identity proof, identity proof,  RP registration request and result, and etc.),
+%  and provide incorrect values for negotiating $PID_{RP}$ (detailed in Section~\ref{implementations}).
 
 %RP's goal:1)获得目前登录用户在其他RP可用的identity proof；2）collusive RP 关联用户
 \vspace{1mm}\noindent \textbf{Malicious RPs.}
-The adversary could control a set of RPs, by registering an RP at the IdP or exploiting various vulneraries to attack RPs.
+The adversary could compromised a set of RPs,
+ by registering an RP at the IdP or exploiting software vulneraries to intrude RPs.
 These malicious RPs aim to break the security and privacy of the correct users, and could behave arbitrarily.
 For example, to break the security, the malicious RPs need to obtain an identity proof valid for other RP, and attempt to achieve this by behaving as follows:
  impersonating other RP at the user by providing the incorrect RP certificate,
