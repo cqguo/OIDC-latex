@@ -13,7 +13,7 @@ In UPRESSO, these functions are constructed based on discrete logarithm cryptogr
 In UPRESSO, IdP assigns a  unique random number as  $ID_U$ ($0 < ID_U <q $)  at the user's registration, and a unique $ID_{RP}$ at the RP's initial registration. The $ID_{RP}$ is generated using Equation~\ref{equ:IDRP}, where $r$ is a random number ($1 < r < q$).
 
 \begin{equation}
-    ID_{RP} = g^{r} mod \ p
+    ID_{RP} = g^{r} \bmod p
    \label{equ:IDRP}
 \end{equation}
 
@@ -24,7 +24,7 @@ the cooperation between the user and RP prevents the malicious user and RP from 
 
 
  \begin{equation}
-    \mathcal{F}_{ID_{RP} \mapsto PID_{RP}}: {ID_{RP}}^{N_{U}* N_{RP}} mod \ p
+    \mathcal{F}_{ID_{RP} \mapsto PID_{RP}}: PID_{RP} = {ID_{RP}}^{N_{U}* N_{RP}} \bmod p
    \label{equ:PIDRP}
    \end{equation}
 
@@ -35,7 +35,7 @@ nor link a user's $PID_U$s at different RPs who can never  know $r$ and $ID_U$. 
 
 
 \begin{equation}
- \mathcal{F}_{ID_{U} \mapsto PID_{U}}: {PID_{RP}}^{ID_U} \ mod \ p
+ \mathcal{F}_{ID_{U} \mapsto PID_{U}}: PID_U = {PID_{RP}}^{ID_U} \bmod p
  \label{equ:PIDU}
 \end{equation}
 
@@ -43,7 +43,7 @@ Finally, the RP derives $Account$ for the user with the function $\mathcal{F}_{P
 Same as the analysis of $PID_U$, the collusive RPs fail to derive $ID_U$ from $Account$ nor link a user's $Account$s due to the different and unknown $r$s.
 
  \begin{equation}
-   \mathcal{F}_{PID_{U} \mapsto Account}: {PID_U}^{(n_U*n_{RP})^{-1} mod \ q} mod \ p
+   \mathcal{F}_{PID_{U} \mapsto Account}: Account = {PID_U}^{(N_UN_{RP})^{-1} \bmod q} \bmod p
    \label{equ:Account}
    \end{equation}
 
@@ -53,8 +53,8 @@ The function $\mathcal{F}_{ID_{RP} \mapsto PID_{RP}}$ prevents the curious IdP f
 The functions $\mathcal{F}_{ID_{U} \mapsto PID_{U}}$ and $\mathcal{F}_{PID_{U} \mapsto Account}$ prevents the collusive RPs from linking a user's $PID_U$s and $Account$s at different RPs, and therefore avoids the RP-based identity linkage.
  \begin{multline}\label{equ:AccountNotChanged}
    Account =  {PID_{U}}^{t} mod \ p  \\
-   = {({PID_{RP}}^{ID_U})}^{{(N_U*N_{RP})^{-1} mod \ q}} mod \ p \\
-   = {ID_{RP}} ^ {ID_U * N_U * N_{RP} *t\ mod\ q} = {ID_{RP}}^{ID_U} mod \ p
+   = {({PID_{RP}}^{ID_U})}^{{(N_UN_{RP})^{-1} mod \ q}} mod \ p \\
+   = {ID_{RP}} ^ {ID_U N_U N_{RP} t\ mod\ q} = {ID_{RP}}^{ID_U} mod \ p
  \end{multline}
 
 The \textbf{transformed receiver designation} is also supported with the efficient functions $\mathcal{F}_{ID_{RP} \mapsto PID_{RP}}$ and $\mathcal{F}_{ID_{U} \mapsto PID_{U}}$, together with  a user-centric verification.
