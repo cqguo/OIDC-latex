@@ -1,7 +1,8 @@
 \subsection{Performance Evaluation}
 \label{sec:evaluation}
 %We have compared the processing time of each user login in UPRESSO, with the original OIDC implementation (MITREid Connect) and SPRESSO which only hides the user's accessed RPs from IdP.
-\noindent\textbf{Environment.} The evaluation was performed on 3 machines, one (3.4GHz CPU, 8GB RAM, 500GB SSD, Windows 10) as IdP, one (3.1 GHz, 8GB RAM, 128 GB SSD, Windows 10) as an RP, and the last one (2.9GHz CPU, 8GB RAM, 128GB SSD, Windows 10) as a user. The user agent is Chrome v75.0.3770.100. And the machines are connected by an isolated 1Gbps network. 
+%OIDC, RP的软件
+\noindent\textbf{Environment.} The evaluation was performed on 3 machines, one (3.4GHz CPU, 8GB RAM, 500GB SSD, Windows 10) as IdP, one (3.1 GHz CPU, 8GB RAM, 128 GB SSD, Windows 10) as an RP, and the last one (2.9GHz CPU, 8GB RAM, 128GB SSD, Windows 10) as a user. The user agent is Chrome v75.0.3770.100. And the machines are connected by an isolated 1Gbps network.
 
 %A DELL OptiPlex 9020 PC (Intel Core i7-4770 CPU, 3.4GHz, 500GB SSD and 8GB RAM) with Window 10 prox64 works as the IdP. A ThinkCentre M9350z-D109 PC (Intel Core i7-4770s CPU, 3.1GHz, 128GB SSD and 8GB RAM) with  Window 10 prox64 servers as RP. The user adopts Chrome v75.0.3770.100 as the user agent on the Acer VN7-591G-51SS Laptop (Intel Core i5-4210H CPU, 2.9GHz, 128GB SSD and 8GB RAM) with  Windows 10 prox64. For SPRESSO, the extra trusted entity FWD is deployed on the same machine as IdP.
 %没有因为部署在同一个机器上使得开销变长，monitor指系统的监视器
@@ -22,18 +23,21 @@ The evaluation results are provided in Figure~\ref{fig:evaluation}. The overall 
 
 In the requesting, UPRESSO requires the user and RP to perform 1 and 2  modular exponentiations respectively for $PID_{RP}$ transforming and cooperatively complete $PID_{RP}$ refreshing at the IdP, which totally needs 98 ms;  SPRESSO needs 19 ms for the RP to obtain IdP's public key and encrypt its domain; while MITREid Connect only needs 10 ms.
 
+%估计能减少多少，
 In the generation, UPRESSO needs  an extra 6 ms for computing $PID_U$, compared to MITREid Connect which only needs 32 ms.
 SPRESSO requires the longest time (71 ms), as it adopts a JavaScript cryptographic library, while others adopt a more efficient Java library.
 
-In the transmission, UPRESSO only needs 14 ms for Chrome extension to relay the identity proof to RP server directly. 
+%transmission & extraction
+In the transmission, UPRESSO only needs 14 ms for Chrome extension to relay the identity proof to RP server directly.
 MITREid Connect requires the IdP to send the identity proof to  RP's web page which then sends the proof to RP server through a JavaScript function, and needs 57 ms.
 SPRESSO needs the longest time (193 ms) due to a complicated processing at the user's browser,
   which needs the browser to obtain identity proof from IdP, download the JavaScript program from a trusted entity (named FWD), execute the program to decrypt RP's endpoint, send this endpoint to RP's web page who finally transmits the proof to RP server.
 In the evaluation,  FWD and IdP are deployed in one machine, which doesn't introduce performance degradation as  FWD and IdP work sequently for one login.
+
 %SPRESSO needs a trusted entity named FWD for transmitting the identity proof. We deployed FWD and IdP on the same machine to reduce transmitting delay between them, while the computation never becomes the bottleneck according to the observation.
 
 
-In the verification, UPRESSO needs to an extra calculation for $Account$, which then requires  58 ms, compared to 14 ms in MITREid Connect and 17 ms in SPRESSO.
+In the verification, UPRESSO needs an extra calculation for $Account$, which then requires  58 ms, compared to 14 ms in MITREid Connect and 17 ms in SPRESSO.
 
 
 
