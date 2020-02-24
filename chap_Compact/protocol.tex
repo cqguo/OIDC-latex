@@ -29,7 +29,7 @@ the cooperation between the user and RP prevents the malicious user and RP from 
    \end{equation}
 
 For the user $ID_U$ to login at an RP with a privacy-preserving identifer $PID_{RP}$, IdP calculates the user's privacy-preserving identifer $PID_U$ using the function  $\mathcal{F}_{ID_{U} \mapsto PID_{U}}$ as Equation~\ref{equ:PIDU}. The function $\mathcal{F}_{ID_{U} \mapsto PID_{U}}$ satisfies the requirements described in Section~\ref{subsec:challenges}.
-Combining Equation~\ref{equ:IDRP}, ~\ref{equ:PIDRP} and~\ref{equ:PIDU}, we get that  $PID_U$ equals to $g^{r*N_U*N_{RP}*ID_U}\ mod \ p$.
+Combining Equation~\ref{equ:IDRP}, ~\ref{equ:PIDRP} and~\ref{equ:PIDU}, we get that  $PID_U$ equals to $g^{rN_UN_{RP}ID_U} \bmod p$.
 The discrete logarithm cryptography ensures that the RPs fail to derive $ID_U$ from $PID_U$,
 nor link a user's $PID_U$s at different RPs who can never  know $r$ and $ID_U$. %have different $ID_{RP}$. %discrete logarithm of $ID_{RP}$ modulo $ID_{RP}^'$
 
@@ -48,13 +48,13 @@ Same as the analysis of $PID_U$, the collusive RPs fail to derive $ID_U$ from $A
    \end{equation}
 
 The \textbf{trapdoor user identification} is supported with these three functions.
-For a user's multiple logins, each PR obtains the different $PID_U$s and the corresponding $t$s , then derives the unchanged $Account$  as shown in Equation~\ref{equ:AccountNotChanged}.
+For a user's multiple logins, each PR obtains the different $PID_U$s and the corresponding $T$s , then derives the unchanged $Account$  as shown in Equation~\ref{equ:AccountNotChanged}.
 The function $\mathcal{F}_{ID_{RP} \mapsto PID_{RP}}$ prevents the curious IdP from linking the $PID_{RP}$s of different logins at an RP, and therefore avoids  the  IdP-based access tracing.
 The functions $\mathcal{F}_{ID_{U} \mapsto PID_{U}}$ and $\mathcal{F}_{PID_{U} \mapsto Account}$ prevents the collusive RPs from linking a user's $PID_U$s and $Account$s at different RPs, and therefore avoids the RP-based identity linkage.
  \begin{multline}\label{equ:AccountNotChanged}
-   Account =  {PID_{U}}^{t} mod \ p  \\
+   Account =  {PID_{U}}^{T} mod \ p  \\
    = {({PID_{RP}}^{ID_U})}^{{(N_UN_{RP})^{-1} mod \ q}} mod \ p \\
-   = {ID_{RP}} ^ {ID_U N_U N_{RP} t\ mod\ q} = {ID_{RP}}^{ID_U} mod \ p
+   = {ID_{RP}} ^ {ID_U N_U N_{RP} T\ mod\ q} = {ID_{RP}}^{ID_U} mod \ p
  \end{multline}
 
 The \textbf{transformed receiver designation} is also supported with the efficient functions $\mathcal{F}_{ID_{RP} \mapsto PID_{RP}}$ and $\mathcal{F}_{ID_{U} \mapsto PID_{U}}$, together with  a user-centric verification.
@@ -88,7 +88,7 @@ Finally, the transformed receiver designation is provided through the two-step d
     \hline
     {$Account$} & {User's identifier at an RP.} & {Long-term} \\
     \hline
-    {$r$} & {Secret value for $ID_{RP}=g^r\ mod\ p$.} & {Long-term} \\
+    {$r$} & {Secret value for $ID_{RP}=g^r \bmod p$.} & {Long-term} \\
     \hline
     {$ID_{RP}$} & {RP's original identifier.} & {Long-term} \\
     \hline
@@ -98,9 +98,9 @@ Finally, the transformed receiver designation is provided through the two-step d
     \hline
     {$N_{RP}$} & {RP-generated random nonce for $PID_{RP}$.} & {One-time} \\
     \hline
-    {$Y_{RP}$} & {Public value for $n_{RP}$, $(ID_{RP})^{N_{RP}} \ mod\ p$.} & {One-time} \\
+    {$Y_{RP}$} & {Public value for $n_{RP}$, $(ID_{RP})^{N_{RP}} \bmod p$.} & {One-time} \\
     \hline
-    {$t$} & {A trapdoor, $t=(N_U*N_{RP})^{-1} mod \ q$.} & {One-time} \\
+    {$T$} & {A trapdoor, $T=(N_U N_{RP})^{-1} \bmod q$.} & {One-time} \\
     \hline
     {$Cert_{RP}$} & {An RP certificate. } & {Long-term} \\
     \hline
@@ -162,9 +162,10 @@ Here we introduce the detailed processes for each step in Figure~\ref{fig:proces
 In this phase, the user and RP cooperative to generate $PID_{RP}$ as follows:
 \begin{itemize}
   \item The user sends a login request to trigger the negotiation of $PID_{RP}$ (Step 1).
-  \item The RP chooses a random $N_{RP}$ ($1 < N_{RP} <q$), calculates $Y_{RP}={ID_{RP}}^{N_{RP}} mod \ p$ (Step 2.1.1); and sends $Cert_{RP}$ with $Y_{RP}$ to the user (Step 2.1.2).
-  \item The user checks the $Cert_{RP}$, extracts $ID_{RP}$ from the valid $Cert_{RP}$, chooses a random $N_U$ ($1 < N_U <q$) to calculate $PID_{RP}={Y_{RP}}^{N_{U}} mod \ p$ (Step 2.1.3); and sends $N_U$ with $PID_{RP}$ to the RP (Step 2.1.4).
-  \item The RP calculates $PID_{RP}$ with $N_U$ and $Y_{RP}$, checks its consistency with the received one, derives the trapdoor $t={(N_U*N_{RP})}^{-1} \ mod \ q$ (Step 2.1.5); and sends the calculated $PID_{RP}$ to the user (Step 2.1.6).
+  \item The RP chooses a random $N_{RP}$ ($1 < N_{RP} <q$), calculates $Y_{RP}={ID_{RP}}^{N_{RP}} \bmod p$ (Step 2.1.1); and sends $Cert_{RP}$ with $Y_{RP}$ to the user (Step 2.1.2).
+  \item The user checks the $Cert_{RP}$, extracts $ID_{RP}$ from the valid $Cert_{RP}$, chooses a random $N_U$ ($1 < N_U <q$) to calculate $PID_{RP}={Y_{RP}}^{N_{U}} \bmod p$ (Step 2.1.3); and sends $N_U$ with $PID_{RP}$ to the RP (Step 2.1.4).
+  \item The RP calculates $PID_{RP}$ with $N_U$ and $Y_{RP}$, checks its consistency with the received one,
+   derives the trapdoor $T={(N_U N_{RP})}^{-1} \bmod q$ (Step 2.1.5); and sends the calculated $PID_{RP}$ to the user (Step 2.1.6).
   \item The user checks the consistency of the received $PID_{RP}$ with the stored one.
 \end{itemize}
 During the process, the user will halt the login, if  the $Cert_{RP}$ is invalid or the received $PID_{RP}$ is different from the stored one. The RP also halts the process if the $PID_{RP}$ sent by the user is inconsistent with the calculated one.
