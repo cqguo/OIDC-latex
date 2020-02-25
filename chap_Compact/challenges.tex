@@ -106,8 +106,11 @@ Variable $PID_{RP}$ and $PID_U$ are generated for the identity proof,
 It is worthy noting that when user privacy is not well considered,
     this relationship is simplified.
 For example,
-    $ID_U$ is assigned to $PID_U$ and $ID_{RP}$ is assigned to $PID_{RP}$,
-        so $ID_U$ and $ID_{RP}$ are directly bound in identity proofs for commonly-used OIDC \cite{OpenIDConnect}.
+in commonly-used OIDC \cite{OpenIDConnect},
+    $ID_U$ is directly assigned to $PID_U$, 
+        or constant RP-specific $PID_U$ is adopted.
+    %and $ID_{RP}$ is assigned to $PID_{RP}$,
+%        so $ID_U$ and $ID_{RP}$ are directly bound in identity proofs for .
 
 
 %
@@ -238,13 +241,15 @@ this trapdoor also works in the generations of $PID_{RP}$ and $PID_U$
 \vspace{1mm}\noindent \textbf{Transformed RP designation.}
 To bind the dynamic $PID_{RP}$ in identity proofs signed by the IdP,
     the user firstly cooperates with the RP to generate $PID_{RP}$ based on $ID_{RP}$ and then
-         registers this transformed RP identifier in the IdP.
+         registers this transformed RP identifier (i.e., $PID_{RP}$) in the IdP.
+The identity transformation of RP is completely kept secret to the IdP.
 Then, the one-time $PID_{RP}$ is bound with $PID_U$ in the identity proof.
 $PID_{RP}$ is computed based on $ID_{RP}$ and the trapdoor,
     so that the RP holding the trapdoor is able to verify the specified receiver of identity proofs
             with
             transformed $PID_{RP}$ but not $ID_{RP}$.
-
+    
+    
 
 %UPPRESSO splits the receiver designation into two steps: IdP designates the identity proof to a transformed RP identifer (i.e., $PID_{RP}$), while the user and RP cooperatively designate a fresh and unique $PID_{RP}$ only to one $ID_{RP}$. Then, each RP only needs to check the designation based on $PID_{RP}$.
 %\begin{itemize}
