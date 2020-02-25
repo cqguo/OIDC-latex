@@ -1,29 +1,51 @@
 \section{Discussions and Future works}
 \label{sec:discussion}
-We provide some discussions about UPRESSO here.
+We first discuss the scalability, security against DoS attack and OIDC authorization code flow support in UPPRESSO, and then present the extensions for UPPRESSO.
+
 %Scalbility
+\noindent{\textbf{Scalability.}} The adversary cannot exhaust $ID_{RP}$ and $PID_{RP}$.
+For $ID_{RP}$, it is generated only in RP's initial registration.
+For $PID_{RP}$,  in practice, we only need to ensure all $PID_{RP}$s are different among the unexpired identity proof (the number denoted as $n$). We assume that IdP doesn't perform the uniqueness check, and then calculate the probability that at least two $PID_{RP}$s are equal in these $n$ ones. The probability is $1-\prod_{i=0}^{n-1}(1-i/q)$ which increases with $n$.
+For an IdP with throughput $2*10^8$ req/s and valid period of identity proof set as 5 minutes, $n$ is less than $2^{36}$, then the probability is less than $2^{-183}$ for 256-bit $q$.
+Moreover, as this probability is negligible, the uniqueness check of $PID_{RP}$, i.e., the RP identifier refreshing, could be removed in the SSO login process, and this optimization can be adopted when this negligible probability is acceptable by the users and RPs.
+
 %DoS
+%Security against ID exhaustion DoS
+%1.用户被鉴别过的，可以事后审计的； 2. IdP， 本来对OIDC是做一次数字签名， 加了一次模幂，资源消耗 --> DoS attack
+\noindent{\textbf{Security against DoS attack.}}
+The adversary may attempt to perform DoS attack on the IdP and RP. For example, the adversary may act as a user to invoke the RP identifier refreshing (Step 2.2.3) and identity proof generation (Step 4) at the IdP, which requires the IdP to perform two signature generations and one modular exponentiation.
+However, as the user has already been authenticated at the IdP, the IdP cloud identify the malicious users based on audit, in addition to the existing DoS mitigation schemes.
+The adversary may act as a user requesting to log into an RP, and make the RP perform two modular exponentiations.
+The RP could previously computed a set of $Y_{RP}$s to mitigate this attack.
+
 %授权码
+%兼容:目前只提供隐式模式,对其他模式与协议的兼容方法
+\noindent{\textbf{OIDC authorization code flow support.}} The privacy-preserving functions $\mathcal{F}_{ID_{U} \mapsto PID_{U}}$, $\mathcal{F}_{ID_{RP} \mapsto PID_{RP}}$ and $\mathcal{F}_{PID_{U} \mapsto Account}$ can be integrated into OIDC authorization code flow directly, therefore  RP-based identity linkage and IdP-based access tracing are still prevented during the construction and parsing of identity proof.
+The only privacy leakage is introduced by the transmission, as RP servers obtain the identity proof directly from the IdP in this flow, which allows the IdP to obtain RP's network information (e.g., IP address).
+UPPRESSO could integrate anonymous networks (e.g., Tor)  to prevent this leakage.
+
 %平台无关
+%Similar as SPRESSO, we can integrated for***
+%SPRESSO跨平台:我们目前的方案只在browser实现
+%我们现在的实现使得一个用户不需要在机器上存任何东西，只有装那个插件。这个实现可以进一步推广到这个插件都不用安装***
+\noindent{\textbf{Platform independent.}}
+Our current implementation only requires the user to install a Chrome extension and doesn't need to store any persistent data at the user's machine.
+Moreover, the implementation could  be further extended to remove the Chrome extension, whose JavaScript program is then fetched from the honest IdP. The processing is similar as SPRESSO. That is, 1) the RP's window (window A)  opens a new iframe (window B) to visit the RP's web page, while the RP's web page redirects window B to the IdP; 2) window B downloads the JavaScript  program from IdP and performs the processing in Steps 2.1.3, 2.2.1, 2.4 and 5.2; 3) then postMessages are adopted to exchange messages between window A and B for Steps 2.1.4, 2.1.6, 2.2.4, 2.3 and 5.3. 
+The opener handle of window B is preserved (i.e., window A) for the postMessage, as window A  opens window B with a web page from the RP;
+ and window B is redirected to the IdP with \emph{noreferrer} attribute set, to prevent the browser from sending RP's URL in the Referrer header to the IdP.
+
+
+
 %malicious IdP
 %标题，collusive RPs-->PSI PSI实现的前提条件被破坏。 PSI使得RP在不侵犯用户隐私的前提下，进行idenity linkage。
 %RP designation --> RP specification / binding
 %The primary goal of SSO services is to implement secure user authentication [6], ---> 6多加几个参考文献
 %User privacy leaks in all existing SSO protocols and implementations. -->加几个参考文献
 
-%兼容:目前只提供隐式模式,对其他模式与协议的兼容方法
-\noindent{\textbf{OIDC authorization code flow support.}} The privacy-preserving functions $\mathcal{F}_{ID_{U} \mapsto PID_{U}}$, $\mathcal{F}_{ID_{RP} \mapsto PID_{RP}}$ and $\mathcal{F}_{PID_{U} \mapsto Account}$ can be integrated into OIDC authorization code flow directly, therefore  RP-based identity linkage and IdP-based access tracing are still prevented during the construction and parsing of identity proof.
-The only privacy leakage is introduced by the transmission, as RP servers obtain the identity proof directly from the IdP in this flow, which allows the IdP to obtain RP's network information (e.g., IP address).
-UPRESSO could integrate anonymous networks (e.g., Tor)  to prevent this leakage.
-%Similar as SPRESSO, we can integrated for***
 
 
-%SPRESSO跨平台:我们目前的方案只在browser实现
-%我们现在的实现使得一个用户不需要在机器上存任何东西，只有装那个插件。这个实现可以进一步推广到这个插件都不用安装***
-\noindent{\textbf{Platform independent.}}
-Firstly, a user could use any machine (the Chrome extension installed) to log in at RPs and need no extra processing (e.g., synchronization),
-as the user's machine doesn't need to store any persistent data and only caches $Cert_{RP}$, $PID_{RP}$ and one-time endpoint during the processing of one login.
-Secondly, the implementation of UPRESSO could  be further improved, then the user could  log in at RPs without the Chrome extension, whose JavaScript program is then fetched from the honest IdP. The processing is similar as SPRESSO. That is, 1) the RP's window opens a new iframe  visiting the login interface at an RP and being redirected to IdP; 2) this iframe downloads the JavaScript  program from IdP and performs the processing in Steps 2.1.3, 2.2.1, 2.4 and 5.2; 3) the opener handle of this new window is preserved (i.e., RP's window) and then postMessages can be adopted to exchange messages between the two windows for Steps 2.1.4, 2.1.6, 2.2.4, 2.3 and 5.3. The redirection in the new iframe is necessary to prevent the Referer header containing RP's URL from being sent to the IdP. However, it cannot be achieved by introduced the special attribute (rel="noreferrer") while opening the new iframe, as it results in the new window does not have a handle on opening window (opener) which is used for message exchanging between RP's window and IdP's window.
+
+
 
 %1) RP's window opens a new window to download a document from RP; 2) the document uses JavaScript to navigate this window to IdP, while the noreferrer attribute is set to clear Referer header and prevent the browser from sending RP's URL to the IdP; 3) this window downloads the  JavaScript  program from IdP and performs the processing in Steps 2.1.3, 2.2.1, 2.4 and 5.2; 4) the opener handle of this new window is preserved (i.e., RP's window) and then postMessages can be adopted to exchange messages between the two windows for Steps 2.1.4, 2.1.6, 2.2.4, 2.3 and 5.3.
 
@@ -31,16 +53,10 @@ Secondly, the implementation of UPRESSO could  be further improved, then the use
 %; and 4) the correct RP sets subresource integrity (SRI) to prevent the IdP from providing incorrect JavaScript programs.
 %A native web technology called subresource integrity (SRI)7 is currently under development at the W3C. SRI allows a document to create an iframe with an attribute integrity that takes a hash value. The browser now would guarantee that the document loaded into the iframe hashes to exactly the given value. So, essentially the creator of the iframe can enforce the iframe to be loaded with a aspecific document. This would enable SPRESSO to automatically check the integrity of FWDdoc without any extensions.
 
-%Security against ID exhaustion DoS
-%1.用户被鉴别过的，可以事后审计的； 2. IdP， 本来对OIDC是做一次数字签名， 加了一次模幂，资源消耗 --> 拆分成两个，一个是Scalability； 一个是DoS attack
-\noindent{\textbf{Scalability.}} The adversary cannot exhaust $ID_{RP}$ and $PID_{RP}$.
-For $ID_{RP}$, it is generated only in RP's initial registration, and existing DoS mitigation  could be adopted to mitigate malicious registration.
-For $PID_{RP}$,  in practice, we only need to ensure all $PID_{RP}$s are different among the unexpired identity proof (the number denoted as $n$). The probability
-that two or more  $PID_{RP}$s are same among the unexpired identity proof, is $1-\prod_{i=0}^{n-1}(1-i/q)$ which increases with $n$.
-For an IdP with throughput $2*10^8$ req/s and valid period of identity proof set as 5 minutes, $n$ is less than $2^{36}$, then the probability is less than $2^{-183}$ for 256-bit $q$.
+
 
 %While USPRESS is designed for semi-honest IdP, it could be extended to prevent
-\noindent{\textbf{Malicious IdP mitigation.}} The IdP is assumed to assign unique $ID_{RP}$ in $Cert_{RP}$ for each RP and generate the correct $PID_U$ for each login. The malicious IdP may attempt to provide incorrect $ID_{RP}$ and $PID_U$, which could be prevented by integrating certificate transparency~\cite{rfc6962} and user's identifier check~\cite{SPRESSO}. With certificate transparency~\cite{rfc6962}, the monitors  checks the uniqueness of $r$ among all the certificates stored in the log server. To prevent the malicious IdP from injecting a incorrect $PID_U$, the correct user could provide a nickname to the correct RP for an extra check as in SPRESSO~\cite{SPRESSO}.
+\noindent{\textbf{Malicious IdP mitigation.}} The IdP is assumed to assign unique $ID_{RP}$ in $Cert_{RP}$ for each RP and generate the correct $PID_U$ for each login. The malicious IdP may attempt to provide incorrect $ID_{RP}$ and $PID_U$, which could be prevented by integrating certificate transparency~\cite{rfc6962} and user's identifier check~\cite{SPRESSO}. With certificate transparency~\cite{rfc6962}, the monitors  checks the uniqueness of $ID_{RP}$ among all the certificates stored in the log server. To prevent the malicious IdP from injecting a incorrect $PID_U$, the correct user could provide a nickname to the correct RP for an extra check as in SPRESSO~\cite{SPRESSO}.
 
 
 
