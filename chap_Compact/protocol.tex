@@ -93,12 +93,14 @@ Similar to the analysis of $PID_U$,
         and 
     collusive RPs cannot link a user's $PID_U$s at different RPs.
 
-\textbf{Trapdoor user identification} is supported with these three functions.
-For a user's multiple logins, each PR obtains the different $PID_U$s and the corresponding $T$s , then derives the identical $Account$  as shown in Equation~\ref{equ:AccountNotChanged}.
+\textbf{Trapdoor user identification.} %is supported with these three functions.
+For a user's multiple logins, each PR obtains the different $PID_U$s and the corresponding $T$s,
+ then derives the identical $Account$  as shown in Equation~\ref{equ:AccountNotChanged}.
 The function $\mathcal{F}_{ID_{RP} \mapsto PID_{RP}}$ prevents the curious IdP from linking the $PID_{RP}$s of different logins at an RP, and therefore avoids  the  IdP-based access tracing.
 The functions $\mathcal{F}_{ID_{U} \mapsto PID_{U}}$ and $\mathcal{F}_{PID_{U} \mapsto Account}$ prevents the collusive RPs from linking a user's $PID_U$s and $Account$s at different RPs, and therefore avoids the RP-based identity linkage.
 
-\textbf{Transformed RP designation} is also supported with $\mathcal{F}_{ID_{RP} \mapsto PID_{RP}}$ and $\mathcal{F}_{ID_{U} \mapsto PID_{U}}$, together with  a user-centric verification.
+\textbf{Transformed RP designation.} %is also supported with $\mathcal{F}_{ID_{RP} \mapsto PID_{RP}}$ and $\mathcal{F}_{ID_{U} \mapsto PID_{U}}$, together
+    % with  a user-centric verification. 放入到后面写！这里只是谈ID transformation
 The $\mathcal{F}_{ID_{RP} \mapsto PID_{RP}}$ ensures that the user and RP cooperatively generate a fresh $PID_{RP}$  for a user's login,
  while $\mathcal{F}_{ID_{U} \mapsto PID_{U}}$ ensures that the IdP generates the exact $PID_U$ for the $ID_U$ who logins at $PID_{RP}$.
 The IdP will bind $PID_{U}$ with $PID_{RP}$ in the identity proof, which designates this identity proof to $PID_{RP}$.
@@ -111,29 +113,32 @@ Finally, the transformed RP designation is provided through the two-step designa
     \centering
     \begin{tabular}{|c|c|c|}
     \hline
-    {Notation} & {Definition} & {Attribute} \\
+    {\textbf{Notation}} & {\textbf{Definition}} & {\textbf{Attribute}} \\
     \hline
     {$p$} & {A large prime.} & {Long-term} \\
     \hline
-    {$q$} & {A large prime.} & {Long-term} \\
+    {$q$} & {A large  prime factor of ($p-1$).} & {Long-term} \\
     \hline
-    {$L$} & {Length of $q$. } & {Long-term} \\
-    \hline
+%    {$L$} & {Length of $q$. } & {Long-term} \\    \hline
     {$g$} & {A generator of order $q$ in $GF(p)$. } & {Long-term} \\
+     \hline
    % \hline
     %{$SK_{ID}$, $PK$} & {The private/public key to sign/verify identity proof.} & {System-unique} \\
+    {$SK$, $PK$} & {The private/public key of IdP. } & {Long-term} \\
+    \hline
+    {$ID_{RP}$} & {RP's unique identifier.} & {Long-term} \\
+    \hline
+    {$r$} & {value for $ID_{RP}=g^r \bmod p$.} & {Secret, Long-term} \\
+    \hline
+    {$Cert_{RP}$} & {An RP certificate. } & {Long-term} \\
     \hline
     {$ID_U$} & {User's unique identifier.} & {Long-term} \\
     \hline
-    {$PID_U$} & {User's privacy-preserving identifier.} & {One-time}\\
-    \hline
     {$Account$} & {User's identifier at an RP.} & {Long-term} \\
     \hline
-    {$r$} & {Secret value for $ID_{RP}=g^r \bmod p$.} & {Long-term} \\
-    \hline
-    {$ID_{RP}$} & {RP's original identifier.} & {Long-term} \\
-    \hline
     {$PID_{RP}$} & {RP's privacy-preserving identifier.} & {One-time} \\
+    \hline
+    {$PID_U$} & {User's privacy-preserving identifier.} & {One-time}\\
     \hline
     {$N_U$} & {User-generated random nonce for $PID_{RP}$.} & {One-time} \\
     \hline
@@ -143,10 +148,6 @@ Finally, the transformed RP designation is provided through the two-step designa
     \hline
     {$T$} & {A trapdoor, $T=(N_U N_{RP})^{-1} \bmod q$.} & {One-time} \\
     \hline
-    {$Cert_{RP}$} & {An RP certificate. } & {Long-term} \\
-    \hline
-    {$SK$, $PK$} & {The private/public key of IdP. } & {Long-term} \\
-     \hline
     \end{tabular}
     \label{tbl:notations}
 \end{table}
@@ -273,7 +274,7 @@ However, UPPRESSO achieves privacy preservation by integrating  $\mathcal{F}_{ID
 %one-time endpoint 和endpoint
 The above modifications could be completed automatically for each login, without affecting other communication pattern.
 The user automatically invokes the JavaScript functions to complete RP identifier transforming, one-time endpoint generating/replacing and RP identifier refreshing for each login. While, the RP server and IdP server provide the corresponding web service to complete the processing automatically.
-The protocol of RP identifier transforming is based Diffie-Hellman key exchange~\cite{DiffieH76}, while $N_U$ is provided to RP for computing the trapdoor.
+The protocol of RP identifier transformation is based Diffie-Hellman key exchange~\cite{DiffieH76}, while $N_U$ is provided to RP for computing the trapdoor.
 The protocol of RP identifier refreshing is based on the dynamic registration in OIDC, while it is triggered by the user instead of the RP, adds $PID_{RP}$ in the request and includes a signature $Sig_{Res}$ in the response.
 
 \begin{comment}
