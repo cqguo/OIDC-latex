@@ -14,7 +14,7 @@ In UPPRESSO,
 $\mathcal{F}_{ID_{RP} \mapsto PID_{RP}}$, $\mathcal{F}_{ID_{U} \mapsto PID_{U}}$ and $\mathcal{F}_{PID_{U} \mapsto Account}$
     are constructed based on the discrete logarithm with public parameters $p$, $q$, and $g$, %% L不作为参数，我们说：e, n是RSA算法参数，不说2048是参数。
  where  $p$ is a large prime defining the finite field $GF(p)$,
- % $L$ is the length of $q$ in bits,  ($2^{L-1} < q < 2^L$) 
+ % $L$ is the length of $q$ in bits,  ($2^{L-1} < q < 2^L$)
   $q$ is a prime factor of ($p-1$), and $g$ is a generator of order $q$ in $GF(p)$.
 %the prime number $q$  is the order of a multiplicative subgroup of $GF(p)$, which is generated with the generator $g$ by $\{g\ mod\ p, g^2\ mod\ p, ..., g^{q-1}\ mod\ p, 1=g^q\ mod\ p\}$.
 
@@ -50,8 +50,8 @@ Finally,
     the cooperation by the user and the RP prevents a single malicious entity from manipulating $PID_{RP}$ in the identity proof.
 %For example, the malicious user fails to make a correct RP accept a $PID_{RP}$ used in another login, while the collusive RPs fail to use a same or correlated $PID_{RP}$s for different logins.
 
-On receiving a request of 
-    $ID_U$ and $PID_{RP}$ from an authenticated user, 
+On receiving a request of
+    $ID_U$ and $PID_{RP}$ from an authenticated user,
 the IdP calculates $PID_U$ as Equation~\ref{equ:PIDU},
     and binds it in the identity proof.
 
@@ -71,7 +71,7 @@ Moreover,
 Finally, the RP derives $Account$ for the user %with the function $\mathcal{F}_{PID_{U} \mapsto Account}$
  as Equation~\ref{equ:Account}.
 Here, we define $T = (N_UN_{RP})^{-1} \bmod q$ as the trapdoor at the RP.
-As $q$ is a prime number and $1< N_U, N_{RP} < q$, $q$ is coprime to $N_U N_{RP}$, and then $T$ that satisfies $T (N_U N_{RP}) = 1 \bmod q$ always exists. 
+As $q$ is a prime number and $1< N_U, N_{RP} < q$, $q$ is coprime to $N_U N_{RP}$, and then $T$ that satisfies $T (N_U N_{RP}) = 1 \bmod q$ always exists.
 
 \begin{equation}
    \mathcal{F}_{PID_{U} \mapsto Account}: Account = {PID_U}^{T} \bmod p
@@ -88,24 +88,26 @@ So for a user's multiple logins at an RP, the RP extracts an identical $Acount$.
  \end{multline}
 
 $\mathcal{F}_{PID_{U} \mapsto Account}$ satisfies the following requirements. %described in Section~\ref{subsec:challenges}.
-Similar to the analysis of $PID_U$, 
+Similar to the analysis of $PID_U$,
     the RP cannot derive $ID_U$ from $PID_U$,
-        and 
+        and
     collusive RPs cannot link a user's $PID_U$s at different RPs.
 
-\textbf{Trapdoor user identification.} %is supported with these three functions.
-For a user's multiple logins, each PR obtains the different $PID_U$s and the corresponding $T$s,
- then derives the identical $Account$  as shown in Equation~\ref{equ:AccountNotChanged}.
-The function $\mathcal{F}_{ID_{RP} \mapsto PID_{RP}}$ prevents the curious IdP from linking the $PID_{RP}$s of different logins at an RP, and therefore avoids  the  IdP-based access tracing.
-The functions $\mathcal{F}_{ID_{U} \mapsto PID_{U}}$ and $\mathcal{F}_{PID_{U} \mapsto Account}$ prevents the collusive RPs from linking a user's $PID_U$s and $Account$s at different RPs, and therefore avoids the RP-based identity linkage.
+\noindent\textbf{Trapdoor user identification.} %is supported with these three functions.
+In a user's multiple logins, the RP expresses different $PID_U$s and have corresponding $T$s,
+ so that always derives the identical $Account$.
+%$\mathcal{F}_{ID_{U} \mapsto PID_{U}}$ and $\mathcal{F}_{PID_{U} \mapsto Account}$
+The comprehensive design of identifier transformation functions
+ prevents collusive RPs from linking a user's $PID_U$s and $Account$s at different RPs, and therefore prevents RP-based identity linkage.
 
-\textbf{Transformed RP designation.} %is also supported with $\mathcal{F}_{ID_{RP} \mapsto PID_{RP}}$ and $\mathcal{F}_{ID_{U} \mapsto PID_{U}}$, together
+\noindent\textbf{Transformed RP designation.} %is also supported with $\mathcal{F}_{ID_{RP} \mapsto PID_{RP}}$ and $\mathcal{F}_{ID_{U} \mapsto PID_{U}}$, together
     % with  a user-centric verification. 放入到后面写！这里只是谈ID transformation
 The $\mathcal{F}_{ID_{RP} \mapsto PID_{RP}}$ ensures that the user and RP cooperatively generate a fresh $PID_{RP}$  for a user's login,
  while $\mathcal{F}_{ID_{U} \mapsto PID_{U}}$ ensures that the IdP generates the exact $PID_U$ for the $ID_U$ who logins at $PID_{RP}$.
 The IdP will bind $PID_{U}$ with $PID_{RP}$ in the identity proof, which designates this identity proof to $PID_{RP}$.
-In the user-centric verification,  both the user and RP checks the uniqueness of $PID_{RP}$, while the user further checks that $PID_{RP}$ is exactly generated for the RP $ID_{RP}$,  and then sends the identity proof  only  to this RP. Therefore, the $PID_{RP}$ is designated to $ID_{RP}$.
+Therefore, the $PID_{RP}$ is designated to $ID_{RP}$.
 Finally, the transformed RP designation is provided through the two-step designations.
+The function $\mathcal{F}_{ID_{RP} \mapsto PID_{RP}}$ prevents the curious IdP from linking the $PID_{RP}$s of different logins at an RP, and therefore avoids  the  IdP-based access tracing.
 
 
 \begin{table}[tb]
@@ -154,6 +156,12 @@ Finally, the transformed RP designation is provided through the two-step designa
 
 \subsection{UPPRESSO Overview}
 \label{implementations}
+
+user-centric verification,  both the user and RP checks the uniqueness of $PID_{RP}$, while the user further checks that $PID_{RP}$ is exactly generated for the RP $ID_{RP}$,  and then sends the identity proof  only  to this RP.
+
+RP Certificate.
+
+
 UPPRESSO contains four sub-protocols, i.e., system initialization, RP initial registration, user registration and SSO login.
 The system initialization is invoked by the IdP to initialize the SSO system and only needs to be invoked once for each SSO system.
 The RP initial registration is invoked by each RP to obtain the necessary parameters (a unique identifier $ID_{RP}$ and an RP certificate $Cert_{RP}$) from the IdP and only needs to be invoked once for each RP.
@@ -164,10 +172,15 @@ The process for user registration is the same as the one in the typical SSO syst
 therefore, we focus on the processes in  system initialization, RP initial registration and SSO login.
 For clarity, we list the used notations  in Table~\ref{tbl:notations}.
 
-\vspace{1mm}\noindent \textbf{System initialization.} The IdP chooses $L$, generates a large prime $p$, a prime $q$ of $L$ bits, and a generator $g$ of order $q$ as  the parameters for the discrete logarithm cryptography~\cite{gallagher2013digital}, and generates one asymmetric key pair ($SK$ denotes the private key and $PK$ is the public key) for the generation of the identity proof and $Cert_{RP}$.
-The IdP keeps $SK$ secretly, and provides $p$, $q$, $g$, $L$ with $PK$ as the public parameters.
-The values of $p$, $q$, $g$ and $L$ remain the same during the full lifecycle of an SSO system.
-While, the asymmetric key pair ($SK$, $PK$) will be updated when necessary. For example, when $SK$ is leaked, IdP must update ($SK$,$PK$).
+\vspace{1mm}\noindent \textbf{System initialization.} The IdP %chooses $L$,
+ generates a large prime $p$, a prime factor $q$ of $p-1$
+  and a generator $g$ of order $q$ as  the parameters for the discrete logarithm cryptography~\cite{gallagher2013digital}.
+ With enough security strength.
+
+generates one asymmetric key pair ($SK$ denotes the private key and $PK$ is the public key) for the generation of the identity proof and $Cert_{RP}$.
+The IdP keeps $SK$ secretly, and provides $p$, $q$, $g$ and $PK$ as the public parameters.
+%The values of $p$, $q$, $g$ remain the same during the full lifecycle of an SSO system.
+%While, the asymmetric key pair ($SK$, $PK$) will be updated when necessary. For example, when $SK$ is leaked, IdP must update ($SK$,$PK$).
 
 \vspace{1mm}\noindent\textbf{RP initial registration.}
 The RP initial registration is invoked only once by an RP, to apply $ID_{RP}$ and $Cert_{RP}$ from IdP.
@@ -177,6 +190,9 @@ The detailed processes are as follows:
 \item IdP chooses a unique and random $r$ ($1 < r < q$),  calculates $ID_{RP}$ using Equation~\ref{equ:IDRP},  generates the signature $Sig_{SK}$ of [$ID_{RP}, endpoint$] with $SK$, and returns [$ID_{RP}, endpoint, Sig_{SK}$] as $Cert_{RP}$. Here, the $r$ is never leaked.
 \item The RP  verifies $Cert_{RP}$ using $PK$,  and stores $ID_{RP}$ with the valid $Cert_{RP}$ for the further use.
 \end{enumerate}
+
+Note that, $ID_{RP}$ cannot be chosen by the RP, and it must be chosen by the IdP.
+$ID_U$  can be selected by the user or the IdP.
 
 \vspace{1mm}\noindent\textbf{SSO login.}
 Once a user attempts to log in at an RP, the SSO login is invoked. We use the OIDC implicit protocol flow as an example, to demonstrate  how to integrate the three functions $\mathcal{F}_{ID_{U} \mapsto PID_{U}}$, $\mathcal{F}_{ID_{RP} \mapsto PID_{RP}}$ and $\mathcal{F}_{PID_{U} \mapsto Account}$ into the typical SSO systems.
@@ -188,9 +204,10 @@ And in the $Account$ calculation, the RP derives the unchanged $Account$ as in E
 
 \subsection{UPPRESSO Protocol flow}
 \label{sebsec:loginprocess}
-In UPPRESSO, the SSO login sub-protocol provides the secure SSO service and prevents both the IdP-based access tracing and RP-based identity linkage.
-The protocol, shown in Figure~\ref{fig:process},  prevents the curious IdP from obtaining the RP's identifying information during the interchanges,
-  and avoids the adversary to break the security and user's privacy.
+In UPPRESSO, %the SSO login sub-protocol provides the secure SSO service and prevents both the IdP-based access tracing and RP-based identity linkage.
+The protocol, shown in Figure~\ref{fig:process},
+ % prevents the curious IdP from obtaining the RP's identifying information during the interchanges,
+%  and avoids the adversary to break the security and user's privacy.
 Here we introduce the detailed processes for each step in Figure~\ref{fig:process}.
 
 \begin{figure*}
@@ -215,8 +232,9 @@ During the process, the user will halt the login, if  the $Cert_{RP}$ is invalid
 \vspace{1mm}\noindent\textbf{RP identifier refreshing.}
 The user registers $PID_{RP}$ at the IdP as follows.
 \begin{itemize}
-  \item The user generates an one-time endpoint to hide the RP's endpoint from IdP (Step 2.2.1), and sends the registering request [$Reg$, $PID_{RP}$, one-time endpoint] to the IdP (Step 2.2.2).
-  \item The IdP checks $PID_{RP}$, and constructs the response [$RegRes$, $RegMes$, $Sig_{Reg}$] (Step 2.2.3). The $RegRes$ is registration result, and is set as $OK$ only when $PID_{RP}$ is never used before and is of order $q$ module $p$. The $RegMes$ is the same as the dynamic registration response, and contains $PID_{RP}$, the issuing time and valid time. The $Sig_{Reg}$ is the signature for $RegRes$ and $RegMes$ generated by the IdP with $SK$.
+  \item The user generates an one-time endpoint to hide the RP's endpoint from IdP (Step 2.2.1), and sends the refreshing request [$Reg$, $PID_{RP}$, one-time endpoint] to the IdP (Step 2.2.2).
+  \item The IdP checks $PID_{RP}$, and constructs the response [$RegRes$, $RegMes$, $Sig_{Reg}$] (Step 2.2.3). The $RegRes$ is the result, and is set as $OK$ only when $PID_{RP}$ is never used before and is of order $q$ module $p$. The $RegMes$ is the same as the dynamic registration response, and contains $PID_{RP}$, the issuing time and valid time. The $Sig_{Reg}$ is the signature for $RegRes$ and $RegMes$ generated by the IdP with $SK$.
+\item ++++++++++++
   \item The user accepts $RegRes$ directly due to the secure connection with IdP, and forwards the registration result to the RP (Step 2.2.4).
   \item The IdP checks $Sig_{SK}$ and $RegMes$, and accepts $RegRes$ only when $Sig_{Reg}$ is valid, $PID_{RP}$ is the same as the negotiated one, and $RegMes$ is not expired.
 \end{itemize}
@@ -227,7 +245,7 @@ In this phase, the RP continues the process of the user's login and obtains the 
 \begin{itemize}
   \item The RP uses $PID_{RP}$ and the endpoint to construct an identity proof request, which is the same as the one in  OIDC. (Step 2.3).
   \item The user checks the consistency of the received $PID_{RP}$  with the negotiated one (Step 2.4); replaces the endpoint with the one-time endpoint generated in Step 2.2.1, and sends the modified identity proof request to the IdP (Step 2.5).
-  \item The IdP authenticates the user if she hasn't been authenticated (Step 3); checks whether $PID_{RP}$ and the one-time endpoint have been registered,
+  \item The IdP authenticates the user if necessary (Step 3); checks whether $PID_{RP}$ and the one-time endpoint have been registered,
    calculates $PID_U$ using Equation~\ref{equ:PIDU},  constructs the identity proof [$PID_{RP}$, $PID_U$, $ValTime$, $Attr$,$Sig_{IdProof}$] where $ValTime$ is the valid period, $Attr$ contains the  attributes that the user agrees to provide to the RP, $Sig_{IdProof}$ is the signature of the identity proof generated by IdP with $SK$ (Step 4). Then, the IdP sends the identity proof with the one-time endpoint to the user (Step 5.1).
   \item The user finds  the  endpoint corresponding to the one-time endpoint (Step 5.2),
    and forwards the identity proof to the RP through this endpoint (Step 5.3).
