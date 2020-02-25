@@ -13,11 +13,11 @@ The calculations of $ID_{RP}$, $PID_U$ and RSA signature are implemented based o
 
 The user-side processing is implemented as a Chrome extension with about 330 lines JavaScript code, to provide the functions in Steps 2.1.3, 2.2.1, 2.4 and 5.2.
 The cryptographic computation, e.g., $Cert_{RP}$ verification and $PID_{RP}$ negotiation, is implemented based on jsrsasign~\cite{jsrsasign}, an efficient JavaScript cryptographic library.
-This chrome extension requires permissions to access to privileged fields of the Tab objects used by several APIs including \emph{chrome.tabs} (interact with the browser's tab system), \emph{chrome.windows} (interact with browser windows) and \emph{chrome.webRequest} (observe and analyze traffic and intercept, block, or modify requests in-flight)~\cite{chromeExtension}.
+This chrome extension requires permissions  \emph{chrome.tabs} and \emph{chrome.windows} to obtain RP's URL from the browser's tab,  and \emph{chrome.webRequest} to intercept, block, modify requests to the IdP/RP~\cite{chromeExtension}.
 %send HTTPS request/reply and hijack the HTTPS responses, to obtain the RP's URL and communicate with IdP and RP.
-%and 30 lines  Chrome extension configuration files (specifying the required permissions, such as reading chrome tab information, sending the HTTP request, blocking the received HTTP response).
+%and 30 lines  Chrome extension configuration files (specifying the required permissions, such as reading chrome tab information, sending the HTTP request, blocking the received HTTP response). to access to privileged fields of the Tab objects including
 Here, the cross-origin HTTPS requests sent by this chrome extension to the RP and IdP, will be blocked by Chrome due to the default same-origin security policy.
-To avoid this block, UPPRESSO modifies the IdP and RP, and sets \verb+chrome-extension://chrome-id+ (\verb+chrome-id+ is uniquely assigned by Google) in the HTTPS header \verb+Access-Control-Allow-Origin+ of the IdP's and RP's responses.
+To avoid this block, UPPRESSO modifies the IdP and RP, and sets \verb+chrome-extension://chrome-id+ (\verb+chrome-id+ is uniquely assigned by Google) in HTTPS header \verb+Access-Control-Allow-Origin+ of the IdP's and RP's responses.
 %Moreover, the chrome extension needs to construct cross-origin requests to communicate with the RP and IdP, which is forbidden by the default same-origin security policy. Therefore it is required to add the HTTP header \verb+Access-Control-Allow-Origin+ in the response of IdP and RP to accept only the request from the origin \verb+chrome-extension://chrome-id+ (\verb+chrome-id+ is uniquely assigned by the Google).
 
 We provide a Java SDK for RPs to integrate UPPRESSO.
