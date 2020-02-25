@@ -160,7 +160,7 @@ to prevent \emph{RP-based identity linkage},
         and it is computationally infeasible for the RP to derive (any information about) $ID_{U}$ from $PID_{U}$, $PID_{RP}$ and $Account$.
 
 Finally,
-    we attempt to achieve \emph{user identification} and \emph{receiver designation},
+    we attempt to achieve \emph{user identification} and \emph{RP designation},
         by the comprehensive design of identity transformations
          (i.e., $\mathcal{F}_{ID_{U} \mapsto PID_U}$,   $\mathcal{F}_{ID_{RP} \mapsto PID_{RP}}$,
   and $\mathcal{F}_{PID_{U} \mapsto Account}$) as follows.
@@ -207,19 +207,19 @@ Moreover, the RP obtains a private trapdoor in the negotiation,
 %%  that is, the RP could derive a same $Account$ with the $PID_{U}$ and $PID_{RP}$ from different logins. We assume RP calculates $Account$ by invoking $\mathcal{F}_{PID_{U} \mapsto Account}$ with $PID_U$, $ID_{RP}$ and $PID_{RP}$.
 %
 %  \item %Who generates $PID_{RP}$, and what's the requirement? PID_RP可以由RP或者user合作生成，但要保证唯一性。
-%  Each $PID_{RP}$ must be globally unique, i.e., only assigned to one RP,  for achieving the \textbf{receiver designation}.
+%  Each $PID_{RP}$ must be globally unique, i.e., only assigned to one RP,  for achieving the \textbf{RP designation}.
 %        The user and RP may generate the $PID_{RP}$ separately or cooperatively, through the function $\mathcal{F}_{ID_{RP} \mapsto PID_{RP}}$.
 %        However, both the user and RP must check the uniqueness of $PID_{RP}$ before accept and use it.
 %        If either the user or the RP doesn't perform the check, the adversary could make it accept a $PID_{RP}$ same as an RP and then misuse the identity proof.
 %        %$PID_{RP}$ is one form of the RP's identifer, and seems unrelated with the user's identifier.
 %        %Although, the user may inject the user's information into $PID_{RP}$, these information will be treated as random values at the RP and never be used to calculate $Account$, as the user is not trusted by the RP.
 %        %Therefore, we can assume that $PID_{RP}$ is generated through $\mathcal{F}_{ID_{RP} \mapsto PID_{RP}}$ with the parameter $ID_{RP}$.~\footnote{The $PID_{RP}$ may also be related with the previous $PID_{RP}$. We omit the previous $PID_{RP}$ in the parameters as it is also a transformation of $ID_{RP}$.}
-%  \item The \textbf{receiver designation} further requires that  $PID_{U}$ is bound with either a non-null $PID_{RP}$ or $ID_{RP}$ in identity proof.
+%  \item The \textbf{RP designation} further requires that  $PID_{U}$ is bound with either a non-null $PID_{RP}$ or $ID_{RP}$ in identity proof.
 %        When $PID_{RP}$  is non-null, IdP builds the identity proof separately and the \textbf{integrity} is also ensured.
 %        When $PID_{RP}$  is null, only the user could bind $PID_{U}$ with an RP identifier (i.e., $ID_{RP}$) which is unique and checkable to the RP.
 %        In this case, the user who performs the binding, must have a publicly verifiable grant from the IdP, as required by \textbf{integrity}.
 %%        The binding and integrity cloud be achieved by existing public key infrastructure.
-%   \item The \textbf{receiver designation} also requires the identity proof will only be sent to the correct RP.
+%   \item The \textbf{RP designation} also requires the identity proof will only be sent to the correct RP.
 %       As IdP doesn't know $ID_{RP}$, the user or a third party trusted by the correct RP will ensure this.
 %\end{itemize}
 
@@ -251,7 +251,7 @@ $PID_{RP}$ is computed based on $ID_{RP}$ and the trapdoor,
 
 
 
-%UPPRESSO splits the receiver designation into two steps: IdP designates the identity proof to a transformed RP identifer (i.e., $PID_{RP}$), while the user and RP cooperatively designate a fresh and unique $PID_{RP}$ only to one $ID_{RP}$. Then, each RP only needs to check the designation based on $PID_{RP}$.
+%UPPRESSO splits the RP designation into two steps: IdP designates the identity proof to a transformed RP identifer (i.e., $PID_{RP}$), while the user and RP cooperatively designate a fresh and unique $PID_{RP}$ only to one $ID_{RP}$. Then, each RP only needs to check the designation based on $PID_{RP}$.
 %\begin{itemize}
 %  \item In the first step, the IdP generates $PID_U$ for $PID_{RP}$ and achieves full privacy-preserving binding (i.e., $PID_U$ with $PID_{RP}$).
 %UPPRESSO introduces an efficient one-way (trapdoor) function $\mathcal{F}_{ID_{U} \mapsto PID_{U}}$.
@@ -260,7 +260,7 @@ $PID_{RP}$ is computed based on $ID_{RP}$ and the trapdoor,
 %  \item In the second step, the user and RP cooperatively generate a fresh $PID_{RP}$ based on $\mathcal{F}_{ID_{RP} \mapsto PID_{RP}}$ and check the uniqueness of the $PID_{RP}$, therefore a fresh and unique $PID_{RP}$ is only mapped to one RP, when at least a correct user or correct RP exists. Moreover, the user needs to extract the correct endpoint of $ID_{RP}$, to ensure that the  identity proof is sent to the only correct RP.
 %\end{itemize}
 
-%To meet the above two principles, we need to construct three satisfying functions $\mathcal{F}_{ID_{RP} \mapsto PID_{RP}}$, $\mathcal{F}_{ID_{U} \mapsto PID_{U}}$ and $\mathcal{F}_{PID_{U} \mapsto Account}$, design the protocols between the user, RP and IdP to avoid the privacy leakage during message transmission, and implement the  processing at the user as  required by the transformed receiver designation.
+%To meet the above two principles, we need to construct three satisfying functions $\mathcal{F}_{ID_{RP} \mapsto PID_{RP}}$, $\mathcal{F}_{ID_{U} \mapsto PID_{U}}$ and $\mathcal{F}_{PID_{U} \mapsto Account}$, design the protocols between the user, RP and IdP to avoid the privacy leakage during message transmission, and implement the  processing at the user as  required by the transformed RP designation.
 
 
 \subsection{Existing SSO Solutions}
