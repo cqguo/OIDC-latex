@@ -113,40 +113,41 @@ The function $\mathcal{F}_{ID_{RP} \mapsto PID_{RP}}$ prevents the curious IdP f
 \begin{table}[tb]
     \caption{The notations used in UPPRESSO.}
     \centering
-    \begin{tabular}{|c|c|c|}
+%    \begin{tabular}{|c|c|c|}
+    \begin{tabular}{|p{1.0cm}|p{4.5cm}|p{2cm}|}
     \hline
     {\textbf{Notation}} & {\textbf{Definition}} & {\textbf{Attribute}} \\
     \hline
-    {$p$} & {A large prime.} & {Long-term} \\
+    {$p$} & {A large prime.} & {Long-term constant} \\
     \hline
-    {$q$} & {A large  prime factor of ($p-1$).} & {Long-term} \\
+    {$q$} & {A large  prime factor of ($p-1$).} & {Long-term  constant} \\
     \hline
 %    {$L$} & {Length of $q$. } & {Long-term} \\    \hline
-    {$g$} & {A generator of order $q$ in $GF(p)$. } & {Long-term} \\
+    {$g$} & {A generator of order $q$ in $GF(p)$. } & {Long-term  constant} \\
      \hline
    % \hline
     %{$SK_{ID}$, $PK$} & {The private/public key to sign/verify identity proof.} & {System-unique} \\
-    {$SK$, $PK$} & {The private/public key of IdP. } & {Long-term} \\
+    {$SK$, $PK$} & {The private/public key of IdP. } & {Long-term constant} \\
     \hline
-    {$ID_{RP}$} & {RP's unique identifier.} & {Long-term} \\
+    {$ID_{RP}$} & {RP's unique identifier, $ID_{RP}=g^r \bmod p$.} & {Long-term constant} \\
     \hline
-    {$r$} & {value for $ID_{RP}=g^r \bmod p$.} & {Secret, Long-term} \\
+%    {$r$} & {value for $ID_{RP}=g^r \bmod p$.} & {Secret, Long-term} \\
+%    \hline
+    {$Cert_{RP}$} & {An RP certificate. } & {Long-term constant} \\
     \hline
-    {$Cert_{RP}$} & {An RP certificate. } & {Long-term} \\
+    {$ID_U$} & {User's unique identifier.} & {Long-term constant} \\
     \hline
-    {$ID_U$} & {User's unique identifier.} & {Long-term} \\
+    {$Account$} & {User's identifier at an RP, $Account = {ID_{RP}}^{ID_U} \bmod p$.} & {Long-term constant} \\
     \hline
-    {$Account$} & {User's identifier at an RP.} & {Long-term} \\
+    {$PID_{RP}$} & {RP's privacy-preserving identifier, $PID_{RP} = {ID_{RP}}^{N_{U} N_{RP}} \bmod p$.} & {One-time} \\
     \hline
-    {$PID_{RP}$} & {RP's privacy-preserving identifier.} & {One-time} \\
-    \hline
-    {$PID_U$} & {User's privacy-preserving identifier.} & {One-time}\\
+    {$PID_U$} & {User's privacy-preserving identifier, $PID_U = {PID_{RP}}^{ID_U} \bmod p$.} & {One-time}\\
     \hline
     {$N_U$} & {User-generated random nonce for $PID_{RP}$.} & {One-time} \\
     \hline
     {$N_{RP}$} & {RP-generated random nonce for $PID_{RP}$.} & {One-time} \\
     \hline
-    {$Y_{RP}$} & {Public value for $n_{RP}$, $(ID_{RP})^{N_{RP}} \bmod p$.} & {One-time} \\
+    {$Y_{RP}$} & {Public value for $N_{RP}$, $Y_{RP} = {ID_{RP}}^{N_{RP}} \bmod p$.} & {One-time} \\
     \hline
     {$T$} & {A trapdoor, $T=(N_U N_{RP})^{-1} \bmod q$.} & {One-time} \\
     \hline
@@ -230,8 +231,7 @@ And in the $Account$ calculation, the RP derives $Account = {{PID_{U}}}^{{(N_UN_
 
 \subsection{UPPRESSO Protocol flow}
 \label{sebsec:loginprocess}
-In UPPRESSO, %the SSO login sub-protocol provides the secure SSO service and prevents both the IdP-based access tracing and RP-based identity linkage.
-The protocol, shown in Figure~\ref{fig:process},
+Figure~\ref{fig:process} shows the SSO login protocol of UPPRESSO. %the SSO login sub-protocol provides the secure SSO service and prevents both the IdP-based access tracing and RP-based identity linkage.
  % prevents the curious IdP from obtaining the RP's identifying information during the interchanges,
 %  and avoids the adversary to break the security and user's privacy.
 Here we introduce the detailed processes for each step in Figure~\ref{fig:process}.
