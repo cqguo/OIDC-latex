@@ -112,7 +112,6 @@ The function $\mathcal{F}_{ID_{RP} \mapsto PID_{RP}}$ prevents the curious IdP f
 
 \begin{table}[tb]
     \caption{The notations used in UPPRESSO.}
-    \setlength{\tabcolsep}{0.5mm}
     \centering
     \begin{tabular}{|c|c|c|}
     \hline
@@ -131,7 +130,7 @@ The function $\mathcal{F}_{ID_{RP} \mapsto PID_{RP}}$ prevents the curious IdP f
     \hline
     {$ID_{RP}$} & {RP's unique identifier.} & {Long-term} \\
     \hline
-    {$r$} & {Value for $ID_{RP}=g^r \bmod p$.} & {Secret, Long-term} \\
+    {$r$} & {value for $ID_{RP}=g^r \bmod p$.} & {Secret, Long-term} \\
     \hline
     {$Cert_{RP}$} & {An RP certificate. } & {Long-term} \\
     \hline
@@ -149,7 +148,7 @@ The function $\mathcal{F}_{ID_{RP} \mapsto PID_{RP}}$ prevents the curious IdP f
     \hline
     {$Y_{RP}$} & {Public value for $n_{RP}$, $(ID_{RP})^{N_{RP}} \bmod p$.} & {One-time} \\
     \hline
-    {$T$} & {Trapdoor, $T=(N_U N_{RP})^{-1} \bmod q$.} & {One-time} \\
+    {$T$} & {A trapdoor, $T=(N_U N_{RP})^{-1} \bmod q$.} & {One-time} \\
     \hline
     \end{tabular}
     \label{tbl:notations}
@@ -195,28 +194,39 @@ For clarity, we list the notations in Table~\ref{tbl:notations}.
 The IdP generates one key pair ($SK$, $PK$) to sign identity proofs and RP certificates.
 The lengths of $p$, $q$ and ($SK$, $PK$) shall satisfy the requirements of security strength.
 
-The IdP keeps $SK$ as secrets, while $p$, $q$, $g$ and $PK$ are public parameters.
+The IdP keeps $SK$ secret, while $p$, $q$, $g$ and $PK$ are public parameters.
 %The values of $p$, $q$, $g$ remain the same during the full lifecycle of an SSO system.
 %While, the asymmetric key pair ($SK$, $PK$) will be updated when necessary. For example, when $SK$ is leaked, IdP must update ($SK$,$PK$).
 
 \vspace{1mm}\noindent\textbf{RP initial registration.}
 An RP registers itself at the IdP to request $ID_{RP}$ and $Cert_{RP}$ as follows:
 \begin{enumerate}
-\item RP sends a request $Req_{Cert_{RP}}$ to the IdP. The $Req_{Cert_{RP}}$ contains the RP's endpoint (e.g., URL) for receiving the identity proof.
-\item IdP chooses a unique and random $r$ ($1 < r < q$),  calculates $ID_{RP}$ using Equation~\ref{equ:IDRP},  generates the signature $Sig_{SK}$ of [$ID_{RP}, endpoint$] with $SK$, and returns $Cert_{RP} = [ID_{RP}, endpoint]_{SK}$, where $[\cdot]_{SK}$ means a message signed using $SK$.
+\item RP sends a registration request to the IdP,
+    including the RP's endpoint (e.g., URL) for receiving the identity proof.
+\item IdP chooses a unique random number $r$ ($1 < r < q$), computes $ID_{RP} = g^r \bmod p$,
+signs $[ID_{RP}, endpoint, *]$ using $SK$, where $*$ is  supplementary information such as the RP's common name,
+and returns $Cert_{RP} = [ID_{RP}, endpoint]_{SK}$ to the RP, where $[\cdot]_{SK}$ means a message signed using $SK$.
 \item The RP  verifies $Cert_{RP}$ using $PK$,  and then accepts $ID_{RP}$ and $Cert_{RP}$.
 \end{enumerate}
 
-Note that, $ID_{RP}$ cannot be chosen by the RP, and it must be chosen by the IdP AND  Here, the $r$ is never leaked.
-$ID_U$  can be selected by the user or the IdP.
+Note that, $ID_{RP}$ cannot be chosen by the RP,
+ and it must be chosen by the IdP and $r$ is kept unknown to the RP.
+On the contrary,
+    $ID_U$ may be chosen by the user or the IdP,
+    provided that it is unique for each user.
 
 \vspace{1mm}\noindent\textbf{SSO login.}
-Once a user attempts to log in at an RP, the SSO login is invoked. We use the OIDC implicit protocol flow as an example, to demonstrate  how to integrate the three functions $\mathcal{F}_{ID_{U} \mapsto PID_{U}}$, $\mathcal{F}_{ID_{RP} \mapsto PID_{RP}}$ and $\mathcal{F}_{PID_{U} \mapsto Account}$ into the typical SSO systems.
-As shown in Figure~\ref{fig:UPPRESSO}, the SSO login sub-protocol contains four phases, RP identifier transforming, RP identifier refreshing, $PID_U$ generation and $Account$ calculation.
-In the RP identifier transforming, the user and RP negotiate $PID_{RP}$ based on Diffie-Hellman key exchange~\cite{DiffieH76}, where $PID_{RP}$ is calculated as in Equation~\ref{equ:PIDRP}.
-In the RP identifier refreshing, the user registerers the unique  $PID_{RP}$ at IdP.
-In the $PID_U$ generation, IdP calculates $PID_U$ with $ID_U$ and $PID_{RP}$ as in Equation~\ref{equ:PIDU}.
-And in the $Account$ calculation, the RP derives the unchanged $Account$ as in Equation~\ref{equ:Account}.
+Once a user attempts to log in at an RP, the SSO login is initiated.
+%We use the OIDC implicit protocol flow as an example, to demonstrate  how to integrate the three functions $\mathcal{F}_{ID_{U} \mapsto PID_{U}}$, $\mathcal{F}_{ID_{RP} \mapsto PID_{RP}}$ and $\mathcal{F}_{PID_{U} \mapsto Account}$ into the typical SSO systems.
+As shown in Figure~\ref{fig:UPPRESSO}, the SSO login consists of four phases,
+ RP identifier transformation,
+  RP identifier refreshing,
+  $PID_U$ generation and $Account$ calculation.
+In the RP identifier transforming, the user and RP negotiate $PID_{RP} = {ID_{RP}}^{N_{U} N_{RP}} \bmod p$.
+In the RP identifier refreshing, the user registerers $PID_{RP}$ at the IdP.
+In the $PID_U$ generation, the IdP calculates $PID_U = {PID_{RP}}^{ID_U} \bmod p$ and signs the identity proof.
+And in the $Account$ calculation, the RP derives $Account = {{PID_{U}}}^{{(N_UN_{RP})^{-1} \bmod q}}$ after verifying the identity proof,
+    and allows the user to log in as $Account$.
 
 \subsection{UPPRESSO Protocol flow}
 \label{sebsec:loginprocess}
