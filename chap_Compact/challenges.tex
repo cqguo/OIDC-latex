@@ -51,6 +51,10 @@ Or,
      the adversaries could impersonate the victim user by submitting any leaked identity proof to the RP~\cite{ChenPCTKT14,FettKS16,WangZLG16},
      if confidentiality is not ensured.
 
+The design and implementation of a secure SSO system is challenging,  various vulnerabilities have been found and exploited to break at least one requirement~\cite{ChenPCTKT14, FettKS16,WangCW12,ZhouE14,WangZLG16,YangLLZH16,SomorovskyMSKJ12,MohsenS16}.
+For example, Friendcaster was found to accept any received identity proof~\cite{ExplicatingSDK,ChenPCTKT14}
+(i.e., a violation of RP designation) so that a malicious RP could log in to Friendcaster as the victim user by replaying the identity proof received from the user to Friendcaster~\cite{MohsenS16}. \cite{WangCW12} reported that some RPs of Google ID SSO accepted user attributes that were not tied to the identity proof (i.e., a potential violation of integrity). As a result, a malicious user could insert arbitrary attributes (e.g., an email address) into the identity proof to impersonate another user at the RP.
+
 \subsection{The Identity Dilemma of Privacy-Preserving SSO}
 \label{subsec:challenges}
 As mentioned in Section \ref{sec:intro},
@@ -280,15 +284,15 @@ It is also applicable to explain the approaches of existing privacy-preserving S
     \setlength{\tabcolsep}{0.5mm}
     \begin{tabular}{|c|c|c|c|}
     \hline
-    {Solutions} & {\tiny{$\mathcal{F}_{ID_{U} \mapsto PID_{U}}$}} & {\tiny{$\mathcal{F}_{ID_{RP} \mapsto PID_{RP}}$}} & {\tiny{$\mathcal{F}_{PID_{U} \mapsto Account}$}}\\
+    {Solutions} & {{$\mathcal{F}_{ID_{U} \mapsto PID_{U}}$}} & {{$\mathcal{F}_{ID_{RP} \mapsto PID_{RP}}$}} & {{$\mathcal{F}_{PID_{U} \mapsto Account}$}}\\
     \hline
-    {PPID} & {\tiny{$Map[ID_U,ID_{RP}]$ (\checkmark)}} & {\tiny{$ID_{RP}$ ($\times$)}} & {\tiny{$PID_U$ (\checkmark)}}\\
+    {PPID} & {{$Map[ID_U,ID_{RP}]$ (\checkmark)}} & {{$ID_{RP}$ ($\times$)}} & {{$PID_U$ (\checkmark)}}\\
     \hline
-    {SPRESSO} & {\tiny{$ID_U$ ($\times$)}} & {\tiny{$Enc(ID_{RP}||nonce)$} (\checkmark)} &{\tiny{$ID_U$ ($\times$)}}\\
+    {SPRESSO} & {{$ID_U$ ($\times$)}} & {{$Enc(ID_{RP}||nonce)$} (\checkmark)} &{{$ID_U$ ($\times$)}}\\
     \hline
-    {BrowserID} & {\tiny{$ID_U$ ($\times$)}} & {\tiny{$\bot$ (\checkmark)}} &{\tiny{$ID_U$ ($\times$)}}\\
+    {BrowserID} & {{$ID_U$ ($\times$)}} & {{$\bot$ (\checkmark)}} &{{$ID_U$ ($\times$)}}\\
     \hline
-    {UPRESSO} & {\tiny{${PID_{RP}}^{ID_U}$ (\checkmark)}}  & {\tiny{${ID_{RP}}^{N_U*N_{RP}}$ (\checkmark)}} & {\tiny{${PID_{U}}^{t}$ (\checkmark)}}\\
+    {UPPRESSO} & {{${PID_{RP}}^{ID_U}$ (\checkmark)}}  & {{${ID_{RP}}^{N_UN_{RP}}$ (\checkmark)}} & {{${PID_{U}}^{T}$ (\checkmark)}}\\
     \hline
     \end{tabular}
     \label{tbl:compare}
