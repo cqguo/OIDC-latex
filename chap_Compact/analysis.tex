@@ -8,19 +8,19 @@ We prove that the basic requirements of SSO system, i.e., user identification, R
 In the following, we analyze the affects of the modifications listed in Section~\ref{subsec:compatible}, respectively.
 
 The first modification may affect the RP designation, as the identity proof is bound with $PID_{RP}$ instead of $ID_{RP}$.
-However, in UPPRESSO, $PID_{RP}$ provides the same binding as $ID_{RP}$, which is achieved by the \textbf{transformed RP designation} through $\mathcal{F}_{ID_{RP} \mapsto PID_{RP}}$  with the protocols in  RP identifier transforming and RP identifier refreshing.
+However, in UPPRESSO, $PID_{RP}$ provides the same binding as $ID_{RP}$, which is achieved by the \textbf{transformed RP designation} through $\mathcal{F}_{ID_{RP} \mapsto PID_{RP}}$  with the protocols in  RP identifier transforming and $PID_{RP}$ registration.
 In OIDC, $ID_{RP}$ is used to ensure that  identity proof is only valid to the designated RP, as the correct IdP ensures that one $ID_{RP}$ is only assigned to one RP, and the correct RP only accepts the identity proof which has a same $ID_{RP}$ with the assigned one.
 In UPPRESSO, the $PID_{RP}$ is also unique
 and one $PID_{RP}$ is  only assigned to one RP when at least a correct user or correct RP exists, then identity proof bound with a $PID_{RP}$ is only valid to this RP. The detailed proofs are:
 \begin{itemize} %correct beliving
-  \item The correct IdP ensures the the uniqueness of $PID_{RP}$, while the correct user checks this uniqueness through the RP identifier refreshing directly, and the correct RP checks it based on the user-redirected RP identifier refreshing result, which is signed by the IdP.
+  \item The correct IdP ensures the the uniqueness of $PID_{RP}$, while the correct user checks this uniqueness through the $PID_{RP}$ registration directly, and the correct RP checks it based on the user-redirected $PID_{RP}$ registration result, which is signed by the IdP.
   \item The correct user and RP check the freshness of $PID_{RP}$ based on the nonce $N_{RP}$ and $N_U$ respectively,
    which avoids the replay attack by reusing the unique $PID_{RP}$ incorrectly.
    %文字加上 用户、RP、用户和RP合谋能够进行。 a malicious RP may control by itself or acting as a user of beliving RP. These two cannot succeed
   \item The collusive RPs and users cannot make one specified (e.g., duplicated) $PID_{RP}$ be generated in the negotiation with a correct user or RP.
   For example,  the malicious RP may attempt to misuse the received identity proof at another RP by acting as a user to negotiate a same $PID_{RP}$ with this target RP.
   However, this is prevented and the adversary cannot control the values of $PID_{RP}$ due to the cooperated function $\mathcal{F}_{ID_{RP} \mapsto PID_{RP}}$ and the protocol in RP identifier transforming.
-  The RP chooses $N_{RP}$ before obtaining $N_{U}$ and cannot change $N_{RP}$ after receiving $N_U$, while the user calculates $PID_{RP}$ by ${Y_{RP}}^{N_{u}} \bmod p$ and  cannot to derive $N_{RP}$ from the $Y_{RP}$.
+  The RP chooses $N_{RP}$ before obtaining $N_{U}$ and cannot change $N_{RP}$ after receiving $N_U$, while the user choose $N_U$ for ${Y_{RP}}^{N_{u}} \bmod p$ before obtaining $N_{RP}$ and  cannot derive $N_{RP}$ from the $Y_{RP}$.
   As $PID_{RP}$ is calculated based on two random numbers $N_{U}$ and $N_{RP}$, a same $PID_{RP}$ may indeed be generated in two negotiations,
    however the probability is $1/q$ ($\leqslant 2^{-255}$ when $L=256$), which is negligible.
 \end{itemize}
@@ -35,7 +35,7 @@ The last two modifications affect user identification, which is still ensured in
 In OIDC, the RP uniquely identifies a user based on the identifier from the IdP, who provides a unique and identical identifier for a user $ID_U$ at an RP.
 In UPPRESSO,  the correct RP  computes an identical value $Accout = {PID_U}^T = {ID_{RP}}^{ID_U} \bmod p$  for a user's multiple logins, as shown in Equation~\ref{equ:AccountNotChanged};
  and one $Accout$ is only assigned to one user at an RP,  as IdP ensures that one $ID_U$ is only assigned to one user.
-Moreover, the calculation can never be tampered by the adversary,  as  $PID_U$ is provided by the IdP and protected in the identity proof, while $T$ is stored at the RP itself, and the calculation is performed at the RP.
+Moreover, the calculation can never be tampered with by the adversary,  as  $PID_U$ is provided by the IdP and protected in the identity proof, while $T$ is stored at the RP itself, and the calculation is performed at the RP.
 
 The above analysis demonstrates that (1) integrity and confidentiality are not affected by the modifications in UPPRESSO and could be  guaranteed by the mechanisms (i.e., digital signature and TLS) inherited from OIDC; and (2) these modifications on OIDC introduce no security degradation on user identification and RP designation.
 Therefore, UPPRESSO provides the secure SSO service.
@@ -52,7 +52,7 @@ UPPRESSO prevents the IdP-based login tracing, the curious IdP cannot derive RP'
 The detailed proofs are as follows.
 
 \emph{The IdP cannot derive RP's identifying information from any login.}
-UPPRESSO prevents the leakage of RP's identifying information (Step 2 in Figure~\ref{fig:OpenID} in OIDC), as the user provides the IdP a random string as the one-time endpoint instead of the RP's exact endpoint, and sends $PID_{RP}$ instead of $ID_{RP}$.
+UPPRESSO prevents the leakage of RP's identifying information in the generation of identity proof, as the user provides the IdP a random string as the one-time endpoint instead of the RP's exact endpoint, and sends $PID_{RP}$ instead of $ID_{RP}$.
 \emph{From any $PID_{RP}$, the IdP cannot derive $ID_{RP}$}, as the IdP doesn't know $N_UN_{RP}$ and cannot determine which $ID_{RP}$ corresponds to this $PID_{RP}$.
 That is because,
 for any given $PID_{RP}$, all the already-assigned $ID_{RP}$s could be the one corresponding to it,
@@ -99,10 +99,12 @@ The collusive RPs cannot associate a user's  $PID_U$s either, due to the unknown
 %Two or more RPs合作关联 ID_U，（提供错误值）
 %尽管不直接推导，Two or more RPs 合作associate user login （提供错误值、不提供错误值） provide an incorrect $N_{RP}$ in $\mathcal{F}_{ID_{RP} \mapsto PID_{RP}}$
 %Now, we consider malicious RPs.
-\emph{Any malicious RP cannot derive $ID_U$ and collusive RPs cannot associate $PID_U$s ($Account$s), by manipulating $N_{RP}$s.}
-A malicious RP may attempt to manipulate $N_{RP}$s in one or multiple logins to make the generated $PID_U$s or $Account$s be vulnerable for deriving $ID_U$,
- and the collusive RPs may attempt to manipulate $N_{RP}$s cooperatively to make a user's $PID_U$s or $Account$s be associated at these RPs and then to associate a user's multiple logins.
-Here, $N_{RP}$s are the only values controlled by the RPs.
+\emph{Any malicious RP cannot derive $ID_U$ and collusive RPs cannot associate $PID_U$s ($Account$s), by manipulating $Y_{RP}$s.}
+A malicious RP may attempt to manipulate $Y_{RP}$s in one or multiple logins to make the generated $PID_U$s or $Account$s be vulnerable for deriving $ID_U$,
+ and the collusive RPs may attempt to manipulate $Y_{RP}$s cooperatively to make a user's $PID_U$s or $Account$s be associated at these RPs and then to associate a user's multiple logins.
+Here, $Y_{RP}$s are the only values controlled by the RPs.
+The $Y_{RP}$ must be in the form of ${ID_{RP}}^{N_{RP}} \bmod p$, which is checked by the correct user with $N_{RP}$.
+Then, the malicious RPs can only manipulate $N_{RP}$s.
 However, the manipulation on $N_{RP}$ is masked by $N_U$ in $PID_U$ due to cooperative function $\mathcal{F}_{ID_{RP} \mapsto PID_{RP}}$,
  and has no effect on $Account$ as shown in Equation~\ref{equ:AccountNotChanged}.
 \begin{itemize}

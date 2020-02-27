@@ -13,7 +13,7 @@ Moreover, as this probability is negligible, the uniqueness check of $PID_{RP}$,
 %Security against ID exhaustion DoS
 %1.用户被鉴别过的，可以事后审计的； 2. IdP， 本来对OIDC是做一次数字签名， 加了一次模幂，资源消耗 --> DoS attack
 \noindent{\textbf{Security against DoS attack.}}
-The adversary may attempt to perform DoS attack on the IdP and RP. For example, the adversary may act as a user to invoke the RP identifier refreshing (Step 2.2.3) and identity proof generation (Step 4) at the IdP, which requires the IdP to perform two signature generations and one modular exponentiation.
+The adversary may attempt to perform DoS attack on the IdP and RP. For example, the adversary may act as a user to invoke the $PID_{RP}$ registration (Step 2.1) and identity proof generation (Step 3.2) at the IdP, which requires the IdP to perform two signature generations and one modular exponentiation.
 However, as the user has already been authenticated at the IdP, the IdP cloud identify the malicious users based on audit, in addition to the existing DoS mitigation schemes.
 The adversary may act as a user requesting to log into an RP, and make the RP perform two modular exponentiations.
 The RP could previously computed a set of $Y_{RP}$s to mitigate this attack.
@@ -30,7 +30,7 @@ UPPRESSO could integrate anonymous networks (e.g., Tor)  to prevent this leakage
 %我们现在的实现使得一个用户不需要在机器上存任何东西，只有装那个插件。这个实现可以进一步推广到这个插件都不用安装***
 \noindent{\textbf{Platform independent.}}
 Our current implementation only requires the user to install a Chrome extension and doesn't need to store any persistent data at the user's machine.
-Moreover, the implementation could  be further extended to remove the Chrome extension, whose JavaScript program is then fetched from the honest IdP. The processing is similar as SPRESSO. That is, 1) the RP's window (window A)  opens a new iframe (window B) to visit the RP's web page, while the RP's web page redirects window B to the IdP; 2) window B downloads the JavaScript  program from IdP and performs the processing in Steps 2.1.3, 2.2.1, 2.4 and 5.2; 3) then postMessages are adopted to exchange messages between window A and B for Steps 2.1.4, 2.1.6, 2.2.4, 2.3 and 5.3.
+Moreover, the implementation could  be further extended to remove the Chrome extension, whose JavaScript program is then fetched from the honest IdP. The processing is similar as SPRESSO. That is, 1) the RP's window (window A)  opens a new iframe (window B) to visit the RP's web page, while the RP's web page redirects window B to the IdP; 2) window B downloads the JavaScript  program from IdP and performs the processing in Steps 1.3, 1.5, 2.1, 3.2 and 3.5; 3) then postMessages are adopted to exchange messages between window A and B for Steps 1.2, 1.3, 1.4, 2.3, 3.1 and 3.5.
 The opener handle of window B is preserved (i.e., window A) for the postMessage, as window A  opens window B with a web page from the RP;
  and window B is redirected to the IdP with \emph{noreferrer} attribute set, to prevent the browser from sending RP's URL in the Referrer header to the IdP.
 
