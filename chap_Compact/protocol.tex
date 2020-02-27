@@ -201,14 +201,14 @@ The IdP keeps $SK$ secret, while $p$, $q$, $g$ and $PK$ are public parameters.
 
 \vspace{1mm}\noindent\textbf{RP initial registration.}
 An RP registers itself at the IdP to request $ID_{RP}$ and $Cert_{RP}$ as follows:
-\begin{enumerate}
+\begin{itemize}
 \item RP sends a registration request to the IdP,
     including the RP's endpoint (e.g., URL) for receiving the identity proof.
 \item IdP chooses a unique random number $r$ ($1 < r < q$), computes $ID_{RP} = g^r \bmod p$,
 signs $[ID_{RP}, endpoint, *]$ using $SK$, where $*$ is  supplementary information such as the RP's common name,
 and returns $Cert_{RP} = [ID_{RP}, endpoint]_{SK}$ to the RP, where $[\cdot]_{SK}$ means a message signed using $SK$.
 \item The RP  verifies $Cert_{RP}$ using $PK$,  and then accepts $ID_{RP}$ and $Cert_{RP}$.
-\end{enumerate}
+\end{itemize}
 
 Note that, $ID_{RP}$ cannot be chosen by the RP,
  and it must be chosen by the IdP and $r$ is kept unknown to the RP.
@@ -246,12 +246,12 @@ Here we introduce the detailed processes for each step in Figure~\ref{fig:proces
 \vspace{1mm}\noindent\textbf{RP identifier transforming.}
 In this phase, the user and RP cooperative to generate $PID_{RP}$ as follows:
 \begin{itemize}
-  \item The user sends a login request to trigger the negotiation of $PID_{RP}$ (Step 1).
-  \item The RP chooses a random $N_{RP}$ ($1 < N_{RP} <q$), calculates $Y_{RP}={ID_{RP}}^{N_{RP}} \bmod p$ (Step 2.1.1);
-   and sends $Y_{RP}$ with $Cert_{RP}$  to the user (Step 2.1.2).
-  \item The user checks the $Cert_{RP}$, extracts $ID_{RP}$ from the valid $Cert_{RP}$, chooses a random $N_U$ ($1 < N_U <q$) to calculate $PID_{RP}={Y_{RP}}^{N_{U}} \bmod p$ (Step 2.1.3); and sends $N_U$ %with $PID_{RP}$
+  \item [1.1] The user sends a login request to trigger the negotiation of $PID_{RP}$.
+  \item [1.2] The RP chooses a random $N_{RP}$ ($1 < N_{RP} <q$), calculates $Y_{RP}={ID_{RP}}^{N_{RP}} \bmod p$; % (Step 2.1.1);
+   and sends $Y_{RP}$ with $Cert_{RP}$  to the user. % (Step 2.1.2).
+  \item [1.3] The user checks the $Cert_{RP}$, extracts $ID_{RP}$ from the valid $Cert_{RP}$, chooses a random $N_U$ ($1 < N_U <q$) to calculate $PID_{RP}={Y_{RP}}^{N_{U}} \bmod p$ (Step 2.1.3); and sends $N_U$ %with $PID_{RP}$
        to the RP (Step 2.1.4).
-  \item The RP calculates $PID_{RP}$ with $N_U$ and $Y_{RP}$, %checks its consistency with the received one,
+  \item [1.4] The RP calculates $PID_{RP}$ with $N_U$ and $Y_{RP}$, %checks its consistency with the received one,
    derives the trapdoor $T={(N_U N_{RP})}^{-1} \bmod q$ (Step 2.1.5); and
    acknowledges the negotiation.
    %sends the calculated $PID_{RP}$ to the user (Step 2.1.6).
@@ -316,13 +316,13 @@ Finally, RP derives the user's  $Account$ and completes the user's login as foll
 \label{subsec:compatible}
 UPPRESSO could be integrated in the traditional SSO systems, to  prevent the IdP-based login tracing and RP-based identity linkage.
 The integration doesn't degrade the security and only requires minimal modification.
-Here, we use the implicit protocol flow of OIDC as an example to demonstrate the compatibility of UPPRESSO with the traditional SSO systems, as shown in Figure~\ref{fig:UPPRESSO}.
+Here, we use the implicit protocol flow of OIDC as an example to demonstrate the compatibility of UPPRESSO with the traditional SSO systems, as shown in Figure~\ref{fig:process}.
 The further analysis, such as integration with the authorization code flow of OIDC,  is provided in Section~\ref{sec:discussion}.
 
 First of all,
     UPPRESSO doesn't introduce any new role, nor change the security assumptions on each role (i.e., user, IdP and RP).
 
-As shown in Figure~\ref{fig:UPPRESSO}, in UPPRESSO, the SSO protocol for identity proof  (Steps between 2.3 and 7) is the same as in OIDC (Steps between 2 and 7); the formats of identity proof and corresponding request are the same as in OIDC; the correctness checks on the identity proof request at the IdP (i.e., consistency of RP' identifier and endpoint with the registered one) are the same as in OIDC; the correctness checks on the identity proof (i.e., consistency of RP' identifier with the one in the request, integrity, validity time, freshness, and etc.) at the RP are the same as in OIDC.
+As shown in Figure~\ref{fig:process}, in UPPRESSO, the SSO protocol for identity proof  (Steps between 2.3 and 7) is the same as in OIDC (Steps between 2 and 7); the formats of identity proof and corresponding request are the same as in OIDC; the correctness checks on the identity proof request at the IdP (i.e., consistency of RP' identifier and endpoint with the registered one) are the same as in OIDC; the correctness checks on the identity proof (i.e., consistency of RP' identifier with the one in the request, integrity, validity time, freshness, and etc.) at the RP are the same as in OIDC.
 
 %以下为描述Step 2.3到7的详细内容.
 %That is, the RP construct a request for identity proof (Step 2.3); the user redirects this request to the IdP (Step 2.5); the IdP generates the identity proof (Step 4), and sends it to the user (Step 5.1) who redirects it to the RP (Step 5.3); and finally the RP verifies the identity proof (Step 6).
