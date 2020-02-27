@@ -107,7 +107,7 @@ The $\mathcal{F}_{ID_{RP} \mapsto PID_{RP}}$ ensures that the user and RP cooper
 The IdP will bind $PID_{U}$ with $PID_{RP}$ in the identity proof, which designates this identity proof to $PID_{RP}$.
 Therefore, the $PID_{RP}$ is designated to $ID_{RP}$.
 Finally, the transformed RP designation is provided through the two-step designations.
-The function $\mathcal{F}_{ID_{RP} \mapsto PID_{RP}}$ prevents the curious IdP from linking the $PID_{RP}$s of different logins at an RP, and therefore avoids  the  IdP-based access tracing.
+The function $\mathcal{F}_{ID_{RP} \mapsto PID_{RP}}$ prevents the curious IdP from linking the $PID_{RP}$s of different logins at an RP, and therefore avoids  the  IdP-based login tracing.
 
 
 \begin{table}[tb]
@@ -226,22 +226,22 @@ As shown in Figure~\ref{fig:UPPRESSO}, the SSO login consists of four phases,
 In the RP identifier transforming, the user and RP negotiate $PID_{RP} = {ID_{RP}}^{N_{U} N_{RP}} \bmod p$.
 In the RP identifier refreshing, the user registerers $PID_{RP}$ at the IdP.
 In the $PID_U$ generation, the IdP calculates $PID_U = {PID_{RP}}^{ID_U} \bmod p$ and signs the identity proof.
-And in the $Account$ calculation, the RP derives $Account = {{PID_{U}}}^{{(N_UN_{RP})^{-1} \bmod q}}$ after verifying the identity proof,
+And in the $Account$ calculation, the RP derives $Account = {{PID_{U}}}^{{(N_UN_{RP})^{-1} \bmod q}} \bmod p$ after verifying the identity proof,
     and allows the user to log in as $Account$.
 
 \subsection{UPPRESSO Protocol flow}
 \label{sebsec:loginprocess}
-Figure~\ref{fig:process} shows the SSO login protocol of UPPRESSO. %the SSO login sub-protocol provides the secure SSO service and prevents both the IdP-based access tracing and RP-based identity linkage.
+Figure~\ref{fig:process} shows the SSO login protocol of UPPRESSO. %the SSO login sub-protocol provides the secure SSO service and prevents both the IdP-based login tracing and RP-based identity linkage.
  % prevents the curious IdP from obtaining the RP's identifying information during the interchanges,
 %  and avoids the adversary to break the security and user's privacy.
 Here we introduce the detailed processes for each step in Figure~\ref{fig:process}.
 
-\begin{figure}
+\begin{figure*}
   \centering
-  \includegraphics[width=\linewidth]{fig/process.pdf}
+  \includegraphics[width=0.85\linewidth]{fig/process.pdf}
   \caption{Process for each user login.}
   \label{fig:process}
-\end{figure}
+\end{figure*}
 
 \vspace{1mm}\noindent\textbf{RP identifier transforming.}
 In this phase, the user and RP cooperative to generate $PID_{RP}$ as follows:
@@ -261,7 +261,8 @@ During the process, the user will halt the login, if  the $Cert_{RP}$ is invalid
  %or the received $PID_{RP}$ is different from the stored one. The RP also halts the process if the $PID_{RP}$ sent by the user is inconsistent with the calculated one.
 The user verifies that $PID_{RP} \neq g^0 \bmod p$;
     if $PID_{RP} = g^0 \bmod p$, it means that $N_U = 0 \bmod q$ or $N_{RP} = 0 \bmod q$
-        and then $PID_U = {g}^{0*ID_U}$ is constant.
+        and then $PID_U = {g}^{0*ID_U}$ is constant for all users.
+This case appears only if  $N_U = q$ or $N_{RP} = q$.
 
 \vspace{1mm}\noindent\textbf{RP identifier refreshing.}
 The user registers $PID_{RP}$ at the IdP as follows.
@@ -313,7 +314,7 @@ Finally, RP derives the user's  $Account$ and completes the user's login as foll
 
 \subsection{Compatibility with OIDC}
 \label{subsec:compatible}
-UPPRESSO could be integrated in the traditional SSO systems, to  prevent the IdP-based access tracing and RP-based identity linkage.
+UPPRESSO could be integrated in the traditional SSO systems, to  prevent the IdP-based login tracing and RP-based identity linkage.
 The integration doesn't degrade the security and only requires minimal modification.
 Here, we use the implicit protocol flow of OIDC as an example to demonstrate the compatibility of UPPRESSO with the traditional SSO systems, as shown in Figure~\ref{fig:UPPRESSO}.
 The further analysis, such as integration with the authorization code flow of OIDC,  is provided in Section~\ref{sec:discussion}.
