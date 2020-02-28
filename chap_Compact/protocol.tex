@@ -47,10 +47,10 @@ it is computationally infeasible for
 $N_{U}$ and $N_{RP}$  serves as nonces to ensure that (\emph{a}) $PID_{RP}$ is valid only for this login as well as the identity proof,
      and (\emph{b}) the IdP cannot associate multiple ${PID_{RP}}$s for a same RP.
 Finally,
-    the cooperation by the user and the RP prevents a single malicious entity from manipulating $PID_{RP}$ in the identity proof.
+    the cooperation by the user and the RP prevents a single malicious entity from manipulating the value of $PID_{RP}$.
 %For example, the malicious user fails to make a correct RP accept a $PID_{RP}$ used in another login, while the collusive RPs fail to use a same or correlated $PID_{RP}$s for different logins.
 
-On receiving a request of
+On receiving an identity proof request of
     $ID_U$ and $PID_{RP}$ from an authenticated user,
 the IdP calculates $PID_U$ as Equation~\ref{equ:PIDU},
     and binds it in the identity proof.
@@ -65,12 +65,14 @@ We have $PID_U = {ID_{RP}}^{N_UN_{RP}ID_U}  = g^{rN_UN_{RP}ID_U} \bmod p$ from E
 The discrete logarithm problem ensures that the RP cannot derive $ID_U$ from $PID_U$.
 Moreover,
     provided that $r$ is kept secret to the RP,
-    collusive RPs cannot link a user's $PID_U$s at different RPs.
+    collusive RPs cannot link a user's $PID_U$s at different RPs;
     % who can never know $r$ and $ID_U$. %have different $ID_{RP}$. %discrete logarithm of $ID_{RP}$ modulo $ID_{RP}^'$
+the collusive RPs may attempt to link a user's accounts  by checking whether the equality $Account_2$=$(Account_1)^{r_2/r_1}\ mod\ p$ holds for $Account_1$ at an RP $ID\_{RP1}\ =\ g^{r_1}\ mod\ p$ and $Account_2$ at another RP $ID\_{RP2}\ =\ g^{r_2}\ mod\ p$.
+
 
 Finally, the RP derives $Account$ for the user %with the function $\mathcal{F}_{PID_{U} \mapsto Account}$
  as Equation~\ref{equ:Account}.
-Here, we define $T = (N_UN_{RP})^{-1} \bmod q$ as the trapdoor at the RP.
+Here, we define $T = (N_UN_{RP})^{-1} \bmod q$ as the RP's trapdoor.
 As $q$ is a prime number and $1< N_U, N_{RP} < q$, $q$ is coprime to $N_U N_{RP}$, and then $T$ that satisfies $T (N_U N_{RP}) = 1 \bmod q$ always exists.
 
 \begin{equation}
