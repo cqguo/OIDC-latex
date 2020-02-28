@@ -342,35 +342,66 @@ The RP performs verifies the identity proof, including the signature, the validi
 
 \subsection{Compatibility with OIDC}
 \label{subsec:compatible}
-UPPRESSO could be integrated in the traditional SSO systems, %to  prevent the IdP-based login tracing and RP-based identity linkage.
-and it only requires small modifications.
-Here, we use the implicit protocol flow of OIDC as an example to demonstrate the compatibility of UPPRESSO with the traditional SSO systems, as shown in Figure~\ref{fig:process}.
-The further analysis, such as integration with the authorization code flow of OIDC,  is provided in Section~\ref{sec:discussion}.
+The design of UPPRESSO can be integrated in the traditional SSO systems, %to  prevent the IdP-based login tracing and RP-based identity linkage.
+and it only requires small modifications to implement the SSO login flow of UPPRESSO.
+Next, we compare it with OIDC to demonstrate the compatibility of UPPRESSO.
+
+As mentioned above,
+    the SSO login flow of UPPRESSO is composed of four phases, namely,
+        RP identifier transforming, $PID_{RP}$ registration, identity proof generation, and $Account$ calculation.
+RP identifier transforming is conducted between a user and the RP, which is specific to UPPRESSO,
+    while the others adopt the communication patterns of some OIDC flows.
 
 First of all,
     UPPRESSO doesn't introduce any new role, nor change the security assumptions on each role (i.e., user, IdP and RP).
+$PID_{RP}$ registration can be viewed as the RP dynamic registration flow of OIDC~\cite{DynamicRegistration},
+    where an entity registers its identity and endpoint at the IdP.
+In UPPRESSO,
+    this process is launched by any authenticated user,
+        and the registration will become invalid after a validity period.
+These two differences will bring very small modifications.
 
-As shown in Figure~\ref{fig:process}, in UPPRESSO, the SSO protocol for identity proof is the same as in OIDC; the formats of identity proof and corresponding request are the same as in OIDC; the correctness checks on the identity proof request at the IdP (i.e., consistency of RP' identifier and endpoint with the registered one) are the same as in OIDC; the correctness checks on the identity proof (i.e., consistency of RP' identifier with the one in the request, integrity, validity time, freshness, and etc.) at the RP are the same as in OIDC.
+
+Identity proof generation and $Account$ calculation of UPPRESSO,
+    finish the same steps as the implicit protocol flow of OIDC,
+        except some parameters are modified as follows.
+$ID_U$ is transformed to $PID_U$ by the IdP, and this modification is actually allowed in OIDC;
+    for example, PPID allows various designs to calculate $PID_U$ from $ID_U$.
+The calculation of $Account$ from $PID_U$ bound in the identity proof,
+    can be viewed as a step by the RP to derive its user account after the implicit protocol flow of OIDC ends.
+The final modification is
+    the replacement of endpoint by the user, to forward the identity proof to the RP.
+In fact, this message forwarding is common when an application-layer network proxy is deployed.
+So 
+identity proof generation and $Account$ calculation of UPPRESSO,
+    can be viewed as a particular but compatible implementation of the implicit protocol flow of OIDC.
+Finally,
+    identity proof generation and $Account$ calculation of UPPRESSO,
+        can be also implemented as the authorization code flow of OIDC with small modifications,
+        which is discussed in Section \ref{sec:discussion}.
+
+%As shown in Figure~\ref{fig:process}, in UPPRESSO, the SSO protocol for identity proof is the same as in OIDC; the formats of identity proof and corresponding request are the same as in OIDC; the correctness checks on the identity proof request at the IdP (i.e., consistency of RP' identifier and endpoint with the registered one) are the same as in OIDC; the correctness checks on the identity proof (i.e., consistency of RP' identifier with the one in the request, integrity, validity time, freshness, and etc.) at the RP are the same as in OIDC.
+%The above modifications could be completed automatically for each login, without affecting other communication pattern.
 
 %以下为描述Step 2.3到7的详细内容.
 %That is, the RP construct a request for identity proof (Step 2.3); the user redirects this request to the IdP (Step 2.5); the IdP generates the identity proof (Step 4), and sends it to the user (Step 5.1) who redirects it to the RP (Step 5.3); and finally the RP verifies the identity proof (Step 6).
 
-However, UPPRESSO achieves privacy preservation by integrating  $\mathcal{F}_{ID_{U} \mapsto PID_{U}}$, $\mathcal{F}_{ID_{RP} \mapsto PID_{RP}}$ and $\mathcal{F}_{PID_{U} \mapsto Account}$, and  introduces the following modifications on OIDC.
+%However, UPPRESSO achieves privacy preservation by integrating  $\mathcal{F}_{ID_{U} \mapsto PID_{U}}$, $\mathcal{F}_{ID_{RP} \mapsto PID_{RP}}$ and $\mathcal{F}_{PID_{U} \mapsto Account}$, and  introduces the following modifications on OIDC.
 
-\begin{enumerate}
-  \item The identity proof is bound with $PID_{RP}$ instead of $ID_{RP}$, which introduces the RP identifier transforming (Steps 1.2-1.5)  and $PID_{RP}$ registration (Steps 2.1-2.4).
-  \item The identity proof is designated to one-time endpoint instead of RP's identifying endpoint, which requires the user to register the one-time endpoint in Step 2.1 and replace it with the original endpoint in Step 3.2.
-  \item IdP generates $PID_U$ based on ($PID_{RP}$, $ID_U$) instead of ($ID_{RP}$, $ID_U$).
-  \item The RP calculates $Account$ from the changing $PID_U$ instead of an unchanged one.
-\end{enumerate}
+%\begin{enumerate}
+%  \item The identity proof is bound with $PID_{RP}$ instead of $ID_{RP}$, which introduces the RP identifier transforming (Steps 1.2-1.5)  and $PID_{RP}$ registration (Steps 2.1-2.4).
+%  \item The identity proof is designated to one-time endpoint instead of RP's identifying endpoint, which requires the user to register the one-time endpoint in Step 2.1 and replace it with the original endpoint in Step 3.2.
+%  \item IdP generates $PID_U$ based on ($PID_{RP}$, $ID_U$) instead of ($ID_{RP}$, $ID_U$).
+%  \item The RP calculates $Account$ from the changing $PID_U$ instead of an unchanged one.
+%\end{enumerate}
 
 %上述modification如何实现的，简单描述
 %to add: PID_{RP} transforming 和 RP identifer refreshing在user和RP的页面自己完成了。 都用现成的数据格式
 %one-time endpoint 和endpoint
-The above modifications could be completed automatically for each login, without affecting other communication pattern.
-The user automatically invokes the JavaScript functions to complete RP identifier transforming, one-time endpoint generating/replacing and $PID_{RP}$ registration for each login. While, the RP server and IdP server provide the corresponding web service to complete the processing automatically.
-The protocol of RP identifier transformation is based Diffie-Hellman key exchange~\cite{DiffieH76}, while $N_U$ is provided to RP for computing the trapdoor and $N_{RP}$ is provided to the user for verifying the correctness of $Y_{RP}$.
-The protocol of $PID_{RP}$ registration is based on the dynamic registration in OIDC, while it is triggered by the user instead of the RP, adds $PID_{RP}$ in the request and includes a signature $Sig_{Res}$ in the response.
+%The user automatically invokes the JavaScript functions to complete RP identifier transforming, one-time endpoint generating/replacing and $PID_{RP}$ registration for each login.
+%While, the RP server and IdP server provide the corresponding web service to complete the processing automatically.
+
+%The protocol of RP identifier transformation is based Diffie-Hellman key exchange~\cite{DiffieH76}, while $N_U$ is provided to RP for computing the trapdoor and $N_{RP}$ is provided to the user for verifying the correctness of $Y_{RP}$.
 
 \begin{comment}
 \vspace{1mm}\noindent \textbf{Consistency with OIDC.}
