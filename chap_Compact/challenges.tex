@@ -62,14 +62,14 @@ As mentioned in Section \ref{sec:intro},
 Thus, a privacy-preserving SSO system shall prevent these two kinds of user privacy leakage,
     while satisfying four basic security requirements of SSO services.
 Since integrity and confidentiality are ensured by digital signatures of the IdP and TLS communications in the system \cite{OpenIDConnect},
-    we focus only user identification and RP designation in the remainder.
+    we focus only \emph{user identification} and \emph{RP designation} in the remainder.
 
 The pseudo-identifiers of users and RPs (denoted as $PID_U$ and $PID_{RP}$, respectively)
     are introduced,
-     as we consider two privacy threats.
+     as we consider the two privacy threats.
 To prevent IdP-based login tracing, % while ensure RP designation,
     the IdP shall be aware of $PID_{RP}$ at most
-        and then $ID_{RP}$ is not bound in identity proofs;
+        and then $ID_{RP}$ does not appear in identity proofs;
     otherwise, if $ID_{RP}$ is disclosed to the IdP,
      it enable IdP-based login tracing because the user is authenticated by the IdP and $ID_U$ is automatically disclosed.
 In order to prevent RP-based identity linkage, % while ensure user identification,
@@ -77,21 +77,20 @@ In order to prevent RP-based identity linkage, % while ensure user identificatio
         otherwise, collusive RPs will link a user's login activities based on $ID_U$ in received identity proofs.
 Finally,
     only the pseudo-identifiers of users and RPs (i.e., at most $PID_U$ and $PID_{RP}$,
-     but not $ID_U$ or $ID_{RP}$) are bound by the IdP in identity proofs.
+     but not $ID_U$ or $ID_{RP}$) are bound in identity proofs.
 
-Then, when we consider both the requirements of security and privacy,
+When we consider both the requirements of security and privacy,
 it brings the identity dilemma as follows:
     when the IdP is unaware of the visited RP,
-        it (\emph{a}) binds $PID_{RP}$ in each identity proof that still enables an RP to verify the specified receiver,
-        to ensure RP designation,
+        it (\emph{a}) binds $PID_{RP}$ in each identity proof that enables an RP to verify the specified receiver,
+        to \emph{ensure RP designation},
         and (\emph{b}) generates $PID_U$s in the identity proofs for a user in multiple logins at an RP,
-         which enable the RP to extract the identical user identifier
-         (i.e., $Account$), to ensure user identification.
-Moreover,
+         which enable the RP to derive the identical user identifier
+         (i.e., $Account$), to \emph{ensure user identification}.
+However,
     for a certain user,
-    $PID_{RP}$s are different in the multiple logins at an RP, to prevent IdP-based visit tracing,
-    $PID_U$s are different when the user visits different RPs, to prevent RP-based identity linkage,
- and $Account$s are RP-specific (i.e., distinct for different RPs).
+    (\emph{c}) different $PID_{RP}$s appear in the multiple logins at an RP, to \emph{prevent IdP-based visit tracing},
+    and (\emph{d}) $PID_U$s and also the derived $Account$s are different when the user visits different RPs to \emph{prevent RP-based identity linkage}.
 
 \begin{figure}
   \centering
@@ -105,12 +104,12 @@ We explain the relationship between the identifiers, the pseudo-identifiers and 
 In every login instance,
     the user knows both $ID_U$ and $ID_{RP}$.
 The IdP is aware of $ID_U$ after it authenticates the user.
-One-time $PID_{RP}$ and $PID_U$ are generated for the identity proof,
-    satisfying that $PID_{RP}$ enables the verification of RP designation and $PID_{U}$ enables the derivation of identical $Account$.
-It is worthy noting that when user privacy is not well considered,
+One-time $PID_{RP}$ and $PID_U$ are generated and bound in the identity proof,
+    while $PID_{RP}$ enables the verification of RP designation and $PID_{U}$ enables the derivation of identical $Account$.
+It is worthy noting that, when user privacy is not well considered,
     this relationship is simplified.
 For example,
-in commonly-used OIDC \cite{OpenIDConnect},
+in commonly-deployed OIDC systems \cite{OpenIDConnect},
     $ID_U$ is directly assigned to $PID_U$,
         or constant RP-specific $PID_U$ is adopted.
     %and $ID_{RP}$ is assigned to $PID_{RP}$,
@@ -306,7 +305,7 @@ It is also applicable to explain the approaches of existing privacy-preserving S
 PPID prevents only RP-based identity linkage but not IdP-based login tracing,
     where
     $PID_{RP} = ID_{RP}$.
-The IdP by itself maintains the deterministic mapping from $ID_U$ to $PID_U$ distinct for different RPs,
+The IdP by itself maintains the deterministic mapping from $ID_U$ to $PID_U$ distinct among different RPs,
     and $Account = PID_U$.
 
 %However, these scheme provide at most two satisfying functions, and therefore fail to prevent either the IdP-based login tracing or RP-based identity linkage.
