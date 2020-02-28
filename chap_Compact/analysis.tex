@@ -32,7 +32,7 @@ In UPPRESSO, the correct user obtains the correct endpoint for $ID_{RP}$ from $C
 
 The last two modifications affect user identification, which is still ensured in UPPRESSO by the \textbf{trapdoor user identification} provided by $\mathcal{F}_{ID_{RP} \mapsto PID_{RP}}$, $\mathcal{F}_{ID_{U} \mapsto PID_{U}}$ and $\mathcal{F}_{PID_{U} \mapsto Account}$.
 In OIDC, the RP uniquely identifies a user based on the identifier from the IdP, who provides a unique and identical identifier for a user $ID_U$ at an RP.
-In UPPRESSO,  the correct RP  computes an identical value $Accout = {PID_U}^T = {ID_{RP}}^{ID_U} \bmod p$  for a user's multiple logins, as shown in Equation~\ref{equ:AccountNotChanged};
+In UPPRESSO,  the correct RP  derives an identical value $Accout = {PID_U}^T = {ID_{RP}}^{ID_U} \bmod p$  for a user's multiple logins, as shown in Equation~\ref{equ:AccountNotChanged};
  and one $Accout$ is only assigned to one user at an RP,  as IdP ensures that one $ID_U$ is only assigned to one user.
 Moreover, the calculation can never be tampered with by the adversary,  as  $PID_U$ is provided by the IdP and protected in the identity proof, while $T$ is stored at the RP itself, and the calculation is performed at the RP.
 
@@ -78,14 +78,14 @@ The detailed proofs are as follows.
 \begin{itemize}
   \item For $PID_U$, it equals to ${PID_{RP}}^{ID_U}\ mod\ p$ according to $\mathcal{F}_{ID_{U} \mapsto PID_{U}}$, and further transformed to $g^{r*N_U*N_{RP}*ID_U\ mod\ q}\ mod\ p$ by combining $\mathcal{F}_{ID_{U} \mapsto PID_{U}}$, $\mathcal{F}_{ID_{RP} \mapsto PID_{RP}}$ with Equation~\ref{equ:IDRP}.
       Here, $p$, $q$ and $g$ are public parameters, $PID_{RP}$, $N_{RP}$ and $N_U$ are known to the RP, while $r$ is secretly maintained by the IdP and never leaked to the RP.
-      Then, it is computational infeasible to compute $ID_U$ from $PID_U$ with all the known values (e.g., $PID_{RP}$, $g$ and etc.) due to the discrete logarithm problem.
-  \item For $Account$, it equals to ${ID_{RP}}^{ID_U}\ mod\ p$ according to Equation~\ref{equ:AccountNotChanged}, and further transformed to $g^{r*ID_U\ mod\ q}\ mod\ p$ with Equation~\ref{equ:IDRP}. Same as the above analysis, it is also computational infeasible to compute $ID_U$ from $Account$ with all the known values (e.g., $ID_{RP}$, $g$ and etc.).
+      Then, it is computational infeasible to calculate $ID_U$ from $PID_U$ with all the known values (e.g., $PID_{RP}$, $g$ and etc.) due to the discrete logarithm problem.
+  \item For $Account$, it equals to ${ID_{RP}}^{ID_U}\ mod\ p$ according to Equation~\ref{equ:AccountNotChanged}, and further transformed to $g^{r*ID_U\ mod\ q}\ mod\ p$ with Equation~\ref{equ:IDRP}. Same as the above analysis, it is also computational infeasible to calculate $ID_U$ from $Account$ with all the known values (e.g., $ID_{RP}$, $g$ and etc.).
   \item The RP cannot infer $ID_U$ by combining $Account$ and $PID_U$.
         $Account$ and $PID_U$ are both generated from $ID_U$, however $Accout={PID_U}^T\ mod\ p$ where $T$ is a random value known to RP and independent with $ID_U$.
 \end{itemize}
 
 %one RP 多个login中的PIDu-> IDu, 多个login中的Account->IDu
-\emph{Any RP cannot directly derive $ID_U$ from $PID_U$s and $Account$s obtained in multiple logins.} All these $Account$s are equal,  while any $PID_{U}$ (e.g., $PID_{U1}$) can be computed from any other $PID_{U}$ (e.g., $PID_{U2}$),  $PID_{U1}$=$PID_{U2} * Account^{N_{U1}*N_{RP1}-N_{U2}*N_{RP2}}\ mod\ p$, where $N_{U2}$, $N_{RP2}$, $N_{U2}$ and $N_{RP2}$ are values known to the RP and independent with $ID_U$.
+\emph{Any RP cannot directly derive $ID_U$ from $PID_U$s and $Account$s obtained in multiple logins.} All these $Account$s are equal,  while any $PID_{U}$ (e.g., $PID_{U1}$) can be calculated from any other $PID_{U}$ (e.g., $PID_{U2}$),  $PID_{U1}$=$PID_{U2} * Account^{N_{U1}*N_{RP1}-N_{U2}*N_{RP2}}\ mod\ p$, where $N_{U2}$, $N_{RP2}$, $N_{U2}$ and $N_{RP2}$ are values known to the RP and independent with $ID_U$.
 
 %two or more RPs 合谋， 不提供错误值
 \emph{The collusive RPs cannot directly associate  a user's $Account$s and $PID_U$s.} The collusive RPs may attempt to link a user's accounts  by checking whether the equality $Account_2$=$(Account_1)^{r_2/r_1}\ mod\ p$ holds for $Account_1$ at an RP $ID\_{RP1}\ =\ g^{r_1}\ mod\ p$ and $Account_2$ at another RP $ID\_{RP2}\ =\ g^{r_2}\ mod\ p$.
