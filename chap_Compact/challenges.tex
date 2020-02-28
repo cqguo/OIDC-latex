@@ -87,10 +87,14 @@ it brings the identity dilemma as follows:
         and (\emph{b}) generates $PID_U$s in the identity proofs for a user in multiple logins at an RP,
          which enable the RP to derive the identical user identifier
          (i.e., $Account$), to \emph{ensure user identification}.
-However,
+Moreover,
     for a certain user,
-    (\emph{c}) different $PID_{RP}$s appear in the multiple logins at an RP, to \emph{prevent IdP-based visit tracing},
-    and (\emph{d}) $PID_U$s and also the derived $Account$s are different when the user visits different RPs to \emph{prevent RP-based identity linkage}.
+    (\emph{c}) to \emph{prevent IdP-based visit tracing}, different $PID_{RP}$s appear in the multiple logins at an RP, 
+        while
+        it is computationally infeasible for the IdP to derive $ID_{RP}$ from $PID_{RP}$ and $PID_{U}$,
+    and (\emph{d})  to \emph{prevent RP-based identity linkage}, $PID_U$s and also the derived $Account$s are different when the user visits different RPs,
+    while 
+    it is computationally infeasible for an RP to derive $ID_{U}$ from $PID_{U}$, $PID_{RP}$ and $Account$.
 
 \begin{figure}
   \centering
@@ -140,48 +144,50 @@ in commonly-deployed OIDC systems \cite{OpenIDConnect},
 
 \subsection{The Principles of UPPRESSO}
 \label{subsec:solutions}
-As demonstrated in Figure \ref{fig:IDCorrelation},
+As shown in Figure \ref{fig:IDCorrelation},
 to design secure privacy-preserving SSO solutions
-    (i.e., solve the identity dilemma of privacy-preserving SSO),
-  we need to find out satisfying functions to compute $PID_U$, $PID_{RP}$ and $Account$,
-which are denoted as $\mathcal{F}_{ID_{U} \mapsto PID_U}$,   $\mathcal{F}_{ID_{RP} \mapsto PID_{RP}}$,
+    (i.e., solve the identity dilemma),
+  we need to find out qualified identifier-transformation functions to compute $PID_U$, $PID_{RP}$ and $Account$,
+denoted as $\mathcal{F}_{ID_{U} \mapsto PID_U}$,   $\mathcal{F}_{ID_{RP} \mapsto PID_{RP}}$,
   and $\mathcal{F}_{PID_{U} \mapsto Account}$, respectively.
 
 %We present UPPRESSO, a secure and privacy-preserving SSO system,
 %which prevents the IdP-based login tracing and RP-based identity linkage under the prerequisites that  the basic requirements of SSO systems are satisfied.
-First of all,
-    UPPRESSO adopts the communication pattern of OpenID Connect,
-    and then \emph{integrity} and \emph{confidentiality} of identity proofs are also implemented by digital signatures of the IdP
-            and TLS communications in the system.
 
-In order to prevent \emph{IdP-based login tracing},
-    the IdP of UPPRESSO is aware of $PID_{RP}$ but not $ID_{RP}$,
-        and it is computationally infeasible for the IdP to derive (any information about) $ID_{RP}$ from $PID_{RP}$ and $PID_{U}$;
-to prevent \emph{RP-based identity linkage},
-    an RP accepts identity proofs including $PID_{U}$ but not $ID_{U}$,
-     to derive $Account$ distinct among RPs,
-        and it is computationally infeasible for the RP to derive (any information about) $ID_{U}$ from $PID_{U}$, $PID_{RP}$ and $Account$.
+%First of all,
+%    UPPRESSO adopts the communication pattern of OpenID Connect,
+%    and then \emph{integrity} and \emph{confidentiality} of identity proofs are also implemented by digital signatures of the IdP
+%            and TLS communications in the system.
 
-Finally,
-    we attempt to achieve \emph{user identification} and \emph{RP designation},
-        by the comprehensive design of identifier transformations
-         (i.e., $\mathcal{F}_{ID_{U} \mapsto PID_U}$,   $\mathcal{F}_{ID_{RP} \mapsto PID_{RP}}$,
-  and $\mathcal{F}_{PID_{U} \mapsto Account}$) as follows.
-\begin{itemize}
-\item
-$\mathcal{F}_{ID_{U} \mapsto PID_U}$ and $\mathcal{F}_{PID_{U} \mapsto Account}$
-    work together to ensure user identification,
-    i.e.,
-    derive identical $Account$ for a user in multiple logins at an RP.
+
+%In order to prevent \emph{IdP-based login tracing},
+%    the IdP of UPPRESSO is aware of $PID_{RP}$ but not $ID_{RP}$,
+%        and it is computationally infeasible for the IdP to derive (any information about) $ID_{RP}$ from $PID_{RP}$ and $PID_{U}$;
+%to prevent \emph{RP-based identity linkage},
+%    an RP accepts identity proofs including $PID_{U}$ but not $ID_{U}$,
+%     to derive $Account$ distinct among RPs,
+%        and it is computationally infeasible for the RP to derive (any information about) $ID_{U}$ from $PID_{U}$, $PID_{RP}$ and $Account$.
+
+%Finally,
+%    we attempt to achieve \emph{user identification} and \emph{RP designation},
+%        by the comprehensive design of identifier transformations
+%         (i.e., $\mathcal{F}_{ID_{U} \mapsto PID_U}$,   $\mathcal{F}_{ID_{RP} \mapsto PID_{RP}}$,
+%  and $\mathcal{F}_{PID_{U} \mapsto Account}$) as follows.
+%\begin{itemize}
+%\item
+%$\mathcal{F}_{ID_{U} \mapsto PID_U}$ and $\mathcal{F}_{PID_{U} \mapsto Account}$
+%    work together to ensure user identification,
+%    i.e.,
+%    derive identical $Account$ for a user in multiple logins at an RP.
+%
+%\item
+% $\mathcal{F}_{ID_{RP} \mapsto PID_{RP}}$ ensures RP designation,
+%    i.e., $PID_{RP}$ is enough to specify a certain RP.
+%\end{itemize}
 
 %  \item For an RP, $\mathcal{F}_{ID_{RP} \mapsto PID_{RP}}$ generates $PID_{RP}$s in multiple logins, and these  $PID_{RP}$s are independent to the IdP.
 %  \item For a user, $\mathcal{F}_{ID_{U} \mapsto PID_{U}}$ generates $PID_{U}$s in multiple logins at different RPs, and these $PID_{U}$s are independent to these RPs. $\mathcal{F}_{PID_{U} \mapsto Account}$ outputs $Account$s for a user at different RPs, and these $Account$ are independent to these RPs.
 %  \item For a user and an RP, $\mathcal{F}_{PID_{U} \mapsto Account}$ generates a unchanged $Account$ in multiple logins.
-
-\item
- $\mathcal{F}_{ID_{RP} \mapsto PID_{RP}}$ ensures RP designation,
-    i.e., $PID_{RP}$ is enough to specify a certain RP.
-\end{itemize}
 
 
 UPPRESSO designs three pseudo-identifiers (i.e., $PID_U$, $PID_{RP}$, and $Account$)
@@ -191,13 +197,13 @@ in a \emph{dynamical} and \emph{comprehensive} way,
 That is,
     for a certain user,
 in each login process at an RP,
-    $PID_U$ and $PID_{RP}$ vary,
-        to satisfying the requirements of privacy;
+    $PID_U$ and $PID_{RP}$ vary
+        to satisfy the requirements of privacy;
 but $PID_U$ and $PID_{RP}$ vary synchronously so that identical $Account$s are derived.
 In particular,
     the user and the RP negotiate $PID_{RP}$ based on $ID_{RP}$ in each login process,
-        and then $PID_{RP}$ is transmitted to the IdP.
-        The IdP generates $PID_U$ based on $ID_U$ and also $PID_{RP}$.
+        and then $PID_{RP}$ is transmitted by the user to the IdP.
+        Then, the IdP generates $PID_U$ based on $ID_U$ and also $PID_{RP}$.
 Moreover, the RP obtains a private trapdoor in the negotiation,
     which is used to compute $Account$ from $PID_U$.
 
@@ -233,7 +239,7 @@ Existing SSO solutions always depend on constant $ID_U$ in all identity proofs,
 UPPRESSO introduces trapdoor user identification,
     while an RP holds a trapdoor to derive the identical $Accout$ from dynamic $PID_{U}$s in identity proofs.
 Intuitively,
-this trapdoor also works in the generations of $PID_{RP}$ and $PID_U$
+this trapdoor also plays a part in the generations of $PID_{RP}$ and $PID_U$
 %    (i.e., $\mathcal{F}_{ID_{RP} \mapsto PID_{RP}}$ and $\mathcal{F}_{ID_{U} \mapsto PID_{U}}$),
     directly or indirectly.
 
@@ -266,19 +272,19 @@ $PID_{RP}$ is computed based on $ID_{RP}$ and the trapdoor,
 %To meet the above two principles, we need to construct three satisfying functions $\mathcal{F}_{ID_{RP} \mapsto PID_{RP}}$, $\mathcal{F}_{ID_{U} \mapsto PID_{U}}$ and $\mathcal{F}_{PID_{U} \mapsto Account}$, design the protocols between the user, RP and IdP to avoid the privacy leakage during message transmission, and implement the  processing at the user as  required by the transformed RP designation.
 
 
-\subsection{Existing SSO Solutions}
+\subsection{Existing Privacy-Preserving SSO Solutions}
 We use the framework of identifier transformation in Figure \ref{fig:IDCorrelation}
-    to explain the designs of different SSO solutions.
+    to explain the designs of existing SSO solutions.
 First of all,
     when $PID_U = ID_U$ and $PID_{RP} = ID_{RP}$,
-    this framework describes commonly-adopted OpenID Connect.
-It is also applicable to explain the approaches of existing privacy-preserving SSO solutions,
+    this framework describes the basic SSO services.
+It is also applicable to explain the approaches of privacy-preserving SSO systems,
     including PPID \cite{OpenIDConnect}, BrowserID \cite{BrowserID} and SPRESSO \cite{SPRESSO}.
 
 % and explain why they cannot prevent both IdP-based login tracing and RP-based identity linkage.
 
 \begin{table}[tb]
-    \caption{Three functions in privacy-preserving SSO.}
+    \caption{Identifier-transformation in privacy-preserving SSO.}
     \centering
     \setlength{\tabcolsep}{0.5mm}
     \begin{tabular}{|c|c|c|c|}
@@ -325,11 +331,11 @@ The IdP by itself maintains the deterministic mapping from $ID_U$ to $PID_U$ dis
 %
 
 SPRESSO and BrowserID prevent only IdP-based login tracing but not RP-based identity linkage.
-In each login process of SPRESSO,
+In a login instance of SPRESSO,
  the RP generates $PID_{RP}$ by encrypting $ID_{RP}$ padded with a nonce (i.e., $PID_{RP} = Enc(RP_ID || nonce)$),
     and $PID_{RP}$ is forwarded by the user to the IdP,
     so that $ID_{RP}$ is kept unknown to the IdP and $PID_{RP}$ enables the verification of RP designation.
-The IdP of SPRESSO provides constant $ID_U$ in identity proofs for a user's multiple logins no matter which RP the user is visiting,
+The IdP of SPRESSO binds constant $ID_U$ in identity proofs for a user's multiple logins no matter which RP the user is visiting,
     and $Account = ID_U$.
 
 The IdP of BrowserID signs identity proofs binding only $ID_U$ but no $PID_{RP}$ or $ID_{RP}$ (i.e., $PID_{RP} = \bot$),
@@ -340,7 +346,7 @@ On the other hand,
 The identity proof signed by the IdP authorizes the user to sign subsidiary identity proofs,
     and subsidiary identity proofs are kept confidential to the IdP.
 $ID_U$ is bound in each identity proof of BrowserID,
-    and $Account = ID_U$.
+    and then $Account = ID_U$.
 
 As analyzed above,
     none of these solutions provides protections against both IdP-based login tracing and
