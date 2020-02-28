@@ -258,7 +258,8 @@ In this phase, the user and RP cooperative to generate $PID_{RP}$ as follows:
    %sends the calculated $PID_{RP}$ to the user (Step 2.1.6).
 %  \item The user checks the consistency of the received $PID_{RP}$ with the stored one.
 \end{itemize}
-During the process, the user will halt the login, if  the $Cert_{RP}$ is invalid.
+During the process, the user will halt the login, if  the $Cert_{RP}$ is invalid, nor the $N_{RP}$ is incorrect.
+The user's correctness check  of $N_{RP}$ ensures the order of $Y_{RP}$ (and $PID_{RP}$) is $q$, and prevents the malicious RP from choosing an arbitrary $Y_{RP}$ (then $PID_{RP}$) of a less order which will make it easier for the RP to derive the $ID_U$ from the $PID_U$.
  %or the received $PID_{RP}$ is different from the stored one. The RP also halts the process if the $PID_{RP}$ sent by the user is inconsistent with the calculated one.
 The user verifies that $PID_{RP} \neq g^0 \bmod p$;
     if $PID_{RP} = g^0 \bmod p$, it means that $N_U = 0 \bmod q$ or $N_{RP} = 0 \bmod q$
@@ -303,7 +304,7 @@ The IdP rejects the identity proof request, if the $PID_{RP}$ and the one-time e
 
 
 \vspace{1mm}\noindent\textbf{$\mathbf{Account}$ calculation.}
-Finally, RP derives the user's  $Account$ and completes the user's login as follows. 
+Finally, RP derives the user's  $Account$ and completes the user's login as follows.
 \begin{itemize}
 \item[4.1]
 The RP performs the checks on the identity proof, including the valid time, correctness of $Sig_{IdProof}$, and   the consistency between $PID_{RP}$ and the  negotiated one.
