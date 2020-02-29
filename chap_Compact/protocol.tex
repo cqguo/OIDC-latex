@@ -296,7 +296,7 @@ The user registers $PID_{RP}$ at the IdP as follows.
         where $Validity$ is the validity period.
 The IdP returns the signed response to the user.
   \item [2.3] The user forwards the registration result to the RP.
-  \item [2.4] The RP verifies the IdP's signature, and accepts it only if $PID_{RP}$ and $Hash(N_{RP}, N_U)$ match those in the negotiation and it is in the validity period..
+  \item [2.4] The RP verifies the IdP's signature, and accepts it only if $PID_{RP}$ and $Hash(N_{RP}, N_U)$ match those in the negotiation and it is in the validity period.
 \end{itemize}
 
 %If $RegRes$ is $OK$, the RP identifier refreshing completes. Otherwise, the user and RP will renegotiate the $PID_{RP}$.
@@ -316,8 +316,8 @@ In this phase, the RP continues the process of the user login and obtains $PID_U
   \item [3.2] The user first confirms the scope of the requested attributes and verifies $PID_{RP}$ with the negotiated one. The user replaces the endpoint with the registered one-time $Endpoint_U$, and sends the modified identity proof request to the IdP.
   \item [3.3] The IdP verifies whether $PID_{RP}$ and $Endpoint_U$ have been registered and unexpired, and
    calculates $PID_U = {PID_{RP}}^{ID_U} \bmod p$ for the authenticated user.
-\item [3.4] The IdP constructs and signs the identity proof $[PID_{RP}, PID_U, ValTime, Attr]_{SK}$, where $ValTime$ is the validity period, and $Attr$ contains the requested attributes. Then, the IdP sends the identity proof to the one-time endpoint at the user.
-  \item [3.5] The user extracts the RP endpoint in $Cert_RP$,
+\item [3.4] The IdP constructs and signs the identity proof $[PID_{RP}, PID_U, Iss, ValTime, Attr]_{SK}$, where $Iss$ is the identifier of the IdP,  $ValTime$ is the validity period, $Attr$ contains the requested attributes. Then, the IdP sends the identity proof to the one-time endpoint at the user.
+  \item [3.5] The user extracts the RP endpoint in $Cert_{RP}$,
    and forwards the identity proof to the RP through this endpoint.
 \end{itemize}
 The user halts the process if $PID_{RP}$ in the identity proof request is inconsistent with  the negotiated one.
@@ -328,7 +328,7 @@ The IdP rejects the identity proof request, if the pair of $PID_{RP}$ and $Endpo
 Finally, RP derives the user's  $Account$ and completes the user login as follows.
 \begin{itemize}
 \item[4.1]
-The RP performs verifies the identity proof, including the signature, the validity period, and the consistency between $PID_{RP}$ and the negotiated one.
+The RP verifies the identity proof, including the signature, the validity period, and the consistency between $PID_{RP}$ and the negotiated one.
 \item [4.2] The RP extracts $PID_U$, and calculates $Accout = {PID_U}^T \bmod p$; and sends the $Success$ as the login result to the user. If any fails, the RP rejects this login.
 \end{itemize}
 %
@@ -357,9 +357,10 @@ First of all,
 $PID_{RP}$ registration can be viewed as the RP dynamic registration flow of OIDC~\cite{DynamicRegistration},
     where an entity registers its identity and endpoint at the IdP.
 In UPPRESSO,
-    this process is launched by any authenticated user,
+    this process is launched by any authenticated user who provides a candidate of the identity,
+      the registration response includes a signature from the IdP,
         and the registration will become invalid after a validity period.
-These two differences will bring very small modifications.
+These differences will bring very small modifications.
 
 
 Identity proof generation and $Account$ calculation of UPPRESSO,
@@ -372,7 +373,7 @@ The calculation of $Account$ from $PID_U$ bound in the identity proof,
 The final modification is
     the replacement of endpoint by the user, to forward the identity proof to the RP.
 In fact, this message forwarding is common when an application-layer network proxy is deployed.
-So 
+So
 identity proof generation and $Account$ calculation of UPPRESSO,
     can be viewed as a particular but compatible implementation of the implicit protocol flow of OIDC.
 Finally,
