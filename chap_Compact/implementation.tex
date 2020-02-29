@@ -1,14 +1,21 @@
 \section{Implementation and Performance Evaluation}
 \label{sec:implementation}
-We have implemented the UPPRESSO prototype, and evaluated its performance by comparing with the original OIDC and SPRESSO which only prevents IdP-based login tracing.
+We have implemented the UPPRESSO prototype, 
+and evaluated its performance by comparing with the original OIDC which only prevents RP-based identity linkage, 
+ and SPRESSO which only prevents IdP-based login tracing.
 
 \subsection{Implementation}
 We adopt SHA-256 for digest generation, and  RSA-2048 for the signature generation. %in  the $Cert_{RP}$, identity proof and RP identifier refreshing result.
-We randomly choose a 2048-bit prime as $p$, a 256-bit prime as $q$, and a  $q$-order generator as $g$. The  $N_U$, $N_{RP}$ and $ID_U$  are 256-bit random numbers. Then, the discrete logarithm cryptography  provides equivalent security strength (i.e., 112 bits) as RSA-2048~\cite{barkerecommendation}.
-UPPRESSO includes the processing at the IdP, user and RP. The implementations at each entity are as follows.
+We randomly choose a 2048-bit prime as $p$, a 256-bit prime as $q$, and a  $q$-order generator as $g$.
+The  $N_U$, $N_{RP}$ and $ID_U$  are 256-bit random numbers.
+Then, the discrete logarithm cryptography  provides equivalent security strength (i.e., 112 bits) as RSA-2048~\cite{barkerecommendation}.
+UPPRESSO includes the processing at the IdP, user and RP.
+The implementations at each entity are as follows.
 
-The implementation of IdP only needs small modifications on existing OIDC implementation. The IdP is implemented based on MITREid Connect~\cite{MITREid}, an open-source OIDC Java implementation certificated by the OpenID Foundation~\cite{OIDF}.
-We add 3 lines Java code for generation of $PID_U$, 26 lines for converting the dynamic registration into RP identifier refreshing, i.e., checking $PID_{RP}$ provided by the RP and adding a signature $Sig_{Reg}$ in the response.  %25 lines for generation of signature in dynamic registration, modify 1 line for checking the registration token in dynamic registration, while
+The implementation of IdP only needs small modifications on existing OIDC implementation.
+The IdP is implemented based on MITREid Connect~\cite{MITREid}, an open-source OIDC Java implementation certificated by the OpenID Foundation~\cite{OIDF}.
+We add 3 lines Java code for generation of $PID_U$, 
+26 lines for converting the dynamic registration into $PID_{RP}$ registration, i.e., checking $PID_{RP}$ provided by the RP and adding a signature $Sig_{Reg}$ and validity period in the response.  %25 lines for generation of signature in dynamic registration, modify 1 line for checking the registration token in dynamic registration, while
 The calculations of $ID_{RP}$, $PID_U$ and RSA signature are implemented based on Java built-in cryptographic libraries (e.g., BigInteger).
 
 The user-side processing is implemented as a Chrome extension with about 330 lines JavaScript code, to provide the functions in Steps 1.3, 1.5, 2.1, 3.2 and 3.5.
@@ -17,11 +24,11 @@ This chrome extension requires permissions  \emph{chrome.tabs} and \emph{chrome.
 %send HTTPS request/reply and hijack the HTTPS responses, to obtain the RP's URL and communicate with IdP and RP.
 %and 30 lines  Chrome extension configuration files (specifying the required permissions, such as reading chrome tab information, sending the HTTP request, blocking the received HTTP response). to access to privileged fields of the Tab objects including
 Here, the cross-origin HTTPS requests sent by this chrome extension to the RP and IdP, will be blocked by Chrome due to the default same-origin security policy.
-To avoid this block, UPPRESSO modifies the IdP and RP, and sets \verb+chrome-extension://chrome-id+ (\verb+chrome-id+ is uniquely assigned by Google) in HTTPS header \verb+Access-Control-Allow-Origin+ of the IdP's and RP's responses.
+To avoid this block, UPPRESSO modifies the IdP and RP, and sets \verb+chrome-extension://chrome-id+ (\verb+chrome-id+ is uniquely assigned by Google) in \verb+Access-Control-Allow-Origin+ header of the IdP's and RP's responses.
 %Moreover, the chrome extension needs to construct cross-origin requests to communicate with the RP and IdP, which is forbidden by the default same-origin security policy. Therefore it is required to add the HTTP header \verb+Access-Control-Allow-Origin+ in the response of IdP and RP to accept only the request from the origin \verb+chrome-extension://chrome-id+ (\verb+chrome-id+ is uniquely assigned by the Google).
 
 We provide a Java SDK for RPs to integrate UPPRESSO.
-The SDK provides 2 functions to encapsulate RP's processings: one for  \emph{RP identifier transforming} and \emph{RP identifier refreshing} phases, and the other for \emph{$Account$ calculation} phase. %in Figure~\ref{fig:process}
+The SDK provides 2 functions to encapsulate RP's processings: one for  RP identifier transforming and $PID_{RP}$ registration, while the other for \emph{$Account$ calculation}. %in Figure~\ref{fig:process}
 The SDK is implemented based on the Spring Boot framework  with about 1100 lines code, and cryptographic computations are implemented based on Spring Security library.
 An RP only needs to invoke these two functions for the integration.
 
