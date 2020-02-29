@@ -2,16 +2,56 @@
 \label{sec:related}
 Various SSO  protocols have been proposed, such as, OIDC, OAuth 2.0, SAML, Central Authentication Service (CAS)~\cite{aubry2004esup} and Kerberos~\cite{Kerberos}.
 These protocols are widely adopted in Google, Facebook, Shibboleth project~\cite{Shibboleth}, Java applications and etc.
-And, plenty of works have been conducted on security analysis and privacy protection for SSO systems.
+And, plenty of works have been conducted on privacy protection and security analysis for SSO systems.
+
+\subsection{Privacy protection for SSO systems.}
+
+\noindent\textbf{Privacy-preserving SSO systems.}
+As suggested by NIST~\cite{NIST2017draft}, SSO systems should prevent both  RP-based identity linkage and IdP-based login tracing.
+The pairwise user identifier is adopted in SAML~\cite{SAML} and OIDC~\cite{OpenIDConnect}, and only prevents RP--based identity linkage;
+while SPRESSO~\cite{SPRESSO} and BrowserID~\cite{BrowserID} only prevent IdP-based login tracing.
+BrowserID is adopted in Persona~\cite{persona} and Firefox Accounts~\cite{FirefoxAccount}, however a formal analysis on Persona, found IdP-based accessing tracing could still succeed~\cite{FettKS14, BrowserID}.
+UPPRESSO prevents both the RP-based identity linkage and IdP-based accessing tracing, and could be integrated into OIDC which has been formally analyzed~\cite{FettKS17}.
+Moreover, OAuth and OIDC allow users to determine whether to provide an attribute to the RPs or not~\cite{ChenPCTKT14,YangLLZH16}.
+
+
+\noindent\textbf{Anonymous SSO systems.}
+Anonymous SSO schemes are designed to allow users to access a service (i.e. RP) protected by a verifier (i.e., IdP) without revealing their identity.
+One of the earliest anonymous SSO systems is proposed for Global System for Mobile (GSM) communication in 2008~\cite{ElmuftiWRR08}.
+The notion of anonymous SSO was formalized~\cite{WangWS13} in 2013.
+And, various cryptographic primitives, such as group signature, zero-knowledge proof and etc., were adopted to design anonymous SSO schemes~\cite{WangWS13,HanCSTW18}.
+Anonymous SSO schemes are designed for the anonymous services, and not applicable to common services.
+
 
 %破坏一个属性的尽量放在一起
 \subsection{Security analysis of SSO systems.}
-\noindent\textbf{Analysis on SSO implementations.} Various vulnerabilities were found in SSO implementations, and then exploited for impersonation and identity injection attacks by breaking the confidentiality, integrity or designation of identity proof.
-Wang et al.~\cite{WangCW12} analyzed the SSO implementations of Google and Facebook from the view of the browser relayed traffic, and found the adversary could manipulate the traffic to steal the identity proof. The browser's vulnerabilities could also be  exploited by malicious RPs to break the confidentiality of identity proof~\cite{ArmandoCCCPS13}.
+\noindent\textbf{Formal analysis on SSO standards.}
+The SSO standards (e.g., SAML, OAuth and OIDC) have been formally analyzed.
+Fett et al.~\cite{FettKS16, FettKS17} conducted the formal analysis on OAuth 2.0 and OIDC standards based on an expressive Dolev-Yao style model~\cite{FettKS14}, and proposed two new attacks, i.e., 307 redirect attack and IdP Mix-Up attack.
+When IdP misuses HTTP 307 status code for redirection, the sensitive information (e.g., credentials) entered at the IdP will be leaked to the RP by the user's browser.
+While, IdP Mix-Up attack confuses the RP about which IdP is used and makes the victim RP send the identity proof to the malicious IdP, 
+ which breaks the confidentiality of the identity proof.
+Fett et al.~\cite{FettKS16, FettKS17} proved that OAuth 2.0 and OIDC are secure once these two attacks  prevented.
+UPPRESSO could be integrated into OIDC, which simplifies its security analysis.
+
+
+\noindent\textbf{Single sign-off.}
+In SSO systems, once a user's IdP account is compromised, the adversary could hijack all her RPs' accounts.
+A backwards-compatible extension, named single sign-off, is proposed for OIDC.
+The single sign-off  allows the user to revoke all her identity proof and notify all RPs to freeze her accounts~\cite{GhasemisharifRC18}.
+The single sign-off could also be achieved in UPPRESSO, where the correct user needs to revoke the identity proofs at all RPs, as the IdP doesn't know which RPs the user visits.
+
+
+
+\noindent\textbf{Analysis on SSO implementations.}
+Various vulnerabilities were found in SSO implementations, and then exploited for impersonation and identity injection attacks.
+Wang et al.~\cite{WangCW12} analyzed the SSO implementations of Google and Facebook from the view of the browser relayed traffic, and found the adversary could manipulate the traffic to steal the identity proof, breaking the confidentiality of identity proof.
+The browser's vulnerabilities could also be  exploited by malicious RPs to break the confidentiality of identity proof~\cite{ArmandoCCCPS13}.
 The integrity has been tampered with in SAML, OAuth and OIDC systems ~\cite{SomorovskyMSKJ12,WangCW12,ZhouE14,WangZLG16,YangLLZH16,MainkaMS16, MainkaMSW17},
  due to various vulnerabilities, such as  XML Signature wrapping (XSW)~\cite{SomorovskyMSKJ12}, RP's incomplete verification~\cite{ZhouE14,WangZLG16,YangLLZH16} and etc.
 And, a dedicated, bidirectional authenticated secure channel was proposed to improve the confidentiality and integrity of identity proof~\cite{CaoSBKVC14}.
-The vulnerabilities were also found to break the designation, such as the incorrect binding  at IdPs~\cite{YangLCZ18} and insufficient verification at RPs~\cite{ZhouE14,WangZLG16,YangLLZH16}.
+The vulnerabilities were also found to break the RP designation, such as the incorrect binding  at IdPs~\cite{YangLCZ18} and insufficient verification at RPs~\cite{ZhouE14,WangZLG16,YangLLZH16}.
+The analysis of Google's SAML implementation~\cite{ArmandoCCCT08} found a vulnerability which could be exploited by the malicious RPs to reuse the identity proof at other RPs, which also breaks the RP designation.
 
 
 
@@ -46,8 +86,13 @@ Yang et al.~\cite{YangLCZ18} analysed the SDK implementation of OAuth 2.0, and a
 %ChenPCTKT14分析了authentication与authorization的区别（authentication的token必需与RP进行绑定，binding），并提出了移动端与web端单点登录的区别：缺少浏览器的重定向机制作为安全传输。在移动端系统中，面临的安全问题包括：使用未与RP绑定的token （binding），使用app之间的消息传递或者webview都是不安全的 （confidentiality），client-side logic（将app secret存储在客户端，在应用端可以使用access token换取用户信息，之后使用用户信息向RP证明用户的身份，这个用户信息可能被攻击者篡改，导致integrity）， 缺少明确的用户授权行为 （confidentiality）
 \end{comment}
 
-\noindent\textbf{Analysis on mobile SSO systems.} In mobile SSO systems, a new challenge is introduced in the identity proof transmission between mobile applications of RP and IdP. No unique identifier (such as DNS name in Web SSO) exist to designate the receiving mobile application, as the malicious application may register a same identifier with the victim at mobile OSes, to steal identity proof~\cite{WangZLLYLG15}. The IdP may provide an encapsulated WebView to be integrated in the RP's mobile application to simplify this transmission. However vulnerabilities were found in WebView~\cite{DBLPconfacsacLuoHDWY11}, and exploited by malicious RP's application to tamper with the communication between the WebView and IdP server~\cite{MohsenS16}.
-Automatic analyzing tools were proposed for mobile SSO systems, and plenty of vulnerabilities were found in the top Android applications to break the confidentiality and binding of identity proof~\cite{WangZLLYLG15,ShiWL19,MohsenS16,YangLS17}.
+\noindent\textbf{Analysis on mobile SSO systems.}
+In mobile SSO systems, a new challenge is introduced in the identity proof transmission between mobile applications of RP and IdP.
+No unique identifier (such as DNS name in Web SSO) exist to designate the receiving mobile application, as the malicious application may register a same identifier with the victim at mobile OSes, to steal identity proof~\cite{WangZLLYLG15}, breaking the confidentiality of identity proof.
+The IdP may provide an encapsulated WebView to be integrated in the RP's mobile application to simplify this transmission.
+However vulnerabilities were found in WebView~\cite{DBLPconfacsacLuoHDWY11}, and exploited by malicious RP's application to tamper with the communication between the WebView and IdP server~\cite{MohsenS16}, and then break the RP designation by providing an incorrect RP identifier.
+Ye et al.~\cite{YeBWD15} performed an analysis of  SSO implementations for Android, and found a vulnerability of Facebook Login which leaked the Facebook's session cookie to the  malicious RP applications.
+Automatic analyzing tools were proposed for mobile SSO systems, and plenty of vulnerabilities were found in the top Android applications to break the confidentiality and RP designation of identity proof~\cite{WangZLLYLG15,ShiWL19,MohsenS16,YangLS17}.
 
 
 %MohsenS16分析了在移动端使用webview实现SSO会导致恶意RP可以向WebView中插入JS代码获取用户的token （confidentiality），同时提供了对WebView的保护防止恶意RP获得token
@@ -59,22 +104,3 @@ Automatic analyzing tools were proposed for mobile SSO systems, and plenty of vu
 
 %YeBWD15在facebook的webview实现中，通过第三方应用获得facebook的cookie，使攻击者能够以受害者的身份登录facebook应用。we build a dummy app using the Facebook Login and we authorize the app with public profile permission. Then we used adb tool kit with root privilege to access to storage of the mobile phone. We successfully locate the cookies c_user and xs as well as the credential access_token. The cookies are stored in an sqlite database in mobile phone’s storage at path /data/data/<Apps package name> /databases/webviewCookiesChromium.db and the access_token is stored in an xml file at path /data/data/<App’s package name> /com.facebook.AuthorizationClient. WebViewAuthHandler.TOKEN\_STORE\_KEY.xml.
 
-\noindent\textbf{Formal analysis on SSO systems.} The SSO standards (e.g., SAML, OAuth and OIDC) and the typical implementations have been formally analyzed.
-Fett et al.~\cite{FettKS16, FettKS17} conducted the formal analysis on OAuth 2.0 and OIDC standards and proposed two new attacks, i.e., 307 redirect attack and IdP Mix-Up attack. When IdP misuses HTTP 307 status code for redirection, the sensitive information (e.g., credentials) entered at the IdP will  be leaked to the RP by the user's browser. While, IdP Mix-Up attack confuses the RP about which IdP is used and makes the victim RP send the identity proof to the malicious IdP.
-Fett et al.~\cite{FettKS16, FettKS17} proved that OAuth 2.0 and OIDC are secure once these two attacks  prevented. UPPRESSO could be integrated into OIDC, which simplifies its security analysis.
-The formal analysis of Google's SAML implementation~\cite{ArmandoCCCT08} found a vulnerability which could be exploited by the malicious RPs to reuse the identity proof at other RPs.
-Ye et al.~\cite{YeBWD15} performed a formal analysis of  SSO implementations for Android, and found a vulnerability of Facebook Login which leaked the Facebook's session cookie to the  malicious RP applications.
-
-
-\noindent\textbf{Single sign-off.} In SSO systems, once a user's IdP account is compromised, the adversary could hijack all her RPs' accounts. A backwards-compatible extension, named single sign-off, is proposed for OIDC. The single sign-off  allows the user to revoke all her identity proof and notify all RPs to freeze her accounts~\cite{GhasemisharifRC18}. The single sign-off could also be achieved in UPPRESSO, where the correct user needs to revoke the identity proofs at all RPs, as the IdP doesn't know which RPs the user visits.
-
-\subsection{Privacy protection for SSO systems.}
-
-\noindent\textbf{Privacy-preserving SSO systems.}
-As suggested in NIST SP800-63C~\cite{NIST2017draft}, SSO systems should prevent both  RP-based identity linkage and IdP-based login tracing. The pairwise user identifier is adopted in SAML~\cite{SAML} and OIDC~\cite{OpenIDConnect}, and only prevents RP--based identity linkage; while SPRESSO~\cite{SPRESSO} and BrowserID~\cite{BrowserID} only prevent  IdP-based login tracing. BrowserID is adopted in Persona~\cite{persona} and Firefox Accounts~\cite{FirefoxAccount}, however a formal analysis on Persona, found IdP-based accessing tracing could still succeed~\cite{FettKS14, BrowserID}. UPPRESSO prevents both the RP-based identity linkage and IdP-based accessing tracing, and could be integrated into OIDC which has been formally analyzed~\cite{FettKS17}. Moreover, OAuth and OIDC allow users to determine whether to provide an attribute to the RPs or not~\cite{ChenPCTKT14,YangLLZH16}.
-
-
-\noindent\textbf{Anonymous SSO systems.} Anonymous SSO schemes are designed to allow users to access a service (i.e. RP) protected by a verifier (i.e., IdP) without revealing their identity. One of the earliest anonymous SSO systems is proposed for Global System for Mobile (GSM) communication in 2008~\cite{ElmuftiWRR08}.
-The notion of anonymous SSO was formalized~\cite{WangWS13} in 2013.
-And, various cryptographic primitives, such as group signature, zero-knowledge proof and etc., were adopted to design anonymous SSO schemes~\cite{WangWS13,HanCSTW18}.
-Anonymous SSO schemes are designed for the anonymous services, and not applicable to common services.
