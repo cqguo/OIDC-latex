@@ -7,28 +7,35 @@ This section presents the analysis of security and privacy of UPPRESSO.
 We prove that the basic requirements of SSO system, i.e., user identification, RP designation, integrity and confidentiality, are still satisfied in UPPRESSO with the modifications on OIDC, whose security  has been formally analyzed in~\cite{FettKS17}.
 In the following, we analyze the affects of the modifications listed in Section~\ref{subsec:compatible}, respectively.
 
-The first modification is that the identity proof is bound with $PID_{RP}$ which is negotiated between the user and RP in RP identifier transformation, and registered at the IdP by the user in $PID_{RP}$ registration. 
-This may affect the RP designation, as the identity proof is bound with $PID_{RP}$ instead of $ID_{RP}$.
-However, in UPPRESSO, $PID_{RP}$ provides the same binding as $ID_{RP}$, which is achieved by the \textbf{transformed RP designation} through $\mathcal{F}_{ID_{RP} \mapsto PID_{RP}}$  with the protocols in  RP identifier transforming and $PID_{RP}$ registration.
-In OIDC, $ID_{RP}$ is used to ensure that  identity proof is only valid to the designated RP, as the correct IdP ensures that one $ID_{RP}$ is only assigned to one RP, and the correct RP only accepts the identity proof which has a same $ID_{RP}$ with the assigned one.
-In UPPRESSO, the $PID_{RP}$ is also unique
-and one $PID_{RP}$ is  only assigned to one RP when at least a correct user or correct RP exists, then identity proof bound with a $PID_{RP}$ is only valid to this RP. The detailed proofs are:
+The first modification is that the identity proof is bound with $PID_{RP}$,
+    which is negotiated between the user and the RP in RP identifier transformation
+     and then registered at the IdP by the user in $PID_{RP}$ registration.
+This may affect RP designation, as the identity proof binds $PID_{RP}$ instead of $ID_{RP}$.
+In OIDC $ID_{RP}$ is used to ensure that an identity proof is only valid to the designated RP,
+ as the IdP ensures $ID_{RP}$ is unique and the RP only accepts identity proofs binding $ID_{RP}$.
+In UPPRESSO $PID_{RP}$ provides the same binding as $ID_{RP}$ as follows,
+ which is achieved by \textbf{transformed RP designation} through $\mathcal{F}_{ID_{RP} \mapsto PID_{RP}}$.
+   % with the protocols in  RP identifier transforming and $PID_{RP}$ registration.
+%$PID_{RP}$ is also unique
+%    and one $PID_{RP}$ is  only assigned to one RP when at least a correct user or correct RP exists, then identity proof bound with a $PID_{RP}$ is only valid to this RP. The detailed proofs are:
 \begin{itemize} %correct beliving
-  \item The correct IdP ensures the the uniqueness of $PID_{RP}$, while the correct user checks this uniqueness through the $PID_{RP}$ registration directly, and the correct RP checks it based on the user-redirected $PID_{RP}$ registration result, which is signed by the IdP.
+  \item The IdP ensures the uniqueness of $PID_{RP}$ in $PID_{RP}$ registration.
+    And the $PID_{RP}$ registration result is signed by the IdP,
+        and verified by the user and the RP before the protocol moves on.
+%   while the correct user checks this uniqueness through the $PID_{RP}$ registration directly, and the correct RP checks it based on the user-redirected $PID_{RP}$ registration result, which is signed by the IdP.
    %文字加上 用户、RP、用户和RP合谋能够进行。 a malicious RP may control by itself or acting as a user of beliving RP. These two cannot succeed
-  \item The collusive RPs and users cannot make one specified (e.g., duplicated) $PID_{RP}$ be generated in the negotiation with a correct user or RP.
+  \item Collusive RPs and users cannot make one specified (e.g., duplicated) $PID_{RP}$ be generated in the negotiation with a correct user or RP.
   For example,  the malicious RP may attempt to misuse the received identity proof at another RP by acting as a user to negotiate a same $PID_{RP}$ with this target RP.
   However, this is prevented and the adversary cannot control the values of $PID_{RP}$ due to the cooperated function $\mathcal{F}_{ID_{RP} \mapsto PID_{RP}}$ and the protocol in RP identifier transforming.
   The RP chooses $N_{RP}$ before obtaining $N_{U}$ and cannot change $N_{RP}$ after receiving $N_U$, while the user choose $N_U$ for ${Y_{RP}}^{N_{u}} \bmod p$ before obtaining $N_{RP}$ and  cannot derive $N_{RP}$ from the $Y_{RP}$.
-  As $PID_{RP}$ is calculated based on two random numbers $N_{U}$ and $N_{RP}$, a same $PID_{RP}$ may indeed be generated in two negotiations,
+  \item   As $PID_{RP}$ is calculated based on two random numbers $N_{U}$ and $N_{RP}$, a same $PID_{RP}$ may indeed be generated in two negotiations,
    however the probability is $1/q$ ($\leqslant 2^{-255}$ when $q$ is a 256-bit prime), which is negligible.
-  \item Even when a same $PID_{RP}$ is generated for two or more RPs, it will be accepted by only one RP, due to the uniqueness check at IdP and the Hash($N_{RP}$, $N_U$) in $PID_{RP}$ registration. The RP only accepts the $PID_{RP}$ when the Hash($N_{RP}$, $N_U$) is correct.
+Even when a same $PID_{RP}$ is generated for two or more RPs, it will be accepted by only one RP, due to the uniqueness check at IdP and the Hash($N_{RP}$, $N_U$) in $PID_{RP}$ registration. The RP only accepts the $PID_{RP}$ when the Hash($N_{RP}$, $N_U$) is correct.
 \end{itemize}
 
-As analyzed above, the modifications on the RP dynamic registration flow of OIDC are necessary for \textbf{transformed RP designation},
- and obviously never affect any other requirement of SSO systems.
+%As analyzed above, the modifications on the RP dynamic registration flow of OIDC are necessary for \textbf{transformed RP designation}, and obviously never affect any other requirement of SSO systems.
 
-The calculations of $PID_U$ at the IdP and $Account$ at the RP may affect user identification, 
+The calculations of $PID_U$ at the IdP and $Account$ at the RP may affect user identification,
  which is still ensured in UPPRESSO by the \textbf{trapdoor user identification} provided by $\mathcal{F}_{ID_{RP} \mapsto PID_{RP}}$, $\mathcal{F}_{ID_{U} \mapsto PID_{U}}$ and $\mathcal{F}_{PID_{U} \mapsto Account}$.
 In OIDC, the RP uniquely identifies a user based on the identifier from the IdP, who provides a unique and identical identifier for a user $ID_U$ at an RP.
 In UPPRESSO,  the correct RP  derives an identical value $Accout = {PID_U}^T = {ID_{RP}}^{ID_U} \bmod p$  for a user's multiple logins, as shown in Equation~\ref{equ:AccountNotChanged};
@@ -55,12 +62,12 @@ Therefore, UPPRESSO provides the secure SSO service.
 In this section, we prove that UPPRESSO prevents the IdP-based login tracing and RP-based identity linkage.
 
 \noindent{\textbf{IdP-based login tracing prevention.}}
-UPPRESSO prevents the IdP-based login tracing, the curious IdP cannot derive RP's identifying information from one login, 
+UPPRESSO prevents the IdP-based login tracing, the curious IdP cannot derive RP's identifying information from one login,
  nor associate the logins based on the visited RP.
 The detailed proofs are as follows.
 
 \emph{The IdP cannot derive RP's identifying information from any login.}
-UPPRESSO prevents the leakage of RP's identifying information in the generation of identity proof, 
+UPPRESSO prevents the leakage of RP's identifying information in the generation of identity proof,
  as the user provides the IdP a random string as the one-time endpoint instead of the RP's exact endpoint, and sends $PID_{RP}$ instead of $ID_{RP}$.
 \emph{From any $PID_{RP}$, the IdP cannot derive $ID_{RP}$}, as the IdP doesn't know $N_UN_{RP}$ and cannot determine which $ID_{RP}$ corresponds to this $PID_{RP}$.
 That is because,
@@ -68,15 +75,15 @@ for any given $PID_{RP}$, all the already-assigned $ID_{RP}$s could be the one c
 as for arbitrary $ID_{RP}$ there always exists $N_U$ and $N_{RP}$  making $PID_{RP}={ID_{RP}}^{N_UN_{RP} \bmod q} \bmod p$.
 We prove it in two steps.
 \begin{itemize}
-  \item First, for an arbitrary $PID_{RP}$ (denoted  as $g^{r_1N_1 \bmod q} \bmod p$, $N_1=N_{U1}N_{RP1} \bmod q$) 
+  \item First, for an arbitrary $PID_{RP}$ (denoted  as $g^{r_1N_1 \bmod q} \bmod p$, $N_1=N_{U1}N_{RP1} \bmod q$)
                and  an arbitrary  $ID_{RP}$ (denoted as $g^{r_2} \bmod p$, $r_2 \neq r_1$),
-               there always exists $N_2$ satisfying $r_2N_2=r_1N_1 \bmod q$. 
-               That's because $q$ is a prime and co-prime to any $r_2$, then there always exists $N_2^{'}$ making $r_2N_2^{'}=1\ mod\ q$, 
+               there always exists $N_2$ satisfying $r_2N_2=r_1N_1 \bmod q$.
+               That's because $q$ is a prime and co-prime to any $r_2$, then there always exists $N_2^{'}$ making $r_2N_2^{'}=1\ mod\ q$,
                and $N_2=(r_1N_1)N_2^{'} \bmod q$ making the equality hold.
-  \item Second, for the derived $N_2$, 
+  \item Second, for the derived $N_2$,
                there always exists two numbers $N_{U2}$ and $N_{RP2}$ satisfying $N_2= N_{U2}N_{RP2} \bmod q$.
-               That's because, $q$ is a prime and co-prime to any chosen $N_{U2}$, 
-                  there always exists a number $N_{RP2}^{'}$ making $N_{U2}N_{RP2}^{'}=1 \bmod q$, 
+               That's because, $q$ is a prime and co-prime to any chosen $N_{U2}$,
+                  there always exists a number $N_{RP2}^{'}$ making $N_{U2}N_{RP2}^{'}=1 \bmod q$,
                   and then exists $N_{RP2}= N_{RP2}^{'}N_2 \bmod q$ making $N_{U2}N_{RP2}=N_2 \bmod q$.
 \end{itemize}
 
@@ -87,41 +94,41 @@ We prove it in two steps.
 \emph{IdP cannot to determine whether two or more logins are for a same RP.} The only information that can be used for this classification is one-time endpoint and $PID_{RP}$. However, both one-time endpoints and $PID_{RP}$s are independent among the logins, guaranteed by the secure random number generators that used to generate one-time endpoints and $N_{U}$s at the correct user, and $N_{RP}$s at the correct RPs.
 
 \noindent{\textbf{RP-based identity linkage prevention.}}
-UPPRESSO prevents the RP-based identity linkage, 
- any malicious RPs cannot derive the user's identifying information (i.e., $ID_U$) from $PID_U$ and $Account$, 
+UPPRESSO prevents the RP-based identity linkage,
+ any malicious RPs cannot derive the user's identifying information (i.e., $ID_U$) from $PID_U$ and $Account$,
  nor associate a user's logins at different RPs.
 The detailed proofs are as follows.
 
 %one RP:   直接从PIDu->IDu, Account->IDu, PIDu&Account -> IDu,
-\emph{Any RP cannot derive $ID_U$ from one $PID_U$ and $Account$ without manipulating $Y_{RP}$s}, 
+\emph{Any RP cannot derive $ID_U$ from one $PID_U$ and $Account$ without manipulating $Y_{RP}$s},
       due to the one-way function $\mathcal{F}_{ID_{U} \mapsto PID_{U}}$.
 \begin{itemize}
-  \item For $PID_U$, it equals to ${PID_{RP}}^{ID_U} \bmod p$ according to $\mathcal{F}_{ID_{U} \mapsto PID_{U}}$, 
+  \item For $PID_U$, it equals to ${PID_{RP}}^{ID_U} \bmod p$ according to $\mathcal{F}_{ID_{U} \mapsto PID_{U}}$,
          and further transformed to $g^{rN_UN_{RP}ID_U \bmod q} \bmod p$ by combining $\mathcal{F}_{ID_{U} \mapsto PID_{U}}$, $\mathcal{F}_{ID_{RP} \mapsto PID_{RP}}$ with Equation~\ref{equ:IDRP}.
-      Here, $p$, $q$ and $g$ are public parameters, 
+      Here, $p$, $q$ and $g$ are public parameters,
         $PID_{RP}$, $N_{RP}$ and $N_U$ are known to the RP, while $r$ is secretly maintained by the IdP and never leaked to the RP.
-      Then, it is computational infeasible to calculate $ID_U$ from $PID_U$ 
+      Then, it is computational infeasible to calculate $ID_U$ from $PID_U$
             with all the known values (e.g., $PID_{RP}$, $g$ and etc.) due to the discrete logarithm problem.
-            
-  \item For $Account$, it equals to ${ID_{RP}}^{ID_U} \bmod p$ according to Equation~\ref{equ:AccountNotChanged}, 
-         and further transformed to $g^{rID_U \bmod q} \bmod p$ with Equation~\ref{equ:IDRP}. 
+
+  \item For $Account$, it equals to ${ID_{RP}}^{ID_U} \bmod p$ according to Equation~\ref{equ:AccountNotChanged},
+         and further transformed to $g^{rID_U \bmod q} \bmod p$ with Equation~\ref{equ:IDRP}.
         Same as the above analysis, it is also computational infeasible to calculate $ID_U$ from $Account$ with all the known values (e.g., $ID_{RP}$, $g$ and etc.).
-        
+
   \item The RP cannot infer $ID_U$ by combining $Account$ and $PID_U$.
         $Account$ and $PID_U$ are both generated from $ID_U$, however $Accout={PID_U}^T \bmod p$
-          where $T$ is a random value known to RP and independent with $ID_U$ 
+          where $T$ is a random value known to RP and independent with $ID_U$
            when the  RP doesn't manipulate $Y_{RP}$.
 \end{itemize}
 
 %one RP 多个login中的PIDu-> IDu, 多个login中的Account->IDu
-\emph{Any RP cannot derive $ID_U$ from multiple $PID_U$s and $Account$s without manipulating $Y_{RP}$s.} 
-      All these $Account$s are equal,  
+\emph{Any RP cannot derive $ID_U$ from multiple $PID_U$s and $Account$s without manipulating $Y_{RP}$s.}
+      All these $Account$s are equal,
       while any $PID_{U}$ (e.g., $PID_{U1}$) can be calculated from any other $PID_{U}$ (e.g., $PID_{U2}$) for the user at this RP,
       $PID_{U1}$=$PID_{U2}Account^{N_{U1}N_{RP1}-N_{U2}N_{RP2}} \bmod p$, where $N_{U2}$, $N_{RP2}$, $N_{U2}$ and $N_{RP2}$ are values known to the RP and independent with $ID_U$ when the the RP doesn't manipulate $Y_{RP}$s.
 
 %two or more RPs 合谋， 不提供错误值
 \emph{The collusive RPs cannot associate a user's $Account$s and $PID_U$s without manipulating $Y_{RP}$s.}
-     The collusive RPs may attempt to link a user's accounts  
+     The collusive RPs may attempt to link a user's accounts
        by checking whether the equality $Account_2$=$(Account_1)^{r_2/r_1} \bmod p$ holds for $Account_1$ at an RP $ID_{RP1} = g^{r_1} \bmod p$ and $Account_2$ at another RP $ID_{RP2} = g^{r_2} \bmod p$.
      But, the associating always fails, as RPs cannot derive $r$ (and therefore ${r_2/r_1}$) from $ID_{RP}$ due to the discrete logarithm problem.
      The collusive RPs cannot associate a user's  $PID_U$s either, due to the unknown $r$s.
@@ -133,20 +140,20 @@ The detailed proofs are as follows.
 %尽管不直接推导，Two or more RPs 合作associate user login （提供错误值、不提供错误值） provide an incorrect $N_{RP}$ in $\mathcal{F}_{ID_{RP} \mapsto PID_{RP}}$
 %Now, we consider malicious RPs.
 \emph{Any malicious RP cannot derive $ID_U$ and collusive RPs cannot associate $PID_U$s ($Account$s), with manipulating $Y_{RP}$s.}
-A malicious RP may attempt to manipulate $Y_{RP}$s in one or multiple logins 
+A malicious RP may attempt to manipulate $Y_{RP}$s in one or multiple logins
     to make the generated $PID_U$s or $Account$s be vulnerable for deriving $ID_U$,
-and the collusive RPs may attempt to manipulate $Y_{RP}$s cooperatively 
+and the collusive RPs may attempt to manipulate $Y_{RP}$s cooperatively
     to make a user's $PID_U$s or $Account$s be associated at these RPs and then to associate a user's multiple logins.
 Here, $Y_{RP}$s are the only values controlled by the RPs.
 The $Y_{RP}$ must be in the form of ${ID_{RP}}^{N_{RP}} \bmod p$, which is checked by the correct user with the provided $N_{RP}$.
 Then, the malicious RPs can only manipulate $N_{RP}$s.
-However, the manipulation on $N_{RP}$ is masked by $N_U$ in $PID_U$ 
+However, the manipulation on $N_{RP}$ is masked by $N_U$ in $PID_U$
   due to cooperative function $\mathcal{F}_{ID_{RP} \mapsto PID_{RP}}$,
      and has no effect on $Account$ as shown in Equation~\ref{equ:AccountNotChanged}.
 \begin{itemize}
-  \item For $PID_U$, it equals to ${PID_{RP}}^{ID_U} \bmod p$ and $g^{rN_UN_{RP}ID_U \bmod q} \bmod p$. 
-         The RP cannot control $PID_{RP}$ as it generates $N_{RP}$ before obtaining $N_U$ 
-            and cannot change $N_{RP}$ after obtaining $N_U$. 
+  \item For $PID_U$, it equals to ${PID_{RP}}^{ID_U} \bmod p$ and $g^{rN_UN_{RP}ID_U \bmod q} \bmod p$.
+         The RP cannot control $PID_{RP}$ as it generates $N_{RP}$ before obtaining $N_U$
+            and cannot change $N_{RP}$ after obtaining $N_U$.
          The random and independent $N_U$ prevents the RPs from controlling $PID_U$.
   \item For $Account$, it equals to ${ID_{RP}}^{ID_U} \bmod p$ and $g^{rID_U \bmod q} \bmod p$.
         Obviously, $Account$ is independent with $N_{RP}$ and cannot be controlled by any RP.
@@ -156,7 +163,7 @@ However, the manipulation on $N_{RP}$ is masked by $N_U$ in $PID_U$
 %victim user Account_v1 = ID_RP1^ID_Uv at RP1, malicious user Account_m1=ID_{RP1}^ID_Um
 %victim user Account_v2 = ID_RP2^ID_Uv at RP2, malicious user Account_m2=ID_{RP2}^ID_Um
 \emph{The collusive RPs and users cannot associate the victim user, with manipulating $Y_{RP}$s.}
-The RPs may collude with the users 
+The RPs may collude with the users
   and attempt to associate a victim user's $Account$s  at the different RPs
      based on the relation among the $Account$s of the malicious user and victim user.
 For example, at $ID_{RP1}$ and $ID_{RP2}$, the victim user's accounts are $Account_{v1}$ and $Account_{v2}$,
