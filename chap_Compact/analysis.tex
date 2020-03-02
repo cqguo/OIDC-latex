@@ -81,56 +81,60 @@ Therefore, UPPRESSO provides the secure SSO services.
 
 \subsection{Privacy}
 \label{subsec:privacy}
-In this section, we prove that UPPRESSO prevents the IdP-based login tracing and RP-based identity linkage.
+UPPRESSO prevents both IdP-based login tracing and RP-based identity linkage.
 
 \noindent{\textbf{IdP-based login tracing prevention.}}
-UPPRESSO prevents the IdP-based login tracing, the curious IdP cannot derive RP's identifying information from one login,
- nor associate the logins based on the visited RP.
-The detailed proofs are as follows.
-
-\emph{The IdP cannot derive RP's identifying information from any login.}
-UPPRESSO prevents the leakage of RP's identifying information in the generation of identity proof,
+%UPPRESSO prevents IdP-based login tracing;    that is, the curious IdP cannot derive any information about the RP identity from one login, nor associate the logins based on the visited RP.
+%The detailed proofs are as follows.
+%
+\emph{The IdP cannot obtain any information about the visited RP from any login,}
+%UPPRESSO prevents the leakage of RP's identifying information in the generation of identity proof,
  as the user provides the IdP a random string as the one-time endpoint instead of the RP's exact endpoint, and sends $PID_{RP}$ instead of $ID_{RP}$.
-\emph{From any $PID_{RP}$, the IdP cannot derive $ID_{RP}$}, as the IdP doesn't know $N_UN_{RP}$ and cannot determine which $ID_{RP}$ corresponds to this $PID_{RP}$.
-That is because,
-for any given $PID_{RP}$, all the already-assigned $ID_{RP}$s could be the one corresponding to it,
-as for arbitrary $ID_{RP}$ there always exists $N_U$ and $N_{RP}$  making $PID_{RP}={ID_{RP}}^{N_UN_{RP} \bmod q} \bmod p$.
-We prove it in two steps.
-\begin{itemize}
-  \item First, for an arbitrary $PID_{RP}$ (denoted  as $g^{r_1N_1 \bmod q} \bmod p$, $N_1=N_{U1}N_{RP1} \bmod q$)
-               and  an arbitrary  $ID_{RP}$ (denoted as $g^{r_2} \bmod p$, $r_2 \neq r_1$),
+From any $PID_{RP}$, the IdP cannot derive $ID_{RP}$, as the IdP doesn't know $N_UN_{RP}$ and cannot determine which $ID_{RP}$ corresponds to this $PID_{RP}$.
+For a given $PID_{RP}$, any $ID_{RP} = g^r$ could find $N$ satisfying $PID_{RP}={ID_{RP}}^{N} \bmod p$ as follows.
+ % as for arbitrary $ID_{RP}$ there always exists $N_U$ and $N_{RP}$  making $PID_{RP}={ID_{RP}}^{N_UN_{RP} \bmod q} \bmod p$.
+ %We prove it in two steps.
+%\begin{itemize}
+ % \item 
+
+Let's assume $PID_{RP} = g^{r_1N_1 \bmod q} \bmod p$ and $N_1=N_{U1}N_{RP1} \bmod q$.
+Then, % First, for an arbitrary $PID_{RP}$ (denoted  as $g^{r_1N_1 \bmod q} \bmod p$, $N_1=N_{U1}N_{RP1} \bmod q$)
+               for any $ID_{RP} = g^{r_2} \bmod p$, $r_2 \neq r_1$),
                there always exists $N_2$ satisfying $r_2N_2=r_1N_1 \bmod q$.
-               That's because $q$ is a prime and co-prime to any $r_2$, then there always exists $N_2^{'}$ making $r_2N_2^{'}=1\ mod\ q$,
+Because $q$ is a prime and co-prime to any $r_2$, 
+    there always exists $N_2^{'}$ satisfying $r_2N_2^{'}=1\ mod\ q$,
                and $N_2=(r_1N_1)N_2^{'} \bmod q$ making the equality hold.
-  \item Second, for the derived $N_2$,
-               there always exists two numbers $N_{U2}$ and $N_{RP2}$ satisfying $N_2= N_{U2}N_{RP2} \bmod q$.
-               That's because, $q$ is a prime and co-prime to any chosen $N_{U2}$,
-                  there always exists a number $N_{RP2}^{'}$ making $N_{U2}N_{RP2}^{'}=1 \bmod q$,
-                  and then exists $N_{RP2}= N_{RP2}^{'}N_2 \bmod q$ making $N_{U2}N_{RP2}=N_2 \bmod q$.
-\end{itemize}
+%  \item Second, for the derived $N_2$,
+%               there always exists two numbers $N_{U2}$ and $N_{RP2}$ satisfying $N_2= N_{U2}N_{RP2} \bmod q$.
+%               That's because, $q$ is a prime and co-prime to any chosen $N_{U2}$,
+%                  there always exists a number $N_{RP2}^{'}$ making $N_{U2}N_{RP2}^{'}=1 \bmod q$,
+%                  and then exists $N_{RP2}= N_{RP2}^{'}N_2 \bmod q$ making $N_{U2}N_{RP2}=N_2 \bmod q$.
+%\end{itemize}
 
 
 %对已分配的ID_{RP}中的每一个值, 需要遍历所有q个value，才能确定其是否能够生成相应的PID_{RP}，这是计算不可信的；而且对于一个PID_{RP}而言，可能有不止一个ID_{RP} 与之对应; 以下是针对乘法子群不同的可能，即不规定生成元的情况。
 %As the IdP doesn't know the value $n_U*n_{RP}$, the IdP has to calculate all the ${ID_{RP}}^x\ mod\ p, x\in[1, q-1]$ for each one of the already assigned $ID_{RP}$s, to determine whether this $ID_{RP}$ is a possible one corresponding to the received $PID_{RP}$. This is computational infeasible as $q$ is too large ($q>2^{N-1}$, $N\geq 256$). Moreover, there may be two or even more possible ones which  are indistinguishable to the IdP. For example, if the received $PID_{RP}$ is $g^{7}$ where $g$ is a generator and $q$ is 11, both $g^{2}$ and $g^{3}$ are the possible values for $ID_{RP}$ where the corresponding $n_U*n_{RP}$ are 9 and 6 respectively.
 
-\emph{IdP cannot to determine whether two or more logins are for a same RP.} The only information that can be used for this classification is one-time endpoint and $PID_{RP}$. However, both one-time endpoints and $PID_{RP}$s are independent among the logins, guaranteed by the secure random number generators that used to generate one-time endpoints and $N_{U}$s at the correct user, and $N_{RP}$s at the correct RPs.
+\emph{IdP cannot to determine whether two or more logins are at a same RP.}
+The only information that can be used for this classification is one-time endpoint and $PID_{RP}$. However, both one-time endpoints and $PID_{RP}$s are independent among the logins, guaranteed by the secure random number generators that used to generate one-time endpoints and $N_{U}$s at the correct user, and $N_{RP}$s at the correct RPs.
 
 \noindent{\textbf{RP-based identity linkage prevention.}}
-UPPRESSO prevents the RP-based identity linkage,
- any malicious RPs cannot derive the user's identifying information (i.e., $ID_U$) from $PID_U$ and $Account$,
- nor associate a user's logins at different RPs.
-The detailed proofs are as follows.
-
+%UPPRESSO prevents the RP-based identity linkage,
+% any malicious RPs cannot derive the user's identifying information (i.e., $ID_U$) from $PID_U$ and $Account$,
+% nor associate a user's logins at different RPs.
+%The detailed proofs are as follows.
+%
+%
 %one RP:   直接从PIDu->IDu, Account->IDu, PIDu&Account -> IDu,
-\emph{Any RP cannot derive $ID_U$ from one $PID_U$ and $Account$ without manipulating $Y_{RP}$s},
-      due to the one-way function $\mathcal{F}_{ID_{U} \mapsto PID_{U}}$.
+\emph{Any RP cannot derive $ID_U$ from one $PID_U$ and $Account$ without manipulating $Y_{RP}$s.}
+ %      due to the one-way function $\mathcal{F}_{ID_{U} \mapsto PID_{U}}$.
 \begin{itemize}
-  \item For $PID_U$, it equals to ${PID_{RP}}^{ID_U} \bmod p$ according to $\mathcal{F}_{ID_{U} \mapsto PID_{U}}$,
-         and further transformed to $g^{rN_UN_{RP}ID_U \bmod q} \bmod p$ by combining $\mathcal{F}_{ID_{U} \mapsto PID_{U}}$, $\mathcal{F}_{ID_{RP} \mapsto PID_{RP}}$ with Equation~\ref{equ:IDRP}.
+  \item For $PID_U = {PID_{RP}}^{ID_U} = g^{rN_UN_{RP}ID_U \bmod q} \bmod p$.
       Here, $p$, $q$ and $g$ are public parameters,
         $PID_{RP}$, $N_{RP}$ and $N_U$ are known to the RP, while $r$ is secretly maintained by the IdP and never leaked to the RP.
       Then, it is computational infeasible to calculate $ID_U$ from $PID_U$
-            with all the known values (e.g., $PID_{RP}$, $g$ and etc.) due to the discrete logarithm problem.
+           % with all the known values (e.g., $PID_{RP}$, $g$ and etc.)
+           due to the discrete logarithm problem.
 
   \item For $Account$, it equals to ${ID_{RP}}^{ID_U} \bmod p$ according to Equation~\ref{equ:AccountNotChanged},
          and further transformed to $g^{rID_U \bmod q} \bmod p$ with Equation~\ref{equ:IDRP}.
