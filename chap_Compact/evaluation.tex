@@ -28,8 +28,8 @@ The RPs in all the three schemes provide the same function, i.e.,   extracting t
 We have measured the time for a user's login at an RP, and calculated the average values of $1000$ measurements.
 For better analysis, we divide a login into 4 phases according to the lifecycle of identity proof:
  \textbf{Identity proof requesting} (Steps 1.1-3.2 in Figure~\ref{fig:process}), RP (and user) constructing and transmitting the request to IdP;
- \textbf{Identity proof generation} (Steps 3.3 and 3.4-generation in Figure~\ref{fig:process}), IdP generating identity proof (no user authentication);
- \textbf{Identity proof extraction} (Steps 3.4-transmission and 3.5 in Figure~\ref{fig:process}), RP server extracts the identity proof from the IdP;
+ \textbf{Identity proof generation} (Steps 3.3 and 3.4 in Figure~\ref{fig:process}), IdP generating identity proof (no user authentication);
+ \textbf{Identity proof extraction} (Steps 3.4 and 3.5 in Figure~\ref{fig:process}), RP server extracts the identity proof from the IdP;
  and \textbf{Identity proof verification} (Steps 4.1 and 4.2 in Figure~\ref{fig:process}), RP verifying and parsing the identity proof.
 
 \noindent\textbf{Results.}
@@ -45,7 +45,7 @@ The details are as follows.
 \end{figure}
 
 In the requesting, UPPRESSO requires the user and RP to perform 2 and 2  modular exponentiations respectively for RP identifier transformation
-and complete $PID_{RP}$ registration at the IdP, which totally needs 144 ms;
+and complete $PID_{RP}$ registration at the IdP, which totally need 144 ms;
 SPRESSO needs 19 ms for the RP to obtain IdP's public key and encrypt its domain;
 while MITREid Connect only needs 10 ms.
 
@@ -59,8 +59,8 @@ And, then the overall time in SPRESSO will be 269 ms, still larger than 254 ms i
 In the identity proof extraction, UPPRESSO only needs 14 ms where the Chrome extension relays the identity proof to the RP server directly.
 MITREid Connect requires the IdP to send the identity proof to the RP's web page which then sends the proof to the RP server through a JavaScript function, and needs 57 ms.
 SPRESSO needs the longest time (193 ms) due to a complicated processing at the user's browser,
-  which needs the browser to obtain identity proofs from the IdP, download the JavaScript program from a trusted entity (named FWD), execute the program to decrypt RP's endpoint, send this endpoint to RP's web page who finally transmits the proof to RP server.
-In the evaluation,  FWD and IdP are deployed in one machine, which doesn't introduce performance degradation based on the observation. % as  FWD and IdP work sequently for one login.
+  which needs the browser to obtain identity proofs from the IdP, download the JavaScript program from a trusted entity (forwarder), execute the program to decrypt RP's endpoint, send identity proofs to this endpoint (an RP's web page) who finally transmits the proof to RP server.
+In the evaluation,  forwarder and IdP are deployed in one machine, which doesn't introduce performance degradation based on the observation. % as  FWD and IdP work sequently for one login.
 
 %SPRESSO needs a trusted entity named FWD for transmitting the identity proof. We deployed FWD and IdP on the same machine to reduce transmitting delay between them, while the computation never becomes the bottleneck according to the observation.
 

@@ -12,9 +12,9 @@ And, plenty of works have been conducted on privacy protection and security anal
 %Privacy problems in SSO have been widely recognized that, as suggested in NIST SP800-63C~\cite{NIST2017draft}, SSO systems should prevent both RP-based identity linkage and IdP-based login tracing. However, only a few solutions were proposed to protect user privacy so far. The pairwise user identifier, a simple design of function $\mathcal{F}_{ID_{U} \mapsto PID_{U}}$, has been specified in widely adopted deployed SSO standards, such as SAML~\cite{SAML} and OIDC~\cite{OpenIDConnect}. However, pairwise user identifier cannot prevent the IdP-based login tracing attack, as it doesn't adopt the function $\mathcal{F}_{ID_{RP} \mapsto PID_{RP}}$, therefore exposing $ID_{RP}$ to RP directly. To best of our knowledge, so far only SPRESSO~\cite{SPRESSO} and BrowserID~\cite{BrowserID} are proposed to prevent RP-based identity linkage by designing the individual function $\mathcal{F}_{ID_{RP} \mapsto PID_{RP}}$. However, neither SPRESSO nor BrowserID have proposed the function $\mathcal{F}_{ID_{U} \mapsto PID_{U}}$, which makes they are vulnerable to IdP-based login tracing. Moreover, there is no simple way to combine the existing function $\mathcal{F}_{ID_{U} \mapsto PID_{U}}$ and $\mathcal{F}_{ID_{RP} \mapsto PID_{RP}}$, as the dilemma is discussed in Section~\ref{**} which breaks the \textbf{user identification} in SSO system.
 As suggested by NIST~\cite{NIST2017draft}, SSO systems should prevent both  RP-based identity linkage and IdP-based login tracing.
 The pairwise user identifier is adopted in SAML~\cite{SAML} and OIDC~\cite{OpenIDConnect}, and only prevents RP--based identity linkage; while SPRESSO~\cite{SPRESSO} and BrowserID~\cite{BrowserID} only prevent  IdP-based login tracing.
-BrowserID is adopted in Persona~\cite{persona} and Firefox Accounts~\cite{FirefoxAccount}, however an analysis on Persona, found IdP-based accessing tracing could still succeed~\cite{FettKS14, BrowserID}.
+BrowserID is adopted in Persona~\cite{persona} and Firefox Accounts~\cite{FirefoxAccount}, however an analysis on Persona found IdP-based login tracing could still succeed~\cite{FettKS14, BrowserID}.
 UPPRESSO prevents both the RP-based identity linkage and IdP-based login tracing, and could be integrated into OIDC which has been formally analyzed~\cite{FettKS17}.
-Moreover, OAuth and OIDC allow users to determine the scope of attributes exposed to the RP.
+%Moreover, OAuth and OIDC allow users to determine the scope of attributes exposed to the RP.
 
 
 \noindent\textbf{Anonymous SSO systems.}
@@ -40,30 +40,30 @@ Fett et al.~\cite{FettKS16, FettKS17} proved that OAuth 2.0 and OIDC are secure 
 
 \noindent\textbf{Single sign-off.} In SSO systems, once a user's IdP account is compromised, the adversary could hijack all her RPs' accounts.
 A backwards-compatible extension, named single sign-off, is proposed for OIDC.
-The single sign-off  allows the user to revoke all her identity proof and notify all RPs to freeze her accounts~\cite{GhasemisharifRC18}.
-The single sign-off could also be achieved in UPPRESSO, where the correct user needs to revoke the identity proofs at all RPs, as the IdP doesn't know which RPs the user visits.
+The single sign-off  allows the user to revoke all her identity proofs and notify all RPs to freeze her accounts~\cite{GhasemisharifRC18}.
+The single sign-off could also be achieved in UPPRESSO, where the user needs to revoke the identity proofs at all RPs, as the IdP doesn't know which RPs the user visits.
 
 
 \noindent\textbf{Analysis on SSO implementations.}
 Various vulnerabilities were found in SSO implementations, and then exploited for impersonation and identity injection attacks by breaking the confidentiality~\cite{WangCW12,ccsSunB12,ArmandoCCCPS13,DiscoveringJCS,dimvaLiM16}, integrity~\cite{WangCW12,SomorovskyMSKJ12,WangZLG16,MainkaMS16, MainkaMSW17,dimvaLiM16} or RP designation~\cite{WangZLG16,MainkaMS16,MainkaMSW17,YangLCZ18,dimvaLiM16} of identity proof.
 Wang et al.~\cite{WangCW12} analyzed the SSO implementations of Google and Facebook from the view of the browser relayed traffic, and found logic flaws in IdPs and RPs to break the confidentiality and integrity of identity proof.
-An authentication flaw found in Google Apps~\cite{ArmandoCCCPS13}, allowed a malicious RP to hijack a user's authentication attempt and inject the malicious code to steal the cookie (or identity proof) for the targeted RP, breaking the confidentiality.
+An authentication flaw was found in Google Apps~\cite{ArmandoCCCPS13}, allowing a malicious RP to hijack a user's authentication attempt and inject the malicious code to steal the cookie (or identity proof) for the targeted RP, breaking the confidentiality.
 The integrity has been tampered with in SAML, OAuth and OIDC systems ~\cite{SomorovskyMSKJ12,WangCW12,WangZLG16,MainkaMS16, MainkaMSW17},
  due to various vulnerabilities, such as  XML Signature wrapping (XSW)~\cite{SomorovskyMSKJ12}, RP's incomplete verification~\cite{WangCW12,WangZLG16,MainkaMSW17}, IdP spoofing~\cite{MainkaMS16,MainkaMSW17} and etc.
 And, a dedicated, bidirectional authenticated secure channel was proposed to improve the confidentiality and integrity of identity proof~\cite{CaoSBKVC14}.
 The vulnerabilities were also found to break the RP designation, such as the incorrect binding  at IdPs~\cite{YangLCZ18,WangZLG16}, insufficient verification at RPs~\cite{MainkaMS16,MainkaMSW17,YangLCZ18}.
-Automatical tools, such as SSOScan~\cite{ZhouE14}, OAuthTester~\cite{YangLLZH16} and S3KVetter~\cite{YangLCZ18}, have been designed to detect vulnerabilities to break the confidentiality, integrity or RP designation of identity proof.
+Automatical tools, such as SSOScan~\cite{ZhouE14}, OAuthTester~\cite{YangLLZH16} and S3KVetter~\cite{YangLCZ18}, have been designed to detect vulnerabilities for breaking the confidentiality, integrity or RP designation of identity proof.
 
 
 
 \noindent\textbf{Analysis on mobile SSO systems.}
 %1.	WebSSO中有browser来完成，2. Mobile SSO中，system browser和webview无法识别RP、IdP App可能被重打包。
-In mobile SSO systems, the IdP App, IdP SDK (i.e. an encapsulated WebView) or system browser are adopted to redirect identity proof from IdP App to RP App.
-However, none of them was trusted to ensure the identity proof only be sent to the designated RP~\cite{ChenPCTKT14,WangZLLYLG15}, as WebView and  system browser cannot authenticate RP App while the IdP App may be repackaged.
+In mobile SSO systems, the IdP App, IdP-provided SDK (e.g., an encapsulated WebView) or system browser are adopted to redirect identity proof from IdP App to RP App.
+However, none of them was trusted to ensure that the identity proof could be only sent to the designated RP~\cite{ChenPCTKT14,WangZLLYLG15}, as WebView and  system browser cannot authenticate RP App while the IdP App may be repackaged.
 %A framework named SecureOAuth~\cite{MohsenS16} was proposed to harden the WebView-based SSO implementations in Android.
 %Ye et al.~\cite{YeBWD15} performed an analysis of  SSO implementations for Android, and found a vulnerability of Facebook Login which leaked the Facebook's session cookie to the  malicious RP applications.
 Moreover, the SSO protocols needed to be modified to provide SSO services for mobile Apps, however these modifications were not well understood by RP developers~\cite{ChenPCTKT14,YangLS17}.
-The top Android applications have been analyzed~\cite{TowardsShehabM14,ChenPCTKT14,WangZLLYLG15,YangLS17,ShiWL19}, and vulnerabilities were found break the confidentiality~\cite{TowardsShehabM14,ChenPCTKT14,WangZLLYLG15,YangLS17,ShiWL19}, integrity~\cite{ChenPCTKT14,YangLS17}, and RP designation~\cite{ChenPCTKT14,ShiWL19} of the identity proof.
+The top Android applications have been analyzed~\cite{TowardsShehabM14,ChenPCTKT14,WangZLLYLG15,YangLS17,ShiWL19}, and vulnerabilities were found to break the confidentiality~\cite{TowardsShehabM14,ChenPCTKT14,WangZLLYLG15,YangLS17,ShiWL19}, integrity~\cite{ChenPCTKT14,YangLS17}, and RP designation~\cite{ChenPCTKT14,ShiWL19} of identity proof.
 %Automatic analyzing tools, MoSSOT~\cite{ShiWL19}, was proposed to detect vulnerabilities in mobile SSO systems. %, and plenty of vulnerabilities were found in the top Android applications to break the confidentiality and RP designation of identity proof.
 
 

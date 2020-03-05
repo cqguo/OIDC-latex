@@ -17,7 +17,7 @@ The UPPRESSO IdP is implemented based on MITREid Connect~\cite{MITREid}, an open
 We add 3 lines of Java code to calculate $PID_U$,
 26 lines to the function of dynamic registration to support $PID_{RP}$ registration,
  i.e., checking $PID_{RP}$ and adding a signature and validity period in the response.  %25 lines for generation of signature in dynamic registration, modify 1 line for checking the registration token in dynamic registration, while
-The calculations of $PID_{RP}$, $PID_U$ and RSA signature are implemented based on Java built-in cryptographic libraries (e.g., BigInteger).
+The calculations of $ID_{RP}$, $PID_U$ and RSA signature are implemented based on Java built-in cryptographic libraries (e.g., BigInteger).
 
 The user-side processing is implemented as a Chrome extension with about 330 lines of JavaScript code, to provide the functions in Steps 1.3, 1.5, 2.1, 3.2 and 3.5.
 The cryptographic computation, e.g., $Cert_{RP}$ verification and $PID_{RP}$ negotiation, is implemented based on jsrsasign~\cite{jsrsasign}, an efficient JavaScript cryptographic library.
@@ -29,7 +29,7 @@ To avoid this block, UPPRESSO modifies the IdP and RP, and sets \verb+chrome-ext
 %Moreover, the chrome extension needs to construct cross-origin requests to communicate with the RP and IdP, which is forbidden by the default same-origin security policy. Therefore it is required to add the HTTP header \verb+Access-Control-Allow-Origin+ in the response of IdP and RP to accept only the request from the origin \verb+chrome-extension://chrome-id+ (\verb+chrome-id+ is uniquely assigned by the Google).
 
 We provide a Java SDK for RPs to integrate UPPRESSO.
-The SDK provides 2 functions to encapsulate RP's processings: one for  RP identifier transforming and $PID_{RP}$ registration, while the other for $Account$ calculation. %in Figure~\ref{fig:process}
+The SDK provides 2 functions to encapsulate RP's processings: one for  RP identifier transformation, $PID_{RP}$ registration and identity proof request generation; while the other for identity proof verification and $Account$ calculation. %in Figure~\ref{fig:process}
 The SDK is implemented based on the Spring Boot framework  with about 1100 lines code, and cryptographic computations are implemented based on Spring Security library.
 An RP only needs to invoke these two functions for the integration.
 
