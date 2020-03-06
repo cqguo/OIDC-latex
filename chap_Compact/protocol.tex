@@ -188,10 +188,11 @@ This cannot be finished by the RP; otherwise, the IdP will associate $PID_{RP}$ 
 
 \subsection{SSO Login Flow of UPPRESSO}
 \label{sebsec:loginprocess}
-Figure~\ref{fig:process} shows the detailed SSO login protocol of UPPRESSO. %the SSO login sub-protocol provides the secure SSO service and prevents both the IdP-based login tracing and RP-based identity linkage.
+
+We illustrate the steps of the SSO login protocol of UPPRESSO in Figure~\ref{fig:process}, %the SSO login sub-protocol provides the secure SSO service and prevents both the IdP-based login tracing and RP-based identity linkage.
  % prevents the curious IdP from obtaining the RP's identifying information during the interchanges,
 %  and avoids the adversary to break the security and user's privacy.
-We describe the detailed processes as follows.
+and describe the detailed processes as follows.
 
 \begin{figure*}
   \centering
@@ -285,44 +286,21 @@ If any fails, the RP rejects this login.
 
 \subsection{Compatibility with OIDC}
 \label{subsec:compatible}
-The design of UPPRESSO can be easily integrated in the traditional SSO systems, %to  prevent the IdP-based login tracing and RP-based identity linkage.
-and it only requires small modifications to implement the SSO login flow of UPPRESSO (i.e., the most important protocol of UPPRESSO).
-Next, we compare it with OIDC to demonstrate the compatibility of UPPRESSO.
 
-First of all,
-    UPPRESSO doesn't introduce any new role, nor change the security assumptions on each role (i.e., user, IdP and RP).
-The SSO login flow of UPPRESSO is composed of four phases, namely,
-        RP identifier transformation, $PID_{RP}$ registration, identity proof generation, and $Account$ calculation.
-RP identifier transformation is conducted between a user and the RP, which is specific to UPPRESSO,
-    while the others adopt the communication patterns of some OIDC flows.
+As described above, the SSO login protocol of UPPRESSO follows a same logic flow of OIDC login protocol with small modifications to transform the identifiers. Next, we will discuss these necessary modifications and demonstrate its compatibility with OIDC. This indicates that it can be easily integrated with other commonly adopted SSO systems.
 
-$PID_{RP}$ registration can be viewed as the RP dynamic registration flow of OIDC~\cite{DynamicRegistration},
-    where an entity registers its identity and endpoint at the IdP.
-In UPPRESSO,
-    this process is launched by any authenticated user who provides an RP identifer,
-      the registration response includes a signature by the IdP,
-        and the registration will become invalid after a validity period.
-These differences (i.e., the RP identifier not provided by the IdP, the registration response signed by the IdP,
-    and the automatically-expired registration) bring very small modifications.
+First, UPPRESSO does not introduce any new role nor change the security assumptions for each role. %(i.e., user, IdP and RP).
+Moreover, among the four phases of its SSO login flow, only the RP identifier transformation phase is newly introduced by UPPRESSO, while the other three ($PID_{RP}$ registration, identity proof generation and $Account$ calculation) adopt similar communication pattern as OIDC flows.
 
+In particular, the $PID_{RP}$ registration phase can be viewed as a variant of the RP dynamic registration flow of OIDC~\cite{DynamicRegistration}, where an entity registers its identity and endpoint at the IdP. Different from OIDC, in UPPRESSO, this process can be launched by any authenticated user who obtains an RP identifier, the registration response includes a signature by the IdP, and the registration will become invalid after a validity period. However, these changes only require small modifications to the RP dynamic registration flow of OIDC.
+%These differences (i.e., the RP identifier not provided by the IdP, the registration response signed by the IdP, and the automatically-expired registration) bring very small modifications.
 
-Identity proof generation and $Account$ calculation of UPPRESSO,
-    finish the same steps as the implicit protocol flow of OIDC,
-        except some parameters are modified as follows.
-$ID_U$ is transformed to $PID_U$ by the IdP, and this modification is actually allowed in OIDC;
-    for example, PPID allows various ways to calculate $PID_U$ from $ID_U$.
-The calculation of $Account$ from $PID_U$ bound in the identity proof,
-    can be viewed as a customized step by the RP to derive its user account after the implicit protocol flow of OIDC ends.
-The final modification is
-    the replacement of endpoint by the user, to forward the identity proof to the RP.
-In fact, this message forwarding is common when an application-layer network proxy is deployed.
-So
-identity proof generation and $Account$ calculation of UPPRESSO,
-    can be viewed as a particular but compatible implementation of the implicit protocol flow of OIDC.
-Finally,
-    identity proof generation and $Account$ calculation of UPPRESSO,
-        can be also implemented as the authorization code flow of OIDC with small modifications,
-        which is discussed in Section \ref{sec:discussion}.
+The identity proof generation and $Account$ calculation phases adopt the same steps and functions as the implicit protocol flow of OIDC but calling a few different parameters. First, in identity proof generation, $PID_U$ transformed from $ID_U$ is used to replace $ID_U$, which is directly supported by OIDC, similar as in PPID approaches that also convert $ID_U$ into $PID_U$. The calculation of $Account$ from $PID_U$ %bound in the identity proof,
+can be viewed as a customized step by the RP to derive its user account after the implicit protocol flow of OIDC ends. Another modification is the replacement of endpoint by the user for transmitting the identity proof to the RP.
+In fact, this message forwarding is common when an application-layer network proxy is deployed. So,
+the identity proof generation and $Account$ calculation phases of UPPRESSO can be viewed as a particular but compatible implementation of the implicit protocol flow of OIDC.
+
+It is worth noting that the identity proof generation and $Account$ calculation phases of UPPRESSO can be also implemented as the authorization code flow of OIDC with small modifications, which will be discussed in Section \ref{sec:discussion}.
 
 %As shown in Figure~\ref{fig:process}, in UPPRESSO, the SSO protocol for identity proof is the same as in OIDC; the formats of identity proof and corresponding request are the same as in OIDC; the correctness checks on the identity proof request at the IdP (i.e., consistency of RP' identifier and endpoint with the registered one) are the same as in OIDC; the correctness checks on the identity proof (i.e., consistency of RP' identifier with the one in the request, integrity, validity time, freshness, and etc.) at the RP are the same as in OIDC.
 %The above modifications could be completed automatically for each login, without affecting other communication pattern.
