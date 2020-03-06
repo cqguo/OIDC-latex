@@ -158,14 +158,7 @@ At the same time, the RP obtains a private trapdoor in the negotiation,
 
 
 \subsection{Existing Privacy-Preserving SSO Solutions}
-We use the framework of identifier transformation in Figure \ref{fig:IDCorrelation}
-    to explain the designs of existing SSO solutions.
-First of all,
-    when $PID_U = ID_U$ and $PID_{RP} = ID_{RP}$,
-    this framework describes the basic SSO services.
-It is also applicable to explain the approaches of privacy-preserving SSO systems,
-    including PPID \cite{OpenIDConnect,SAMLIdentifier}, BrowserID \cite{BrowserID} and SPRESSO \cite{SPRESSO},
-    as shown in Table \ref{tbl:compare}.
+Next, we map three existing privacy-preserving SSO approaches (PPID \cite{OpenIDConnect,SAMLIdentifier}, BrowserID \cite{BrowserID} and SPRESSO \cite{SPRESSO}) to the identifier-transformation framework in Figure~\ref{fig:IDCorrelation} and explain their designs and potential privacy issues as shown in Table \ref{tbl:compare}. It is worth noting that when $PID_U = ID_U$ and $PID_{RP} = ID_{RP}$, this framework depicts the basic SSO services with no privacy protection.
 
 % and explain why they cannot prevent both IdP-based login tracing and RP-based identity linkage.
 
@@ -222,11 +215,8 @@ $\dag$: BrowserID binds null $PID_{RP}$ in the identity proofs by the IdP,
 
 % Various solutions~\cite{OpenIDConnect, SAMLIdentifier,BrowserID,SPRESSO}, are proposed, attempting to construct a secure and privacy-preserving SSO system.
 
-PPID prevents only RP-based identity linkage but not IdP-based login tracing,
-    where
-    $PID_{RP} = ID_{RP}$.
-The IdP by itself maintains the deterministic mapping from $ID_U$ to $PID_U$ which is distinct among different RPs,
-    and $Account = PID_U$.
+In PPID approaches, the IdP generates different $PID_U$s for a user to log into different RPs and maintains deterministic one-to-many mappings from $ID_U$ to $PID_U$s. Therefore, RP-based identity linkage is prevented. At each RP, $Account = PID_U$ ensures user identification. However, since $ID_{RP}$ is directly used in identity proofs ($PID_{RP} = ID_{RP}$), they cannot defend against IdP-based login tracing.
+
 
 %However, these scheme provide at most two satisfying functions, and therefore fail to prevent either the IdP-based login tracing or RP-based identity linkage.
 %\begin{itemize}
@@ -244,28 +234,11 @@ The IdP by itself maintains the deterministic mapping from $ID_U$ to $PID_U$ whi
 %Providing $ID_U$ to the RP, makes  the collusive RPs easily link the user's logins at different RPs.
 %
 
-SPRESSO and BrowserID prevent only IdP-based login tracing but not RP-based identity linkage.
-In a login instance of SPRESSO,
- the RP generates $PID_{RP}$ by encrypting $ID_{RP}$ padded with a nonce (i.e., $PID_{RP} = Enc(RP_ID || nonce)$),
-    and $PID_{RP}$ is forwarded by the user to the IdP,
-    so that $ID_{RP}$ is kept unknown to the IdP and $PID_{RP}$ enables the verification of RP designation.
-The IdP of SPRESSO binds constant $ID_U$ in identity proofs for a user's multiple logins no matter which RP the user is visiting,
-    and $Account = ID_U$.
+In SPRESSO, the RP generates $PID_{RP}$ by encrypting $ID_{RP}$ padded with a nonce %, i.e., $PID_{RP} = Enc(RP_ID || nonce)$,
+for each login session and forwards $PID_{RP}$ to the IdP through the user. With the corresponding nonce, the RP can verify the $PID_{RP}$ in the identity proof to ensure RP designation, while hiding $ID_{RP}$ from the IdP to defend against IdP-based login tracing. However, the IdP uses a constant $ID_U$ to generate identity proofs for each user regardless of which RP she requests to login to. As a result, SPRESSO is vulnerable to RP-based identity linkage, since $Account$ always equals to $ID_U$.
 
-The IdP of BrowserID signs identity proofs binding only $ID_U$ but no $PID_{RP}$ or $ID_{RP}$ (i.e., $PID_{RP} = \bot$),
-    and IdP-based login tracing is prevented.
-On the other hand,
- in order to ensure RP designation with null $PID_{RP}$,
-    $ID_{RP}$ is bound in the \emph{subsidiary} identity proof signed by the user instead of the IdP.
-The identity proof signed by the IdP authorizes the user to sign subsidiary identity proofs,
-    and subsidiary identity proofs are kept confidential to the IdP.
-$ID_U$ is bound in each pair of identity proof and subsidiary identity proof of BrowserID,
-    and $Account = ID_U$.
+The identity proofs in the BrowserID system include $ID_U$ but no RP information (i.e., $PID_{RP} = \bot$), therefore, it prevents IdP-based login tracing. To ensure RP designation, BrowserID requires the user to append a \emph{subsidiary} identity proof and sign it, where the identity proof signed by the IdP authorizes the user to sign the subsidiary identity proof. Obviously, $ID_U$ is tied to a pair of identity proof and subsidiary identity proof and passed to the RP. Therefore, $Account = ID_U$, which makes BrowserID vulnerable to RP-based identity linkage.
 
-As analyzed above,
-    none of these solutions provides protections against both IdP-based login tracing and
-        RP-based identity linkage.
-One of the reasons is that
-    they do not explicitly clarify three pseudo-identifiers (i.e., $PID_U$, $PID_{RP}$, and $Account$)
-        and then design $\mathcal{F}_{ID_{U} \mapsto PID_U}$,   $\mathcal{F}_{ID_{RP} \mapsto PID_{RP}}$,
-  and $\mathcal{F}_{PID_{U} \mapsto Account}$ comprehensively.
+As we can see, none of these approaches prevents IdP-based login tracing and RP-based identity linkage at the same time. This is because in each approach, three transformation functions $\mathcal{F}_{ID_{U} \mapsto PID_U}$, $\mathcal{F}_{ID_{RP} \mapsto PID_{RP}}$ and $\mathcal{F}_{PID_{U} \mapsto Account}$ are arbitrarily designed and function separately, which causes either $PID_{RP} = ID_{RP}$ or $Account = ID_U$.
+
+%they do not explicitly clarify three pseudo-identifiers (i.e., $PID_U$, $PID_{RP}$, and $Account$) and then design $\mathcal{F}_{ID_{U} \mapsto PID_U}$,   $\mathcal{F}_{ID_{RP} \mapsto PID_{RP}}$, and $\mathcal{F}_{PID_{U} \mapsto Account}$ comprehensively.
