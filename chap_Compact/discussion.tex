@@ -8,7 +8,7 @@ This section lists extended discussions of UPPRESSO and future works.
 \noindent{\textbf{Scalability.}} The adversary cannot exhaust $ID_{RP}$ and $PID_{RP}$.
 For $ID_{RP}$, it is generated only in RP's initial registration.
 For $PID_{RP}$,  in practice, we only need to ensure all $PID_{RP}$s are different among the unexpired identity proof (the number denoted as $n$). We assume that IdP doesn't perform the uniqueness check, and then calculate the probability that at least two $PID_{RP}$s are equal in these $n$ ones. The probability is $1-\prod_{i=0}^{n-1}(1-i/q)$ which increases with $n$.
-For an IdP with throughput $2*10^8$ req/s and valid period of identity proof set as 5 minutes, $n$ is less than $2^{36}$, then the probability is less than $2^{-183}$ for 256-bit $q$.
+For an IdP with throughput $2*10^8$ req/s, when the validity period of the identity proof ($PID_{RP}$) is set as 5 minutes, $n$ is less than $2^{36}$, then the probability is less than $2^{-183}$ for 256-bit $q$.
 Moreover, as this probability is negligible, the uniqueness check of $PID_{RP}$, i.e., the $PID_{RP}$ registration, could be removed in the SSO login process, and this optimization can be adopted when this negligible probability is acceptable by the users and RPs.
 
 %DoS
@@ -58,7 +58,7 @@ The opener handle of window B is preserved (i.e., window A) for the postMessage,
 
 
 %While USPRESS is designed for semi-honest IdP, it could be extended to prevent
-\noindent{\textbf{Malicious IdP mitigation.}} The IdP is assumed to assign unique $ID_{RP}$ in $Cert_{RP}$ for each RP and generate the correct $PID_U$ for each login. The malicious IdP may attempt to provide incorrect $ID_{RP}$ and $PID_U$, which could be prevented by integrating certificate transparency~\cite{rfc6962} and user's identifier check~\cite{SPRESSO}. With certificate transparency~\cite{rfc6962}, the monitors  check the uniqueness of $ID_{RP}$ among all the certificates stored in the log server. To prevent the malicious IdP from injecting a incorrect $PID_U$, the user could provide a nickname to the RP for an extra check as in SPRESSO~\cite{SPRESSO}.
+\noindent{\textbf{Malicious IdP mitigation.}} The IdP is assumed to assign a unique $ID_{RP}$ in $Cert_{RP}$ for each RP and generate the correct $PID_U$ for each login. The malicious IdP may attempt to provide the incorrect $ID_{RP}$ and $PID_U$, which could be prevented by integrating certificate transparency~\cite{rfc6962} and user's identifier check~\cite{SPRESSO}. With certificate transparency~\cite{rfc6962}, the monitors  check the uniqueness of $ID_{RP}$ among all the certificates stored in the log server. To prevent the malicious IdP from injecting any incorrect $PID_U$, the user could provide a nickname to the RP for an extra check as in SPRESSO~\cite{SPRESSO}.
 
 
 

@@ -1,7 +1,7 @@
 \section{The Design of UPPRESSO}
 \label{sec:UPPRESSO}
 This section provides the design of UPPRESSO.
-We firstly present the detailed functions of identifier transformation, for trapdoor user identification and transformed RP designation.
+We firstly present the detailed functions of identifier transformation, for transformed RP designation and trapdoor user identification.
 Then, we provide an overview of UPPRESSO and describe the protocols.
 We finally discuss the compatibility of UPPRESSO with OIDC.
 
@@ -45,7 +45,7 @@ $\mathcal{F}_{ID_{RP} \mapsto PID_{RP}}$ satisfies the following requirements. %
 First,
 it is computationally infeasible for
     the IdP to derive $ID_{RP}$ from $PID_{RP}$ due to the discrete logarithm problem.
-$N_{U}$ and $N_{RP}$  serves as nonces to ensure that (\emph{a}) $PID_{RP}$ is valid only for this login as well as the identity proof,
+$N_{U}$ and $N_{RP}$  serve as nonces to ensure that (\emph{a}) $PID_{RP}$ is valid only for this login as well as the identity proof,
      and (\emph{b}) the IdP cannot associate multiple ${PID_{RP}}$s for a same RP.
 Finally,
     the cooperation by the user and the RP prevents a single malicious entity from manipulating the value of $PID_{RP}$.
@@ -76,7 +76,7 @@ If $r$ is known to the RP,
 Finally, the RP derives $Account$ for the user %with the function $\mathcal{F}_{PID_{U} \mapsto Account}$
  as Equation~\ref{equ:Account}.
 Here, we define $T = (N_UN_{RP})^{-1} \bmod q$ as the RP's trapdoor.
-As $q$ is a prime number and $1< N_U, N_{RP} < q$, $q$ is coprime to $N_U N_{RP}$, and there always exists $T$ that satisfies $T (N_U N_{RP}) = 1 \bmod q$.
+As $q$ is a prime number and $1< N_U, N_{RP} < q$, $q$ is coprime to $N_U N_{RP}$, and there always exists $T$ that satisfies $(N_U N_{RP}) T = 1 \bmod q$.
 
 \begin{equation}
    \mathcal{F}_{PID_{U} \mapsto Account}: Account = {PID_U}^{T} \bmod p
@@ -98,13 +98,6 @@ Similar to the analysis of $PID_U$,
         and
     collusive RPs cannot link a user's $Account$s at different RPs.
 
-\noindent\textbf{Trapdoor User Identification.} %is supported with these three functions.
-In a user's multiple logins, the RP expresses different $PID_U$s and has the corresponding $T$s,
- so that derives the identical $Account$.
-%$\mathcal{F}_{ID_{U} \mapsto PID_{U}}$ and $\mathcal{F}_{PID_{U} \mapsto Account}$
-The comprehensive design of identifier-transformation functions
- prevents collusive RPs from linking a user's $PID_U$s and $Account$s at different RPs, and therefore prevents RP-based identity linkage.
-
 \noindent\textbf{Transformed RP Designation.} %is also supported with $\mathcal{F}_{ID_{RP} \mapsto PID_{RP}}$ and $\mathcal{F}_{ID_{U} \mapsto PID_{U}}$, together
     % with  a user-centric verification. 放入到后面写！这里只是谈ID transformation
 $\mathcal{F}_{ID_{RP} \mapsto PID_{RP}}$ ensures that the user and RP cooperatively generate a fresh $PID_{RP}$ in each login,
@@ -114,6 +107,13 @@ The IdP will bind $PID_{U}$ with $PID_{RP}$ in the identity proof, which designa
 Finally, the transformed RP designation is provided through two phases.
 The function $\mathcal{F}_{ID_{RP} \mapsto PID_{RP}}$ prevents the curious IdP from linking $PID_{RP}$s of different logins at an RP, and therefore avoids IdP-based login tracing.
 
+\noindent\textbf{Trapdoor User Identification.} %is supported with these three functions.
+In a user's multiple logins, the RP expresses different $PID_U$s and has the corresponding $T$s,
+ so that derives the identical $Account$.
+%$\mathcal{F}_{ID_{U} \mapsto PID_{U}}$ and $\mathcal{F}_{PID_{U} \mapsto Account}$
+The comprehensive design of identifier-transformation functions
+ prevents collusive RPs from linking a user's $PID_U$s and $Account$s at different RPs, and therefore prevents RP-based identity linkage.
+
 \subsection{UPPRESSO Overview}
 \label{implementations}
 In addition to the identifier-transformation functions,
@@ -122,11 +122,11 @@ It is worthy noting that,
     in order to protect user privacy against both the IdP and the visited RP,
         these steps have to be conducted at the user.
 Firstly,
-    because the IdP is unaware of the visited RP and also the RP's endpoint to receive the identity proof,
+    because the IdP is unaware of the visited RP and also the RP endpoint to receive the identity proof,
         this endpoint shall be queried by the user from the trusted IdP indirectly to ensure confidentiality;
         otherwise, an incorrect endpoint leaks the identity proofs.
 In UPPRESSO this is implemented as an RP certificate signed by the IdP,
-    which is composed of $ID_{RP}$, the RP's endpoint and other supplementary information.
+    which is composed of $ID_{RP}$, the RP endpoint and other supplementary information.
 Then, the user determines the correct endpoint by itself,
     while in commonly-used OIDC systems, the endpoint is configured by the IdP.
 Secondly,
@@ -217,7 +217,7 @@ The IdP keeps $SK$ secret, while $p$, $q$, $g$ and $PK$ are public parameters.
 An RP registers itself at the IdP to request $ID_{RP}$ and $Cert_{RP}$ as follows:
 \begin{itemize}
 \item The RP sends a registration request to the IdP,
-    including the RP's endpoint (e.g., URL) to receive identity proofs.
+    including the RP endpoint (e.g., URL) to receive identity proofs.
 \item The IdP chooses a unique random number $r$ ($1 < r < q$), calculates $ID_{RP} = g^r \bmod p$,
 signs $[ID_{RP}, Endpoint_{RP}, *]$ using $SK$, where $*$ is  supplementary information such as the RP's common name,
 and returns $Cert_{RP} = [ID_{RP}, Endpoint_{RP}, *]_{SK}$ to the RP, where $[\cdot]_{SK}$ means a message signed using $SK$.
@@ -225,7 +225,7 @@ and returns $Cert_{RP} = [ID_{RP}, Endpoint_{RP}, *]_{SK}$ to the RP, where $[\c
 \end{itemize}
 
 Note that, $ID_{RP}$ cannot be chosen by the RP,
- and it must be chosen by the IdP and $r$ is kept unknown to the RP.
+  it must be chosen by the IdP and $r$ is kept unknown to the RP.
 On the contrary,
     $ID_U$ may be chosen by the user or the IdP,
     provided that it is unique for each user.

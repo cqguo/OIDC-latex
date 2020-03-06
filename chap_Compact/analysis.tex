@@ -97,9 +97,9 @@ For a given $PID_{RP}$, any $ID_{RP} = g^r \bmod p$ could find $N$ satisfying $P
 %\begin{itemize}
  % \item
 
-Let's assume $PID_{RP} = g^{r_1N_1 \bmod q} \bmod p$ and $N_1=N_{U1}N_{RP1} \bmod q$.
+Let's assume $PID_{RP} = g^{r_1N_1 \bmod q} \bmod p$ and $N_1=N_{U_1}N_{RP_1} \bmod q$.
 Then, % First, for an arbitrary $PID_{RP}$ (denoted  as $g^{r_1N_1 \bmod q} \bmod p$, $N_1=N_{U1}N_{RP1} \bmod q$)
-               for any $ID_{RP} = g^{r_2} \bmod p$, $r_2 \neq r_1$),
+               for any $ID_{RP} = g^{r_2} \bmod p$ ($r_2 \neq r_1 \bmod q$),
                there always exists $N_2$ satisfying $r_2N_2=r_1N_1 \bmod q$.
 Because $q$ is a prime and co-prime to any $r_2$,
     there always exists $N_2^{'}$ satisfying $r_2N_2^{'}=1\ mod\ q$,
@@ -115,8 +115,8 @@ Because $q$ is a prime and co-prime to any $r_2$,
 %对已分配的ID_{RP}中的每一个值, 需要遍历所有q个value，才能确定其是否能够生成相应的PID_{RP}，这是计算不可信的；而且对于一个PID_{RP}而言，可能有不止一个ID_{RP} 与之对应; 以下是针对乘法子群不同的可能，即不规定生成元的情况。
 %As the IdP doesn't know the value $n_U*n_{RP}$, the IdP has to calculate all the ${ID_{RP}}^x\ mod\ p, x\in[1, q-1]$ for each one of the already assigned $ID_{RP}$s, to determine whether this $ID_{RP}$ is a possible one corresponding to the received $PID_{RP}$. This is computational infeasible as $q$ is too large ($q>2^{N-1}$, $N\geq 256$). Moreover, there may be two or even more possible ones which  are indistinguishable to the IdP. For example, if the received $PID_{RP}$ is $g^{7}$ where $g$ is a generator and $q$ is 11, both $g^{2}$ and $g^{3}$ are the possible values for $ID_{RP}$ where the corresponding $n_U*n_{RP}$ are 9 and 6 respectively.
 
-\emph{IdP cannot to determine whether two or more logins are at a same RP.}
-The only information that can be used for this classification is one-time endpoint and $PID_{RP}$. However, both one-time endpoints and $PID_{RP}$s are independent among the logins, guaranteed by the secure random number generators that used to generate one-time endpoints and $N_{U}$s at the correct user, and $N_{RP}$s at the correct RPs.
+\emph{The IdP cannot determine whether two or more logins are at a same RP.}
+The only information that can be used for this classification is one-time endpoint and $PID_{RP}$. However, both one-time endpoints and $PID_{RP}$s are independent among the logins, guaranteed by the secure random number generators that used to generate one-time endpoints and $N_{U}$s at the benign user, and $N_{RP}$s at the benign RPs.
 
 \noindent{\textbf{RP-based identity linkage prevention.}}
 %UPPRESSO prevents the RP-based identity linkage,
@@ -141,15 +141,15 @@ The only information that can be used for this classification is one-time endpoi
 
   \item The RP cannot infer $ID_U$ by combining $Account$ and $PID_U$.
         $Account$ and $PID_U$ are both generated from $ID_U$, however $Accout={PID_U}^T \bmod p$
-          where $T$ is a random value known to RP and independent with $ID_U$
+          where $T$ is a random value known to the RP and independent with $ID_U$
            when the  RP doesn't manipulate $Y_{RP}$.
 \end{itemize}
 
 %one RP 多个login中的PIDu-> IDu, 多个login中的Account->IDu
 \emph{Any RP cannot derive $ID_U$ from multiple $PID_U$s and $Account$s without manipulating $Y_{RP}$s.}
       All these $Account$s are equal,
-      while any $PID_{U}$ (e.g., $PID_{U1}$) can be calculated from any other $PID_{U}$ (e.g., $PID_{U2}$) for the user at this RP,
-      $PID_{U1}$=$PID_{U2}Account^{N_{U1}N_{RP1}-N_{U2}N_{RP2}} \bmod p$, where $N_{U1}$, $N_{RP1}$, $N_{U2}$ and $N_{RP2}$ are values known to the RP and independent with $ID_U$ when the RP doesn't manipulate $Y_{RP}$s.
+      while any $PID_{U}$ (e.g., $PID_{U_1}$) can be calculated from any other $PID_{U}$ (e.g., $PID_{U_2}$) for the user at this RP,
+      $PID_{U_1}$=$PID_{U_2}Account^{N_{U_1}N_{RP_1}-N_{U_2}N_{RP_2}} \bmod p$, where $N_{U_1}$, $N_{RP_1}$, $N_{U_2}$ and $N_{RP_2}$ are values known to the RP and independent with $ID_U$ when the RP doesn't manipulate $Y_{RP}$s.
 
 %two or more RPs 合谋， 不提供错误值
 \emph{The collusive RPs cannot associate a user's $Account$s and $PID_U$s without manipulating $Y_{RP}$s.}
@@ -170,7 +170,7 @@ A malicious RP may attempt to manipulate $Y_{RP}$s in one or multiple logins
 and the collusive RPs may attempt to manipulate $Y_{RP}$s cooperatively
     to make a user's $PID_U$s or $Account$s be associated at these RPs and then to associate a user's multiple logins.
 Here, $Y_{RP}$s are the only values controlled by the RPs.
-The $Y_{RP}$ must be in the form of ${ID_{RP}}^{N_{RP}} \bmod p$, which is checked by the correct user with the provided $N_{RP}$.
+The $Y_{RP}$ must be in the form of ${ID_{RP}}^{N_{RP}} \bmod p$, which is checked by the benign user with the provided $N_{RP}$.
 Then, the malicious RPs can only manipulate $N_{RP}$s.
 However, the manipulation on $N_{RP}$ is masked by $N_U$ in $PID_U$
   due to cooperative function $\mathcal{F}_{ID_{RP} \mapsto PID_{RP}}$,
@@ -187,13 +187,13 @@ However, the manipulation on $N_{RP}$ is masked by $N_U$ in $PID_U$
 %和恶意用户合谋，但是仅仅是被动攻击。
 %victim user Account_v1 = ID_RP1^ID_Uv at RP1, malicious user Account_m1=ID_{RP1}^ID_Um
 %victim user Account_v2 = ID_RP2^ID_Uv at RP2, malicious user Account_m2=ID_{RP2}^ID_Um
-\emph{The collusive RPs and users cannot associate the victim user, with manipulating $Y_{RP}$s.}
+\emph{The collusive RPs and users cannot associate the victim user.}
 The RPs may collude with the users
   and attempt to associate a victim user's $Account$s  at the different RPs
      based on the relation among the $Account$s of the malicious user and victim user.
-For example, at $ID_{RP1}$ and $ID_{RP2}$, the victim user's accounts are $Account_{v1}$ and $Account_{v2}$,
- while the malicious user's ones are $Account_{m1}$ and $Account_{m2}$,
-  then the adversary may attempt to find whether exists a value $ID_{\Delta}$ satisfying both $Account_{m1}/Account_{v1}={ID_{RP1}}^{ID_{\Delta}} \bmod p$ and $Account_{m2}/Account_{v2}={ID_{RP2}}^{ID_{\Delta}} \bmod p$.
+For example, at $ID_{RP_1}$ and $ID_{RP_2}$, the victim user's accounts are $Account_{v_1}$ and $Account_{v_2}$,
+ while the malicious user's ones are $Account_{m_1}$ and $Account_{m_2}$,
+  then the adversary may attempt to find whether exists a value $ID_{\Delta}$ satisfying both $Account_{m_1}/Account_{v_1}={ID_{RP_1}}^{ID_{\Delta}} \bmod p$ and $Account_{m_2}/Account_{v_2}={ID_{RP_2}}^{ID_{\Delta}} \bmod p$.
 However, as $ID_U$s are independent while $ID_U$ is only known to the IdP and the corresponding user,
   the adversary cannot derive the victim user's $ID_U$ (and then $ID_{\Delta}$) for this association.
 
