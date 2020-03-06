@@ -1,11 +1,11 @@
-\section{Discussions and Future works}
+\section{Discussions and Future work}
 \label{sec:discussion}
 %We first discuss the scalability, security against DoS attack and OIDC authorization code flow support in UPPRESSO, and then present the extensions for UPPRESSO.
 
-This section lists extended discussions of UPPRESSO and future works.
+In this section, we discuss some related issues of  UPPRESSO such as its scalability and robustness against DoS attacks and our future work.
 
 %Scalbility
-\noindent{\textbf{Scalability.}} The adversary cannot exhaust $ID_{RP}$ and $PID_{RP}$.
+\vspace{1mm}\noindent{\textbf{Scalability.}} The adversary cannot exhaust $ID_{RP}$ and $PID_{RP}$.
 For $ID_{RP}$, it is generated only in RP's initial registration.
 For $PID_{RP}$,  in practice, we only need to ensure all $PID_{RP}$s are different among the unexpired identity proof (the number denoted as $n$). We assume that IdP doesn't perform the uniqueness check, and then calculate the probability that at least two $PID_{RP}$s are equal in these $n$ ones. The probability is $1-\prod_{i=0}^{n-1}(1-i/q)$ which increases with $n$.
 For an IdP with throughput $2*10^8$ req/s, when the validity period of the identity proof ($PID_{RP}$) is set as 5 minutes, $n$ is less than $2^{36}$, then the probability is less than $2^{-183}$ for 256-bit $q$.
@@ -22,7 +22,7 @@ The RP could previously calculated a set of $Y_{RP}$s to mitigate this attack.
 
 %授权码
 %兼容:目前只提供隐式模式,对其他模式与协议的兼容方法
-\noindent{\textbf{OIDC authorization code flow support.}} The privacy-preserving functions $\mathcal{F}_{ID_{U} \mapsto PID_{U}}$, $\mathcal{F}_{ID_{RP} \mapsto PID_{RP}}$ and $\mathcal{F}_{PID_{U} \mapsto Account}$ can be integrated into OIDC authorization code flow directly, therefore  RP-based identity linkage and IdP-based login tracing are still prevented during the construction and parsing of identity proof.
+\vspace{1mm}\noindent{\textbf{OIDC authorization code flow support.}} The privacy-preserving functions $\mathcal{F}_{ID_{U} \mapsto PID_{U}}$, $\mathcal{F}_{ID_{RP} \mapsto PID_{RP}}$ and $\mathcal{F}_{PID_{U} \mapsto Account}$ can be integrated into OIDC authorization code flow directly, therefore  RP-based identity linkage and IdP-based login tracing are still prevented during the construction and parsing of identity proof.
 The only privacy leakage is introduced by the transmission, as RP servers obtain the identity proof directly from the IdP in this flow, which allows the IdP to obtain RP's network information (e.g., IP address).
 UPPRESSO needs to integrate existing anonymous networks (e.g., Tor)  to prevent this leakage.
 
@@ -30,7 +30,7 @@ UPPRESSO needs to integrate existing anonymous networks (e.g., Tor)  to prevent 
 %Similar as SPRESSO, we can integrated for***
 %SPRESSO跨平台:我们目前的方案只在browser实现
 %我们现在的实现使得一个用户不需要在机器上存任何东西，只有装那个插件。这个实现可以进一步推广到这个插件都不用安装***
-\noindent{\textbf{Platform independent.}}
+\vspace{1mm}\noindent{\textbf{Platform independent.}}
 Our current implementation only requires the user to install a Chrome extension and doesn't need to store any persistent data at the user's machine.
 Moreover, the implementation could  be further extended to remove the Chrome extension, whose JavaScript program is then fetched from the honest IdP. The processing is similar as SPRESSO. That is, 1) the RP's window (window A)  opens a new iframe (window B) to visit the RP's web page, while the RP's web page redirects window B to the IdP; 2) window B downloads the JavaScript  program from the IdP and performs the processing in Steps 1.3, 1.5, 2.1, 3.2 and 3.5; 3) then postMessages are adopted to exchange messages between window A and B for Steps 1.2, 1.3, 1.4, 2.3, 3.1 and 3.5.
 The opener handle of window B is preserved (i.e., window A) for the postMessage, as window A  opens window B with a web page from the RP;
