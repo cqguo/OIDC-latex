@@ -80,10 +80,16 @@ public class ClientInformationResponseView extends AbstractView {
 		response.setStatus(code.value());
 
 		JsonObject o = ClientDetailsEntityJsonProcessor.serialize(c);
+		JsonObject content = new JsonObject();
+		content.addProperty("Result", "OK");
+		content.add("RegistrationInfo", o);
+		JsonObject output = new JsonObject();
+		output.add("Content", content);
+		output.addProperty("Sig", "123456");
 
 		try {
 			Writer out = response.getWriter();
-			gson.toJson(o, out);
+			gson.toJson(output, out);
 		} catch (JsonIOException e) {
 
 			logger.error("JsonIOException in ClientInformationResponseView.java: ", e);

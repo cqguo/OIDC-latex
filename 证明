@@ -1,0 +1,48 @@
+证明
+定义单点登录成功
+	browser对应的cookie被设置为对应的user account
+证明1 ：impersonation
+	cookie不会泄露给任何的攻击者
+		browser的same origin policy
+		script不会发送任何的cookie
+	只有接收到有效的token，才会将cookie设置
+	有效的token一定是IdP签发给对应RP的token
+	有效的token一定是签发给IdP password对应的用户
+	用户的password一定不会泄露给攻击者
+	token在传输过程中不会被攻击者获得
+证明2 ： identity injection
+	cookie设置的user account是用户的
+		用户发送给RP的identity proof中的PID_U对应自己的ID_U
+		browser上的恶意页面发送的identity proof不会被RP接受
+			这个怎么弄呢？
+
+
+
+Definition 1： attacker知道Cookie，where S(r).sessions[Cookie[sessionid]][user] ≡ ModPow(S(r).ID, u_i, S(i).p)，u_i ∈ ListOfUser(i)。
+
+如果要满足Definition 1，那么以下两个要满足：
+	a. attacker能够获得Cookie，满足。。。
+	b. attacker知道Cookie，能够将其设置为。。。。
+
+证明a不满足
+	cookie不会泄露给任何的attacker
+		browser的same origin policy
+		script不会发送任何的cookie
+
+证明b不满足
+	如果想要设置，那么需要满足知道token，token.Content[PID_RP] ≡ S[r].sessions[Cookie[sessionid]][PID_RP], ModPow(S(r).ID, u_i, S(i).p) ≡ ModPow(token.Content[PID_U] ,  S[r].sessions[Cookie[sessionid]][t], S(i).p), token.Validity in Validity
+
+	PID_RP必须是与ID_RP唯一对应的，RP和browser知道对应关系
+
+	attacker能够从IdP server，IdP script或者RP script获得对应的token
+
+	attacker从RP script获得token
+		RP script只会将token发送给s'.Parameters[RPDomain]，初始化设置为对应RP的domain，不会被修改，所以攻击者无法从RP script获得token
+
+	attacker从IdP server获得token
+		token生成在IdP line 83，需要验证s'.sessions[headers[Cookie][sessionid]][username] ≡ username, 需要在line 21验证password，由于attacker不知道secretOfID(username)，所以无法获得token
+
+	attacker从RP script获得token
+		发送token在line 132，在line 73设置，检验s'.Parameters[Endpoint_RP] ∈ Cert.Content.Endpoints
+
+		如果想要成功，需要设置Cert，

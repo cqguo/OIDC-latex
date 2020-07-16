@@ -1,0 +1,120 @@
+Input: ⟨tree, docnonce, scriptstate, scriptinputs, cookies, localStorage, sessionStorage, ids, secret⟩
+let s' := scriptstate
+let command := <>
+let origin := GETORIGIN(tree,docnonce)
+let RPDomain := s'.Parameters[RPDomain]
+let IdpWindowNonce := SUBWINDOWS(tree, AUXWINDOW(tree, docnonce)).1.nonce
+swithch s'.q do
+	case start
+		let path := s'.Parameters[RPRedirectPath]
+		let IdP <- s'.IdPs
+		let url := <URL, S, RPDomain, path, <IdP, IdP>>
+		let command := ⟨IFRAME,url,_SELF⟩ ′
+		let s'.q := expectIdPReady
+	case expectIdPReady
+		let pattern := ⟨POSTMESSAGE, *, ⊥, Content⟩ 
+		let input := CHOOSEINPUT(scriptinputs,pattern)
+		if input ̸≡ ⊥ then
+			let ready := input.Content[Ready]
+			if ready ≡ ⊥ then
+				stop <>
+			end if
+			let path := s'.Parameters[RPNegotiationPath]
+			let url := <URL, S, RPDomain, path, <>>
+			let s'.refXHR := λ1
+			let command := ⟨XMLHTTPREQUEST,url,GET,⊥,s'refXHR⟩
+			let s'.q := expectYRP
+		end if
+	case expectYRP
+		let pattern := ⟨XMLHTTPREQUEST,Body,s'refXHR⟩
+		let input := CHOOSEINPUT(scriptinputs,pattern) 
+		if input ̸≡ ⊥ then
+			let Y_RP := input.Body[Y_RP]
+			let Cert := input.Body[Cert]
+			if Cert ≡ ⊥ ∪ Y_RP ≡ ⊥ then
+				stop <>
+			end if
+			let command := ⟨POSTMESSAGE,IdpWindowNonce,<<Y_RP,Y_RP>,<Cert, Cert>>,<s'.Parameters[IdPDomain], S>⟩
+			s'.q := expectNU
+		end if
+	case expectNU
+		let pattern := ⟨POSTMESSAGE, *, ⊥, Content⟩ 
+		let input := CHOOSEINPUT(scriptinputs,pattern)
+		if input ̸≡ ⊥ then
+			let N_U := input.Content[N_U]
+			if N_U ≡ ⊥ then
+				stop <>
+			end if
+			let path := s'.Parameters[RPNegotiationFinish]
+			let url := <URL, S, RPDomain, path, <>>
+			let s'.refXHR := λ1
+			let command := ⟨XMLHTTPREQUEST,url,POST,<N_U, N_U>,s'.refXHR⟩
+			s'.q := expectNRP
+		end if
+	case expectNRP
+		let pattern := ⟨XMLHTTPREQUEST,Body,s'.refXHR⟩
+		let input := CHOOSEINPUT(scriptinputs,pattern) 
+		if input ̸≡ ⊥ then
+			let N_RP := input.Body[N_RP]
+			if N_RP ≡ ⊥ then
+				stop <>
+			end if
+			let command := ⟨POSTMESSAGE,IdpWindowNonce,<N_RP,N_RP>,<s'.Parameters[IdPDomain], S>⟩
+			s'.q := expectRegistrationResult
+		end if
+	case expectRegistrationResult
+		let pattern := ⟨POSTMESSAGE, *, ⊥, Content⟩ 
+		let input := CHOOSEINPUT(scriptinputs,pattern)
+		if input ̸≡ ⊥ then
+			let RegistrationResult := input.Content[RegistrationResult]
+			if RegistrationResult ≡ ⊥ then
+				stop <>
+			end if
+			let path := s'Parameters[RPRegistrationFinish]
+			let url := <URL, S, RPDomain, path, <>>
+			let s'.refXHR := λ1
+			let command := ⟨XMLHTTPREQUEST,url,POST,<RegistrationResult, RegistrationResult>,s'.refXHR⟩
+			s'.q := expectProofRequest
+		end if
+	case expectProofRequest
+		let pattern := ⟨XMLHTTPREQUEST,Body,s'.refXHR⟩
+		let input := CHOOSEINPUT(scriptinputs,pattern) 
+		if input ̸≡ ⊥ then
+			let RegistrationResult := input.Body[RegistrationResult]
+			let PID_RP := input.Body[PID_RP]
+			let Endpoint_RP := input.Body[Endpoint_RP]
+			if PID_RP ≡ ⊥ ∪ Endpoint_RP ≡ ⊥ then
+				stop <>
+			end if
+			let command := ⟨POSTMESSAGE,IdpWindowNonce, <<PID_RP,PID_RP>,<Endpoint_RP, Endpoint_RP>>,<s'.Parameters[IdPDomain], S>⟩
+			s'.q := expectToken
+		end if
+	case expectToken
+		let pattern := ⟨POSTMESSAGE, *, *, Content⟩ 
+		let input := CHOOSEINPUT(scriptinputs,pattern)
+		if input ̸≡ ⊥ then
+			let Token := input.Content[Token]
+			if Token ≡ ⊥ then
+				stop <>
+			end if
+			let path := s'.Parameters[UploadToken]
+			let url := <URL, S, RPDomain, path, <>>
+			let s'.refXHR := λ1
+			let command := ⟨XMLHTTPREQUEST,url,POST,<Token, Token>,s'refXHR⟩
+			s'.q := expectLoginResult
+		end if
+	case expectLoginResult
+		let pattern := ⟨XMLHTTPREQUEST,Body,s'refXHR⟩
+		let input := CHOOSEINPUT(scriptinputs,pattern) 
+		if input ̸≡ ⊥ then
+			let LoginResult := input.Content[LoginResult]
+			if LoginResult /≡ OK then
+				stop <>
+			end if
+			let path := s'Parameters[HomePage]
+			let url := <URL, S, RPDomain, path, <>>
+			let command := ⟨HREF,url,_SELF,⊥⟩
+			s'.q := stop
+		end if
+
+stop ⟨s′,cookies,localStorage,sessionStorage,command⟩

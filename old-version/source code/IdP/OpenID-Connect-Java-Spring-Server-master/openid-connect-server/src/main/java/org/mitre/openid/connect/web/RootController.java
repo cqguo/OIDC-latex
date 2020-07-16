@@ -53,6 +53,10 @@ public class RootController {
 
 	@RequestMapping({"", "home", "index", "index111"})
 	public String showHomePage(ModelMap m) {
+		int i = 0;
+		i++;
+		if(i==0)
+			return null;
 		return "home";
 	}
 	
@@ -97,7 +101,16 @@ public class RootController {
 //		return d.registerNewClient(jsonString, m);
 		return "manage";
 	}
-	
-	
+
+	@RequestMapping({"script"})
+	public String getScript(ModelMap m){
+		return "script";
+	}
+
+	@PreAuthorize("hasRole('ROLE_USER')")
+	@RequestMapping({"isAuthenticated"})
+	public String isAuthenticated(ModelMap m){
+		return "authenticated";
+	}
 
 }
