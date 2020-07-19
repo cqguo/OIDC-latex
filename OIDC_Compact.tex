@@ -3,12 +3,11 @@
 \usepackage{graphicx}
 \usepackage{verbatim}
 \usepackage{caption}
-\usepackage{algorithm}
-\usepackage{algorithmicx}
-\usepackage{algpseudocode}
+%
+
+%\usepackage{algpseudocode}
 \usepackage{amsmath,amssymb,amsthm}
-\newtheorem{theorem}{Theorem}
-\newtheorem{corollary}{Corollary}
+
 \usepackage{graphicx}
 %\usepackage{geometry}
 %\usepackage{subfigure}
@@ -23,12 +22,39 @@
 \usepackage{color}
 \usepackage{soul}
 
+\usepackage[algo2e]{algorithm2e}
+\usepackage{algorithm}
+\usepackage{algorithmic}
 
+
+\newtheorem{theorem}{Theorem}
+\newtheorem{corollary}{Corollary}
 \theoremstyle{definition}
 \newtheorem{definition}{Definition}
 \newtheorem{proposition}[theorem]{Proposition}
 \newtheorem{lemma}{Lemma}
 
+
+\makeatletter
+\newenvironment{breakablealgorithm}
+  {% \begin{breakablealgorithm}
+   \begin{center}
+     \refstepcounter{algorithm}% New algorithm
+     \hrule height.8pt depth0pt \kern2pt% \@fs@pre for \@fs@ruled
+     \renewcommand{\caption}[2][\relax]{% Make a new \caption
+       {\raggedright\textbf{\ALG@name~\thealgorithm} ##2\par}%
+       \ifx\relax##1\relax % #1 is \relax
+         \addcontentsline{loa}{algorithm}{\protect\numberline{\thealgorithm}##2}%
+       \else % #1 is not \relax
+         \addcontentsline{loa}{algorithm}{\protect\numberline{\thealgorithm}##1}%
+       \fi
+       \kern2pt\hrule\kern2pt
+     }
+  }{% \end{breakablealgorithm}
+     \kern2pt\hrule\relax% \@fs@post for \@fs@ruled
+   \end{center}
+  }
+\makeatother
 
 
 %\geometry{left=0.7in,right=0.7in,top=1in,bottom=1in}
@@ -83,12 +109,13 @@ Single sign-on, security, privacy. %, trace, linkage
 %\input{chap_Compact/discussion.tex}
 %\input{chap_Compact/relatedwork.tex}
 %\input{chap_Compact/conclusion.tex}
-\input{chap_Compact/appendix.tex}
+
 \bibliographystyle{IEEEbib}
 \bibliography{ref}
-
+\onecolumn
+\input{chap_Compact/appendix.tex}
+\twocolumn
 \end{document}
-
 %2020.2.6
 %introdution ÖÐ£¬½²ÊöIdPºÍRPºÏÄ±£¬arge IdPs, especially social IdPs like Google and Facebook
 %introdution ÖÐ£¬We have implemented a prototype of UPPRESSO based on an open-source implementation of OIDC£¬½²ÏÂ¶¯Ì¬×¢²á¡£
