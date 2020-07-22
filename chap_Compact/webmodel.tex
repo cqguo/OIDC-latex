@@ -3,13 +3,16 @@
 
 Our formal analysis of UPPRESSO is based on the Dolev-Yao style web model~\cite{SPRESSO}, which has been widely used in formal analysis of SSO protocol, e.g., OAuth 2.0~\cite{FettKS16} and OIDC ~\cite{FettKS17}.
 To make the description cleaner, we foucus on our modification on OIDC, and assume DNS and HTTPS are secure, which has already been anaylzed in~\cite{SPRESSO}.
-\subsection{Communication Model}
+
+The main entities in the model are $atomic\ processes$, which represent the essential nodes in the web systems, such as browsers, web servers and attackers. The atomic processes communicate with each other through the $events$ containing the receiver atomic process's address (IP), the sender atomic process process's address (IP) and the transmitted $message$. Moreover, there are also dependent $scripting\ processes$ which runs on the client-side environment relying on the browsers such as JavaScript. The scripting provides the server defined function to the browser.  The web system mainly consists of the set of atomic processes and scripting processes. The operation of a system is described as that the system converts its states via step of runs. The state of web system is called $configuraton$ which consists of all the states of the atomic processes in the system and all the event can be accepted by the processes.
+
+\subsection{Communication Description}
 Here we give a brief  presentation of generic Dolev-Yao-style communication model proposed by ~\cite{SPRESSO} on which our web model  is based. 
+
 
 A $signature \Sigma$ consists of a finite set of function symbols, such as $\mathtt{encrypt}, \mathtt{decrypt}$, and $\mathtt{pair}$, each with an arity. A function symbol with arity 0 (with no arguments)  is a constant symbol.
 The set of \emph{terms} is defined over a signature $\Sigma$, an infinite set of names, and an infinite set of variables.
 
-\vspace{1mm}\noindent\textbf{Equational theory } is defined as usual in Dolev-Yao models which introduces the symbol $\equiv$ representing the congruence relation on terms. For instance,  $dec(enc(m, k), k)$ $\equiv$ $m$
 
 
 \vspace{1mm}\noindent\textbf{Messages  } are defined as formal terms without variables (called ground terms). The signature $\Sigma$ for the messages in the model is considered containing constants (such as ASCII strings and nonce), sequence symbols (such as n-ary sequences $\langle \rangle$, $\langle . \rangle$, $\langle . ,. \rangle$ etc.) and further function symbols (such as encryption/decryption and digital signatures). An HTTP request is a common message in the web model, containing a type $\mathtt{HTTPReq}$, a nonce $n$, a method  $\mathtt{GET}$ or $\mathtt{POST}$,  a domain , a path, URL parameters, request headers, and the body  over the $\Sigma$ in the sequence symbol formate. Here is an example for an HTTP GET request for the domain  $\mathtt{exa.com/path?para=1}$ with the headers and body empty.
@@ -25,6 +28,7 @@ It's worth noting that for one process in a state only a finite set of events ca
 
 \vspace{1mm}\noindent\textbf{Scripting Processes}. The web model also contains the scripting process representing the client-side script loaded by browser such as JavaScript code. However, the $scripting\ process$ must rely on an $atom\ process$ such as browser and provide the relation $R$ witch is called by this $atomic\ process$. 
 
+\vspace{1mm}\noindent\textbf{Equational theory } is defined as usual in Dolev-Yao models which introduces the symbol $\equiv$ representing the congruence relation on terms. For instance,  $dec(enc(m, k), k)$ $\equiv$ $m$
 
 
 \subsection{Web System}
@@ -33,7 +37,7 @@ The web system contains a set of processes (including atomic processes and scrip
 \vspace{1mm}\noindent\textbf{Configuration}. 
 We firstly define the set of states $S$ of a system, consists of all  the current states of  processes in $\mathcal{W}$. And the set of events $E$, for each event $e \in E$, there is always a state $s \in S$, $e$ and $s$ can be accepted by one of the processes as the input. A $configuration$ of the system is defined as the tuple ($S, E, N$) where $N$ is the mentioned sequence of unused nonces. 
 
-\vspace{1mm}\noindent\textbf{Processing Steps}. A processing step is the system migrating from the configuration ($S, E, N$) to ($S', E', N'$) by processing an event $e \in E$. 
+\vspace{1mm}\noindent\textbf{Run Steps}. A run step is the system migrating from the configuration ($S, E, N$) to ($S', E', N'$) by processing an event $e \in E$. 
 
 \subsection{Model Of UPPRESSO}
 The UPPRESSO model is a web system which is defined as 
@@ -47,7 +51,7 @@ We now give a brief description about UPPRESSO model.
 \begin{itemize}
 \item The browser is responsible to send HTTP request, receive HTTP response, handle user behaviour and transmit message between scripting process. As the browser is honest, we only focus on the  scripting process running on the browser. The detailed model of browser is shown in~\cite{SPRESSO} 
 \item IdP server process (defined as $p^i$) only accepts the events whose messages are HTTP request and the $path$ $\in$ {$/script$, $/dynamicRegistration$, $/login$, $/loginInfo$, $/authorize$}. The function of each path is shown in Section~\ref{sec:UPPRESSO}.  All the events are accepted by $p^i$ in any state but the output may be different. The detailed $R^i$ is shown in *.  
-\item RP server process (defined as $p^r$) only accepts the events whose messages are HTTP request and the $path$ $\in$ $\{$ $/script$, $/login$, $/startNegotiation$,  $/registration$, $/uploadToken$ $\}$. The function of each path is shown in Section~\ref{sec:UPPRESSO}. The event with $path$ $\in$  $\{$ $/script$, $/login$, $/startNegotiation$ $\}$ are accepted in any state. However, the event with $path$ $\equiv$ $/registration$ is accepted only when the state $s$ is the output for event  $path$ $\equiv$ $/startNegotiation$. In the same way the following accepted events must be arranged as $path$  in the sequence $/registration$, $/uploadToken$.
+\item RP server process (defined as $p^r$) only accepts the events whose messages are HTTP request and the $path$ $\in$ $\{$ $/script$, $/login$, $/startNegotiation$,  $/registrationResult$, $/uploadToken$ $\}$. The function of each path is shown in Section~\ref{sec:UPPRESSO}. The event with $path$ $\in$  $\{$ $/script$, $/login$, $/startNegotiation$ $\}$ are accepted in any state. However, the event with $path$ $\equiv$ $/registrationResult$ is accepted only when the state $s$ is the output for event  $path$ $\equiv$ $/startNegotiation$. In the same way the following accepted events must be arranged as $path$  in the sequence $/registrationResult$, $/uploadToken$.
 \item IdP and RP scripting process accepts the events in the formate as HTTP response and postMessage. The details about accepted events are shown in ~\ref{*}.
 \end{itemize}
 
@@ -174,10 +178,10 @@ All the path will be visited in each login procedure. It can be easily found tha
 \end{itemize}
 \label{def:rpprivacy}
 \end{definition}
-RP server process only accepts the events whose messages are HTTP request and the $path$ $\in$ $\{$ $/script$, $/login$, $/startNegotiation$,  $/registration$, $/uploadToken$ $\}$.
+RP server process only accepts the events whose messages are HTTP request and the $path$ $\in$ $\{$ $/script$, $/login$, $/startNegotiation$,  $/registrationResult$, $/uploadToken$ $\}$.
 As the RPs may behave malicious so that the events received by RP scripting process should also be considered. However, all of the messages received by RP scripting process are transmitted to RP server. Therefore, we only need to focus on the events received by RP server. 
 
-Firstly, we assume that all the parameters are set legally. We give the brief proof. The events visiting to $/script$ and $/login$ carry no parameters and bodies so that the events must be equivalent. The visits to  $/startNegotiation$ only carry the nonce so that the events are equivalent. The visits to  $/registration$ carry the IdP signed registration result, however, the contents in the result  contains the $PID_{RP}$, $N_U$ and $endpint$. The contents are all random constants ($PID_{RP}$ is regarded as same as $N_U$) so that the events are equivalent. The visits to  $/uploadToken$ includes the identity proof containing the $PID_{RP}$, $PID_U$. According to Definition~\ref{def:powequ}, the $PID_U$s are statically equivalent to $r_1$.  Moreover, with the $r_2$ shared state, $Account_{r_1}$s are known to $r_1$. However, $r_1$ is unable to transform $Account_{r_1}$s into the users' account $Account_{r_2}$ at $r_2$  so that the events cannot be linked to the existing user. Therefore, the requirements of  Definition~\ref{def:rpprivacy}  are met.
+Firstly, we assume that all the parameters are set legally. We give the brief proof. The events visiting to $/script$ and $/login$ carry no parameters and bodies so that the events must be equivalent. The visits to  $/startNegotiation$ only carry the nonce so that the events are equivalent. The visits to  $/registrationResult$ carry the IdP signed registration result, however, the contents in the result  contains the $PID_{RP}$, $N_U$ and $endpint$. The contents are all random constants ($PID_{RP}$ is regarded as same as $N_U$) so that the events are equivalent. The visits to  $/uploadToken$ includes the identity proof containing the $PID_{RP}$, $PID_U$. According to Definition~\ref{def:powequ}, the $PID_U$s are statically equivalent to $r_1$.  Moreover, with the $r_2$ shared state, $Account_{r_1}$s are known to $r_1$. However, $r_1$ is unable to transform $Account_{r_1}$s into the users' account $Account_{r_2}$ at $r_2$  so that the events cannot be linked to the existing user. Therefore, the requirements of  Definition~\ref{def:rpprivacy}  are met.
 
 However, as the RPs are considered maybe malicious, such that they will attempt to steal the data from other process or set the malicious parameters during the login procedure. That is, according to Definition~\ref{def:powequ}, the $PID_U$ the $Accounts$ must be equivalent to the attacker as long as the attacker does not know the $ID_U$. Therefore the attacker may attempt to steal the $ID_U$ from UPPRESSO system.
 But it is easy to be found that IdP will not send the plain $ID_U$ to any process so that RPs cannot obtain the $ID_U$. Another way is that RPs may attempt to treat the $Account$ or $PID_U$ to be generated insecurely, but we are going to prove it is impossible.
