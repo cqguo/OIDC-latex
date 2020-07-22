@@ -353,10 +353,10 @@ The state of IdP scripting process \myss{scriptstate} is a term in the form \mys
       \mystate{\myss{input := \mathtt{CHOOSEINPUT}(scriptinputs,pattern)}}
       \myif{input \not\equiv \mathtt{null}}
       \mystate{\myss{Cert := input.Content[Cert]}}
-      \mystate{\myss{s'.Parameters[Cert] := Cert}}
       \myif{\mathtt{checksig}(Cert.Content, Cert.Sig, s'.PubKey) \equiv \mathtt{null}}
       \mystate{\myss{\textbf{stop}\ \myangle{}}}
       \ENDIF
+       \mystate{\myss{s'.Parameters[Cert] := Cert}}
       \mystate{\myss{N_U := s'.Parameters[N_U]}}
       \mystate{\myss{PID_{RP} := \mathtt{ModPow}(Cert.Content.ID_{RP}, N_U, s'.p)}}
       \mystate{\myss{s'.Parameters[PID_{RP}] := PID_{RP}}}
@@ -372,7 +372,7 @@ The state of IdP scripting process \myss{scriptstate} is a term in the form \mys
       \CASE{expectRegistrationResult}
       \mystate{\myss{pattern := \myangle{\mathtt{XMLHTTPREQUEST},Body,s'.refXHR}}}
       \mystate{\myss{input := \mathtt{CHOOSEINPUT}(scriptinputs,pattern) }}
-      \myif{input \not\equiv \mathtt{null}}
+      \myif{input \not\equiv \mathtt{null} \land input.Content[RegistrationResult].type \equiv OK}
       \mystate{\myss{RegistrationResult := input.Body[RegistrationResult]}}
       \myif{ RegistrationResult.Content.Result \not\equiv OK}
       \mystate{\myss{s'.q := stop}}
@@ -390,11 +390,11 @@ The state of IdP scripting process \myss{scriptstate} is a term in the form \mys
        \mystate{\myss{Endpoint_{RP} := input.Content[Endpoint]}}
        \mystate{\myss{s'.Parameters[Nonce] := input.Content[Nonce]}}
        \mystate{\myss{Cert := s'.Parameters[Cert]}}
-      \mystate{\myss{s'.Parameters[Endpoint_{RP}] := Endpoint_{RP}}}
       \myif{Endpoint_{RP} \notin Cert.Content.Endpoints \lor PID_{RP} \not\equiv s'.Parameters[PID_{RP}]}
       \mystate{\myss{s'.q := stop}}
       \mystate{\myss{\textbf{stop}\ \myangle{}}}
       \ENDIF
+       \mystate{\myss{s'.Parameters[Endpoint_{RP}] := Endpoint_{RP}}}
       \mystate{\myss{Url := \myangle{\mathtt{URL}, \mathtt{S}, IdPDomain, /loginInfo, \myangle{}}}}
       \mystate{\myss{s'.refXHR :=  \mathtt{Random}()}}
       \mystate{\myss{command : = \myangle{\mathtt{XMLHTTPREQUEST}, Url, \mathtt{GET},\myangle{}, s'.refXHR}}}
@@ -541,4 +541,99 @@ The relation of RP scripting process $script\_rp$ is shown as Algorithm~\ref{alg
 
 \end{algorithmic}
 \end{breakablealgorithm}
+
+\subsection{Proof of Theorem~\ref{the:secure}}
+
+
+\newtheorem{redef}{Definition}
+\newtheorem{req}{Requirement}
+\newtheorem{relemma}{Lemma}
+
+We assume that all the network messages are protected by HTTPS and postMessage messages are protected by the browser, such that web attackers listening the network flow are not considered. 
+
+In this section, we will give a full version of proof about UPPRESSO security. Firstly, we recall the security requirements of UPPRESSO. That is, the system must ensure that only a legitimate user can log into an honest RP under her unique account. We consider the visits to RP's resource paths are controlled by the visitors' cookie, so that the attacker can break the security only when he own the cookie bound to the honest user. Therefore, we can propose the definition~\ref{def:secure} about the secure UPPRESSO system.
+\begin{redef}
+Let $\mathcal{UWS}$ be a UPPRESSO web system, $\mathcal{UWS}$ is secure \textbf{iff} for any honest RP $r$ $\in $ $\mathcal{W}$ and  the authenticated cookie $c$ for honest $u$,  $c$ is unknown to the attacker $a$. 
+\end{redef}
+Therefore, the proof of Theorem~\ref{the:secure} is converted into whether the UPPRESSO system meet the requirement in definition~\ref{def:secure}. However, as we consider the attacker initially knows any honest users' cookies, the requirement of definition~\ref{def:secure} can be separated as following requirements. Before describe the requirements, we firstly define the user \myss{u}'s authenticated cookie for RP \myss{r} as \myss{c(u,r)}.
+\begin{req}
+If $c(u,r)$ is the authenticated cookie owned by $u$, $c(u,r)$ cannot be obtained by $a$.
+\label{req:cookie1}
+\end{req}
+\begin{req}
+If $c$ is an unauthenticated cookie owned by $a$, $c$ cannot be set as \myss{c(u,r)}. 
+\label{req:cookie2}
+\end{req}
+
+To prove that UPPRESSO meets the requirements, we now show some lemmas. The first lemma here can prove that the UPPRESSO system meets requirement~\ref{req:cookie1}.
+\begin{relemma}
+Attacker does not learn users' cookies.
+\label{rel:cookie}
+\end{relemma}
+
+\begin{proof}
+As the Brute-force attacks, such as exhausting the possible users' cookies, are not  considered, the attackers can only try to obtain the cookies from honest processes in the system.  For an honest user \myss{u} and the honest RP \myss{r}, the valid cookie \myss{c(u,r)} can only be obtained by \myss{u}'s browser \myss{b_u}, the \myss{r}'s script \myss{script\_rp} and RP's server \myss{P^r} . 
+Here we only need to prove that attacker cannot receive the event from these processes carrying \myss{c(u,r)}.
+\begin{itemize}
+\item \myss{b.} The browsers used by users are considered honest and well implemented. Therefore, based on the same-origin policy, \myss{b_u} only sends \myss{r}'s cookie to RP's domain, so that attackers cannot receive the cookie.
+\item \myss{script_rp}. According to Algorithm~\ref{alg4}, the \myss{script_rp} does not send any cookie. 
+\item \myss{P^r}. According to Algorithm~\ref{alg2}, the \myss{P^r} does not send any cookie. 
+\end{itemize}
+Therefore, lemma~\ref{rel:cookie} is proved.
+\end{proof}
+
+To prove UPPRESSO system meets the requirement~\ref{req:cookie2}, firstly we need to know how the cookie can be set as \myss{c(u, r)}. Based on the algorithm~\ref{alg2}, we propose the new definition.
+\begin{redef}
+In $\mathcal{UWS}$, the cookie $c$ is to be set as\myss{c(u),r} only when RP $r$ receives a valid $u$'s identity proof, here we defined as \myss{t(u,r)}, from the owner of $c$. 
+\label{red:token}
+\end{redef}
+
+To prove that \myss{t(u,r)} cannot be obtained by attackers, we firstly show some lemmas.
+\begin{relemma}
+Attacker does not learn users' passwords.
+\label{rel:password}
+\end{relemma}
+\begin{proof}
+Same as the proof to lemmas~\ref{rel:cookie}, we only need to prove that attackers cannot receive the message form honest processes carrying password. The honest IdP server is defined as \myss{P^i} and the IdP script is defined as \myss{script\_idp}. Here we give the proof about each processes.
+\begin{itemize}
+\item \myss{script\_rp}. According to algorithm~\ref{alg4}, we can prove that RP script does not send any stored passwords.
+\item \myss{P^r}. According to algorithm~\ref{alg2}, it is easy to find out that RP server does not receive or send any stored passwords.
+\item \myss{script\_rp}. Based on algorithm~\ref{alg3}, we can find that IdP script sends the user's password at line 68. The target of this message is \myss{Url} whose host is\myss{IdPDoaim} set at line 67. The \myss{IdPDomian} is set at line 4 and the value is defined  by the script initially with no modification. Therefore the password can only be sent to IdP server. The IdP server obtain the password at algorithm~\ref{alg1} line 10 and does not send this parameter to any other processes. 
+\item \myss{P^i}. Based on algorithm~\ref{alg1},  we can find that IdP server does not send any stored passwords. 
+\end{itemize}
+Therefore, no attackers can obtain the password from honest processes, so that this lemma is proved.
+\end{proof}
+
+\begin{relemma}
+Attacker cannot forge or modify the IdP issued proofs.
+\label{rel:signature}
+\end{relemma}
+\begin{proof}
+Here we only consider the \myss{Cert} used in \myss{script\_idp}, the \myss{RegistrationResult} and \myss{Token} used in \myss{P^r} . First of all, we can easily find that the IdP does not send the private key to any processes so that the attackers cannot obtain the private key. 
+\begin{itemize}
+\item \myss{Cert} is used at algorithm~\ref{alg3} line 21, 52. At line 21, the \myss{Cert} has already been verified at line 16. At line 52, the \myss{Cert} is picked from the state parameters, and the cert parameter is set at line 19.  At line 19, the \myss{Cert} has already been verified at line 16.
+At line 16 the \myss{Cert} is verified with the public key in the scriptstate, where the key is considered initially honest and the key is not modified at algorithm~\ref{alg3}. Therefore, \myss{Cert} cannot be forged or modified. 
+\item \myss{RegistrationResult} is used at algorithm~\ref{alg2} from line 35 to 55 after line 30 where it is verified. The public key is initially set in the RP and never modified so that  it is considered honest. Therefore, \myss{RegistrationResult} cannot be forged or modified. 
+\item \myss{Token} is used at algorithm~\ref{alg2} from line 69 to 84 after line 65 where it is verified.  And the public has been proved honest. Therefore, \myss{Token} cannot be forged or modified. 
+\end{itemize}
+Therefore, this lemma is proved.
+\end{proof}
+
+Here we now show the lemma to prove that UPPRESSO meets the requirements in definition~\ref{red:token} .
+\begin{relemma}
+Attacker cannot learn users' valid identity proofs.
+\end{relemma}
+\begin{proof}
+As the \myss{Token} has been proved that it can not be gorged by the attackers, here we only need to prove attackers cannot receive \myss{Token} from other honest processes.
+\begin{itemize}
+\item Attacker cannot obtain the \myss{Token} from RP server.  We check all the messages sent by the RP server at algorithm~\ref{alg2} line 4, 7, 19, 25, 31, 36, 45, 55, 61, 66, 74, 84. It is easy to proved that the RP server does not sent any \myss{Token} to other processes.
+\item Attacker cannot obtain the \myss{Token} from RP script. The  messages sent by RP script can be classified into two classes. The messages at algorithm~\ref{alg4} line 18, 36, 56 are sent to the RPDomain set at line 4, so that attackers cannot receive these messages. However, the messages at line 26,  46 only carry the contents received from RP server. We have already that RP server does not send any \myss{Token}. Therefore, attackers cannot receive the \myss{Token} from RP script.
+\item Attacker cannot obtain the \myss{Token} from IdP server.  Considered the messages at algorithm~\ref{alg1} line 4, 12, 16, 23, 26, 36, 44, 51, 67, it can be found that only the message at line 67 carries the \myss{Token}. This \myss{Token} is generated at line 65, following the trace where the \myss{Content} at line 63, the \myss{PID_U} at line 61, the \myss{UID} at line 60, the \myss{session} at line 48, and finally the \myss{cookie} at line 47. That is the \myss{Token} receive must be the owner of the \myss{cookie} the session of which save the parameter \myss{UID} . The \myss{UID} is set at line 15 after verifying the password and never modified. As we have already proved that the cookies and passwords cannot be known to attackers, so that attackers cannot obtain the \myss{Token} from IdP server.
+\item Attacker cannot obtain the \myss{Token} from IdP script. As the proof above, only IdP sends the \myss{Token} with the message at algorithm~\ref{alg1} line 67, the IdP script can only receive the \myss{Token} at algorithm~\ref{alg3} line 99. Here we are going to proof that the token \myss{t(u,r)} can be only sent to the corresponding RP server through IdP script. The receiver of \myss{t(u,r)} is restricted by the \myss{RPOrigin} at line 100, which is set at line 55. The host in the \myss{RPOrigin} is verified included in \myss{Cert} at line 51. If the \myss{Cert} belong to \myss{r}, the attacker cannot obtain the \myss{t(u,r)}. Now we give the proof that the \myss{Cert} belong to \myss{r}. Firstly we define the negotiated \myss{PID_{RP}} in \myss{t(u,r)} as \myss{p}. That is the \myss{PID_{RP}} at algorithm~\ref{alg2} line 69 must equals with \myss{p} and the \myss{PID_{RP}} is verified at line 44 with the \myss{RegistrationToken}. This verification cannot be passed due to the state check at line 60. At the same validity period, the IdP script need to send the registration request with same \myss{p}  and receive the successful registration result. As the IdP checks the uniqueness of \myss{PID_{RP}} at algorithm~\ref{alg1} line 32. Therefore the \myss{r} and IdP script must share the same \myss{RegistrationToken}. As the \myss{RegistrationToken} contains the \myss{\mathtt{Hash}(N_U)}, the IdP script and \myss{r} must share the same \myss{ID_{RP}}. Therefore, the the \myss{Cert} saved as the IdP scriptstate parameter must belong to \myss{r}.
+\end{itemize}
+Therefore, attackers cannot  learn users' valid identity proofs.
+\end{proof}
+Here we have proved that UPPRESSO meets the requirement in definition~\ref{red:token}. Therefore the requirement~\ref{req:cookie2} is met, so that the theorem~\ref{the:secure} is proved.
+
+
 \end{appendices}
