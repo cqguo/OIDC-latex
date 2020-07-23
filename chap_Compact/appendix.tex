@@ -549,7 +549,7 @@ The relation of RP scripting process $script\_rp$ is shown as Algorithm~\ref{alg
 \newtheorem{req}{Requirement}
 \newtheorem{relemma}{Lemma}
 
-We assume that all the network messages are protected by HTTPS and postMessage messages are protected by the browser, such that web attackers listening the network flow are not considered. 
+We assume that all the network messages are protected by HTTPS and postMessage messages are protected by the browser, and the browsers are all honest, such that web attackers listening the network flow are not considered. 
 
 In this section, we will give a full version of proof about UPPRESSO security. Firstly, we recall the security requirements of UPPRESSO. That is, the system must ensure that only a legitimate user can log into an honest RP under her unique account. We consider the visits to RP's resource paths are controlled by the visitors' cookie, so that the attacker can break the security only when he own the cookie bound to the honest user. Therefore, we can propose the definition~\ref{def:secure} about the secure UPPRESSO system.
 \begin{redef}
@@ -634,6 +634,62 @@ As the \myss{Token} has been proved that it can not be gorged by the attackers, 
 Therefore, attackers cannot  learn users' valid identity proofs.
 \end{proof}
 Here we have proved that UPPRESSO meets the requirement in definition~\ref{red:token}. Therefore the requirement~\ref{req:cookie2} is met, so that the theorem~\ref{the:secure} is proved.
+
+\subsection{Proof of Theorem~\ref{the:privacy}}
+In this section, we will give a full version of proof about UPPRESSO privacy. That is, if UPPRESSO is a privacy-preserving system, the system must be IdP-Privacy and RP-Privacy. Firstly we recall the requirements of IdP-Privacy and RP-Privacy system. Then we will give the proof that UPPRESSO system meets these requirements. 
+\begin{req}
+\textbf{IdP-Privacy}. There are honest RPs $r_1, r_2$, IdP $i$ and the honest user $u$. We define the event sets containing each users' login procedure, for instance, the \myss{events_{(u, r_1)}} consists of all the events generated during the \myss{u} logging in to \myss{r_1} in correct procedure. It requires that for every every event $e_1 \in events_{(u, r_1)}$ received by IdP, there is always an  an event $e_2 \in events_{(u, r_2)}$, and $e_1$ and $e_2$ are equivalent.
+\label{req:idp}
+\end{req}
+Here we give the proof that UPPRESSO system meets the requirement~\ref{req:idp}.
+\begin{proof}
+Here we consider the IdP behave honestly, therefore, we only focus on all events sent to the IdP and prove the equivalence of these events. As the IdP only accepts the HTTP requests to the path \myss{/script, /synamicRegistration, /login, loginInfo} and \myss{/authorize}, we will examine each of these paths.
+\begin{itemize}
+\item \myss{/script}. Based on algorithm~\ref{alg1}, we can find that every requests to this path does not carry any parameters and bodies. Therefore, for event $e_1 \in events_{(u, r_1)}$ and $e_2 \in events_{(u, r_2)}$, the HTTPS messages in \myss{e_1} and \myss{e_2} meet the requirements in definition~\ref{def:httpequ}, such that \myss{e_1} and \myss{e_2} are equivalent.
+\item \myss{/loginInfo}. As it defined in algorithm~\ref{alg1}, no parameters and bodies are sent to this path. The proof is same as it in path \myss{/script}. 
+\item \myss{/login}. According to  algorithm~\ref{alg1}, the requests carry the body including \myss{u}'s username and password. For event $e_1 \in events_{(u, r_1)}$ and $e_2 \in events_{(u, r_2)}$, the usernames and passwords must be the same. Therefore, \myss{e_1} and \myss{e_2} are equivalent. 
+\item \myss{/dynamicRegistration}. As defined in algorithm~\ref{alg1}, the requests should carry the body containing \myss{PID_{RP}}, \myss{Endpoint} and \myss{Nonce}. That is the \myss{PID_{RP}} is the result of \myss{ID_{RP}^{N_U} \mod p}, where \myss{N_U} is unknown to IdP, so that based on definition~\ref{def:powequ} the \myss{PID_{RP}} in \myss{e_1} and \myss{e_2} are equivalent. The \myss{Endpoint}s and \myss{Nonce}s are all randomly generated unrelated, therefore, they are equivalent in each events. It is proved that \myss{e_1} and \myss{e_2} are equivalent. 
+\item \myss{/authorize}. Based on the algorithm~\ref{alg1}, it is easy to find that the requests to this path carry the body including \myss{PID_{RP}} and \myss{Endpoint} same as in path \myss{/dynamicRegistration}. The proof of equivalence is also same as above.
+\end{itemize}
+Therefore, we prove that UPPRESSO meets the requirement~\ref{req:idp}.
+\end{proof}
+
+\begin{req}
+\textbf{IRP-Privacy}. There are honest RPs $r_1, r_2$, IdP $i$ and the honest users $u_1, u_2$. It requires that for every every event $e_1 \in events_{(u_1, r_2)}$ received by IdP. The following requirements are proposed even if \myss{r_1} and \myss{r_2} share their states.
+\begin{itemize}
+\item There is always an  an event $e_2 \in events_{(u_2, r_2)}$, and $e_1$ and $e_2$ are equivalent.
+\item For any user \myss{u}, the event \myss{e \in events_{(u_2, r_2)}} can not linked with specific \myss{Account} .
+\end{itemize}
+\label{req:rp}
+\end{req}
+Here we give the proof that UPPRESSO system meets the requirement~\ref{req:rp}.
+\begin{proof}
+As the RPs are considered maybe malicious, at the beginning of the proof we only focus on the procedure with legal parameters. Then the RPs are considered able to use illegal parameters and conduct illegal processes. 
+
+The events known to the RPs contains the postMessages form IdP script to RP script, and the HTTPS messages from RP script to RP server. However, we can find at algorithm~\ref{alg2} that all the postMessages received by RP script are transmitted to RP server, so that we can only focus on the RPs paths for HTTPS requests. The proof when RPs behave honestly is described as follows. 
+\begin{itemize}
+\item \myss{/script}. As it is defined at algorithm~\ref{alg2}, every requests to this path does not carry any parameters and bodies. The HTTPS messages in event $e_1 \in events_{(u_1, r_2)}$ and $e_2 \in events_{(u_2, r_2)}$must be equivalent based on definition~\ref{def:httpequ}, such that \myss{e_1} and \myss{e_2} are equivalent.
+\item \myss{/login}. According to algorithm~\ref{alg2}, the requests to this path do not carry any parameters and bodies. Therefore, same as it in path \myss{/script}, \myss{e_1} and \myss{e_2} must be equivalent.
+\item \myss{/startNegotiation}. Based on  algorithm~\ref{alg2}, we can find that the requests to this path only carry the body including \myss{N_U}. As \myss{N_U} is the new generated random constant number, the messages in \myss{e_1} and \myss{e_2} are equivalent, so that \myss{e_1} and \myss{e_2} are equivalent.
+\item \myss{/registrationResult}. According to  algorithm~\ref{alg2}, the requests to this path contains the \myss{RegistrationResult} in the body. The \myss{RegistrationResult}'s content contains \myss{PID_{RP}}, \myss{Endpoint}, \myss{Nonce} and the \myss{Validity}. However, the \myss{PID_{RP}} is considered equal with \myss{N_U}, and \myss{Nonce} is the hash of \myss{N_U}, so that \myss{PID_{RP}}s and \myss{Nonce}s are equivalent. \myss{Endpoint} is newly generated random string. \myss{Validity} is generated based on the current time. Therefore, all the parameters in \myss{e_1} and \myss{e_2} are considered equivalent, such that \myss{e_1} and \myss{e_2} are equivalent. 
+\item \myss{/uploadToken}.  As it defined algorithm~\ref{alg2}, the requests to this path carry the \myss{Token}. \myss{Token} consists of \myss{PID_{RP}}, \myss{PID_U} and \myss{Validity}. As it is proved above, \myss{PID_{RP}}s and \myss{Validity}s in each events are equivalent. \myss{PID_U} is the result of \myss{ID_{RP}^{ID_U} \mod p}, so that \myss{PID_U}s are equivalent to RP without knowing \myss{ID_U} sue to definition~\ref{def:powequ}. Therefore,  \myss{e_1} and \myss{e_2} are equivalent. 
+\end{itemize}
+Moreover, with the r2 shared states, users' \myss{Account}s at \myss{r_2} are known
+to \myss{r_1} . However, as \myss{ID_{RP}}s of \myss{r_1} and \myss{r_2} have the relation \myss{ID_{RP_{r_1}}} \myss{\equiv}  \myss{ID_{RP_{r_2}}^n \mod p}. But \myss{n} is unknown to RPs due to the discrete logarithm problem. Therefore, the \myss{Account} at \myss{r_2} cannot be linked with the \myss{Account} at \myss{r_1}. 
+
+Therefore, the UPPRESSO meets the requirement~\ref{req:rp} while RPs behave honestly. 
+
+Then we prove that UPPRESSO meets the RP-Privacy requirements even though RPs behave maliciously. The malicious RPs will attempt to steal the data from other process or set the malicious parameters during the login procedure. That is, according to Definition~\ref{def:powequ}, the $PID_U$s the $Account$s must be equivalent to the attacker as long as the attacker does not know the $ID_U$. However, based on algorithm~\ref{alg1} we can find out that IdP does not send \myss{ID_U} to any processes, so that $PID_U$s the $Account$s must be equivalent in each events. 
+
+Moreover, another way is that RPs may attempt to treat the \myss{Account} or \myss{PID_U} to be generated incorrectly, but we are going to prove it is impossible.
+\begin{itemize}
+\item RP may lead the login using the forged $ID_{RP}$ or $PID_{RP}$ so that $PID_U$s and $Accounts$ are no more equivalent. However, $ID_{RP}$ are provided by the $Cert$ which is verified at algorithm~\ref{alg3} line 17, by the IdP's public key set initially and not modified.  $PID_{RP}$ is generated by the $ID_{RP}$ at line 21 using the honest user generated nonce at line 20. Therefore, it is impossible to lead the honest user to use the illegal $ID_{RP}$ and $PID_{RP}$.
+\item RP may also lead the same user to upload the identity proof with same $PID_U$ or $Account$ so that the system is not RP-Privacy according to requirement~\ref{req:rp}. However, the $PID_U$ is generated containing the user's generated nonce $N_U$ so that it is not controlled by the RP. $Account$ is generated as the form $ID_{RP}^{ID_U} \mod p$, while RPs may lead the user to use the same $ID_{RP}$ to generate identity proof. However, the $ID_{RP}$ is bound with $Cert$ which is verified by the user and it is easy for user to find out the login RP  does not coincide the RP name shown on her browser. 
+\end{itemize}
+
+In conclusion, we prove that UPPRESSO system meets the requirement~\ref{req:rp}. 
+\end{proof}
+ As we have proved the UPPRESSO system meets the requirement~\ref{req:idp} and ~\ref{req:rp}, the theorem~\ref{the:privacy} is proved.
 
 
 \end{appendices}
