@@ -7,30 +7,32 @@ Next, we present the main design of UPPRESSO. First, we describe our design for 
 \label{subsec:overview}
 
 As discussed in Section \ref{sec:challenge}, the identifier-transformation functions are essential for privacy-preserving SSO systems.
-In UPPRESSO, the three functions, $\mathcal{F}_{ID_{RP} \mapsto PID_{RP}}$, $\mathcal{F}_{ID_{U} \mapsto PID_{U}}$ and $\mathcal{F}_{PID_{U} \mapsto Account}$, are all constructed based on the discrete logarithm problem with public parameters $p$, $q$, and $g$, %% L不作为参数，我们说：e, n是RSA算法参数，不说2048是参数。
+In UPPRESSO, the three functions, $\mathcal{F}_{ID_{RP} \mapsto PID_{RP}}$, $\mathcal{F}_{ID_{U} \mapsto PID_{U}}$ and $\mathcal{F}_{PID_{U} \mapsto Account}$, are all constructed based on the discrete logarithm problem with public parameters $p$, $q$, %and $g$, %% L不作为参数，我们说：e, n是RSA算法参数，不说2048是参数。
 where $p$ is a large prime defining the finite field $GF(p)$,
  % $L$ is the length of $q$ in bits,  ($2^{L-1} < q < 2^L$)
-$q$ is a prime factor of ($p-1$), and $g$ is a generator of order $q$ in $GF(p)$.
+and $q$ is a prime factor of ($p-1$).%, and $g$ is a generator of order $q$ in $GF(p)$.
 %the prime number $q$  is the order of a multiplicative subgroup of $GF(p)$, which is generated with the generator $g$ by $\{g\ mod\ p, g^2\ mod\ p, ..., g^{q-1}\ mod\ p, 1=g^q\ mod\ p\}$.
 
-Without loss of generality, we assume the IdP assigns long-term identifiers $ID_U$ to a user and $ID_{RP}$ to an RP when they first register at the IdP. In particular, the IdP assigns a unique random number to each user as $ID_U$, where $1<ID_U<q$. For each RP, the IdP selects a random number $r$, where $1 < r < q$, and computes a unique $ID_{RP}$ as:
-\begin{equation}
-    ID_{RP} = g^{r} \bmod p
-   \label{equ:IDRP}
-\end{equation}
-\noindent where $r$ is kept secret from the RP.
+Without loss of generality, we assume the IdP assigns long-term identifiers $ID_U$ to a user and $ID_{RP}$ to an RP when they first register at the IdP. In particular, the IdP assigns a unique random number to each user as $ID_U$, where $1<ID_U<q$, and $ID_{RP}$ is a generator of order $q$ in $GF(p)$.% For each RP, the IdP selects a random number $r$, where $1 < r < q$, and computes a unique $ID_{RP}$ as:
+%\begin{equation}
+  %  ID_{RP} = g^{r} \bmod p
+   %\label{equ:IDRP}
+%\end{equation}
+%\noindent where $r$ is kept secret from the RP.
 
-\vspace{1mm}\noindent {\bf RP Identifier Transformation.} In each login session, the user negotiates with the RP she tries to log in, and computes a pseudo-identifier $PID_{RP}$ for the RP cooperatively. First, the RP chooses a random number $N_{RP}$ ($1 < N_{RP}<q $), and the user chooses another random number $N_{U}$ ($1 < N_{U}<q $).
-Then, they exchange $N_{RP}$ and $N_{U}$ to calculate $PID_{RP}$ following Equation~\ref{equ:PIDRP}.
+\vspace{1mm}\noindent {\bf RP Identifier Transformation.} In each login session, the user negotiates with the RP she tries to log in, and computes a pseudo-identifier $PID_{RP}$ for the RP cooperatively. The user chooses a random number $N_{RP}$ ($1 < N_{RP}<q $), and RP provides the $ID_{RP}$ for user to calculate $PID_{RP}$ following Equation~\ref{equ:PIDRP}.
+%First, the RP chooses a random number $N_{RP}$ ($1 < N_{RP}<q $), and the user chooses another random number $N_{U}$ ($1 < N_{U}<q $).
+%Then, they exchange $N_{RP}$ and $N_{U}$ to calculate $PID_{RP}$ following Equation~\ref{equ:PIDRP}.
 \begin{equation}
-\mathcal{F}_{ID_{RP} \mapsto PID_{RP}}: PID_{RP} = {ID_{RP}}^{N_{U} N_{RP}} \bmod p
+\mathcal{F}_{ID_{RP} \mapsto PID_{RP}}: PID_{RP} = {ID_{RP}}^{N_{U}} \bmod p
 \label{equ:PIDRP}
 \end{equation}
 
 
 The transformation function $\mathcal{F}_{ID_{RP} \mapsto PID_{RP}}$ satisfies the following requirements. % described in Section~\ref{subsec:challenges}.
      %That is, the function $\mathcal{F}_{ID_{RP} \mapsto PID_{RP}}$ is invoked to generate $PID_{RP}$ for each login, while
-First, it is computationally infeasible for the IdP to derive $ID_{RP}$ from $PID_{RP}$ due to the discrete logarithm problem. Moreover, two nonces $N_{U}$ and $N_{RP}$ ensure that: (\emph{a}) $PID_{RP}$ is valid only for this login and for the identity proof generated in this login, and (\emph{b}) $PID_{RP}$ is dynamically generated for this login and is different from other $PID_{RP}$s generated in other login session between the same user and RP. Therefore, the IdP cannot associate multiple $PID_{RP}$s of a same RP. Finally, the cooperative generation process between the user and the RP prevents a single malicious entity from manipulating the value of $PID_{RP}$.
+First, it is computationally infeasible for the IdP to derive $ID_{RP}$ from $PID_{RP}$ due to the discrete logarithm problem. Moreover, the nonce $N_{U}$ ensures that: (\emph{a}) $PID_{RP}$ is valid only for this login and for the identity proof generated in this login, and (\emph{b}) $PID_{RP}$ is dynamically generated for this login and is different from other $PID_{RP}$s generated in other login session between the same user and RP. Therefore, the IdP cannot associate multiple $PID_{RP}$s of a same RP.
+%wo nonces $N_{U}$ and $N_{RP}$ ensure that: (\emph{a}) $PID_{RP}$ is valid only for this login and for the identity proof generated in this login, and (\emph{b}) $PID_{RP}$ is dynamically generated for this login and is different from other $PID_{RP}$s generated in other login session between the same user and RP. Therefore, the IdP cannot associate multiple $PID_{RP}$s of a same RP. Finally, the cooperative generation process between the user and the RP prevents a single malicious entity from manipulating the value of $PID_{RP}$.
 %For example, the malicious user fails to make a correct RP accept a $PID_{RP}$ used in another login, while the collusive RPs fail to use a same or correlated $PID_{RP}$s for different logins.
 
 
@@ -49,14 +51,14 @@ First, it is computationally infeasible for the IdP to derive $ID_{RP}$ from $PI
     {$q$} & {A large  prime factor of ($p-1$).} & {Long-term constant} \\
     \hline
 %    {$L$} & {Length of $q$. } & {Long-term} \\    \hline
-     {$g$} & {A generator of order $q$ in $GF(p)$. } & {Long-term constant} \\
-     \hline
+ %    {$g$} & {A generator of order $q$ in $GF(p)$. } & {Long-term constant} \\
+    % \hline
    % \hline
     %{$SK_{ID}$, $PK$} & {The private/public key to sign/verify identity proof.} & {System-unique} \\
     {$SK$, $PK$} & {The private/public key of IdP. } & {Long-term constant} \\
     \hline
-    {$ID_{RP}$} & {$ID_{RP}=g^r \bmod p$, an RP's unique identity.} & {Long-term constant} \\
-    \hline
+  %  {$ID_{RP}$} & {$ID_{RP}=g^r \bmod p$, an RP's unique identity.} & {Long-term constant} \\
+    %\hline
 %    {$r$} & {value for $ID_{RP}=g^r \bmod p$.} & {Secret, Long-term} \\
 %    \hline
     {$Cert_{RP}$} & {An RP certificate, containing the RP's identity and endpoint.} & {Long-term constant} \\
@@ -65,17 +67,17 @@ First, it is computationally infeasible for the IdP to derive $ID_{RP}$ from $PI
     \hline
      {$Account$} & {$Account = {ID_{RP}}^{ID_U} \bmod p$, a user's identifier at an RP.} & {Long-term constant} \\
     \hline
-    {$PID_{RP}$} & {$PID_{RP} = {ID_{RP}}^{N_{U} N_{RP}} \bmod p$, an RP's pseudo-identifier.} & {One-time variable} \\
+    {$PID_{RP}$} & {$PID_{RP} = {ID_{RP}}^{N_{U}} \bmod p$, an RP's pseudo-identifier.} & {One-time variable} \\
     \hline
     {$PID_U$} & {$PID_U = {PID_{RP}}^{ID_U} \bmod p$, a user's pseudo-identifier.} & {One-time variable}\\
     \hline
     {$N_U$} & {A user-generated nonce for $PID_{RP}$.} & {One-time variable} \\
     \hline
-    {$N_{RP}$} & {An RP-generated nonce for $PID_{RP}$.} & {One-time variable} \\
-    \hline
-    {$Y_{RP}$} & {$Y_{RP} = {ID_{RP}}^{N_{RP}} \bmod p$, the public value for $N_{RP}$.} & {One-time variable} \\
-    \hline
-    {$T$} & {$T=(N_U N_{RP})^{-1} \bmod q$, the trapdoor to derive $Account$.} & {One-time variable} \\
+ %   {$N_{RP}$} & {An RP-generated nonce for $PID_{RP}$.} & {One-time variable} \\
+  %  \hline
+   % {$Y_{RP}$} & {$Y_{RP} = {ID_{RP}}^{N_{RP}} \bmod p$, the public value for $N_{RP}$.} & {One-time variable} \\
+    %\hline
+    {$T$} & {$T=N_U^{-1} \bmod q$, the trapdoor to derive $Account$.} & {One-time variable} \\
     \hline
     \end{tabular}
     \label{tbl:notations}
@@ -89,10 +91,11 @@ First, it is computationally infeasible for the IdP to derive $ID_{RP}$ from $PI
 \end{equation}
 
 % The function $\mathcal{F}_{ID_{U} \mapsto PID_{U}}$ satisfies the requirements described in Section~\ref{subsec:challenges}.
-From Equations~\ref{equ:IDRP}, ~\ref{equ:PIDRP} and~\ref{equ:PIDU}, we see that $PID_U = {ID_{RP}}^{N_UN_{RP}ID_U}  = g^{rN_UN_{RP}ID_U} \bmod p$.
-First, the discrete logarithm problem ensures that the RP cannot derive $ID_U$ from $PID_U$.
+From Equations%~\ref{equ:IDRP}, 
+~\ref{equ:PIDRP} and~\ref{equ:PIDU}, we see that $PID_U = {ID_{RP}}^{N_UID_U} \bmod p$.
+The discrete logarithm problem ensures that the RP cannot derive $ID_U$ from $PID_U$.
 
-Moreover, $ID_{RP}$ is generated following Equation~\ref{equ:IDRP} to introduce a random $r$ that is unknown to the RP, so that for a given $ID_U$, $PID_U$ is determined by $r$, $N_{U}$ and $N_{RP}$ together. Otherwise, if two collusive RPs know $r_1$ and $r_2$ respectively, they can check if ${PID_{U_1}}^{r_2N_{U_2}N_{RP_2}} = {PID_{U_2}}^{r_1N_{U_1}N_{RP_1}} \bmod\ p$ holds, which means a same user logs into them in two SSO sessions (i.e., $ID_{U_1}==ID_{U_2}$).
+%Moreover, $ID_{RP}$ is generated following Equation~\ref{equ:IDRP} to introduce a random $r$ that is unknown to the RP, so that for a given $ID_U$, $PID_U$ is determined by $r$, $N_{U}$ and $N_{RP}$ together. Otherwise, if two collusive RPs know $r_1$ and $r_2$ respectively, they can check if ${PID_{U_1}}^{r_2N_{U_2}N_{RP_2}} = {PID_{U_2}}^{r_1N_{U_1}N_{RP_1}} \bmod\ p$ holds, which means a same user logs into them in two SSO sessions (i.e., $ID_{U_1}==ID_{U_2}$).
 
 %Moreover, since $r$ is unknown to the RP, collusive RPs cannot link a user's $PID_U$s at different RPs. If $r$ is known to the RP, two collusive RPs might attempt to associate a user's $PID_U$s by checking whether the equality ${PID_{U_1}}^{r_2N_{U_2}N_{RP_2}} = {PID_{U_2}}^{r_1N_{U_1}N_{RP_1}} \bmod\ p$ holds or not, because ${PID_{U_1}} = g^{r_1N_{U_1}N_{RP_1}ID_{U_1}} \bmod p$ and ${PID_{U_2}} = g^{r_2N_{U_2}N_{RP_2}ID_{U_2}} \bmod p$.
 
@@ -102,11 +105,11 @@ following Equation~\ref{equ:Account}.
    \mathcal{F}_{PID_{U} \mapsto Account}: Account = {PID_U}^{T} \bmod p
    \label{equ:Account}
    \end{equation}
-Here, we define $T = (N_UN_{RP})^{-1} \bmod q$ as the RP's trapdoor.
-As $q$ is a prime number and $1< N_U, N_{RP} < q$, $q$ is coprime to $N_U N_{RP}$. Also, there always exists a $T$ that satisfies $T (N_U N_{RP}) = 1 \bmod q$. Moreover, from Equations~\ref{equ:PIDRP}, \ref{equ:PIDU} and \ref{equ:Account}, we have $Account = {ID_{RP}}^{ID_U} \bmod p$, derived as below.
+Here, we define $T = N_U^{-1} \bmod q$ as the RP's trapdoor.
+As $q$ is a prime number and $1< N_U < q$, $q$ is coprime to $N_U$. Also, there always exists a $T$ that satisfies $T N_U = 1 \bmod q$. Moreover, from Equations~\ref{equ:PIDRP}, \ref{equ:PIDU} and \ref{equ:Account}, we have $Account = {ID_{RP}}^{ID_U} \bmod p$, derived as below.
 \begin{multline}\label{equ:AccountNotChanged}
-   Account =  {PID_{U}}^{T} = {({PID_{RP}}^{ID_U})}^{{(N_UN_{RP})^{-1} \bmod q}}\\
-   = {ID_{RP}} ^ {ID_U N_U N_{RP} T \bmod q} = {ID_{RP}}^{ID_U} \bmod p
+   Account =  {PID_{U}}^{T} = {({PID_{RP}}^{ID_U})}^{{N_U^{-1} \bmod q}}\\
+   = {ID_{RP}} ^ {ID_U N_U N_U^{-1} \bmod q} = {ID_{RP}}^{ID_U} \bmod p
 \end{multline}
 
 Therefore, when a user logins at an RP multiple times, the RP can always derives the same $Account$ to identity the user. Finally, the transformation function $\mathcal{F}_{PID_{U} \mapsto Account}$ satisfies the following requirements: %described in Section~\ref{subsec:challenges}.
@@ -140,9 +143,11 @@ The UPPRESSO system has four procedures, namely system initialization, RP initia
 
 
 \vspace{1mm}\noindent \textbf{System Initialization.} System initialization is conducted once by the IdP to establish the entire system. In particular, the IdP %chooses $L$,
-generates a large prime $p$, a prime factor $q$ of $p-1$ and a generator $g$ of order $q$ as the parameters of the discrete logarithm problem. %~\cite{gallagher2013digital}.
+generates a large prime $p$, and a prime factor $q$ of $p-1$
+% and a generator $g$ of order $q$ 
+ as the parameters of the discrete logarithm problem. %~\cite{gallagher2013digital}.
 The IdP also generates one key pair ($SK$, $PK$) to sign identity proofs and RP certificates.
-The lengths of $p$, $q$ and ($SK$, $PK$) should satisfy the required security strength. Then, the IdP keeps $SK$ secret, while announcing $p$, $q$, $g$ and $PK$ are public parameters.
+The lengths of $p$, $q$ and ($SK$, $PK$) should satisfy the required security strength. Then, the IdP keeps $SK$ secret, while announcing $p$, $q$ and $PK$ are public parameters.
 %The values of $p$, $q$, $g$ remain the same during the full lifecycle of an SSO system.
 %While, the asymmetric key pair ($SK$, $PK$) will be updated when necessary. For example, when $SK$ is leaked, IdP must update ($SK$,$PK$).
 
@@ -151,13 +156,14 @@ Each RP launches this procedure only once. In particular, an RP registers itself
 \begin{itemize}
 \item The RP sends a registration request to the IdP,
     including the RP endpoint (e.g., URL) to receive identity proofs.
-\item The IdP chooses a unique random number $r$ ($1 < r < q$), calculates $ID_{RP} = g^r \bmod p$,
+\item The IdP generates the unique generator $ID_{RP}$,
+%chooses a unique random number $r$ ($1 < r < q$), calculates $ID_{RP} = g^r \bmod p$,
 signs $[ID_{RP}, Endpoint_{RP}, *]$ using $SK$, where $*$ denotes the supplementary information such as the RP's common name, and returns $Cert_{RP} = [ID_{RP}, Endpoint_{RP}, *]_{SK}$ to the RP, where $[\cdot]_{SK}$ means the message is signed using $SK$.
 \item The RP verifies $Cert_{RP}$ using $PK$ and accepts $ID_{RP}$ and $Cert_{RP}$ if they are valid.
 \end{itemize}
 
 
-Note that, $ID_{RP}$ cannot be chosen by the RP. It must be chosen by the IdP with $r$ unknown to the RP.
+Note that, $ID_{RP}$ cannot be chosen by the RP. It must be generated by the IdP.% with $r$ unknown to the RP.
 
 \vspace{1mm}\noindent\textbf{User registration.} UPPRESSO takes the same user registration process as other SSO systems to set up a unique user identifier $ID_U$ and the corresponding user credential. User registration is launched only once by each user. $ID_U$ can be chosen by either the user or the IdP, as long as it is unique for each user.
 
@@ -214,7 +220,7 @@ In this phase, the user and the RP cooperate to generate $PID_{RP}$ as follows:
 \begin{itemize}
 \item[2.1] The IdP script chooses a random number $N_U$ ($1 < N_U <q$) and sends it to RP script through postMessage, then RP script sends $N_U$ to RP server.
 \item[2.2] The RP  verifies $N_{U} \neq 0 \bmod q$, calculates $PID_{RP}$ with $N_U$, derives the trapdoor $T={(N_U N_{RP})}^{-1} \bmod q$; and  acknowledges the negotiation by responding with $Cert_{RP}$. The $Cert_{RP}$ is transmitted from RP script to IdP script through postMessage.
-\item[2.3] The IdP script verifies $Cert_{RP}$, extracts $ID_{RP}$ from the valid $Cert_{RP}$,  calculate $PID_{RP}={ID_{RP}}^{N_{U}} \bmod p$, creates a one-time endpoint to hide the RP's endpoint from the IdP and calculate $Nonce=Hash(N_U)$.
+\item[2.3] The IdP script verifies $Cert_{RP}$, extracts $ID_{RP}$ from the valid $Cert_{RP}$,  calculate $PID_{RP}={ID_{RP}}^{N_{U}} \bmod p$, creates a one-time endpoint to hide the RP's endpoint from the IdP and calculates $Nonce=Hash(N_U)$.
 
 
  % \item [1.1] The user sends a login request to trigger the negotiation of $PID_{RP}$.

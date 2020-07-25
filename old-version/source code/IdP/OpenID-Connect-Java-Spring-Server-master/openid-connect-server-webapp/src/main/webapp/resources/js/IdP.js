@@ -5,13 +5,7 @@ let Domain = "http://192.168.0.190:8080/openid-connect-server-webapp"
 let state = "start"
 let pubKey = ""
 let Cert, Y_RP, N_U,  ID_RP, N_RP, PID_RP, redirect_uri, payload
-let currentEndpoint
-
-
-
-
 function doAuthorize() {
-
 	$.ajax({
 		url : 'authorize?client_id=' + PID_RP + '&redirect_uri=' + redirect_uri + '&response_type=token&scope=openid%20email',
 		// dataType : 'json',
@@ -58,9 +52,6 @@ function logFuc(){
 	xmlhttp.setRequestHeader("Content-Type", "application/x-www-form-urlencoded")
 	xmlhttp.send(body);
 }
-
-
-
 var pKey = KEYUTIL.getKey("-----BEGIN PUBLIC KEY-----\n" +
 	"MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAnzyis1ZjfNB0bBgKFMSv\n" +
 	"vkTtwlvBsaJq7S5wA+kzeVOVpVWwkWdVha4s38XM/pa/yr47av7+z3VTmvDRyAHc\n" +
@@ -102,8 +93,6 @@ var sKey = 	KEYUTIL.getKey("-----BEGIN RSA PRIVATE KEY-----\n" +
 function verify(mes, key){
 	return true
 }
-
-
 function generateModPow(x, y, z){
 	let xbn = nbi();
 	let ybn = nbi();
@@ -126,9 +115,6 @@ function initXML(){
 		return ActiveXObject("Microsoft.XMLHTTP");
 	}
 }
-
-
-
 function doRequestToken (data){
 	let registrationUrl = Domain + "/isAuthenticated"
 	let xmlhttp = initXML()
@@ -151,8 +137,6 @@ function doRequestToken (data){
 	xmlhttp.send();
 
 }
-
-
 function doRegistration() {
 	let registrationUrl = Domain + "/register"
 	let xmlhttp = initXML()
@@ -175,7 +159,6 @@ function doRegistration() {
 	let sha256Str = sha256.digest()
 	redirect_uri = Domain + "1/" + sha256Str
 	let body = {"client_id": PID_RP, "application_type": "web", "client_name": "M_OIDC", "redirect_uris":redirect_uri, "grant_types": "implicit", "response_types": ["id_token"]}
-	//let body = "{\"client_id\":\"" + PID_RP + "\",\"application_type\":\"web\",\"client_name\":\"M_OIDC\",\"redirect_uris\":\"http://oidcupload.12450.com/token\", \"grant_types\": \"implicit\"}"// \"response_types\": [\"id_token\", \"token\"],
 	xmlhttp.send(JSON.stringify(body));
 }
 
@@ -188,7 +171,6 @@ function onReceiveMessage(event){
 			if (state != "expectCert")
 				break
 			Cert = message.Cert
-		//	Y_RP = message.Y_RP
 			if (Cert==null)//||Y_RP==null)
 				break
 			let CertTup = Cert.split('\.')
@@ -197,14 +179,12 @@ function onReceiveMessage(event){
 			let sig = CertTup[2]
 			if (header==null||payload==null||sig==null)
 				break
-		//	let key = pubKey[JSON.parse(header).kid]
 			let signatureVf=new KJUR.crypto.Signature({"alg":"SHA256withRSA", "prvkeypem": pKey});
 			signatureVf.updateString(header + "." + payload);
 			let verify = signatureVf.verify(b64tohex(sig));
 			if (!verify)
 				break
 			ID_RP = "2859278237642201956931085611015389087970918161297522023542900348087718063098423976428252369340967506010054236052095950169272612831491902295835660747775572934757474194739347115870723217560530672532404847508798651915566434553729839971841903983916294692452760249019857108409189016993380919900231322610083060784269299257074905043636029708121288037909739559605347853174853410208334242027740275688698461842637641566056165699733710043802697192696426360843173620679214131951400148855611740858610821913573088059404459364892373027492936037789337011875710759208498486908611261954026964574111219599568903257472567764789616958430"
-			//= JSON.parse(atob(payload)).basic_client_id
 			PID_RP = generateModPow(ID_RP, N_U, p);
 			doRegistration()
 			break
@@ -216,14 +196,10 @@ function onReceiveMessage(event){
 				state = "stop"
 				break
 			}
-			// if (data.redirect_uri in Cert) {
-				doRequestToken(data)
-			// }
+			doRequestToken(data)
+			break
 	}
-
-
 }
-
 N_U = bigInt.randBetween("0", q).toString();
 window.addEventListener('message', onReceiveMessage);
 let Ready = {'Type':'N_U', 'N_U': N_U}
