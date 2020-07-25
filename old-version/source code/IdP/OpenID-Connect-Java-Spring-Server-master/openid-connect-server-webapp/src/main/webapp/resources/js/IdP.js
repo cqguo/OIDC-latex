@@ -1,5 +1,5 @@
-let p = "27449016760001930830125617668247859359745430986704432309085929677995807338305678419885652753794242496407976182871494825520552812933077776662415387179356727792234451654055658177210561689664280863983972105655690337291450879107894692596167210983185326590416340066192826004270803522574046051860102165172244586056707834948333241005980694712476760216030160395462421297530733396614124258707965156976358959843617034441619164457098759725517618250918992025137481460788874501395889763568442978210065547845149324569983455235117868998436516548293413794803510612425480720620581614363153446128915785524341773999191504845709308817083";
-let q = "12345678901234567890123456789012345678901234567890123456789012345678901234567890"
+let p = "18111848663142005571178770624881214696591339256823507023544605891411707081617152319519180201250440615163700426054396403795303435564101919053459832890139496933938670005799610981765220283775567361483662648340339405220348871308593627647076689407931875483406244310337925809427432681864623551598136302441690546585427193224254314088256212718983105131138772434658820375111735710449331518776858786793875865418124429269409118756812841019074631004956409706877081612616347900606555802111224022921017725537417047242635829949739109274666495826205002104010355456981211025738812433088757102520562459649777989718122219159982614304359";
+let q = "19689526866605154788513693571065914024068069442724893395618704484701"
 let g = "3"
 let Domain = "http://192.168.0.190:8080/openid-connect-server-webapp"
 let state = "start"
@@ -11,18 +11,6 @@ let currentEndpoint
 
 
 function doAuthorize() {
-	// let authorizationUrl = Domain + "/authorize?client_id=" + PID_RP + "&redirect_uri=" + redirect_uri + "&response_type=token&scope=openid%20email"
-	// let xmlhttp = initXML()
-	// xmlhttp.onreadystatechange = function () {
-	// 	if (xmlhttp.readyState == 3 && xmlhttp.status == 200) {
-	// 		console.log(xmlhttp.fragment)
-	// 	} else {
-	//
-	// 	}
-	// }
-	// xmlhttp.open("GET", authorizationUrl, false);
-	// xmlhttp.send()
-
 
 	$.ajax({
 		url : 'authorize?client_id=' + PID_RP + '&redirect_uri=' + redirect_uri + '&response_type=token&scope=openid%20email',
@@ -41,20 +29,6 @@ function doAuthorize() {
 		}
 
 	});
-
-	// $.get('/openid-connect-server-webapp/authorize?client_id=' + PID_RP + '&redirect_uri=' + redirect_uri + '&response_type=token&scope=openid%20email', {}, function(response, status, request) {
-	// 	if (status == STATUS.REDIRECT) {
-	// 		// you need to return the redirect url
-	// 		location.href = response.redirectUrl;
-	// 	} else {
-	// 		$('#content').html(request.responseText);
-	// 	}
-	// });
-
-	// fetch('/openid-connect-server-webapp/authorize?client_id=' + PID_RP + '&redirect_uri=' + redirect_uri + '&response_type=token&scope=openid%20email', { redirect: 'manual' })
-	// 	.then(response => {
-	// 		console.log(response);
-	// 	})
 }
 
 
@@ -185,8 +159,8 @@ function doRegistration() {
 	xmlhttp.onreadystatechange = function () {
 		if (xmlhttp.readyState == 4 && xmlhttp.status == 201) {
 			let data = JSON.parse(xmlhttp.responseText)
-			console.log(xmlhttp.responseText)
-			if (data.Content.Result == "OK"){
+			let content = JSON.parse(atob(data.Content))
+			if (content.Result == "OK"){
 				state = "expectRequest"
 				let RegistrationResult = {"Type": "RegistrationResult", "RegistrationResult": xmlhttp.responseText}
 				window.opener.postMessage(JSON.stringify(RegistrationResult), '*');
@@ -200,7 +174,7 @@ function doRegistration() {
 	sha256.updateString(N_U)
 	let sha256Str = sha256.digest()
 	redirect_uri = Domain + "1/" + sha256Str
-	let body = {"client_id": PID_RP, "application_type": "web", "client_name": "M_OIDC", "redirect_uris":redirect_uri, "grant_types": "implicit"}
+	let body = {"client_id": PID_RP, "application_type": "web", "client_name": "M_OIDC", "redirect_uris":redirect_uri, "grant_types": "implicit", "response_types": ["id_token"]}
 	//let body = "{\"client_id\":\"" + PID_RP + "\",\"application_type\":\"web\",\"client_name\":\"M_OIDC\",\"redirect_uris\":\"http://oidcupload.12450.com/token\", \"grant_types\": \"implicit\"}"// \"response_types\": [\"id_token\", \"token\"],
 	xmlhttp.send(JSON.stringify(body));
 }
@@ -211,7 +185,7 @@ function onReceiveMessage(event){
 	let messageType = message.Type
 	switch (messageType) {
 		case "Cert":
-			if (state != "expectYRP")
+			if (state != "expectCert")
 				break
 			Cert = message.Cert
 		//	Y_RP = message.Y_RP
@@ -229,21 +203,9 @@ function onReceiveMessage(event){
 			let verify = signatureVf.verify(b64tohex(sig));
 			if (!verify)
 				break
-			N_U = bigInt.randBetween("0", q).toString();
-			ID_RP = JSON.parse(atob(payload)).basic_client_id
+			ID_RP = "2859278237642201956931085611015389087970918161297522023542900348087718063098423976428252369340967506010054236052095950169272612831491902295835660747775572934757474194739347115870723217560530672532404847508798651915566434553729839971841903983916294692452760249019857108409189016993380919900231322610083060784269299257074905043636029708121288037909739559605347853174853410208334242027740275688698461842637641566056165699733710043802697192696426360843173620679214131951400148855611740858610821913573088059404459364892373027492936037789337011875710759208498486908611261954026964574111219599568903257472567764789616958430"
+			//= JSON.parse(atob(payload)).basic_client_id
 			PID_RP = generateModPow(ID_RP, N_U, p);
-			state = "expectPIDRP"
-			let content = {"Type": "N_U", "N_U": N_U}
-			console.log(content)
-			window.opener.postMessage(JSON.stringify(content), '*');
-			break
-		case "PID_RP":
-			if (state != "expectPIDRP")
-				break
-			if (PID_RP != message.PID_RP) {
-				state = "stop"
-				break
-			}
 			doRegistration()
 			break
 		case "Request":
@@ -262,12 +224,10 @@ function onReceiveMessage(event){
 
 }
 
-
-
-
+N_U = bigInt.randBetween("0", q).toString();
 window.addEventListener('message', onReceiveMessage);
-let Ready = {'Type': 'Ready'}
-state = "expectYRP"
+let Ready = {'Type':'N_U', 'N_U': N_U}
+state = "expectCert"
 window.opener.postMessage(JSON.stringify(Ready), '*');
 
 

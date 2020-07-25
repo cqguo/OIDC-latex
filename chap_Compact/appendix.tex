@@ -564,6 +564,11 @@ If $c(u,r)$ is the authenticated cookie owned by $u$, $c(u,r)$ cannot be obtaine
 If $c$ is an unauthenticated cookie owned by $a$, $c$ cannot be set as \myss{c(u,r)}. 
 \label{req:cookie2}
 \end{req}
+\begin{req}
+The user \myss{u} does not use the attacker's cookie (defined as \myss{c(a,r)}). 
+\label{req:cookie3}
+\end{req}
+
 
 To prove that UPPRESSO meets the requirements, we now show some lemmas. The first lemma here can prove that the UPPRESSO system meets requirement~\ref{req:cookie1}.
 \begin{relemma}
@@ -576,7 +581,7 @@ As the Brute-force attacks, such as exhausting the possible users' cookies, are 
 Here we only need to prove that attacker cannot receive the event from these processes carrying \myss{c(u,r)}.
 \begin{itemize}
 \item \myss{b.} The browsers used by users are considered honest and well implemented. Therefore, based on the same-origin policy, \myss{b_u} only sends \myss{r}'s cookie to RP's domain, so that attackers cannot receive the cookie.
-\item \myss{script_rp}. According to Algorithm~\ref{alg4}, the \myss{script_rp} does not send any cookie. 
+\item \myss{script\_rp}. According to Algorithm~\ref{alg4}, the \myss{script_rp} does not send any cookie. 
 \item \myss{P^r}. According to Algorithm~\ref{alg2}, the \myss{P^r} does not send any cookie. 
 \end{itemize}
 Therefore, lemma~\ref{rel:cookie} is proved.
@@ -633,7 +638,26 @@ As the \myss{Token} has been proved that it can not be gorged by the attackers, 
 \end{itemize}
 Therefore, attackers cannot  learn users' valid identity proofs.
 \end{proof}
-Here we have proved that UPPRESSO meets the requirement in definition~\ref{red:token}. Therefore the requirement~\ref{req:cookie2} is met, so that the theorem~\ref{the:secure} is proved.
+
+
+Here we confirm that UPPRESSO meet the requirement~\ref{req:cookie3}. As the browser follows the same-origin policy, we consider that the attackers cannot set its cookie to user's browser at RP's origin. Therefore, due to definition~\ref{red:token}, the user only  sets her cookie as \myss{c(a,r)} when RP receives the \myss{Token} containing the attacker's \myss{PID{RP}} and a  valid \myss{PID_{RP}} negotiated by \myss{u} and \myss{r}. It requires that the attackers must know a valid \myss{PID_{RP}}. Here we give a lemma.
+\begin{relemma}
+Attacker does not know a valid \myss{PID_{RP}} negotiated by user \myss{u} and RP \myss{r}. 
+\end{relemma} 
+\begin{proof}
+Here we give the proof that attacker cannot obtain the \myss{PID_{RP}} and \myss{N_U} from each processes.
+\begin{itemize}
+\item \myss{P^i}. We can find at algorithm~\ref{alg1} IdP only returns the message containing \myss{PID_{RP}} to other processes when the \myss{PID_{RP}} is included in the request message. 
+\item \myss{P^r}. Same as IdP server, RP server only send the message containing \myss{PID_{RP}} at algorithm at line 55, and the \myss{PID_{RP}} is contained in the \myss{RegistrationResult} received at line 28 and werified at line 44.
+\myss{script\_rp}. We can find at algorithm~\ref{alg4}, RP script  only sends the messages to RP server and IdP script. The receivers' identities are ensured at line 3, 4. Therefore, attackers cannot obtains the  \myss{PID_{RP}} and \myss{N_U}.
+\myss{script\_idp}. The HTTP requests sent by IdP script are forwarded to the domain set at algorithm~\ref{alg3} line 4. The HTTP requests are ensured sent to IdP server. The postMessages are sent to the target set at line 3, and we will prove the target cannot be attacker.  
+According to algorithm~\ref{alg2} line 44, the \myss{PID_{RP}} is valid at RP server only when server receives the registration result. The \myss{\mathtt{Hash}(N_U)} in the result ensure the result must issued for the correct \myss{ID_{RP}}. As the registration result is \myss{PID_{RP}}-unique due to algorithm~\ref{alg1} line 32, the registration result received by IdP script at algorithm~\ref{alg3} line 35 must be same as it in RP server. This HTTP response is related with the HTTP request at line 28, carrying \myss{PID_{RP}} and \myss{\mathtt{Hash}(N_U)} at line 21, 25. It ensure the \myss{Cert} obtained at line 15 must belong to RP not the attacker. As the target at line 3 is the window which opens the IdP script window and asks for user's login consent, user can easily find out the target site is not coincident with the consent requirement. Therefore, the target cannot be the attacker.
+%Here we assume the target is attacker and then the transmitted \myss{PIR_{RP}} and \myss{N_U} cannot be valid at 
+\end{itemize}
+\end{proof}
+
+
+Here we have proved that UPPRESSO meets the requirements in definition~\ref{red:token}. Therefore the requirement~\ref{req:cookie2} is met, so that the theorem~\ref{the:secure} is proved.
 
 \subsection{Proof of Theorem~\ref{the:privacy}}
 In this section, we will give a full version of proof about UPPRESSO privacy. That is, if UPPRESSO is a privacy-preserving system, the system must be IdP-Privacy and RP-Privacy. Firstly we recall the requirements of IdP-Privacy and RP-Privacy system. Then we will give the proof that UPPRESSO system meets these requirements. 

@@ -202,9 +202,9 @@ and describe the detailed processes as follows.
 \vspace{1mm}\noindent\textbf{Scripts Downloading.}
 At the beginning, the user downloads the scripts from RP server and IdP server as follows:
 \begin{itemize}
-\item[1.1-1.2] The user visits the RP's script site and obtains the script.
-\item[1.3-1.4] The script opens a new window in the browser visiting the login path at RP server.
-\item[1.5-1.6] The visit to RP's login path is redirected to IdP's script.
+\item[1.1,2] The user visits the RP's script site and obtains the script.
+\item[1.3,4] The script opens a new window in the browser visiting the login path at RP server.
+\item[1.5,6] The visit to RP's login path is redirected to IdP's script.
 \item[1.7] The new window obtains the IdP's script, so far the scripts downloading phase finishes.
 \end{itemize}
 
@@ -249,7 +249,7 @@ The user registers $PID_{RP}$ at the IdP.
 \item[3.2] The IdP verifies that $PID_{RP}$ is unique among unexpired $PID_{RP}$s,
     and then signs the response $[PID_{RP}, Hash( N_U), Validity]_{SK}$,
         where $Validity$ is the validity period.
-\item[3.3-3.4] The IdP script forwards the registration result to the RP server through RP script.
+\item[3.3,4] The IdP script forwards the registration result to the RP server through RP script.
 \item[3.5] The RP verifies the IdP's signature, and accepts it only if $PID_{RP}$ and $Hash(N_U)$ match those in the negotiation and it is in the validity period.
 
 
@@ -275,13 +275,13 @@ More details are analyzed in Section~\ref{sec:analysis}.
 \vspace{1mm}\noindent\textbf{ID Proof Generation.}
 In this phase, the user login continues and the IdP signs the identity proof. % The processes are as follows.
 \begin{itemize}
-\item[4.1-4.2] The RP uses $PID_{RP}$ and $Endpoint_{RP}$ to construct an identity proof request for a set of user's attributes, and the request is forwarded to IdP script through RP script.
+\item[4.1,2] The RP uses $PID_{RP}$ and $Endpoint_{RP}$ to construct an identity proof request for a set of user's attributes, and the request is forwarded to IdP script through RP script.
 \item[4.3] The IdP authenticates the user if she has not been authenticated yet. 
  \item[4.4] The user first confirms the scope of the requested attributes. IdP script verifies the $PID_{RP}$ with the negotiated one and $Endpoint_{RP} \in Cert_{RP}$, replaces the endpoint with the registered one-time $Endpoint_U$ and then sends the modified identity proof request to the IdP server.
  \item [4.5] The IdP verifies whether $PID_{RP}$ and $Endpoint_U$ have been registered and unexpired, and
    calculates $PID_U = {PID_{RP}}^{ID_U} \bmod p$ for the authenticated user.
 \item[4.6] The IdP constructs and signs the identity proof $[PID_{RP}, PID_U, Iss, ValTime, Attr]_{SK}$, where $Iss$ is the identifier of the IdP,  $ValTime$ is the validity period, $Attr$ contains the requested attributes. Then, the IdP sends the identity proof to the one-time endpoint at the user.
-\item[4.7-4.8] The IdP script forwards the identity proof to RP script with the origin $Endpoint_{RP}$ and RP script sends it to the server.
+\item[4.7,8] The IdP script forwards the identity proof to RP script with the origin $Endpoint_{RP}$ and RP script sends it to the server.
 
 %  \item [3.1] The RP uses $PID_{RP}$ and $Endpoint_{RP}$ to construct an identity proof request for a set of user's attributes.  %, which is the same as the one in  OIDC.
 
@@ -328,7 +328,7 @@ The identity proof generation and $Account$ calculation phases adopt the same st
 can be viewed as a customized step by the RP to derive its user account after the implicit protocol flow of OIDC ends. 
 %Another modification is the replacement of endpoint by the user for transmitting the identity proof to the RP.
 %In fact, this message forwarding is common when an application-layer network proxy is deployed. 
-So, the identity proof generation and $Account$ calculation phases of UPPRESSO can be viewed as a particular but compatible implementation of the implicit protocol flow of OIDC.
+So,the identity proof generation and $Account$ calculation phases of UPPRESSO can be viewed as a particular but compatible implementation of the implicit protocol flow of OIDC.
 
 It is worth noting that the identity proof generation and $Account$ calculation phases of UPPRESSO can be also implemented as the authorization code flow of OIDC with small modifications, which will be discussed in Section \ref{sec:discussion}.
 
