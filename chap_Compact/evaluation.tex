@@ -44,7 +44,7 @@ The details are as follows.
   \label{fig:evaluation}
 \end{figure}
 
-In the requesting, UPPRESSO requires both the user and RP to perform 2  modular exponentiations for RP identifier transformation
+In the requesting, UPPRESSO requires firstly user downloads the RP script, opens the IdP window and downloads the IdP script, then both the user and RP to perform 1  modular exponentiations for RP identifier transformation
 and complete $PID_{RP}$ registration at the IdP, which totally need 144 ms;
 SPRESSO needs 19 ms for the RP to obtain IdP's public key and encrypt its domain;
 while MITREid Connect only needs 10 ms.
@@ -53,10 +53,10 @@ while MITREid Connect only needs 10 ms.
 In the generation, UPPRESSO needs  an extra 6 ms for computing $PID_U$, compared to MITREid Connect which only needs 32 ms.
 SPRESSO requires 71 ms, as it implements the IdP based on node.js and therefore can only adopt a JavaScript cryptographic library, while others adopt a more efficient Java library.
 As the processings in SPRESSO and MITREid Connect are the same, the processing time in SPRESSO may be reduced to 32 ms.
-And, then the overall time in SPRESSO will be 269 ms, still larger than 254 ms in UPPRESSO.
+%And, then the overall time in SPRESSO will be 269 ms, still larger than 254 ms in UPPRESSO.
 
 %transmission & extraction
-In the identity proof extraction, UPPRESSO only needs 14 ms where the Chrome extension relays the identity proof to the RP server directly.
+In the identity proof extraction, UPPRESSO only needs 14 ms where the scripts relay the identity proof to the RP server.
 MITREid Connect requires the IdP to send the identity proof to the RP's web page which then sends the proof to the RP server through a JavaScript function, and needs 57 ms.
 SPRESSO needs the longest time (193 ms) due to a complicated processing at the user's browser,
   which needs the browser to obtain identity proofs from the IdP, download the JavaScript program from a trusted entity (forwarder), execute the program to decrypt RP's endpoint, send identity proofs to this endpoint (an RP's web page) who finally transmits the proof to RP server.
