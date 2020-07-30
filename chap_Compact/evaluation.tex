@@ -34,7 +34,8 @@ For better analysis, we divide a login into 4 phases according to the lifecycle 
 
 \noindent\textbf{Results.}
 The evaluation results are provided in Figure~\ref{fig:evaluation}.
-The overall processing times are  113 ms, 308 ms and 254 ms for MITREid Connect, SPRESSO and UPPRESSO, respectively.
+The overall processing times are  113 ms, 308 ms and 492 ms for MITREid Connect, SPRESSO and UPPRESSO, respectively.
+The part in UPPRESSO takes the longest time is opening the new window and downloading the script which totally cost about 255 ms. The time cost can be cut down as the browser can implicitly conduct this procedure while user visit the RP website. 
 The details are as follows.
 
 \begin{figure}
@@ -45,7 +46,7 @@ The details are as follows.
 \end{figure}
 
 In the requesting, UPPRESSO requires firstly user downloads the RP script, opens the IdP window and downloads the IdP script, then both the user and RP to perform 1  modular exponentiations for RP identifier transformation
-and complete $PID_{RP}$ registration at the IdP, which totally need 144 ms;
+and complete $PID_{RP}$ registration at the IdP, which totally need 371 ms, where
 SPRESSO needs 19 ms for the RP to obtain IdP's public key and encrypt its domain;
 while MITREid Connect only needs 10 ms.
 
@@ -56,7 +57,7 @@ As the processings in SPRESSO and MITREid Connect are the same, the processing t
 %And, then the overall time in SPRESSO will be 269 ms, still larger than 254 ms in UPPRESSO.
 
 %transmission & extraction
-In the identity proof extraction, UPPRESSO only needs 14 ms where the scripts relay the identity proof to the RP server.
+In the identity proof extraction, UPPRESSO only needs  about 25 ms where the scripts relay the identity proof to the RP server.
 MITREid Connect requires the IdP to send the identity proof to the RP's web page which then sends the proof to the RP server through a JavaScript function, and needs 57 ms.
 SPRESSO needs the longest time (193 ms) due to a complicated processing at the user's browser,
   which needs the browser to obtain identity proofs from the IdP, download the JavaScript program from a trusted entity (forwarder), execute the program to decrypt RP's endpoint, send identity proofs to this endpoint (an RP's web page) who finally transmits the proof to RP server.
