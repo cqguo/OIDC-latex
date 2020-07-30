@@ -71,6 +71,7 @@ Therefore, to prove theorem ~\ref{the:secure}, we are going to prove that an aut
 \begin{itemize}
 \item If $c$ is the authenticated cookie owned by $u$, $c$ cannot be obtained by $a$.
 \item If $c$ is an unauthenticated cookie owned by $a$, $c$ cannot be authenticated by $r$ for $u$. 
+\item The user $u$ does not use the attacker's cookie $c_a$.
 \end{itemize}
 
 
@@ -113,6 +114,12 @@ Attackers cannot obtain the $u$'s valid identity proof in $\mathcal{UWS}$.
 \begin{proof}
 We now give a brief proof about Lemma~\ref{lemma:token}. As the attacker attempts to obtain a valid identity proof, he must receive the proof from one of following processes, IdP server process, RP server process, IdP scripting process and RP scripting process. That is, according to the model we find the honest RP scripting process only send identity proof to honest RP server and RP server will not send the proof to any process. It can be proved that only the process who holds $u$'s password can obtain the $u$'s identity proof from IdP server. As the attacker does not know $u$'s password so that he cannot obtain the identity proof from IdP server. To prove that attacker cannot obtain the identity from IdP scripting process is a little complicated so that we here only give a straightforward conclusion. That is when the honest user $u$ sends the identity proof from the IdP scripting process, the receiver is restricted by the RP Certification $cert_r$. And the identity proof is valid in honest RP $r$ only if the $cert_r$ belongs to $r$ (the full proof is in ~\ref{•}). 
 \end{proof}
+
+Due to definition~\ref{def:cookie}, if an attacker attempts to lead the user to set her cookie as the $c_a$, the user must send the attacker's identity proof to RP, which requires the attacker must know the negotiated $PID_{RP)$. Here we give a lemma.
+\begin{lemma}
+Attacker does not know a valid \myss{PID_{RP}} negotiated by user \myss{u} and RP \myss{r}. 
+\end{lemma}
+The detailed proof is shown in appendix. Therefore, the attacker cannot obtain a valid identity proof, so that the attack is impossible. 
 
 Therefore,  $\mathcal{UWS}$ satisfies the requirements in Definition~\ref{1}, such that Theorem~\ref{the:secure} is proved. 
 
