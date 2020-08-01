@@ -206,30 +206,6 @@ We map three existing privacy-preserving SSO approaches (PPID \cite{OpenIDConnec
 
 % and explain why they cannot prevent both IdP-based login tracing and RP-based identity linkage.
 
-\begin{table}[tb]
-    \caption{Identifier-transformation in privacy-preserving SSO.}
-    \centering
-    \setlength{\tabcolsep}{1.2mm}
-    \begin{tabular}{|c|c|c|c|}
-    \hline
-    {\textbf{Solution}} & {\textbf{$PID_{U}$}} & {\textbf{$PID_{RP}$}} & {\textbf{$Account$}}\\
-    \hline
-    {PPID} & {{$\mathcal{F}(ID_U,ID_{RP})$}} & {{$ID_{RP}$}} & {{$PID_U$}}\\
-    \hline
-    {SPRESSO} & {{$ID_U$}} & {{$Enc(ID_{RP}|nonce)$}} &{{$ID_U$}}\\
-    \hline
-    {BrowserID$^\dag$} & {{$ID_U$}} & {{$\bot$}} &{{$ID_U$}}\\
-    \hline
-    {UPPRESSO} & {{$\mathcal{F}(ID_U, PID_{RP})$}} & {{$\mathcal{F}(ID_{RP}, T)$}} &{{$\mathcal{F}(PID_U, T)$}}\\
-    \hline
-    \end{tabular}
-\flushleft
-{\footnotesize
-$\dag$: BrowserID binds null $PID_{RP}$ in the identity proofs by the IdP,
-    but $ID_{RP}$ is bound in the \emph{subsidiary} identity proof signed by the user.}
-    \label{tbl:compare}
-\end{table}
-
 
 %\begin{table}[tb]
 %    \caption{Identifier-transformation in privacy-preserving SSO.}
@@ -260,6 +236,31 @@ $\dag$: BrowserID binds null $PID_{RP}$ in the identity proofs by the IdP,
 % Various solutions~\cite{OpenIDConnect, SAMLIdentifier,BrowserID,SPRESSO}, are proposed, attempting to construct a secure and privacy-preserving SSO system.
 
 In PPID approaches, the IdP generates different $PID_U$s for a user to log in to different RPs and maintains deterministic one-to-many mappings from $ID_U$ to $PID_U$s. Therefore, they can prevent RP-based identity linkage. At each RP, a user is identified by a same $PID_U$ (i.e., $Account = PID_U$), which ensures user identification. However, since $ID_{RP}$ is directly used in identity proofs (i.e., $PID_{RP} = ID_{RP}$), these approaches are vulnerable to IdP-based login tracing.
+
+\begin{table}[tb]
+    \caption{Identifier-transformation in privacy-preserving SSO.}
+    \centering
+    \setlength{\tabcolsep}{1.2mm}
+    \begin{tabular}{|c|c|c|c|}
+    \hline
+    {\textbf{Solution}} & {\textbf{$PID_{U}$}} & {\textbf{$PID_{RP}$}} & {\textbf{$Account$}}\\
+    \hline
+    {PPID} & {{$\mathcal{F}(ID_U,ID_{RP})$}} & {{$ID_{RP}$}} & {{$PID_U$}}\\
+    \hline
+    {SPRESSO} & {{$ID_U$}} & {{$Enc(ID_{RP}|nonce)$}} &{{$ID_U$}}\\
+    \hline
+    {BrowserID$^\dag$} & {{$ID_U$}} & {{$\bot$}} &{{$ID_U$}}\\
+    \hline
+    {UPPRESSO} & {{$\mathcal{F}(ID_U, PID_{RP})$}} & {{$\mathcal{F}(ID_{RP}, T)$}} &{{$\mathcal{F}(PID_U, T)$}}\\
+    \hline
+    \end{tabular}
+\flushleft
+{\footnotesize
+$\dag$: BrowserID binds null $PID_{RP}$ in the identity proofs by the IdP,
+    but $ID_{RP}$ is bound in the \emph{subsidiary} identity proof signed by the user.}
+    \label{tbl:compare}
+\end{table}
+
 
 %However, these scheme provide at most two satisfying functions, and therefore fail to prevent either the IdP-based login tracing or RP-based identity linkage.
 %\begin{itemize}
