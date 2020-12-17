@@ -1,0 +1,138 @@
+Input: ⟨tree, docnonce, scriptstate, scriptinputs, cookies, localStorage, sessionStorage, ids, secret⟩
+let s' := scriptstate
+let command := <>
+let target := PARENTWINDOW(tree,docnonce)
+let IdPDomain := s'.Parameters[IdPDomain]
+swithch s'.q do
+	case start 
+		let command := ⟨POSTMESSAGE,target,<Ready, OK>,⊥⟩
+		let s'.q := expectNRP
+	case expectYRP
+		let pattern := ⟨POSTMESSAGE, *, *, Content⟩ 
+		let input := CHOOSEINPUT(scriptinputs,pattern)
+		if input ̸≡ ⊥ then
+			let Cert := input.Content[Cert]
+			//let Y_RP := input.Content[Y_RP]
+			let s'.Parameters[Cert] := Cert
+			//let s'.Parameters[Y_RP] := Y_RP
+			if Cert ≡ ⊥ then //∪ Y_RP ≡ ⊥ then
+				stop <>
+			end if
+			let pubKey := s'.IdPPubKey
+			if checksig(Cert.Content, Cert.sig, pubKey) ≡ ⊥ then
+				stop <>
+			end if
+			let N_U := λ2
+			let PID_RP := ModPow(Cert,Content.ID_RP, N_U, Cert.Content.p)
+			let s'.Parameters[N_U] := N_U
+			let s'.Parameters[PID_RP] := PID_RP
+			let command := ⟨POSTMESSAGE,target,<N_U, N_U>,⊥⟩
+			let s'.q := expectNRP
+		end if
+	case expectNRP
+		let pattern := ⟨POSTMESSAGE, *, *, Content⟩ 
+		let input := CHOOSEINPUT(scriptinputs,pattern)
+		if input ̸≡ ⊥ then
+			//let N_RP := input.Content[N_RP]
+			if N_RP ≡ ⊥ then
+				stop <>
+			end if
+			let Cert := s'.Parameters[Cert]
+			//let Y_RP := ModPow(Cert.Content.ID_RP, N_RP, Cert.Content.p)
+			//if Y_RP /≡ s'.Parameters[Y_RP] then
+			//	s'.q := stop
+			//	stop <>
+			end if
+			let Endpoint_U := λ3
+			let s'.Parameters[Endpoint_U]
+			let path := s'.Parameters[Registration]
+			let PID_RP := s'.Parameters[PID_RP]
+			let N_U := s'.Parameters[N_U]
+			let Nonce := hash(N_U)
+			let url := <URL, S, IdPDomain, path, ⊥>
+			let s'.refXHR := λ1
+			let command := ⟨XMLHTTPREQUEST,url,POST,<PID_RP, PID_RP>, <Nonce, Nonce>, <Endpoint, endpoint_U>, s'.refXHR⟩
+			let s'.q := expectRegistrationResult
+		end if
+	case expectRegistrationResult
+		let pattern := ⟨XMLHTTPREQUEST,Body,s'.refXHR⟩
+		let input := CHOOSEINPUT(scriptinputs,pattern) 
+		if input ̸≡ ⊥ then
+			let RegistrationResult := input.Body[RegistrationResult]
+			if RegistrationResult ≡ ⊥ ∪ RegistrationResult.Content.Result /≡ OK then
+				stop <>
+			end if
+			let command := ⟨POSTMESSAGE,target,<RegistrationResult, RegistrationResult>,⊥⟩
+			let s'.q := expectProofRquest
+		end if
+	case expectProofRquest
+		let pattern := ⟨POSTMESSAGE, *, *, Content⟩ 
+		let input := CHOOSEINPUT(scriptinputs,pattern)
+		if input ̸≡ ⊥ then
+			let PID_RP := input.Content[PID_RP]
+			let s'.Parameters[Endpoint_RP] := input.Content[Endpoint_RP]
+			if s'.Parameters[Endpoint_RP] /∈ Cert.Content.Endpoints ∪  PID_RP ̸≡ s'.Parameters[PID_RP] then
+				s'.q := stop
+				stop <>	
+			end if
+			let path := s'.Parameters[LoginState]
+			let url := <URL, S, IdPDomain, path, ⊥>
+			let s'.refXHR := λ1
+			let command := ⟨XMLHTTPREQUEST,url,GET,⊥,s'.refXHR⟩
+			let s'.q := expectLoginState
+		end if
+	case expectLoginState
+		let pattern := ⟨XMLHTTPREQUEST,Body,s'refXHR⟩
+		let input := CHOOSEINPUT(scriptinputs,pattern) 
+		if input ̸≡ ⊥ then
+			let state := input.Body[LoginState]
+			if state ≡ False then
+				let username ← ids
+				let path := s'Parameters[LoginPath]
+				let url := <URL, S, IdPDomain, path, ⊥>
+				let s'.refXHR := λ1
+				let command := ⟨XMLHTTPREQUEST,url,POST,<<username, username>, <password, secret>>,⊥⟩
+				s'.q := expectLoginResult
+			else state ≡ True then
+				let path := s'.Parameters[AuthorizationPath]
+				let PID_RP := s'.Parameters[PID_RP]
+				let Endpoint_U := s'Parameters[Endpoint_U]
+				let url := <URL, S, RPDomain, path, <<PID_RP, PID_RP>, <Endpoint, Endpoint_U>>>
+				let s'.refXHR := λ1
+				let command := ⟨XMLHTTPREQUEST,url,GET,⊥,s'.refXHR⟩
+				let s'.q := expectToken
+			end if
+		end if
+	case expectLoginResult
+		let pattern := ⟨XMLHTTPREQUEST,Body,s'refXHR⟩
+		let input := CHOOSEINPUT(scriptinputs,pattern)
+		if input ̸≡ ⊥ then
+			let LoginResult := input.Body[LoginResult]
+			if LoginResult ̸≡ OK then
+				stop <>
+			end if
+				let path := s'.Parameters[Authorizatiob]
+				let PID_RP := s'.Parameters[PID_RP]
+				let Endpoint_U := s'Parameters[Endpoint_U]
+				let url := <URL, S, RPDomain, path, <<PID_RP, PID_RP>, <Endpoint, Endpoint_U>>>
+				let s'.refXHR := λ1
+				let command := ⟨XMLHTTPREQUEST,url,GET,⊥,s'.refXHR⟩
+				let s'.q := expectToken
+		end if
+	case expectToken
+		et pattern := ⟨XMLHTTPREQUEST,Body,x'.refXHR⟩
+		let input := CHOOSEINPUT(scriptinputs,pattern) 
+		if input ̸≡ ⊥ then
+			let Token := input.Body[Token]
+			if Token ≡ ⊥ then
+				stop <>
+			end if
+			let url := s'.Parameters[Endpoint_RP]
+			let RPOringin := <url, S>
+			let command := ⟨POSTMESSAGE,target,<Token,Token>,RPOrigin⟩ 
+			let s .q := stop
+		end if
+stop ⟨s′,cookies,localStorage,sessionStorage,command⟩
+
+
+

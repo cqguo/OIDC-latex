@@ -1,0 +1,104 @@
+Dolev-Yao 模型
+Signature 定义为一组function例如 f(x,y)...，常量constant被定义为不包含任何参数的signature
+
+terms 包含name, varialbe 以及 signature，例如 let M := enc(x,k),M就是name，x是variable，enc是signature
+
+A signature Σ consists of a finite set of function symbols, such as f, encrypt, and pair, each with an arity. A function symbol with arity 0 is a constant symbol.
+Given a signature Σ, an infinite set of names, and an infinite set of variables, the set of terms is defined by the grammar
+L,M,N,T,U,V ::= terms
+ a,b,c,...,k,...,m,n,...,s      name
+ x, y, z    variable
+  f(M1,...,Ml)      function application
+
+
+Message：不包含varialbe的term，例如http request就是message
+
+event：定义了从a向f发送message m，<a,f,m>
+
+atomic process: (I, Z, R, s0),定义了网络系统中的单个节点。I代表了该节点的地址集合，Z代表了该节点所有状态的集合（状态就是描述当前节点的term），R代表节点的relation（relation对应着每一对input和output，input是状态+event， output是新的状态+新event）
+
+scripting process：代表了网页上运行的脚本，作为browser的额外relation，向scripting process输入状态和event，得到新的状态和event作为输出
+
+Web system
+web system是多个process组成的一个集合，表示为（W, S, script, E0）
+其中W是所有atom process组成的集合，S是所有scripting process组成的集合，script是所有scripting process具体的代码，E0是整个系统初始状态下能够接受的event的集合
+
+configuration
+描述web system一个时间点的状态，表示为（S，E，N）其中S是所有process当前状态的集合，E是在当前状态下，process能接受的event的集合，N是当前所有未使用的随机数nonce的集合（这个是SPRESSO中定义的，我并没有找到这个存在的必要性，我们也没有用到）
+
+processing step
+描述系统的运行，系统在处理一个event之后，从一个configuration 跳转到新的configuration
+
+UPPRESSO model
+UPPRESSO model就是一个web system model
+系统中的atomic process包括IdP server， RP servers 和 browser，以及attacker process
+scripting process 包括IdP script和RP scripts以及attacker script
+browser process有SPRESSO已经定义过了
+我们认为honest RP都会遵循相同方式运行，所以我们统一地提供了RP server和RP script的model
+IdP server和RP server process接受message为http request的event，event的要求参考protocol
+IdP script和RP script process接受postmessage和http response
+
+证明安全性
+definition 1 如果UPPRESSO是安全的，当且仅当，如果cookie c是用户u在RP r认证后的cookie，那么c不可能被攻击者获得
+在初始状态下，attacker不知道任何authenticated cookie，那么需要证明（1）attacker不能获得u的authenticated cookie（2）attacker不能将自己拥有的cookie变成u的authenticated cookie
+证明：
+lemma 1 attacker不能直接获得其他honest process的cookie。
+因为系统中的process不会发送任意的cookie，由于same-origin原则，browser不会泄露cookie
+Definition 2 只有RP在收到u的有效identity proof之后，才会将对应的cookie设置为u的authenticated cookie
+可以从RP process model中发现
+lemma 2 attacker不能获得user的password
+通过model发现password只会从honest IdP script发送至IdP server
+lemma 3 IdP签名的proof不会被伪造
+我们可以从model中发现，所有签名的proof在使用之前都进行了正确的验证
+lemma 4 attacker不能获得用户的identity proof
+attacker不能从RP server获得identity proof，因为RP server不会发送任何identity proof
+attacker不能从RP script获得identity proof，因为RP sever只会将identity proof发送给对应的RP server
+attacker不能从IdP server获得identity proof，因为如果从IdP获得identity proof要求u的password
+attacker不能从IdP script获得identity proof，由于完整的证明比较复杂，所以在这只给出一个直观的结论：IdP script发送identity proof收到Cert的限制，只能发送给Cert对应RP的script，当identity proof是u在r有效的时，u使用的Cert一定是r的
+
+另外由于UPPRESSO系统通过HTTPS保护，所以不考虑web attacker（监听网络消息）
+
+证明privacy
+definition 3定义static equivalence 两个message t1 t2，对于任意两个function M()，N()，如果M(t1)=N(t1) 是M(t2)=N(t2)的充分必要条件，那么t1 和 t2 statically equivalent
+
+definition 4 对于大素数p，p-1的素因子q，任意选取两个p的生成元g1， g2，两个随机数n1，n2小于q，在n1和n2不可知的情况下， g1^n1 mod p和g2^n2 mod p statically equivalent, g1^n1 mod p和 g1^n2 mod p statically equivalent
+
+definition 5 equivalence of http requests
+https对所有receiver之外的process都是equivalent
+Https对receiver或者http：
+message的host，path，origin，referer的值相同，parameters和body的值statically equivalent
+
+definition 6 equivalence of events
+两个event e1 e2分别为 <a1,f1,m1>, <a2,f2,m2>,满足
+a1=a2，或者a1，a2不与任何process绑定（随机IP）
+f1=f2，或者f1，f2不与任何process绑定（随机IP）
+m1 m2 equivalent
+
+求证UPPRESSO是IdP-privacy和RP-privacy
+definition 7 IdP-privacy
+假设系统中存在两个RP，honest 用户u会访问两个RP，对于任意的的u请求登录r1相关的被IdP记录的event e1，一定会存在对应的u请求登录r2的event e2，e1和e2对IdP i是不可区分的
+
+证明UPPRESSO满足IdP-privacy的definition
+对于所有的web attacker，所有的events都受到HTTPS保护，都是statically equivalent的
+IdP是honest的，所以只需要考虑IdP能够接收的event
+我们对IdP接收的event按照http request的path分类，发现只有动态注册/registrationPath和签发identity proof的/authorization需要考虑，/registrationPath接收的消息包括PID_RP，hash(N_U
+),endpoints,根据definition 3 4 判断他们是statically equivalent
+同理可证对/authorization的请求
+
+
+definition 8 定义UPPRESSO的RP-privacy，当r1和r2共享state的情况下，对于每一个u1登录r2的event e1，存在一个u2登录r2的event e2，e1和e2 对于r1 equivalent，并且r2向r1共享的state不能让event被映射到任意一个r1已经存在的user
+
+证明UPPRESSO满足RP-privacy的definition
+首先判断RP是honest的情况，证明同IdP-privacy的证明，只需要说明PID_U的statically equivalent，另外，由于可以从PID_U推导出Account，但是无法从user在r2的Account推导出在r1的Account
+RP是maliciou的情况：
+RP诱导生成不安全的PID_U或者Account，由于需要操控PID_RP或者ID_RP，前者由用户生成的n和ID_RP共同控制，后者由ID_RP控制，由于ID_RP被Cert保护，所以RP无法控制
+RP诱导相同用户在不同RP生成相同的PID_U或者Account， 前者需要操控PID_RP，由用户生成的n和ID_RP共同控制，无法被RP控制，后者需要在不同的RP使用相同的ID_RP，由Cert保护，如果在一个RP使用其他RP的cert，用户在登录时会发现正在使用的应用和请求登录的应用身份不同
+
+
+
+
+
+
+
+
+

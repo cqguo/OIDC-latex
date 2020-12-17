@@ -1,0 +1,125 @@
+\section{Threat Model and Assumption}
+\label{sec:assumptionandthreatmodel}
+To be compatible the traditional SSO systems (e.g., SAML, OIDC), UPRESSO doesn't introduce any other entity, but only
+  modifies the processes at existing entities,  i.e, one IdP, multiple RPs and users, to provide the secure and privacy-preserving SSO service.
+Here, we introduce the threat model and assumptions in UPRESSO. % for the security and privacy protection of the SSO system.
+% 有其他可以比较吗？
+%There are three types of entities in UPRESSO, i.e., the IdP, a group of RPs and users. Unlike existing privacy-preserving SSOs \cite{SPRESSO}, UPRESSO does not rely on any trusted third parties.
+
+
+\subsection{Threat Model}
+In UPRESSO, the IdP is assumed to be semi-honest, while the users and RPs could be controlled by the adversary and be malicious. % or even collude with each other.
+The malicious users and RPs could behave arbitrarily and collude with each other for breaking the security and privacy of correct users.
+While, the IdP will follow the protocol correctly, and is only curious about the user's privacy.
+%However, even with the presence of malicious RPs and users in the login flows, UPRESSO is expected to protect honest users from (1) being impersonated by the malicious user to log in to the honest RPs, and (2) logging in to the honest RPs as the malicious user.
+%The group users are consisted of parts of malicious users and other honest users, and similarly there are also malicious and honest RPs. It must be ensured to protect the honest users from,
+%In particular, the adversary attempts to break the security and privacy properties under the following threat model.
+The details are as follows.
+
+\vspace{1mm}\noindent \textbf{Semi-honest IdP.}
+%All the actions performed by IdP fulfil the requirements of UPRESSO and none of action undefined is conducted.
+%But the IdP might try to achieve the additional information which is not defined to be exposed to IdP passively without breaking the rule of UPRESSO.
+We assume the IdP is well-protected and will never leak any sensitive information.
+For example, the private key for generating the identity proof and RP certificate (used in Section~\ref{implementations}) will never be leaked,
+ therefore the adversary fails to impersonate as the IdP to forge a valid identity proof or RP certificate.
+%its private key for signing the RP certificate and identity proof is never leaked.
+The honest IdP processes the requests of RP registration and identity proof correctly, % processes messages correctly and only conducts the necessary actions  as defined by the protocol
+and never colludes with others (e.g., malicious RPs and users).
+For example, IdP ensures the uniqueness of $ID_{RP}$ and $PID_{RP}$, and generates the correct RP certificate, $PID_U$ and identity proof.
+However, the curious IdP may attempt to break the user's privacy without violating the protocol.
+For example, the curious IdP may store and analyze the received messages, and perform the timing attacks, attempting to achieve the IdP-based linkage. %, i.e., finding which RPs are visited by a user.
+%is also curious about users' private information. It may attempt to infer the user's access traces (i.e., which RPs accessed by the user) by analyzing the content and timing of the received messages. For example, in OIDC IdP achieves the user's identity while authenticating the user and knows user accessed RP by the RP's identifier and endpoint in the authentication request.
+ %For example, inferring RP's identifiers in (or receivers of) the identity proof.
+%More specifically, for RP's initial registration, the IdP checks the correctness of RP's URL,  assigns an unique original identifier, and generates the correct signature. For identity proof, the IdP generates the proof only for the authenticated user, calculates the user identifier based on the user's unique identifier
+%and the user-provided transformation of RP identifier, binds the proof with the transformation, generates the signature correctly, and sends it only to the user.
+
+
+
+
+%User's goal: 向IdP发送identity proof，使IdP认为自己是另一个victim
+%方式：1）已经拥有有效的identity proof，希望与IdP协商出相同的PID_RP；2）通过篡改或者伪造identity proof来实现攻击
+\vspace{1mm}\noindent \textbf{Malicious users.} %The user might be under the full control of adversaries, so that the malicious user is able to conduct any action defined or not defined in the UPRESSO.
+The adversary could control a set of users, for example through stealing the users' credentials~\cite{xx} or registering  at the IdP and RPs directly.
+These malicious users
+%The adversary may obtain the user's credential through various attacks, or register a valid account at the IdP and the RPs. The user controlled by the adversary
+ aim to break the security of the SSO system.
+That is, they  attempt to impersonate  an uncontrolled user at the victim RP, and  make  a victim user log in at the correct RP under a controlled identity.
+To achieve this, they could behave arbitrarily~\cite{WangCW12, SomorovskyMSKJ12}.
+For example, the malicious users may forge the identity proof, modify the forwarding messages (requests of identity proof, identity proof,  RP registration request and result, and etc.), and provide incorrect values for negotiating $PID_{RP}$ (detailed in Section~\ref{implementations}).
+
+%may attempt to lead the RP to accept an identity proof issued for another RP by sending illegal login request to the RP, transmitting a modified or forged identity proof request to the IdP~\cite{WangCW12}, or choosing a non-random nonce to participate in the generation of RP's transformation identifier.
+%Moreover, the malicious user also attempts to create the valid identity proof for an honest RP itself by replying a corrupted or forged identity proof to the RP~\cite{WangCW12, SomorovskyMSKJ12}.
+%For example, the malicious user  may send illegal login request to the RP,
+%transmit a modified or forged identity proof request to the IdP,
+%reply a corrupted or forged identity proof to the RP, or choose a non-random nonce to participate in the generation of RP's transformation identifier.
+%to login at a RP under a uncontrolled user's account,
+
+
+%RP's goal:1)获得目前登录用户在其他RP可用的identity proof；2）collusive RP 关联用户
+\vspace{1mm}\noindent \textbf{Malicious RPs.} %The RP might be corrupted by the adversary or just built by the adversary, which is able to perform any action desired by the adversary for any purpose.
+The adversary could control a set of RPs, by registering an RP at the IdP or exploiting various vulneraries to attack RPs.
+These malicious RPs aim to break the security and privacy of the correct users, and could behave arbitrarily.
+For example, to break the security, the malicious RPs need to obtain an identity proof valid for other RP, and attempt to achieve this by behaving as follows:
+ impersonating other RP at the user by providing the incorrect RP certificate,
+ using incorrect values during the negotiation of  $PID_{RP}$ to make  the generated $PID_{RP}$ be same as the one for other RP,
+ or constructing an incorrect request to trigger the IdP issuing an identity proof binding with other RP.
+Moreover, the malicious RPs may attempt to perform the RP-based identity linkage and break the user's privacy.
+To achieve this, the RPs could  behave arbitrarily and collude with each other.
+For example, the RPs may attempt to derive the $ID_U$ from $PID_U$ by providing incorrect values to the IdP,
+ and the colluded RPs may attempt to link the user's multiple logins, by providing correlated values (e.g., $PID_{RP}$) to the IdP.
+
+%For example, or use incorrect $PID_{RP}$ to construct an incorrect  request for the identity proof,
+%the malicious RP may attempt to achieve the (current authenticated) user's identity proof valid for other honest RPs or lead the IdP to issue the non-privacy-preserving identity proof (resulting in RP-based identity linkage), by deliberately choosing certain nonces in RP identifier transformations and trick honest RPs to accept them, provide an incorrect identity proof request with incorrect RP identifiers, or send the invalid or other RP's valid certificate instead of its own.
+
+%For example, they may manipulate the generation of identity proofs by deliberately choosing certain nonces in RP identifier transformations and trick honest RPs to accept them,
+%provide an incorrect identity proof request with incorrect RP identifiers,
+%or send the invalid or other RP's valid certificate instead of its own. %Moreover, the RPs will never collude with the IdP.
+
+%Moreover, the conclusion is also considered available in UPRESSO, of which the details are shown as follows:
+%The malicious users and RPs may collude as follows:
+
+\vspace{1mm}\noindent \textbf{Collusive users and RPs.} %In particular,
+The malicious users and RPs may collude and behave arbitrarily, attempting to break the security of UPRESSO.
+%perform the impersonation or identity injection attacks.
+For example, %to log in to the honest RP under the victim user's account,
+the adversary may first act as a malicious RP, and make an incorrect identity proof generated for the visiting user,
+  then act a malicious user, and use this identity proof to impersonate this victim user at another RP.
+The adversary could also first act as a user to login a correct RP and obtain an identity proof,
+ then act a malicious RP to perform the identity injection attack, by injecting this identity proof to the session between the victim user and the correct RP with other web attacks (e.g., CSRF).
+%Moreover, the collusive users and RPs may also attempt to break the user's privacy.
+%For example, the malicious users may attempt to infer $ID_{RP}$ of an uncontrolled RP by providing incorrect values in generating $PID_{RP}$,
+
+%attract the victim user to access a malicious RP to initiate an authentication request for identity proof that is also valid to honest RPs, and then pretend to be the victim user to access these RPs using the received identity proof. %To make the victim user log in to the honest RP under an malicious account,
+%The adversary may also act as a user to obtain an identity proof for herself to access an honest RP, and then work as an RP to redirect the victim user to the honest RP using her proof (e.g. CSRF).
+
+\subsection{Assumption}
+% 这2个合谋的特例，其实就是在上面的Malicious RP and User的引申，所以，我把它放在这里了；不和上面并列。
+
+%\vspace{1mm}\noindent \textbf{Collusive RPs and users.}
+\begin{comment}
+In particular, the malicious users and RPs may collude to perform the impersonation or identity injection attacks.
+For example, %to log in to the honest RP under the victim user's account,
+the adversary may first attract the victim user to access a malicious RP to initiate an authentication request for identity proof that is also valid to honest RPs, and then pretend to be the victim user to access these RPs using the received identity proof. %To make the victim user log in to the honest RP under an malicious account,
+The adversary may also act as a user to obtain an identity proof for herself to access an honest RP, and then work as an RP to redirect the victim user to the honest RP using her proof (e.g. CSRF).
+\end{comment}
+In UPRESSO, 
+we assume that the user agent deployed at the honest user is correctly implemented,
+and will transmit the messages to the correct destination. % without leakage nor corruption.
+The TLS is also correctly implemented at the user agent, IdP and RP, which ensures the confidentiality and integrity of the network traffic between correct entities.
+We also assume a secure random number generator is adopted in UPRESSO to provide the unpredictable random numbers;
+and the adopted cryptographic algorithms, including the RSA and SHA-256, are secure and implemented correctly.
+Therefore,  no one without private key can forge the signature, and the adversary fails to infer the private key during the computation.
+Moreover, we also assume the security of the discrete logarithm problem is ensured.
+
+The collusive RPs may attempt to link a user  based on the identifying attributes, such as the telephone number and credit number.
+Here, we assume that the users refuse to provide these attributes to the RPs, and the correct RPs never collect these attributes as required by privacy laws (e.g., GDPR).
+Moreover, the global network traffic analysis may be adopted to correlate the user's logins at different RPs.
+  However, UPRESSO may integrate existing defenses to prevent this attack.
+%\vspace{1mm}\noindent \textbf{Collusive RPs.}
+%To break user's privacy, the collusive RPs may link user accounts across them by actively returning incorrect messages, or passively combining the received messages.
+%using the same (or derivable) user identifier in the identity proof.
+%However, user linkage based on other attributes in user accounts and the global network traffic analysis are not considered in this work, which may be prevented by limiting the attributes exposed to each RP and introducing cover traffic by accessing irrelevant RPs.
+
+
+
+

@@ -1,0 +1,90 @@
+\documentclass[conference, 10pt]{IEEEtran}
+%\setlength\columnsep{0.2in}
+\usepackage{graphicx}
+\usepackage{verbatim}
+\usepackage{caption}
+\usepackage{algorithm}
+\usepackage{algorithmicx}
+\usepackage{algpseudocode}
+\usepackage{amsmath,amssymb,amsthm}
+\newtheorem{theorem}{Theorem}
+\newtheorem{corollary}{Corollary}
+\usepackage{graphicx}
+%\usepackage{geometry}
+%\usepackage{subfigure}
+\usepackage{url}
+\usepackage{multirow}
+\usepackage{listings}
+\usepackage{cite}
+\usepackage{array}
+\usepackage{enumerate}
+\usepackage{booktabs}
+\usepackage{amsthm}
+\usepackage{color}
+\usepackage{soul}
+%\geometry{left=0.7in,right=0.7in,top=1in,bottom=1in}
+
+%IEEE S&P Submitted papers may include up to 13 pages of text and up to 5 pages for references and appendices, totalling no more than 18 pages.
+
+\begin{document}
+\pagenumbering{arabic}
+\title{{UPRESSO}: An Unlinkable Privacy-REspecting Single Sign-On System}
+%\title{{Recluse}: A Privacy-Respecting Single Sign-On System Achieving Unlinkable Users' Traces}
+%\title{{Recluse}: A Privacy-Respecting Single Sign-On System Avoiding User Linkage and Tracing}
+%\title{EOIDC: An Enhanced OpenID-Connect Protocol That Protect Users' Privacy}
+%
+% Single address.
+% ---------------
+%\name{Anonymous ICME submission}
+%\address{}
+\maketitle
+\begin{abstract}
+%(e.g., shifting the risks for managing the user's credentials) (e.g., reducing the number of credentials)
+ The Single Sign-On (SSO) service, provided by identity provider (IdP),  is widely deployed and integrated to bring the convenience to both the relying party (RP) and the users.
+% by shifting the users' credentials to the identity provider (IdP) and reducing the user's maintained  credentials.
+ However, the privacy leakage is an obstacle to the users' adoption of SSO,
+ as the curious IdP may track at which RPs users log in,
+% as the curious IdP knows which RPs to be accessed by a user
+while collusive RPs could link the user from a common or related identifer(s) issued by the IdP.
+ %while the RPs may link the user with the non-independent identifiers in the identity proof provided by the IdP.
+ Existing solutions preserve the user's privacy  from either the curious IdP or the collusive RPs, but never from the both entities.
+In this paper, we provide an SSO system, named UPRESSO, to hide the user's accessed RPs from the curious IdP
+and prevent the identity linkage from the collusive RPs.
+In UPRESSO, IdP generates a different privacy-preserving ID ($PID_U$) for a user among RPs, and binds $PID_U$ with a transformation of the RP identifier ($PID_{RP}$), without obtaining the real RP identifier.
+Each RP uses a trapdoor to derive the user's unique account from $PID_U$,
+while a user's accounts are different among the RPs.
+%based on the transformation of the RP identifiers and user's accounts on the discrete logarithm problem.
+UPRESSO  is compatible with OpenID Connect, a widely deployed and well analyzed SSO system;
+    where dynamic registration is utilized to make $PID_{RP}$ valid in the IdP.
+    % finish xx and xx to xxx. % 利用动态注册来xx，xxx来搞定xxx；一句话的大概说明
+The analysis shows that user's privacy is preserved in UPRESSO without any degradation on the security of OpenID Connect.
+%Recluse is proved to preserve the user's privacy without any degradation on the security of OpenID Connect.
+We have implemented a prototype of UPRESSO. The evaluation demonstrates that UPRESSO is efficient, and only needs 208 ms for a user to login at an RP in our environment.
+\end{abstract}
+\begin{IEEEkeywords}
+Single Sign-On, security, privacy, trace, linkage
+\end{IEEEkeywords}
+
+\input{chap/introduction.tex}
+\input{chap/background.tex}
+\input{chap/challenges.tex}
+\input{chap/threatmodel.tex}
+\input{chap/protocol.tex}
+\input{chap/analysis.tex}
+\input{chap/implementation.tex}
+\input{chap/evaluation.tex}
+\input{chap/discussion.tex}
+\input{chap/relatedwork.tex}
+\input{chap/conclusion.tex}
+
+\bibliographystyle{IEEEbib}
+\bibliography{ref}
+
+\end{document}
+
+%2020.2.6 
+%introdution 中，讲述IdP和RP合谋，arge IdPs, especially social IdPs like Google and Facebook
+%introdution 中，We have implemented a prototype of UPRESSO based on an open-source implementation of OIDC，讲下动态注册。
+%3.A 中Receiver designation这个词（binding 和 user确保只发给对应RP）。 integrity和confidentity（HTTPS）放在一起。
+
+%RPID renew---》refresh

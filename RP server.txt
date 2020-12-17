@@ -1,0 +1,123 @@
+input <f,a,m>,s
+let s':=s
+let n, method, path, parameters, headers, body such that 
+	⟨HTTPReq,n,method,path,parameters,headers,body⟩≡m
+	if possible; otherwise stop <>,s
+if path≡/script then
+	let m':=⟨HTTPResp,n,200,⟨⟩,RPScript⟩
+	stop <f,a,m'>,s'
+if path ≡ /login then
+	let IdP := parameters[IdP]
+	if IdP ≡ ⊥ then
+		let m' := PARAMETERSERROR
+		stop <a, f, m'>, s'
+	end if
+	let s'.CurrentIdP := s'.IdPs[IdP]
+	if s'.CurrentIdP ≡ ⊥ then
+		let m' := PARAMETERSERROR
+		stop <a, f, m'>, s'
+	end if
+	let m' := ⟨HTTPResp,n,302,⟨Location, s'.CurrentIdP.ScriptUrl⟩,<>⟩
+	stop <a,f,m'>, s
+else if path ≡ /startNegotiation then
+	//let N_RP := v1
+	//let Y_RP := ModPow(s'.CurrentIdP.Cert.Content.ID_RP, N_RP, s'.CurrentIdP.p)
+	let sessionid := headers[Cookie][sessionid]
+	let session := s'.sessions[sessionid]
+	//let session[N_RP] := N_RP
+	//let session[Y_RP] := Y_RP
+	let session[state] := expectN_U
+	let m' := ⟨HTTPResp,n,200,<>,<Cert,s'.CurrentIdP.Cert>⟩
+	stop <a,f,m'>, s'
+else if path ≡ /finishNegotiation then
+	let sessionid := headers[Cookie][sessionid]
+	let session := s'.sessions[sessionid]
+	if session[state] ̸≡ expectN_U then 
+		let m' := ⟨HTTPResp,n,200,<>,STATEERROR⟩
+		stop <a, f, m'>, s'
+	end if
+	let N_U := body[N_U]
+	if N_U ≡ ⊥ then
+		let m' := ⟨HTTPResp,n,200,<>,PARAMETERERROR⟩
+		stop <a, f, m'>, s'
+	end if
+	//let N_RP := s'.sessions[sessionid][N_RP]
+	//let Y_RP := s'.sessions[sessionid][Y_RP]
+	let PID_RP := ModPow(ID_RP, N_U, s'.CurrentIdP.p)
+	let t := ExEU(N_U, s'.CurrentIdP.q)
+	let session[sessionid][N_U] := N_U
+	let session[sessionid][t] := t
+	let session[sessionid][PID_RP] := PID_RP
+	let session[state] := expectRegistrationResult
+	let m' := ⟨HTTPResp,n,200,<>,<>⟩
+	stop <a,f,m'> ,s'
+else if path ≡ /registration then
+	let sessionid := headers[Cookie][sessionid]
+	let session := s'.sessions[sessionid]
+	if session[state] ̸≡ expectRegistrationResult then 
+		let m' := ⟨HTTPResp,n,200,<>,STATEERROR⟩
+		stop <a, f, m'>, s'
+	end if
+	let RegistrationResult := body[RegistrationResult]
+	if RegistrationResult ≡ ⊥ then
+		let m' := ⟨HTTPResp,n,200,<>,PARAMETERERROR⟩
+		stop <a, f, m'>, s'
+	end if
+	if checksig(RegistrationResult.Content, RegistrationResult.sig, s'.CurrentIdP.pubKey) ≡ ⊥ then
+		let m' := ⟨HTTPResp,n,200,<>,<RegistrationResult, Fail>⟩
+		let session := ⊥
+		stop <a,f,m'>, s'
+	end if
+	if RegistrationResult.Content.Result /≡ OK
+		let m' := ⟨HTTPResp,n,200,<>,<RegistrationResult, Fail>⟩
+		let session := ⊥
+		stop <a,f,m'>, s'
+	end if
+	let PID_RP := s'.sessions[sessionid][PID_RP]
+	//let N_RP := s'.sessions[sessionid][N_RP]
+	let N_U := s'.sessions[sessionid][N_U]
+	let Nonce := hash( N_U)
+	let time := v3
+	if PID_RP /≡ RegistrationResult.Content.PID_RP ∪ Nonce /≡ RegistrationResult.Content.Nonce ∪ time not in RegistrationResult.Content.Validity
+		let m' := ⟨HTTPResp,n,200,<>,<RegistrationResult, Fail>⟩
+		let session := ⊥
+		stop <a,f,m'>, s
+	end if
+	let session[PIDValidity] := RegistrationResult.Content.Validity
+	let Endpoint_RP <- s'.Endpoints
+	let session[state] := expectToken
+	let m' := ⟨HTTPResp,n,200,⟨⟩,<<PID_RP, PID_RP>, <Endpoint_RP, Endpoint_RP>>⟩
+	stop <a,f,m'>, s'
+else if path ≡ /uploadToken then
+	let sessionid := headers[Cookie][sessionid]
+	let session := s'.sessions[sessionid]
+	if session[state] ̸≡ expectToken then 
+		let m' := ⟨HTTPResp,n,200,<>,STATEERROR⟩
+		stop <a, f, m'>, s'
+	end if
+	let Token := body[Token]
+	if checksig(Token.Content, Token.sig, s'.CurrentIdP.pubKey) ≡ ⊥ ∪ Token.Content.ID /≡ s'.Current.IdP.ID then
+		let m' := ⟨HTTPResp,n,200,⟨⟩,loginFailure⟩
+		stop <a,f,m'>, s
+	end if
+	let PID := session[PID]
+	let time := v3
+	let PID_RP := session[PID_RP]
+	let PIDValidity := session[PIDValidity]
+	if PID_RP /≡ Token.Content.PID_RP ∪ time not in Token.Content.Validity ∪ time not in PIDValidity
+		let m' := ⟨HTTPResp,n,200,⟨⟩, LoginFailure⟩
+		stop <a,f,m'>, s
+	end if
+	let PID_U := Token.Content.PID_U
+	let t := session[t]
+	let Account := ModPow(PID_U, t, s'.CurrentIdP.p)
+	if Account /∈ ListOfUser() then
+		RegisterUser(Account)
+	end if
+	let session[user] := Account
+	let m' := ⟨HTTPResp,n,200,⟨⟩,LoginSucess⟩
+	stop <a,f,m'>, s'
+end if
+stop <>, s
+
+

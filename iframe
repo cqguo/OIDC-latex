@@ -1,0 +1,81 @@
+m:
+	inputUrl
+	openIfram
+	close
+	clickHref
+	form
+
+input <f,a,m>, s
+let s' := s
+
+if m.command ≡ inputUrl then
+	let s'.oringin := m.origin
+	let s'.script := null
+	let s'.url := m.url
+	let n := New Random
+	let s'.n := n
+	let method := Get
+	let m' := ⟨HTTPReq,n,method,m.path,m.parameters,<s'.Cookies[s'.origin]>,<>⟩
+	stop <a, m.origin, m'>, s'
+if m.command ≡ clickHref then
+	if s'.oringin /≡ m.origin
+		let headers <- <Referer, s'.url>
+	end if
+	let s'.script := null
+	let s'.oringin := m.origin
+	let s'.url := m.url
+	let n := New Random
+	let s'.n := n
+	let method := Get
+	let m' := ⟨HTTPReq,n,method,m.path,m.parameters,<s'.Cookies[s'.origin>,<>⟩
+	stop <a, m.origin, m'>, s'
+if m.command ≡ openIframe then
+	let s'.Cookies := m.Cookies
+	let s'.parent.location := a
+	if m.url ≡ null
+		stop <>, s'
+	end if
+	if s'.fromOringin /≡ m.origin
+		let headers <- <Referer, s'.parent.url>
+	end if
+	let s'.oringin := m.origin
+	let s'.url := m.url
+	let n := New Random
+	let s'.n := n
+	let method := Get
+	let m' := ⟨HTTPReq,n,method,m.path,m.parameters,<>,<>⟩
+	stop <a, m.url, m'>, s'
+if m.command ≡ close then
+	Clean(s')
+	stop <>, s'
+if m.command ≡ HTTPResp then
+	if s'.script ≡ null then
+		let ⟨HTTPReq,n,code,headers,body⟩≡m
+		if n /≡ s'.n then
+			stop <>, s
+		end if
+		if code ≡ 302 then
+			let n := New Random
+			let s'.n := n
+			let method := Get
+			let m' := ⟨HTTPReq,n,method,headers[Cookie].path,headers[Cookie].parameters,<s'.Cookies[headers[Cookie].origin]>,<>⟩
+			stop <a, headers[Cookie].origin, m'>, s'
+		else if code ≡ 200 then
+			s'.n := null
+			if m ≡ IdPScript
+				s'.script.info := IdP
+				s'.script.content := IdPScript
+				if s'.parent ≡ null then
+					stop <>, s'
+				end if
+				stop <f, s'.parent.location, Ready>, s'
+			else if m ≡ RPScript
+				s'.script.info := RP
+				s'.script.content := RPScript
+			end if
+			stop <>, s'
+else if s'.script.info ≡ RP then
+	if m.command ≡ Trigger then
+		let m' := <openIframe, >
+	
+else s'.script.info ≡ IdP then

@@ -1,0 +1,88 @@
+IdP privacy
+
+系统中存在RP <r1,r2,...,ri>, 对应的<e1,e2,...,ei>是不可区分的
+
+证明：假设系统中存在两个RP，任意r1和r2属于<r1,r2,...,ri>，honest 用户u会访问两个RP，对于任意的的u请求登录r1相关的被IdP记录的event e1，一定会存在对应的u请求登录r2的event e2，e1和e2对IdP i是不可区分的，从而推导出
+	//还需要证明同一个RP的多次登录请求的event是不可区分的，证明方法同上
+
+Equivalence of Events，当且仅当
+两个event e1 e2分别为 <a1,f1,m1>, <a2,f2,m2>,满足
+（1）a1=a2，或者a1，a2不与任何process绑定（随机IP）
+（2）f1=f2，或者f1，f2不与任何process绑定（随机IP）
+（3）m是不可区分的
+
+Equivalence of Message，当且仅当
+（1）如果m是HTTPS message，那么m对指定的接收者以外是不可区分的
+（2）如果m是HTTP message，或者对于指定的接收者,那么两个HTTP message是不可区分的
+
+Equivalence of HTTP Message，当且仅当
+m1.headers[referer] = m2.headers[referer], m1.parameters与m2.parameters Static Equivalence，m1.body与m2.body Static Equivalence
+	如果m1.host=m2.host，还需要满足m1.path = m2.path
+	
+
+Static Equivalence. Let t1, t2 ∈ TN (V) be two terms with V a set of variables. We say that t1 and t2 are statically equivalent, written t1 ≈ t2, iff for all terms M, N ∈ T0/ ({x}) with x a variable and x ̸∈ V , it holds true that
+M[t1/x] ≡ N[t1/x] ⇔ M[t2/x] ≡ N[t2/x].
+
+
+
+definition（lemma？） 两个随机数（随机字符串）
+如果随机数没有映射到任何的值上，那么两个随机数是Static Equivalence的
+如果两个随机数n1 n2分别映射到m1 m2，如果m1 m2是Static Equivalence的，那么<n1, m1> <n2, m2>是Static Equivalence的
+
+lemma 对于两个p的生成元g1 g2，g1 g2不是Static Equivalence的，分别有随机数n1 n2，g1^n1 mod p 和g2^n2 mod p是Static Equivalence的
+proof：无法直接推导出g1 g2；无法获得n1 n2，验证分别对应g1 g2。所以g1^n1 mod p 和g2^n2是无法映射到任何值上的随机数，是Static Equivalence的
+
+对IdP的每个path进行分析，只有dynamicregistration 和 authorize两个path接受的event与RP有关，证明PID_RP1和PID_RP2 Static Equivalence，endpoint1和endpoint2  Static Equivalence，证明就完成
+
+如何证明PID_RP1和PID_RP2 Static Equivalence
+证明：IdP i无法同时同一个process获得PID_RP ID_RP N_U中的任意两项，所以无法映射PID_RP到ID_RP上。其中PID_RP只由u的浏览器中的IdP script发送给IdP；其中N_U在IdP script生成，发送给RP script，再由RP script发送给RP server，RP server不发送给其他方，因为我们认为IdP不执行任何恶意行为，所以N_U不会被IdP获得；ID_RP只会包含在Cert中，由RP server发送给RP script，由RP script发送给IdP script， IdP script不会发送给任何其他人。所以IdP i无法同时同一个process获得PID_RP ID_RP N_U中的任意两项，所以无法映射PID_RP到ID_RP上。
+
+
+
+下面写的是不对的！！！！！！
+RP privacy
+我们把share信息的process 定义为set of processes
+定义：Equivalence of Events to set of processes,当且仅当
+两个event e1 e2分别为 <a1,f1,m1>, <a2,f2,m2>,满足
+（1）a1=a2，或者a1，a2不与任何process绑定（随机IP）
+（2）f1,f2属于set of processes，或者f1，f2不与任何process绑定（随机IP）
+（3）m是不可区分的
+
+定义：Equivalence of Messages to set of processes,当且仅当
+m1对应的process的标识为ID_RP1，m2对应的process的标识为ID_RP2
+那么只要满足m1[t/ID_RP1] ≈ m2[t/ID_RP2], 就满足
+
+
+
+定义user对RP的不可区分，for any event or message provided to an RP, it cannot link the specific user at RP to the event and message
+
+u1 or u2 to r is 可区分的。。。, account is derivable and link to user attributes
+
+对r1，对于任意的u1 r2 event e1， u2 r2 event e2， and any message m1 provided by u1 r2, 存在message m2 provided by u2 r2, e1 e2不可区分， m1 m2不可区分
+
+接受N_U的不可区分
+
+接受registrationresult 不可区分
+
+接受token不可区分
+证明：PID_U不可区分，Account不可区分
+PID_U1 = PID_RP1^ID_U1 mod p， PID_U2 = PID_RP2^ID_U2 mod p
+Account1 = ID_RP2^ID_U1 mod p， Account2 = ID_RP2^ID_U2 mod p
+正常情况下PID_U和Account不可区分，因为是离散对数问题
+
+RP试图操纵ID_RP
+1.试图操纵ID_RP成为非生成元，破坏PID_U或者Account的安全性，不可行
+2.试图使用r1的ID_RP
+由于cert中包含RP的name，在不考虑phishing attack的前提下，用户会发现请求认证的应用名与自己当前访问的RP不同
+
+
+
+
+接受message不可区分
+证明：不包含任意的关联的unique user attributes
+
+
+
+
+
+
