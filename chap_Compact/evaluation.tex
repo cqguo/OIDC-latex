@@ -35,8 +35,8 @@ For better analysis, we divide a login into 4 phases according to the lifecycle 
 \noindent\textbf{Results.}
 The evaluation results are provided in Figure~\ref{fig:evaluation}.
 The overall processing times are  113 ms, 308 ms and 492 ms for MITREid Connect, SPRESSO and UPPRESSO, respectively.
-The part in UPPRESSO takes the longest time is opening the new window and downloading the script which totally cost about 255 ms. The time cost can be cut down as the browser can implicitly conduct this procedure while user visit the RP website. 
-The details are as follows.
+The main overhead  in UPPRESSO is opening the new window and downloading the script from IdP, which needs about 255 ms. This overhead could be reduced by implicitly conducting this procedure when the user visits the RP website. The details are as follows.
+
 
 \begin{figure}
   \centering
@@ -46,10 +46,11 @@ The details are as follows.
   \vspace{-7mm}
 \end{figure}
 
-In the requesting, UPPRESSO requires firstly user downloads the RP script, opens the IdP window and downloads the IdP script, then both the user and RP to perform 1  modular exponentiations for RP identifier transformation
-and complete $PID_{RP}$ registration at the IdP, which totally need 371 ms (255 ms downloading scripts and open new window ), where
+In the requesting, UPPRESSO requires that (1) the user downloads the RP script, opens the IdP window and downloads the IdP script, and (2) the user and RP performs 1 modular exponentiations for RP identifier transformation and complete $PID_{RP}$ registration at the IdP. The total proceeding time is 371 ms (255 ms downloading scripts and open new window ), where
 SPRESSO needs 19 ms for the RP to obtain IdP's public key and encrypt its domain;
 while MITREid Connect only needs 10 ms.
+
+
 
 %估计能减少多少，
 In the generation, UPPRESSO needs  an extra 6 ms for computing $PID_U$, compared to MITREid Connect which only needs 32 ms.
