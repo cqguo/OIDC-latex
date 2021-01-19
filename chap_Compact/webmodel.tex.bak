@@ -2,7 +2,7 @@
 \label{sec:formal}
 %Our formal analysis of UPPRESSO is based on the Dolev-Yao style web model presented in ~\cite{SPRESSO}. However, in this paper we simplify the model, in particularly we assumed that DNS servers are always honest and the DNS requests and responses are always handled securely so that they are not considered in our model.  Moreover, we assume that HTTPs protocol is hundred-percent adopted and securely implemented, such that the web communications are secure and we will not focus on the encryption and decryption of these communications.
 
-We formally analyze the security and privacy properties of UPPRESSO based on the Dolev-Yao style web model~\cite{SPRESSO}, which has been widely used in the formal analysis of SSO protocols such as OAuth 2.0~\cite{FettKS16} and OIDC~\cite{FettKS17}. For brevity, we focus on the modifications introduced by UPPRESSO in this paper and neglect the proofs for the security of DNS and HTTPS requests. We refer interested readers to~\cite{SPRESSO} for details.
+We formally analyze the privacy and security properties of UPPRESSO based on the Dolev-Yao style web model~\cite{SPRESSO}, which has been widely used in the formal analysis of SSO protocols such as OAuth 2.0~\cite{FettKS16} and OIDC~\cite{FettKS17}. For brevity, we focus on the modifications introduced by UPPRESSO in this paper and neglect the proofs for the security of DNS and HTTPS requests. We refer interested readers to~\cite{SPRESSO} for details.
 
 \subsection{The Web Model}
 \label{subsec:webmodel}
@@ -20,6 +20,7 @@ Each atomic process also contains a set of nonces that it may use.
 
 \noindent{\em Scripting Processes} represent client-side scripts loaded by the browser to provide server-defined functions to the browser. However, a scripting process must rely on an atomic process, such as the browser, and provide the relation $R$ called by this atomic process.
 
+\begin{comment}
 \noindent{\em Equational theory} is defined as usual in Dolev-Yao models, which uses the symbol $\equiv$ to represent the congruence relation on terms. For example, $dec(enc(m, k), k)$ $\equiv$ $m$, where $k$ is a symmetric key.
 
 \noindent {\em Static equivalence.} As defined in~\cite{SPRESSO}, two messages $t_1$ and $t_2$ are statically equivalent, denoted as $t_1 \approx t_2$, if and only if, for all terms such as $M(x)$ and $N(x)$ which only contain one variable $x$ without nonce, it is true that $M(t_1)$ $\equiv$ $N(t_1)$ \textbf{iff} $M(t_2)$ $\equiv$ $N(t_2)$. For instance, for messages $m$ and $m'$, and a symmetric key $k$, $enc(m, k)$ $\approx$ $enc(m', k)$ is always true to the attacker who does not know $k$.
@@ -29,7 +30,8 @@ Using static equivalence, we define equivalence of $modpow$ function as below. W
 For a large prime $p$ (2048-bit length) and $p-1$'s prime factor $q$ (256-bit length), there are two constants $g_1$, $g_2$ as the generators of $p$ and the constants $n_1$, $n_2$ ($n_1$, $n_2$ $<$ $q$). We define the function symbol $modpow(a, b, p)$ $=$ $a^b \mod p$, there are $modpow(g_1, n_1, p)$ $\approx$ $modpow(g_2, n_2, p)$ and  $modpow(g_1, n_1, p)$ $\approx$ $modpow(g_1, n_2, p)$  always true due to the discrete logarithm problem as the $n_1$ and $n_2$ are unknown.
 \label{def:powequ}
 \end{definition}
-\begin{comment}
+
+
 \begin{definition}
 \noindent\textbf{Equivalence of HTTP requests}. There are messages $m_1$ and $m_2$, we say that $m_1$ $\approx$ $m_2$ \textbf{iff} the following conditions are met,
 \vspace{-\topsep}
@@ -147,6 +149,7 @@ The attacker cannot know a valid $PID_{RP}$ negotiated by a user $u$ and an RP $
 
 Finally, we prove $\mathcal{UWS}$ satisfies requirements (A), (B) and (C) in Definition~\ref{def:secure}. As a result, Theorem~\ref{the:secure} is proved.  Due to space limit, we include all the detailed proofs of the lemmas and theorems in the Appendix.
 
+\begin{comment}
 \subsection{Privacy of UPPRESSO}
 We adopt a similar web model as above, which contains web attackers instead of network attackers. Then, we show the privacy of UPPRESSO by proving Theorem~\ref{the:privacy}.
 \begin{theorem}
@@ -178,16 +181,15 @@ Similar, we can prove $\mathcal{UWS}$ meets the requirements defined in Definiti
 
 Then, we consider the case that malicious RPs exist in the system. %They may attempt to steal data from other processes or set malicious parameters in a login session.
 According to Definition~\ref{def:powequ}, $PID_U$ and $Accounts$ seem equivalent to the attacker who does not know $ID_U$. However, the attacker cannot obtain $ID_U$ from other UPPRESSO processes, since the IdP never sends out $ID_U$ in clear. Next, we prove that a malicious RP cannot derive $ID_U$ from $PID_U$ or $Account$, even if it can manipulate the generation of $PID_U$ and $Account$. First, the malicious RP may use a forged $ID_{RP}$ to make $PID_U$ or $Account$ inequivalent. However, such illegal $ID_{RP}$ can be detected by the IdP scripting process of an honest user. Moreover, the malicious RP may make a same user submit the identity proof with the same $PID_U$. However, as $PID_U$ is generated with a nonce $N_U$ chosen by the user, the RP cannot manipulate $PID_U$.
-\begin{comment}
 \vspace{-\topsep}
 \begin{itemize}
 \setlength{\itemsep}{0pt plus 1pt}
 \item RP may lead the login using the forged  so that $PID_U$s and $Accounts$ are no more equivalent. However, $ID_{RP}$ are provided by the $Cert$ which is verified at algorithm~\ref{alg3} line 17, by the IdP's public key set initially and not modified.  $PID_{RP}$ is generated by the $ID_{RP}$ at line 21 using the honest user generated nonce at line 20. Therefore, it is impossible to lead the honest user to use the illegal $ID_{RP}$ and $PID_{RP}$.
 \item RP may also lead the same user to upload the identity proof with same $PID_U$ or $Account$ so that the system is not RP-Privacy according to requirement~\ref{req:rp}. However, the $PID_U$ is generated containing the user's generated nonce $N_U$ so that it is not controlled by the RP. $Account$ is generated as the form $ID_{RP}^{ID_U} \mod p$, while RPs may lead the user to use the same $ID_{RP}$ to generate identity proof. However, the $ID_{RP}$ is bound with $Cert$ which is verified by the user and it is easy for user to find out the login RP  does not coincide the RP name shown on her browser.
 \end{itemize}
-\end{comment}
-Now, we prove that system meets all the requirements in Definition~\ref{def:rpprivacy}. Therefore, Theorem ~\ref{the:privacy} is proved.
 
+Now, we prove that system meets all the requirements in Definition~\ref{def:rpprivacy}. Therefore, Theorem ~\ref{the:privacy} is proved.
+\end{comment}
 
 
 
