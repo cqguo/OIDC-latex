@@ -1,0 +1,26 @@
+\section{Provable Security Analysis of Privacy}
+\label{sec:privacy}
+In this section, we will give the proof that UPPRESSO is defensive to both IdP-based login tracing and RP-based identity linkage, based on DDH assumption\cite{GoldwasserK16}, the computational problem. 
+
+
+\noindent\textbf{DDH Assumption.}
+$\mathbb{G}$ is a q-order  cyclic additive group of $E(\mathbb{F}_p)$, where $q$ and $n$ are large primitive number, and $P$ is the generator of $\mathbb{G}$.  For any PPT algorithm $D$, the distributions, \{$P$, $aP$, $bP$, $abP$\}$_{a,b \in \mathbb{Z}_n}$ and \{$P$, $aP$, $bP$, $cP$\}$_{a,b,c \in \mathbb{Z}_n}$, are computationally indistinguishable. There is a negligible $\sigma(k)$, where $k$ is the security parameter. 
+\begin{multline*}
+    \ \ \ \ \ \ \ Pr[D(P, aP, bP, abP)=1]\\-Pr[D(P, aP, bP, cP)=1]=\sigma(k)\ \ \ \ \ \ \ \ 
+\end{multline*}
+
+\noindent\textbf{IdP-based identity linkage.} 
+It can be found in figure~\ref{fig:process} that the only parameter related with RP's identity and received by IdP is $PID_{RP}$. Moreover, $PID_{RP}$ is created based on $ID_{RP}$ and the IdP uncontrolled random number $N_U$. As $N_U$ is randomly chosen in $\mathbb{Z}_n$,  $PID_{RP}$ is also the randomly chosen point in $\mathbb{G}$ to IdP. Therefore, obviously IdP cannot trace the user's login RPs, so that IdP-based identity linkage is not possible in UPPRESSO.
+
+\noindent\textbf{RP-based identity linkage.} 
+In the \emph{RP-based identity linkage} scenario, collusive RPs conduct the malicious behavior against IdP and users to relate the user in different RPs. It can be considered as a $Game$ guessing whether $PID_U$s for different RPs belong to the same user.  In this $Game$ IdP and users act as the challenger, and RPs act as the adversary. If only it can be proved that the adversary cannot take any advantage of guessing $PID_U$, RP-based identity linkage should be considered impossible in UPPRESSO.
+
+Firstly we give the realistic model of the $ID_U -guessing- Game$, shown as figure~\ref{fig:game0}.
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=1\linewidth]{fig/game0.pdf}
+  \caption{Game0.}
+  \label{fig:game0}
+\end{figure}
+
