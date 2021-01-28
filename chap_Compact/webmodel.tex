@@ -78,6 +78,11 @@ However, an event with a path in {\sf \{ /script, /login, /startNegotiation\}} c
 \end{itemize}
 
 \subsection{Security of UPPRESSO}
+At the very beginning, it is to be emphasized that, whether an RP accepted $Acount$ can be controlled by an adversary may be the most noticeable question for readers, as it can caused the essential attack that the adversary can impersonate other honest users by controlling the $Acount$. For example, the adversary may try to make the conflict $Account_1=ID_{U_1}ID_{RP_1}$, $Account_2=ID_{U_2}ID_{RP_2}$ and $Account_1=Account_2$ possible, where $ID_{U_1}$ and $ID_{RP_1}$ belong to the honest user and RP.
+Here we give the direct conclusion and brief proofs in advance and the details are shown in the following analysis. \textbf{The $Account$ accepted by an RP must be consist with $ID_{RP}$ and $ID_U$, where $ID_{RP}$ belongs to this RP and $ID_U$ is decided by IdP according to the requesting user.} That is, while an RP $R$ receive an identity proof related with an honest user $u$'s $Account$, this identity proof must be issued to $u$ for $r$. 
+
+\noindent\textbf{Proof. }An identity proof contains the $PID_{RP}$ and $PID_{U}$, and it follows the relation $PID_U=ID_UPID_{RP}$. RP is going to transform into $Account$ with the trapdoor $N^{-1}$. However, during the registration phase in authentication, the RP received the registration token including $PID_{RP}$ and $hash(N)$, which confirms that $N^{-1}PID_{RP}=ID_{RP}$. Therefore, the RP would achieve the $Account=ID_UR$ ($R$ is the real ID of this RP). As $ID_U$ is unique for each user, the efforts of the adversary in making the conflicted $Account_1$ and $Account_2$ is impossible.
+
 In the security analysis, we consider web systems $\mathcal{UWS}$ defined in Section~\ref{subsec:webmodel}. In this model, we considers only
 %As and postMeassage is correctly implemented in the browsers, in the following analysis, we consider there is no web attacker who can listen to and send messages from its own address, but
 one network attacker who is able to listen to and spoof all addresses. The network attacker can control (malicious) browsers and RPs.
