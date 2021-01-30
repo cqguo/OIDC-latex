@@ -26,7 +26,7 @@ We compare UPPRESSO with MITREid Connect~\cite{MITREid} and SPRESSO~\cite{SPRESS
 We implemented a Java RP based on Spring Boot framework for UPPRESSO and MITREid Connect, by integrating the corresponding SDK respectively.
 The RPs in all the three schemes provide the same function, i.e.,   extracting the user's account from the identity proof.
 We have measured the time for a user's login at an RP, and calculated the average values of $1000$ measurements.
-For better analysis, we divide a login into 4 phases according to the lifecycle of identity proof:
+For better analysis, we divide a login into 3 phases according to the lifecycle of identity proof:
  \textbf{Identity proof requesting} (Steps 1.1-4.3 in Figure~\ref{fig:process}), the RP (and user) constructing and transmitting the request to IdP;
  \textbf{Identity proof generation} (Steps 4.4-4.6 in Figure~\ref{fig:process}), the IdP generating identity proof (no user authentication);
 and  \textbf{Identity proof acceptance} (Steps 4.5-5.2 in Figure~\ref{fig:process}), the RP server receives, verifies and parse the identity proof relayed from the IdP;
@@ -35,7 +35,7 @@ and  \textbf{Identity proof acceptance} (Steps 4.5-5.2 in Figure~\ref{fig:proces
 \noindent\textbf{Results.}
 The evaluation results are provided in Figure~\ref{fig:evaluation}.
 The overall processing times are  113 ms, 308 ms and 310 ms for MITREid Connect, SPRESSO and UPPRESSO, respectively. The details are as follows.
-The main overhead  in UPPRESSO is opening the new window and downloading the script from IdP, which needs about 104 ms. This overhead could be reduced by implicitly conducting this procedure when the user visits the RP website.
+The significant overhead  in UPPRESSO is opening the new window and downloading the script from IdP, which needs about 104 ms. This overhead could be reduced by implicitly conducting this procedure when the user visits the RP website.
 
 
 \begin{figure}
@@ -46,7 +46,7 @@ The main overhead  in UPPRESSO is opening the new window and downloading the scr
   \vspace{-7mm}
 \end{figure}
 
-In the requesting, UPPRESSO requires that (1) the user downloads the RP script, opens the IdP window and downloads the IdP script, and (2) the user and RP performs 1 elliptic curve scalar multiplication for RP identifier transformation and complete $PID_{RP}$ registration at the IdP. The total proceeding time is 271 ms (104 ms downloading scripts and open new window ), where
+In the requesting, UPPRESSO requires that (1) the user downloads the RP script, opens the IdP window and downloads the IdP script, and (2) the user and RP performs 2 elliptic curve scalar multiplications for RP identifier transformation and complete $PID_{RP}$ registration at the IdP. The total proceeding time is 271 ms (104 ms downloading scripts and opening new window ), where
 SPRESSO needs 19 ms for the RP to obtain IdP's public key and encrypt its domain;
 while MITREid Connect only needs 10 ms.
 

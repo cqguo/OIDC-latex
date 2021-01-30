@@ -104,10 +104,10 @@ The \myss{tree} is the relations of the opened windows and documents, which are 
 \subsection{Model of UPPRESSO}
 In this section, we introduce the model of processes in UPPRESSO system, including IdP server process, RP server process, IdP scripting process and RP scripting process. We will focus on the state form and relation $R$. They can describe that what kind of event can be accepted by the process in each state, and the content of new output events and states.
 \subsection{IdP Server Process}
-The state of IdP server process is a term in the form \myss{\myangle{ID, p, SignKey, sessions, users, RPs, Validity, Tokens}}. Other data stored at IdP but not used during SSO authentication are not mentioned here.
+The state of IdP server process is a term in the form \myss{\myangle{ID, SignKey, sessions, users, RPs, Validity, Tokens}}. Other data stored at IdP but not used during SSO authentication are not mentioned here.
 \begin{itemize}
 \item \myss{ID} is the identifier of IdP.
-\item \myss{p} is the large prime mentioned before.
+%\item \myss{p} is the large prime mentioned before.
 \item \myss{SignKey} is the private key used by IdP to generate signatures.
 \item \myss{sessions} is the term in the form of \myss{\myangle{\myangle{Cookie, session}}}, the Cookie uniquely identifies the session and sessions store the  browser uploaded messages.
 \item \myss{users} is the set of user's information, including  \myss{username, password, ID_U}  and other attributes.
@@ -121,7 +121,8 @@ To make the description clearer, we also provide the \myss{functions} to define 
 \item \myss{\mathtt{UIDOfUser(u)}} is used to search the user \myss{u}'s \myss{ID_U}.
 \item \myss{\mathtt{ListOfPID()}} is the set of IDs of registered RP.
 \item \myss{\mathtt{EndpointsOfRP(r)}} is the set of endpoints registered by the RP with ID \myss{r}.
-\item \myss{\mathtt{ModPow(a, b, c)}} is the result of \myss{a^b \mod c}.
+%\item \myss{\mathtt{ModPow(a, b, c)}} is the result of \myss{a^b \mod c}.
+\item \myss{\mathtt{Multiply(P, a)}} is the result of \myss{aP}, where $P$ is the point on elliptic curve and $a$ is the integer.
 \item \myss{\mathtt{CurrentTime()}} is the system current time.
 \end{itemize}
 
@@ -136,7 +137,7 @@ The state of RP server process is a term in the form \myss{\myangle{ID_{RP}, End
 \begin{itemize}
 \item \myss{ID_{RP}} and \myss{Endpoints} are RP's registered information at IdP.
 \item \myss{Cert} is the IdP signed RP information containing \myss{ID_{RP}, Endpoints} and other attributes.
-\item \myss{IdP} is the term of the form \myss{\langle ScriptUrl}, \myss{p}, \myss{q}, \myss{PubKey \rangle}, where \myss{ScriptUrl} is the site to download IdP script, \myss{p} and \myss{q} are large primes defined before, and \myss{PubKey} is the public key used to verify the IdP signed messages.
+\item \myss{IdP} is the term of the form \myss{\langle ScriptUrl}, \myss{q}, \myss{PubKey \rangle}, where \myss{ScriptUrl} is the site to download IdP script, \myss{q} is the large prime defined before, and \myss{PubKey} is the public key used to verify the IdP signed messages.
 \item \myss{sessions} is same as it in IdP process.
 \item \myss{users} is the set of users registered at this RP, each user is uniquely identified by the \myss{Account}.
 \end{itemize}
@@ -152,11 +153,11 @@ The relation of RP process $R^r$ is shown as Algorithm~\ref{alg2} in Appendix~\r
 
 
 \subsection{IdP scripting process}
-The state of IdP scripting process \myss{scriptstate} is a term in the form \myss{\myangle{IdPDomain, Parameters,p, q, refXHR}}, where
+The state of IdP scripting process \myss{scriptstate} is a term in the form \myss{\myangle{IdPDomain, Parameters, q, refXHR}}, where
 \begin{itemize}
 \item \myss{IdPDomain} is the IdP's host.
 \item \myss{Parameters} is used to store the parameters received from other processes.
-\item \myss{p} is the large prime defined before.
+%\item \myss{p} is the large prime defined before.
 \item \myss{q} is used to label the procedure point in the login.
 \item \myss{refXHR} is the nonce to map HTTP request and response.
 \end{itemize}
@@ -209,10 +210,10 @@ The user \myss{u} does not use the attacker's cookie (denoted as \myss{c(a,r)}).
 
 
 To prove that UPPRESSO meets the requirements, we now provide the following lemmas. Lemma~\ref{req:cookie1} proves that the UPPRESSO system meets Requirement~\ref{req:cookie1}.
-\begin{lemma}
+\begin{relemma}
 Attacker does not learn users' cookies.
 \label{rel:cookie}
-\end{lemma}
+\end{relemma}
 
 \begin{proof}
 The Brute-force attacks, such as exhausting the possible users' cookies, are infeasible due to the length of cookies. The attackers can only try to obtain the cookies from honest processes in the system.  For an honest user \myss{u} and the honest RP \myss{r}, the valid cookie \myss{c(u,r)} can only be obtained by \myss{u}'s browser \myss{b_u}, the \myss{r}'s script \myss{script\_rp} and RP's server \myss{P^r} .
@@ -297,6 +298,7 @@ This HTTP response is related with the HTTP request at Line 28, carrying \myss{P
 
 Therefore, Requirement~\ref{req:cookie3} is satisfied and Theorem~\ref{the:secure} is proved.
 
+\begin{comment}
 \subsection{Proof of Theorem~\ref{the:privacy}}
 In this section, we give a detailed proof about the privacy of UPPRESSO. That is,  UPPRESSO is a privacy-preserving system, satisfying IdP-Privacy and RP-Privacy. As analyzed above,  the requirements of IdP-Privacy and RP-Privacy are as follows. 
 \begin{req}
@@ -354,6 +356,7 @@ Malicious RPs may attempt to generate  \myss{Account} and \myss{PID_U} incorrect
 Therefore,  UPPRESSO system meets Requirement~\ref{req:rp}.
 \end{proof}
 Finally, we have proved that the UPPRESSO system meets Requirement~\ref{req:idp} and ~\ref{req:rp}, and therefore Theorem~\ref{the:privacy} is proved.
+\end{comment}
 
 \onecolumn
 
@@ -428,7 +431,7 @@ Finally, we have proved that the UPPRESSO system meets Requirement~\ref{req:idp}
   \mystop{f,a,m'}
   \ENDIF
   \mystate{\myss{ID_U := session[uid]}}
-  \mystate{\myss{PID_U := \mathtt{ModPow}(PID_{RP}, ID_U, s'.p)}}
+  \mystate{\myss{PID_U := \mathtt{Multiply}(PID_{RP}, ID_U)}}
   \mystate{\myss{Validity := \mathtt{CurrentTime} ()+ s'.Validity}}
   \mystate{\myss{Content := \myangle{PID_{RP}, PID_U, s'.ID, Validity}}}
   \mystate{\myss{Sig := \mathtt{Sig}(Content, s'.SignKey)}}
@@ -462,7 +465,7 @@ Finally, we have proved that the UPPRESSO system meets Requirement~\ref{req:idp}
   \mystate{\myss{cookie := headers[Cookie]}}
   \mystate{\myss{session := s'.sessions[cookie]}}
   \mystate{\myss{N_U := parameters[N_U]}}
-  \mystate{\myss{PID_{RP} := \mathtt{ModPow}(s'.ID_{RP}, N_U, s'.IdP.p)}}
+  \mystate{\myss{PID_{RP} := \mathtt{Multiply}(s'.ID_{RP}, N_U)}}
   \mystate{\myss{T:= \mathtt{ExEU}(N_U, s'.IdP.q)}}
   \mystate{\myss{session[N_U] := N_U}}
   \mystate{\myss{session[PID_{RP}] := PID_{RP}}}
@@ -528,7 +531,7 @@ Finally, we have proved that the UPPRESSO system meets Requirement~\ref{req:idp}
   \ENDIF
   \mystate{\myss{PID_U := Content.PID_U}}
   \mystate{\myss{T := session[t]}}
-  \mystate{\myss{Account := \mathtt{ModPow}(PID_U, T, s'.IdP.p)}}
+  \mystate{\myss{Account := \mathtt{Multiply}(PID_U, T)}}
   \myif{Account \in \mathtt{ListOfUser}()}
   \mystate{\myss{\mathtt{RegisterUser}(Account)}}
   \ENDIF
@@ -568,7 +571,7 @@ Finally, we have proved that the UPPRESSO system meets Requirement~\ref{req:idp}
       \ENDIF
        \mystate{\myss{s'.Parameters[Cert] := Cert}}
       \mystate{\myss{N_U := s'.Parameters[N_U]}}
-      \mystate{\myss{PID_{RP} := \mathtt{ModPow}(Cert.Content.ID_{RP}, N_U, s'.p)}}
+      \mystate{\myss{PID_{RP} := \mathtt{Multiply}(Cert.Content.ID_{RP}, N_U)}}
       \mystate{\myss{s'.Parameters[PID_{RP}] := PID_{RP}}}
       \mystate{\myss{Endpoint := \mathtt{RandomUrl}()}}
       \mystate{\myss{s'.Parameters[Endpoint] := Endpoint}}
