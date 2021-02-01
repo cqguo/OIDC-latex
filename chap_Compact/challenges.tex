@@ -58,7 +58,7 @@ It was also reported that some RPs of Google ID SSO accepted user attributes tha
   %  \hline
    % {$Y_{RP}$} & {$Y_{RP} = {ID_{RP}}^{N_{RP}} \bmod p$, the public value for $N_{RP}$.} & {One-time variable} \\
     %\hline
-    {$T$} & {The trapdoor to derive $Account$: $T=N_U^{-1} \bmod n$.} & {One-time variable} \\
+    {$T_{RP}$} & {The trapdoor to derive $Account$: $T_{RP}=N_U^{-1} \bmod n$.} & {One-time variable} \\
     \hline
     \end{tabular}
     \label{tbl:notations}
@@ -173,14 +173,14 @@ At the same time, the RP obtains a private trapdoor in the negotiation,
 
 
 %\vspace{1mm}
-\noindent \textbf{Transformed RP designation.} To prevent IdP-based login tracing, the RP includes a $PID_{RP}$ dynamically transformed from $ID_{RP}$, instead of $ID_{RP}$, in the identity proof request. UPPRESSO designs a novel trapdoor-based transformation function $\mathcal{F}_{ID_{RP} \mapsto PID_{RP}}(ID_{RP}, T)$ to compute $PID_{RP}$ based on $ID_{RP}$ and a random trapdoor $T$, which is dynamically negotiated between the user and the RP in each login. Then, the user assists the RP to register $PID_{RP}$ at the IdP through OIDC dynamic registration. When an RP receives an identity proof, it verifies if the enclosed $PID_{RP}$ is transformed from its $ID_{RP}$ and the trapdoor of this session.
+\noindent \textbf{Transformed RP designation.} To prevent IdP-based login tracing, the RP includes a $PID_{RP}$ dynamically transformed from $ID_{RP}$, instead of $ID_{RP}$, in the identity proof request. UPPRESSO designs a novel trapdoor-based transformation function $\mathcal{F}_{ID_{RP} \mapsto PID_{RP}}(ID_{RP}, T_{RP})$ to compute $PID_{RP}$ based on $ID_{RP}$ and a random trapdoor $T_{RP}$, which is dynamically negotiated between the user and the RP in each login. Then, the user assists the RP to register $PID_{RP}$ at the IdP through OIDC dynamic registration. When an RP receives an identity proof, it verifies if the enclosed $PID_{RP}$ is transformed from its $ID_{RP}$ and the trapdoor of this session.
 
 %To bind dynamic $PID_{RP}$ in identity proofs signed by the IdP, the user firstly cooperates with the RP to generate $PID_{RP}$ based on $ID_{RP}$ and then registers this transformed RP identifier (i.e., $PID_{RP}$) in the IdP.
 %The identifier transformation of RP is completely kept secret to the IdP. Then, the one-time $PID_{RP}$ is bound with $PID_U$ in the identity proof. $PID_{RP}$ is calculated based on $ID_{RP}$ and the trapdoor, so that the RP holding the trapdoor is able to verify the specified receiver of identity proofs with transformed $PID_{RP}$ but not $ID_{RP}$.
 
 
 %\vspace{1mm}
-\noindent \textbf{Trapdoor user identification.} To prevent RP-based identity linkage, we design a transformation function $\mathcal{F}_{ID_{U} \mapsto PID_U}(ID_U, PID_{RP})$ for the IdP to generate $PID_U$. When an RP receives an identity proof, another transformation function $\mathcal{F}_{PID_{U} \mapsto Account}(PID_U, PID_{RP}, T)$ is designed to help the RP to derive the $Account$ from $PID_U$ and $PID_{RP}$ using the trapdoor it holds. Intuitively, the trapdoor $T$ plays a role in the generations of $PID_{RP}$ and $PID_U$, directly or indirectly.
+\noindent \textbf{Trapdoor user identification.} To prevent RP-based identity linkage, we design a transformation function $\mathcal{F}_{ID_{U} \mapsto PID_U}(ID_U, PID_{RP})$ for the IdP to generate $PID_U$. When an RP receives an identity proof, another transformation function $\mathcal{F}_{PID_{U} \mapsto Account}(PID_U, PID_{RP}, T_{RP})$ is designed to help the RP to derive the $Account$ from $PID_U$ and $PID_{RP}$ using the trapdoor it holds. Intuitively, the trapdoor $T_{RP}$ plays a role in the generations of $PID_{RP}$ and $PID_U$, directly or indirectly.
 
 %Existing SSO solutions always depend on constant $ID_U$ in all identity proofs or RP-specific $PID_U$ that keeps constant for an RP, to identify an account in the RP.
 %UPPRESSO introduces trapdoor user identification, where an RP holds a trapdoor $T$ to derive the identical $Account$ from dynamic $PID_{U}$s in identity proofs. Intuitively, the trapdoor $T$ also plays a part in the generations of $PID_{RP}$ and $PID_U$,
@@ -256,7 +256,7 @@ In PPID approaches, the IdP generates different $PID_U$s for a user to log in to
     \hline
     {BrowserID$^\dag$} & {{$ID_U$}} & {{$\bot$}} &{{$ID_U$}}\\
     \hline
-    {UPPRESSO} & {{$\mathcal{F}(ID_U, PID_{RP})$}} & {{$\mathcal{F}(ID_{RP}, T)$}} &{{$\mathcal{F}(PID_U, T)$}}\\
+    {UPPRESSO} & {{$\mathcal{F}(ID_U, PID_{RP})$}} & {{$\mathcal{F}(ID_{RP}, T_{RP})$}} &{{$\mathcal{F}(PID_U, T_{RP})$}}\\
     \hline
     \end{tabular}
 \flushleft
