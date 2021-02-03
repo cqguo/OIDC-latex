@@ -67,10 +67,11 @@ There are events $e_1$ := $\langle a_1, f_1, m_1 \rangle$ and $e_2$ := $\langle 
 
 \noindent A {\em run step} is the system migrating from configurations ($S, E, N$) to ($S', E', N'$) by processing an event $e \in E$.
 
-\noindent\textbf{The Formal Model of UPPRESSO}
+\noindent\textbf{The Formal Model of UPPRESSO.}
 Accordingly, we model UPPRESSO as a web system, which is defined as $\mathcal{UWS} = (\mathcal{W}, \mathcal{S}, \mathtt{script}, E^0)$. $\mathcal{W}$ is a finite set of atomic processes in UPPRESSO, which contains an IdP server process, a finite set of web servers for the honest RPs, a finite set of honest browsers, and a finite set of attacker processes. Here, we consider all the RP processes and browser processes are honest, and model an RP or a browser controlled by an adversary as an atomic attacker process.
 %We assume  all the honest RPs are implemented following the same rule so that the processes are considered consistent besides of the addresses they listen to.
 $\mathcal{S}$ is a finite set of scripting processes, which contains {\sf script\_rp}, {\sf script\_idp} and {\sf script\_attacker}, where {\sf script\_rp} and {\sf script\_idp} are honest scripts downloaded by an RP process and the IdP process, and {\sf script\_attacker} denotes a script downloaded by an attacker process that exists in all browser processes.
+The details about each process are described in Appendix.
 \begin{comment}
  Below is a brief description about the processes and scripts in UPPRESSO.
 \vspace{-\topsep}
@@ -85,32 +86,34 @@ However, an event with a path in {\sf \{ /script, /login, /startNegotiation\}} c
 \end{comment}
 
 \subsection{Security of UPPRESSO}
-At the very beginning, it is to be emphasized that, whether an RP accepted $Acount$ can be controlled by an adversary may be the most noticeable question for readers
+At the very beginning, it is to be emphasized that, whether an RP accepted $Acount$ can be controlled by an adversary may be the most noticeable question for readers.
 %, as it can caused the essential attack that the adversary can impersonate other honest users by controlling the $Acount$. 
-For example, the adversary may try to make the conflict $Account_1=ID_{U_1}ID_{RP_1}$, $Account_2=ID_{U_2}ID_{RP_2}$ and $Account_1=Account_2$ possible, where $ID_{U_1}$ and $ID_{RP_1}$ belong to the honest user and RP.
-Here we give the direct conclusion and brief proofs in advance and the details are shown in the following analysis. \textbf{The $PID_U$ achieved by an adversary cannot be transformed into the honest user's $Account$ at an honest RP.} 
+For example, the adversary may try to make the conflict $Account_1=ID_{U_1}ID_{RP_1}$, $Account_2=ID_{U_2}ID_{RP_2}$, and $Account_1=Account_2$ possible, where $ID_{U_1}$ and $ID_{RP_1}$ belong to the honest user and RP.
+Here we give the direct conclusion and brief proofs in advance. \textbf{The $PID_U$ achieved by an adversary cannot be transformed into the honest user's $Account$ at an honest RP.} 
 %That is, while an RP $R$ receive an identity proof related with an honest user $u$'s $Account$, this identity proof must be issued to $u$ for $r$. 
 
 \noindent\textbf{Proof. }
-While the $PID_{U_{adv}}$ is achieved by the adversary, if must be in the form $PID_{U_{adv}}=$ (a)$PID_{RP_{adv}}ID_{U_{adv}}$; (b) $PID_{RP_{adv}}ID_{U}$; or (c) $PID_{RP}ID_{U_{adv}}$. Due to the $PID_RP$ registration, the (a) and (b) cannot be accepted by honest RP. In (c) the $PID_{RP}$ must be created as $N_UID_{RP_{hon}}$, while the hash($N_U$) is included in registration result. Moreover, the trapdoor $T=N_U^{-1} \bmod n$ cannot be controlled be adversary. Therefore, the $Account$ cannot be controlled by the adversary.
+While the $PID_{U_{adv}}$ is achieved by the adversary, if must be in the form $PID_{U_{adv}}=$ (a) $ID_{U_{adv}}PID_{RP_{adv}}$; (b) $ID_{U}PID_{RP_{adv}}$; or (c) $ID_{U_{adv}}PID_{RP}$. Due to the $PID_{RP}$ registration, the (a) and (b) cannot be accepted by honest RP. In (c) the $PID_{RP}$ must be created as $N_UID_{RP_{hon}}$, while the hash($N_U$) is included in registration result. Moreover, the trapdoor $T=N_U^{-1} \bmod n$ cannot be controlled be adversary. So, the $PID_{U_{adv}}$ must be transformed into $ID_{U_{adv}}ID_{RP_{hon}}$ (i.e., the $Account$). Therefore, the $Account$ cannot be controlled by the adversary.
 %An identity proof contains the $PID_{RP}$ and $PID_{U}$, and it follows the relation $PID_U=ID_UPID_{RP}$. RP is going to transform into $Account$ with the trapdoor $N^{-1}$. However, during the registration phase in authentication, the RP received the registration token including $PID_{RP}$ and $hash(N)$, which confirms that $N^{-1}PID_{RP}=ID_{RP}$. Therefore, the RP would achieve the $Account=ID_UR$ ($R$ is the real ID of this RP). As $ID_U$ is unique for each user, the efforts of the adversary in making the conflicted $Account_1$ and $Account_2$ is impossible.
 
-In the security analysis, we consider web systems $\mathcal{UWS}$ defined in Section~\ref{subsec:webmodel}. In this model, we considers only
-%As and postMeassage is correctly implemented in the browsers, in the following analysis, we consider there is no web attacker who can listen to and send messages from its own address, but
-one network attacker who is able to listen to and spoof all addresses. The network attacker can control (malicious) browsers and RPs.
+In the security analysis, we consider web systems $\mathcal{UWS}$ defined in Section~\ref{subsec:webmodel}.
+ In this model, we considers only
+%As and postMeassage is correctly implemented in the browsers, in the following analysis, we consider there is no web attacker who can listen to and send messages from its own address, but one network attacker who is able to listen to and spoof all addresses. The 
+network attacker can control (malicious) browsers and RPs.
 The analysis of the security of UPPRESSO is to prove the below theorem:
+\vspace{-\topsep}
 \begin{theorem}
 Let $\mathcal{UWS}$ be a UPPRESSO web system defined above. Then, $\mathcal{UWS}$ is secure.
 \label{the:secure}
 \end{theorem}
 \vspace{-\topsep}
-In Section~\ref{subsec:basicrequirements}, we describe the fundamental security properties that an SSO system should satisfy.  The adversary should not succeed in \emph{impersonation attacks}) or \emph{identity injection attacks}. 
-We consider the visits to an RP's resource paths are controlled by the visitors' cookie. So, if such a system exists, the attacker could break the security if and only if he owns the cookie bound to the honest user. 
+In Section~\ref{subsec:basicrequirements}, we describe the fundamental security properties that an SSO system should satisfy with.  The adversary should not succeed in \emph{impersonation attacks}) or \emph{identity injection attacks}. 
+We consider the visits to an RP's resource paths are controlled by the visitors' cookie. So, if such a system exists, the attacker could break the security only if he owns the cookie bound to the honest user. 
 Therefore, we define a secure UPPRESSO as below.
 %Confidentiality and integrity require that the identity proof from the IdP cannot be intercepted or altered. As we assume tall the messages transmitted using HTTPS, we can prove that the encrypted communications over HTTPS between honest entities cannot be tampered by the network attacker. Therefore, an honest RP can receive correct identity proofs and retrieve the correct key for signature verification from the IdP through the honest browsers. For brevity, we do not include the detailed proofs here, which are similar to the proof in~\cite{SPRESSO}.
 
 %User identification and RP designation informally require that {\em an attacker should not be able to log in to an honest RP as an honest user}. To prove this property, we assume there exists a UPPRESSO web system in which an attacker can log in to an honest RP as an honest user, and show this assumption leads to a contradiction. We consider the visits to an RP's resource paths are controlled by the visitors' cookie. So, if such a system exists, the attacker could break the security if and only if he owns the cookie bound to the honest user. %the attacker should be able to obtain an authenticated cookie for an honest user.
-
+\vspace{-\topsep}
 \begin{definition}
 Let $\mathcal{UWS}$ be a UPPRESSO web system. $\mathcal{UWS}$ is secure {\em iff} any authenticated cookie $c(u,r)$ of an honest user $u$ for an honest RP $r \in \mathcal{W}$ is unknown to the attacker $a$.
 \label{def:secure}
@@ -126,6 +129,7 @@ $\mathcal{UWS}$ meeting the requirement (A) can be proved by the following Lemma
 %\end{itemize}
 %\vspace{1mm}\noindent\textbf{Proof Outline. }
 %Here we introduce the lemmas briefly to prove that $\mathcal{UWS}$ follows the requirements by Definition~\ref{def:secure} so that $\mathcal{UWS}$ is secure. And the detailed proofs to these lemmas are in ~\ref{*}.
+\vspace{-\topsep}
 \begin{lemma}
 The cookie owned by an honest user cannot be leaked to the attacker.
 \label{lemma:cookie}
@@ -136,6 +140,7 @@ First, due to the same-origin policy, an honest browser should not leak the cook
 
 Next, to prove $\mathcal{UWS}$ satisfies the requirement (B), we define the process that authenticates a cookie as below.
 %\end{proof}
+\vspace{-\topsep}
 \begin{definition}
 In $\mathcal{UWS}$, a cookie $c$ is set as an authenticated cookie $c(u,r)$ for a user $u$ and an RP $r$ only when $r$ receives a valid identity proof of $u$ from the owner of $c$.
 \label{def:cookie}
@@ -143,10 +148,13 @@ In $\mathcal{UWS}$, a cookie $c$ is set as an authenticated cookie $c(u,r)$ for 
 \vspace{-\topsep}
 %Then we are going to prove that $\mathcal{UWS}$ follows the requirements that the cookie of the attacker cannot be set authenticated.
 %Here we propose the lemmas.
+\vspace{-\topsep}
 \begin{lemma}
 In $\mathcal{UWS}$, an attacker cannot obtain the password of an honest user $u$.
 \label{lemma:password}
 \end{lemma}
+\vspace{-\topsep}
+\vspace{-\topsep}
 \begin{lemma}
 In $\mathcal{UWS}$, an attacker cannot forge or modify the proofs issued by the IdP.
 \label{lemma:unforged}
@@ -155,6 +163,7 @@ In $\mathcal{UWS}$, an attacker cannot forge or modify the proofs issued by the 
 %\begin{proof}
 Lemma~\ref{lemma:password} can be easily proved because the password is only sent by an honest IdP scripting process to the IdP server. Lemma~\ref{lemma:unforged} can be proved by showing that the proofs issued by the IdP process are signed and verified. With Lemma~\ref{lemma:password} and Lemma~\ref{lemma:unforged}, we can prove the following lemma.
 %\end{proof}
+\vspace{-\topsep}
 \begin{lemma}
 In $\mathcal{UWS}$, an attacker cannot obtain a valid identity proof for an honest user $u$.
 \label{lemma:token}
@@ -168,10 +177,12 @@ According to the proof as the beginning of this section, it is proved that the $
 
 Then, we prove a $\mathcal{UWS}$ system meets the requirement (C). We here propose another lemma. 
 %First, the attacker cannot set $c(a,r)$ with the RP's origin in an honest browser due to the same-origin policy. According to Definition~\ref{def:cookie}, the RP $r$ sets $c(a,r)$ in an honest browser $u$ if it receives an identity proof with the attacker's $PID_U$ and a valid $PID_{RP}$ generated by $u$ and $r$. This requires the attacker to know a valid $PID_{RP}$. According to the following lemma, the attacker cannot obtain an identity proof with a valid $PID_{RP}$.
+\vspace{-\topsep}
 \begin{lemma}
 The attacker cannot know a valid $PID_{RP}$ negotiated by a user $u$ and an RP $r$.
 \label{lemma:PID}
 \end{lemma}
+\vspace{-\topsep}
 In UPPRESSO, an RP shares different $PID_{RP}$s with different users. According to this lemma, the adversary cannot forge the token accepted by RP in honest user's login session. Therefore, requirement (C) is satisfied.
 
 
