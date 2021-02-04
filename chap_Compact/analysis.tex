@@ -23,7 +23,7 @@ In UPPRESSO $PID_{RP}$ provides the same binding as $ID_{RP}$ as follows,
     And the $PID_{RP}$ registration result is signed by the IdP,
         and verified by the user and the RP before the protocol moves on.
 %   while the correct user checks this uniqueness through the $PID_{RP}$ registration directly, and the correct RP checks it based on the user-redirected $PID_{RP}$ registration result, which is signed by the IdP.
-   %ÎÄ×Ö¼ÓÉÏ ÓÃ»§¡¢RP¡¢ÓÃ»§ºÍRPºÏÄ±ÄÜ¹»½øĞĞ¡£ a malicious RP may control by itself or acting as a user of beliving RP. These two cannot succeed
+   %æ–‡å­—åŠ ä¸Š ç”¨æˆ·ã€RPã€ç”¨æˆ·å’ŒRPåˆè°‹èƒ½å¤Ÿè¿›è¡Œã€‚ a malicious RP may control by itself or acting as a user of beliving RP. These two cannot succeed
   \item Collusive RPs and users cannot deceive an RP to accept
             a fake signed $PID_{RP}$ registration result,
             because $Hash(N_{RP}, N_U)$ is included in $PID_{RP}$ registration as nonce
@@ -76,7 +76,7 @@ The above analysis demonstrates that (1) \emph{integrity} and \emph{confidential
   and (2) the modifications introduce no security degradation on \emph{user identification} and \emph{RP designation}.
 Therefore, UPPRESSO provides the secure SSO services.
 
-%CSRFÓĞÆäËûÍ¨ÓÃ·ÀÓù·½°¸£¬ÕâÀïÌ¸²»ÖµµÃ¡£ ÓÉÓÚÖ»ÓĞ307£¬½¨Òé·Åµ½related workÖĞ
+%CSRFæœ‰å…¶ä»–é€šç”¨é˜²å¾¡æ–¹æ¡ˆï¼Œè¿™é‡Œè°ˆä¸å€¼å¾—ã€‚ ç”±äºåªæœ‰307ï¼Œå»ºè®®æ”¾åˆ°related workä¸­
 %\vspace{1mm}\noindent\textbf{Protection conducted by user agent.} The design of UPPRESSO makes it immune to some existing known attacks~\cite{FettKS16} (e.g., CSRF, 307 Redirect). The Cross-Site Request Forgery (CSRF) attack is  usually exploited by the adversary to perform the identity injection. However, in UPPRESSO, the honest user logs  $PID_{RP}$ and one-time endpoint in the session,  and performs the checks before sending the identity proof to the RP's endpoint, which prevents the CSRF attack. The 307 Redirect attacks~\cite{FettKS16} is due to the implementation error at the IdP, i.e. returning the incorrect status code (i.e., 307), which makes the IdP leak the user's credential to the RPs during the redirection. In UPPRESSO, the redirection is intercepted by the trusted user agent which removes these sensitive information.
 
 \subsection{Privacy}
@@ -112,7 +112,7 @@ Because $q$ is a prime and co-prime to any $r_2$,
 %\end{itemize}
 
 
-%¶ÔÒÑ·ÖÅäµÄID_{RP}ÖĞµÄÃ¿Ò»¸öÖµ, ĞèÒª±éÀúËùÓĞq¸övalue£¬²ÅÄÜÈ·¶¨ÆäÊÇ·ñÄÜ¹»Éú³ÉÏàÓ¦µÄPID_{RP}£¬ÕâÊÇ¼ÆËã²»¿ÉĞÅµÄ£»¶øÇÒ¶ÔÓÚÒ»¸öPID_{RP}¶øÑÔ£¬¿ÉÄÜÓĞ²»Ö¹Ò»¸öID_{RP} ÓëÖ®¶ÔÓ¦; ÒÔÏÂÊÇÕë¶Ô³Ë·¨×ÓÈº²»Í¬µÄ¿ÉÄÜ£¬¼´²»¹æ¶¨Éú³ÉÔªµÄÇé¿ö¡£
+%å¯¹å·²åˆ†é…çš„ID_{RP}ä¸­çš„æ¯ä¸€ä¸ªå€¼, éœ€è¦éå†æ‰€æœ‰qä¸ªvalueï¼Œæ‰èƒ½ç¡®å®šå…¶æ˜¯å¦èƒ½å¤Ÿç”Ÿæˆç›¸åº”çš„PID_{RP}ï¼Œè¿™æ˜¯è®¡ç®—ä¸å¯ä¿¡çš„ï¼›è€Œä¸”å¯¹äºä¸€ä¸ªPID_{RP}è€Œè¨€ï¼Œå¯èƒ½æœ‰ä¸æ­¢ä¸€ä¸ªID_{RP} ä¸ä¹‹å¯¹åº”; ä»¥ä¸‹æ˜¯é’ˆå¯¹ä¹˜æ³•å­ç¾¤ä¸åŒçš„å¯èƒ½ï¼Œå³ä¸è§„å®šç”Ÿæˆå…ƒçš„æƒ…å†µã€‚
 %As the IdP doesn't know the value $n_U*n_{RP}$, the IdP has to calculate all the ${ID_{RP}}^x\ mod\ p, x\in[1, q-1]$ for each one of the already assigned $ID_{RP}$s, to determine whether this $ID_{RP}$ is a possible one corresponding to the received $PID_{RP}$. This is computational infeasible as $q$ is too large ($q>2^{N-1}$, $N\geq 256$). Moreover, there may be two or even more possible ones which  are indistinguishable to the IdP. For example, if the received $PID_{RP}$ is $g^{7}$ where $g$ is a generator and $q$ is 11, both $g^{2}$ and $g^{3}$ are the possible values for $ID_{RP}$ where the corresponding $n_U*n_{RP}$ are 9 and 6 respectively.
 
 \emph{The IdP cannot determine whether two or more logins are at a same RP.}
@@ -125,7 +125,7 @@ The only information that can be used for this classification is one-time endpoi
 %The detailed proofs are as follows.
 %
 %
-%one RP:   Ö±½Ó´ÓPIDu->IDu, Account->IDu, PIDu&Account -> IDu,
+%one RP:   ç›´æ¥ä»PIDu->IDu, Account->IDu, PIDu&Account -> IDu,
 \emph{Any RP cannot derive $ID_U$ from one $PID_U$ and $Account$ without manipulating $Y_{RP}$s.}
  %      due to the one-way function $\mathcal{F}_{ID_{U} \mapsto PID_{U}}$.
 \begin{itemize}
@@ -145,13 +145,13 @@ The only information that can be used for this classification is one-time endpoi
            when the  RP doesn't manipulate $Y_{RP}$.
 \end{itemize}
 
-%one RP ¶à¸öloginÖĞµÄPIDu-> IDu, ¶à¸öloginÖĞµÄAccount->IDu
+%one RP å¤šä¸ªloginä¸­çš„PIDu-> IDu, å¤šä¸ªloginä¸­çš„Account->IDu
 \emph{Any RP cannot derive $ID_U$ from multiple $PID_U$s and $Account$s without manipulating $Y_{RP}$s.}
       All these $Account$s are equal,
       while any $PID_{U}$ (e.g., $PID_{U_1}$) can be calculated from any other $PID_{U}$ (e.g., $PID_{U_2}$) for the user at this RP,
       $PID_{U_1}$=$PID_{U_2}Account^{N_{U_1}N_{RP_1}-N_{U_2}N_{RP_2}} \bmod p$, where $N_{U_1}$, $N_{RP_1}$, $N_{U_2}$ and $N_{RP_2}$ are values known to the RP and independent with $ID_U$ when the RP doesn't manipulate $Y_{RP}$s.
 
-%two or more RPs ºÏÄ±£¬ ²»Ìá¹©´íÎóÖµ
+%two or more RPs åˆè°‹ï¼Œ ä¸æä¾›é”™è¯¯å€¼
 \emph{The collusive RPs cannot associate a user's $Account$s and $PID_U$s without manipulating $Y_{RP}$s.}
      The collusive RPs may attempt to link a user's accounts
        by checking whether the equality $Account_2$=$(Account_1)^{r_2/r_1} \bmod p$ holds for $Account_1$ at an RP $ID_{RP1} = g^{r_1} \bmod p$ and $Account_2$ at another RP $ID_{RP2} = g^{r_2} \bmod p$.
@@ -159,10 +159,10 @@ The only information that can be used for this classification is one-time endpoi
      The collusive RPs cannot associate a user's  $PID_U$s either, due to the unknown $r$s.
 
 
-%Ò»¸öRPÔÚÒ»¸öloginÖĞÌá¹©´íÎóµÄN_{RP}£¬À´Ö±½ÓÍÆµ¼ID_U
-%Ò»¸öRPÔÚ¶à¸öloginÖĞÌá¹©´íÎóµÄN_{RP}£¬À´Ö±½ÓÍÆµ¼ID_U £¨Ìá¹©´íÎóÖµ£©
-%Two or more RPsºÏ×÷¹ØÁª ID_U£¬£¨Ìá¹©´íÎóÖµ£©
-%¾¡¹Ü²»Ö±½ÓÍÆµ¼£¬Two or more RPs ºÏ×÷associate user login £¨Ìá¹©´íÎóÖµ¡¢²»Ìá¹©´íÎóÖµ£© provide an incorrect $N_{RP}$ in $\mathcal{F}_{ID_{RP} \mapsto PID_{RP}}$
+%ä¸€ä¸ªRPåœ¨ä¸€ä¸ªloginä¸­æä¾›é”™è¯¯çš„N_{RP}ï¼Œæ¥ç›´æ¥æ¨å¯¼ID_U
+%ä¸€ä¸ªRPåœ¨å¤šä¸ªloginä¸­æä¾›é”™è¯¯çš„N_{RP}ï¼Œæ¥ç›´æ¥æ¨å¯¼ID_U ï¼ˆæä¾›é”™è¯¯å€¼ï¼‰
+%Two or more RPsåˆä½œå…³è” ID_Uï¼Œï¼ˆæä¾›é”™è¯¯å€¼ï¼‰
+%å°½ç®¡ä¸ç›´æ¥æ¨å¯¼ï¼ŒTwo or more RPs åˆä½œassociate user login ï¼ˆæä¾›é”™è¯¯å€¼ã€ä¸æä¾›é”™è¯¯å€¼ï¼‰ provide an incorrect $N_{RP}$ in $\mathcal{F}_{ID_{RP} \mapsto PID_{RP}}$
 %Now, we consider malicious RPs.
 \emph{Any malicious RP cannot derive $ID_U$ and collusive RPs cannot associate $PID_U$s ($Account$s), with manipulating $Y_{RP}$s.}
 A malicious RP may attempt to manipulate $Y_{RP}$s in one or multiple logins
@@ -184,7 +184,7 @@ However, the manipulation on $N_{RP}$ is masked by $N_U$ in $PID_U$
         Obviously, $Account$ is independent with $N_{RP}$ and cannot be controlled by any RP.
 \end{itemize}
 
-%ºÍ¶ñÒâÓÃ»§ºÏÄ±£¬µ«ÊÇ½ö½öÊÇ±»¶¯¹¥»÷¡£
+%å’Œæ¶æ„ç”¨æˆ·åˆè°‹ï¼Œä½†æ˜¯ä»…ä»…æ˜¯è¢«åŠ¨æ”»å‡»ã€‚
 %victim user Account_v1 = ID_RP1^ID_Uv at RP1, malicious user Account_m1=ID_{RP1}^ID_Um
 %victim user Account_v2 = ID_RP2^ID_Uv at RP2, malicious user Account_m2=ID_{RP2}^ID_Um
 \emph{The collusive RPs and users cannot associate the victim user.}
@@ -197,7 +197,7 @@ For example, at $ID_{RP_1}$ and $ID_{RP_2}$, the victim user's accounts are $Acc
 However, as $ID_U$s are independent while $ID_U$ is only known to the IdP and the corresponding user,
   the adversary cannot derive the victim user's $ID_U$ (and then $ID_{\Delta}$) for this association.
 
-%ºÍ¶ñÒâÓÃ»§ºÏÄ±£¬Ö÷¶¯¹¥»÷,ÖØ¸´ÄÚÈİ£¬Ã²ËÆ²»ĞèÒª
+%å’Œæ¶æ„ç”¨æˆ·åˆè°‹ï¼Œä¸»åŠ¨æ”»å‡»,é‡å¤å†…å®¹ï¼Œè²Œä¼¼ä¸éœ€è¦
 %\emph{The malicious RPs and users cannot associate the victim user by manipulating $N_{RP}$s or $N_{U}$s}.
 %The malicious RPs may manipulate $N_{RP}$s while the colluded users may manipulate $N_{U}$s, attempting to link the victim user's logins at different RPs.
 %However, same as the above analysis, malicious RPs cannot control the victim user's $PID_U$s and $Account$s due to the independent $N_U$s from the victim user.
