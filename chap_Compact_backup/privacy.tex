@@ -14,9 +14,8 @@ Assume that $n$ is also a large prime. Let $P$ be a generator point of $\mathbb{
 \vspace{-\topsep}
 \begin{multline*}
 Pr[D(P, aP, bP, abP)=1]-Pr[D(P, aP, bP, cP)=1]=\sigma(k)
-\end{multline*}
-
 \vspace{-\topsep}
+\end{multline*}
 
 \noindent\textbf{IdP-based identity linkage.} 
 It can be found in figure~\ref{fig:process} that $PID_{RP}$ is the only data related with RP's identity accessible to IdP. Moreover, $PID_{RP}$ is created based on $ID_{RP}$ and the IdP uncontrolled random number $N_U$. As $N_U$ is randomly chosen in $\mathbb{Z}_n$,  $PID_{RP}$ can be also seemed  randomly chosen in $\mathbb{G}$ to IdP. Therefore, obviously IdP cannot trace the user's login RPs, so that IdP-based identity linkage is not possible in UPPRESSO.
@@ -37,15 +36,14 @@ Following, we are going to build the model of Game to show how the challenger in
 \item[-] $PID_U$ generation: In this phase, challenger firstly receives and  verifies whether $PID_{RP}$ is correctly generated based on $ID_{RP}$ and corresponding $N_U$ (i.e., the algorithm $Verify(ID_{RP},PID_{RP},N_U)$). Then it generates the $PID_U$ using the algorithm $F_{PID_U}(ID_U,PID_{RP})$ and sends it to adversary.
 \end{itemize}
 \vspace{-\topsep}
+Firstly we give the realistic model of the $ID_U$-guessing Game, shown as Game 0 in figure~\ref{fig:game}. In this Game, adversary firstly achieves 2 $ID_{RP}$s and 3 $N_U$s (denote as $n_1, n_2, n_3$), then generates 3 $PID_{RP}$s. In the challenger's view, these $PID_{RP}$s are related with 3 $N_U$s respectively. Following the challenger generates $PID_U$s for different $PID_{RP}$s based on the 2 $ID_U$s (denote as $u_1, u_2$) generated in initialization phase. 
+Then challenger generates the random $b$=0 or 1. $PID_{U1}$ is generated based on $ID_{U1}$. However $PID_{U2}$ and $PID_{U3}$ are generated according to $b$. That is, $PID_{U2}=ID_{Ub}PID_{RP2}$, and $PID_{U3}=ID_{U(1-b)}PID_{RP3}$.  
 \begin{strip}
-\centering\includegraphics[width=\textwidth, height=0.3\textheight]{fig/game.pdf}
+\centering\includegraphics[width=\textwidth]{fig/game.pdf}
 \captionof{figure}{Game.}
 \label{fig:game}
 \vspace{-5mm}
 \end{strip}
-Firstly we give the realistic model of the $ID_U$-guessing Game, shown as Game 0 in figure~\ref{fig:game}. In this Game, adversary firstly achieves 2 $ID_{RP}$s and 3 $N_U$s (denote as $n_1, n_2, n_3$), then generates 3 $PID_{RP}$s. In the challenger's view, these $PID_{RP}$s are related with 3 $N_U$s respectively. Following the challenger generates $PID_U$s for different $PID_{RP}$s based on the 2 $ID_U$s (denote as $u_1, u_2$) generated in initialization phase. 
-Then challenger generates the random $b$=0 or 1. $PID_{U1}$ is generated based on $ID_{U1}$. However $PID_{U2}$ and $PID_{U3}$ are generated according to $b$. That is, $PID_{U2}=ID_{Ub}PID_{RP2}$, and $PID_{U3}=ID_{U(1-b)}PID_{RP3}$.  
-
 
 Finally adversary returns the $b'$. While $b=b'$ is true, we consider the adversary succeeds,.
 %that means the RP-identity-linkage is possible in UPPRESSO.
@@ -64,9 +62,9 @@ The inputs of the algorithm is $\{P,X,Y,Z\}$. While the input is in the form $\{
 \begin{multline*}
    \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \  Pr[D(P,xP,yP,zP)=1]=Pr[{\Gamma_1}]\\
    Pr[D(P,xP,yP,xyP)=1]=Pr[{\Gamma_2}]\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 
+   \vspace{-\topsep}
 \end{multline*}
 
-\vspace{-\topsep}
 Therefore, $|Pr[\Gamma_1]-Pr[\Gamma_2]|=\sigma(n)$, where $\sigma(n)$ is negligible, and $n$ is the security parameter. So, the adversary has no advantage to guessing $b$ in Game 0, that means he cannot distinguish whether two $PID_U$s for different RPs belong to the same user or not. 
 
 The RP-based identity linkage attack is not possible in UPPRESSO.

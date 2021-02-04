@@ -26,8 +26,7 @@ We compare UPPRESSO with MITREid Connect~\cite{MITREid} and SPRESSO~\cite{SPRESS
 We implemented a Java RP based on Spring Boot framework for UPPRESSO and MITREid Connect, by integrating the corresponding SDK respectively.
 The RPs in all the three schemes provide the same function, i.e.,   extracting the user's account from the identity proof.
 We have measured the time for a user's login at an RP, and calculated the average values of $1000$ measurements.
-
-For better analysis, we divide a login into 3 phases according to the lifecycle of identity proof:
+For better analysis, we divide a login into 4 phases according to the lifecycle of identity proof:
  \textbf{Identity proof requesting} (Steps 1.1-4.3 in Figure~\ref{fig:process}), the RP (and user) constructing and transmitting the request to IdP;
  \textbf{Identity proof generation} (Steps 4.4-4.6 in Figure~\ref{fig:process}), the IdP generating identity proof (no user authentication);
 and  \textbf{Identity proof acceptance} (Steps 4.5-5.2 in Figure~\ref{fig:process}), the RP server receives, verifies and parse the identity proof relayed from the IdP;
@@ -36,37 +35,35 @@ and  \textbf{Identity proof acceptance} (Steps 4.5-5.2 in Figure~\ref{fig:proces
 \noindent\textbf{Results.}
 The evaluation results are provided in Figure~\ref{fig:evaluation}.
 The overall processing times are  113 ms, 308 ms and 310 ms for MITREid Connect, SPRESSO and UPPRESSO, respectively. The details are as follows.
-The significant overhead  in UPPRESSO is opening the new window and downloading the script from IdP, which needs about 104 ms. This overhead could be reduced by implicitly conducting this procedure when the user visits the RP website.
+The main overhead  in UPPRESSO is opening the new window and downloading the script from IdP, which needs about 104 ms. This overhead could be reduced by implicitly conducting this procedure when the user visits the RP website.
 
 
 \begin{figure}
   \centering
-  \includegraphics[width=0.9\linewidth]{fig/evaluation2.pdf}
-  \vspace{-6mm}
+  \includegraphics[width=\linewidth]{fig/evaluation2.pdf}
   \caption{The Evaluation.}
   \label{fig:evaluation}
-\vspace{-7mm}
+  \vspace{-7mm}
 \end{figure}
 
-In the requesting, UPPRESSO requires  271 ms totally.
-The significant overhead  in UPPRESSO is opening the new window and downloading the script from IdP, which needs about 104 ms. This overhead could be reduced by implicitly conducting this procedure when the user visits the RP website.
-SPRESSO needs 19 ms for the RP to obtain IdP's public key and encrypt its domain,
-and MITREid Connect only needs 10 ms.
+In the requesting, UPPRESSO requires that (1) the user downloads the RP script, opens the IdP window and downloads the IdP script, and (2) the user and RP performs 1 elliptic curve scalar multiplication for RP identifier transformation and complete $PID_{RP}$ registration at the IdP. The total proceeding time is 271 ms (104 ms downloading scripts and open new window ), where
+SPRESSO needs 19 ms for the RP to obtain IdP's public key and encrypt its domain;
+while MITREid Connect only needs 10 ms.
 
 
 
 %估计能减少多少，
 In the generation, UPPRESSO needs  totally 34 ms including computing $PID_U$, compared to MITREid Connect which only needs 32 ms.
 SPRESSO requires 71 ms, as it implements the IdP based on node.js and therefore can only adopt a JavaScript cryptographic library, while others adopt a more efficient Java library.
-%As the processings in SPRESSO and MITREid Connect are the same, the processing time in SPRESSO may be reduced to 32 ms.
+As the processings in SPRESSO and MITREid Connect are the same, the processing time in SPRESSO may be reduced to 32 ms.
 %And, then the overall time in SPRESSO will be 269 ms, still larger than 254 ms in UPPRESSO.
 
 %transmission & extraction
-In the identity proof acceptance, UPPRESSO only needs  about 6 ms. % where the scripts relay the identity proof to the RP server, and RP server verifies and parses the proof.
+In the identity proof acceptance, UPPRESSO only needs  about 6 ms where the scripts relay the identity proof to the RP server, and RP server verifies and parses the proof.
 MITREid Connect requires the IdP to send the identity proof to the RP's web page which then sends the proof to the RP server through a JavaScript function, and needs 71 ms.
-SPRESSO needs the longest time (210 ms) due the complicated processing at the user's browser.
-  %which needs the browser to obtain identity proofs from the IdP, download the JavaScript program from a trusted entity (forwarder), execute the program to decrypt RP's endpoint, send identity proofs to this endpoint (an RP's web page) who finally transmits the proof to RP server.
-%In the evaluation, the forwarder and IdP are deployed in one machine, which doesn't introduce performance degradation based on the observation. % as  FWD and IdP work sequently for one login.
+SPRESSO needs the longest time (210 ms) due to a complicated processing at the user's browser,
+  which needs the browser to obtain identity proofs from the IdP, download the JavaScript program from a trusted entity (forwarder), execute the program to decrypt RP's endpoint, send identity proofs to this endpoint (an RP's web page) who finally transmits the proof to RP server.
+In the evaluation, the forwarder and IdP are deployed in one machine, which doesn't introduce performance degradation based on the observation. % as  FWD and IdP work sequently for one login.
 
 %SPRESSO needs a trusted entity named FWD for transmitting the identity proof. We deployed FWD and IdP on the same machine to reduce transmitting delay between them, while the computation never becomes the bottleneck according to the observation.
 

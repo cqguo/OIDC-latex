@@ -1,14 +1,15 @@
-\section{Discussions and Future work}
+\section{Discussions and Future Work}
 \label{sec:discussion}
 %We first discuss the scalability, security against DoS attack and OIDC authorization code flow support in UPPRESSO, and then present the extensions for UPPRESSO.
 
 In this section, we discuss some related issues and our future work.
 
+\begin{comment}
 %Scalbility
 \vspace{1mm}\noindent{\textbf{Scalability.}} The adversary cannot exhaust $ID_{RP}$ and $PID_{RP}$.
 For $ID_{RP}$, it is generated only in RP's initial registration.
-For $PID_{RP}$,  in practice, we only need to ensure all $PID_{RP}$s are different among the unexpired identity proof (the number denoted as $n$). We assume that IdP doesn't perform the uniqueness check, and then calculate the probability that at least two $PID_{RP}$s are equal in these $n$ ones. The probability is $1-\prod_{i=0}^{n-1}(1-i/q)$ which increases with $n$.
-For an IdP with throughput $2*10^8$ req/s, when the validity period of the identity proof ($PID_{RP}$) is set as 5 minutes, $n$ is less than $2^{36}$, then the probability is less than $2^{-183}$ for 256-bit $q$.
+For $PID_{RP}$,  in practice, we only need to ensure all $PID_{RP}$s are different among the unexpired identity proof (the number denoted as $a$). We assume that IdP doesn't perform the uniqueness check, and then calculate the probability that at least two $PID_{RP}$s are equal in these $a$ ones. The probability is $1-\prod_{i=0}^{a-1}(1-i/q)$ which increases with $a$.
+For an IdP with throughput $2*10^8$ req/s, when the validity period of the identity proof ($PID_{RP}$) is set as 5 minutes, $a$ is less than $2^{36}$, then the probability is less than $2^{-183}$ for 256-bit $q$ (the order of base point $G$ on $P-256$).
 Moreover, as this probability is negligible, the uniqueness check of $PID_{RP}$, i.e., the $PID_{RP}$ registration, could be removed in the SSO login process, and this optimization can be adopted when this negligible probability is acceptable by the users and RPs.
 
 %DoS
@@ -19,6 +20,7 @@ The adversary may attempt to perform DoS attack on the IdP and RP. For example, 
 However, as the user has already been authenticated at the IdP, the IdP could identify the malicious users based on audit, in addition to the existing DoS mitigation schemes.
 %The adversary may act as a user requesting to log into an RP, and make the RP perform two modular exponentiations.
 %The RP could previously calculated a set of $Y_{RP}$s to mitigate this attack.
+\end{comment}
 
 %授权码
 %兼容:目前只提供隐式模式,对其他模式与协议的兼容方法

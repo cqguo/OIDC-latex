@@ -1,5 +1,5 @@
-\appendix
-%\begin{appendices}
+
+\section{Appendix}
 
 \renewcommand{\algorithmicrequire}{\textbf{Input:}}
 \newcommand{\deflet}{\textbf{let}}
@@ -19,10 +19,10 @@
 \newcommand{\ENDDEFAULT}{\end{ALC@g}}
 \newcommand{\DEFAULTLINE}[1]{\STATE \textbf{default:} }
 
-\section{Web Model}
+\subsection{Web Model}
 \label{ape:model}
 
-\subsection{Data Format}
+\subsubsection{Data Format}
 Here we provide the details of the format of the messages we use to construct the UPPRESSO model.
 
 \vspace{1mm}\noindent\textbf{HTTP Messages}.
@@ -70,7 +70,7 @@ The data used in UPPRESSO are defined in the following forms:
 \vspace{1mm}\noindent\textbf{Patten Matching}.  We define the term with the variable $*$ as the pattern, such as \myss{\myangle{a, b, *}}. 
 The pattern matches any term which only replaces the $*$ with other terms. For instance,  \myss{\myangle{a, b, *}} matches \myss{\myangle{a, b, c}}.
 
-\subsection{Browser Model}
+\subsubsection{Browser Model}
 In UPPRESSO, we assume that the browsers are honest, therefore, we only need to analyze how the browsers interactive with the scripts.
 
 We firstly introduce the windows and documents of the browser model.
@@ -101,9 +101,9 @@ The \myss{tree} is the relations of the opened windows and documents, which are 
 
 
 
-\subsection{Model of UPPRESSO}
+\subsubsection{Model of UPPRESSO}
 In this section, we introduce the model of processes in UPPRESSO system, including IdP server process, RP server process, IdP scripting process and RP scripting process. We will focus on the state form and relation $R$. They can describe that what kind of event can be accepted by the process in each state, and the content of new output events and states.
-\subsubsection{IdP Server Process}
+\noindent\textbf{IdP Server Process}
 The state of IdP server process is a term in the form \myss{\myangle{ID, SignKey, sessions, users, RPs, Validity, Tokens}}. Other data stored at IdP but not used during SSO authentication are not mentioned here.
 \begin{itemize}
 \item \myss{ID} is the identifier of IdP.
@@ -132,7 +132,7 @@ The relation of IdP process $R^i$ is shown as Algorithm~\ref{alg1} in Appendix~\
 
 
 
-\subsubsection{RP process}
+\noindent\textbf{RP process}
 The state of RP server process is a term in the form \myss{\myangle{ID_{RP}, Endpoints, IdP, Cert, sessions, users}}. Other attributes are not mentioned here.
 \begin{itemize}
 \item \myss{ID_{RP}} and \myss{Endpoints} are RP's registered information at IdP.
@@ -152,7 +152,7 @@ The relation of RP process $R^r$ is shown as Algorithm~\ref{alg2} in Appendix~\r
 
 
 
-\subsubsection{IdP scripting process}
+\noindent\textbf{IdP scripting process}
 The state of IdP scripting process \myss{scriptstate} is a term in the form \myss{\myangle{IdPDomain, Parameters, q, refXHR}}, where
 \begin{itemize}
 \item \myss{IdPDomain} is the IdP's host.
@@ -172,7 +172,7 @@ The state of IdP scripting process \myss{scriptstate} is a term in the form \mys
 
 
 
-\subsubsection{RP scripting process}
+\noindent\textbf{RP scripting process}
 The state of RP scripting process \myss{scriptstate} is a term in the form \myss{\langle IdPDomain}, \myss{RPDomain}, \myss{Parameters}, \myss{q}, \myss{refXHR\rangle}. The \myss{RPDomain} is the host string of the corresponding RP server, and other terms are defined in the same way as in IdP scripting process.
 
 Here, we define the function \myss{\mathtt{SUBWINDOW}(tree, docnonce)}, which takes the \myss{tree} defined above and the current document's \myss{nonce} as the input. And it selects the \myss{nonce} of the first window opened by this document as the output. However, if there is no opened windows, it returns  null.
@@ -750,4 +750,4 @@ Finally, we have proved that the UPPRESSO system meets Requirement~\ref{req:idp}
 \end{algorithmic}
 \end{breakablealgorithm}
 
-%\end{appendices}
+
