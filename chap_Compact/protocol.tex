@@ -10,12 +10,12 @@ After we conceptualize the privacy problem into an identifier-transformation pro
 
 %As discussed in Section \ref{sec:challenge}, the identifier-transformation functions are essential for privacy-preserving SSO systems.
 
-We construct the three functions, $\mathcal{F}_{ID_{RP} \mapsto PID_{RP}}$, $\mathcal{F}_{ID_{U} \mapsto PID_{U}}$ and $\mathcal{F}_{PID_{U} \mapsto Account}$, based on NIST elliptical curve $P-256$.
+We construct three functions, $\mathcal{F}_{ID_{RP} \mapsto PID_{RP}}$, $\mathcal{F}_{ID_{U} \mapsto PID_{U}}$ and $\mathcal{F}_{PID_{U} \mapsto Account}$, based on the NIST elliptic curve $P-256$, 
 %the discrete logarithm problem with public parameters $p$, $q$, %and $g$, %% L不作为参数，我们说：e, n是RSA算法参数，不说2048是参数。
 where 
 %$q$ is a large prime defining the finite field $\mathbb{F}_q$,
-$G$ is a point on the curve known as the base point, 
- % $L$ is the length of $q$ in bits,  ($2^{L-1} < q < 2^L$)
+$G$ is a point on the curve known as the base point 
+% $L$ is the length of $q$ in bits,  ($2^{L-1} < q < 2^L$)
 and $n$ the order of the base point $G$. %, and $g$ is a generator of order $q$ in $GF(p)$.
 %the prime number $q$  is the order of a multiplicative subgroup of $GF(p)$, which is generated with the generator $g$ by $\{g\ mod\ p, g^2\ mod\ p, ..., g^{q-1}\ mod\ p, 1=g^q\ mod\ p\}$.
 Without loss of generality, we assume the IdP assigns long-term identifiers $ID_U$ to a user and $ID_{RP}$ to an RP when they first register at the IdP. In particular, the IdP assigns a unique random number to each user as $ID_U$, where $1<ID_U<n$, and $ID_{RP}$ is a point on the curve generated based on $G$.% For each RP, the IdP selects a random number $r$, where $1 < r < q$, and computes a unique $ID_{RP}$ as:
@@ -25,7 +25,7 @@ Without loss of generality, we assume the IdP assigns long-term identifiers $ID_
 %\end{equation}
 %\noindent where $r$ is kept secret from the RP.
 
-%\vspace{1mm}
+\vspace{0.5mm}
 \noindent {\bf The RP Identifier Transformation Function.} In each login session, the user assists the RP to convert $ID_{RP}$ into a pseudo-identifier $PID_{RP}$. In particular, the user selects a random number $N_{U}$ ($1 < N_{U}<n$) and calculates $PID_{RP}$ as:
 %First, the RP chooses a random number $N_{RP}$ ($1 < N_{RP}<q $), and the user chooses another random number $N_{U}$ ($1 < N_{U}<q $).
 %Then, they exchange $N_{RP}$ and $N_{U}$ to calculate $PID_{RP}$ following Equation~\ref{equ:PIDRP}.
@@ -49,7 +49,7 @@ When a user visits a same RP multiple times, different $PID_{RP}$s will be gener
 %For example, the malicious user fails to make a correct RP accept a $PID_{RP}$ used in another login, while the collusive RPs fail to use a same or correlated $PID_{RP}$s for different logins.
 
 
-%\vspace{1mm}
+\vspace{0.5mm}
 \noindent {\bf The User Identifier Transformation Function.} 
 %Now, the identity proof request to the IdP contains a user identity $ID_U$ and a pseudo-identifier of the RP $PID_{RP}$. Therefore, 
 To avoid the identity proof carrying the user identity $ID_U$, IdP can convert $ID_U$ into a pseudo-identifier for the user as follows and use it in the identity proof:
@@ -70,7 +70,7 @@ an RP can  link a user's one-time pseudo-identifier at the IdP ($PID_U$) to her 
 
 %Moreover, since $r$ is unknown to the RP, collusive RPs cannot link a user's $PID_U$s at different RPs. If $r$ is known to the RP, two collusive RPs might attempt to associate a user's $PID_U$s by checking whether the equality ${PID_{U_1}}^{r_2N_{U_2}N_{RP_2}} = {PID_{U_2}}^{r_1N_{U_1}N_{RP_1}} \bmod\ p$ holds or not, because ${PID_{U_1}} = g^{r_1N_{U_1}N_{RP_1}ID_{U_1}} \bmod p$ and ${PID_{U_2}} = g^{r_2N_{U_2}N_{RP_2}ID_{U_2}} \bmod p$.
 
-%\vspace{1mm}
+\vspace{0.5mm}
 \noindent {\bf The User Account Transformation Function.} We define the trapdoor $T$ of each login session as $T = N_U^{-1} \bmod n$. 
 %As $n$ is a prime number and $1< N_U < n$, $n$ is coprime to $N_U$. So, there always exists a $T$ that satisfies $T N_U = 1 \bmod n$. 
 Using this trapdoor, the RP can easily derive a unique account (denoted as $A$ in the equation) for the user in each login session as:%with the function $\mathcal{F}_{PID_{U} \mapsto Account}$
@@ -168,7 +168,7 @@ It consists of five phases, namely scripts downloading, RP identifier transforma
 \end{comment}
 
 \begin{strip}
-\centering\includegraphics[width=0.7\textwidth]{fig/process-js.pdf}
+\centering\includegraphics[width=0.9\textwidth]{fig/process-js.pdf}
 \captionof{figure}{The flow of a user login in UPPRESSO.}
 \label{fig:process}
 \vspace{-5mm}

@@ -172,14 +172,14 @@ At the same time, the RP obtains a private trapdoor in the negotiation,
 %\end{itemize}
 
 
-\vspace{0.5mm}
+%\vspace{0.5mm}
 \noindent \textbf{Transformed RP designation.} To prevent IdP-based login tracing, the RP includes a $PID_{RP}$ dynamically transformed from $ID_{RP}$ in the identity proof request. UPPRESSO designs a novel trapdoor-based transformation function $\mathcal{F}_{ID_{RP} \mapsto PID_{RP}}(ID_{RP}, T)$ to compute $PID_{RP}$ based on $ID_{RP}$ and a random trapdoor $T$ that is dynamically negotiated between the user and the RP in each login. Then, the user assists the RP to register $PID_{RP}$ at the IdP through OIDC dynamic registration. When an RP receives an identity proof, it verifies if the enclosed $PID_{RP}$ is transformed from its $ID_{RP}$ and the trapdoor of this login session.
 
 %To bind dynamic $PID_{RP}$ in identity proofs signed by the IdP, the user firstly cooperates with the RP to generate $PID_{RP}$ based on $ID_{RP}$ and then registers this transformed RP identifier (i.e., $PID_{RP}$) in the IdP.
 %The identifier transformation of RP is completely kept secret to the IdP. Then, the one-time $PID_{RP}$ is bound with $PID_U$ in the identity proof. $PID_{RP}$ is calculated based on $ID_{RP}$ and the trapdoor, so that the RP holding the trapdoor is able to verify the specified receiver of identity proofs with transformed $PID_{RP}$ but not $ID_{RP}$.
 
 
-\vspace{0.5mm}
+%\vspace{0.5mm}
 \noindent \textbf{Trapdoor user identification.} To prevent RP-based identity linkage, we design a transformation function $\mathcal{F}_{ID_{U} \mapsto PID_U}(ID_U, PID_{RP})$ for the IdP to generate $PID_U$. When an RP receives an identity proof, another transformation function $\mathcal{F}_{PID_{U} \mapsto Account}(PID_U, PID_{RP}, T)$ is designed to help the RP to derive the $Account$ from $PID_U$ and $PID_{RP}$ using the trapdoor it holds. Intuitively, the trapdoor $T$ plays a role in the generations of $PID_{RP}$ and $PID_U$, directly or indirectly.
 
 %Existing SSO solutions always depend on constant $ID_U$ in all identity proofs or RP-specific $PID_U$ that keeps constant for an RP, to identify an account in the RP.
