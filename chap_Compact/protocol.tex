@@ -244,14 +244,12 @@ In this phase, the IdP calculates $PID_U = {ID_U}{PID_{RP}}$ and signs the ident
 \vspace{-\topsep}
 In this phase, if any check fails, the process will be halted. For example, the user halts the process if $PID_{RP}$ in the identity proof request is inconsistent with  the negotiated one. The IdP rejects the identity proof request, if the pair of $PID_{RP}$ and $Endpoint_U$ has not been registered.
 
-
-
 \noindent{\em 5. $\mathbf{Account}$ calculation.}
 The RP verifies the identity proof, derives the user's unique $Account$, and allows her to log in.
 \vspace{-\topsep}
 \begin{itemize}
 %\setlength{\itemsep}{0pt plus 1pt}
-\item[5.1] The RP verifies the identity proof, including the signature, validity period, and the consistency between $PID_{RP}$ and the negotiated one. If any fails, the RP rejects this login.
+\item[5.1] The RP verifies the identity proof, including the signature, validity period, and if $PID_{RP}$ is consistent with the negotiated one. If any fails, the RP rejects this login.
 \vspace{-\topsep}
 \item [5.2] The RP extracts $PID_U$, calculates $Accout = T \cdot {PID_U}$, and allows the user to log in.
 \end{itemize}
@@ -393,14 +391,13 @@ The RP verifies the identity proof, including the signature, validity period, an
 \label{subsec:compatible}
 UPPRESSO does not introduce any new role nor change the security assumptions for each role. It follows a similar logic flow as OIDC in SSO login and only requires small modifications to perform identifier transformation.
 %Here, we explain the modification in each of the five phases of its SSO login flow to show that UPPRESSO is compatible with OIDC, which indicates UPPRESSO can be easily integrated with other commonly used SSO systems.
-
 Among the five phases, the {\em scripts downloading} and {\em RP identifier transformation} phases are newly introduced by UPPRESSO. The browser is required to download two scripts from the IdP and RP and most of the designed operations in these two phases are performed by the scripts in the browser. So, we require minimal modifications to the IdP and RP servers providing new network interfaces (i.e., the new URLs for downloading resources). The other three phases adopt a similar communication pattern as OIDC. In particular, the {\em $PID_{RP}$ registration} phase can be viewed as a variant of the RP dynamic registration flow of OIDC~\cite{DynamicRegistration}, which allows an entity to register its identity and endpoint at the IdP.
 %Different from OIDC in which only RPs can call a dynamic registration, UPPRESSO allows any authenticated user to launch this process and register an RP identifier with the IdP.
 %The {\em identity proof generation} and {\em $Account$ calculation} phases adopt the same steps and functions as the implicit protocol flow of OIDC, while using a few different parameters. First, in identity proof generation, $PID_U$ transformed from $ID_U$ is used to replace $ID_U$, which is directly supported by OIDC, similar as in the PPID approaches that also convert $ID_U$ into $PID_U$. The calculation of $Account$ from $PID_U$ 
 %can be viewed as a customized step by the RP to derive its user account after the implicit protocol flow of OIDC ends.
 
 %So,the identity proof generation and $Account$ calculation phases of UPPRESSO can be viewed as a particular but compatible implementation of the implicit protocol flow of OIDC. It is worth noting that the identity proof generation and $Account$ calculation phases of 
-UPPRESSO can also be implemented as the authorization code flow of OIDC with small modifications, which will be discussed in Section~\ref{sec:discussion}.
+UPPRESSO can also support the authorization code flow of OIDC with small modifications (to be discussed in Section~\ref{sec:discussion}).
 
 %As shown in Figure~\ref{fig:process}, in UPPRESSO, the SSO protocol for identity proof is the same as in OIDC; the formats of identity proof and corresponding request are the same as in OIDC; the correctness checks on the identity proof request at the IdP (i.e., consistency of RP' identifier and endpoint with the registered one) are the same as in OIDC; the correctness checks on the identity proof (i.e., consistency of RP' identifier with the one in the request, integrity, validity time, freshness, and etc.) at the RP are the same as in OIDC.
 %The above modifications could be completed automatically for each login, without affecting other communication pattern.

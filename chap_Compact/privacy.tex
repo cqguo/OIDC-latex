@@ -2,32 +2,38 @@
 \label{sec:privacy}
 
 
-In this section, we will give the proving that UPPRESSO is defensive to both IdP-based login tracing and RP-based identity linkage, based on DDH assumption\cite{GoldwasserK16}, the computational problem. 
+In this section, we will give the privacy proof and show that UPPRESSO is secure against both IdP-based login tracing and RP-based identity linkage attacks.
 
+\noindent\textbf{IdP-based login tracing.} 
+As shown in figure~\ref{fig:process}, the only information that is related to the RP's identity and accessible to the IdP is $PID_{RP}$, which is converted from $ID_{RP}$ using a random $N_U$. Since $N_U$ is randomly chosen from $\mathbb{Z}_n$ by the user and the IdP does not involve in the process, the IdP should treat $PID_{RP}$ as randomly chosen from $\mathbb{G}$. So, the IdP cannot recognize the RP nor derive its real identity. Therefore, IdP-based identity linkage becomes impossible in UPPRESSO.
 
-\noindent\textbf{DDH Assumption.}
-Let $q$ be a large prime and
-$\mathbb{G}$ is a  cyclic group of order $n$ of an elliptic curve $E(\mathbb{F}_q)$. 
-Assume that $n$ is also a large prime. Let $P$ be a generator point of $\mathbb{G}$. The DDH Assumption for $\mathbb{G}$ states that for any probabilistic polynomial time (PPT) algorithm $D$, the two probability distributions \{$aP$, $bP$, $abP$\} (with a, b being randomly and independently chosen from $\mathbb{Z}_n$) and\{$aP$, $bP$, $cP$\} (with a, b, c being randomly and independently chosen from $\mathbb{Z}_n$) are computationally indistinguishable in the sense that there is a negligible $\sigma(k)$ with the security parameter $k$ such that
+Next, we will prove that UPPRESSO prevents RP-based identity linkage based on the Decisional Diffie-Hellman (DDH) assumption~\cite{GoldwasserK16}. Here, we briefly introduce the DDH assumption: 
+%\noindent\textbf{The DDH Assumption.}
+Let $q$ be a large prime and $\mathbb{G}$ denote a  cyclic group of order $n$ of an elliptic curve $E(\mathbb{F}_q)$. 
+Assume that $n$ is also a large prime. Let $P$ be a generator point of $\mathbb{G}$. The DDH assumption for $\mathbb{G}$ states that for any probabilistic polynomial time (PPT) algorithm $D$, the two probability distributions \{$aP$, $bP$, $abP$\} and \{$aP$, $bP$, $cP$\}, where $a$, $b$, and $c$ are randomly and independently chosen from $\mathbb{Z}_n$, are computationally indistinguishable in the sense that there is a negligible $\sigma(k)$ with the security parameter $k$ such that:
 %where $q$ and $n$ are large primitive number, and $P$ is the point of $\mathbb{G}$.  
 %For any probabilistic polynomial time (PPT) algorithm $D$, the distributions, \{$P$, $aP$, $bP$, $abP$\}$_{a,b \in \mathbb{Z}_n}$ and \{$P$, $aP$, $bP$, $cP$\}$_{a,b,c \in \mathbb{Z}_n}$, are computationally indistinguishable. There is a negligible $\sigma(k)$, where $k$ is the security parameter. 
 \vspace{-\topsep}
 \begin{multline*}
 Pr[D(P, aP, bP, abP)=1]-Pr[D(P, aP, bP, cP)=1]=\sigma(k)
 \end{multline*}
-
 \vspace{-\topsep}
 
-\noindent\textbf{IdP-based identity linkage.} 
-It can be found in figure~\ref{fig:process} that $PID_{RP}$ is the only data related with RP's identity accessible to IdP. Moreover, $PID_{RP}$ is created based on $ID_{RP}$ and the IdP uncontrolled random number $N_U$. As $N_U$ is randomly chosen in $\mathbb{Z}_n$,  $PID_{RP}$ can be also seemed  randomly chosen in $\mathbb{G}$ to IdP. Therefore, obviously IdP cannot trace the user's login RPs, so that IdP-based identity linkage is not possible in UPPRESSO.
-
+\vspace{-2mm}
 \noindent\textbf{RP-based identity linkage.} 
-In the \emph{RP-based identity linkage} scenario, collusive RPs conduct the malicious behavior against IdP and users to relate the user in different RPs. It can be considered as a $Game$ guessing whether $PID_U$s for different RPs belong to the same user.  In this $Game$ IdP and users act as the challenger, and RPs act as the adversary. 
+Collusive RPs can act arbitrarily to correlate $PID_U$s at different RPs and guess if they belong to the same user. Therefore, we consider the collusive RPs are playing a guessing $Game$. In this $Game$, the IdP and the users act as the challenger, while the collusive RPs act as the adversary (denoted as $A$ in Figure~\ref{fig:game}). RP-based identity linkage is impossible in UPPRESSO {\em if and only if the adversary has no advantage over the challenger in the guessing game.}
 
-\textbf{If only the adversary cannot take any advantage on guessing whether $PID_U$s belong to same user, RP-based identity linkage is considered impossible in UPPRESSO.}
+%\vspace{-\topsep}
+\vspace{1mm}
+\begin{strip}
+\centering\includegraphics[width=\textwidth, height=0.35\textheight]{fig/game.pdf}
+\captionof{figure}{Game.}
+\label{fig:game}
+\vspace{-5mm}
+\end{strip}
 
+Next, we build the model of the guessing Game to depict the interactions between the challenger and the adversary. First, we describe the challenger's actions in the Game.
 
-Following, we are going to build the model of Game to show how the challenger interactive with the adversary. Here we describe the challenger's actions in the Game.
 \begin{itemize}
 \vspace{-\topsep}
 \item[-] Initialization: In the initialization phase, the challenger generates the $ID_{RP}$s and $ID_U$s for multiple RPs and users, based on the initialization algorithm $Setup(G,n)$ where $G$ and $n$ have been already defined in table~\ref{tbl:notations}.
@@ -36,13 +42,9 @@ Following, we are going to build the model of Game to show how the challenger in
 \vspace{-\topsep}
 \item[-] $PID_U$ generation: In this phase, challenger firstly receives and  verifies whether $PID_{RP}$ is correctly generated based on $ID_{RP}$ and corresponding $N_U$ (i.e., the algorithm $Verify(ID_{RP},PID_{RP},N_U)$). Then it generates the $PID_U$ using the algorithm $F_{PID_U}(ID_U,PID_{RP})$ and sends it to adversary.
 \end{itemize}
-\vspace{-\topsep}
-\begin{strip}
-\centering\includegraphics[width=\textwidth, height=0.35\textheight]{fig/game.pdf}
-\captionof{figure}{Game.}
-\label{fig:game}
-\vspace{-5mm}
-\end{strip}
+
+
+
 Firstly we give the realistic model of the $ID_U$-guessing Game, shown as Game 0 in figure~\ref{fig:game}. In this Game, adversary firstly achieves 2 $ID_{RP}$s and 3 $N_U$s (denote as $n_1, n_2, n_3$), then generates 3 $PID_{RP}$s. In the challenger's view, these $PID_{RP}$s are related with 3 $N_U$s respectively. Following the challenger generates $PID_U$s for different $PID_{RP}$s based on the 2 $ID_U$s (denote as $u_1, u_2$) generated in initialization phase. 
 Then challenger generates the random $b$=0 or 1. $PID_{U1}$ is generated based on $ID_{U1}$. However $PID_{U2}$ and $PID_{U3}$ are generated according to $b$. That is, $PID_{U2}=ID_{Ub}PID_{RP2}$, and $PID_{U3}=ID_{U(1-b)}PID_{RP3}$.  
 
