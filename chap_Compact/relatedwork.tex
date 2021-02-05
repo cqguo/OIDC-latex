@@ -1,7 +1,7 @@
 \section{Related Works}%各个方向全都加入，例如安全分析
 \label{sec:related}
 Various SSO  protocols have been proposed, such as, OIDC, OAuth 2.0, SAML, Central Authentication Service (CAS)~\cite{aubry2004esup} and Kerberos~\cite{Kerberos}.
-These protocols are widely adopted in Google, Facebook, Shibboleth project~\cite{Shibboleth}, Java applications and etc.
+These protocols are widely adopted in Google, Facebook, Shibboleth project~\cite{Shibboleth}, Java applications, etc.
 And, plenty of works have been conducted on privacy protection and security analysis for SSO systems.
 
 %\subsection{Privacy protection for SSO systems.}
@@ -13,7 +13,7 @@ And, plenty of works have been conducted on privacy protection and security anal
 As suggested by NIST~\cite{NIST2017draft}, SSO systems should prevent both  RP-based identity linkage and IdP-based login tracing.
 The pairwise user identifier is adopted in SAML~\cite{SAML} and OIDC~\cite{OpenIDConnect}, and only prevents RP--based identity linkage; while SPRESSO~\cite{SPRESSO} and BrowserID~\cite{BrowserID} only prevent  IdP-based login tracing.
 BrowserID is adopted in Persona~\cite{persona} and Firefox Accounts~\cite{FirefoxAccount}, however an analysis on Persona found IdP-based login tracing could still succeed~\cite{FettKS14, BrowserID}.
-UPPRESSO prevents both the RP-based identity linkage and IdP-based login tracing, and could be integrated into OIDC which has been formally analyzed~\cite{FettKS17}.
+UPPRESSO prevents both the RP-based identity linkage and IdP-based login tracing and could be integrated into OIDC which has been formally analyzed~\cite{FettKS17}.
 %Moreover, OAuth and OIDC allow users to determine the scope of attributes exposed to the RP.
 
 
@@ -21,21 +21,21 @@ UPPRESSO prevents both the RP-based identity linkage and IdP-based login tracing
 Anonymous SSO schemes are designed to allow users to access a service (i.e. RP) protected by a verifier (i.e., IdP) without revealing their identities.
 One of the earliest anonymous SSO systems was proposed for Global System for Mobile (GSM) communication in 2008~\cite{ElmuftiWRR08}.
 The notion of anonymous SSO was formalized~\cite{WangWS13} in 2013.
-And, various cryptographic primitives, such as group signature, zero-knowledge proof and etc., were adopted to design anonymous SSO schemes~\cite{WangWS13,HanCSTW18}.
+And, various cryptographic primitives, such as group signature, zero-knowledge proof, etc., were adopted to design anonymous SSO schemes~\cite{WangWS13,HanCSTW18}.
 %However, all above schemes cannot provide either the $ID_{U}$ directly or the function $\mathcal{F}_{ID_{U} \mapsto PID_{U}}$ and $\mathcal{F}_{PID_{U} \mapsto Account}$ allowing RP achieve the constant $Account$ for the same user. It breaks the basic requirement of \textbf{user identification}.
-Anonymous SSO schemes are designed for the anonymous services, and not applicable to common services which need user identification.
+Anonymous SSO schemes are designed for the anonymous services, and not applicable to common services that need user identification.
 
 
 
 %破坏一个属性的尽量放在一起
 %\subsection{Security analysis of SSO systems.}
 \noindent\textbf{Formal analysis on SSO standards.}
-The SSO standards (e.g., SAML, OAuth and OIDC) have been formally analyzed.
-Fett et al.~\cite{FettKS16, FettKS17} have conducted the formal analysis on OAuth 2.0 and OIDC standards based on an expressive Dolev-Yao style model~\cite{FettKS14},
+The SSO standards (e.g., SAML, OAuth, and OIDC) have been formally analyzed.
+Fett et al.~\cite{FettKS16, FettKS17} have conducted a formal analysis on OAuth 2.0 and OIDC standards based on an expressive Dolev-Yao style model~\cite{FettKS14},
 and proposed two new attacks, i.e., 307 redirect attack and IdP Mix-Up attack.
 When the IdP misuses HTTP 307 status code for redirection, the sensitive information (e.g., credentials) entered at the IdP will  be leaked to the RP by the user's browser.
-While, IdP Mix-Up attack confuses the RP about which IdP is used and makes the victim RP send the identity proof to the malicious IdP, which breaks the confidentiality of the identity proof.
-Fett et al.~\cite{FettKS16, FettKS17} have proved that OAuth 2.0 and OIDC are secure once these two attacks  prevented. UPPRESSO could be integrated into OIDC, which simplifies its security analysis.
+While the IdP Mix-Up attack confuses the RP about which IdP is used and makes the victim RP send the identity proof to the malicious IdP, which breaks the confidentiality of the identity proof.
+Fett et al.~\cite{FettKS16, FettKS17} have proved that OAuth 2.0 and OIDC are secure once these two attacks are prevented. UPPRESSO could be integrated into OIDC, which simplifies its security analysis.
 \cite{ArmandoCCCT08} formally analyzed SAML and its variant proposed by Google, and found that Google's variant of SAML doesn't set RP's identifier in the identity proof, which breaks RP designation.
 
 \begin{comment}
@@ -46,15 +46,14 @@ The single sign-off could also be achieved in UPPRESSO, where the user needs to 
 \end{comment}
 
 
-\noindent\textbf{Analysis on SSO implementations.}
-Various vulnerabilities were found in SSO implementations, and then exploited for impersonation and identity injection attacks by breaking the confidentiality~\cite{WangCW12,ccsSunB12,ArmandoCCCPS13,DiscoveringJCS,dimvaLiM16}, integrity~\cite{WangCW12,SomorovskyMSKJ12,WangZLG16,MainkaMS16, MainkaMSW17,dimvaLiM16} or RP designation~\cite{WangZLG16,MainkaMS16,MainkaMSW17,YangLCZ18,dimvaLiM16} of identity proof.
-Wang et al.~\cite{WangCW12} analyzed the SSO implementations of Google and Facebook from the view of the browser relayed traffic, and found logic flaws in IdPs and RPs to break the confidentiality and integrity of identity proof.
+\noindent\textbf{Analysis of SSO implementations.}
+Various vulnerabilities were found in SSO implementations, and then exploited for impersonation and identity injection attacks by breaking the confidentiality~\cite{WangCW12,ccsSunB12,ArmandoCCCPS13,DiscoveringJCS,dimvaLiM16}, integrity~\cite{WangCW12,SomorovskyMSKJ12,WangZLG16,MainkaMS16, MainkaMSW17,dimvaLiM16} or RP designation~\cite{WangZLG16,MainkaMS16,MainkaMSW17,YangLCZ18,dimvaLiM16} of identity proof. Wang et al.~\cite{WangCW12} analyzed the SSO implementations of Google and Facebook from the view of the browser relayed traffic and found logic flaws in IdPs and RPs to break the confidentiality and integrity of identity proof.
 An authentication flaw was found in Google Apps~\cite{ArmandoCCCPS13}, allowing a malicious RP to hijack a user's authentication attempt and inject the malicious code to steal the cookie (or identity proof) for the targeted RP, breaking the confidentiality.
 The integrity has been tampered with in SAML, OAuth and OIDC systems ~\cite{SomorovskyMSKJ12,WangCW12,WangZLG16,MainkaMS16, MainkaMSW17},
- due to various vulnerabilities, such as  XML Signature wrapping (XSW)~\cite{SomorovskyMSKJ12}, RP's incomplete verification~\cite{WangCW12,WangZLG16,MainkaMSW17}, IdP spoofing~\cite{MainkaMS16,MainkaMSW17} and etc.
-And, a dedicated, bidirectional authenticated secure channel was proposed to improve the confidentiality and integrity of identity proof~\cite{CaoSBKVC14}.
-The vulnerabilities were also found to break the RP designation, such as the incorrect binding  at IdPs~\cite{YangLCZ18,WangZLG16}, insufficient verification at RPs~\cite{MainkaMS16,MainkaMSW17,YangLCZ18}.
-Automatical tools, such as SSOScan~\cite{ZhouE14}, OAuthTester~\cite{YangLLZH16} and S3KVetter~\cite{YangLCZ18}, have been designed to detect vulnerabilities for breaking the confidentiality, integrity or RP designation of identity proof.
+due to various vulnerabilities, such as  XML Signature wrapping (XSW)~\cite{SomorovskyMSKJ12}, RP's incomplete verification~\cite{WangCW12,WangZLG16,MainkaMSW17}, IdP spoofing~\cite{MainkaMS16,MainkaMSW17} and etc.
+And, a dedicated, the bidirectional authenticated secure channel was proposed to improve the confidentiality and integrity of identity proof~\cite{CaoSBKVC14}.
+Vulnerabilities were also found to break the RP designation, such as the incorrect binding  at IdPs~\cite{YangLCZ18,WangZLG16}, insufficient verification at RPs~\cite{MainkaMS16,MainkaMSW17,YangLCZ18}.
+Automatical tools, such as SSOScan~\cite{ZhouE14}, OAuthTester~\cite{YangLLZH16} and S3KVetter~\cite{YangLCZ18}, have been designed to detect vulnerabilities for breaking the confidentiality, integrity, or the RP designation of identity proof.
 
 
 \begin{comment}
