@@ -43,7 +43,8 @@ Each atomic process also contains a set of nonces that it may use.
 \subsection{Data Format}
 Here we provide the details of the format of the messages we use to construct the UPPRESSO model.
 
-\vspace{1mm}\noindent\textbf{HTTP Messages}.
+\vspace{1mm}
+\noindent\textbf{HTTP Messages}.
 An HTTP request message is the term of the form
 \begin{multline*}
 \ \ \ \ \ \ \ \ \langle \mathtt{HTTPReq}, nonce, method, host, path, \\ 
@@ -53,8 +54,9 @@ An HTTP response message is the term of the form
 \begin{equation*}
     \myangle{\mathtt{HTTPResp}, nonce, status, headers, body}
 \end{equation*}
- The details are defined as follows:
- \begin{itemize}
+The details are defined as follows:
+\begin{itemize}
+\setlength\itemsep{-2pt}
  \item \myss{\mathtt{HTTPReq}} and \myss{\mathtt{HTTPResp}} denote the types of messages.
  \item \myss{nonce} is a random number that maps the response to the corresponding request. 
  \item \myss{method} is one of the HTTP methods, such as \myss{\mathtt{GET}} and \myss{\mathtt{POST}}.
@@ -64,7 +66,7 @@ An HTTP response message is the term of the form
  \item \myss{headers} is the header content of each HTTP messages as the form \myss{\myangle{\myangle{name, value}, \myangle{name, value}, \dotsc}}, such as \myss{\langle\myangle{Referer, http://www.example.com},} \myss{\myangle{Cookies, c}\rangle}.
  \item \myss{body} is the body content carried by HTTP \myss{\mathtt{POST}} request or HTTP response in the form \myss{\myangle{\myangle{name, value}, \myangle{name, value}, \dotsc}}.
   \item \myss{status} is the HTTP status code defined by HTTP standard.
- \end{itemize}
+\end{itemize}
 
 \vspace{1mm}\noindent\textbf{URL}.
 URL is a term \myss{\myangle{\mathtt{URL}, protocol,host,path,parameters}}, where \myss{\mathtt{URL}} is the type, \myss{protocol} is chosen in \myss{\{\mathtt{S}}, \myss{\mathtt{P}\}} as \myss{\mathtt{S}} stands for HTTPS and \myss{\mathtt{P}} stands for HTTP. The \myss{host, path}, and \myss{parameters} are the same as in HTTP messages.
@@ -81,6 +83,7 @@ XMLHTTPRequest is the HTTP message transmitted  by scripts in the browser. That 
 \vspace{1mm}\noindent\textbf{Data Operation}.
 The data used in UPPRESSO are defined in the following forms:
 \begin{itemize}
+\setlength\itemsep{-2pt}
 \item \textbf{Standardized Data} is the data in the fixed format, for instance, the HTTP request is the standardized data in the form \myss{\langle\mathtt{HTTPReq}}, \myss{nonce}, \myss{method}, \myss{host}, \myss{path}, \myss{parameters}, \myss{headers}, \myss{body\rangle}.  We assume there is an HTTP request \myss{r :=}  \myss{\langle\mathtt{HTTPReq}},  \myss{n},  \myss{\mathtt{GET}},  \myss{example.com},  \myss{/path},  \myss{\myangle{}},  \myss{\myangle{}},  \myss{\myangle{}\rangle}, here we define the operation on the $r$. That is, the elements in $r$ can be accessed in the form \myss{r.name}, such that \myss{r.method \equiv \mathtt{GET}},  \myss{r.path \equiv /path} and \myss{r.body \equiv \myangle{}}.
 \item \textbf{Dictionary Data} is the data in the form \myss{\myangle{\myangle{name, value}, \myangle{name, value}, \dotsc}}, for instance the \myss{body} in HTTP request is dictionary data. We assume there is a \myss{body := \myangle{\myangle{username, alice}, \myangle{password, 123}}}, here we define the operation on the $body$. That is, we can access the elements in \myss{body} in the form \myss{body[name]}, such that \myss{body[username] \equiv alice} and \myss{body[password] \equiv 123}. We can also add the new attributes to the dictionary, for example after we set \myss{body[age] := 18}, the \myss{body} are changed into\myss{ \myangle{\myangle{username, alice}, \myangle{password, 123}, \myangle{age, 18}}}.
 \end{itemize}
@@ -89,13 +92,14 @@ The data used in UPPRESSO are defined in the following forms:
 The pattern matches any term which only replaces the $*$ with other terms. For instance,  \myss{\myangle{a, b, *}} matches \myss{\myangle{a, b, c}}.
 
 \subsection{Browser Model}
-In UPPRESSO, we assume that the browsers are honest, therefore, we only need to analyze how the browsers interactive with the scripts.
+In UPPRESSO, we assume that the browsers are honest, therefore, we only need to analyze how the browsers interactive with the scripts. 
+We first introduce the windows and documents of the browser model.
 
-We firstly introduce the windows and documents of the browser model.
+\vspace{1mm}
+\noindent\textbf{Window}. A window \myss{w} is a term of the form \myss{w = \myangle{nonce, documents, opener}}, representing the  the concrete browser window in the system. The \myss{nonce} is the window reference to identify each windows. The \myss{documents} is the set of documents (defined below) including the current document and cached documents (for example, the documents can be viewed via the ``forward" and ``back" buttons in the browser). The \myss{opener} represents the window in which this window is created, for instance, while a user clicks the href in document \myss{d} and it creates a new window \myss{w}, there is \myss{w.opener \equiv d.nonce}.
 
-\vspace{1mm}\noindent\textbf{Window}. A window \myss{w} is a term of the form \myss{w = \myangle{nonce, documents, opener}}, representing the  the concrete browser window in the system. The \myss{nonce} is the window reference to identify each windows. The \myss{documents} is the set of documents (defined below) including the current document and cached documents (for example, the documents can be viewed via the ``forward" and ``back" buttons in the browser). The \myss{opener} represents the window in which this window is created, for instance, while a user clicks the href in document \myss{d} and it creates a new window \myss{w}, there is \myss{w.opener \equiv d.nonce}.
-
-\vspace{1mm}\noindent\textbf{Document}. A document \myss{d} is a term of the form
+\vspace{1mm}
+\noindent\textbf{Document}. A document \myss{d} is a term of the form
 \begin{multline*}
   \ \ \ \langle nonce, location, referrer, script, scriptstate, \\
   scriptinputs, subwindows, active \rangle \ \ \ 
@@ -104,6 +108,7 @@ where document is the HTML content in the window.  The \myss{nonce} locates the 
 
 A scripting process is the dependent process relying on the browser, which can be considered as a relation \myss{R} mapping a message input and a message output. And finally the browser will conduct the command in the output message. Here we give the description of the form of input and output.
 \begin{itemize}
+\setlength\itemsep{-2pt}
 \item \textbf{Scripting Message Input. } The input is the term in the form
 \begin{multline*}
 \langle tree, docnonce, scriptstate, stateinputs,cookies,\\
@@ -124,6 +129,7 @@ In this section, we introduce the model of processes in UPPRESSO system, includi
 \subsubsection{IdP Server Process}
 The state of IdP server process is a term in the form \myss{\myangle{ID, SignKey, sessions, users, RPs, Validity, Tokens}}. Other data stored at IdP but not used during SSO authentication are not mentioned here.
 \begin{itemize}
+\setlength\itemsep{-2pt}
 \item \myss{ID} is the identifier of IdP.
 %\item \myss{p} is the large prime mentioned before.
 \item \myss{SignKey} is the private key used by IdP to generate signatures.
@@ -135,6 +141,7 @@ The state of IdP server process is a term in the form \myss{\myangle{ID, SignKey
 \end{itemize}
 To make the description clearer, we also provide the \myss{functions} to define the complicated procedure.
 \begin{itemize}
+\setlength\itemsep{-2pt}
 \item \myss{\mathtt{SecretOfID(u)}} is used to search the user \myss{u}'s password.
 \item \myss{\mathtt{UIDOfUser(u)}} is used to search the user \myss{u}'s \myss{ID_U}.
 \item \myss{\mathtt{ListOfPID()}} is the set of IDs of registered RP.
@@ -153,18 +160,21 @@ The relation of IdP process $R^i$ is shown as Algorithm~\ref{alg1} in Appendix~\
 \subsubsection{RP process}
 The state of RP server process is a term in the form \myss{\myangle{ID_{RP}, Endpoints, IdP, Cert, sessions, users}}. Other attributes are not mentioned here.
 \begin{itemize}
+\setlength\itemsep{-2pt}
 \item \myss{ID_{RP}} and \myss{Endpoints} are RP's registered information at IdP.
 \item \myss{Cert} is the IdP signed RP information containing \myss{ID_{RP}, Endpoints} and other attributes.
 \item \myss{IdP} is the term of the form \myss{\langle ScriptUrl}, \myss{q}, \myss{PubKey \rangle}, where \myss{ScriptUrl} is the site to download IdP script, \myss{q} is the large prime defined before, and \myss{PubKey} is the public key used to verify the IdP signed messages.
 \item \myss{sessions} is same as it in IdP process.
 \item \myss{users} is the set of users registered at this RP, each user is uniquely identified by the \myss{Account}.
 \end{itemize}
- The new \myss{functions} are defined as follows
- \begin{itemize}
+
+The new \myss{functions} are defined as follows:
+\begin{itemize}
+\setlength\itemsep{-2pt}
  \item \myss{\mathtt{ExEU}(a, q)} is the Extended Euclidean algorithm, which calculates  \myss{a^{-1} \mod q}.
   \item \myss{\mathtt{Random}()} generates a fresh random number.
   \item \myss{\mathtt{RegisterUser}(Account)} add the new user with \myss{Account} into RP's user list.
- \end{itemize}
+\end{itemize}
 The relation of RP process $R^r$ is shown as Algorithm~\ref{alg2} in Appendix~\ref{ape:alg}.
 
 
@@ -173,19 +183,21 @@ The relation of RP process $R^r$ is shown as Algorithm~\ref{alg2} in Appendix~\r
 \subsubsection{IdP scripting process}
 The state of IdP scripting process \myss{scriptstate} is a term in the form \myss{\myangle{IdPDomain, Parameters, q, refXHR}}, where
 \begin{itemize}
+\setlength\itemsep{-2pt}
 \item \myss{IdPDomain} is the IdP's host.
 \item \myss{Parameters} is used to store the parameters received from other processes.
 %\item \myss{p} is the large prime defined before.
 \item \myss{q} is used to label the procedure point in the login.
 \item \myss{refXHR} is the nonce to map HTTP request and response.
 \end{itemize}
- The new \myss{functions} are defined as follows.
- \begin{itemize}
+The new \myss{functions} are defined as follows.
+\begin{itemize}
+\setlength\itemsep{-2pt}
  \item \myss{\mathtt{PARENTWINDOW}(tree,docnonce)}. The first parameter is the input relation tree defined before, and the second parameter is the nonce of a document. The output returned by the function is the current window's opener's nonce (null if it doesn't exist nor it is invisible to this document).
   \item \myss{\mathtt{CHOOSEINPUT}(inputs,pattern)}. The first parameter is a set of messages, and the second parameter is a pattern. The result returned by the function is the message in \myss{inputs} matching the \myss{pattern}.
   \item \myss{\mathtt{RandomUrl}()} returns a newly generated host string.
- \end{itemize}
- The relation of IdP scripting process $script\_idp$ is shown in Appendix~\ref{ape:alg} Algorithm~\ref{alg3}.
+\end{itemize}
+The relation of IdP scripting process $script\_idp$ is shown in Appendix~\ref{ape:alg} Algorithm~\ref{alg3}.
 
 
 
@@ -237,6 +249,7 @@ Attacker does not learn users' cookies.
 The Brute-force attacks, such as exhausting the possible users' cookies, are infeasible due to the length of cookies. The attackers can only try to obtain the cookies from honest processes in the system.  For an honest user \myss{u} and the honest RP \myss{r}, the valid cookie \myss{c(u,r)} can only be obtained by \myss{u}'s browser \myss{b_u}, the \myss{r}'s script \myss{script\_rp} and RP's server \myss{P^r} .
 Here, we only need to prove that the attacker cannot receive the event from these processes which carries \myss{c(u,r)}.
 \begin{itemize}
+\setlength\itemsep{-2pt}
 \item \myss{b.} The browsers are considered honest and well implemented. Therefore, based on the same-origin policy, \myss{b_u} only sends \myss{r}'s cookie to RP's domain, so that attackers cannot receive the cookie.
 \item \myss{script\_rp}. According to Algorithm~\ref{alg4}, the \myss{script\_rp} does not send any cookie.
 \item \myss{P^r}. According to Algorithm~\ref{alg2}, the \myss{P^r} does not send any cookie.
@@ -258,6 +271,7 @@ Attacker does not learn users' passwords.
 \begin{proof}
 Same as the proof to Lemma~\ref{rel:cookie}, we only need to prove that attackers cannot receive the message from honest processes that carries the password. The honest IdP server is defined as \myss{P^i} and the IdP script is defined as \myss{script\_idp}. Here we give the proof about each processes.
 \begin{itemize}
+\setlength\itemsep{-2pt}
 \item \myss{script\_rp}. According to Algorithm~\ref{alg4}, we can prove that RP script does not send any stored passwords.
 \item \myss{P^r}. According to Algorithm~\ref{alg2}, it is easy to find out that RP server does not receive or send any stored passwords.
 \item \myss{script\_idp}. Based on Algorithm~\ref{alg3}, we can find that IdP script sends the user's password at Line 68. The target of this message is \myss{Url} whose host is \myss{IdPDoaim} set at Line 67. The \myss{IdPDomian} is set at Line 4 and the value is defined  by the script and never modified. Therefore, the password can only be sent to the IdP server. The IdP server obtains the password at Line 10 in Algorithm~\ref{alg1}  and does not send this parameter to any other processes.
@@ -273,6 +287,7 @@ Attacker cannot forge or modify the IdP-issued proofs.
 \begin{proof}
 The IdP-issued proofs include the \myss{Cert} used in \myss{script\_idp}, the \myss{RegistrationResult} and \myss{Token} used in \myss{P^r} . We can easily find that the IdP does not send the private key to any processes so that the attackers cannot obtain the private key. Then we only need to prove that all the proofs are well verified.
 \begin{itemize}
+\setlength\itemsep{-2pt}
 \item \myss{Cert} is used at Line 21, 52 in Algorithm~\ref{alg3}. At Line 21, the \myss{Cert} has already been verified at Line 16. At Line 52, the \myss{Cert} is picked from the state parameters, and the cert parameter is set at Line 19.  At Line 19, the \myss{Cert} has already been verified at Line 16.
 At Line 16 the \myss{Cert} is verified with the public key in the scriptstate, where the key is considered initially honest and the key is not modified at Algorithm~\ref{alg3}. Therefore, \myss{Cert} cannot be forged or modified.
 \item \myss{RegistrationResult} is used in Algorithm~\ref{alg2} from Line 35 to 55, which is verified at Line 30. The public key is initially set in the RP and never modified. Therefore, \myss{RegistrationResult} cannot be forged or modified.
@@ -288,6 +303,7 @@ Attacker cannot learn users' valid identity proofs.
 \begin{proof}
 As the \myss{Token} has been proved that it can not be forged by the attackers, here we only need to prove that attackers cannot receive \myss{Token} from other honest processes.
 \begin{itemize}
+\setlength\itemsep{-2pt}
 \item Attacker cannot obtain the \myss{Token} from RP server.  We check all the messages sent by the RP server at Line 4, 7, 19, 25, 31, 36, 45, 55, 61, 66, 74, 84 in Algorithm~\ref{alg2}. It is easy to prove that the RP server does not send any \myss{Token} to other processes.
 \item Attacker cannot obtain the \myss{Token} from RP script. The  messages sent by RP script can be classified into two classes. 1) The messages at Line 18, 36, 56 in Algorithm~\ref{alg4}  are sent to the RPDomain which is set at Line 4, so that attackers cannot receive these messages. 2) The messages at Line 26,  46 only carry the contents received from RP server, and we have proved that RP server does not send any \myss{Token}. Therefore, attackers cannot receive the \myss{Token} from RP script.
 \item Attacker cannot obtain the \myss{Token} from IdP server.  Considering the messages at Line 4, 12, 16, 23, 26, 36, 44, 51, 67 in Algorithm~\ref{alg1}, we find that only the message at Line 67 carries the \myss{Token}. This \myss{Token} is generated at Line 65, following the trace where the \myss{Content} at Line 63, the \myss{PID_U} at Line 61, the \myss{ID_U} at Line 60, the \myss{session} at Line 48, and finally the \myss{cookie} at Line 47. That is, the receiver of \myss{Token}  must be the owner of the \myss{cookie} in which session that saves the parameter \myss{ID_U} . The \myss{ID_U} is set at Line 15 after verifying the password and never modified. As we have already proved that the cookies and passwords cannot be known to attackers,  attackers cannot obtain the \myss{Token} from IdP server.
@@ -304,6 +320,7 @@ Attacker does not know a valid \myss{PID_{RP}} negotiated by user \myss{u} and R
 \begin{proof}
 Here we give the proof that attacker cannot obtain the \myss{PID_{RP}} and \myss{N_U} from each processes.
 \begin{itemize}
+\setlength\itemsep{-2pt}
 \item \myss{P^i}. We can find in Algorithm~\ref{alg1}, IdP only returns the message containing \myss{PID_{RP}} to other processes when the \myss{PID_{RP}} is included in the request message.
 \item \myss{P^r}. Same as IdP server, RP server only sends the message containing \myss{PID_{RP}}  at Line 55 in Algorithm~\ref{alg2}, and the \myss{PID_{RP}} is contained in the \myss{RegistrationResult} received at Line 28 and verified at Line 44.
 \item \myss{script\_rp}. We can find in  Algorithm~\ref{alg4}, RP script  only sends the messages to RP server and IdP script. The receivers' identities are ensured at Line 3, 4. Therefore, attackers cannot obtains the  \myss{PID_{RP}} and \myss{N_U}.
