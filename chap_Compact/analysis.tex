@@ -2,39 +2,40 @@
 \label{sec:analysis}
 In this section, we propose the security properties of privacy-preserving SSO schemes and then give the proofs that UPPRESSO follows the security properties.
 \subsection{Security Properties}
+======= % 这一部分，与前面有些重复
 \noindent\textbf{Authentication.}
 Firstly, base on the existing security analysing work on SSO systems ~\cite{ArmandoCCCT08, FettKS16, FettKS17, SomorovskyMSKJ12, WangCW12, ArmandoCCCPS13, ZhouE14, WangZLLYLG15, WangZLG16,YangLLZH16, MainkaMS16, MohsenS16, MainkaMSW17, YangLCZ18, YangLS17, ShiWL19} , we can summarize basic requirements of security SSO authentication.
 \begin{itemize}
 \item \textbf{Confidentiality. }Anyone who holds the identity proof can prove its identity to the server, therefore, the identity proof must be well protected to avoid leaking it to the adversary by neither being stolen during transmission, nor sent to the adversary party(e.g. IdP Mix Up attack).
 \item \textbf{Integrity. }Only the IdP is able to generate a valid identity proof, no other entity should be able to modify or forge it without being found. And, the honest RP should only accept the valid identity proof.
 \item \textbf{RP designation. }IdP issues the identity proof for specific RP(s), so that only the target RP would accept the identity proof from user. Otherwise, when a malicious receives a valid identity proof from an honest user, it can log in to other RPs as this user with this identity proof.
-\item \textbf{User identification. }IdP should always provide the unique identifier for each user, and only the honest user can achieve an identity proof representing this identifier. 
+\item \textbf{User identification. }IdP should always provide the unique identifier for each user, and only the honest user can achieve an identity proof representing this identifier.
 %That is, for $\mathcal{F}_{ID_{RP} \mapsto PID_{RP}}$, $\mathcal{F}_{ID_{U} \mapsto PID_{U}}$ and $\mathcal{F}_{PID_{U} \mapsto Account}$ algorithms, the adversary cannot forge the identity proof accepted by an RP, whose $Account$  is same as another honest user's in this RP.
 \end{itemize}
 
-\noindent\textbf{Privacy.} 
+\noindent\textbf{Privacy.}
 The privacy-preserving SSO system requires that (a) the curious but honest IdP should not learn the user's visited RP. It means the following requirements must be satisfied.
 \begin{itemize}
-\item  IdP should always fail to derive RP's identity information (i.e., $ID_{RP}$ and real endpoint) through  a single login flow, and fail to distinguish whether the multiple login flows are from the same RP or not. 
+\item  IdP should always fail to derive RP's identity information (i.e., $ID_{RP}$ and real endpoint) through  a single login flow, and fail to distinguish whether the multiple login flows are from the same RP or not.
 \item  RPs cannot infer a user's unique identifier (i.e., the $ID_U$), or find out whether the $Account$s in each RP are belong to one user or not.
 \end{itemize}
 
 \subsection{Proof of Security}
 \noindent\textbf{Authentication.}
 
-The  confidentiality of identity proof is guaranteed because none of the honest would send it to a malicious party. The detail of the proof is shown in the Appendix. Here we only focus on the main point of confidentiality, preventing the honest parties from sending the identity proof to the adversary without $redirect_uri$ mechanism. IdP issues the signed $RP certificate$ for each RP, which contains the RP's correct endpoint for identity proof. It can be found in Figure~\ref{fig:process}, in step 4.5-4.6, the identity proof is generated and sent ton RP, and the identity proof is strictly transformed to the origin defined in $RP certificate$. The scheme achieves the same security property as $redirect_uri$ mechanism. 
+The  confidentiality of identity proof is guaranteed because none of the honest would send it to a malicious party. The detail of the proof is shown in the Appendix. Here we only focus on the main point of confidentiality, preventing the honest parties from sending the identity proof to the adversary without $redirect_uri$ mechanism. IdP issues the signed $RP certificate$ for each RP, which contains the RP's correct endpoint for identity proof. It can be found in Figure~\ref{fig:process}, in step 4.5-4.6, the identity proof is generated and sent ton RP, and the identity proof is strictly transformed to the origin defined in $RP certificate$. The scheme achieves the same security property as $redirect_uri$ mechanism.
 
 The integrity of identity proof is guaranteed as all the attributes contained are well protected by the signature, and the key is never leaked to the adversary. Moreover, it can be proved that the attributes included in the identity proof cannot be controlled by the adversary beside of $PID_{RP}$.
 
-Due to the $PID_{RP}$ registration, in a valid period an $PID_{RP}$ is only available to an RP, restricted by the $hash(N_U)$. Therefore, in the valid period the identity proof can be only accepted by the specific RP. 
+Due to the $PID_{RP}$ registration, in a valid period an $PID_{RP}$ is only available to an RP, restricted by the $hash(N_U)$. Therefore, in the valid period the identity proof can be only accepted by the specific RP.
 
 The main point of identification is whether an RP accepted $Account$ can be controlled by an adversary may be the most noticeable question for readers.
 For example, the adversary may try to make the conflict $Account_1=ID_{U_1}ID_{RP_1}$, $Account_2=ID_{U_2}ID_{RP_2}$, and $Account_1=Account_2$ possible, where $ID_{U_1}$ and $ID_{RP_1}$ belong to the honest user and RP.
-Here we give the direct conclusion. \textbf{The $PID_U$ achieved by an adversary cannot be transformed into the honest user's $Account$ at an honest RP.} 
+Here we give the direct conclusion. \textbf{The $PID_U$ achieved by an adversary cannot be transformed into the honest user's $Account$ at an honest RP.}
 
 The details of authentication proof are shown in Appendix.
 
-\noindent\textbf{Privacy.} 
+\noindent\textbf{Privacy.}
 
 As shown in figure~\ref{fig:process}, the only information that is related to the RP's identity and is accessible to the IdP is $PID_{RP}$, which is converted from $ID_{RP}$ using a random $N_U$. Since $N_U$ is randomly chosen from $\mathbb{Z}_n$ by the user and the IdP ha no control of the process, the IdP should treat $PID_{RP}$ as being randomly chosen from $\mathbb{G}$. So, the IdP cannot recognize the RP nor derive its real identity. Therefore, IdP-based identity linkage becomes impossible in UPPRESSO.
 
