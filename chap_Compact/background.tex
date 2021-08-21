@@ -6,12 +6,12 @@ In this section, we first introduce a popular SSO protocol, OIDC, to explain typ
 \subsection{OpenID Connect}
 \label{subsec:OIDC}
 %As an extension of OAuth 2.0 for user authentication,
-OIDC is one of the most popular SSO protocols~\cite{OpenIDConnect}. %As other SSO protocols~\cite{SAMLIdentifier}, OIDC
+OIDC is one of the most popular SSO protocols \cite{OpenIDConnect}. %As other SSO protocols \cite{SAMLIdentifier}, OIDC
 It involves three entities, i.e., {\em users}, the {\em identity provider (IdP)}, and {\em relying parties (RPs)}.
 Users and RPs register at the IdP with identifiers %($ID_U$, $ID_{RP}$ and $PID_U$ in some schemes) %(or $PID_{RP}$ in some schemes)
-and other necessary information such as credentials and RP endpoints (e.g., the URLs to receive identity proofs).
+and other necessary information such as credentials (e.g., username/passwords) and RP endpoints (e.g., the URLs to receive identity proofs).
 % below can be removed
-The IdP should maintain these attributes securely.
+%The IdP should maintain these attributes securely.
 
 %\vspace{0.5mm}
 \noindent\textbf{OIDC Implicit Flow.}
@@ -20,14 +20,14 @@ OIDC supports three types of user login flows: implicit flow, authorization code
 %In the authorization code flow, the IdP binds an authorization code with the RP, and sends it to the RP through the user; then, the RP establishes an HTTPS connection to the IdP and uses the authorization code with the RP's credential to obtain the user's identifier and other attributes.
 UPPRESSO is compatible with all three flows. For brevity, we will present our design and implementation based on the OIDC implicit flow in the rest of the paper and discuss the extension to support the authorization code flow in Section~\ref{sec:discussion}.
 
-As shown in Figure~\ref{fig:OpenID}, first, the user initiates a login request to an RP. Then, the RP constructs an identity proof request with its identifier, an endpoint to receive the identity proof and the scope of requested user attributes. The RP sends the request to the user who will redirect it to the IdP. If the user has not been authenticated yet, the IdP initiates an authentication process to authenticate the user based on her identity and credential. If a privacy-preserving pseudo-identifier is used, this process also involves mapping the real identifier ($ID_U$) to the pseudo identifier ($PID_U$). %$ID_U$ to $PID_U$ based on $ID_{RP}$.
+As shown in Figure~\ref{fig:OpenID}, first, the user initiates a login request to an RP. Then, the RP constructs an identity proof request with its identifier, an endpoint to receive the identity proof and the scope of requested user attributes. The RP sends the request to the user who will redirect it to the IdP. If the user has not been authenticated yet, the IdP initiates an authentication process to authenticate the user based on her identity and credential. If a privacy-preserving pseudo-identity is used, this process also involves mapping the real identifier ($ID_U$) to the pseudo identifier ($PID_U$). %$ID_U$ to $PID_U$ based on $ID_{RP}$.
 Once successfully authenticating the user, the IdP generates an identity proof (called {\em id token}) and returns it to the RP endpoint through user redirection. The id token contains a user identifier (either $ID_U$ or $PID_U$), an RP identifier ($ID_{RP}$), the issuer, a validity period, the requested user attributes, etc. %% If the RP endpoint has not been registered at the IdP, the IdP will return a warning to notify the user about potential identity proof leakage. % 这里只是谈主线；各种错误情况太多，举不胜举
 Besides redirecting the messages between the RP and the IdP, the user also checks if the RP is permitted to obtain the user attributes in the identity proof. Usually, the redirection and checking actions are handled by a user-controlled software called {\em user agent} (e.g., browser). Finally, the RP verifies the received identity proof and makes the authentication decision.
 %extracts user's identifier and returns the authentication result to the user (Step 7).
 
 %\vspace{0.5mm}
 \noindent\textbf{RP Dynamic Registration.}
-OIDC also supports {\em RP dynamic registration}~\cite{DynamicRegistration}. When an RP first registers at an IdP, it obtains a registration token with which the RP can %initiate a dynamic registration process to
+OIDC also supports {\em RP dynamic registration} \cite{DynamicRegistration}. When an RP first registers at an IdP, it obtains a registration token with which the RP can %initiate a dynamic registration process to
 update its information (e.g., endpoints) with the IdP at a later time. After a successful dynamic registration, the RP obtains a new $ID_{RP}$ from the IdP.
 +++++
 We only talk about the background. nothing on UPPRESSO.
@@ -44,9 +44,9 @@ UPPRESSO leverages this function and slightly modifies the dynamic registration 
 
 \subsection{Existing Privacy Solutions for SSO}
 \label{subsec-solutions}
-Pairwise pseudonymous identifier (PPID) is recommended by NIST~\cite{NIST2017draft} and specified in several SSO protocols~\cite{OpenIDConnect, SAMLIdentifier} to hide the real user identity from the RPs. It can be generated by the IdP to identify a user to an RP. PPIDs for one user at different RPs should not be correlated with each other, so that collusive RPs cannot link a user's logins. However, PPID-based approaches cannot prevent IdP-based login tracing, since the IdP needs to know which RP the user visits to generate the correct identify proof.
+Pairwise pseudonymous identifier (PPID) is recommended by NIST \cite{NIST2017draft} and specified in several SSO protocols \cite{OpenIDConnect, SAMLIdentifier} to hide the real user identity from the RPs. It can be generated by the IdP to identify a user to an RP. PPIDs for one user at different RPs should not be correlated with each other, so that collusive RPs cannot link a user's logins. However, PPID-based approaches cannot prevent IdP-based login tracing, since the IdP needs to know which RP the user visits to generate the correct identify proof.
 
-Meanwhile, BrowserID~\cite{BrowserID} and SPRESSO~\cite{SPRESSO} proposed to defend against IdP-based login tracing. However, both solutions are vulnerable to RP-based identity linkage. In BrowserID (and its prototypes known as Mozilla Persona~\cite{persona} and Firefox Accounts~\cite{FirefoxAccount}), the IdP does not know the identity of the requesting RP. Instead, it generates a special ``identity proof'' to bind the user's unique identifier (e.g., email address) to a public key, so that the user can sign another subsidiary identity proof to bind her identity with the RP's identity and send both identity proofs to the RP. Obviously, when a user logs in to different RPs, the RPs can extract the same user identifier from different identity proofs and correlate these logins. In SPRESSO, the RP creates a one-time pseudo-identifier for itself at each login. Then, the IdP generates an identity proof binding this pseudo-identifier of the RP and the user's identity (i.e., email address). %and returns it through a trusted third-party entity called forwarder.
+Meanwhile, BrowserID \cite{BrowserID} and SPRESSO \cite{SPRESSO} proposed to defend against IdP-based login tracing. However, both solutions are vulnerable to RP-based identity linkage. In BrowserID (and its prototypes known as Mozilla Persona \cite{persona} and Firefox Accounts \cite{FirefoxAccount}), the IdP does not know the identity of the requesting RP. Instead, it generates a special ``identity proof'' to bind the user's unique identifier (e.g., email address) to a public key, so that the user can sign another subsidiary identity proof to bind her identity with the RP's identity and send both identity proofs to the RP. Obviously, when a user logs in to different RPs, the RPs can extract the same user identifier from different identity proofs and correlate these logins. In SPRESSO, the RP creates a one-time pseudo-identity for itself at each login. Then, the IdP generates an identity proof binding this pseudo-identity of the RP and the user's identity (i.e., email address). %and returns it through a trusted third-party entity called forwarder.
 Similarly, the RPs can correlate a user's logins using her unique identifier in the identity proofs.
 
 \begin{comment}
@@ -59,8 +59,8 @@ Based on the discrete logarithm problem, UPPRESSO designs the identifier-transfo
 Here, we briefly review the discrete logarithm problem.
 %A number $g$ ($0<g<p$) is called a primitive root modular a prime $p$, if for ${\forall}y$ ($0<y<p$), there is a  number $x$ ($0\le x <p-1$) satisfying $y=g^x \pmod p$.
 For the finite field $GF(p)$ where $p$ is a large prime, a number $g$ is called a generator of order $q$, if it constructs a cyclic  group of $q$ elements by calculating $y=g^x \ mod\ p$.
-And $x$ is called the discrete logarithm of $y$ modulo $p$. Given a large prime $p$, a generator $g$ and a number $y$, it is computationally infeasible to solve the discrete logarithm (i.e., $x$) of $y$~\cite{WXWM}, which is called the discrete logarithm problem.
+And $x$ is called the discrete logarithm of $y$ modulo $p$. Given a large prime $p$, a generator $g$ and a number $y$, it is computationally infeasible to solve the discrete logarithm (i.e., $x$) of $y$ \cite{WXWM}, which is called the discrete logarithm problem.
 The hardness of solving discrete logarithms is utilized to design several secure cryptographic primitives, including Diffie-Hellman key exchange and the digital signature algorithm (DSA).
 
-%In the process of $F_{PID_{RP}}$ and $F_{PID_U}$, we needs to calculate the primitive root for a  large prime $p$ as follows~\cite{Shoup,Wang}. First, we retrieve a primitive root $g_m$  modulo $p$ from all the integers by finding the first integer passing  the primitive root checking.  A lemma is propose to simply the checking, that if $p=2q+1$ ($q$ is a prime),  an integer $\mu \in (1, p-1)$ is a primitive root if and only if $\mu^2\neq 1 \ mod \ p$ and $\mu^q\neq 1 \ mod \ p$. Then, based on $g_m$, we can calculate a new primitive root $g = g_{m}^{t} mod \ p$, where $t$ is an integer coprime to $p-1$.
+%In the process of $F_{PID_{RP}}$ and $F_{PID_U}$, we needs to calculate the primitive root for a  large prime $p$ as follows \cite{Shoup,Wang}. First, we retrieve a primitive root $g_m$  modulo $p$ from all the integers by finding the first integer passing  the primitive root checking.  A lemma is propose to simply the checking, that if $p=2q+1$ ($q$ is a prime),  an integer $\mu \in (1, p-1)$ is a primitive root if and only if $\mu^2\neq 1 \ mod \ p$ and $\mu^q\neq 1 \ mod \ p$. Then, based on $g_m$, we can calculate a new primitive root $g = g_{m}^{t} mod \ p$, where $t$ is an integer coprime to $p-1$.
 \end{comment}

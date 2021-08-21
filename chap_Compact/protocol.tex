@@ -1,7 +1,7 @@
 \section{The Design of UPPRESSO}
 \label{sec:UPPRESSO}
 
-After we conceptualize the privacy problem into an identifier-transformation problem, the design of UPPRESSO is mainly about designing three identifier-transformation functions to generate pseudo-identifiers for the user and RP as well as linking the user's pseudo-identifier to her account at an RP. In this section, we first present our design of these three functions to support {\em transformed RP designation} and {\em trapdoor user identification} properties, and then describe the details of the UPPRESSO system and its login flow.
+After we conceptualize the privacy problem into an identifier-transformation problem, the design of UPPRESSO is mainly about designing three identifier-transformation functions to generate pseudo-identities for the user and RP as well as linking the user's pseudo-identity to her account at an RP. In this section, we first present our design of these three functions to support {\em transformed RP designation} and {\em trapdoor user identification} properties, and then describe the details of the UPPRESSO system and its login flow.
 %Finally, we discuss the compatibility of UPPRESSO with OIDC.
 
 
@@ -26,7 +26,7 @@ The IdP assigns long-term identifiers $ID_U$ and $ID_{RP}$ to a user and an RP r
 %\noindent where $r$ is kept secret from the RP.
 
 %\vspace{0.5mm}
-\noindent {\bf The RP Identifier Transformation Function.} In each login session, the user assists the RP to convert $ID_{RP}$ into a pseudo-identifier $PID_{RP}$. In particular, the user selects a random number $N_{U}$ ($1 < N_{U}<n$) and calculates $PID_{RP}$ as:
+\noindent {\bf The RP Identifier Transformation Function.} In each login session, the user assists the RP to convert $ID_{RP}$ into a pseudo-identity $PID_{RP}$. In particular, the user selects a random number $N_{U}$ ($1 < N_{U}<n$) and calculates $PID_{RP}$ as:
 %First, the RP chooses a random number $N_{RP}$ ($1 < N_{RP}<q $), and the user chooses another random number $N_{U}$ ($1 < N_{U}<q $).
 %Then, they exchange $N_{RP}$ and $N_{U}$ to calculate $PID_{RP}$ following Equation~\ref{equ:PIDRP}.
 \begin{equation}
@@ -39,7 +39,7 @@ With $\mathcal{F}_{ID_{RP} \mapsto PID_{RP}}$,  %satisfies the following require
 %is a one-way function so that it
 it is computationally infeasible for the IdP to derive $ID_{RP}$ % from $PID_{RP}$
 due to the discrete logarithm problem.
-Moreover, the nonce $N_{U}$ ensures that: (\emph{a}) $PID_{RP}$ is a one-time pseudo-identifier in each login;
+Moreover, the nonce $N_{U}$ ensures that: (\emph{a}) $PID_{RP}$ is a one-time pseudo-identity in each login;
 %that is valid only for the identity proof generated in this login;
 and (\emph{b}) $PID_{RP}$ is dynamically generated in each login.
 When a user visits the same RP multiple times, different $PID_{RP}$s will be generated, which cannot be correlated to the same RP by the curious IdP.
@@ -51,8 +51,8 @@ When a user visits the same RP multiple times, different $PID_{RP}$s will be gen
 
 %\vspace{0.5mm}
 \noindent {\bf The User Identifier Transformation Function.}
-%Now, the identity proof request to the IdP contains a user identity $ID_U$ and a pseudo-identifier of the RP $PID_{RP}$. Therefore,
-To avoid using the user identity $ID_U$ in identity proofs, the IdP can convert $ID_U$ into a pseudo-identifier for the user as follows:
+%Now, the identity proof request to the IdP contains a user identity $ID_U$ and a pseudo-identity of the RP $PID_{RP}$. Therefore,
+To avoid using the user identity $ID_U$ in identity proofs, the IdP can convert $ID_U$ into a pseudo-identity for the user as follows:
 \begin{equation}
 \setlength{\abovedisplayskip}{3pt}
 \setlength{\belowdisplayskip}{3pt}
@@ -61,10 +61,10 @@ To avoid using the user identity $ID_U$ in identity proofs, the IdP can convert 
 \end{equation}
 % The function $\mathcal{F}_{ID_{U} \mapsto PID_{U}}$ satisfies the requirements described in Section~\ref{subsec:challenges}.
 From Equations%~\ref{equ:IDRP},
-~\ref{equ:PIDRP} and~\ref{equ:PIDU}, we see that $PID_U = ({N_UID_U} \bmod n) \cdot {ID_{RP}}$. So, $PID_U$ is a one-time pseudo-identifier. It is only valid in one login session and one identity proof.
-As expected, the RP cannot derive $ID_U$ from $PID_U$ due to the discrete logarithm problem, but it can associate a user's one-time pseudo-identifier ($PID_U$) registered at the IdP with her long-term identifier registered at the RP (i.e., $Account$).
+~\ref{equ:PIDRP} and~\ref{equ:PIDU}, we see that $PID_U = ({N_UID_U} \bmod n) \cdot {ID_{RP}}$. So, $PID_U$ is a one-time pseudo-identity. It is only valid in one login session and one identity proof.
+As expected, the RP cannot derive $ID_U$ from $PID_U$ due to the discrete logarithm problem, but it can associate a user's one-time pseudo-identity ($PID_U$) registered at the IdP with her long-term identifier registered at the RP (i.e., $Account$).
 
-%Moreover, although the IdP does not know how the RP identifies the user (i.e. the user's $Account$ at the RP), involving $PID_{RP}$ in the generation of $PID_U$ indirectly links a user's one-time pseudo-identifier at the IdP ($PID_U$) to her long-term identifier at the RP ($Account$) through a trapdoor.
+%Moreover, although the IdP does not know how the RP identifies the user (i.e. the user's $Account$ at the RP), involving $PID_{RP}$ in the generation of $PID_U$ indirectly links a user's one-time pseudo-identity at the IdP ($PID_U$) to her long-term identifier at the RP ($Account$) through a trapdoor.
 
 %Moreover, $ID_{RP}$ is generated following Equation~\ref{equ:IDRP} to introduce a random $r$ that is unknown to the RP, so that for a given $ID_U$, $PID_U$ is determined by $r$, $N_{U}$ and $N_{RP}$ together. Otherwise, if two collusive RPs know $r_1$ and $r_2$ respectively, they can check if ${PID_{U_1}}^{r_2N_{U_2}N_{RP_2}} = {PID_{U_2}}^{r_1N_{U_1}N_{RP_1}} \bmod\ p$ holds, which means a same user logs into them in two SSO sessions (i.e., $ID_{U_1}==ID_{U_2}$).
 
@@ -125,7 +125,7 @@ Therefore, it prevents IdP-based login tracing.
 %In particular, the IdP %chooses $L$,
 %generates a large prime $p$, and a prime factor $q$ of $p-1$
 % and a generator $g$ of order $q$
-%as the parameters of the discrete logarithm problem. %~\cite{gallagher2013digital}.
+%as the parameters of the discrete logarithm problem. % \cite{gallagher2013digital}.
 In particular, the IdP generates key pair ($SK$, $PK$) to sign identity proofs and RP certificates.
 %The lengths of %$p$, $q$ and
 %($SK$, $PK$) should satisfy the required security strength.
@@ -393,7 +393,7 @@ The RP verifies the identity proof, including the signature, validity period, an
 \label{subsec:compatible}
 UPPRESSO does not introduce any new role (or component) nor change the security assumptions for each role. It follows a similar logic flow as OIDC in SSO login and only requires small modifications to perform identifier transformation.
 %Here, we explain the modification in each of the five phases of its SSO login flow to show that UPPRESSO is compatible with OIDC, which indicates UPPRESSO can be easily integrated with other commonly used SSO systems.
-Among the five phases, the {\em scripts downloading} and {\em RP identifier transformation} phases are newly introduced by UPPRESSO. The browser is required to download two scripts from the IdP and RP and most of the designed operations in these two phases are performed by the scripts in the browser. So, we require minimal modifications to the IdP and RP servers providing new network interfaces (i.e., the new URLs for downloading resources). The other three phases adopt a similar communication pattern as OIDC. In particular, the {\em $PID_{RP}$ registration} phase can be viewed as a variant of the RP dynamic registration flow of OIDC~\cite{DynamicRegistration}, which allows an entity to register its identity and endpoint at the IdP.
+Among the five phases, the {\em scripts downloading} and {\em RP identifier transformation} phases are newly introduced by UPPRESSO. The browser is required to download two scripts from the IdP and RP and most of the designed operations in these two phases are performed by the scripts in the browser. So, we require minimal modifications to the IdP and RP servers providing new network interfaces (i.e., the new URLs for downloading resources). The other three phases adopt a similar communication pattern as OIDC. In particular, the {\em $PID_{RP}$ registration} phase can be viewed as a variant of the RP dynamic registration flow of OIDC \cite{DynamicRegistration}, which allows an entity to register its identity and endpoint at the IdP.
 %Different from OIDC in which only RPs can call a dynamic registration, UPPRESSO allows any authenticated user to launch this process and register an RP identifier with the IdP.
 %The {\em identity proof generation} and {\em $Account$ calculation} phases adopt the same steps and functions as the implicit protocol flow of OIDC, while using a few different parameters. First, in identity proof generation, $PID_U$ transformed from $ID_U$ is used to replace $ID_U$, which is directly supported by OIDC, similar as in the PPID approaches that also convert $ID_U$ into $PID_U$. The calculation of $Account$ from $PID_U$
 %can be viewed as a customized step by the RP to derive its user account after the implicit protocol flow of OIDC ends.
@@ -422,7 +422,7 @@ UPPRESSO can also support the authorization code flow of OIDC with small modific
 %The user automatically invokes the JavaScript functions to complete RP identifier transforming, one-time endpoint generating/replacing and $PID_{RP}$ registration for each login.
 %While, the RP server and IdP server provide the corresponding web service to complete the processing automatically.
 
-%The protocol of RP identifier transformation is based Diffie-Hellman key exchange~\cite{DiffieH76}, while $N_U$ is provided to RP for computing the trapdoor and $N_{RP}$ is provided to the user for verifying the correctness of $Y_{RP}$.
+%The protocol of RP identifier transformation is based Diffie-Hellman key exchange \cite{DiffieH76}, while $N_U$ is provided to RP for computing the trapdoor and $N_{RP}$ is provided to the user for verifying the correctness of $Y_{RP}$.
 
 \begin{comment}
 \vspace{1mm}\noindent \textbf{Consistency with OIDC.}
