@@ -1,7 +1,12 @@
-\section{Background}
+\section{Background and Related Work}
 \label{sec:background}
 %UPPRESSO is designed to be compatible with OpenID Connect (OIDC) and provide privacy protections based on the discrete logarithm problem. Next,
-In this section, we first introduce a popular SSO protocol, OIDC, to explain typical SSO login flows. Then, we discuss existing SSO privacy solutions and their limitations.
+
+This section introduces the popular OpenID Connect \cite{OpenIDConnect},
+ to explain typical SSO login flows.
+Then, we discuss existing privacy-preserving SSO solutions and other related works.
+
++++++++++++++++++
 
 \subsection{OpenID Connect}
 \label{subsec:OIDC}
@@ -18,9 +23,9 @@ and other necessary information such as credentials (e.g., username/passwords) a
 OIDC supports three types of user login flows: implicit flow, authorization code flow, and hybrid flow (i.e., a mix-up of the previous two).
 %In the implicit flow, an {\em id token} is generated as the identity proof, which contains a user identifier, an RP identifier, the issuer (i.e., IdP), the validity period, and other requested attributes. The IdP signs the id token using its private key to ensure integrity, and sends it to the RP through the user.
 %In the authorization code flow, the IdP binds an authorization code with the RP, and sends it to the RP through the user; then, the RP establishes an HTTPS connection to the IdP and uses the authorization code with the RP's credential to obtain the user's identifier and other attributes.
-UPPRESSO is compatible with all three flows. For brevity, we will present our design and implementation based on the OIDC implicit flow in the rest of the paper and discuss the extension to support the authorization code flow in Section~\ref{sec:discussion}.
+UPPRESSO is compatible with all three flows. For brevity, we will present our design and implementation based on the OIDC implicit flow in the rest of the paper and discuss the extension to support the authorization code flow in Section \ref{sec:discussion}.
 
-As shown in Figure~\ref{fig:OpenID}, first, the user initiates a login request to an RP. Then, the RP constructs an identity proof request with its identifier, an endpoint to receive the identity proof and the scope of requested user attributes. The RP sends the request to the user who will redirect it to the IdP. If the user has not been authenticated yet, the IdP initiates an authentication process to authenticate the user based on her identity and credential. If a privacy-preserving pseudo-identity is used, this process also involves mapping the real identifier ($ID_U$) to the pseudo identifier ($PID_U$). %$ID_U$ to $PID_U$ based on $ID_{RP}$.
+As shown in Figure \ref{fig:OpenID}, first, the user initiates a login request to an RP. Then, the RP constructs an identity proof request with its identifier, an endpoint to receive the identity proof and the scope of requested user attributes. The RP sends the request to the user who will redirect it to the IdP. If the user has not been authenticated yet, the IdP initiates an authentication process to authenticate the user based on her identity and credential. If a privacy-preserving pseudo-identity is used, this process also involves mapping the real identifier ($ID_U$) to the pseudo identifier ($PID_U$). %$ID_U$ to $PID_U$ based on $ID_{RP}$.
 Once successfully authenticating the user, the IdP generates an identity proof (called {\em id token}) and returns it to the RP endpoint through user redirection. The id token contains a user identifier (either $ID_U$ or $PID_U$), an RP identifier ($ID_{RP}$), the issuer, a validity period, the requested user attributes, etc. %% If the RP endpoint has not been registered at the IdP, the IdP will return a warning to notify the user about potential identity proof leakage. % 这里只是谈主线；各种错误情况太多，举不胜举
 Besides redirecting the messages between the RP and the IdP, the user also checks if the RP is permitted to obtain the user attributes in the identity proof. Usually, the redirection and checking actions are handled by a user-controlled software called {\em user agent} (e.g., browser). Finally, the RP verifies the received identity proof and makes the authentication decision.
 %extracts user's identifier and returns the authentication result to the user (Step 7).
@@ -32,7 +37,7 @@ update its information (e.g., endpoints) with the IdP at a later time. After a s
 +++++
 We only talk about the background. nothing on UPPRESSO.
 +++++
-UPPRESSO leverages this function and slightly modifies the dynamic registration process to implement the {\em $PID_{RP}$ registration} process (see details in Section~\ref{sec:UPPRESSO}.C), which allows an RP to generate different privacy-preserving RP identifiers and register them with the IdP.
+UPPRESSO leverages this function and slightly modifies the dynamic registration process to implement the {\em $PID_{RP}$ registration} process (see details in Section \ref{sec:UPPRESSO}.C), which allows an RP to generate different privacy-preserving RP identifiers and register them with the IdP.
 
 \begin{figure}[t]
   \centering

@@ -1,6 +1,3 @@
-\section{The Design of UPPRESSO}
-\label{sec:UPPRESSO}
-
 After we conceptualize the privacy problem into an identifier-transformation problem, the design of UPPRESSO is mainly about designing three identifier-transformation functions to generate pseudo-identities for the user and RP as well as linking the user's pseudo-identity to her account at an RP. In this section, we first present our design of these three functions to support {\em transformed RP designation} and {\em trapdoor user identification} properties, and then describe the details of the UPPRESSO system and its login flow.
 %Finally, we discuss the compatibility of UPPRESSO with OIDC.
 
@@ -28,7 +25,7 @@ The IdP assigns long-term identifiers $ID_U$ and $ID_{RP}$ to a user and an RP r
 %\vspace{0.5mm}
 \noindent {\bf The RP Identifier Transformation Function.} In each login session, the user assists the RP to convert $ID_{RP}$ into a pseudo-identity $PID_{RP}$. In particular, the user selects a random number $N_{U}$ ($1 < N_{U}<n$) and calculates $PID_{RP}$ as:
 %First, the RP chooses a random number $N_{RP}$ ($1 < N_{RP}<q $), and the user chooses another random number $N_{U}$ ($1 < N_{U}<q $).
-%Then, they exchange $N_{RP}$ and $N_{U}$ to calculate $PID_{RP}$ following Equation~\ref{equ:PIDRP}.
+%Then, they exchange $N_{RP}$ and $N_{U}$ to calculate $PID_{RP}$ following Equation \ref{equ:PIDRP}.
 \begin{equation}
 \setlength{\abovedisplayskip}{3pt}
 \setlength{\belowdisplayskip}{3pt}
@@ -59,14 +56,14 @@ To avoid using the user identity $ID_U$ in identity proofs, the IdP can convert 
  \mathcal{F}_{ID_{U} \mapsto PID_{U}}: PID_U = {ID_U} \cdot {PID_{RP}}
  \label{equ:PIDU}
 \end{equation}
-% The function $\mathcal{F}_{ID_{U} \mapsto PID_{U}}$ satisfies the requirements described in Section~\ref{subsec:challenges}.
-From Equations%~\ref{equ:IDRP},
-~\ref{equ:PIDRP} and~\ref{equ:PIDU}, we see that $PID_U = ({N_UID_U} \bmod n) \cdot {ID_{RP}}$. So, $PID_U$ is a one-time pseudo-identity. It is only valid in one login session and one identity proof.
+% The function $\mathcal{F}_{ID_{U} \mapsto PID_{U}}$ satisfies the requirements described in Section \ref{subsec:challenges}.
+From Equations% \ref{equ:IDRP},
+ \ref{equ:PIDRP} and \ref{equ:PIDU}, we see that $PID_U = ({N_UID_U} \bmod n) \cdot {ID_{RP}}$. So, $PID_U$ is a one-time pseudo-identity. It is only valid in one login session and one identity proof.
 As expected, the RP cannot derive $ID_U$ from $PID_U$ due to the discrete logarithm problem, but it can associate a user's one-time pseudo-identity ($PID_U$) registered at the IdP with her long-term identifier registered at the RP (i.e., $Account$).
 
 %Moreover, although the IdP does not know how the RP identifies the user (i.e. the user's $Account$ at the RP), involving $PID_{RP}$ in the generation of $PID_U$ indirectly links a user's one-time pseudo-identity at the IdP ($PID_U$) to her long-term identifier at the RP ($Account$) through a trapdoor.
 
-%Moreover, $ID_{RP}$ is generated following Equation~\ref{equ:IDRP} to introduce a random $r$ that is unknown to the RP, so that for a given $ID_U$, $PID_U$ is determined by $r$, $N_{U}$ and $N_{RP}$ together. Otherwise, if two collusive RPs know $r_1$ and $r_2$ respectively, they can check if ${PID_{U_1}}^{r_2N_{U_2}N_{RP_2}} = {PID_{U_2}}^{r_1N_{U_1}N_{RP_1}} \bmod\ p$ holds, which means a same user logs into them in two SSO sessions (i.e., $ID_{U_1}==ID_{U_2}$).
+%Moreover, $ID_{RP}$ is generated following Equation \ref{equ:IDRP} to introduce a random $r$ that is unknown to the RP, so that for a given $ID_U$, $PID_U$ is determined by $r$, $N_{U}$ and $N_{RP}$ together. Otherwise, if two collusive RPs know $r_1$ and $r_2$ respectively, they can check if ${PID_{U_1}}^{r_2N_{U_2}N_{RP_2}} = {PID_{U_2}}^{r_1N_{U_1}N_{RP_1}} \bmod\ p$ holds, which means a same user logs into them in two SSO sessions (i.e., $ID_{U_1}==ID_{U_2}$).
 
 %Moreover, since $r$ is unknown to the RP, collusive RPs cannot link a user's $PID_U$s at different RPs. If $r$ is known to the RP, two collusive RPs might attempt to associate a user's $PID_U$s by checking whether the equality ${PID_{U_1}}^{r_2N_{U_2}N_{RP_2}} = {PID_{U_2}}^{r_1N_{U_1}N_{RP_1}} \bmod\ p$ holds or not, because ${PID_{U_1}} = g^{r_1N_{U_1}N_{RP_1}ID_{U_1}} \bmod p$ and ${PID_{U_2}} = g^{r_2N_{U_2}N_{RP_2}ID_{U_2}} \bmod p$.
 
@@ -80,7 +77,7 @@ With this trapdoor, the RP can easily derive a unique account (denoted as $A$ in
    \mathcal{F}_{PID_{U} \mapsto Account}: A = {T} \cdot {PID_U}
    \label{equ:Account}
 \end{equation}
-From Equations~\ref{equ:PIDRP}, \ref{equ:PIDU} and \ref{equ:Account}, we can further derive:
+From Equations \ref{equ:PIDRP}, \ref{equ:PIDU} and \ref{equ:Account}, we can further derive:
 %\begin{multline}\label{equ:AccountNotChanged}
 %   A =  {PID_{U}}^{T}
 %   = {({PID_{RP}}^{ID_U})}^{{N_U^{-1} \bmod q}} \\
@@ -99,7 +96,7 @@ From Equations~\ref{equ:PIDRP}, \ref{equ:PIDU} and \ref{equ:Account}, we can fur
 This means when a user logs in to an RP multiple times, the RP can always derive the same $Account$ from different $PID_U$s to uniquely identify the user. However, the RP cannot derive $ID_U$ from $Account$ due to the discrete logarithm problem.
 %Finally, $Account$ provides no clue for different RPs to correlate the users.
 
-With three identifier-transformation functions, UPRESSO supports two desirable properties discussed in Section~\ref{subsec:solutions}
+With three identifier-transformation functions, UPRESSO supports two desirable properties discussed in Section \ref{subsec:solutions}
 %, namely transformed RP designation and trapdoor user identification,
 to satisfy {\em all} the security and privacy requirements of an SSO. %desirable for a secure and privacy-preserving SSO service.
 %\vspace{1mm}
@@ -155,10 +152,10 @@ why cannot? How about $ID_U$?
 
 %\vspace{1mm}
 \noindent\textbf{SSO Login.} An SSO login procedure is launched when a user requests to log in to an RP.
-%, which calls three identifier-transformation functions following the login flow as shown in Figure~\ref{fig:process}.
+%, which calls three identifier-transformation functions following the login flow as shown in Figure \ref{fig:process}.
 %Once a user attempts to log into an RP, the SSO login is initiated.
 %We use the OIDC implicit protocol flow as an example, to demonstrate  how to integrate the three functions $\mathcal{F}_{ID_{U} \mapsto PID_{U}}$, $\mathcal{F}_{ID_{RP} \mapsto PID_{RP}}$ and $\mathcal{F}_{PID_{U} \mapsto Account}$ into the typical SSO systems.
-It consists of five phases, namely scripts downloading, RP identifier transformation, $PID_{RP}$ registration, identity proof generation, and $Account$ calculation, as shown in Figure~\ref{fig:process}.
+It consists of five phases, namely scripts downloading, RP identifier transformation, $PID_{RP}$ registration, identity proof generation, and $Account$ calculation, as shown in Figure \ref{fig:process}.
 
 
 \begin{comment}
@@ -262,7 +259,7 @@ The RP verifies the identity proof, derives the user's unique $Account$, and all
 \subsection{SSO Login Flow of UPPRESSO}
 \label{sebsec:loginprocess}
 
-We illustrate the steps of the SSO login protocol of UPPRESSO in Figure~\ref{fig:process}, %the SSO login sub-protocol provides the secure SSO service and prevents both the IdP-based login tracing and RP-based identity linkage.
+We illustrate the steps of the SSO login protocol of UPPRESSO in Figure \ref{fig:process}, %the SSO login sub-protocol provides the secure SSO service and prevents both the IdP-based login tracing and RP-based identity linkage.
  % prevents the curious IdP from obtaining the RP's identifying information during the interchanges,
 %  and avoids the adversary to break the security and user's privacy.
 and describe the detailed processes as follows.
@@ -344,7 +341,7 @@ The IdP ensures $PID_{RP}$ is unique among unexpired ones;
  otherwise, one identity proof for one $PID_{RP}$ might be accepted by other RPs.
 %The RP checks if Hash($N_{RP}$, $N_U$) matches,
 %    to ensure this is signed for it (not for other RPs).
-More details are analyzed in Section~\ref{sec:analysis}.
+More details are analyzed in Section \ref{sec:analysis}.
 
 \vspace{1mm}\noindent\textbf{ID Proof Generation.}
 In this phase, the user login continues and the IdP signs the identity proof. % The processes are as follows.
@@ -399,9 +396,9 @@ Among the five phases, the {\em scripts downloading} and {\em RP identifier tran
 %can be viewed as a customized step by the RP to derive its user account after the implicit protocol flow of OIDC ends.
 
 %So,the identity proof generation and $Account$ calculation phases of UPPRESSO can be viewed as a particular but compatible implementation of the implicit protocol flow of OIDC. It is worth noting that the identity proof generation and $Account$ calculation phases of
-UPPRESSO can also support the authorization code flow of OIDC with small modifications (to be discussed in Section~\ref{sec:discussion}).
+UPPRESSO can also support the authorization code flow of OIDC with small modifications (to be discussed in Section \ref{sec:discussion}).
 
-%As shown in Figure~\ref{fig:process}, in UPPRESSO, the SSO protocol for identity proof is the same as in OIDC; the formats of identity proof and corresponding request are the same as in OIDC; the correctness checks on the identity proof request at the IdP (i.e., consistency of RP' identifier and endpoint with the registered one) are the same as in OIDC; the correctness checks on the identity proof (i.e., consistency of RP' identifier with the one in the request, integrity, validity time, freshness, and etc.) at the RP are the same as in OIDC.
+%As shown in Figure \ref{fig:process}, in UPPRESSO, the SSO protocol for identity proof is the same as in OIDC; the formats of identity proof and corresponding request are the same as in OIDC; the correctness checks on the identity proof request at the IdP (i.e., consistency of RP' identifier and endpoint with the registered one) are the same as in OIDC; the correctness checks on the identity proof (i.e., consistency of RP' identifier with the one in the request, integrity, validity time, freshness, and etc.) at the RP are the same as in OIDC.
 %The above modifications could be completed automatically for each login, without affecting other communication pattern.
 
 %以下为描述Step 2.3到7的详细内容.
@@ -426,7 +423,7 @@ UPPRESSO can also support the authorization code flow of OIDC with small modific
 
 \begin{comment}
 \vspace{1mm}\noindent \textbf{Consistency with OIDC.}
-As shown in Figure~\ref{fig:UPPRESSO}, the architecture of UPPRESSO is the same as the one in OIDC. UPPRESSO does not introduce any new entity, but only integrates the three function $\mathcal{F}_{ID_{U} \mapsto PID_{U}}$, $\mathcal{F}_{ID_{RP} \mapsto PID_{RP}}$ and $\mathcal{F}_{PID_{U} \mapsto Account}$ into the processes at the IdP, RP, and user.
+As shown in Figure \ref{fig:UPPRESSO}, the architecture of UPPRESSO is the same as the one in OIDC. UPPRESSO does not introduce any new entity, but only integrates the three function $\mathcal{F}_{ID_{U} \mapsto PID_{U}}$, $\mathcal{F}_{ID_{RP} \mapsto PID_{RP}}$ and $\mathcal{F}_{PID_{U} \mapsto Account}$ into the processes at the IdP, RP, and user.
 
 The formats of the  identity proof and corresponding request, and the verification of the identity proof,  are almost same in OIDC and UPPRESSO.
 The only difference is that $ID_{RP}$ and endpoint are replaced with the privacy-preserving versions, i.e., $PID_{RP}$ and one-time endpoint, in UPPRESSO.
