@@ -51,17 +51,17 @@ It was also reported that some RPs of Google ID SSO accepted user attributes tha
     \hline
      {$Account$} & {A user's identifier at an RP: $A=  {ID_U}{ID_{RP}} $ (denoted as $A$ in equations).} & {Long-term} \\
     \hline
-    {$PID_{RP}$} & {$PID_{RP} = {N_{U}}{ID_{RP}} $, an RP's pseudo-identity.} & {One-time} \\
+    {$PID_{RP}$} & {$PID_{RP} = {N_{U}}{ID_{RP}} $, an RP's pseudo-identity.} & {Ephemeral} \\
     \hline
-    {$PID_U$} & {$PID_U = {ID_U}{PID_{RP}}$, a user's pseudo-identity.} & {One-time}\\
+    {$PID_U$} & {$PID_U = {ID_U}{PID_{RP}}$, a user's pseudo-identity.} & {Ephemeral} \\
     \hline
-    {$N_U$} & {A user-generated nonce for $PID_{RP}$.} & {One-time} \\
+    {$N_U$} & {A user-generated nonce for $PID_{RP}$.} & {Ephemeral} \\
     \hline
  %   {$N_{RP}$} & {An RP-generated nonce for $PID_{RP}$.} & {One-time variable} \\
   %  \hline
    % {$Y_{RP}$} & {$Y_{RP} = {ID_{RP}}^{N_{RP}} \bmod p$, the public value for $N_{RP}$.} & {One-time variable} \\
     %\hline
-    {$T$} & {The trapdoor to derive $Account$: $T=N_U^{-1} \bmod n$.} & {One-time} \\
+    {$T$} & {The trapdoor to derive $Account$: $T=N_U^{-1} \bmod n$.} & {Ephemeral} \\
     \hline
     \end{tabular}
     \label{tbl:notations}
@@ -117,7 +117,7 @@ Meanwhile, to prevent RP-based identity linkage, the IdP should not directly inc
   \vspace{-5mm}
 \end{figure}
 
-We illustrate the relationships among the identities, pseudo-identities and the identity tokens in Figure \ref{fig:IDCorrelation}. The red and green blocks represent long-term identities and one-time pseudo-identities, respectively. The arrows denote how the pseudo-identities can be obtained. To protect user privacy, the identity token should use only the one-time pseudo-identities %(as shown in the dashed block of Figure \ref{fig:IDCorrelation})
+We illustrate the relationships among the identities, pseudo-identities and the identity tokens in Figure \ref{fig:IDCorrelation}. The red and green blocks represent permanent identities and ephemeral pseudo-identities, respectively. The arrows denote how the pseudo-identities can be obtained. To protect user privacy, the identity token should use only the ephemeral pseudo-identities %(as shown in the dashed block of Figure \ref{fig:IDCorrelation})
 and $PID_U$ and $PID_{RP}$ should satisfy the above requirements. This causes a \textbf{\em privacy dilemma} for the IdP: given a user ($ID_U$) and an unknown RP ($PID_{RP}$), the IdP is expected to generate a pseudo-identity ($PID_{U}$), which should be correlated with the user's long-term account that uniquely identifies the user at that RP, {\em without knowing anything about the RP's identity nor the user account at the RP}.
 %however, the IdP is assumed to know nothing about the RP's identity nor the user account at the RP.
 
