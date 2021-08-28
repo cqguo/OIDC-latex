@@ -8,15 +8,15 @@ In this section, we discuss some related issues and our future work.
 %Scalbility
 \vspace{1mm}\noindent{\textbf{Scalability.}} The adversary cannot exhaust $ID_{RP}$ and $PID_{RP}$.
 For $ID_{RP}$, it is generated only in RP's initial registration.
-For $PID_{RP}$,  in practice, we only need to ensure all $PID_{RP}$s are different among the unexpired identity proof (the number denoted as $a$). We assume that IdP doesn't perform the uniqueness check, and then calculate the probability that at least two $PID_{RP}$s are equal in these $a$ ones. The probability is $1-\prod_{i=0}^{a-1}(1-i/q)$ which increases with $a$.
-For an IdP with throughput $2*10^8$ req/s, when the validity period of the identity proof ($PID_{RP}$) is set as 5 minutes, $a$ is less than $2^{36}$, then the probability is less than $2^{-183}$ for 256-bit $q$ (the order of base point $G$ on $P-256$).
+For $PID_{RP}$,  in practice, we only need to ensure all $PID_{RP}$s are different among the unexpired identity token (the number denoted as $a$). We assume that IdP doesn't perform the uniqueness check, and then calculate the probability that at least two $PID_{RP}$s are equal in these $a$ ones. The probability is $1-\prod_{i=0}^{a-1}(1-i/q)$ which increases with $a$.
+For an IdP with throughput $2*10^8$ req/s, when the validity period of the identity token ($PID_{RP}$) is set as 5 minutes, $a$ is less than $2^{36}$, then the probability is less than $2^{-183}$ for 256-bit $q$ (the order of base point $G$ on $P-256$).
 Moreover, as this probability is negligible, the uniqueness check of $PID_{RP}$, i.e., the $PID_{RP}$ registration, could be removed in the SSO login process, and this optimization can be adopted when this negligible probability is acceptable by the users and RPs.
 
 %DoS
 %Security against ID exhaustion DoS
 %1.用户被鉴别过的，可以事后审计的； 2. IdP， 本来对OIDC是做一次数字签名， 加了一次模幂，资源消耗 --> DoS attack
 \noindent{\textbf{Security against DoS attack.}}
-The adversary may attempt to perform DoS attack on the IdP and RP. For example, the adversary may act as a user to invoke the $PID_{RP}$ registration (Step 3.1) and identity proof generation (Step 4.3) at the IdP, which requires the IdP to perform two signature generations and one modular exponentiation.
+The adversary may attempt to perform DoS attack on the IdP and RP. For example, the adversary may act as a user to invoke the $PID_{RP}$ registration (Step 3.1) and identity token generation (Step 4.3) at the IdP, which requires the IdP to perform two signature generations and one modular exponentiation.
 However, as the user has already been authenticated at the IdP, the IdP could identify the malicious users based on audit, in addition to the existing DoS mitigation schemes.
 %The adversary may act as a user requesting to log into an RP, and make the RP perform two modular exponentiations.
 %The RP could previously calculated a set of $Y_{RP}$s to mitigate this attack.
@@ -24,8 +24,8 @@ However, as the user has already been authenticated at the IdP, the IdP could id
 
 %授权码
 %兼容:目前只提供隐式模式,对其他模式与协议的兼容方法
-\vspace{1mm}\noindent{\textbf{OIDC authorization code flow support.}} The privacy-preserving functions $\mathcal{F}_{ID_{U} \mapsto PID_{U}}$, $\mathcal{F}_{ID_{RP} \mapsto PID_{RP}}$ and $\mathcal{F}_{PID_{U} \mapsto Account}$ can be integrated into OIDC authorization code flow directly, therefore  RP-based identity linkage and IdP-based login tracing are still prevented during the construction and parsing of identity proof.
-The only privacy leakage is introduced by the transmission, as RP servers obtain the identity proof directly from the IdP in this flow, which allows the IdP to obtain RP's network information (e.g., IP address).
+\vspace{1mm}\noindent{\textbf{OIDC authorization code flow support.}} The privacy-preserving functions $\mathcal{F}_{ID_{U} \mapsto PID_{U}}$, $\mathcal{F}_{ID_{RP} \mapsto PID_{RP}}$ and $\mathcal{F}_{PID_{U} \mapsto Account}$ can be integrated into OIDC authorization code flow directly, therefore  RP-based identity linkage and IdP-based login tracing are still prevented during the construction and parsing of identity token.
+The only privacy leakage is introduced by the transmission, as RP servers obtain the identity token directly from the IdP in this flow, which allows the IdP to obtain RP's network information (e.g., IP address).
 UPPRESSO needs to integrate existing anonymous networks (e.g., Tor)  to prevent this leakage.
 
 %平台无关
@@ -63,4 +63,4 @@ UPPRESSO needs to integrate existing anonymous networks (e.g., Tor)  to prevent 
 \noindent{\textbf{Malicious IdP mitigation.}} The IdP is assumed to assign a unique $ID_{RP}$ in $Cert_{RP}$ for each RP and generate the correct $PID_U$ for each login. The malicious IdP may attempt to provide the incorrect $ID_{RP}$ and $PID_U$, which could be prevented by integrating certificate transparency \cite{rfc6962} and user's identifier check \cite{SPRESSO}. With certificate transparency \cite{rfc6962}, the monitors  check the uniqueness of $ID_{RP}$ among all the certificates stored in the log server. To prevent the malicious IdP from injecting any incorrect $PID_U$, the user could provide a nickname to the RP for an extra check as in SPRESSO \cite{SPRESSO}.
 
 \noindent{\textbf{Identity linkage through cookie.}}
-In UPPRESSO, IdP does not provide any distinctive information (such as $ID_U$) of each user to RP, which avoids RP-based identity linkage. However, the cookie of each user may be exploited by RPs to correlate the same user. For instance, while the user has logged in to $RP_A$ with $Account_A$, RP may redirect the user's $Account_A$ to $RP_B$ through the hidden iframe. That is, as long as the user has logged in to $RP_B$ with $Account_B$, the user would be correlated. Moreover, this attack is not only appeared in SSO systems, but also existed in all user-account systems. However, this attack can be easily detected through multiple methods, such as checking the iframe in the script, observing redirection flow through browser network tool, and detecting the redirection based on the browser extension. 
+In UPPRESSO, IdP does not provide any distinctive information (such as $ID_U$) of each user to RP, which avoids RP-based identity linkage. However, the cookie of each user may be exploited by RPs to correlate the same user. For instance, while the user has logged in to $RP_A$ with $Account_A$, RP may redirect the user's $Account_A$ to $RP_B$ through the hidden iframe. That is, as long as the user has logged in to $RP_B$ with $Account_B$, the user would be correlated. Moreover, this attack is not only appeared in SSO systems, but also existed in all user-account systems. However, this attack can be easily detected through multiple methods, such as checking the iframe in the script, observing redirection flow through browser network tool, and detecting the redirection based on the browser extension.

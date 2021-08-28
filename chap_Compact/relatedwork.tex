@@ -34,60 +34,60 @@ The SSO standards (e.g., SAML, OAuth, and OIDC) have been formally analyzed.
 Fett et al. \cite{FettKS16, FettKS17} have conducted a formal analysis on OAuth 2.0 and OIDC standards based on an expressive Dolev-Yao style model \cite{FettKS14},
 and proposed two new attacks, i.e., 307 redirect attack and IdP Mix-Up attack.
 When the IdP misuses HTTP 307 status code for redirection, the sensitive information (e.g., credentials) entered at the IdP will  be leaked to the RP by the user's browser.
-While the IdP Mix-Up attack confuses the RP about which IdP is used and makes the victim RP send the identity proof to the malicious IdP, which breaks the confidentiality of the identity proof.
+While the IdP Mix-Up attack confuses the RP about which IdP is used and makes the victim RP send the identity token to the malicious IdP, which breaks the confidentiality of the identity token.
 Fett et al. \cite{FettKS16, FettKS17} have proved that OAuth 2.0 and OIDC are secure once these two attacks are prevented. UPPRESSO could be integrated into OIDC, which simplifies its security analysis.
-\cite{ArmandoCCCT08} formally analyzed SAML and its variant proposed by Google, and found that Google's variant of SAML doesn't set RP's identifier in the identity proof, which breaks RP designation.
+\cite{ArmandoCCCT08} formally analyzed SAML and its variant proposed by Google, and found that Google's variant of SAML doesn't set RP's identifier in the identity token, which breaks RP designation.
 
 \begin{comment}
 \noindent\textbf{Single sign-off.} In SSO systems, once a user's IdP account is compromised, the adversary could hijack all her RPs' accounts.
 A backwards-compatible extension, named single sign-off, is proposed for OIDC.
-The single sign-off  allows the user to revoke all her identity proofs and notify all RPs to freeze her accounts \cite{GhasemisharifRC18}.
-The single sign-off could also be achieved in UPPRESSO, where the user needs to revoke the identity proofs at all RPs, as the IdP doesn't know which RPs the user visits.
+The single sign-off  allows the user to revoke all her identity tokens and notify all RPs to freeze her accounts \cite{GhasemisharifRC18}.
+The single sign-off could also be achieved in UPPRESSO, where the user needs to revoke the identity tokens at all RPs, as the IdP doesn't know which RPs the user visits.
 \end{comment}
 
 
 \noindent\textbf{Analysis of SSO implementations.}
-Various vulnerabilities were found in SSO implementations, and then exploited for impersonation and identity injection attacks by breaking the confidentiality \cite{WangCW12,ccsSunB12,ArmandoCCCPS13,DiscoveringJCS,dimvaLiM16}, integrity \cite{WangCW12,SomorovskyMSKJ12,WangZLG16,MainkaMS16, MainkaMSW17,dimvaLiM16} or RP designation \cite{WangZLG16,MainkaMS16,MainkaMSW17,YangLCZ18,dimvaLiM16} of identity proof. Wang et al. \cite{WangCW12} analyzed the SSO implementations of Google and Facebook from the view of the browser relayed traffic and found logic flaws in IdPs and RPs to break the confidentiality and integrity of identity proof.
-An authentication flaw was found in Google Apps \cite{ArmandoCCCPS13}, allowing a malicious RP to hijack a user's authentication attempt and inject the malicious code to steal the cookie (or identity proof) for the targeted RP, breaking the confidentiality.
+Various vulnerabilities were found in SSO implementations, and then exploited for impersonation and identity injection attacks by breaking the confidentiality \cite{WangCW12,ccsSunB12,ArmandoCCCPS13,DiscoveringJCS,dimvaLiM16}, integrity \cite{WangCW12,SomorovskyMSKJ12,WangZLG16,MainkaMS16, MainkaMSW17,dimvaLiM16} or RP designation \cite{WangZLG16,MainkaMS16,MainkaMSW17,YangLCZ18,dimvaLiM16} of identity token. Wang et al. \cite{WangCW12} analyzed the SSO implementations of Google and Facebook from the view of the browser relayed traffic and found logic flaws in IdPs and RPs to break the confidentiality and integrity of identity token.
+An authentication flaw was found in Google Apps \cite{ArmandoCCCPS13}, allowing a malicious RP to hijack a user's authentication attempt and inject the malicious code to steal the cookie (or identity token) for the targeted RP, breaking the confidentiality.
 The integrity has been tampered with in SAML, OAuth and OIDC systems  \cite{SomorovskyMSKJ12,WangCW12,WangZLG16,MainkaMS16, MainkaMSW17},
 due to various vulnerabilities, such as  XML Signature wrapping (XSW) \cite{SomorovskyMSKJ12}, RP's incomplete verification \cite{WangCW12,WangZLG16,MainkaMSW17}, IdP spoofing \cite{MainkaMS16,MainkaMSW17} and etc.
-And, a dedicated, the bidirectional authenticated secure channel was proposed to improve the confidentiality and integrity of identity proof \cite{CaoSBKVC14}.
+And, a dedicated, the bidirectional authenticated secure channel was proposed to improve the confidentiality and integrity of identity token \cite{CaoSBKVC14}.
 Vulnerabilities were also found to break the RP designation, such as the incorrect binding  at IdPs \cite{YangLCZ18,WangZLG16}, insufficient verification at RPs \cite{MainkaMS16,MainkaMSW17,YangLCZ18}.
-Automatical tools, such as SSOScan \cite{ZhouE14}, OAuthTester \cite{YangLLZH16} and S3KVetter \cite{YangLCZ18}, have been designed to detect vulnerabilities causing violations of confidentiality, integrity, or RP designation in identity proofs.
+Automatical tools, such as SSOScan \cite{ZhouE14}, OAuthTester \cite{YangLLZH16} and S3KVetter \cite{YangLCZ18}, have been designed to detect vulnerabilities causing violations of confidentiality, integrity, or RP designation in identity tokens.
 
 
 \begin{comment}
 \noindent\textbf{Analysis on mobile SSO systems.}
 %1.	WebSSO中有browser来完成，2. Mobile SSO中，system browser和webview无法识别RP、IdP App可能被重打包。
-In mobile SSO systems, the IdP App, IdP-provided SDK (e.g., an encapsulated WebView) or system browser are adopted to redirect identity proof from IdP App to RP App.
-However, none of them was trusted to ensure that the identity proof could be only sent to the designated RP \cite{ChenPCTKT14,WangZLLYLG15}, as WebView and  system browser cannot authenticate RP App while the IdP App may be repackaged.
+In mobile SSO systems, the IdP App, IdP-provided SDK (e.g., an encapsulated WebView) or system browser are adopted to redirect identity token from IdP App to RP App.
+However, none of them was trusted to ensure that the identity token could be only sent to the designated RP \cite{ChenPCTKT14,WangZLLYLG15}, as WebView and  system browser cannot authenticate RP App while the IdP App may be repackaged.
 %A framework named SecureOAuth \cite{MohsenS16} was proposed to harden the WebView-based SSO implementations in Android.
 %Ye et al. \cite{YeBWD15} performed an analysis of  SSO implementations for Android, and found a vulnerability of Facebook Login which leaked the Facebook's session cookie to the  malicious RP applications.
 Moreover, the SSO protocols needed to be modified to provide SSO services for mobile Apps, however these modifications were not well understood by RP developers \cite{ChenPCTKT14,YangLS17}.
-The top Android applications have been analyzed \cite{TowardsShehabM14,ChenPCTKT14,WangZLLYLG15,YangLS17,ShiWL19}, and vulnerabilities were found to break the confidentiality \cite{TowardsShehabM14,ChenPCTKT14,WangZLLYLG15,YangLS17,ShiWL19}, integrity \cite{ChenPCTKT14,YangLS17}, and RP designation \cite{ChenPCTKT14,ShiWL19} of identity proof.
-%Automatic analyzing tools, MoSSOT \cite{ShiWL19}, was proposed to detect vulnerabilities in mobile SSO systems. %, and plenty of vulnerabilities were found in the top Android applications to break the confidentiality and RP designation of identity proof.
+The top Android applications have been analyzed \cite{TowardsShehabM14,ChenPCTKT14,WangZLLYLG15,YangLS17,ShiWL19}, and vulnerabilities were found to break the confidentiality \cite{TowardsShehabM14,ChenPCTKT14,WangZLLYLG15,YangLS17,ShiWL19}, integrity \cite{ChenPCTKT14,YangLS17}, and RP designation \cite{ChenPCTKT14,ShiWL19} of identity token.
+%Automatic analyzing tools, MoSSOT \cite{ShiWL19}, was proposed to detect vulnerabilities in mobile SSO systems. %, and plenty of vulnerabilities were found in the top Android applications to break the confidentiality and RP designation of identity token.
 \end{comment}
 
 %以下内容被拆分到上面三点内容了，但是注释内容有对论文的详细表述
 \begin{comment}
-%Various attacks were proposed for the impersonation attack and identity injection, by breaking the confidentiality, integrity and binding of identity proof,
+%Various attacks were proposed for the impersonation attack and identity injection, by breaking the confidentiality, integrity and binding of identity token,
 %and extensive efforts have been devoted to the security considerations of SSO systems.
 %analysis of 14 major SAML frameworks and show that 11 of them, including Salesforce, Shibboleth, and IBM XS40, have critical XML Signature wrapping (XSW) vulnerabilities
-XML Signature wrapping (XSW) vulnerabilities were found in 11 major SAML implementations (e.g., the ones provided by Salesforce, Shibboleth, and IBM XS40) \cite{SomorovskyMSKJ12}, which was used to break the integrity of identity proof.
+XML Signature wrapping (XSW) vulnerabilities were found in 11 major SAML implementations (e.g., the ones provided by Salesforce, Shibboleth, and IBM XS40) \cite{SomorovskyMSKJ12}, which was used to break the integrity of identity token.
 %Juraj et al.\cite{SomorovskyMSKJ12} breaks the integrity, by exploiting the XSW vulnerabilities to  insert malicious elements in 11 SAML frameworks.
 Wang et al. \cite{WangCW12} performed a traffic analysis on SSO implementations provided by Google and Facebook, and broke the integrity and confidentiality to sign onto the victim's account.
-%, including bypassing the verification of signature (braking integrity), leaking of identity proof (breaking confidentiality) and so on.
+%, including bypassing the verification of signature (braking integrity), leaking of identity token (breaking confidentiality) and so on.
 %In 2014 Zhou et al. \cite{ZhouE14}, in 2016 Wang et al. \cite{WangZLG16} and Yang et al. \cite{YangLLZH16} built the automatic tester to analyse the implementations of existing applications and achieve the statistical result of these applications.
-%The usual vulnerabilities found in these works includes, 1) using bearer token for authentication (break binding); 2) using publicly accessible information as identity proof (breaking confidentiality); 3) client-side protocol logic (breaking integrity) and so on.
-The vulnerabilities \cite{ZhouE14,WangZLG16,YangLLZH16} were found in the RP's implementations of OAuth, for example, the bearer token or publicly accessible information is misused as the identity proof which allows the breaking of binding or confidentiality, the incomplete verification at the client breaks the integrity.
-%MainkaMS16 针对OpenID，描述的是恶意的IdP影响到RP集成的其他正确IdP上的用户信息，主要是 ID Spoofing: 恶意的IdP以正确的IdP名义签发identity proof；Key Confusion 让RP 以为恶意IdP的key是对应正确IdP的。
+%The usual vulnerabilities found in these works includes, 1) using bearer token for authentication (break binding); 2) using publicly accessible information as identity token (breaking confidentiality); 3) client-side protocol logic (breaking integrity) and so on.
+The vulnerabilities \cite{ZhouE14,WangZLG16,YangLLZH16} were found in the RP's implementations of OAuth, for example, the bearer token or publicly accessible information is misused as the identity token which allows the breaking of binding or confidentiality, the incomplete verification at the client breaks the integrity.
+%MainkaMS16 针对OpenID，描述的是恶意的IdP影响到RP集成的其他正确IdP上的用户信息，主要是 ID Spoofing: 恶意的IdP以正确的IdP名义签发identity token；Key Confusion 让RP 以为恶意IdP的key是对应正确IdP的。
 %We found two novel classes of attacks, ID Spoofing (IDS) and Key Confusion (KC), on OpenID, which were not covered by previous research. Both attack classes allow compromising the security of all accounts on a vulnerable SP, even if those accounts were not allowed to use the malicious IdP.
 %MainkaMSW17 是将MainkaMS16 用到OpenID connect的自动化工具
 The integrity may be broken in OpenID connection implementations \cite{MainkaMS16, MainkaMSW17}.
 %Christian et al. \cite{MainkaMS16, MainkaMSW17} proposed the corrupted IdP might compromise the account in the RP associated with other IdPs, which break the confidentiality and integrity of SSO systems.
 %ArmandoCCCPS13 针对SAML和OpenID，攻击者利用浏览器的漏洞，将用户与RP之间的cookie发送给了恶意的RP，破坏机密性。具体地，就是讲恶意的js代码插在relaystate参数中，破坏同源策略。
 %As we can see in the figure, c requires a resource from a compromised SP i; i, acting in turn as a client, receives from sp an Authentication Request, and passes it back to c, with the malicious code injected into theRelayState. The client’s browser eventually executes the redirection to the maliciously-crafted URI, as if coming from the Google domain (thus circumventing the same origin policy). This redirection leads to the theft of theHID, HUSR, and ASIDAScookies by sp.
-Armando et al. \cite{ArmandoCCCPS13} exploits the vulnerability at the user agent, to transmit the identity proof to the adversary.
+Armando et al. \cite{ArmandoCCCPS13} exploits the vulnerability at the user agent, to transmit the identity token to the adversary.
 %Besides, other analysis about SSO systems in various directions, such as in 2013 Armando et al. \cite{ArmandoCCCPS13} issued the specific code injection in Google SSO system results in the impersonate attack,
 %CaoSBKVC14 指出impersonation attacks的root cause是IdP和RP之间没有一个安全信道实现机密性和完整性，其introduce a dedicated, authenticated, bidirectional, secure channel，具体的是针对RP标识，不再使用一个随机的appid，而是 an unforgeable identifier to represent the identity of an RP（直接用他的域名 the identity of the RP is its web origin）；安全信道是按需建立类似于TLS的双向认证通道，且使用完之后销毁。
 Cao et al. \cite{CaoSBKVC14} proposed a dedicated, authenticated, bidirectional, secure channel between RP and RP, to improve the confidentiality and integrity.
@@ -99,10 +99,10 @@ Yang et al. \cite{YangLCZ18} analysed the SDK implementation of OAuth 2.0, and a
 \end{comment}
 
 %MohsenS16分析了在移动端使用webview实现SSO会导致恶意RP可以向WebView中插入JS代码获取用户的token （confidentiality），同时提供了对WebView的保护防止恶意RP获得token
-%WangZLLYLG15 使用自动化工具对Android应用进行分析，总结了Android应用面临的安全问题：1 Vulnerability I (V1): Improper User-agent（使用WebView实现SSO）， 2 Vulnerabili ty II (V2): Lack of Authentication（使用app间消息传递实现SSO）， 3 Vulnerability III (V3): Inadequate transmission protection （网络传输缺少保护）， 4 Vulnerabili ty IV (V4): Insecure secret Management （上面的 client-side logic）， 5 Vulnerability V (V5): Problematical server-side validation （RP server与IdP server之间的消息传递没有受到保护，用户的信息可能被泄露，用户信息可能被篡改）， 6 Vulnerabili ty VI (V6): Wrong authentication proof （使用公开信息作为identity proof，破坏confidentiality ）
-%YangLS17 使用工具分析Android 应用OAuth实现的问题：1 Untrusted Identity Proof （使用server-to-server transmission保护，使用签名保护 integrity）， 2 Heavy Client-Side Logic（客户端逻辑）
+%WangZLLYLG15 使用自动化工具对Android应用进行分析，总结了Android应用面临的安全问题：1 Vulnerability I (V1): Improper User-agent（使用WebView实现SSO）， 2 Vulnerabili ty II (V2): Lack of Authentication（使用app间消息传递实现SSO）， 3 Vulnerability III (V3): Inadequate transmission protection （网络传输缺少保护）， 4 Vulnerabili ty IV (V4): Insecure secret Management （上面的 client-side logic）， 5 Vulnerability V (V5): Problematical server-side validation （RP server与IdP server之间的消息传递没有受到保护，用户的信息可能被泄露，用户信息可能被篡改）， 6 Vulnerabili ty VI (V6): Wrong authentication token （使用公开信息作为identity token，破坏confidentiality ）
+%YangLS17 使用工具分析Android 应用OAuth实现的问题：1 Untrusted Identity Token （使用server-to-server transmission保护，使用签名保护 integrity）， 2 Heavy Client-Side Logic（客户端逻辑）
 %ShiWL19 使用model-based的自动化工具，分析了Android应用OAuth实现的问题，包括：Access Token Replacement（替换token，破坏binding）， access token Disclosure （confidentiality）， code Disclosure （confidentiality），App Secret Disclosure （客户端逻辑，只曝露secret不会破坏安全性），Augmented Token Replacement （提供token与RP的绑定，但是可以被绕过， the attacker can extract the associated user information of victims from the IdP directly with either the stolen (i.e., network attacker) or obtained (i.e., malicious RP attacker) token, e.g., replaying Step 7 in Fig. 1. Consequently, the attacker can inject both the token and its corresponding user information in his own session），Profile Vulnerability（缺少用户明确授权，泄露用户的隐私数据）
-% In 2016 Mohsen et al. \cite{MohsenS16} proposed the security of SSO systems implemented through WebView, one of the most important Android components, also facing the threaten of untrusted identity proof transmission.
+% In 2016 Mohsen et al. \cite{MohsenS16} proposed the security of SSO systems implemented through WebView, one of the most important Android components, also facing the threaten of untrusted identity token transmission.
 % Moreover, in 2016 Wang et al. \cite{WangZLG16} analysed the design and implementation of SSO systems for multiple platforms with the automatic testing. In 2015 Wnag et al. \cite{WangZLLYLG15}, in 2017 Yang et al. \cite{YangLS17} and in 2019 Shi et al. \cite{ShiWL19} issued the new vulnerabilities in mobile SSO systems and conducted security assessments for the top Android applications and and achieve the statistical result of these applications.
 
 %YeBWD15在facebook的webview实现中，通过第三方应用获得facebook的cookie，使攻击者能够以受害者的身份登录facebook应用。we build a dummy app using the Facebook Login and we authorize the app with public profile permission. Then we used adb tool kit with root privilege to access to storage of the mobile phone. We successfully locate the cookies c_user and xs as well as the credential access_token. The cookies are stored in an sqlite database in mobile phone’s storage at path /data/data/<Apps package name> /databases/webviewCookiesChromium.db and the access_token is stored in an xml file at path /data/data/<App’s package name> /com.facebook.AuthorizationClient. WebViewAuthHandler.TOKEN\_STORE\_KEY.xml.

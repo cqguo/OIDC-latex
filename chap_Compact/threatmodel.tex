@@ -19,16 +19,16 @@ Malicious users and RPs may behave arbitrarily or collude with each other, attem
 \noindent \textbf{Curious-but-honest IdP.}
 A curious-but-honest IdP strictly follows the protocol, while being interested in learning user privacy.  %without violating the protocol.
 For example, it may store all the received messages to infer the relationship among $ID_U$, $ID_{RP}$, $PID_{U}$, and $PID_{RP}$ to trace a user's login activities at multiple RPs. We also assume the IdP is well-protected. %and never leaks sensitive information.
-For example, the IdP is trusted to maintain the private key for signing identity proofs and RP certificates. %(see Section \ref{implementations} for details)
-So, the adversaries cannot forge an identity proof or an RP certificate.
+For example, the IdP is trusted to maintain the private key for signing identity tokens and RP certificates. %(see Section \ref{implementations} for details)
+So, the adversaries cannot forge an identity token or an RP certificate.
 %An honest IdP %follows the protocols to process the requests from users and RPs, and
 %should not collude with malicious RPs or users,
 %For example, the IdP ensures the uniqueness of $ID_{RP}$ and $ID_{U}$ when an RP or a user registers, and calculates the pseudo-identity as the UPPRESSO protocol specifies.
 %However,
 We do not consider the collusion of the IdP and RPs.
 
-%User's goal: 向IdP发送identity proof，使IdP认为自己是另一个victim
-%方式：1）已经拥有有效的identity proof，希望与IdP协商出相同的PID_RP；2）通过篡改或者伪造identity proof来实现攻击
+%User's goal: 向IdP发送identity token，使IdP认为自己是另一个victim
+%方式：1）已经拥有有效的identity token，希望与IdP协商出相同的PID_RP；2）通过篡改或者伪造identity token来实现攻击
 
 %\vspace{0.5mm}
 \noindent \textbf{Malicious Users.}
@@ -37,21 +37,21 @@ We assume the adversary can control a set of users, for example by stealing user
 %to break the security of UPPRESSO.
 They may impersonate a victim user at honest RPs, or trick a victim user to log in to an honest RP under the adversary's account.
 %To achieve this, they could behave arbitrarily \cite{WangCW12, SomorovskyMSKJ12}.
-For example, a malicious user may %forge the identity proof,
-modify, insert, drop or replay a message, or deviate arbitrarily from the specifications when processing $ID_{RP}$, $PID_{RP}$, and identity proofs.
+For example, a malicious user may %forge the identity token,
+modify, insert, drop or replay a message, or deviate arbitrarily from the specifications when processing $ID_{RP}$, $PID_{RP}$, and identity tokens.
 
-% the forwarding messages (requests of identity proof, identity proof,  RP registration request and result, and etc.),
+% the forwarding messages (requests of identity token, identity token,  RP registration request and result, and etc.),
 %  and provide incorrect values for negotiating $PID_{RP}$ (detailed in Section \ref{implementations}).
 
-%RP's goal:1)获得目前登录用户在其他RP可用的identity proof；2）collusive RP 关联用户
+%RP's goal:1)获得目前登录用户在其他RP可用的identity token；2）collusive RP 关联用户
 %\vspace{0.5mm}
 \noindent \textbf{Malicious RPs.}
 The adversary can also control a set of RPs, for example, by directly registering at the IdP as an RP or exploiting software vulnerabilities to compromise some RPs.
 The malicious RPs may behave arbitrarily to break security and privacy guarantees.
-To do so, %they may attempt to obtain a valid identity proof for another RP, to allow some user to log into this target RP:
-a malicious RP may manipulate its $PID_{RP}$ to trick the users to submit identity proofs generated for an honest RP to itself. %and reply them,
-%when a user is logging in, to receive an identity proof that will be accepted by the target RP verifying $PID_{RP}$ but not $ID_{RP}$.
-% or constructing an incorrect request to trigger the IdP issuing an identity proof binding with other RP.
+To do so, %they may attempt to obtain a valid identity token for another RP, to allow some user to log into this target RP:
+a malicious RP may manipulate its $PID_{RP}$ to trick the users to submit identity tokens generated for an honest RP to itself. %and reply them,
+%when a user is logging in, to receive an identity token that will be accepted by the target RP verifying $PID_{RP}$ but not $ID_{RP}$.
+% or constructing an incorrect request to trigger the IdP issuing an identity token binding with other RP.
 %Or, the malicious RPs may collude to perform RP-based identity linkage to break user privacy.
 %For example, the RPs
 Or, it may manipulate its $PID_{RP}$ to affect the generation of $PID_U$ and analyze the relationship between $PID_U$ and $Account$.
@@ -61,15 +61,15 @@ Or, it may manipulate its $PID_{RP}$ to affect the generation of $PID_U$ and ana
 \noindent \textbf{Collusive Users and RPs.} %In particular,
 Malicious users and RPs may collude with each other %and behave arbitrarily,
 to break the security and privacy guarantees.
-For example, the adversary can first pretend to be an honest RP and trick the victim user into submitting her identity proof to it. With the valid identity proof, it can impersonate the victim user and log in to the honest RP.
-%For example, malicious users and RPs may manipulate $PID_U$ and $PID_{RP}$ in an identity proof collusively to perform the impersonation or identity injection attacks.
+For example, the adversary can first pretend to be an honest RP and trick the victim user into submitting her identity token to it. With the valid identity token, it can impersonate the victim user and log in to the honest RP.
+%For example, malicious users and RPs may manipulate $PID_U$ and $PID_{RP}$ in an identity token collusively to perform the impersonation or identity injection attacks.
 %Or,
 %    they collude to
 
-%the adversary may first act as a malicious RP, and make an incorrect identity proof generated for the visiting user,
-%  then act a malicious user, and use this identity proof to impersonate this victim user at another RP.
-%The adversary could also first act as a user to login a correct RP and obtain an identity proof,
-% then act a malicious RP to perform the identity injection attack, by injecting this identity proof to the session between the victim user and the correct RP with other web attacks (e.g., CSRF).
+%the adversary may first act as a malicious RP, and make an incorrect identity token generated for the visiting user,
+%  then act a malicious user, and use this identity token to impersonate this victim user at another RP.
+%The adversary could also first act as a user to login a correct RP and obtain an identity token,
+% then act a malicious RP to perform the identity injection attack, by injecting this identity token to the session between the victim user and the correct RP with other web attacks (e.g., CSRF).
 
 
 \subsection{Assumptions}
