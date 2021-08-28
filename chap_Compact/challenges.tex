@@ -124,7 +124,11 @@ and $PID_U$ and $PID_{RP}$ should satisfy the above requirements. This causes a 
 \subsection{The Identifier-Transformation Framework}
 \label{subsec:solutions}
 
-To solve the dilemma, we should provide the IdP some information related to the user's $Account$ at the RP to assist the generation of $PID_U$, so that $PID_U$ can be correctly correlated with the $Account$. Meanwhile, such information should not provide any additional knowledge for the IdP to derive the RP's identity, or for two RPs to correlate two $Account$s belonging to the same user. Therefore, the privacy protection problem can be converted into an identifier-transformation problem, which aims to design three identifier-transformation functions $\mathcal{F}_{ID_{U} \mapsto PID_U}$, $\mathcal{F}_{ID_{RP} \mapsto PID_{RP}}$, and $\mathcal{F}_{PID_{U} \mapsto Account}$ to compute $PID_U$, $PID_{RP}$, and $Account$, which have the above desired properties.
+To solve the dilemma, we explicitly distinguish a user's identity at the RP (called \emph{account}) from the ,
+    the user identity in the tokens, and the user identity at the IdP.
+
+we should provide the IdP some information related to the user's $Account$ at the RP to assist the generation of $PID_U$,
+ so that $PID_U$ can be correctly correlated with the $Account$. Meanwhile, such information should not provide any additional knowledge for the IdP to derive the RP's identity, or for two RPs to correlate two $Account$s belonging to the same user. Therefore, the privacy protection problem can be converted into an identifier-transformation problem, which aims to design three identifier-transformation functions $\mathcal{F}_{ID_{U} \mapsto PID_U}$, $\mathcal{F}_{ID_{RP} \mapsto PID_{RP}}$, and $\mathcal{F}_{PID_{U} \mapsto Account}$ to compute $PID_U$, $PID_{RP}$, and $Account$, which have the above desired properties.
 
 To achieve this goal, UPPRESSO constructs three transformation functions in an integrated way to support {\em transformed RP designation} and {\em trapdoor user identification}, where (a) different $PID_U$s and $PID_{RP}$s are dynamically generated in different logins; (b) in each login session, $PID_{RP}$ is used to assist the generation of $PID_U$, which helps to link $PID_U$ to $Account$ using the trapdoor of this login session.%; and (c) when a user logs in to an RP multiple times, the RP can correlate each pair of $PID_U$ and $PID_{RP} with an invariant $Account$.
 
