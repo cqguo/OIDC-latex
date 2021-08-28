@@ -4,7 +4,7 @@
 
 This section introduces the popular OIDC \cite{OpenIDConnect},
  to explain typical SSO login flows.
-Then, we discuss existing privacy-preserving SSO solutions and other related works.
+Then, we discuss existing privacy-preserving SSO solutions and also other related works.
 
 \subsection{OpenID Connect}
 \label{subsec:OIDC}
@@ -82,18 +82,26 @@ For a certain user,
 However, PPID-based approaches cannot prevent the IdP-based login tracing,
  since the IdP needs to know which RP the user visits to generate the identify tokens.
 
-+++++++++++++++++
+BrowserID \cite{BrowserID} and SPRESSO \cite{SPRESSO} are proposed to defend SSO services against the IdP-based login tracing,
+    but both solutions are still vulnerable to the threat of RP-based identity linkage.
+In BrowserID (and its prototypes known as Mozilla Persona \cite{persona} and Firefox Accounts \cite{FirefoxAccount}),
+ the IdP issues a special ``token'' to bind the user identity to a short-lived public key,
+ so that the user uses the corresponding private key to sign a subsidiary identity token
+    to bind his identity with the RP identity and send both tokens to the RP.
+When a user logins different RPs, the RPs could extract the identical user identities
+    from different pairs of tokens and link these logins.
+Meanwhile,
+    the RP of SPRESSO creates a one-time but verifiable pseudo-identity for itself in each login instance.
+Then, the IdP generates an identity token binding this RP pseudo-identity and the user identity. %and returns it through a trusted third-party entity called forwarder.
+Similarly, the RPs could link a user's multiple logins based on his unique user identity in these tokens.
 
-BrowserID \cite{BrowserID} and SPRESSO \cite{SPRESSO} proposed to defend against IdP-based login tracing.
-However, both solutions are vulnerable to RP-based identity linkage.
-In BrowserID (and its prototypes known as Mozilla Persona \cite{persona} and Firefox Accounts \cite{FirefoxAccount}), the IdP does not know the identity of the requesting RP.
-Instead, it generates a special ``identity token'' to bind the user's unique identifier (e.g., email address) to a public key,
- so that the user can sign another subsidiary identity token to bind her identity with the RP's identity and send both identity tokens to the RP.
-Obviously, when a user logs in to different RPs, the RPs can extract the same user identifier
- from different identity tokens and correlate these logins.
-In SPRESSO, the RP creates a one-time pseudo-identity for itself at each login.
-Then, the IdP generates an identity token binding this pseudo-identity of the RP and the user's identity (i.e., email address). %and returns it through a trusted third-party entity called forwarder.
-Similarly, the RPs can correlate a user's logins using her unique identifier in the identity tokens.
+It is worth noting that PPIDs cannot be directly integrated in either BrowserID or SPRESSO.
+Permanent PPIDs are assigned in identity tokens based on the visited RP \cite{NIST2017draft,OpenIDConnect, SAMLIdentifier},
+    but the IdP receives (\emph{a}) nothing about the visited RP in BrowserID
+     or (\emph{b}) a one-time pseudo-identity of the RP in SPRESSO.
+    
+    
++++++++++++++++++
 
 \begin{comment}
 
