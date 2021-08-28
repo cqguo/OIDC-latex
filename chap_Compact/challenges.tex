@@ -1,4 +1,4 @@
-\section{The Identity-Transformation Framework and UPPRESSO Overview}
+\section{The Identity-Transformation Framework of UPPRESSO}
 %\section{The Identifier-Transformation Approach of UPPRESSO}
 \label{sec:challenge}
 Next, we overview the required security and privacy properties of an SSO system. Then, we conceptualize the SSO privacy problem as an identifier-transformation problem and explain the privacy dilemma behind existing solutions. Finally, we present the design goals of UPPRESSO. %'s identifier-transformation framework.
@@ -95,8 +95,7 @@ For example, Friendcaster was found to accept any received identity token \cite{
 \end{comment}
 
 
-%\subsection{The Identity Dilemma of Privacy-Preserving SSO}
-\subsection{The Identify Dilemma in SSO Identity Tokens}
+\subsection{The Identify Dilemma of Privacy-Preserving SSO}
 \label{subsec:challenges}
 
 %As discussed in Section \ref{sec:intro}, existing SSO systems are vulnerable to IdP-based login tracing and RP-based identity linkage privacy leakage.
@@ -122,10 +121,10 @@ We illustrate the relationships among the identities, pseudo-identities and the 
 and $PID_U$ and $PID_{RP}$ should satisfy the above requirements. This causes a \textbf{\em privacy dilemma} for the IdP: given a user ($ID_U$) and an unknown RP ($PID_{RP}$), the IdP is expected to generate a pseudo-identity ($PID_{U}$), which should be correlated with the user's long-term account that uniquely identifies the user at that RP, {\em without knowing anything about the RP's identity nor the user account at the RP}.
 %however, the IdP is assumed to know nothing about the RP's identity nor the user account at the RP.
 
-To solve the dilemma, we should provide the IdP some information related to the user's $Account$ at the RP to assist the generation of $PID_U$, so that $PID_U$ can be correctly correlated with the $Account$. Meanwhile, such information should not provide any additional knowledge for the IdP to derive the RP's identity, or for two RPs to correlate two $Account$s belonging to the same user. Therefore, the privacy protection problem can be converted into an identifier-transformation problem, which aims to design three identifier-transformation functions $\mathcal{F}_{ID_{U} \mapsto PID_U}$, $\mathcal{F}_{ID_{RP} \mapsto PID_{RP}}$, and $\mathcal{F}_{PID_{U} \mapsto Account}$ to compute $PID_U$, $PID_{RP}$, and $Account$, which have the above desired properties.
-
-\subsection{The Identifier-Transformation Framework of UPPRESSO}
+\subsection{The Identifier-Transformation Framework}
 \label{subsec:solutions}
+
+To solve the dilemma, we should provide the IdP some information related to the user's $Account$ at the RP to assist the generation of $PID_U$, so that $PID_U$ can be correctly correlated with the $Account$. Meanwhile, such information should not provide any additional knowledge for the IdP to derive the RP's identity, or for two RPs to correlate two $Account$s belonging to the same user. Therefore, the privacy protection problem can be converted into an identifier-transformation problem, which aims to design three identifier-transformation functions $\mathcal{F}_{ID_{U} \mapsto PID_U}$, $\mathcal{F}_{ID_{RP} \mapsto PID_{RP}}$, and $\mathcal{F}_{PID_{U} \mapsto Account}$ to compute $PID_U$, $PID_{RP}$, and $Account$, which have the above desired properties.
 
 To achieve this goal, UPPRESSO constructs three transformation functions in an integrated way to support {\em transformed RP designation} and {\em trapdoor user identification}, where (a) different $PID_U$s and $PID_{RP}$s are dynamically generated in different logins; (b) in each login session, $PID_{RP}$ is used to assist the generation of $PID_U$, which helps to link $PID_U$ to $Account$ using the trapdoor of this login session.%; and (c) when a user logs in to an RP multiple times, the RP can correlate each pair of $PID_U$ and $PID_{RP} with an invariant $Account$.
 
