@@ -22,7 +22,7 @@ To achieve this goal,
 Accordingly,
     a honest RP is able to verify the designated RP identity in identity tokens with its own identity before accepting the tokens;
      otherwise,
-        a malicious RP could replay a received identity token to the honest RP and login as the victim user. 
+        a malicious RP could replay a received identity token to the honest RP and login as the victim user.
 And then the RP allows the token holder to login as the user identity specified in the accepted tokens;
     otherwise, the IdP provides only anonymous services.
 
@@ -34,25 +34,12 @@ The integrity of identity tokens is obviously necessary,
     to prevent adversaries from modifying the user identity or the RP identity.
 Therefore,
     identity tokens are signed by the IdP and usually transmitted through TLS/HTTPS.
-    
-+++++++++++
 
 These four security requirements (i.e., RP designation, user identification, confidentiality, and integrity) of SSO identity tokens
-     have been discussed and analyzed \cite{ArmandoCCCT08,FettKS16, FettKS17}.
+     have been discussed and analyzed \cite{ArmandoCCCT08,FettKS16, FettKS17},
+     and lots of real-world vulnerabilities confirm these requirements \cite{SomorovskyMSKJ12, WangCW12, ArmandoCCCPS13, ZhouE14, WangZLLYLG15, WangZLG16, YangLLZH16, MainkaMS16, MainkaMSW17, YangLCZ18, YangLS17, ShiWL19, ChenPCTKT14, ccsSunB12, DiscoveringJCS, dimvaLiM16, CaoSBKVC14, TowardsShehabM14}.
 
-and practical attacks \cite{SomorovskyMSKJ12, WangCW12, ArmandoCCCPS13, ZhouE14, WangZLLYLG15, WangZLG16, YangLLZH16, MainkaMS16, MainkaMSW17, YangLCZ18, YangLS17, ShiWL19, ChenPCTKT14, ccsSunB12, DiscoveringJCS, dimvaLiM16, CaoSBKVC14, TowardsShehabM14}.
-
-Breaking the user identification of tokens
-    results in \emph{impersonation attacks},
-    where an authenticated adversary logins the honest RP as a victim user
-            whose identity is enclosed in the exploited identity tokens.
-Meanwhile,
-    \emph{identity injection attacks} destroy the RP designation of identity tokens,
-
-
-
-     or allure a victim user to log in to an honest RP under the attacker's account (called ).
-Many attacks exploit vulnerabilities in SSO design and implementation to break at least one of the four security properties. % \cite{ChenPCTKT14, FettKS16,WangCW12,ZhouE14,WangZLG16,YangLLZH16,SomorovskyMSKJ12,MohsenS16}.
+The adversary mainly aims to log in to an honest RP as a victim user (called \emph{impersonation attacks}) or allure a victim user to log in to an honest RP under the attacker's account (called \emph{identity injection attacks}). Many attacks exploit vulnerabilities in SSO design and implementation to break at least one of the four security properties. % \cite{ChenPCTKT14, FettKS16,WangCW12,ZhouE14,WangZLG16,YangLLZH16,SomorovskyMSKJ12,MohsenS16}.
 For example, Friendcaster used to accept every received identity token (i.e., a violation of RP designation) \cite{ChenPCTKT14}. So, a malicious RP can replay a received identity token to Friendcaster and log in as the victim user. If identity tokens are leaked (i.e., a violation of confidentiality) \cite{WangCW12,ccsSunB12,ArmandoCCCPS13,DiscoveringJCS,dimvaLiM16}, the adversary can directly impersonate the victim user.
 It was also reported that some RPs of Google ID SSO accepted user attributes that were not tied to the identity tokens (i.e., a violation of integrity) \cite{WangCW12}, so that an adversary can insert arbitrary attributes (e.g., email of the adversary or another user) into the identity token of the victim user. %to impersonate another user at the RP.
 
