@@ -5,8 +5,6 @@
 \subsection{Identity-Transformation Functions}
 \label{subsec:overview}
 
-+++++++
-
 \begin{table}[tb]
 \scriptsize
     \caption{The notations used in UPPRESSO.}
@@ -90,16 +88,23 @@ On receiving an identity-token request with $ID_U$ and $PID_{RP}$,
 
 %Moreover, since $r$ is unknown to the RP, collusive RPs cannot link a user's $PID_U$s at different RPs. If $r$ is known to the RP, two collusive RPs might attempt to associate a user's $PID_U$s by checking whether the equality ${PID_{U_1}}^{r_2N_{U_2}N_{RP_2}} = {PID_{U_2}}^{r_1N_{U_1}N_{RP_1}} \bmod\ p$ holds or not, because ${PID_{U_1}} = g^{r_1N_{U_1}N_{RP_1}ID_{U_1}} \bmod p$ and ${PID_{U_2}} = g^{r_2N_{U_2}N_{RP_2}ID_{U_2}} \bmod p$.
 
-%\vspace{0.5mm}
-\noindent {\bf $PID_U$-$Acct$ Transformation.} We define the trapdoor $T$ in each login session as $T = N_U^{-1} \bmod n$.
++++++++
+\vspace{1mm}
+\noindent {\bf $PID_U$-$Acct$ Transformation.}
+In the negotiation of $PID_{RP}$,
+    the user also sends the random number $t$ to the RP.
+So the RP also calculates $PID_{RP}$ to verify the designated RP pseudo-identity in identity tokens.
+
+On receiving an identity-token binding $PID_U$ and $PID_{RP}$,
+    the RP calculates $Acct$ as below.
 %As $n$ is a prime number and $1< N_U < n$, $n$ is coprime to $N_U$. So, there always exists a $T$ that satisfies $T N_U = 1 \bmod n$.
-With this trapdoor, the RP derives a unique account (denoted as $A$ in the equation) for the user as:%with the function $\mathcal{F}_{PID_{U} \mapsto Account}$
 \begin{equation}
-\setlength{\abovedisplayskip}{3pt}
-\setlength{\belowdisplayskip}{3pt}
-   \mathcal{F}_{PID_{U} \mapsto Account}: A = {T} \cdot {PID_U}
-   \label{equ:Account}
+    k = t^{-1} \bmod n
 \end{equation}
+\begin{align}
+   Acct = \mathcal{F}_{Acct}(PID_{U}, PID_{RP})\\= [k] PID_{U} = [t^{-1}utr]G = [ur]G
+   \label{equ:Account}
+\end{align}
 From Equations \ref{equ:PIDRP}, \ref{equ:PIDU} and \ref{equ:Account}, we can further derive:
 %\begin{multline}\label{equ:AccountNotChanged}
 %   A =  {PID_{U}}^{T}
