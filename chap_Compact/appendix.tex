@@ -47,8 +47,8 @@ Here we provide the details of the format of the messages we use to construct th
 \noindent\textbf{HTTP Messages}.
 An HTTP request message is the term of the form
 \begin{multline*}
-\ \ \ \ \ \ \ \ \langle \mathtt{HTTPReq}, nonce, method, host, path, \\ 
-parameters, headers, body\rangle \ \ \ \ \ \ \ \ 
+\ \ \ \ \ \ \ \ \langle \mathtt{HTTPReq}, nonce, method, host, path, \\
+parameters, headers, body\rangle \ \ \ \ \ \ \ \
 \end{multline*}
 An HTTP response message is the term of the form
 \begin{equation*}
@@ -58,7 +58,7 @@ The details are defined as follows:
 \begin{itemize}
 \setlength\itemsep{-2pt}
  \item \myss{\mathtt{HTTPReq}} and \myss{\mathtt{HTTPResp}} denote the types of messages.
- \item \myss{nonce} is a random number that maps the response to the corresponding request. 
+ \item \myss{nonce} is a random number that maps the response to the corresponding request.
  \item \myss{method} is one of the HTTP methods, such as \myss{\mathtt{GET}} and \myss{\mathtt{POST}}.
  \item \myss{host} is the constant string domain of visited server.
  \item \myss{path} is the constant string representing the concrete resource of the server.
@@ -88,11 +88,11 @@ The data used in UPPRESSO are defined in the following forms:
 \item \textbf{Dictionary Data} is the data in the form \myss{\myangle{\myangle{name, value}, \myangle{name, value}, \dotsc}}, for instance the \myss{body} in HTTP request is dictionary data. We assume there is a \myss{body := \myangle{\myangle{username, alice}, \myangle{password, 123}}}, here we define the operation on the $body$. That is, we can access the elements in \myss{body} in the form \myss{body[name]}, such that \myss{body[username] \equiv alice} and \myss{body[password] \equiv 123}. We can also add the new attributes to the dictionary, for example after we set \myss{body[age] := 18}, the \myss{body} are changed into\myss{ \myangle{\myangle{username, alice}, \myangle{password, 123}, \myangle{age, 18}}}.
 \end{itemize}
 
-\vspace{1mm}\noindent\textbf{Patten Matching}.  We define the term with the variable $*$ as the pattern, such as \myss{\myangle{a, b, *}}. 
+\vspace{1mm}\noindent\textbf{Patten Matching}.  We define the term with the variable $*$ as the pattern, such as \myss{\myangle{a, b, *}}.
 The pattern matches any term which only replaces the $*$ with other terms. For instance,  \myss{\myangle{a, b, *}} matches \myss{\myangle{a, b, c}}.
 
 \subsection{Browser Model}
-In UPPRESSO, we assume that the browsers are honest, therefore, we only need to analyze how the browsers interactive with the scripts. 
+In UPPRESSO, we assume that the browsers are honest, therefore, we only need to analyze how the browsers interactive with the scripts.
 We first introduce the windows and documents of the browser model.
 
 \vspace{1mm}
@@ -102,7 +102,7 @@ We first introduce the windows and documents of the browser model.
 \noindent\textbf{Document}. A document \myss{d} is a term of the form
 \begin{multline*}
   \ \ \ \langle nonce, location, referrer, script, scriptstate, \\
-  scriptinputs, subwindows, active \rangle \ \ \ 
+  scriptinputs, subwindows, active \rangle \ \ \
 \end{multline*}
 where document is the HTML content in the window.  The \myss{nonce} locates the document. \myss{Location} is the URL where the document is loaded. \myss{Referrer} is same as the Referer header defined in HTTP standard. The \myss{script} is the scripting process downloaded from each servers. \myss{scriptstate} is define by the script, different in each scripts. The \myss{scriptinputs} is the message transmitted into the scripting process. The \myss{subwindows} is the set of \myss{nonce} of document's created windows. \myss{active} represents whether this document is active or not.
 
@@ -117,7 +117,7 @@ localStorage, sessionStorage, ids, secret \rangle
 \item \textbf{Scripting Message Output. }The output is the term in the form
 \begin{multline*}
 \ \ \ \ \ \langle scriptstate, cookies, localStorage, \\
-sessionStorage, command \rangle \ \ \ \ \ 
+sessionStorage, command \rangle \ \ \ \ \
 \end{multline*}
 \end{itemize}
 The \myss{tree} is the relations of the opened windows and documents, which are visible to this script. \myss{Docnonce} is the document nonce. The  \myss{Scriptstate} is a term of the form defined by each script. \myss{Scriptinputs} is the message transmitted to script. However, the \myss{scriptinputs} is defined as standardized forms, for example, postMessage is one of the forms of \myss{scriptinputs}. \myss{Cookies} is the set of cookies that belong to the document's origin. \myss{LocalStorage} is the storage space for browser and \myss{sessionStorage} is the space for each HTTP sessions.  \myss{Ids} is the set of user IDs while \myss{secret} is the password to corresponding user ID. The \myss{command} is the operation which is to be conducted by the browser. Here we only introduce the form of commands used in UPPRESSO system. We have defined the postMessage and XMLHTTPRequest (for HTTP request) message which are the \myss{commands}. Moreover, a term in the form \myss{\myangle{\mathtt{IFRAME}, URL, WindowNonce}} asks the browser to create this document's subwindow and it visits the server with the URL.
@@ -220,7 +220,7 @@ The relation of RP scripting process $script\_rp$ is shown in Appendix~\ref{ape:
 
 We assume that all the network messages are transmitted using HTTPS, postMessage messages are protected by the browser, and the browsers are  honest, so web attackers can never break the security of UPPRESSO.
 
-We provide the detailed proof on the security of UPPRESSO. As analyzed above, the security requirements of UPPRESSO are that the system must ensure only the legitimate user can log into an honest RP under her unique account. We consider the visits to RP's resource paths are controlled by the visitors' cookies, so that the attacker can break the security only when he owns the cookie bound to the honest user. Therefore, we can propose the Definition~\ref{def:secure} about the secure UPPRESSO system.
+We provide the detailed proof on the security of UPPRESSO. As analyzed above, the security requirements of UPPRESSO are that the system must ensure only the legitimate user can login an honest RP under her unique account. We consider the visits to RP's resource paths are controlled by the visitors' cookies, so that the attacker can break the security only when he owns the cookie bound to the honest user. Therefore, we can propose the Definition~\ref{def:secure} about the secure UPPRESSO system.
 \begin{redef}
 Let $\mathcal{UWS}$ be a UPPRESSO web system, $\mathcal{UWS}$ is secure \textbf{iff} for any honest RP $r$ $\in $ $\mathcal{W}$ and  the authenticated cookie $c$ for honest $u$,  $c$ is unknown to the attacker $a$ and only $c$ is used by $u$.
 \end{redef}
@@ -325,7 +325,7 @@ Here we give the proof that attacker cannot obtain the \myss{PID_{RP}} and \myss
 \item \myss{P^r}. Same as IdP server, RP server only sends the message containing \myss{PID_{RP}}  at Line 55 in Algorithm~\ref{alg2}, and the \myss{PID_{RP}} is contained in the \myss{RegistrationResult} received at Line 28 and verified at Line 44.
 \item \myss{script\_rp}. We can find in  Algorithm~\ref{alg4}, RP script  only sends the messages to RP server and IdP script. The receivers' identities are ensured at Line 3, 4. Therefore, attackers cannot obtains the  \myss{PID_{RP}} and \myss{N_U}.
 \item \myss{script\_idp}. The HTTP requests sent by IdP script are forwarded to the domain set at Line 4 in Algorithm~\ref{alg3}. The HTTP requests are sent to IdP server. The postMessages are sent to the one set at Line 3, and we will prove the target cannot be attacker.
-According to Line 44 in Algorithm~\ref{alg2},  \myss{PID_{RP}} is valid at RP server only when RP server receives the registration result. The \myss{\mathtt{Hash}(N_U)} in the result ensures the result must be issued for the correct \myss{ID_{RP}}. As the registration result is \myss{PID_{RP}}-unique due to Line 32 in Algorithm~\ref{alg1}, the registration result received by IdP script at Line 35 in Algorithm~\ref{alg3} must be same as the one in RP server. 
+According to Line 44 in Algorithm~\ref{alg2},  \myss{PID_{RP}} is valid at RP server only when RP server receives the registration result. The \myss{\mathtt{Hash}(N_U)} in the result ensures the result must be issued for the correct \myss{ID_{RP}}. As the registration result is \myss{PID_{RP}}-unique due to Line 32 in Algorithm~\ref{alg1}, the registration result received by IdP script at Line 35 in Algorithm~\ref{alg3} must be same as the one in RP server.
 This HTTP response is related with the HTTP request at Line 28, carrying \myss{PID_{RP}} and \myss{\mathtt{Hash}(N_U)} at Line 21, 25. It ensures the \myss{Cert} obtained at Line 15 must belong to RP. As the target at Line 3 is the window which opens the IdP script window and asks for user's login consent, user can easily find out the target site is not coincident with the consent requirement. Therefore, the target cannot be the attacker.
 %Here we assume the target is attacker and then the transmitted \myss{PIR_{RP}} and \myss{N_U} cannot be valid at
 \end{itemize}
@@ -335,7 +335,7 @@ Therefore, Requirement~\ref{req:cookie3} is satisfied and Theorem~\ref{the:secur
 
 \begin{comment}
 \subsection{Proof of Theorem~\ref{the:privacy}}
-In this section, we give a detailed proof about the privacy of UPPRESSO. That is,  UPPRESSO is a privacy-preserving system, satisfying IdP-Privacy and RP-Privacy. As analyzed above,  the requirements of IdP-Privacy and RP-Privacy are as follows. 
+In this section, we give a detailed proof about the privacy of UPPRESSO. That is,  UPPRESSO is a privacy-preserving system, satisfying IdP-Privacy and RP-Privacy. As analyzed above,  the requirements of IdP-Privacy and RP-Privacy are as follows.
 \begin{req}
 \textbf{IdP-Privacy}. There are honest RPs $r_1, r_2$, IdP $i$ and the honest user $u$. We define the event sets containing each users' login procedure, for instance, the \myss{events_{(u, r_1)}} consists of all the events generated during the \myss{u} logging in to \myss{r_1} in correct procedure. IdP-Privacy requires that for every event $e_1 \in events_{(u, r_1)}$ received by IdP, there is always an  event $e_2 \in events_{(u, r_2)}$, satisfying that $e_1$ and $e_2$ are equivalent.
 \label{req:idp}
@@ -379,7 +379,7 @@ Moreover, with the states shared by \myss{r_2}, \myss{r_1} knows  all  the \myss
 
 Therefore, the UPPRESSO meets Requirement~\ref{req:rp} when RPs behave honestly.
 
-Here, we prove that UPPRESSO meets the RP-Privacy requirements even when RPs behave maliciously. 
+Here, we prove that UPPRESSO meets the RP-Privacy requirements even when RPs behave maliciously.
 The malicious RPs may attempt to steal the data from other process, or set the illegal parameters during the login procedures. That is, according to Definition~\ref{def:powequ}, the $PID_U$s and the $Account$s must be equivalent to the attacker as long as the attacker does not know the $ID_U$. Based on Algorithm~\ref{alg1}, we  find  that IdP does not send \myss{ID_U} to any process, so  $PID_U$s the $Account$s must be equivalent in each event.
 
 Malicious RPs may attempt to generate  \myss{Account} and \myss{PID_U} incorrectly, however, the correct user could find this illegal behaviours as follows.

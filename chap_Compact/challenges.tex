@@ -39,7 +39,7 @@ These four security requirements (i.e., RP designation, user identification, con
      have been discussed and analyzed \cite{ArmandoCCCT08,FettKS16, FettKS17},
      and numerous attacks exploit vulnerabilities in the design and implementation of SSO systems to break one or more of these security properties \cite{SomorovskyMSKJ12, WangCW12, ArmandoCCCPS13, ZhouE14, WangZLLYLG15, WangZLG16, YangLLZH16, MainkaMS16, MainkaMSW17, YangLCZ18, YangLS17, ShiWL19, ChenPCTKT14, ccsSunB12, DiscoveringJCS, dimvaLiM16, CaoSBKVC14, TowardsShehabM14}.
 An adversary might attempt to login an honest RP as a victim user (i.e., \emph{impersonation attacks}),
- or allure a victim user to login to an honest RP as the attacker (i.e.,  \emph{identity injection attacks}).
+ or allure a victim user to login an honest RP as the attacker (i.e.,  \emph{identity injection attacks}).
 For example, Friendcaster used to accept any received identity token, which violates RP designation \cite{ChenPCTKT14},
     so a malicious RP could replay a received identity token to Friendcaster and login as the victim user.
 Because identity tokens were leaked through different ways \cite{WangCW12,ccsSunB12,ArmandoCCCPS13,DiscoveringJCS,dimvaLiM16},
@@ -181,6 +181,15 @@ Given $ID_U$ and $ID_{RP}$, $\mathcal{F}_{Acct}(PID_{U}, PID_{RP}, ID_{RP})$ kee
  $\mathcal{F}_{Acct}(PID_{U}^k, PID_{RP}^k, ID_{RP}) = \mathcal{F}_{Acct}(PID_{U}^{k'}, PID_{RP}^{k'}, ID_{RP})$.
 \end{itemize}
   
+
+In an SSO login flow with the identity-transformation framework,
+    a user will firstly negotiates an ephemeral $PID_{RP}$ with the target RP.
+Then, an identity-token request with $PID_{RP}$ is sent by the user to the IdP.
+After authenticating the user as $ID_U$, the IdP calculates an ephemeral $PID_U$ based on $ID_U$ and the received $PID_{RP}$,
+    and issues an identity-token binding $PID_U$ and $PID_{RP}$.
+This identity-token is forwarded by the user to the RP.
+Finally, after verifying the designated RP pseudo-identity in the token,
+    the RP calculates $Acct$ and allows the token holder to login as $Acct$.
   
 %To achieve this goal, UPPRESSO constructs three transformation functions in an integrated way to support {\em transformed RP designation} and {\em trapdoor user identification}, where (a) different $PID_U$s and $PID_{RP}$s are dynamically generated in different logins; (b) in each login session, $PID_{RP}$ is used to assist the generation of $PID_U$, which helps to link $PID_U$ to $Account$ using the trapdoor of this login session.%; and (c) when a user logs in to an RP multiple times, the RP can correlate each pair of $PID_U$ and $PID_{RP} with an invariant $Account$.
 
