@@ -5,57 +5,50 @@
 \subsection{Identity-Transformation Functions}
 \label{subsec:overview}
 
++++++++
+
 \begin{table}[tb]
 \scriptsize
     \caption{The notations used in UPPRESSO.}
     \centering
 %    \begin{tabular}{|c|c|c|}
-    \setlength{\tabcolsep}{1.2mm}
-    \begin{tabular}{|p{1cm}|p{5.5cm}|p{1.1cm}|}
-    \hline
-    {\textbf{Notation}} & {\textbf{Definition}} & {\textbf{Attribute}} \\
-    \hline
-    {$q$} & {A large prime, the size of the underlying field.} & {Long-term} \\
-    \hline
-    {$E$}&{An elliptic curve defined over a finite field $\mathbb{F}_q$ (e.g., P-256).}&{Long-term}
-     \\
-    \hline
-    {G}&{A point in $E(\mathbb{F}_q)$,  known as the base point.}&{Long-term}\\
-    \hline
-    {$n$} & {the order of the base point $G$.} & {Long-term} \\    \hline
-    {$SK$, $PK$} & {The IdP's key pair, a private key and a public key.} & {Long-term} \\
-    \hline
-   {$ID_{RP}$} & {An RP's unique identity,  a point in cyclic subgroup of $E(\mathbb{F}_q)$ generated base on  $P$.} & {Long-term} \\
-    \hline
-    {$Cert_{RP}$} & {An RP certificate, containing the RP's identity and endpoint.} & {Long-term} \\
-    \hline
-    {$ID_U$} & {A user's unique identity.} & {Long-term} \\
-    \hline
-     {$Account$} & {A user's identifier at an RP: $A=  {ID_U}{ID_{RP}} $ (denoted as $A$ in equations).} & {Long-term} \\
-    \hline
-    {$PID_{RP}$} & {$PID_{RP} = {N_{U}}{ID_{RP}} $, an RP's pseudo-identity.} & {Ephemeral} \\
-    \hline
-    {$PID_U$} & {$PID_U = {ID_U}{PID_{RP}}$, a user's pseudo-identity.} & {Ephemeral} \\
-    \hline
-    {$N_U$} & {A user-generated nonce for $PID_{RP}$.} & {Ephemeral} \\
-    \hline
-    {$T$} & {The trapdoor to derive $Account$: $T=N_U^{-1} \bmod n$.} & {Ephemeral} \\
-    \hline
+    \begin{tabular}{|p{0.85cm}|p{6.65cm}|} \hline
+    {\textbf{Notation}} & {\textbf{Description}} \\ \hline
+    {$E$}&{An elliptic curve defined over a finite field $\mathbb{F}_q$ (e.g., P-256).} \\ \hline
+    {$ID_U$} & {$ID_U = u$, $1 < u < n$} \\ \hline
+   {$ID_{RP}$} & {$ID_{RP} = [r]G$, $1 < r < n$} \\ \hline
+    {$q$} & {A large prime, the size of the underlying field.} \\ \hline
+    {G}&{A point in $E(\mathbb{F}_q)$,  known as the base point.} \\ \hline
+    {$n$} & {the order of the base point $G$.} \\ \hline
+    {$SK$, $PK$} & {The IdP's key pair, a private key and a public key.} \\ \hline
+    {$Cert_{RP}$} & {An RP certificate, containing the RP's identity and endpoint.} \\ \hline
+     {$Acct$} & {A user's identifier at an RP: $A=  {ID_U}{ID_{RP}} $ (denoted as $A$ in equations).} \\ \hline
+    {$PID_{RP}$} & {$PID_{RP} = {N_{U}}{ID_{RP}} $, an RP's pseudo-identity.} \\ \hline
+    {$PID_U$} & {$PID_U = {ID_U}{PID_{RP}}$, a user's pseudo-identity.} \\ \hline
+    {$N_U$} & {A user-generated nonce for $PID_{RP}$.} \\ \hline
+    {$T$} & {The trapdoor to derive $Account$: $T=N_U^{-1} \bmod n$.} \\ \hline
     \end{tabular}
     \label{tbl:notations}
 \end{table}
 
-+++++++
-
-We construct three functions, $\mathcal{F}_{PID_{RP}}$, $\mathcal{F}_{PID_{U}}$ and $\mathcal{F}_{Acct}$, based on the NIST elliptic curve $P$-256,
+We design three identity-transformation functions,
+     $\mathcal{F}_{PID_{RP}}$, $\mathcal{F}_{PID_{U}}$ and $\mathcal{F}_{Acct}$,
+    over an elliptic curve $\mathbb{E}$ where $G$ is the base point of this curve and $n$ is the order of $G$.        %the NIST elliptic curve $P$-256,
 %the discrete logarithm problem with public parameters $p$, $q$, %and $g$, %% L不作为参数，我们说：e, n是RSA算法参数，不说2048是参数。
-where
 %$q$ is a large prime defining the finite field $\mathbb{F}_q$,
-$G$ is a point on the curve (known as the base point)
 % $L$ is the length of $q$ in bits,  ($2^{L-1} < q < 2^L$)
-and $n$ is the order of the base point $G$. %, and $g$ is a generator of order $q$ in $GF(p)$.
+%, and $g$ is a generator of order $q$ in $GF(p)$.
 %the prime number $q$  is the order of a multiplicative subgroup of $GF(p)$, which is generated with the generator $g$ by $\{g\ mod\ p, g^2\ mod\ p, ..., g^{q-1}\ mod\ p, 1=g^q\ mod\ p\}$.
-The IdP assigns long-term identifiers $ID_U$ and $ID_{RP}$ to a user and an RP respectively, when they first register at the IdP. Without loss of generality, we assume the IdP assigns a unique random number to each user as $ID_U$, where $1<ID_U<n$, and $ID_{RP}$ is a point on the curve generated based on $G$.% For each RP, the IdP selects a random number $r$, where $1 < r < q$, and computes a unique $ID_{RP}$ as:
+
+First of all,
+    $ID_U$ is a unique integer satisfying $1<ID_U<n$, 
+    and $ID_{RP}$ is unique point on $\mathbb{E}$.
+When a user is registering at the IdP,
+            a unique random number $u$ $(1 < u < n)$ is generated and $ID_U = u$ is assigned to this user;
+    when an RP is initially registering at the IdP,
+            a random number $r$ $(1 < r < n)$ is generated and $ID_{RP} = [r]G$ is assigned to this RP. 
+
+% For each RP, the IdP selects a random number $r$, where $1 < r < q$, and computes a unique $ID_{RP}$ as:
 %\begin{equation}
   %  ID_{RP} = g^{r} \bmod p
    %\label{equ:IDRP}
@@ -63,7 +56,11 @@ The IdP assigns long-term identifiers $ID_U$ and $ID_{RP}$ to a user and an RP r
 %\noindent where $r$ is kept secret from the RP.
 
 \vspace{1mm}
-\noindent {\bf $ID_{RP}$-$PID_{RP}$ Transformation.} In each login session, the user assists the RP to convert $ID_{RP}$ into a pseudo-identity $PID_{RP}$. In particular, the user selects a random number $N_{U}$ ($1 < N_{U}<n$) and calculates $PID_{RP}$ as:
+\noindent {\bf $ID_{RP}$-$PID_{RP}$ Transformation.} In each login instance,
+    the user selects a random number $N_{U}$ ($1 < N_{U}<n$) and calculates $PID_{RP}$ as:
+    
+    $\mathcal{F}_{PID_{RP}}(ID_{RP}) = $, 
+    
 %First, the RP chooses a random number $N_{RP}$ ($1 < N_{RP}<q $), and the user chooses another random number $N_{U}$ ($1 < N_{U}<q $).
 %Then, they exchange $N_{RP}$ and $N_{U}$ to calculate $PID_{RP}$ following Equation \ref{equ:PIDRP}.
 \begin{equation}
@@ -141,6 +138,9 @@ With three identifier-transformation functions, UPRESSO supports two desirable p
 to satisfy {\em all} the security and privacy requirements of an SSO. %desirable for a secure and privacy-preserving SSO service.
 %\vspace{1mm}
 %\noindent\textbf{\em Transformed RP designation.}
+
+
+
 \begin{comment}
 \textbf{\em (i) Transformed RP designation:} using $\mathcal{F}_{ID_{RP} \mapsto PID_{RP}}$, the user and RP cooperatively generate a dynamic $PID_{RP}$ for each login. The identify token request contains $PID_{RP}$ instead of $ID_{RP}$, so, the RP can verify $PID_{RP}$ is associated with $ID_{RP}$ using the trapdoor but the IdP cannot tell to which RP the user attempts to login. Also, since $PID_{RP}$s of a same RP are different in different login sessions, the IdP cannot even tell if a same RP is visited.
 %Using $PID_{RP}$ and $\mathcal{F}_{ID_{U} \mapsto PID_{U}}$, the IdP generates a corresponding $PID_U$ and encloses it in the identity token to allow the user to login that RP.
