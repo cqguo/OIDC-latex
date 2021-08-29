@@ -80,11 +80,11 @@ For example, Friendcaster was found to accept any received identity token \cite{
 \subsection{The Identify Dilemma of Privacy-Preserving SSO}
 \label{subsec:challenges}
 A \emph{completely} privacy-preserving SSO system shall firstly offer the four security properties as mentioned above,
-    while prevent the privacy threats due to the IdP-based login tracing and the RP-based identity linkage. 
+    while prevent the privacy threats due to the IdP-based login tracing and the RP-based identity linkage.
 However, to satisfy with the requirements of security and privacy at the same time,
      poses a dilemma in the generation of identity tokens as below.
 Table \ref{tbl:notations-dilemma} lists the notations used in the following explanation,
-    and the subscript $j$ and/or the superscript $k$ may be omitted sometimes, when there is no ambiguity.
+    and the subscript $j$ and/or the superscript $i$ may be omitted sometimes, when there is no ambiguity.
 
 \begin{table}[tb]
 \scriptsize
@@ -95,8 +95,8 @@ Table \ref{tbl:notations-dilemma} lists the notations used in the following expl
     {\textbf{Notation}} & {\textbf{Description}} & {\textbf{Attribute}} \\ \hline
     {$ID_U$} & {The user's unique identity at the IdP.} & {Permanent} \\ \hline
     {$ID_{RP_j}$} & {The $j$-th RP's unique identity at the IdP.} & {Permanent} \\ \hline
-    {$PID_{U,j}^k$} & {The user's pseudo-identity, in the user's $k$-th login instance to the $j$-th RP.} & {Ephemeral} \\ \hline
-    {$PID_{RP_j}^k$} & {The $j$-th RP's pseudo-identity, in the user's $k$-th login instance to the $j$-th RP.} & {Ephemeral} \\ \hline
+    {$PID_{U,j}^i$} & {The user's pseudo-identity, in the user's $i$-th login instance to the $j$-th RP.} & {Ephemeral} \\ \hline
+    {$PID_{RP_j}^i$} & {The $j$-th RP's pseudo-identity, in the user's $i$-th login instance to the $j$-th RP.} & {Ephemeral} \\ \hline
     {$Acct_j$} & {The user's identity (or account) at the $j$-th RP.} & {Permanent} \\ \hline
     \end{tabular}
     \label{tbl:notations-dilemma}
@@ -111,8 +111,8 @@ Since the IdP authenticates users and then always knows the user's identity (i.e
 So an \emph{ephemeral} pseudo-identity for the RP (i.e., $PID_{RP}$) shall be used:
 (\emph{a}) to ensure RP designation,
      $PID_{RP}$ shall be uniquely associated with this RP;
-    and (\emph{b}) the IdP cannot derive any information about $ID_{RP}$ from any $PID_{RP}^k$,
-        which implies $PID_{RP}^k$ in multiple login instances shall be independent of each other.
+    and (\emph{b}) the IdP cannot derive any information about $ID_{RP}$ from any $PID_{RP}^i$,
+        which implies $PID_{RP}^i$ in multiple login instances shall be independent of each other.
    % the IdP-based login tracing is still effective, to correlate a user's multiple login instances.
 
 Next, in order to prevent the RP-based identity linkage,
@@ -120,11 +120,11 @@ Next, in order to prevent the RP-based identity linkage,
 A pseudo-identity for the user (i.e., $PID_U$) shall be bound in the identity tokens:
     (\emph{a}) the RP cannot derive any information about $ID_U$ from any $PID_{U,j}$,
     which implies $PID_{U,j}$ for different RPs shall be independent of each other;
-    (\emph{b}) in multiple login instances to the RP, $PID_U^k$ shall be independent of each other or generated ephemerally,
+    (\emph{b}) in multiple login instances to the RP, $PID_U^i$ shall be independent of each other or generated ephemerally,
         to prevent the IdP-based login tracing;\footnote{Even when the target RP is kept unknown to the IdP,
             the IdP shall not link multiple login instances which attempt to visit this RP.}
     and (\emph{c}) to ensure user identification,
-    an \emph{ephemeral} $PID_{U}^k$ in each login instance shall facilitate the RP to correlate it
+    an \emph{ephemeral} $PID_{U}^i$ in each login instance shall facilitate the RP to correlate it
      with the \emph{permanent} account (i.e., $Acct$) at the RP.
 
 Finally, we briefly summary the identities and pseudo-identities.
@@ -161,7 +161,7 @@ This method guides us to propose the identity-transformation framework.
 
 
 %we should provide the IdP some information related to the user's $Account$ at the RP to assist the generation of $PID_U$,
-% so that $PID_U$ can be correctly correlated with the $Account$. Meanwhile, such information should not provide any additional knowledge for the IdP to derive the RP's identity, or for two RPs to correlate two $Account$s belonging to the same user. 
+% so that $PID_U$ can be correctly correlated with the $Account$. Meanwhile, such information should not provide any additional knowledge for the IdP to derive the RP's identity, or for two RPs to correlate two $Account$s belonging to the same user.
 The privacy-protection problem can be converted into an identity-transformation challenge,
  to design three \emph{identity-transformation functions} as follows.
 \begin{itemize}
@@ -176,11 +176,11 @@ From the RP's view,
 \item
 $\mathcal{F}_{Acct}(PID_{U}, PID_{RP}, ID_{RP}) = Acct$, calculated by the RP.
 Given $ID_U$ and $ID_{RP}$, $\mathcal{F}_{Acct}(PID_{U}, PID_{RP}, ID_{RP})$ keeps static;
-    i.e., in the user's any $k$-th and $k'$-th ($k \neq k'$) login instances to the RP, 
+    i.e., in the user's any $i$-th and $i'$-th ($i \neq i'$) login instances to the RP,
 %     i.e.,
- $\mathcal{F}_{Acct}(PID_{U}^k, PID_{RP}^k, ID_{RP}) = \mathcal{F}_{Acct}(PID_{U}^{k'}, PID_{RP}^{k'}, ID_{RP})$.
+ $\mathcal{F}_{Acct}(PID_{U}^i, PID_{RP}^i, ID_{RP}) = \mathcal{F}_{Acct}(PID_{U}^{k'}, PID_{RP}^{k'}, ID_{RP})$.
 \end{itemize}
-  
+
 
 In an SSO login flow with the identity-transformation framework,
     a user will firstly negotiates an ephemeral $PID_{RP}$ with the target RP.
@@ -190,7 +190,7 @@ After authenticating the user as $ID_U$, the IdP calculates an ephemeral $PID_U$
 This identity-token is forwarded by the user to the RP.
 Finally, after verifying the designated RP pseudo-identity in the token,
     the RP calculates $Acct$ and allows the token holder to login as $Acct$.
-  
+
 %To achieve this goal, UPPRESSO constructs three transformation functions in an integrated way to support {\em transformed RP designation} and {\em trapdoor user identification}, where (a) different $PID_U$s and $PID_{RP}$s are dynamically generated in different logins; (b) in each login session, $PID_{RP}$ is used to assist the generation of $PID_U$, which helps to link $PID_U$ to $Account$ using the trapdoor of this login session.%; and (c) when a user logs in to an RP multiple times, the RP can correlate each pair of $PID_U$ and $PID_{RP} with an invariant $Account$.
 
 
