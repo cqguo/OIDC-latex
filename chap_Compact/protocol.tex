@@ -2,7 +2,7 @@
 %Finally, we discuss the compatibility of UPPRESSO with OIDC.
 
 
-\subsection{Identity-Transformation Functions in UPPRESSO}
+\subsection{Identity-Transformation Functions}
 \label{subsec:overview}
 
 \begin{table}[tb]
@@ -45,7 +45,7 @@
     \label{tbl:notations}
 \end{table}
 
-We construct three functions, $\mathcal{F}_{ID_{RP} \mapsto PID_{RP}}$, $\mathcal{F}_{ID_{U} \mapsto PID_{U}}$ and $\mathcal{F}_{PID_{U} \mapsto Account}$, based on the NIST elliptic curve $P$-256,
+We construct three functions, $\mathcal{F}_{PID_{RP}}$, $\mathcal{F}_{PID_{U}}$ and $\mathcal{F}_{Acct}$, based on the NIST elliptic curve $P$-256,
 %the discrete logarithm problem with public parameters $p$, $q$, %and $g$, %% L不作为参数，我们说：e, n是RSA算法参数，不说2048是参数。
 where
 %$q$ is a large prime defining the finite field $\mathbb{F}_q$,
@@ -60,8 +60,8 @@ The IdP assigns long-term identifiers $ID_U$ and $ID_{RP}$ to a user and an RP r
 %\end{equation}
 %\noindent where $r$ is kept secret from the RP.
 
-%\vspace{0.5mm}
-\noindent {\bf The RP Identifier Transformation Function.} In each login session, the user assists the RP to convert $ID_{RP}$ into a pseudo-identity $PID_{RP}$. In particular, the user selects a random number $N_{U}$ ($1 < N_{U}<n$) and calculates $PID_{RP}$ as:
+\vspace{1mm}
+\noindent {\bf $ID_{RP}$-$PID_{RP}$ Transformation.} In each login session, the user assists the RP to convert $ID_{RP}$ into a pseudo-identity $PID_{RP}$. In particular, the user selects a random number $N_{U}$ ($1 < N_{U}<n$) and calculates $PID_{RP}$ as:
 %First, the RP chooses a random number $N_{RP}$ ($1 < N_{RP}<q $), and the user chooses another random number $N_{U}$ ($1 < N_{U}<q $).
 %Then, they exchange $N_{RP}$ and $N_{U}$ to calculate $PID_{RP}$ following Equation \ref{equ:PIDRP}.
 \begin{equation}
@@ -84,8 +84,8 @@ When a user visits the same RP multiple times, different $PID_{RP}$s will be gen
 %For example, the malicious user fails to make a correct RP accept a $PID_{RP}$ used in another login, while the collusive RPs fail to use a same or correlated $PID_{RP}$s for different logins.
 
 
-%\vspace{0.5mm}
-\noindent {\bf The User Identifier Transformation Function.}
+\vspace{1mm}
+\noindent {\bf $ID_U$-$PID_U$ Transformation.}
 %Now, the identity token request to the IdP contains a user identity $ID_U$ and a pseudo-identity of the RP $PID_{RP}$. Therefore,
 To avoid using the user identity $ID_U$ in identity tokens, the IdP can convert $ID_U$ into a pseudo-identity for the user as follows:
 \begin{equation}
@@ -106,9 +106,9 @@ As expected, the RP cannot derive $ID_U$ from $PID_U$ due to the discrete logari
 %Moreover, since $r$ is unknown to the RP, collusive RPs cannot link a user's $PID_U$s at different RPs. If $r$ is known to the RP, two collusive RPs might attempt to associate a user's $PID_U$s by checking whether the equality ${PID_{U_1}}^{r_2N_{U_2}N_{RP_2}} = {PID_{U_2}}^{r_1N_{U_1}N_{RP_1}} \bmod\ p$ holds or not, because ${PID_{U_1}} = g^{r_1N_{U_1}N_{RP_1}ID_{U_1}} \bmod p$ and ${PID_{U_2}} = g^{r_2N_{U_2}N_{RP_2}ID_{U_2}} \bmod p$.
 
 %\vspace{0.5mm}
-\noindent {\bf The User Account Transformation Function.} We define the trapdoor $T$ in each login session as $T = N_U^{-1} \bmod n$.
+\noindent {\bf $PID_U$-$Acct$ Transformation.} We define the trapdoor $T$ in each login session as $T = N_U^{-1} \bmod n$.
 %As $n$ is a prime number and $1< N_U < n$, $n$ is coprime to $N_U$. So, there always exists a $T$ that satisfies $T N_U = 1 \bmod n$.
-With this trapdoor, the RP can easily derive a unique account (denoted as $A$ in the equation) for the user as:%with the function $\mathcal{F}_{PID_{U} \mapsto Account}$
+With this trapdoor, the RP derives a unique account (denoted as $A$ in the equation) for the user as:%with the function $\mathcal{F}_{PID_{U} \mapsto Account}$
 \begin{equation}
 \setlength{\abovedisplayskip}{3pt}
 \setlength{\belowdisplayskip}{3pt}
@@ -239,7 +239,7 @@ The user and RP cooperate to generate $PID_{RP} = {N_{U}}{ID_{RP}}$. To hide the
 \vspace{-\topsep}
 \item[2.2] The RP verifies $N_{U} \neq 0 \bmod n$, calculates $PID_{RP}$ and derives the trapdoor $T={N_U}^{-1} \bmod n$. To acknowledge the negotiation of $PID_{RP}$, the RP replies with $Cert_{RP}$, which is transmitted from the RP script to the IdP script through postMessage.
 \vspace{-\topsep}
-\item[2.3] The IdP script verifies $Cert_{RP}$, extracts $ID_{RP}$ from $Cert_{RP}$ and calculates $PID_{RP}={N_{U}}{ID_{RP}}$ and $nonce=hash(N_U)$. It also creates a one-time endpoint for the RP. If $Cert_{RP}$ is invalid, the user halts the negotiation.
+\item[2.3] The IdP script verifies $Cert_{RP}$, extracts $ID_{RP}$ from $Cert_{RP}$ and calculates $PID_{RP}={N_{U}}{ID_{RP}}$ and $nonce=H(N_U)$. It also creates a one-time endpoint for the RP. If $Cert_{RP}$ is invalid, the user halts the negotiation.
 \end{itemize}
 \vspace{-\topsep}
 It is important to ensure that the RP endpoint is not tampered with by the adversary. In other OIDC systems, the IdP obtains the RP endpoint from RP registration and verifies the endpoint in the identity token request. However, the IdP in UPPRESSO sees only a one-time endpoint. So, we ask the user to verify the correctness of the RP endpoint using the RP certificate. %which is signed by the IdP.
@@ -250,16 +250,16 @@ In this phase, the user registers a new RP with $PID_{RP}$ at the IdP using OIDC
 \vspace{-\topsep}
 \begin{itemize}
 %\setlength{\itemsep}{0pt plus 1pt}
-\item[3.1] The IdP script sends the $PID_{RP}$ registration request $[PID_{RP}, Hash( N_U), Endpoint_U]$ to the IdP.
+\item[3.1] The IdP script sends the $PID_{RP}$ registration request $[PID_{RP}, H(N_U), Endpoint_U]$ to the IdP.
 \vspace{-\topsep}
-\item[3.2] The IdP checks the unexpired $PID_{RP}$s to verify if the received $PID_{RP}$ is unique. Then, it signs the response as $[PID_{RP}, hash( N_U), validity]_{SK}$, where $validity$ denotes when the $PID_{RP}$ will expire.
+\item[3.2] The IdP checks the unexpired $PID_{RP}$s to verify if the received $PID_{RP}$ is unique. Then, it signs the response as $[PID_{RP}, H(N_U), validity]_{SK}$, where $validity$ denotes when the $PID_{RP}$ will expire.
 \vspace{-\topsep}
 \item[3.3] The IdP script forwards the registration result to the RP server through the RP script.
 \vspace{-\topsep}
-\item[3.4] The RP verifies the IdP's signature and accepts the result only if $PID_{RP}$ and $hash(N_U)$ match those in the negotiation and $PID_{RP}$ is not expired.
+\item[3.4] The RP verifies the IdP's signature and accepts the result only if $PID_{RP}$ and $H(N_U)$ match those in the negotiation and $PID_{RP}$ is not expired.
 \end{itemize}
 \vspace{-\topsep}
-$hash(N_U)$ is a nonce to distinguish different login sessions because there is a very small chance that the same $PID_{RP}$ is generated for two RPs even using two different pairs of $ID_{RP}$s and $N_U$s. This nonce avoids a registration result being acceptable to two RPs.
+$H(N_U)$ is a nonce to distinguish different login sessions because there is a very small chance that the same $PID_{RP}$ is generated for two RPs even using two different pairs of $ID_{RP}$s and $N_U$s. This nonce avoids a registration result being acceptable to two RPs.
 
 \noindent{\em 4. Identity Token Generation.}
 In this phase, the IdP calculates $PID_U = {ID_U}{PID_{RP}}$ and signs the identity token. % The processes are as follows.
@@ -281,14 +281,14 @@ In this phase, the IdP calculates $PID_U = {ID_U}{PID_{RP}}$ and signs the ident
 \vspace{-\topsep}
 In this phase, if any check fails, the process will be halted. For example, the user halts the process if $PID_{RP}$ in the identity token request is inconsistent with  the negotiated one. The IdP rejects the identity token request, if the pair of $PID_{RP}$ and $Endpoint_U$ has not been registered.
 
-\noindent{\em 5. $\mathbf{Account}$ calculation.}
+\noindent{\em 5. $Acct$ Calculation.}
 The RP verifies the identity token, derives the user's unique $Account$, and allows her to log in.
 \vspace{-\topsep}
 \begin{itemize}
 %\setlength{\itemsep}{0pt plus 1pt}
 \item[5.1] The RP verifies the identity token, including the signature, validity period, and if $PID_{RP}$ is consistent with the negotiated one. If any fails, the RP rejects this login.
 \vspace{-\topsep}
-\item [5.2] The RP extracts $PID_U$, calculates $Accout = T \cdot {PID_U}$, and allows the user to log in.
+\item [5.2] The RP extracts $PID_U$, calculates $Acct = T \cdot {PID_U}$, and allows the user to log in.
 \end{itemize}
 \vspace{-\topsep}
 
