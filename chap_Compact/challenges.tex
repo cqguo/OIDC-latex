@@ -166,18 +166,22 @@ The privacy-protection problem can be converted into an identity-transformation 
  to design three \emph{identity-transformation functions} as follows.
 \begin{itemize}
 \item
-$\mathcal{F}_{PID_{RP}}(ID_{RP}) = PID_{RP}$, calculated by the user and/or the RP,
-
+$\mathcal{F}_{PID_{RP}}(ID_{RP}) = PID_{RP}$, calculated by the user and/or the RP.
+From the IdP's view,
+$\mathcal{F}_{PID_{RP}}()$ is a one-way function and the calculated $PID_{RP}$ appears a random variable.
 \item
-$\mathcal{F}_{PID_U}(ID_U, PID_{RP}) = PID_{U}$, calculated by the IdP,
-
+$\mathcal{F}_{PID_U}(ID_U, PID_{RP}) = PID_{U}$, calculated by the IdP.
+From the RP's view,
+    $\mathcal{F}_{PID_U}()$ is a one-way function and the calculated $PID_{U}$ appears a random variable.
 \item
-$\mathcal{F}_{Acct}(PID_{U}, PID_{RP}, ID_{RP}) = Acct$, calculated by the RP,
+$\mathcal{F}_{Acct}(PID_{U}, PID_{RP}, ID_{RP}) = Acct$, calculated by the RP.
+Given $ID_U$ and $ID_{RP}$, $\mathcal{F}_{Acct}(PID_{U}, PID_{RP}, ID_{RP})$ keeps static;
+    i.e., in the user's any $k$-th and $k'$-th ($k \neq k'$) login instances to the RP, 
+%     i.e.,
+ $\mathcal{F}_{Acct}(PID_{U}^k, PID_{RP}^k, ID_{RP}) = \mathcal{F}_{Acct}(PID_{U}^{k'}, PID_{RP}^{k'}, ID_{RP})$.
 \end{itemize}
   
   
-+++++++++++++
-
 %To achieve this goal, UPPRESSO constructs three transformation functions in an integrated way to support {\em transformed RP designation} and {\em trapdoor user identification}, where (a) different $PID_U$s and $PID_{RP}$s are dynamically generated in different logins; (b) in each login session, $PID_{RP}$ is used to assist the generation of $PID_U$, which helps to link $PID_U$ to $Account$ using the trapdoor of this login session.%; and (c) when a user logs in to an RP multiple times, the RP can correlate each pair of $PID_U$ and $PID_{RP} with an invariant $Account$.
 
 
@@ -259,13 +263,12 @@ At the same time, the RP obtains a private trapdoor in the negotiation,
 %To meet the above two principles, we need to construct three satisfying functions $\mathcal{F}_{ID_{RP} \mapsto PID_{RP}}$, $\mathcal{F}_{ID_{U} \mapsto PID_{U}}$ and $\mathcal{F}_{PID_{U} \mapsto Account}$, design the protocols between the user, RP and IdP to avoid the privacy leakage during message transmission, and implement the  processing at the user as  required by the transformed RP designation.
 
 
+
+\begin{comment}
 \subsection{Applying Identifier-Transformation to Existing Privacy-Preserving SSO Solutions}
 We map three existing privacy-preserving SSO approaches (PPID \cite{OpenIDConnect}, BrowserID \cite{BrowserID} and SPRESSO \cite{SPRESSO})
  to the identifier transformation framework in Figure \ref{fig:IDCorrelation} and summarize their potential privacy issues in Table \ref{tbl:compare}.
 When $PID_U = ID_U$ and $PID_{RP} = ID_{RP}$, this framework depicts the basic SSO services with no privacy protection.
-
-% and explain why they cannot prevent both IdP-based login tracing and RP-based identity linkage.
-
 
 \begin{table}[b]
     \caption{Identifier-transformation in privacy-preserving SSO.}
@@ -328,3 +331,5 @@ This is because in each approach,
  three transformation functions $\mathcal{F}_{PID_U}$, $\mathcal{F}_{PID_{RP}}$ and $\mathcal{F}_{Acct}$ are designed arbitrarily and function separately, which causes either $PID_{RP} = ID_{RP}$ or $Acct = ID_U$.
 
 %they do not explicitly clarify three pseudo-identities (i.e., $PID_U$, $PID_{RP}$, and $Account$) and then design $\mathcal{F}_{ID_{U} \mapsto PID_U}$,   $\mathcal{F}_{ID_{RP} \mapsto PID_{RP}}$, and $\mathcal{F}_{PID_{U} \mapsto Account}$ comprehensively.
+
+\end{comment}
