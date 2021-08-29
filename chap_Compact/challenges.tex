@@ -260,12 +260,14 @@ At the same time, the RP obtains a private trapdoor in the negotiation,
 
 
 \subsection{Applying Identifier-Transformation to Existing Privacy-Preserving SSO Solutions}
-We map three existing privacy-preserving SSO approaches (PPID \cite{OpenIDConnect}, BrowserID \cite{BrowserID} and SPRESSO \cite{SPRESSO}) to the identifier transformation framework in Figure \ref{fig:IDCorrelation} and summarize their potential privacy issues in Table \ref{tbl:compare}. It is worth noting that when $PID_U = ID_U$ and $PID_{RP} = ID_{RP}$, this framework depicts the basic SSO services with no privacy protection.
+We map three existing privacy-preserving SSO approaches (PPID \cite{OpenIDConnect}, BrowserID \cite{BrowserID} and SPRESSO \cite{SPRESSO})
+ to the identifier transformation framework in Figure \ref{fig:IDCorrelation} and summarize their potential privacy issues in Table \ref{tbl:compare}.
+When $PID_U = ID_U$ and $PID_{RP} = ID_{RP}$, this framework depicts the basic SSO services with no privacy protection.
 
 % and explain why they cannot prevent both IdP-based login tracing and RP-based identity linkage.
 
 
-\begin{table}[tb]
+\begin{table}[b]
     \caption{Identifier-transformation in privacy-preserving SSO.}
     \centering
     \setlength{\tabcolsep}{0.5mm}
@@ -321,6 +323,8 @@ for each login session.  But the IdP issues the identity token using the real us
 Identity tokens in BrowserID include $ID_U$ but no RP information (i.e., $PID_{RP} = \bot$). Therefore, it suffers from RP-based identity linkage, but can prevent IdP-based login tracing.
 %To ensure RP designation, BrowserID requires the user to append a \emph{subsidiary} identity token and sign it, where the identity token signed by the IdP authorizes the user to sign the subsidiary identity token. Obviously, $ID_U$ is tied to a pair of identity token and subsidiary identity token. Similarly, a user's login requests to different RPs can be linked by $ID_U$ (i.e., $Account = ID_U$), which makes BrowserID vulnerable to RP-based identity linkage.
 
-In summary, none of the three approaches can defend against IdP-based login tracing and RP-based identity linkage at the same time. This is because in each approach, three transformation functions $\mathcal{F}_{ID_{U} \mapsto PID_U}$, $\mathcal{F}_{ID_{RP} \mapsto PID_{RP}}$ and $\mathcal{F}_{PID_{U} \mapsto Account}$ are designed arbitrarily and function separately, which causes either $PID_{RP} = ID_{RP}$ or $Account = ID_U$.
+In summary, none of the three approaches can defend against IdP-based login tracing and RP-based identity linkage at the same time.
+This is because in each approach,
+ three transformation functions $\mathcal{F}_{PID_U}$, $\mathcal{F}_{PID_{RP}}$ and $\mathcal{F}_{Acct}$ are designed arbitrarily and function separately, which causes either $PID_{RP} = ID_{RP}$ or $Acct = ID_U$.
 
 %they do not explicitly clarify three pseudo-identities (i.e., $PID_U$, $PID_{RP}$, and $Account$) and then design $\mathcal{F}_{ID_{U} \mapsto PID_U}$,   $\mathcal{F}_{ID_{RP} \mapsto PID_{RP}}$, and $\mathcal{F}_{PID_{U} \mapsto Account}$ comprehensively.
