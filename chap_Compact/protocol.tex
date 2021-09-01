@@ -15,12 +15,12 @@ We design three identity-transformation functions,
 %the prime number $q$  is the order of a multiplicative subgroup of $GF(p)$, which is generated with the generator $g$ by $\{g\ mod\ p, g^2\ mod\ p, ..., g^{q-1}\ mod\ p, 1=g^q\ mod\ p\}$.
 
 First of all,
-    $ID_U$ is a unique integer satisfying $1<ID_U<n$, 
+    $ID_U$ is a unique integer satisfying $1<ID_U<n$,
     and $ID_{RP}$ is unique point on $\mathbb{E}$.
 When a user is registering,
             a unique random number $u$ $(1 < u < n)$ is generated and $ID_U = u$ is assigned to this user;
     when an RP is initially registering at the IdP,
-            a random number $r$ $(1 < r < n)$ is generated and $ID_{RP} = [r]G$ is assigned to this RP. 
+            a random number $r$ $(1 < r < n)$ is generated and $ID_{RP} = [r]G$ is assigned to this RP.
 
 % For each RP, the IdP selects a random number $r$, where $1 < r < q$, and computes a unique $ID_{RP}$ as:
 %\begin{equation}
@@ -95,8 +95,8 @@ From Equations \ref{equ:PIDRP}, \ref{equ:PIDU} and \ref{equ:Account}, it is deri
 
 So the RP obtains the identical permanent account from different identity tokens in multiple login instances,
     with the help of $t$ from the user.
-Given a user, the accounts at different are inherently unique. 
-Moreover, 
+Given a user, the accounts at different are inherently unique.
+Moreover,
     due to the elliptic curve discrete logarithm problem (ECDLP),
 it is computationally infeasible (\emph{a}) for the IdP to derive $ID_{RP}$ from $PID_{RP}$,
     or (\emph{b}) for the RP to derive $ID_U$ from either $PID_U$ or $Acct$.
@@ -123,32 +123,21 @@ Therefore, it prevents IdP-based login tracing.
 \label{implementations}
 
 With the identity-transformation functions,
- UPRESSO potentially satisfies all the requirements of security and privacy
-    as an SSO service. %desirable for a secure and privacy-preserving SSO service.
-But we still another design, \emph{RP certificate},
-     to ensure .
+ UPRESSO potentially satisfies all the requirements of security and privacy. %desirable for a secure and privacy-preserving SSO service.
+But we still need another design, \emph{RP certificate},
+     to ensure the confidentiality of identity tokens.
 In the original SSO protocols,
-    an RP is initially registered at the IdP with an endpoint to receive identity tokens, 
-        and this endpoint is set in an identity-token response by the IdP, to instruct the user to forward the identity token.
+    an RP is initially registered at the IdP with an endpoint to receive identity tokens (e.g., redirection URI in OIDC),
+        and this endpoint is set in the identity-token response by the IdP, to instruct the user to forward the identity token.
 Obviously,
-    an incorrect RP endpoint breaks the confidentiality of identity tokens.
+    an incorrect RP endpoint leaks identity tokens.
 
 In the UPPRESSO protocols,
     because the IdP is not aware of the visited RP,
-        the user has to deal with RP endpoints by himself. 
-
-
-
-RP certificates are designed to 
-    
-    the target RP's endpoint (i.e., redirection URI in OIDC) is pre-registered at the IdP,
-        and is a parameter in the identity-token response.
-    
-    verified parameter return from the IdP.
-To ensure 
-    in privacy-preserving SSO, since the IdP knows nothing about the visited RP,
-    the user has to obtain this critical parameter by itself.
-We 
+        the user has to deal with RP endpoints by himself.
+An RP certificate is a message signed by the IdP, binding the RP's identity and its endpoint.
+This message is sent by the RP in the login instance,
+    so that the user is able to forward the tokens to this verified endpoint.
 
 We present the detailed protocols as below,
     Table \ref{tbl:notations-protocol} lists the notations used in these protocols.
@@ -170,8 +159,8 @@ We present the detailed protocols as below,
     {$PID_U$} & {$PID_U = [{ID_U}]{PID_{RP}} = [utr]G$; a user's pseudo-identity, in some login instance.} \\ \hline
     {$PID_{RP}$} & {$PID_{RP} = [t]{ID_{RP}} = [tr]G$; an RP's pseudo-identity, in some login instance.} \\ \hline
      {$Acct$} & {$Acct = [t^{-1}]PID_{U} = [ID_U]ID_{RP} = [ur]G$; a user's identity at the RP.} \\ \hline
-    {$SK$, $PK$} & {The IdP's key pair, a private key and a public key, to sign/verify identity tokens and RP certificates.} \\ \hline
-    {$Cert_{RP}$} & {An RP certificate, containing the RP's identity and endpoint.} \\ \hline
+    {$SK$, $PK$} & {The IdP's key pair, a private key and a public key, to sign and verify identity tokens and RP certificates.} \\ \hline
+    {$Cert_{RP}$} & {An RP certificate, a message signed by the IdP, binding the RP's identity and endpoint.} \\ \hline
 %    {$T$} & {The trapdoor to derive $Account$: $T=N_U^{-1} \bmod n$.} \\ \hline
     \end{tabular}
     \label{tbl:notations-protocol}
@@ -179,7 +168,7 @@ We present the detailed protocols as below,
 
 
 \vspace{1mm}
-\noindent \textbf{System Initialization.} 
+\noindent \textbf{System Initialization.}
 %In particular, the IdP %chooses $L$,
 %generates a large prime $p$, and a prime factor $q$ of $p-1$
 % and a generator $g$ of order $q$
@@ -187,18 +176,31 @@ We present the detailed protocols as below,
 The IdP generates a key pair ($SK$, $PK$) to sign/verify identity tokens and RP certificates.
 %The lengths of %$p$, $q$ and
 %($SK$, $PK$) should satisfy the required security strength.
-Then, the IdP keeps $SK$ secret, while announcing %$p$, $q$ and
-$PK$ as public parameters.
+Then, the IdP keeps $SK$ secret, while $PK$ is publicly known.
 %The values of $p$, $q$, $g$ remain the same during the full lifecycle of an SSO system.
 %While, the asymmetric key pair ($SK$, $PK$) will be updated when necessary. For example, when $SK$ is leaked, IdP must update ($SK$,$PK$).
 
-++++++
-
 
 \vspace{1mm}
-\noindent\textbf{RP Initial Registration.} Each RP calls an initial registration process once to obtain configurations. In particular, an RP registers itself at the IdP to obtain a unique identifier $ID_{RP}$ and the corresponding RP certificate $Cert_{RP}$ as follows: (i) The RP sends
-a registration request to the IdP, including
-the RP endpoint (e.g., URL) to receive identity tokens; (ii) The IdP generates a unique $ID_{RP}$ and signs $[ID_{RP}, Endpoint_{RP}, *]$ using $SK$, where $*$ denotes supplementary information such as the RP's common name; then, the IdP returns $Cert_{RP} = [ID_{RP}, Endpoint_{RP}, *]_{SK}$ to the RP, where $[\cdot]_{SK}$ means the message is signed using $SK$; (iii) The RP verifies $Cert_{RP}$ using $PK$ and accepts $ID_{RP}$ and $Cert_{RP}$ if they are valid.
+\noindent\textbf{RP Initial Registration.} Each RP launches
+    an initial registration process once to finish configurations.
+In particular, an RP registers itself at the IdP to obtain its unique identifier $ID_{RP}$
+ and the corresponding RP certificate $Cert_{RP}$ as follows:
+\begin{enumerate}
+\item
+The RP sends a registration request to the IdP, including the RP endpoint (e.g., URL) to receive identity tokens,
+    and other optional information.
+\item
+The IdP generates a unique random number $r$,
+    and $ID_{RP} = [r]G$ is assigned to this RP.
+The IdP then signs $Cert_{RP} = [ID_{RP}, Endpoint_{RP}, *]_{SK}$,
+     where $[\cdot]_{SK}$ means a message signed using $SK$ and $*$ denotes supplementary information such as the RP's common name and Email,
+     and returns $Cert_{RP}$ to the RP.
+\item
+The RP verifies $Cert_{RP}$ using $PK$,
+    and accepts $ID_{RP}$ and $Cert_{RP}$ if they are valid.
+\end{enumerate}
+ 
 %\begin{itemize}
 %\item The RP sends a registration request to the IdP, including the RP endpoint (e.g., URL) to receive identity tokens.
 %\item The IdP generates the unique generator $ID_{RP}$,
@@ -206,23 +208,31 @@ the RP endpoint (e.g., URL) to receive identity tokens; (ii) The IdP generates a
 %signs $[ID_{RP}, Endpoint_{RP}, *]$ using $SK$, where $*$ denotes the supplementary information such as the RP's common name, and returns $Cert_{RP} = [ID_{RP}, Endpoint_{RP}, *]_{SK}$ to the RP, where $[\cdot]_{SK}$ means the message is signed using $SK$.
 %\item The RP verifies $Cert_{RP}$ using $PK$ and accepts $ID_{RP}$ and $Cert_{RP}$ if they are valid.
 %\end{itemize}
-\textcolor[rgb]{1.00,0.00,0.00}{Note that, in UPRESSO, $ID_{RP}$ must be generated by the IdP but cannot be chosen by the RP.}
-why cannot? How about $ID_U$?
-% with $r$ unknown to the RP.
 
-%\vspace{1mm}
-\noindent\textbf{User Registration.} UPPRESSO adopts a similar user registration process as the ones in other SSO systems. Each user registers once at the IdP to set up a unique user identifier $ID_U$ and the corresponding user credential.
+Note that $ID_{RP}$ is generated by the IdP but not chosen by the RP;
+otherwise, a malicious RP might choose $ID_{RP}$ which reduces the difficulty to solve the ECDLP
+    (i.e., it is possible for the RP to derive $ID_U$ from $Acct = [ID_U]{ID_{RP}}$
+        or at least some information about $ID_U$).
+    
+
+\vspace{1mm}
+\noindent\textbf{User Registration.}
+UPPRESSO adopts a similar user registration process as the ones in other SSO systems.
+Each user registers once at the IdP to set up a unique user identifier $ID_U$ and the corresponding user credential.
 %$ID_U$ can be chosen by the user or the IdP, as long as it is unique for each user.
 
-%\vspace{1mm}
-\noindent\textbf{SSO Login.} An SSO login procedure is launched when a user requests to login an RP.
+\vspace{1mm}
+\noindent\textbf{SSO Login.} An SSO login instance is typically launched through a user agent (or browser),
+when a user requests to login an RP.
 %, which calls three identifier-transformation functions following the login flow as shown in Figure \ref{fig:process}.
 %Once a user attempts to login an RP, the SSO login is initiated.
 %We use the OIDC implicit protocol flow as an example, to demonstrate  how to integrate the three functions $\mathcal{F}_{ID_{U} \mapsto PID_{U}}$, $\mathcal{F}_{ID_{RP} \mapsto PID_{RP}}$ and $\mathcal{F}_{PID_{U} \mapsto Account}$ into the typical SSO systems.
-It consists of five phases, namely scripts downloading, RP identifier transformation, $PID_{RP}$ registration, identity token generation, and $Account$ calculation, as shown in Figure \ref{fig:process}.
+It consists of five phases, namely script downloading, RP identity transformation, $PID_{RP}$ registration, identity token generation, and $Acct$ calculation, as shown in Figure \ref{fig:process}.
 
 
-\noindent{\em 1. Scripts Downloading.}
+++++++
+
+\noindent 1. {\em Script Downloading.}
 The scripts downloading phase is for the user's browser to download the scripts from the RP and IdP servers. The browser and two scripts work together to play the user agent role.
 \vspace{-\topsep}
 \begin{itemize}
@@ -254,7 +264,7 @@ The user and RP cooperate to generate $PID_{RP} = {N_{U}}{ID_{RP}}$. To hide the
 It is important to ensure that the RP endpoint is not tampered with by the adversary. In other OIDC systems, the IdP obtains the RP endpoint from RP registration and verifies the endpoint in the identity token request. However, the IdP in UPPRESSO sees only a one-time endpoint. So, we ask the user to verify the correctness of the RP endpoint using the RP certificate. %which is signed by the IdP.
 
 
-\noindent{\em 3. $\mathbf{PID_{RP}}$ Registration.}
+\noindent{\em 3. $\mathbf{PID_{RP}}$ Dynamic Registration.}
 In this phase, the user registers a new RP with $PID_{RP}$ at the IdP using OIDC's dynamic registration. This step has to be conducted by the user but not the RP. Otherwise, the IdP can associate $PID_{RP}$ and $ID_{RP}$.
 \vspace{-\topsep}
 \begin{itemize}
