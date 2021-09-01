@@ -125,10 +125,12 @@ Therefore, it prevents IdP-based login tracing.
 With the identity-transformation functions,
  UPRESSO potentially satisfies all the requirements of security and privacy. %desirable for a secure and privacy-preserving SSO service.
 But we still need another design, \emph{RP certificate},
-     to ensure the confidentiality of identity tokens.
+     to ensure the confidentiality of identity tokens,
+    especially when it is designed to provides SSO services through browsers.
 In the original SSO protocols,
-    an RP is initially registered at the IdP with an endpoint to receive identity tokens (e.g., redirection URI in OIDC),
-        and this endpoint is set in the identity-token response by the IdP, to instruct the user to forward the identity token.
+    an RP is initially registered at the IdP with an endpoint to receive identity tokens (e.g., redirection URI in OIDC).
+This endpoint is then set in the identity-token response by the IdP, to instruct the browser to forward the identity token,
+    for a browser does not pre-configure the endpoint for each RP.
 Obviously,
     an incorrect RP endpoint leaks identity tokens.
 
@@ -222,7 +224,7 @@ Each user registers once at the IdP to set up a unique user identifier $ID_U$ an
 %$ID_U$ can be chosen by the user or the IdP, as long as it is unique for each user.
 
 \vspace{1mm}
-\noindent\textbf{SSO Login.} An SSO login instance is typically launched through a user agent (or browser),
+\noindent\textbf{SSO Login.} An SSO login instance is typically launched through a browser,
 when a user requests to login an RP.
 %, which calls three identifier-transformation functions following the login flow as shown in Figure \ref{fig:process}.
 %Once a user attempts to login an RP, the SSO login is initiated.
@@ -233,10 +235,11 @@ It consists of five phases, namely script downloading, RP identity transformatio
 ++++++
 
 \noindent 1. {\em Script Downloading.}
-The scripts downloading phase is for the user's browser to download the scripts from the RP and IdP servers. The browser and two scripts work together to play the user agent role.
+The script downloading phase is for the user's browser
+ to download the scripts from the IdP and RPs.
+The browser and two scripts work together as the user agent.
 \vspace{-\topsep}
 \begin{itemize}
-%\setlength{\itemsep}{0pt plus 1pt}
 \item[1.1] The user visits the RP's site to download the RP script.
 \vspace{-\topsep}
 \item[1.2] The RP script opens a new window in the browser to visit the login path at the RP server.
@@ -249,8 +252,9 @@ The scripts downloading phase is for the user's browser to download the scripts 
 
 
 
-\noindent{\em 2. RP Identifier Transformation.}
-The user and RP cooperate to generate $PID_{RP} = {N_{U}}{ID_{RP}}$. To hide the RP's endpoint from the IdP, the user needs to create a new endpoint to replace the real endpoint of the RP.
+\noindent{\em 2. RP Identity Transformation.}
+The user and RP cooperate to generate $PID_{RP} = {N_{U}}{ID_{RP}}$. To hide the RP's endpoint from the IdP,
+ the user needs to generate a random endpoint to replace the real RP endpoint.
 \vspace{-\topsep}
 \begin{itemize}
 %\setlength{\itemsep}{0pt plus 1pt}
