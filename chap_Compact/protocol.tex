@@ -127,19 +127,20 @@ Therefore, it prevents IdP-based login tracing.
     {$G$, $n$}&{$G$ is a base point of $\mathbb{E}$, and the order of $G$ is $n$.} \\ \hline
 %    {$q$} & {A large prime, the size of the underlying field.} \\ \hline
 %    {$n$} & {the order of the base point $G$.} \\ \hline
-    {$ID_U$} & {$ID_U = u$, $1 < u < n$; a user's unique identity at the IdP.} \\ \hline
-   {$ID_{RP}$} & {$ID_{RP} = [r]G$, $1 < r < n$; an RP's unique identity at the IdP.} \\ \hline
-    {$t$} & {A user-generated random number for each login instance, $1 < t < n$.} \\ \hline
-    {$PID_{RP}$} & {$PID_{RP} = [t]{ID_{RP}} = [tr]G$; an RP's pseudo-identity, in some login instance.} \\ \hline
-    {$PID_U$} & {$PID_U = [{ID_U}]{PID_{RP}} = [utr]G$; a user's pseudo-identity, in some login instance.} \\ \hline
-     {$Acct$} & {$Acct = [t^{-1}]PID_{U} = [ID_U]ID_{RP} = [ur]G$; a user's account at the RP.} \\ \hline
+    {$ID_U$} & {$ID_U = u$, $1 < u < n$; the user's unique identity at the IdP.} \\ \hline
+   {$ID_{RP_j}$} & {$ID_{RP} = [r]G$, $1 < r < n$; the $j$-th RP's unique identity at the IdP.} \\ \hline
+    {$t$} & {A user-generated random number in each login instance, $1 < t < n$.} \\ \hline
+    {$PID_{RP_j}^i$} & {$PID_{RP} = [t]{ID_{RP}} = [tr]G$; the $j$-th RP's pseudo-identity, in the user's $i$-th login instance to this RP.} \\ \hline
+    {$PID_{U,j}^i$} & {$PID_U = [{ID_U}]{PID_{RP}} = [utr]G$; the user's pseudo-identity, in the user's $i$-th login instance to the $j$-th RP.} \\ \hline
+     {$Acct_j$} & {$Acct = [t^{-1}]PID_{U} = [ID_U]ID_{RP} = [ur]G$; the user's account at the $j$-th RP.} \\ \hline
     {$SK$, $PK$} & {The IdP's key pair, a private key and a public key, to sign and verify identity tokens and RP certificates.} \\ \hline
-    {$Cert_{RP}$} & {An RP certificate, a message signed by the IdP, binding the RP's identity and endpoint.} \\ \hline
 %    {$T$} & {The trapdoor to derive $Account$: $T=N_U^{-1} \bmod n$.} \\ \hline
+    {$Enpt_{RP_j}$} & {The $j$-th RP's endpoint, to receive the identity tokens.} \\ \hline
+    {$Cert_{RP_j}$} & {The RP certificate signed by the IdP, binding $ID_{RP_j}$ and $Enpt_{RP_j}$.} \\ \hline
+    {$PEnpt_{U,j}^i$} & {A user-generated ``pseudo-endpoint'', in the user's $i$-th login instance to the $j$-th RP.} \\ \hline
     \end{tabular}
     \label{tbl:notations-protocol}
 \end{table}
-
 
 
 
@@ -147,6 +148,8 @@ Therefore, it prevents IdP-based login tracing.
 In addition to the identity-transformation functions,
     we propose the following designs specific for web applications,
         facilitating a user to visit the services through browsers.
+These designs enable UPPRESSO to provide SSO services for web users with standard browsers,
+    while more efficient but less portable implementations with browser extensions and/or plug-ins are discussed in Section \ref{sec:discussion}.
 
 First of all, in the SSO login flow,
     the user has to deal with RP endpoints (i.e., the URLs to receive identity tokens) by himself.
@@ -157,7 +160,7 @@ This instructs the user agent (or browser) to forward it correctly;
     otherwise, the confidentiality of identity tokens might be broken.
 
 Because the IdP of UPPRESSO is not aware of the visited RP and then cannot set the RP endpoints,
-        \emph{RP certificates} are designed to instructs the browsers about RP endpoints.
+        \emph{RP certificates} are designed to instructs the user agents (or browsers) about RP endpoints.
 An RP certificate is a message signed by the IdP, binding the RP's identity and its endpoint.
 This certificate is sent by the RP in the login flow,
     so that the user is able to forward the identity tokens to this verified endpoint.
@@ -168,21 +171,18 @@ Secondly,
             and the dealing with RP certificates and endpoints,
             for these are not standard functions of a browser.
 Two scripts, one downloaded from the IdP and the other from the target RP,
-    work together in the browser as a user agent.
+    work together (with the standard  browser functions) as a user agent.
 The IdP script communicates with the IdP,
     the RP script does with the RP,
     while two scripts communicates with each other through the \verb+postMessage+ HTML5 API.
-The RP script is necessary to keep the sessions with the RP,
-    and the IdP script cannot be eliminated or replaced because an HTTP request launched by the RP script and sent to the IdP
+The RP script maintains the sessions with the RP.
+The IdP script cannot be eliminated or replaced, because an HTTP request launched by the RP script and sent to the IdP
             will automatically carry the \verb+Referer+ HTTP header, which discloses the RP's domain.
 
 Finally,
-    the IdP's public key is also downloaded in the IdP script to verify RP certificates, which are sent from the RP.
-So the user agent does not need configure anything locally,
-    as it does in OIDC.
-
-The above designs enable UPPRESSO to provide SSO services for users with standard browsers,
-    more efficient but less portable implementations with browser extensions and/or plug-ins is discussed in Section \ref{sec:discussion}.
+    the IdP's public key is downloaded in the IdP script to verify RP certificates, which are sent from the RP.
+So the user agent does not configure anything locally,
+    as it does in most existing SSO systems.
 
 \subsection{UPPRESSO Protocols}
 \label{implementations}
@@ -208,12 +208,12 @@ In particular, an RP registers itself at the IdP to obtain its unique identifier
  and the corresponding RP certificate $Cert_{RP}$ as follows:
 \begin{enumerate}
 \item
-The RP sends a registration request to the IdP, including the RP endpoint (e.g., URL) to receive identity tokens,
+The RP sends a registration request to the IdP, including the RP endpoint to receive identity tokens,
     and other optional information.
 \item
-The IdP generates a unique random number $r$,
-    and $ID_{RP} = [r]G$ is assigned to this RP.
-The IdP then signs $Cert_{RP} = [ID_{RP}, Endpoint_{RP}, *]_{SK}$,
+The IdP generates a unique random number $r$, calculates $ID_{RP} = [r]G$,
+    and assigns $ID_{RP}$ to this RP.
+The IdP then signs $Cert_{RP} = [ID_{RP}, Enpt_{RP}, *]_{SK}$,
      where $[\cdot]_{SK}$ means a message signed using $SK$ and $*$ denotes supplementary information such as the RP's common name and Email,
      and returns $Cert_{RP}$ to the RP.
 \item
