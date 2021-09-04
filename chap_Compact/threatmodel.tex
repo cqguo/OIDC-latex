@@ -4,14 +4,14 @@
 \section{The Design of UPPRESSO}
 \label{sec:UPPRESSO}
 
-In this section,
-    we firstly present the threat model of UPPRESSO,
+This section presents the threat model of UPPRESSO,
         and assumptions on the SSO system.
 Then,
     we design three identity-transformation functions satisfying with the requirements,
     and the detailed protocols.
 The compatibility between UPPRESSO and OIDC is also discussed,
     which will help the adoption and deployment of UPPRESSO.
+Table \ref{tbl:notations-protocol} lists the notations used in the design.
 
 %Similar as other SSO systems (e.g., SAML and OIDC), UPPRESSO consists of an IdP and multiple RPs and users.
 %The IdP provides user authentication services for all RPs.
@@ -19,7 +19,7 @@ The compatibility between UPPRESSO and OIDC is also discussed,
 
 \subsection{Threat Model}
 In UPPRESSO, we consider the IdP is curious-but-honest,
- while some users and RPs could be compromised by adversaries. % or even collude with each other.
+ while some users and RPs could be compromised. % or even collude with each other.
 Malicious users and RPs might behave arbitrarily or collude with each other,
  attempting to break the security and privacy guarantees for benign users.
 
@@ -53,7 +53,7 @@ They want to impersonate a victim user at honest RPs, or allure a victim user to
 %To achieve this, they could behave arbitrarily \cite{WangCW12, SomorovskyMSKJ12}.
 For example, a malicious user might
     modify, insert, drop or replay a message, or deviate arbitrarily from the specifications
-     in the SSO login instances.
+     in any SSO login instances.
 
 % the forwarding messages (requests of identity token, identity token,  RP registration request and result, and etc.),
 %  and provide incorrect values for negotiating $PID_{RP}$ (detailed in Section \ref{implementations}).
@@ -64,7 +64,7 @@ For example, a malicious user might
 \noindent \textbf{Malicious RPs.}
 The adversary could also control a set of RPs, by registering at the IdP as an RP
      or exploiting software vulnerabilities to compromise some RPs.
-The malicious RPs may behave arbitrarily to break the security and privacy guarantees of UPPRESSO.
+The malicious RPs might behave arbitrarily to break the security and privacy guarantees of UPPRESSO.
 %they may attempt to obtain a valid identity token for another RP, to allow some user to log into this target RP:
 For example,
 a malicious RP might manipulate $PID_{RP}$ in a login instance,
@@ -81,7 +81,7 @@ or, it might manipulate $PID_{RP}$ to affect the generation of $PID_U$,
 \vspace{1mm}
 \noindent \textbf{Collusive Users and RPs.} %In particular,
 Malicious users and RPs might collude with each other
-        to break the security and privacy guarantees.
+        to break the security and privacy guarantees for benign users.
 For example, an adversary could first pretend to be an honest RP and allure victim users to forward an identity token to it.
     With the valid identity token, it could impersonate the victim user and login the honest RP.
 %For example, malicious users and RPs may manipulate $PID_U$ and $PID_{RP}$ in an identity token collusively to perform the impersonation or identity injection attacks.
@@ -95,22 +95,20 @@ For example, an adversary could first pretend to be an honest RP and allure vict
 
 \subsection{Assumptions}
 First of all,
-    we assume that a user never authorizes the IdP to enclose any distinctive attributes in identity tokens,
-        while distinctive attributes are identifiable information such as telephone number, Email, driver license, etc.
+    we assume that a user never authorizes the IdP to enclose any \emph{distinctive attributes} in identity tokens,
+        where distinctive attributes are identifiable information such as telephone number, Email, driver license, etc.
 The user does not register distinctive attributes at the RP, either.
 Therefore, the privacy leakage due to user re-identification by distinctive attributes is considered out of the scope of this work.
 
 We focus on the privacy attacks enabled by the design of SSO protocols,
     but not network attacks such as the traffic analysis that traces a user's login activities at different RPs from network packets.
-Such network attacks shall prevented by other existing defenses.
+Such network attacks shall be prevented by other existing defenses.
 The software stack deployed at honest entities is correctly implemented,
      so that it transmits messages to the receivers as expected.
 
-Finally, 
-the user agent deployed at honest users is correctly implemented
-     so that it transmits messages to the receivers as expected.
-We also assume TLS is adopted to secure the communications between honest entities,
- and the cryptographic primitives are correctly implemented.
+Finally,
+we also assume TLS is adopted to secure the communications between honest entities,
+ and the adopted cryptographic primitives are secure.
 %As we consider IdP is always honest, therefore, all the parameters provided by the IdP are assumed to be honest. All the calculations and verifications conducted by IdP are correct. Meanwhile, the collusion between RPs and IdP is not considered in this paper.
 
 

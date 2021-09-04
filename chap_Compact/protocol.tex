@@ -48,7 +48,7 @@ PID_{RP} = \mathcal{F}_{PID_{RP}}(ID_{RP}) = [t]{ID_{RP}} = [tr]G
 \noindent {\bf ${ID_U}$-$PID_U$ Transformation.}
 %Now, the identity token request to the IdP contains a user identity $ID_U$ and a pseudo-identity of the RP $PID_{RP}$. Therefore,
 On receiving an identity-token request with $ID_U$ and $PID_{RP}$,
-    the IdP calculates $PID_{U}$ as below.
+    the IdP calculates $PID_{U}$.
 \begin{equation}
  PID_{U} = \mathcal{F}_{PID_U}(ID_U, PID_{RP}) = [{ID_U}]{PID_{RP}} = [utr]G
  \label{equ:PIDU}
@@ -69,7 +69,6 @@ On receiving an identity-token request with $ID_U$ and $PID_{RP}$,
 In the negotiation of $PID_{RP}$,
     the user also sends the random number $t$ to the RP.
 So the RP also calculates $PID_{RP}$ to verify the designated RP pseudo-identity in identity tokens.
-
 After verifying an identity-token binding $PID_U$ and $PID_{RP}$,
     the RP calculates $Acct$ as below.
 %As $n$ is a prime number and $1< N_U < n$, $n$ is coprime to $N_U$. So, there always exists a $T$ that satisfies $T N_U = 1 \bmod n$.
@@ -95,12 +94,12 @@ From Equations \ref{equ:PIDRP}, \ref{equ:PIDU} and \ref{equ:Account}, it is deri
 
 So the RP obtains the identical permanent account from different identity tokens in multiple login instances,
     with the help of $t$ from the user.
-Given a user, the accounts at different are inherently unique.
+Given a user, the accounts at different RPs are inherently unique.
 Moreover,
-    due to the elliptic curve discrete logarithm problem (ECDLP),
-it is computationally infeasible (\emph{a}) for the IdP to derive $ID_{RP}$ from $PID_{RP}$,
-    or (\emph{b}) for the RP to derive $ID_U$ from either $PID_U$ or $Acct$.
-
+    (\emph{a}) due to the elliptic curve discrete logarithm problem (ECDLP),
+it is computationally infeasible for the RP to derive $ID_U$ from either $PID_U$ or $Acct$;
+    and (\emph{b}) because $t$ is a random number kept secret to the IdP,
+        it is impossible for the IdP to derive $ID_{RP}$ from $PID_{RP}$.
 
 
 \begin{comment}
@@ -119,10 +118,7 @@ Therefore, it prevents IdP-based login tracing.
 
 
 
-\subsection{UPPRESSO Protocols}
-\label{implementations}
-
-\subsubsection{The Designs for Web Applications}
+\subsection{The Design for Web Applications}
 With the identity-transformation functions,
  UPRESSO potentially satisfies all the requirements of security and privacy. %desirable for a secure and privacy-preserving SSO service.
 But we still need another design, \emph{RP certificate},
@@ -161,10 +157,9 @@ How to remember the IdP's public key?
 Why need "PIDRPDynamic Registration." This is for OIDC compatibility.
 
 
+\subsection{UPPRESSO Protocols}
+\label{implementations}
 
-
-We present the detailed protocols as below,
-    Table \ref{tbl:notations-protocol} lists the notations used in these protocols.
 
 \begin{table}[tb]
 \scriptsize
@@ -180,9 +175,9 @@ We present the detailed protocols as below,
     {$ID_U$} & {$ID_U = u$, $1 < u < n$; a user's unique identity at the IdP.} \\ \hline
    {$ID_{RP}$} & {$ID_{RP} = [r]G$, $1 < r < n$; an RP's unique identity at the IdP.} \\ \hline
     {$t$} & {A user-generated random number for each login instance, $1 < t < n$.} \\ \hline
-    {$PID_U$} & {$PID_U = [{ID_U}]{PID_{RP}} = [utr]G$; a user's pseudo-identity, in some login instance.} \\ \hline
     {$PID_{RP}$} & {$PID_{RP} = [t]{ID_{RP}} = [tr]G$; an RP's pseudo-identity, in some login instance.} \\ \hline
-     {$Acct$} & {$Acct = [t^{-1}]PID_{U} = [ID_U]ID_{RP} = [ur]G$; a user's identity at the RP.} \\ \hline
+    {$PID_U$} & {$PID_U = [{ID_U}]{PID_{RP}} = [utr]G$; a user's pseudo-identity, in some login instance.} \\ \hline
+     {$Acct$} & {$Acct = [t^{-1}]PID_{U} = [ID_U]ID_{RP} = [ur]G$; a user's account at the RP.} \\ \hline
     {$SK$, $PK$} & {The IdP's key pair, a private key and a public key, to sign and verify identity tokens and RP certificates.} \\ \hline
     {$Cert_{RP}$} & {An RP certificate, a message signed by the IdP, binding the RP's identity and endpoint.} \\ \hline
 %    {$T$} & {The trapdoor to derive $Account$: $T=N_U^{-1} \bmod n$.} \\ \hline
@@ -191,7 +186,6 @@ We present the detailed protocols as below,
 \end{table}
 
 
-\subsubsection{Flows}
 \noindent \textbf{System Initialization.}
 %In particular, the IdP %chooses $L$,
 %generates a large prime $p$, and a prime factor $q$ of $p-1$
@@ -487,7 +481,7 @@ The RP verifies the identity token, including the signature, validity period, an
 \end{strip}
 \end{comment}
 
-\subsubsection{Compatibility with OIDC}
+\subsection{Compatibility with OIDC}
 \label{subsec:compatible}
 UPPRESSO does not introduce any new role (or component) nor change the security assumptions for each role. It follows a similar logic flow as OIDC in SSO login and only requires small modifications to perform identifier transformation.
 %Here, we explain the modification in each of the five phases of its SSO login flow to show that UPPRESSO is compatible with OIDC, which indicates UPPRESSO can be easily integrated with other commonly used SSO systems.
