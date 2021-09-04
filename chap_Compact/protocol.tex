@@ -8,7 +8,7 @@
 \begin{figure*}
   \centering
   \includegraphics[width=0.9\textwidth]{fig/process-js.pdf}
-  \caption{The flow of a user login in UPPRESSO.}
+  \caption{The SSO login flow of UPPRESSO.}
   \label{fig:process}
 \end{figure*}
 We design three identity-transformation functions,
@@ -515,7 +515,7 @@ The RP verifies the identity token, including the signature, validity period, an
 \subsection{Compatibility with OIDC}
 \label{subsec:compatible}
 We explain the compatibility with OIDC as below,
-    and this compatibility helps us to analyze and implement UPPRESSO.
+    and this compatibility helps us to analyze, implement and deploy UPPRESSO.
 
 Among the five steps of the SSO login flow in UPPRESSO,
     the script downloading prepares the user agent.
@@ -535,23 +535,18 @@ The operations in the $PID_{RP}$ registration are almost identical to those in t
 The operations in the steps of identity token generation and $Acct$ calculation, 
     are actually identical to those in the implicit SSO login flow of OIDC \cite{OpenIDConnect},
     while (\emph{a}) the calculation of $PID_U$ is viewed as a method to generate PPIDs by the IdP
-        and (\emph{b}) the calculation of $Acct$ is viewed as a mapping 
-    the RP's operations are actually identical to 
-
-++++
+        and (\emph{b}) the calculation of $Acct$ is viewed as a mapping from the user identity in tokens
+                    to the local account at the RP.
 
     
-Five steps of the SSO login flow in UPPRESSO,
-    
-
-It follows a similar logic flow as OIDC in SSO login and only requires small modifications to perform identifier transformation.
+%It follows a similar logic flow as OIDC in SSO login and only requires small modifications to perform identifier transformation.
 %Here, we explain the modification in each of the five steps of its SSO login flow to show that UPPRESSO is compatible with OIDC, which indicates UPPRESSO can be easily integrated with other commonly used SSO systems.
-Among the five steps,
- the {\em scripts downloading} and {\em RP identifier transformation} steps are newly introduced by UPPRESSO.
-The browser is required to download two scripts from the IdP and RP and most of the designed operations in these two steps are performed by the scripts in the browser.
-So, we require minimal modifications to the IdP and RPs providing new network interfaces (i.e., the new URLs for downloading resources).
-The other three steps adopt a similar communication pattern as OIDC.
-In particular, the {\em $PID_{RP}$ registration} step can be viewed as a variant of the RP dynamic registration flow of OIDC \cite{DynamicRegistration}, which allows an entity to register its identity and endpoint at the IdP.
+%Among the five steps,
+% the {\em scripts downloading} and {\em RP identifier transformation} steps are newly introduced by UPPRESSO.
+%The browser is required to download two scripts from the IdP and RP and most of the designed operations in these two steps are performed by the scripts in the browser.
+%So, we require minimal modifications to the IdP and RPs providing new network interfaces (i.e., the new URLs for downloading resources).
+%The other three steps adopt a similar communication pattern as OIDC.
+%In particular, the {\em $PID_{RP}$ registration} step can be viewed as a variant of the RP dynamic registration flow of OIDC \cite{DynamicRegistration}, which allows an entity to register its identity and endpoint at the IdP.
 
 %UPPRESSO can also support the authorization code flow of OIDC with small modifications (to be discussed in Section \ref{sec:discussion}).
 

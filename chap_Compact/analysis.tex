@@ -1,4 +1,4 @@
-\section{Security Analysis}
+\section{Formal Analysis of UPPRESSO}
 \label{sec:analysis}
 \begin{figure*}
   \centering
@@ -9,6 +9,10 @@
 \vspace{-7mm}
 \end{figure*}
 In this section, we propose the security properties of privacy-preserving SSO schemes and then give the proofs that UPPRESSO follows the security properties.
+
+++++
+
+
 \subsection{The Web Model}
 \label{subsec:webmodel}
 The Dolev-Yao model abstracts the entities in a system, such as browsers and web servers, as {\em atomic processes}, which communicate with each other through the {\em events}. \cite{SPRESSO} also defines {\em scripting processes} to model client-side scripting such as JavaScript, so a web system consists of a set of atomic and scripting processes. The state of a system, called a {\em configuration}, consists of the current states of all atomic processes and all the events that can be accepted by these processes. We list the definitions of these notations as below \cite{SPRESSO}.
@@ -81,26 +85,26 @@ Pr[D(P, aP, bP, abP)=1]-Pr[D(P, aP, bP, cP)=1]=\sigma(n)
 
 \vspace{-2mm}
 \noindent\textbf{RP-based identity linkage.}
-At the very beginning, let us see the data exposed to RP during the authentication in the UPPRESSO system. 
-We can find that, RP holds $ID_{RP}$,  generates $PID_{RP}$, $T$, $Account$, and receives $N_U$, registration result (containing $PID_{RP}$, hash($N_U$) and $Endpoint_U$), and identity proof (including $PID_{RP}$ and $PID_U$). Then we delete the irrelevant data, $Endpoint_U$, as it is generated randomly and does not participates and further calculation. And the repetitive data should also be deleted, for example, $PID_{RP}$ is generated as $PID_{RP}=N_U \cdot {ID_{RP}}$ so that $PID_{RP}$ can be omitted. Finally, the effective date collected by the RP during the authentication flow is $\langle ID_{RP}, N_U, PID_U\rangle$, while $PID_U$ equals to $ID_U \cdot{(N_U \cdot {ID_{RP})}}$. 
+At the very beginning, let us see the data exposed to RP during the authentication in the UPPRESSO system.
+We can find that, RP holds $ID_{RP}$,  generates $PID_{RP}$, $T$, $Account$, and receives $N_U$, registration result (containing $PID_{RP}$, hash($N_U$) and $Endpoint_U$), and identity proof (including $PID_{RP}$ and $PID_U$). Then we delete the irrelevant data, $Endpoint_U$, as it is generated randomly and does not participates and further calculation. And the repetitive data should also be deleted, for example, $PID_{RP}$ is generated as $PID_{RP}=N_U \cdot {ID_{RP}}$ so that $PID_{RP}$ can be omitted. Finally, the effective date collected by the RP during the authentication flow is $\langle ID_{RP}, N_U, PID_U\rangle$, while $PID_U$ equals to $ID_U \cdot{(N_U \cdot {ID_{RP})}}$.
 
-%We assume that collusive can correlate $PID_U$s at different RPs and guess if they belong to the same user. Thus, 
-There is the data set, $\langle ID_{RP1}$, $N_{U1}$, $ID_U \cdot{(N_{U1} \cdot {ID_{RP1})}}$, $ID_{RP2}$, $N_{U2}$, $ID_U' \cdot{(N_{U2} \cdot {ID_{RP2})}}\rangle$, that RP-based identity linkage attack can be considered as RP guesses whether $ID_U$ equals $ID_U'$. 
-Here, we can define the game, the adversary owns the same ability as the RP. The adversary receive the input $\langle ID_{RP1}$, $N_{U1}$, $ID_U \cdot{(N_{U1} \cdot {ID_{RP1})}}$, $ID_{RP2}$, $N_{U2}$, $ID_U' \cdot{(N_{U2} \cdot {ID_{RP2})}}\rangle$ from the challenger, and returns the result $b$. 
+%We assume that collusive can correlate $PID_U$s at different RPs and guess if they belong to the same user. Thus,
+There is the data set, $\langle ID_{RP1}$, $N_{U1}$, $ID_U \cdot{(N_{U1} \cdot {ID_{RP1})}}$, $ID_{RP2}$, $N_{U2}$, $ID_U' \cdot{(N_{U2} \cdot {ID_{RP2})}}\rangle$, that RP-based identity linkage attack can be considered as RP guesses whether $ID_U$ equals $ID_U'$.
+Here, we can define the game, the adversary owns the same ability as the RP. The adversary receive the input $\langle ID_{RP1}$, $N_{U1}$, $ID_U \cdot{(N_{U1} \cdot {ID_{RP1})}}$, $ID_{RP2}$, $N_{U2}$, $ID_U' \cdot{(N_{U2} \cdot {ID_{RP2})}}\rangle$ from the challenger, and returns the result $b$.
 The $b$ is set 1, while adversary guess that $ID_U$ equals $ID_U'$, otherwise 0. The game is shown as Figure~\ref{fig:game}.
-Therefore, whether the RP-based identity linkage attack is available is equivalent to whether adversary has the advantage on the guessing game. 
+Therefore, whether the RP-based identity linkage attack is available is equivalent to whether adversary has the advantage on the guessing game.
 We define $Pr_1$ is the probability, while the adversary returns $b=1$ as $ID_U$ equals to $ID_U'$. And $Pr_2$ is the probability, while the adversary returns $b=1$ as $ID_U$ does not equal to $ID_U'$.
-Adversary has the advantage on the guessing game means that 
+Adversary has the advantage on the guessing game means that
 \vspace{-\topsep}
 \begin{equation}
 Pr_1-Pr_2>\sigma(n)
 \end{equation}
-While an adversary has the advantage on the guessing game, based on the challenger and adversary, we can build a PPT distinguishing algorithm $D$ that breaks DDH assumption. The algorithm is shown as Figure~\ref{fig:dalgorithm}. That is, the input of $D$ in the form ($X$,$Y$,$Z$,$N$), while $X$,$Y$,$Z$,$N$ are points on the elliptic curve. The challenger receives the input and set $ID_{RP1}=X$, $ID_{RP2}=Y$, $PID_{U1}=N_{U1} \cdot{Z}$, and $PID_{U2}=N_{U2} \cdot{N}$.  At the end, $D$ returns the $b$ as the result. 
+While an adversary has the advantage on the guessing game, based on the challenger and adversary, we can build a PPT distinguishing algorithm $D$ that breaks DDH assumption. The algorithm is shown as Figure~\ref{fig:dalgorithm}. That is, the input of $D$ in the form ($X$,$Y$,$Z$,$N$), while $X$,$Y$,$Z$,$N$ are points on the elliptic curve. The challenger receives the input and set $ID_{RP1}=X$, $ID_{RP2}=Y$, $PID_{U1}=N_{U1} \cdot{Z}$, and $PID_{U2}=N_{U2} \cdot{N}$.  At the end, $D$ returns the $b$ as the result.
 Now, we let ($P$, $aP$, $bP$, $abP$) and  ($P$, $aP$, $bP$, $cP$) be the input. Thus there is
 \vspace{-\topsep}
 \begin{multline*}
 \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ Pr[D(P,aP,bP,abP)=1]=\\ Pr[A(P, N_{U1}, b \cdot{N_{U1}P}, aP, N_{U2},b\cdot{N_{U2} aP})=1]=Pr_1\\
-Pr[D(P,aP,bP,cP)=1]=\ \ \ \ \ \ \ \ \ \ 
+Pr[D(P,aP,bP,cP)=1]=\ \ \ \ \ \ \ \ \ \
 \\ Pr[A(P, N_{U1}, b \cdot{N_{U1}P}, aP, N_{U2},c/a \cdot{N_{U2}aP})=1]=Pr_2
 \end{multline*}
 in the first equation $ID_{U} $ and $ ID_{U}'$ all equal to $b$, while in the second equation $ID_{U}$ does not equal to $ID_{U}'$, so that
