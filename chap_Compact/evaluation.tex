@@ -1,7 +1,7 @@
 \subsection{Performance Evaluation}
 \label{sec:evaluation}
 %We have compared the processing time of each user login in UPPRESSO, with the original OIDC implementation (MITREid Connect) and SPRESSO which only hides the user's accessed RPs from IdP.
-\noindent\textbf{Environment.} The evaluation was performed on 3 machines,
+The evaluation was performed on 3 machines,
 one (3.4GHz CPU, 8GB RAM, 500GB SSD, Windows 10) as IdP,
 one (3.1GHz CPU, 8GB RAM, 128GB SSD, Windows 10) as an RP,
 and the last one (2.9GHz CPU, 8GB RAM, 128GB SSD, Windows 10) as a user.
@@ -19,7 +19,6 @@ And the machines are connected by an isolated 1Gbps network.
 %没有因为部署在同一个机器上使得开销变长，monitor指系统的监视器
 %The monitor demonstrates that the calculation and network processing of the IdP does not become a bottleneck (the load of CPU and network is in the moderate level).
 
-\noindent\textbf{Setting.}
 We compare UPPRESSO with MITREid Connect \cite{MITREid} and SPRESSO \cite{SPRESSO},
 where MITREid Connect provides open-source Java implementations \cite{MITREid} of IdP and RP's SDK and SPRESSO provides the JavaScript implementations based on node.js for all entities \cite{SPRESSO}.
 We implemented a Java RP based on Spring Boot framework for UPPRESSO and MITREid Connect, by integrating the corresponding SDK respectively.
@@ -33,7 +32,6 @@ We divide a login instance into 3 phases according to the life-cycle of the iden
 and \textbf{\em Identity token acceptance} (Steps 4.5-5.2 in Figure \ref{fig:process}), the RP server receives, verifies and parse the identity token relayed from the IdP.
 % and \textbf{Identity token verification} (Steps 5.1 and 5.2 in Figure \ref{fig:process}), the RP verifying and parsing the identity token.
 
-\noindent\textbf{Results.}
 The evaluation results are provided in Figure \ref{fig:evaluation}.
 The overall processing times are  113 ms, 308 ms, and 310 ms for MITREid Connect, SPRESSO, and UPPRESSO, respectively. The details are as follows.
 The significant overhead  in UPPRESSO is opening the new window and downloading the script from IdP, which needs about 104 ms. This overhead could be reduced by implicitly conducting this procedure when the user visits the RP website.

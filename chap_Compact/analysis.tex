@@ -1,13 +1,4 @@
 \section{Formal Analysis of UPPRESSO}
-\label{sec:analysis}
-\begin{figure*}
-  \centering
-  \includegraphics[width=0.82\linewidth]{fig/game1.pdf}
-  \vspace{-6mm}
-  \caption{The Game.}
-  \label{fig:game}
-\vspace{-7mm}
-\end{figure*}
 In this section, we propose the security properties of privacy-preserving SSO schemes and then give the proofs that UPPRESSO follows the security properties.
 
 ++++
@@ -45,7 +36,8 @@ The details about each process are described in Appendix.
 Let's review the security properties in Section~\ref{subsec:basicrequirements}, including \textbf{user identification}, \textbf{RP designation}, \textbf{confidentiality} and \textbf{integrity}. In this section, we will give the brief illustration about how UPPRESSO guarantees the security properties, while the detailed process of proof is provided in the Appendix.
 
 \noindent\textbf{User identification.}
-The RP can always derive the constant and correct account from the changing $PID_U$. That is, the $PID_{RP}$ equal to $N_UID_{RP}$ (verified by RP), and $PID_U$ equals to $ID_UPID_{RP}$. The $PID_{RP}$ and $PID_U$ are protected by IdP generated signature. Thus, an RP can always derive the constant account $A$ equalled with $ID_UID_{RP}$.
+The RP can always derive the constant and correct account from the changing $PID_U$. That is, the $PID_{RP}$ equal to $[t]ID_{RP}$ (verified by RP), and $PID_U$ equals to $[ID_U]PID_{RP}$. The $PID_{RP}$ and $PID_U$ are protected by the IdP's signature.
+Thus, an RP can always derive the constant account equal to $[ID_U]ID_{RP}$.
 
 \noindent\textbf{RP designation.}
 For an honest RP, it only accepts the identity token carrying the $PID_{RP}$ equalled with $N_UID_{RP}$, while the $N_U$ is guaranteed by IdP issued registration result. Thus, the identity proof would only be accepted by the owner of $ID_{RP}$, as it is impossible to make another RP accept it by providing a malicious $N_U$. The detailed process of proof is shown in Appendix.
@@ -59,17 +51,32 @@ The IdP-issued proofs include the $Cert$, $RegistrationResult$ and $Token$. We c
 
 
 \subsection{Proof of Privacy}
+\label{sec:analysis}
+\begin{figure*}
+  \centering
+  \includegraphics[width=0.82\linewidth]{fig/game1.pdf}
+%  \vspace{-6mm}
+  \caption{The Game.}
+  \label{fig:game}
+%\vspace{-7mm}
+\end{figure*}
+
 \begin{figure*}
   \centering
   \includegraphics[width=0.65\linewidth]{fig/dalgorithm.pdf}
   \caption{The distinguishing algorithm.}
-  \vspace{-5mm}
+%  \vspace{-5mm}
   \label{fig:dalgorithm}
 \end{figure*}
 In this section, we will give the privacy proof and show that UPPRESSO is secure against both IdP-based login tracing and RP-based identity linkage attacks.
 
 \noindent\textbf{IdP-based login tracing.}
-As shown in figure~\ref{fig:process}, the only information that is related to the RP's identity and is accessible to the IdP is $PID_{RP}$, which is converted from $ID_{RP}$ using a random $N_U$. Since $N_U$ is randomly chosen from $\mathbb{Z}_n$ by the user and the IdP ha no control of the process, the IdP should treat $PID_{RP}$ as being randomly chosen from $\mathbb{G}$. So, the IdP cannot recognize the RP nor derive its real identity. Therefore, IdP-based identity linkage becomes impossible in UPPRESSO.
+As shown in figure~\ref{fig:process}, the only information that is related to the RP's identity and is accessible to the IdP is $PID_{RP}$,
+ which is converted from $ID_{RP}$ using a random $t$.
+Since $t$ is randomly chosen from $\mathbb{Z}_n$ by the user
+ and the IdP has no control of the process,
+ the IdP should treat $PID_{RP}$ as being randomly chosen from $\mathbb{E}$.
+So, the IdP cannot recognize the RP nor derive its real identity. Therefore, IdP-based identity linkage becomes impossible in UPPRESSO.
 
 Next, we will prove that UPPRESSO prevents RP-based identity linkage based on the Decisional Diffie-Hellman (DDH) assumption \cite{GoldwasserK16}. Here, we briefly introduce the DDH assumption:
 %\noindent\textbf{The DDH Assumption.}
