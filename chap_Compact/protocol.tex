@@ -30,7 +30,7 @@ When a user is registering,
 %\noindent where $r$ is kept secret from the RP.
 
 \vspace{1mm}
-\noindent {\bf $ID_{RP}$-$PID_{RP}$ Transformation.} In each login instance,
+\noindent {\bf $\boldsymbol{ID_{\boldsymbol{RP}}}$-$\boldsymbol{PID_{\boldsymbol{RP}}}$ Transformation.} In each login instance,
     the user selects a random number $t$ ($1 < t <n$) and calculates $PID_{RP}$ as below.
 %First, the RP chooses a random number $N_{RP}$ ($1 < N_{RP}<q $), and the user chooses another random number $N_{U}$ ($1 < N_{U}<q $).
 %Then, they exchange $N_{RP}$ and $N_{U}$ to calculate $PID_{RP}$ following Equation \ref{equ:PIDRP}.
@@ -45,7 +45,7 @@ PID_{RP} = \mathcal{F}_{PID_{RP}}(ID_{RP}) = [t]{ID_{RP}} = [tr]G
 
 
 \vspace{1mm}
-\noindent {\bf ${ID_U}$-$PID_U$ Transformation.}
+\noindent {\bf $\boldsymbol{ID_U}$-$\boldsymbol{PID_U}$ Transformation.}
 %Now, the identity token request to the IdP contains a user identity $ID_U$ and a pseudo-identity of the RP $PID_{RP}$. Therefore,
 On receiving an identity-token request with $ID_U$ and $PID_{RP}$,
     the IdP calculates $PID_{U}$.
@@ -65,7 +65,7 @@ On receiving an identity-token request with $ID_U$ and $PID_{RP}$,
 %Moreover, since $r$ is unknown to the RP, collusive RPs cannot link a user's $PID_U$s at different RPs. If $r$ is known to the RP, two collusive RPs might attempt to associate a user's $PID_U$s by checking whether the equality ${PID_{U_1}}^{r_2N_{U_2}N_{RP_2}} = {PID_{U_2}}^{r_1N_{U_1}N_{RP_1}} \bmod\ p$ holds or not, because ${PID_{U_1}} = g^{r_1N_{U_1}N_{RP_1}ID_{U_1}} \bmod p$ and ${PID_{U_2}} = g^{r_2N_{U_2}N_{RP_2}ID_{U_2}} \bmod p$.
 
 \vspace{1mm}
-\noindent {\bf $PID_U$-$Acct$ Transformation.}
+\noindent {\bf $\boldsymbol{PID_U}$-$\boldsymbol{Acct}$ Transformation.}
 In the negotiation of $PID_{RP}$,
     the user also sends the random number $t$ to the RP.
 So the RP also calculates $PID_{RP}$ to verify the designated RP pseudo-identity in identity tokens.
@@ -116,53 +116,6 @@ Therefore, it prevents IdP-based login tracing.
 \end{comment}
 
 
-
-
-\subsection{The Design for Web Applications}
-With the identity-transformation functions,
- UPRESSO potentially satisfies all the requirements of security and privacy. %desirable for a secure and privacy-preserving SSO service.
-But we still need another design, \emph{RP certificate},
-     to ensure the confidentiality of identity tokens,
-    especially when it is designed to provides SSO services through browsers.
-In the original SSO protocols,
-    an RP is initially registered at the IdP with an endpoint to receive identity tokens (e.g., redirection URI in OIDC).
-This endpoint is then set in the identity-token response by the IdP, to instruct the browser to forward the identity token,
-    for a browser does not pre-configure the endpoint for each RP.
-Obviously,
-    an incorrect RP endpoint leaks identity tokens.
-
-In the UPPRESSO protocols,
-    because the IdP is not aware of the visited RP,
-        the user has to deal with RP endpoints by himself.
-An RP certificate is a message signed by the IdP, binding the RP's identity and its endpoint.
-This message is sent by the RP in the login instance,
-    so that the user is able to forward the tokens to this verified endpoint.
-
-++++++
-special
-Design for browser!
-
-Script downloading and postMessage are necessary
-It must be noticed that, the user cannot visit IdP at step 2,3 directly. While the script in origin A opens a new window with origin B, the HTTP request to B's server will carry the key-value $Referer: A$. Thus, the RP's domain is exposed.% to IdP.
-
-++++++
-Because something need to be done, so we need script.
-In the OIDC, nothing to do;
-only an redirection is enough [this is a standard browser function].
-
-Why two scripts? [Due to the same original policy], different script to different server.
-
-Why postMessage? in user agent
-How to remember the IdP's public key?
-Why need "PIDRPDynamic Registration." This is for OIDC compatibility.
-
-implemented by browser extensions is possible.
-impact the deployment.
-
-\subsection{UPPRESSO Protocols}
-\label{implementations}
-
-
 \begin{table}[tb]
 \scriptsize
     \caption{The notations in the UPPRESSO protocols.}
@@ -186,6 +139,53 @@ impact the deployment.
     \end{tabular}
     \label{tbl:notations-protocol}
 \end{table}
+
+
+
+
+\subsection{The Design for Web Applications}
+In addition to the identity-transformation functions,
+    we propose the following designs specific for web applications,
+        facilitating a user to visit the services through browsers.
+
+First of all, in the SSO login flow,
+    the user has to deal with RP endpoints (i.e., the URLs to receive identity tokens) by himself.
+In existing SSO protocols,
+    an RP initially registers its endpoint at the IdP,
+        and then in each login instance, the IdP will set this endpoint correctly in the identity-token response according to the RP identity.
+This instructs the user agent (or browser) to forward it correctly;
+    otherwise, the confidentiality of identity tokens might be broken.
+
+Because the IdP of UPPRESSO is not aware of the visited RP and then cannot set the RP endpoints,
+        \emph{RP certificates} are designed to instructs the browsers about RP endpoints.
+An RP certificate is a message signed by the IdP, binding the RP's identity and its endpoint.
+This certificate is sent by the RP in the login flow,
+    so that the user is able to forward the identity tokens to this verified endpoint.
+
+Secondly,
+    browser scripts are needed to implement the functions by users,
+        including the generation of $t$ and $PID_{RP}$,
+            and the dealing with RP certificates and endpoints,
+            for these are not standard functions of a browser.
+Two scripts, one downloaded from the IdP and the other from the target RP,
+    work together in the browser as a user agent.
+The IdP script communicates with the IdP,
+    the RP script does with the RP,
+    while two scripts communicates with each other through the \verb+postMessage+ HTML5 API.
+The RP script is necessary to keep the sessions with the RP,
+    and the IdP script cannot be eliminated or replaced because an HTTP request launched by the RP script and sent to the IdP
+            will automatically carry the \verb+Referer+ HTTP header, which discloses the RP's domain.
+
+Finally,
+    the IdP's public key is also downloaded in the IdP script to verify RP certificates, which are sent from the RP.
+So the user agent does not need configure anything locally,
+    as it does in OIDC.
+
+The above designs enable UPPRESSO to provide SSO services for users with standard browsers,
+    more efficient but less portable implementations with browser extensions and/or plug-ins is discussed in Section \ref{sec:discussion}.
+
+\subsection{UPPRESSO Protocols}
+\label{implementations}
 
 
 \noindent \textbf{System Initialization.}
@@ -485,16 +485,29 @@ The RP verifies the identity token, including the signature, validity period, an
 
 \subsection{Compatibility with OIDC}
 \label{subsec:compatible}
-UPPRESSO does not introduce any new role (or component) nor change the security assumptions for each role. It follows a similar logic flow as OIDC in SSO login and only requires small modifications to perform identifier transformation.
+
+do not
+The designs and implementations of UPPRESSO
+
+How to remember the IdP's public key?
+Why need "PIDRPDynamic Registration." This is for OIDC compatibility.
+
+implemented by browser extensions is possible.
+impact the deployment.
+
+
+It follows a similar logic flow as OIDC in SSO login and only requires small modifications to perform identifier transformation.
 %Here, we explain the modification in each of the five phases of its SSO login flow to show that UPPRESSO is compatible with OIDC, which indicates UPPRESSO can be easily integrated with other commonly used SSO systems.
 Among the five phases, the {\em scripts downloading} and {\em RP identifier transformation} phases are newly introduced by UPPRESSO. The browser is required to download two scripts from the IdP and RP and most of the designed operations in these two phases are performed by the scripts in the browser. So, we require minimal modifications to the IdP and RP servers providing new network interfaces (i.e., the new URLs for downloading resources). The other three phases adopt a similar communication pattern as OIDC. In particular, the {\em $PID_{RP}$ registration} phase can be viewed as a variant of the RP dynamic registration flow of OIDC \cite{DynamicRegistration}, which allows an entity to register its identity and endpoint at the IdP.
+
+%UPPRESSO can also support the authorization code flow of OIDC with small modifications (to be discussed in Section \ref{sec:discussion}).
+
+
 %Different from OIDC in which only RPs can call a dynamic registration, UPPRESSO allows any authenticated user to launch this process and register an RP identifier with the IdP.
 %The {\em identity token generation} and {\em $Account$ calculation} phases adopt the same steps and functions as the implicit protocol flow of OIDC, while using a few different parameters. First, in identity token generation, $PID_U$ transformed from $ID_U$ is used to replace $ID_U$, which is directly supported by OIDC, similar as in the PPID approaches that also convert $ID_U$ into $PID_U$. The calculation of $Account$ from $PID_U$
 %can be viewed as a customized step by the RP to derive its user account after the implicit protocol flow of OIDC ends.
 
 %So,the identity token generation and $Account$ calculation phases of UPPRESSO can be viewed as a particular but compatible implementation of the implicit protocol flow of OIDC. It is worth noting that the identity token generation and $Account$ calculation phases of
-UPPRESSO can also support the authorization code flow of OIDC with small modifications (to be discussed in Section \ref{sec:discussion}).
-
 %As shown in Figure \ref{fig:process}, in UPPRESSO, the SSO protocol for identity token is the same as in OIDC; the formats of identity token and corresponding request are the same as in OIDC; the correctness checks on the identity token request at the IdP (i.e., consistency of RP' identifier and endpoint with the registered one) are the same as in OIDC; the correctness checks on the identity token (i.e., consistency of RP' identifier with the one in the request, integrity, validity time, freshness, and etc.) at the RP are the same as in OIDC.
 %The above modifications could be completed automatically for each login, without affecting other communication pattern.
 
