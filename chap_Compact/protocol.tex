@@ -207,19 +207,19 @@ Then, the IdP keeps $SK$ secret, while $PK$ is publicly known.
 In particular, an RP registers itself at the IdP to obtain its unique identifier $ID_{RP}$
  and the corresponding RP certificate $Cert_{RP}$ as follows:
 \begin{enumerate}
-\item
+\vspace{-\topsep}\item
 The RP sends a registration request to the IdP, including the RP endpoint to receive identity tokens,
     and other optional information.
-\item
+\vspace{-\topsep}\item
 The IdP generates a unique random number $r$, calculates $ID_{RP} = [r]G$,
     and assigns $ID_{RP}$ to this RP.
 The IdP then signs $Cert_{RP} = [ID_{RP}, Enpt_{RP}, *]_{SK}$,
      where $[\cdot]_{SK}$ means a message signed using $SK$ and $*$ denotes supplementary information such as the RP's common name and Email,
      and returns $Cert_{RP}$ to the RP.
-\item
+\vspace{-\topsep}\item
 The RP verifies $Cert_{RP}$ using $PK$,
     and accepts $ID_{RP}$ and $Cert_{RP}$ if they are valid.
-\end{enumerate}
+\vspace{-\topsep}\end{enumerate}
 
 %\begin{itemize}
 %\item The RP sends a registration request to the IdP, including the RP endpoint (e.g., URL) to receive identity tokens.
@@ -253,12 +253,10 @@ It consists of five phases, namely script downloading, RP identity transformatio
 ++++++
 
 \noindent 1. {\em Script Downloading.}
-The script downloading phase is for the user's browser
- to download the scripts from the IdP and RPs.
-The browser and two scripts work together as the user agent.
+The browser downloads the scripts from the IdP and visited RP.
 \vspace{-\topsep}
 \begin{itemize}
-\item[1.1] The user visits the RP's site to download the RP script.
+\item[1.1] The user visits the RP's website to download the RP script.
 \vspace{-\topsep}
 \item[1.2] The RP script opens a new window in the browser to visit the login path at the RP server.
 \vspace{-\topsep}
@@ -271,19 +269,21 @@ The browser and two scripts work together as the user agent.
 
 
 \noindent{\em 2. RP Identity Transformation.}
-The user and RP cooperate to generate $PID_{RP} = {N_{U}}{ID_{RP}}$. To hide the RP's endpoint from the IdP,
+The user and RP cooperate to generate $PID_{RP} = [t]{ID_{RP}}$. To hide the RP's endpoint from the IdP,
  the user needs to generate a random endpoint to replace the real RP endpoint.
 \vspace{-\topsep}
 \begin{itemize}
 %\setlength{\itemsep}{0pt plus 1pt}
-\item[2.1] The IdP script chooses a random $N_U$ ($1 < N_U <n$) and sends it to the RP script through postMessage. Then, the RP script sends $N_U$ to the RP server.
+\item[2.1] The IdP script chooses a random number $t$ ($1 < t <n$) and sends it to the RP script through postMessage.
+Then, the RP script sends $t$ to the RP server.
 \vspace{-\topsep}
-\item[2.2] The RP verifies $N_{U} \neq 0 \bmod n$, calculates $PID_{RP}$ and derives the trapdoor $T={N_U}^{-1} \bmod n$. To acknowledge the negotiation of $PID_{RP}$, the RP replies with $Cert_{RP}$, which is transmitted from the RP script to the IdP script through postMessage.
-Do you mean the public key is in the IdP script?
+\item[2.2] The RP receives $t$ and calculates $PID_{RP}$.
+To acknowledge the negotiation of $PID_{RP}$, the RP replies with $Cert_{RP}$, which is transmitted from the RP script to the IdP script through postMessage.
 \vspace{-\topsep}
 \item[2.3] The IdP script verifies $Cert_{RP}$, extracts $ID_{RP}$ from $Cert_{RP}$ and calculates $PID_{RP}={N_{U}}{ID_{RP}}$ and $nonce=H(N_U)$. It also creates a one-time endpoint for the RP. If $Cert_{RP}$ is invalid, the user halts the negotiation.
 \end{itemize}
 \vspace{-\topsep}
+
 It is important to ensure that the RP endpoint is not tampered with by the adversary. In other OIDC systems, the IdP obtains the RP endpoint from RP registration and verifies the endpoint in the identity token request. However, the IdP in UPPRESSO sees only a one-time endpoint. So, we ask the user to verify the correctness of the RP endpoint using the RP certificate. %which is signed by the IdP.
 
 
@@ -301,6 +301,7 @@ In this phase, the user registers a new RP with $PID_{RP}$ at the IdP using OIDC
 \item[3.4] The RP verifies the IdP's signature and accepts the result only if $PID_{RP}$ and $H(N_U)$ match those in the negotiation and $PID_{RP}$ is not expired.
 \end{itemize}
 \vspace{-\topsep}
+
 $H(N_U)$ is a nonce to distinguish different login sessions because there is a very small chance that the same $PID_{RP}$ is generated for two RPs even using two different pairs of $ID_{RP}$s and $N_U$s. This nonce avoids a registration result being acceptable to two RPs.
 
 \noindent{\em 4. Identity Token Generation.}
@@ -321,6 +322,7 @@ In this phase, the IdP calculates $PID_U = {ID_U}{PID_{RP}}$ and signs the ident
 \item[4.6] The IdP sends the identity token to the one-time endpoint. The IdP script forwards the identity token to the RP script that holds the origin $Endpoint_{RP}$. Finally, the RP script sends it to the RP server.
 \end{itemize}
 \vspace{-\topsep}
+
 In this phase, if any check fails, the process will be halted. For example, the user halts the process if $PID_{RP}$ in the identity token request is inconsistent with  the negotiated one. The IdP rejects the identity token request, if the pair of $PID_{RP}$ and $Endpoint_U$ has not been registered.
 
 \noindent{\em 5. $Acct$ Calculation.}
