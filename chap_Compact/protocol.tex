@@ -37,7 +37,8 @@ When a user is registering,
 
 \vspace{1mm}
 \noindent {\bf $\boldsymbol{ID_{\boldsymbol{RP}}}$-$\boldsymbol{PID_{\boldsymbol{RP}}}$ Transformation.} In each login instance,
-    the user selects a random number $t$ ($1 < t <n$) and calculates $PID_{RP}$ as below.
+    the user selects a random number $t$ ($1 < t <n$) as the trapdoor
+         and calculates $PID_{RP}$ as below.
 %First, the RP chooses a random number $N_{RP}$ ($1 < N_{RP}<q $), and the user chooses another random number $N_{U}$ ($1 < N_{U}<q $).
 %Then, they exchange $N_{RP}$ and $N_{U}$ to calculate $PID_{RP}$ following Equation \ref{equ:PIDRP}.
 \begin{equation}
@@ -73,7 +74,7 @@ On receiving an identity-token request with $ID_U$ and $PID_{RP}$,
 \vspace{1mm}
 \noindent {\bf $\boldsymbol{PID_U}$-$\boldsymbol{Acct}$ Transformation.}
 In the negotiation of $PID_{RP}$,
-    the user also sends the random number $t$ to the RP.
+    the user also sends the trapdoor $t$ to the target RP.
 So the RP also calculates $PID_{RP}$ to verify the designated RP pseudo-identity in identity tokens.
 After verifying an identity-token binding $PID_U$ and $PID_{RP}$,
     the RP calculates $Acct$ as below.
@@ -350,7 +351,7 @@ The RP verifies the identity token and allows the user to login.
 The IdP script forwards this token to the RP script,
     which then sends it to the RP through $Enpt_{RP}$.
 \vspace{-\topsep}\item[5.2] The RP verifies the identity token, including the IdP's signature and its validity period.
-It checks $PID_{RP}$ in the token is consistent with the one negotiated in the previous step.
+It also verifies $PID_{RP}$ in the token is consistent with the one negotiated in the previous step.
 \vspace{-\topsep}
 \item [5.3] The RP extracts $PID_U$, calculates $Acct = [t^{-1}]{PID_U}$, and allows the user to login as $Acct$.
 \vspace{-\topsep}

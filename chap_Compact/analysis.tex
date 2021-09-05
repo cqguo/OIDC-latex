@@ -3,27 +3,55 @@ In this section, we presents the proofs that UPPRESSO follows the required prope
 
 
 \subsection{Proofs of Security}
+We demonstrate that UPPRESSO satisfies with the four security requirements of identity tokens in SSO services
+     as listed in Section~\ref{subsec:basicrequirements}.
 
-++++
+%while the detailed process of proof is provided in the Appendix.
+% 这个版本，先不管附录。
 
-Let's review the security properties in Section~\ref{subsec:basicrequirements}, including \textbf{user identification}, \textbf{RP designation}, \textbf{confidentiality} and \textbf{integrity}. In this section, we will give the brief illustration about how UPPRESSO guarantees the security properties, while the detailed process of proof is provided in the Appendix.
+\vspace{1mm}
+\noindent\textbf{User Identification.}
+The RP always derives an identical permanent account from different identity tokens binding $PID_U$ and $PID_{RP}$.
+That is,
+    in the user's any $i$-th and $i'$-th ($i \neq i'$) login instances to the RP,
+ $\mathcal{F}_{Acct}(PID_{U}^i, PID_{RP}^i) = \mathcal{F}_{Acct}(PID_{U}^{i'}, PID_{RP}^{i'}) = [ID_U]ID_{RP}$
 
-\noindent\textbf{User identification.}
-The RP can always derive the constant and correct account from the changing $PID_U$. That is, the $PID_{RP}$ equal to $[t]ID_{RP}$ (verified by RP), and $PID_U$ equals to $[ID_U]PID_{RP}$. The $PID_{RP}$ and $PID_U$ are protected by the IdP's signature.
-Thus, an RP can always derive the constant account equal to $[ID_U]ID_{RP}$.
 
-\noindent\textbf{RP designation.}
-For an honest RP, it only accepts the identity token carrying the $PID_{RP}$ equalled with $N_UID_{RP}$, while the $N_U$ is guaranteed by IdP issued registration result. Thus, the identity proof would only be accepted by the owner of $ID_{RP}$, as it is impossible to make another RP accept it by providing a malicious $N_U$.
+\vspace{1mm}
+\noindent\textbf{RP Designation.}
+An identity token binding $PID_U$ and $PID_{RP}$,
+    designates the target RP, and only the target RP.
+The RP calculates $PID_{RP}$ by itself with the trapdoor $t$ sent from the user,
+    and checks $PID_{RP}$ in the identity token.
+So the target RP will accept this token.
+Meanwhile,
+        the honest IdP guarantees, within its validity period, only one $PID_{RP}$ will be bound in some identity token.
 
+\vspace{1mm}
+\noindent\textbf{Confidentiality.}
+There is no event leaking the identity tokens to any malicious entity other than the authenticated user and the designated RP.
+First of all, the communications among the IdP, RPs and users,
+    are protected by TLS,
+    and the \verb+postMessage+ HTML5 API ensures the dedicated channels between two scripts within the user agent,
+    so that adversaries cannot eavesdrop the transmission of identity tokens.
+Meanwhile, the honest IdP sends the identity token only to the authenticated user,
+    and this user forwards it to the RP through $Enpt_{RP}$.
+The binding of $Enpt_{RP}$ and $ID_{RP}$ is ensured by the RP certificate,
+so only the designated target RP receives this identity token.
 %The detailed process of proof is shown in Appendix.
 
-\noindent\textbf{confidentiality.}
-Based on the formal model of UPPRESSO (detailed model is shown in Appendix), we can find that, there are no events carrying honest user's identity proofs, cookies and passwords sent to other malicious entities. Thus, the confidentiality of UPPRESSO system is guaranteed.
-
-%The detailed process of proof is shown in Appendix.
-
+\vspace{1mm}
 \noindent\textbf{Integrity.}
-The IdP-issued proofs include the $Cert$, $RegistrationResult$ and $Token$. We can easily find that the IdP does not send the private key to any processes so that the attackers cannot obtain the private key.
+The identity token binds $ID_U$ and $ID_{RP}$,
+    implicitly or explicitly, and any breaking will result in some failed check or verification.
+The integrity is ensured by the IdP's signatures:
+ (\emph{a}) the identity token binding $PID_U$ and $PID_{RP}$, is signed by the IdP,
+  and (\emph{b}) the relationship between $PID_{RP}$ and $t$ (or collision-free $H(t)$) is also bound by the IdP's signature in the $PID_{RP}$ registration result.
+Thus,
+    $ID_U$ and $ID_{RP}$ are actually bound by the IdP's signatures,
+        due to the one-to-one mapping between (\emph{a}) the pair of $ID_U$ and $ID_{RP}$ and (\emph{b}) the triad of $PID_U$, $PID_{RP}$, and $t$.
+
+%The detailed process of proof is shown in Appendix.
 
 %The detailed process of proof is shown in Appendix.
 
@@ -31,6 +59,10 @@ The IdP-issued proofs include the $Cert$, $RegistrationResult$ and $Token$. We c
 
 \subsection{Proofs of Privacy}
 \label{sec:analysis}
+
+++++
+
+
 \begin{figure*}
   \centering
   \includegraphics[width=0.82\linewidth]{fig/game1.pdf}
@@ -47,9 +79,10 @@ The IdP-issued proofs include the $Cert$, $RegistrationResult$ and $Token$. We c
 %  \vspace{-5mm}
   \label{fig:dalgorithm}
 \end{figure*}
-In this section, we will give the privacy proof and show that UPPRESSO is secure against both IdP-based login tracing and RP-based identity linkage attacks.
 
-\noindent\textbf{IdP-based login tracing.}
+%In this section, we will give the privacy proof and show that UPPRESSO is secure against both IdP-based login tracing and RP-based identity linkage attacks.
+
+\noindent\textbf{IdP-based Login Tracing.}
 As shown in figure~\ref{fig:process}, the only information that is related to the RP's identity and is accessible to the IdP is $PID_{RP}$,
  which is converted from $ID_{RP}$ using a random $t$.
 Since $t$ is randomly chosen from $\mathbb{Z}_n$ by the user
@@ -70,7 +103,7 @@ Pr[D(P, aP, bP, abP)=1]-Pr[D(P, aP, bP, cP)=1]=\sigma(n)
 \vspace{-\topsep}
 
 \vspace{-2mm}
-\noindent\textbf{RP-based identity linkage.}
+\noindent\textbf{RP-based Identity Linkage.}
 At the very beginning, let us see the data exposed to RP during the authentication in the UPPRESSO system.
 We can find that, RP holds $ID_{RP}$,  generates $PID_{RP}$, $T$, $Account$, and receives $N_U$, registration result (containing $PID_{RP}$, hash($N_U$) and $Endpoint_U$), and identity proof (including $PID_{RP}$ and $PID_U$). Then we delete the irrelevant data, $Endpoint_U$, as it is generated randomly and does not participates and further calculation. And the repetitive data should also be deleted, for example, $PID_{RP}$ is generated as $PID_{RP}=N_U \cdot {ID_{RP}}$ so that $PID_{RP}$ can be omitted. Finally, the effective date collected by the RP during the authentication flow is $\langle ID_{RP}, N_U, PID_U\rangle$, while $PID_U$ equals to $ID_U \cdot{(N_U \cdot {ID_{RP})}}$.
 
