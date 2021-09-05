@@ -61,23 +61,37 @@ Thus,
 \subsection{Privacy}
 Next, we show that UPPRESSO prevents the attacks of IdP-based login tracing and RP-based identity linkage.
 
-++++
-
 \vspace{1mm}
 \noindent\textbf{IdP-based Login Tracing.}
-The only information that is related to the RP's identity and is accessible to the IdP is $PID_{RP}$,
- which is converted from $ID_{RP}$ using a random $t$.
-Since $t$ is randomly chosen from $\mathbb{Z}_n$ by the user
- and the IdP has no control of the process,
- the IdP should treat $PID_{RP}$ as being randomly chosen from $\mathbb{E}$.
-So, the IdP cannot recognize the RP nor derive its real identity. Therefore, IdP-based identity linkage becomes impossible in UPPRESSO.
+The information accessible to the IdP but derived from the RP's identity,
+    is only $PID_{RP}$, where $PID_{RP} = [t]ID_{RP}$ is calculated by the user.
+Because  (\emph{a}) $t$ is a number randomly chosen from $(1,n)$ by the user and kept secret to the IdP
+ and (\emph{b}) $ID_{RP} = [r]G$ and $G$ is the base point,
+ the IdP has to view $PID_{RP}$ as randomly chosen from $\mathbb{E}$.
+So, the IdP cannot derive the RP's identity or link any pair of $PID_{RP}^i$ and $PID_{RP}^{i'}$,
+    and the IdP-based identity linkage is impossible.
 
 \vspace{1mm}
 \noindent\textbf{RP-based Identity Linkage.}
-Next, we will prove that UPPRESSO prevents RP-based identity linkage based on the Decisional Diffie-Hellman (DDH) assumption \cite{GoldwasserK16}. Here, we briefly introduce the DDH assumption:
-%\noindent\textbf{The DDH Assumption.}
-Let $q$ be a large prime and $\mathbb{G}$ denotes a cyclic group of order $n$ of an elliptic curve $E(\mathbb{F}_q)$.
-Assume that $n$ is also a large prime. Let $P$ be a generator point of $\mathbb{G}$. The DDH assumption for $\mathbb{G}$ states that for any probabilistic polynomial time (PPT) algorithm $D$, the two probability distributions \{$aP$, $bP$, $abP$\} and \{$aP$, $bP$, $cP$\}, where $a$, $b$, and $c$ are randomly and independently chosen from $\mathbb{Z}_n$, are computationally indistinguishable in the sense that there is a negligible $\sigma(n)$ with the security parameter $n$ such that:
+We prove UPPRESSO prevents the RP-based identity linkage based on the elliptic curve decision Diffie-Hellman (ECDDH) assumption \cite{GoldwasserK16}.
+
+++++
+
+We briefly introduce the ECDDH assumption.
+Let $\mathbb{E}$ be an elliptic curve over a finite field $\mathbb{F}_q$,
+    and $P$ be a point on $\mathbb{E}$ of order $n$.
+For any probabilistic polynomial time (PPT) algorithm $\mathcal{D}$,
+ two probability distributions \{$[a]P$, $[b]P$, $[ab]P$\} and \{$[a]P$, $[b]P$, $[c]P$\}
+are computationally indistinguishable,
+ where $a$, $b$ and $c$ are integer numbers randomly and independently chosen from $(1,n)$.
+ 
+ That is,
+    there is a negligible $\sigma(n)$ with the security parameter $n$ such that:
+
+
+%Let $q$ be a large prime and $\mathbb{G}$ denotes a cyclic group of order $n$ of an elliptic curve $E(\mathbb{F}_q)$.
+%Assume that $n$ is also a large prime. Let $P$ be a generator point of $\mathbb{G}$. 
+
 %where $q$ and $n$ are large primitive number, and $P$ is the point of $\mathbb{G}$.
 %For any probabilistic polynomial time (PPT) algorithm $D$, the distributions, \{$P$, $aP$, $bP$, $abP$\}$_{a,b \in \mathbb{Z}_n}$ and \{$P$, $aP$, $bP$, $cP$\}$_{a,b,c \in \mathbb{Z}_n}$, are computationally indistinguishable. There is a negligible $\sigma(k)$, where $k$ is the security parameter.
 \vspace{-\topsep}
@@ -112,13 +126,13 @@ There is the data set, $\langle ID_{RP_j}$, $t_j$, $[ID_U][t_j]{ID_{RP_j}}\rangl
 that RP-based identity linkage attack can be considered as these collusive RPs guesses whether $ID_U$ equals $ID_{U'}$.
 Here, we can define the game, the adversary owns the same ability as the RP.
 The adversary receive the input $\langle ID_{RP_j}$, $t_j$, $[ID_U][t_j]{ID_{RP_j}}\rangle$,
-    $\langle ID_{RP_{j'}}$, $t_{j'}$, $[ID_{U'}] [t_{j'}] {ID_{RP_{j'}}}\rangle$, from the challenger, and returns the result $r$.
-The $r$ is set 1, when adversary guess that $ID_U$ equals $ID_U'$, otherwise 0.
+    $\langle ID_{RP_{j'}}$, $t_{j'}$, $[ID_{U'}] [t_{j'}] {ID_{RP_{j'}}}\rangle$, from the challenger, and returns the result $s$.
+The $s$ is set 1, when adversary guess that $ID_U$ equals $ID_U'$, otherwise 0.
 The game is shown as Figure \ref{fig:game}.
 Therefore, whether the RP-based identity linkage attack is possible is equivalent to whether adversary has the advantage on the guessing game.
 
-We define $Pr_1$ is the probability, while the adversary returns $r=1$ as $ID_U$ equals to $ID_{U'}$.
- And $Pr_2$ is the probability, while the adversary returns $r=1$ but $ID_U$ does not equal to $ID_{U'}$.
+We define $Pr_1$ is the probability, while the adversary returns $s=1$ as $ID_U$ equals to $ID_{U'}$.
+ And $Pr_2$ is the probability, while the adversary returns $s=1$ but $ID_U$ does not equal to $ID_{U'}$.
 Adversary has the advantage on the game means that
 \begin{equation}
 Pr_1-Pr_2>\sigma(n)
@@ -135,11 +149,12 @@ At the end, $D$ returns the $r$ from the adversary as the result.
 Now, we let ($P$, $aP$, $bP$, $abP$) and  ($P$, $aP$, $bP$, $cP$) be two inputs.
 Thus there is
 \begin{multline*}
-\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ Pr[D(P,aP,bP,abP)=1]=\\ Pr[A(P, t_j, b \cdot{N_{U1}P}, aP, N_{U2},b\cdot{N_{U2} aP})=1]=Pr_1\\
+\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ Pr[D(P,aP,bP,abP)=1]=\\ Pr[A(P, t_j, [t_j][b]P, aP, t_{j'},[t_{j'}][ab]P)=1]=Pr_1\\\\
 Pr[D(P,aP,bP,cP)=1]=\ \ \ \ \ \ \ \ \ \
-\\ Pr[A(P, N_{U1}, b \cdot{N_{U1}P}, aP, N_{U2},c/a \cdot{N_{U2}aP})=1]=Pr_2
+\\ Pr[A(P, t_j, [t_j][b]P, aP, t_{j'},[t_{j'}][c/a] [a]P)=1]=Pr_2
 \end{multline*}
-in the first equation $ID_{U} $ and $ ID_{U}'$ all equal to $b$, while in the second equation $ID_{U}$ does not equal to $ID_{U}'$, so that
+in the first equation $ID_{U} $ and $ ID_{U'}$ all equal to $b$, while in the second equation $ID_{U} =b$ does not equal to $ID_{U'} = c/a$.
+Due to DDH, we have
 \begin{equation}
 Pr_1-Pr_2=\sigma(n)
 \end{equation}
