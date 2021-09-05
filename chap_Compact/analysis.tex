@@ -112,15 +112,14 @@ There is the data set, $\langle ID_{RP_j}$, $t_j$, $[ID_U][t_j]{ID_{RP_j}}\rangl
 that RP-based identity linkage attack can be considered as these collusive RPs guesses whether $ID_U$ equals $ID_{U'}$.
 Here, we can define the game, the adversary owns the same ability as the RP.
 The adversary receive the input $\langle ID_{RP_j}$, $t_j$, $[ID_U][t_j]{ID_{RP_j}}\rangle$,
-    $\langle ID_{RP_{j'}}$, $t_{j'}$, $[ID_{U'}] [t_{j'}] {ID_{RP_{j'}}}\rangle$, from the challenger, and returns the result $b$.
-The $b$ is set 1, when adversary guess that $ID_U$ equals $ID_U'$, otherwise 0.
+    $\langle ID_{RP_{j'}}$, $t_{j'}$, $[ID_{U'}] [t_{j'}] {ID_{RP_{j'}}}\rangle$, from the challenger, and returns the result $r$.
+The $r$ is set 1, when adversary guess that $ID_U$ equals $ID_U'$, otherwise 0.
 The game is shown as Figure \ref{fig:game}.
 Therefore, whether the RP-based identity linkage attack is possible is equivalent to whether adversary has the advantage on the guessing game.
 
-We define $Pr_1$ is the probability, while the adversary returns $b=1$ as $ID_U$ equals to $ID_U'$.
- And $Pr_2$ is the probability, while the adversary returns $b=1$ but $ID_U$ does not equal to $ID_U'$.
+We define $Pr_1$ is the probability, while the adversary returns $r=1$ as $ID_U$ equals to $ID_{U'}$.
+ And $Pr_2$ is the probability, while the adversary returns $r=1$ but $ID_U$ does not equal to $ID_{U'}$.
 Adversary has the advantage on the game means that
-\vspace{-\topsep}
 \begin{equation}
 Pr_1-Pr_2>\sigma(n)
 \end{equation}
@@ -129,13 +128,14 @@ While an adversary has the advantage on the guessing game, based on the challeng
  we can build a PPT distinguishing algorithm $D$ that breaks DDH assumption.
 The algorithm is shown as Figure \ref{fig:dalgorithm}.
 That is, the input of $D$ in the form ($X$,$Y$,$Z$,$N$), while $X$,$Y$,$Z$,$N$ are points on the elliptic curve.
-The challenger receives the input and set $ID_{RP1}=X$, $ID_{RP2}=Y$, $PID_{U1}=N_{U1} \cdot{Z}$, and $PID_{U2}=N_{U2} \cdot{N}$.  At the end, $D$ returns the $b$ from the adversary as the result.
+The challenger receives the input and set $ID_{RP_j}=X$, $ID_{RP_{j'}}=Y$, $PID_{U,j}=[t_j]Z$, and $PID_{U',j'}= [t_{j'}] N$.
+The challenger input $<X, t_j, [t_j]Z>$ $<Y, t_{j'}, [t_{j'}] N>$ to the game. the adversary returns $r$.
+At the end, $D$ returns the $r$ from the adversary as the result.
 
 Now, we let ($P$, $aP$, $bP$, $abP$) and  ($P$, $aP$, $bP$, $cP$) be two inputs.
 Thus there is
-\vspace{-\topsep}
 \begin{multline*}
-\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ Pr[D(P,aP,bP,abP)=1]=\\ Pr[A(P, N_{U1}, b \cdot{N_{U1}P}, aP, N_{U2},b\cdot{N_{U2} aP})=1]=Pr_1\\
+\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ Pr[D(P,aP,bP,abP)=1]=\\ Pr[A(P, t_j, b \cdot{N_{U1}P}, aP, N_{U2},b\cdot{N_{U2} aP})=1]=Pr_1\\
 Pr[D(P,aP,bP,cP)=1]=\ \ \ \ \ \ \ \ \ \
 \\ Pr[A(P, N_{U1}, b \cdot{N_{U1}P}, aP, N_{U2},c/a \cdot{N_{U2}aP})=1]=Pr_2
 \end{multline*}
