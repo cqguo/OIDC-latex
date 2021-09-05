@@ -37,11 +37,12 @@ The cryptographic computations, e.g., $Cert_{RP}$ verification and $PID_{RP}$ ne
 
 %Moreover, the chrome extension needs to construct cross-origin requests to communicate with the RP and IdP, which is forbidden by the default same-origin security policy. Therefore it is required to add the HTTP header \verb+Access-Control-Allow-Origin+ in the response of IdP and RP to accept only the request from the origin \verb+chrome-extension://chrome-id+ (\verb+chrome-id+ is uniquely assigned by the Google).
 
-++++++++ 
-
 We provide a Java SDK for RPs to integrate UPPRESSO.
-The SDK provides two functions to encapsulate the RP's processing: one for RP identifier transformation, $PID_{RP}$ registration, and identity token request generation; while the other for identity token verification and $Account$ calculation. %in Figure \ref{fig:process}
-The SDK is implemented based on the Spring Boot framework  with about 1,000 lines code and cryptographic computations are implemented based on the Spring Security library.
+The SDK provides two functions to encapsulate the complicated steps:
+ one to request identity tokens,
+    and the other to derive the accounts from identity tokens.
+The SDK is implemented based on the Spring Boot framework  with about 1,000 lines of Java code
+ and cryptographic computations are implemented based on the Spring Security library.
 An RP only needs to invoke these two functions for the integration.
 
 %RP processing login request containing  and identity token parsing containing $Account$ calculation in Figure \ref{fig:process}.
