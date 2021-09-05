@@ -86,7 +86,7 @@ are computationally indistinguishable,
  where $a$, $b$ and $c$ are integer numbers randomly and independently chosen from $(1,n)$.
  
  That is,
-    there is a negligible $\sigma(n)$ with the security parameter $n$ such that:
+    there is a negligible $\sigma(k)$ with the security parameter $k$ such that:
 
 
 %Let $q$ be a large prime and $\mathbb{G}$ denotes a cyclic group of order $n$ of an elliptic curve $E(\mathbb{F}_q)$.
@@ -94,41 +94,33 @@ are computationally indistinguishable,
 
 %where $q$ and $n$ are large primitive number, and $P$ is the point of $\mathbb{G}$.
 %For any probabilistic polynomial time (PPT) algorithm $D$, the distributions, \{$P$, $aP$, $bP$, $abP$\}$_{a,b \in \mathbb{Z}_n}$ and \{$P$, $aP$, $bP$, $cP$\}$_{a,b,c \in \mathbb{Z}_n}$, are computationally indistinguishable. There is a negligible $\sigma(k)$, where $k$ is the security parameter.
-\vspace{-\topsep}
-\begin{multline*}
-Pr[D(P, aP, bP, abP)=1]-Pr[D(P, aP, bP, cP)=1]=\sigma(n)
-\end{multline*}
-\vspace{-\topsep}
+\begin{equation*}
+Pr[\mathcal{D}(P, [a]P, [b]P, [ab]P)=1]-Pr[\mathcal{D}(P, [a]P, [b]P, [c]P)=1]=\sigma(k)
+\end{equation*}
 
-At the very beginning, let us see the data exposed to RP during the authentication in the UPPRESSO system.
+At the beginning, let us see the data exposed to an RP.
 The RP holds $ID_{RP}$,  generates $PID_{RP}$, $Acct$, and receives $t$, registration result (containing $PID_{RP}$, $H(t)$),
     and identity proof (including $PID_{RP}$ and $PID_U$).
-The repetitive data should also be deleted, for example, $PID_{RP}$ is generated as $PID_{RP}= [t]{ID_{RP}}$ so that $PID_{RP}$ can be omitted (so as $Acct = [t^{-1}]PID_{U}$). Finally, the effective date collected by the RP during the authentication flow is $\langle ID_{RP}, t, PID_U\rangle$,
- while $PID_U$ equals to $[ID_U][t]{ID_{RP}}$.
+The repetitive data should also be deleted, for example, $PID_{RP}$ is generated as $PID_{RP}= [t]{ID_{RP}}$ so that $PID_{RP}$ can be omitted (so as $Acct = [t^{-1}]PID_{U}$).
+Finally, the effective date collected by the RP during the SSO login flow is $\langle ID_{RP}, t, PID_U\rangle$,
+ while $PID_U = [ID_U][t]{ID_{RP}}$.
 
-
-\begin{figure*}
-  \centering
-  \includegraphics[width=0.82\linewidth]{fig/game1.pdf}
-  \caption{The Game.}
-  \label{fig:game}
-\end{figure*}
-
-\begin{figure*}
-  \centering
-  \includegraphics[width=0.65\linewidth]{fig/dalgorithm.pdf}
-  \caption{The distinguishing algorithm.}
-  \label{fig:dalgorithm}
-\end{figure*}
+% 这个太简单了，不需要图
+%\begin{figure*}
+%  \centering
+%  \includegraphics[width=0.82\linewidth]{fig/game1.pdf}
+%  \caption{The Game.}
+%  \label{fig:game}
+%\end{figure*}
 
 There is the data set, $\langle ID_{RP_j}$, $t_j$, $[ID_U][t_j]{ID_{RP_j}}\rangle$,
     $\langle ID_{RP_{j'}}$, $t_{j'}$, $[ID_{U'}] [t_{j'}] {ID_{RP_{j'}}}\rangle$, from two RPs ($RP_j$ and $RP_{j'}$),
 that RP-based identity linkage attack can be considered as these collusive RPs guesses whether $ID_U$ equals $ID_{U'}$.
-Here, we can define the game, the adversary owns the same ability as the RP.
+Here, we can define the game, the adversary owns the same ability as collusive RPs.
 The adversary receive the input $\langle ID_{RP_j}$, $t_j$, $[ID_U][t_j]{ID_{RP_j}}\rangle$,
     $\langle ID_{RP_{j'}}$, $t_{j'}$, $[ID_{U'}] [t_{j'}] {ID_{RP_{j'}}}\rangle$, from the challenger, and returns the result $s$.
-The $s$ is set 1, when adversary guess that $ID_U$ equals $ID_U'$, otherwise 0.
-The game is shown as Figure \ref{fig:game}.
+The $s$ is set 1, when adversary guess that $ID_U = ID_U'$, otherwise 0.
+%The game is shown as Figure \ref{fig:game}.
 Therefore, whether the RP-based identity linkage attack is possible is equivalent to whether adversary has the advantage on the guessing game.
 
 We define $Pr_1$ is the probability, while the adversary returns $s=1$ as $ID_U$ equals to $ID_{U'}$.
