@@ -133,29 +133,31 @@ The result is 1, when adversary guess that $ID_U = ID_{U'}$, otherwise $s=0$.
 The RP-based identity linkage attack is equivalent to
  adversary has the advantage on the guessing game (i.e., $Pr_1-Pr_2>\sigma(k)$).
 
-We define $Pr_1$ is the probability, while the adversary returns $s=1$ as $ID_U$ equals to $ID_{U'}$.
- And $Pr_2$ is the probability, while the adversary returns $s=1$ but $ID_U$ does not equal to $ID_{U'}$.
+We define $Pr_s$ is the probability, while the adversary returns $s=1$ as $ID_U$ equals to $ID_{U'}$ (i.e., the attack succeeds).
+ And $Pr_{\bar{s}}$ is the probability, while the adversary returns $s=1$ but $ID_U$ does not equal to $ID_{U'}$ (i.e., the attack fails).
 Adversary has the advantage on the game means that
 \begin{equation*}
-Pr_1-Pr_2>\sigma(k)
+Pr_s-Pr_f>\sigma(k)
 \end{equation*}
 
-We design a PPT algorithm $\mathcal{D}$ based on $\mathcal{G}$, shown in Figure \ref{fig:dalgorithm}.
-The input of $\mathcal{D}$ in the form $(Q_1, Q_2, Q_3, Q_4)$, while $Q_i$ are points on $\mathbb{E}$.
-The challenger receives the input and set $ID_{RP_j}=Q_1$, $ID_{RP_{j'}}=Q_2$, $PID_{U,j}=[t_j]Q_3$, and $PID_{U',j'}= [t_{j'}] Q_4$.
+We design a PPT algorithm $\mathcal{D}^*$ based on $\mathcal{G}$, shown in Figure \ref{fig:dalgorithm}.
+The input of $\mathcal{D}^*$ in the form $(Q_1, Q_2, Q_3, Q_4)$, while $Q_i$ are points on $\mathbb{E}$.
+The challenger receives the input,
+    randomly chooses $t_j$ and $t_{j'}$ from $(1,n)$,
+    and set $ID_{RP_j}=Q_1$, $ID_{RP_{j'}}=Q_2$, $PID_{U,j}=[t_j]Q_3$, and $PID_{U',j'}= [t_{j'}] Q_4$.
 The challenger input $<Q_1, t_j, [t_j]Q_3>$ $<Q_2, t_{j'}, [t_{j'}] Q_4>$ to the game $\mathcal{G}$.
-At the end, $\mathcal{D}$ returns the $s$ from the adversary as the result.
+At the end, $\mathcal{D}^*$ returns the $s$ from the adversary as the result.
 
 We let ($P$, $[a]P$, $[b]P$, $[ab]P$) and  ($P$, $[a]P$, $[b]P$, $[c]P$) be two inputs.
 Thus there is
 \begin{multline*}
-\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ Pr[\mathcal{D}(P,[a]P,[b]P,[ab]P)=1]=\\ Pr[\mathcal{G}(P, t_j, [t_j][b]P, aP, t_{j'},[t_{j'}][ab]P)=1]=Pr_1\\
+\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ Pr[\mathcal{D}^*(P,[a]P,[b]P,[ab]P)=1]=\\ Pr[\mathcal{G}(P, t_j, [t_j][b]P, aP, t_{j'},[t_{j'}][ab]P)=1]=Pr_s\\
 \\
-Pr[\mathcal{D}(P,aP,bP,cP)=1]=\ \ \ \ \ \ \ \ \ \
-\\ Pr[\mathcal{G}(P, t_j, [t_j][b]P, aP, t_{j'},[t_{j'}][c/a] [a]P)=1]=Pr_2
+Pr[\mathcal{D}^*(P,aP,bP,cP)=1]=\ \ \ \ \ \ \ \ \ \
+\\ Pr[\mathcal{G}(P, t_j, [t_j][b]P, aP, t_{j'},[t_{j'}][c/a] [a]P)=1]=Pr_f
 \end{multline*}
-in the first equation $ID_{U} = ID_{U'} = b$, so it is $Pr_1$
- while in the second equation $ID_{U} =b$ but $ID_{U'} = c/a$ so it is $Pr_2$.
+in the first equation $ID_{U} = ID_{U'} = b$, so it is $Pr_s$
+ while in the second equation $ID_{U} =b$ but $ID_{U'} = c/a$ so it is $Pr_f$.
 
 
 Adversary has the advantage on the game means $Pr_1-Pr_2>\sigma(k)$,
