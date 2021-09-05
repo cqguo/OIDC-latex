@@ -1,8 +1,9 @@
 \section{The Analysis of Security and Privacy}
-In this section, we presents the proofs that UPPRESSO follows the required properties of security and privacy.
+\label{sec:analysis}
+In this section, we presents the analysis that UPPRESSO follows the required properties of security and privacy.
 
 
-\subsection{Proofs of Security}
+\subsection{Security}
 UPPRESSO satisfies with the four security requirements of identity tokens in SSO services,
      as listed in Section \ref{subsec:basicrequirements}.
 
@@ -57,39 +58,22 @@ Thus,
 
 
 
-\subsection{Proofs of Privacy}
-\label{sec:analysis}
+\subsection{Privacy}
+Next, we show that UPPRESSO prevents the attacks of IdP-based login tracing and RP-based identity linkage.
 
 ++++
 
-
-\begin{figure*}
-  \centering
-  \includegraphics[width=0.82\linewidth]{fig/game1.pdf}
-%  \vspace{-6mm}
-  \caption{The Game.}
-  \label{fig:game}
-%\vspace{-7mm}
-\end{figure*}
-
-\begin{figure*}
-  \centering
-  \includegraphics[width=0.65\linewidth]{fig/dalgorithm.pdf}
-  \caption{The distinguishing algorithm.}
-%  \vspace{-5mm}
-  \label{fig:dalgorithm}
-\end{figure*}
-
-%In this section, we will give the privacy proof and show that UPPRESSO is secure against both IdP-based login tracing and RP-based identity linkage attacks.
-
+\vspace{1mm}
 \noindent\textbf{IdP-based Login Tracing.}
-As shown in Figure \ref{fig:process}, the only information that is related to the RP's identity and is accessible to the IdP is $PID_{RP}$,
+The only information that is related to the RP's identity and is accessible to the IdP is $PID_{RP}$,
  which is converted from $ID_{RP}$ using a random $t$.
 Since $t$ is randomly chosen from $\mathbb{Z}_n$ by the user
  and the IdP has no control of the process,
  the IdP should treat $PID_{RP}$ as being randomly chosen from $\mathbb{E}$.
 So, the IdP cannot recognize the RP nor derive its real identity. Therefore, IdP-based identity linkage becomes impossible in UPPRESSO.
 
+\vspace{1mm}
+\noindent\textbf{RP-based Identity Linkage.}
 Next, we will prove that UPPRESSO prevents RP-based identity linkage based on the Decisional Diffie-Hellman (DDH) assumption \cite{GoldwasserK16}. Here, we briefly introduce the DDH assumption:
 %\noindent\textbf{The DDH Assumption.}
 Let $q$ be a large prime and $\mathbb{G}$ denotes a cyclic group of order $n$ of an elliptic curve $E(\mathbb{F}_q)$.
@@ -102,24 +86,53 @@ Pr[D(P, aP, bP, abP)=1]-Pr[D(P, aP, bP, cP)=1]=\sigma(n)
 \end{multline*}
 \vspace{-\topsep}
 
-\vspace{-2mm}
-\noindent\textbf{RP-based Identity Linkage.}
 At the very beginning, let us see the data exposed to RP during the authentication in the UPPRESSO system.
-We can find that, RP holds $ID_{RP}$,  generates $PID_{RP}$, $T$, $Account$, and receives $N_U$, registration result (containing $PID_{RP}$, hash($N_U$) and $Endpoint_U$), and identity proof (including $PID_{RP}$ and $PID_U$). Then we delete the irrelevant data, $Endpoint_U$, as it is generated randomly and does not participates and further calculation. And the repetitive data should also be deleted, for example, $PID_{RP}$ is generated as $PID_{RP}=N_U \cdot {ID_{RP}}$ so that $PID_{RP}$ can be omitted. Finally, the effective date collected by the RP during the authentication flow is $\langle ID_{RP}, N_U, PID_U\rangle$, while $PID_U$ equals to $ID_U \cdot{(N_U \cdot {ID_{RP})}}$.
+The RP holds $ID_{RP}$,  generates $PID_{RP}$, $Acct$, and receives $t$, registration result (containing $PID_{RP}$, $H(t)$),
+    and identity proof (including $PID_{RP}$ and $PID_U$).
+The repetitive data should also be deleted, for example, $PID_{RP}$ is generated as $PID_{RP}= [t]{ID_{RP}}$ so that $PID_{RP}$ can be omitted (so as $Acct = [t^{-1}]PID_{U}$). Finally, the effective date collected by the RP during the authentication flow is $\langle ID_{RP}, t, PID_U\rangle$,
+ while $PID_U$ equals to $[ID_U][t]{ID_{RP}}$.
 
-%We assume that collusive can correlate $PID_U$s at different RPs and guess if they belong to the same user. Thus,
-There is the data set, $\langle ID_{RP1}$, $N_{U1}$, $ID_U \cdot{(N_{U1} \cdot {ID_{RP1})}}$, $ID_{RP2}$, $N_{U2}$, $ID_U' \cdot{(N_{U2} \cdot {ID_{RP2})}}\rangle$, that RP-based identity linkage attack can be considered as RP guesses whether $ID_U$ equals $ID_U'$.
-Here, we can define the game, the adversary owns the same ability as the RP. The adversary receive the input $\langle ID_{RP1}$, $N_{U1}$, $ID_U \cdot{(N_{U1} \cdot {ID_{RP1})}}$, $ID_{RP2}$, $N_{U2}$, $ID_U' \cdot{(N_{U2} \cdot {ID_{RP2})}}\rangle$ from the challenger, and returns the result $b$.
-The $b$ is set 1, while adversary guess that $ID_U$ equals $ID_U'$, otherwise 0. The game is shown as Figure \ref{fig:game}.
-Therefore, whether the RP-based identity linkage attack is available is equivalent to whether adversary has the advantage on the guessing game.
-We define $Pr_1$ is the probability, while the adversary returns $b=1$ as $ID_U$ equals to $ID_U'$. And $Pr_2$ is the probability, while the adversary returns $b=1$ as $ID_U$ does not equal to $ID_U'$.
-Adversary has the advantage on the guessing game means that
+
+\begin{figure*}
+  \centering
+  \includegraphics[width=0.82\linewidth]{fig/game1.pdf}
+  \caption{The Game.}
+  \label{fig:game}
+\end{figure*}
+
+\begin{figure*}
+  \centering
+  \includegraphics[width=0.65\linewidth]{fig/dalgorithm.pdf}
+  \caption{The distinguishing algorithm.}
+  \label{fig:dalgorithm}
+\end{figure*}
+
+There is the data set, $\langle ID_{RP_j}$, $t_j$, $[ID_U][t_j]{ID_{RP_j}}\rangle$,
+    $\langle ID_{RP_{j'}}$, $t_{j'}$, $[ID_{U'}] [t_{j'}] {ID_{RP_{j'}}}\rangle$, from two RPs ($RP_j$ and $RP_{j'}$),
+that RP-based identity linkage attack can be considered as these collusive RPs guesses whether $ID_U$ equals $ID_{U'}$.
+Here, we can define the game, the adversary owns the same ability as the RP.
+The adversary receive the input $\langle ID_{RP_j}$, $t_j$, $[ID_U][t_j]{ID_{RP_j}}\rangle$,
+    $\langle ID_{RP_{j'}}$, $t_{j'}$, $[ID_{U'}] [t_{j'}] {ID_{RP_{j'}}}\rangle$, from the challenger, and returns the result $b$.
+The $b$ is set 1, when adversary guess that $ID_U$ equals $ID_U'$, otherwise 0.
+The game is shown as Figure \ref{fig:game}.
+Therefore, whether the RP-based identity linkage attack is possible is equivalent to whether adversary has the advantage on the guessing game.
+
+We define $Pr_1$ is the probability, while the adversary returns $b=1$ as $ID_U$ equals to $ID_U'$.
+ And $Pr_2$ is the probability, while the adversary returns $b=1$ but $ID_U$ does not equal to $ID_U'$.
+Adversary has the advantage on the game means that
 \vspace{-\topsep}
 \begin{equation}
 Pr_1-Pr_2>\sigma(n)
 \end{equation}
-While an adversary has the advantage on the guessing game, based on the challenger and adversary, we can build a PPT distinguishing algorithm $D$ that breaks DDH assumption. The algorithm is shown as Figure \ref{fig:dalgorithm}. That is, the input of $D$ in the form ($X$,$Y$,$Z$,$N$), while $X$,$Y$,$Z$,$N$ are points on the elliptic curve. The challenger receives the input and set $ID_{RP1}=X$, $ID_{RP2}=Y$, $PID_{U1}=N_{U1} \cdot{Z}$, and $PID_{U2}=N_{U2} \cdot{N}$.  At the end, $D$ returns the $b$ as the result.
-Now, we let ($P$, $aP$, $bP$, $abP$) and  ($P$, $aP$, $bP$, $cP$) be the input. Thus there is
+
+While an adversary has the advantage on the guessing game, based on the challenger and adversary,
+ we can build a PPT distinguishing algorithm $D$ that breaks DDH assumption.
+The algorithm is shown as Figure \ref{fig:dalgorithm}.
+That is, the input of $D$ in the form ($X$,$Y$,$Z$,$N$), while $X$,$Y$,$Z$,$N$ are points on the elliptic curve.
+The challenger receives the input and set $ID_{RP1}=X$, $ID_{RP2}=Y$, $PID_{U1}=N_{U1} \cdot{Z}$, and $PID_{U2}=N_{U2} \cdot{N}$.  At the end, $D$ returns the $b$ from the adversary as the result.
+
+Now, we let ($P$, $aP$, $bP$, $abP$) and  ($P$, $aP$, $bP$, $cP$) be two inputs.
+Thus there is
 \vspace{-\topsep}
 \begin{multline*}
 \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ Pr[D(P,aP,bP,abP)=1]=\\ Pr[A(P, N_{U1}, b \cdot{N_{U1}P}, aP, N_{U2},b\cdot{N_{U2} aP})=1]=Pr_1\\
@@ -130,7 +143,7 @@ in the first equation $ID_{U} $ and $ ID_{U}'$ all equal to $b$, while in the se
 \begin{equation}
 Pr_1-Pr_2=\sigma(n)
 \end{equation}
-There is a contradiction between equation (4) and equation (5). Therefore, an adversary cannot have the advantage on the guessing game. Thus, the RP-identity linkage attack is not available.
+There is a contradiction between equation (4) and equation (5). Therefore, an adversary cannot have the advantage on the guessing game. Thus, the RP-identity linkage attack is computationally impossible.
 
 
 \begin{figure}[t]
