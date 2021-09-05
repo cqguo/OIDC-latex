@@ -63,47 +63,46 @@ We show that UPPRESSO effectively prevents the attacks of IdP-based login tracin
 
 \vspace{1mm}
 \noindent\textbf{IdP-based Login Tracing.}
-The information accessible to the IdP but derived from the RP's identity,
+The information accessible to the IdP and derived from the RP's identity,
     is only $PID_{RP}$, where $PID_{RP} = [t]ID_{RP}$ is calculated by the user.
 Because  (\emph{a}) $t$ is a number randomly chosen from $(1,n)$ by the user and kept secret to the IdP
  and (\emph{b}) $ID_{RP} = [r]G$ and $G$ is the base point,
- the IdP has to view $PID_{RP}$ as randomly chosen from $\mathbb{E}$.
+ the IdP has to view $PID_{RP}$ as randomly and independently chosen from $\mathbb{E}$.
 So, the IdP cannot derive the RP's identity or link any pair of $PID_{RP}^i$ and $PID_{RP}^{i'}$,
     and the IdP-based identity linkage is impossible.
 
 \vspace{1mm}
 \noindent\textbf{RP-based Identity Linkage.}
-We prove UPPRESSO prevents the RP-based identity linkage based on the elliptic curve decision Diffie-Hellman (ECDDH) assumption \cite{GoldwasserK16}.
-
-++++
-
-We briefly introduce the ECDDH assumption.
+We prove UPPRESSO prevents the RP-based identity linkage,
+ based on the elliptic curve decision Diffie-Hellman (ECDDH) assumption \cite{GoldwasserK16} as below.
+%We briefly introduce the ECDDH assumption.
 Let $\mathbb{E}$ be an elliptic curve over a finite field $\mathbb{F}_q$,
     and $P$ be a point on $\mathbb{E}$ of order $n$.
 For any probabilistic polynomial time (PPT) algorithm $\mathcal{D}$,
- two probability distributions \{$[a]P$, $[b]P$, $[ab]P$\} and \{$[a]P$, $[b]P$, $[c]P$\}
+ $([a]P$, $[b]P$, $[ab]P)$ and $([a]P$, $[b]P$, $[c]P)$
 are computationally indistinguishable,
  where $a$, $b$ and $c$ are integer numbers randomly and independently chosen from $(1,n)$.
-That is,
-    there is a negligible $\sigma(k)$ with the security parameter $k$ such that:
-
+Let  $Pr\{\}$ denote the probability and
+ we define
+\begin{align*}
+Pr_1 = & Pr\{\mathcal{D}(P, [a]P, [b]P, [ab]P)=1\} \\
+Pr_2 = & Pr\{\mathcal{D}(P, [a]P, [b]P, [c]P)=1\} \\
+\epsilon(k) = & Pr_1 - Pr_2
+\end{align*}
+Then, $\epsilon(k)$ becomes negligible with the security parameter $k$.
 
 %Let $q$ be a large prime and $\mathbb{G}$ denotes a cyclic group of order $n$ of an elliptic curve $E(\mathbb{F}_q)$.
 %Assume that $n$ is also a large prime. Let $P$ be a generator point of $\mathbb{G}$. 
 
 %where $q$ and $n$ are large primitive number, and $P$ is the point of $\mathbb{G}$.
 %For any probabilistic polynomial time (PPT) algorithm $D$, the distributions, \{$P$, $aP$, $bP$, $abP$\}$_{a,b \in \mathbb{Z}_n}$ and \{$P$, $aP$, $bP$, $cP$\}$_{a,b,c \in \mathbb{Z}_n}$, are computationally indistinguishable. There is a negligible $\sigma(k)$, where $k$ is the security parameter.
-\begin{equation*}
-Pr[\mathcal{D}(P, [a]P, [b]P, [ab]P)=1]-Pr[\mathcal{D}(P, [a]P, [b]P, [c]P)=1]=\sigma(k)
-\end{equation*}
 
-Let us see the data exposed to an RP.
-The RP holds $ID_{RP}$,  generates $PID_{RP}$, $Acct$, and receives $t$, registration result (containing $PID_{RP}$, $H(t)$),
-    and identity proof (including $PID_{RP}$ and $PID_U$).
-The repetitive data should also be deleted, for example, $PID_{RP}$ is generated as $PID_{RP}= [t]{ID_{RP}}$ so that $PID_{RP}$ can be omitted (so as $Acct = [t^{-1}]PID_{U}$).
-Finally, the effective date collected by the RP in each SSO login instance
- is $\langle ID_{RP}, t, PID_U\rangle$,
- while $PID_U = [ID_U][t]{ID_{RP}}$.
+In the login flow,
+    an RP holds $ID_{RP}$ and $Acct$, receives $t$, calculates $PID_{RP}$,
+    and verifies two signed responses (i.e., $PID_{RP}$ and $H(t)$ in the $PID_{RP}$ registration result,
+            and $PID_{RP}$ and $PID_U$ in the identity token).
+After filtering out the redundant information (i.e., $PID_{RP}= [t]{ID_{RP}}$ and $Acct = [t^{-1}]PID_{U}$),
+    we find that the RP receives $(ID_{RP}, t, PID_U)$ in each SSO login instance, where $PID_U = [ID_U][t]{ID_{RP}}$.
 
 % 这个太简单了，不需要图
 %\begin{figure*}
@@ -121,47 +120,58 @@ Finally, the effective date collected by the RP in each SSO login instance
   \label{fig:dalgorithm}
 \end{figure}
 
-There is the data set, $\langle ID_{RP_j}$, $t_j$, $[ID_U][t_j]{ID_{RP_j}}\rangle$,
-    $\langle ID_{RP_{j'}}$, $t_{j'}$, $[ID_{U'}] [t_{j'}] {ID_{RP_{j'}}}\rangle$, from two RPs ($RP_j$ and $RP_{j'}$),
-that RP-based identity linkage attack can be considered as these collusive RPs guesses whether $ID_U$ equals $ID_{U'}$.
-
-Here, we define the game $\mathcal{G}$, the adversary owns the same ability as collusive RPs.
-The adversary receive the input $\langle ID_{RP_j}$, $t_j$, $[ID_U][t_j]{ID_{RP_j}}\rangle$,
-    $\langle ID_{RP_{j'}}$, $t_{j'}$, $[ID_{U'}] [t_{j'}] {ID_{RP_{j'}}}\rangle$, from the challenger, and returns the result $s$.
-The result is 1, when adversary guess that $ID_U = ID_{U'}$, otherwise $s=0$.
+In order to launch identity linkage,
+    two RPs bring two triads received in SSO login instances, $(ID_{RP_j}$, $t_j$, $[ID_U][t_j]{ID_{RP_j}})$ and
+    $(ID_{RP_{j'}}$, $t_{j'}$, $[ID_{U'}] [t_{j'}] {ID_{RP_{j'}}})$.
+We describe the attack of RP-based identity linkage as the following game $\mathcal{G}$ between an adversary and a challenger:
+    The adversary receives $(ID_{RP_j}$, $t_j$, $[ID_U][t_j]{ID_{RP_j}})$ and 
+    $(ID_{RP_{j'}}$, $t_{j'}$, $[ID_{U'}] [t_{j'}] {ID_{RP_{j'}}})$ from the challenger,
+     and outputs the result $s$.
+The result is 1, when the adversary guesses that $ID_U = ID_{U'}$;
+     otherwise, the adversary thinks they are unequal and $s=0$.
 %The game is shown as Figure \ref{fig:game}.
-The RP-based identity linkage attack is equivalent to
- adversary has the advantage on the guessing game (i.e., $Pr_1-Pr_2>\sigma(k)$).
 
-We define $Pr_s$ is the probability, while the adversary returns $s=1$ as $ID_U$ equals to $ID_{U'}$ (i.e., the attack succeeds).
- And $Pr_{\bar{s}}$ is the probability, while the adversary returns $s=1$ but $ID_U$ does not equal to $ID_{U'}$ (i.e., the attack fails).
-Adversary has the advantage on the game means that
-\begin{equation*}
-Pr_s-Pr_f>\sigma(k)
-\end{equation*}
+We define $Pr_s$ is the probability that
+    the adversary outputs $s=1$ when $ID_U = ID_{U'}$ (i.e., a successful identity linkage),
+    and $Pr_{\bar{s}}$ is the probability that $s=1$ but $ID_U \neq ID_{U'}$ (i.e., a mistake linkage).
+The successful RP-based identity linkage means 
+    the adversary has non-negligible advantages in $\mathcal{G}$.
 
-We design a PPT algorithm $\mathcal{D}^*$ based on $\mathcal{G}$, shown in Figure \ref{fig:dalgorithm}.
-The input of $\mathcal{D}^*$ in the form $(Q_1, Q_2, Q_3, Q_4)$, while $Q_i$ are points on $\mathbb{E}$.
-The challenger receives the input,
-    randomly chooses $t_j$ and $t_{j'}$ from $(1,n)$,
-    and set $ID_{RP_j}=Q_1$, $ID_{RP_{j'}}=Q_2$, $PID_{U,j}=[t_j]Q_3$, and $PID_{U',j'}= [t_{j'}] Q_4$.
-The challenger input $<Q_1, t_j, [t_j]Q_3>$ $<Q_2, t_{j'}, [t_{j'}] Q_4>$ to the game $\mathcal{G}$.
-At the end, $\mathcal{D}^*$ returns the $s$ from the adversary as the result.
+We then design an algorithm $\mathcal{D}^*$ based on $\mathcal{G}$, shown in Figure \ref{fig:dalgorithm}.
+The input of $\mathcal{D}^*$ appears in the form of $(Q_1, Q_2, Q_3, Q_4)$, while each $Q_i$ is a point on $\mathbb{E}$.
+On receiving the input,
+ the challenger of $\mathcal{G}$ randomly chooses $t_j$ and $t_{j'}$ from $(1,n)$,
+   % and sets $ID_{RP_j}=Q_1$, $ID_{RP_{j'}}=Q_2$, $PID_{U,j}=[t_j]Q_3$, and $PID_{U',j'}= [t_{j'}] Q_4$.
+    and sends $(Q_1, t_j, [t_j]Q_3)$ and $(Q_2, t_{j'}, [t_{j'}] Q_4)$ to the adversary.
+Finally,
+    $\mathcal{D}^*$ directly outputs $s$ from the adversary as the result.
 
-We let ($P$, $[a]P$, $[b]P$, $[ab]P$) and  ($P$, $[a]P$, $[b]P$, $[c]P$) be two inputs.
-Thus there is
-\begin{multline*}
-\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ Pr[\mathcal{D}^*(P,[a]P,[b]P,[ab]P)=1]=\\ Pr[\mathcal{G}(P, t_j, [t_j][b]P, aP, t_{j'},[t_{j'}][ab]P)=1]=Pr_s\\
-\\
-Pr[\mathcal{D}^*(P,aP,bP,cP)=1]=\ \ \ \ \ \ \ \ \ \
-\\ Pr[\mathcal{G}(P, t_j, [t_j][b]P, aP, t_{j'},[t_{j'}][c/a] [a]P)=1]=Pr_f
-\end{multline*}
-in the first equation $ID_{U} = ID_{U'} = b$, so it is $Pr_s$
- while in the second equation $ID_{U} =b$ but $ID_{U'} = c/a$ so it is $Pr_f$.
+Let ($P$, $[a]P$, $[b]P$, $[ab]P$) and  ($P$, $[a]P$, $[b]P$, $[c]P$) be two inputs of $\mathcal{D}^*$.
+Thus, we obtain
+\begin{equation}\label{eq:game-succed}
+\begin{split}
+&Pr\{\mathcal{D}^*(P,[a]P,[b]P,[ab]P)=1\}\\
+=&Pr\{\mathcal{G}(P, t_j, [t_j][b]P, [a]P, t_{j'},[t_{j'}][ab]P)=1\}\\
+=&Pr\{\mathcal{G}(P, t_j, [b][t_j]P, [a]P, t_{j'},[b][t_{j'}][a]P)=1\}=Pr_s
+\end{split}
+\end{equation}
+\begin{equation}\label{eq:game-fail}
+\begin{split}
+&Pr\{\mathcal{D}^*(P,[a]P,[b]P,[c]P)=1\} \\
+=&Pr\{\mathcal{G}(P, t_j, [t_j][b]P, [a]P, t_{j'},[t_{j'}][c/a] [a]P)=1\}\\
+=&Pr\{\mathcal{G}(P, t_j, [b][t_j]P, [a]P, t_{j'},[c/a][t_{j'}][a]P)=1\}=Pr_{\bar{s}}
+\end{split}
+\end{equation}
+
+Equation \ref{eq:game-succed} is equal to $Pr_s$
+        because it represents the successful case of $ID_{U} = ID_{U'} = b$,
+ while Equation \ref{eq:game-fail} is $Pr_{\bar{s}}$ for it represents the mistake case of $ID_{U} =b$ and $ID_{U'} = c/a$.
 
 
-Adversary has the advantage on the game means $Pr_1-Pr_2>\sigma(k)$,
-    which violate the ECDDH assumption.
-So an adversary cannot have the advantage on the game,
+The adversary has non-negligible advantages in $\mathcal{G}$ means that,
+    $Pr_s - Pr_{\bar{s}}>\sigma(k)$
+    and then $\mathcal{D}^*$ significantly distinguishes ($P$, $[a]P$, $[b]P$, $[ab]P$) from  ($P$, $[a]P$, $[b]P$, $[c]P$),
+    which violates the ECDDH assumption.
+So the adversary has no advantages in the game,
     and the RP-based identity linkage is computationally impossible.
 
