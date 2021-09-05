@@ -79,14 +79,14 @@ We prove UPPRESSO prevents the RP-based identity linkage,
 Let $\mathbb{E}$ be an elliptic curve over a finite field $\mathbb{F}_q$,
     and $P$ be a point on $\mathbb{E}$ of order $n$.
 For any probabilistic polynomial time (PPT) algorithm $\mathcal{D}$,
- $([a]P$, $[b]P$, $[ab]P)$ and $([a]P$, $[b]P$, $[c]P)$
+ $([x]P$, $[y]P$, $[xy]P)$ and $([x]P$, $[y]P$, $[z]P)$
 are computationally indistinguishable,
- where $a$, $b$ and $c$ are integer numbers randomly and independently chosen from $(1,n)$.
+ where $x$, $y$ and $z$ are integer numbers randomly and independently chosen from $(1,n)$.
 Let  $Pr\{\}$ denote the probability and
  we define
 \begin{align*}
-Pr_1 = & Pr\{\mathcal{D}(P, [a]P, [b]P, [ab]P)=1\} \\
-Pr_2 = & Pr\{\mathcal{D}(P, [a]P, [b]P, [c]P)=1\} \\
+Pr_1 = & Pr\{\mathcal{D}(P, [x]P, [y]P, [xy]P)=1\} \\
+Pr_2 = & Pr\{\mathcal{D}(P, [x]P, [y]P, [z]P)=1\} \\
 \epsilon(k) = & Pr_1 - Pr_2
 \end{align*}
 Then, $\epsilon(k)$ becomes negligible with the security parameter $k$.
@@ -130,13 +130,13 @@ The result is 1, when the adversary guesses that $ID_U = ID_{U'}$;
      otherwise, the adversary thinks they are unequal and $s=0$.
 %The game is shown as Figure \ref{fig:game}.
 
-We define $Pr_s$ is the probability that
-    the adversary outputs $s=1$ when $ID_U = ID_{U'}$ (i.e., a successful identity linkage),
-    and $Pr_{\bar{s}}$ is the probability that $s=1$ but $ID_U \neq ID_{U'}$ (i.e., a mistake linkage).
+We define $Pr_c$ is the probability that
+    the adversary outputs $s=1$ when $ID_U = ID_{U'}$ (i.e., a \emph{correct} identity linkage),
+    and $Pr_{\bar{c}}$ is the probability that $s=1$ but $ID_U \neq ID_{U'}$ (i.e., an \emph{incorrect} case).
 The successful RP-based identity linkage means 
     the adversary has non-negligible advantages in $\mathcal{G}$.
 
-We then design an algorithm $\mathcal{D}^*$ based on $\mathcal{G}$, shown in Figure \ref{fig:dalgorithm}.
+We design a PPT algorithm $\mathcal{D}^*$ based on $\mathcal{G}$, shown in Figure \ref{fig:dalgorithm}.
 The input of $\mathcal{D}^*$ appears in the form of $(Q_1, Q_2, Q_3, Q_4)$, while each $Q_i$ is a point on $\mathbb{E}$.
 On receiving the input,
  the challenger of $\mathcal{G}$ randomly chooses $t_j$ and $t_{j'}$ from $(1,n)$,
@@ -145,30 +145,30 @@ On receiving the input,
 Finally,
     $\mathcal{D}^*$ directly outputs $s$ from the adversary as the result.
 
-Let ($P$, $[a]P$, $[b]P$, $[ab]P$) and  ($P$, $[a]P$, $[b]P$, $[c]P$) be two inputs of $\mathcal{D}^*$.
+Let ($P$, $[x]P$, $[y]P$, $[xy]P$) and  ($P$, $[x]P$, $[y]P$, $[z]P$) be two inputs of $\mathcal{D}^*$.
 Thus, we obtain
 \begin{equation}\label{eq:game-succed}
 \begin{split}
-&Pr\{\mathcal{D}^*(P,[a]P,[b]P,[ab]P)=1\}\\
-=&Pr\{\mathcal{G}(P, t_j, [t_j][b]P, [a]P, t_{j'},[t_{j'}][ab]P)=1\}\\
-=&Pr\{\mathcal{G}(P, t_j, [b][t_j]P, [a]P, t_{j'},[b][t_{j'}][a]P)=1\}=Pr_s
+&Pr\{\mathcal{D}^*(P,[x]P,[y]P,[xy]P)=1\}\\
+=&Pr\{\mathcal{G}(P, t_j, [t_j][y]P, [x]P, t_{j'},[t_{j'}][xy]P)=1\}\\
+=&Pr\{\mathcal{G}(P, t_j, [y][t_j]P, [x]P, t_{j'},[y][t_{j'}][x]P)=1\}=Pr_c
 \end{split}
 \end{equation}
 \begin{equation}\label{eq:game-fail}
 \begin{split}
-&Pr\{\mathcal{D}^*(P,[a]P,[b]P,[c]P)=1\} \\
-=&Pr\{\mathcal{G}(P, t_j, [t_j][b]P, [a]P, t_{j'},[t_{j'}][c/a] [a]P)=1\}\\
-=&Pr\{\mathcal{G}(P, t_j, [b][t_j]P, [a]P, t_{j'},[c/a][t_{j'}][a]P)=1\}=Pr_{\bar{s}}
+&Pr\{\mathcal{D}^*(P,[x]P,[y]P,[z]P)=1\} \\
+=&Pr\{\mathcal{G}(P, t_j, [t_j][y]P, [x]P, t_{j'},[t_{j'}][z/x] [x]P)=1\}\\
+=&Pr\{\mathcal{G}(P, t_j, [y][t_j]P, [x]P, t_{j'},[z/x][t_{j'}][x]P)=1\}=Pr_{\bar{c}}
 \end{split}
 \end{equation}
-Equation \ref{eq:game-succed} is equal to $Pr_s$
-        because it represents the successful case of $ID_{U} = ID_{U'} = b$,
- while Equation \ref{eq:game-fail} is $Pr_{\bar{s}}$ for it represents the mistake case of $ID_{U} =b$ and $ID_{U'} = c/a$.
+Equation \ref{eq:game-succed} is equal to $Pr_c$
+        because it represents the correct case of $ID_{U} = ID_{U'} = y$,
+ while Equation \ref{eq:game-fail} is $Pr_{\bar{c}}$ for it represents the incorrect case of $ID_{U} =y$ and $ID_{U'} = z/x$.
 
 
-The adversary has non-negligible advantages in $\mathcal{G}$ means that,
-    $Pr_s - Pr_{\bar{s}}>\sigma(k)$
-    and then $\mathcal{D}^*$ significantly distinguishes ($P$, $[a]P$, $[b]P$, $[ab]P$) from  ($P$, $[a]P$, $[b]P$, $[c]P$),
+The adversary has non-negligible advantages in $\mathcal{G}$ means 
+    $Pr_s - Pr_{\bar{s}}>\sigma(k)$,
+    and then $\mathcal{D}^*$ significantly distinguishes ($P$, $[x]P$, $[y]P$, $[xy]P$) from  ($P$, $[x]P$, $[y]P$, $[z]P$),
     which violates the ECDDH assumption.
 So the adversary has no advantages in the game,
     and the RP-based identity linkage is computationally impossible.
