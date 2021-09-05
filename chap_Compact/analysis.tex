@@ -98,7 +98,7 @@ are computationally indistinguishable,
 Pr[\mathcal{D}(P, [a]P, [b]P, [ab]P)=1]-Pr[\mathcal{D}(P, [a]P, [b]P, [c]P)=1]=\sigma(k)
 \end{equation*}
 
-At the beginning, let us see the data exposed to an RP.
+Let us see the data exposed to an RP.
 The RP holds $ID_{RP}$,  generates $PID_{RP}$, $Acct$, and receives $t$, registration result (containing $PID_{RP}$, $H(t)$),
     and identity proof (including $PID_{RP}$ and $PID_U$).
 The repetitive data should also be deleted, for example, $PID_{RP}$ is generated as $PID_{RP}= [t]{ID_{RP}}$ so that $PID_{RP}$ can be omitted (so as $Acct = [t^{-1}]PID_{U}$).
@@ -116,41 +116,45 @@ Finally, the effective date collected by the RP during the SSO login flow is $\l
 There is the data set, $\langle ID_{RP_j}$, $t_j$, $[ID_U][t_j]{ID_{RP_j}}\rangle$,
     $\langle ID_{RP_{j'}}$, $t_{j'}$, $[ID_{U'}] [t_{j'}] {ID_{RP_{j'}}}\rangle$, from two RPs ($RP_j$ and $RP_{j'}$),
 that RP-based identity linkage attack can be considered as these collusive RPs guesses whether $ID_U$ equals $ID_{U'}$.
-Here, we can define the game, the adversary owns the same ability as collusive RPs.
+
+Here, we define the game $\mathcal{G}$, the adversary owns the same ability as collusive RPs.
 The adversary receive the input $\langle ID_{RP_j}$, $t_j$, $[ID_U][t_j]{ID_{RP_j}}\rangle$,
     $\langle ID_{RP_{j'}}$, $t_{j'}$, $[ID_{U'}] [t_{j'}] {ID_{RP_{j'}}}\rangle$, from the challenger, and returns the result $s$.
-The $s$ is set 1, when adversary guess that $ID_U = ID_U'$, otherwise 0.
+The $s$ is set 1, when adversary guess that $ID_U = ID_{U'}$, otherwise 0.
 %The game is shown as Figure \ref{fig:game}.
 Therefore, whether the RP-based identity linkage attack is possible is equivalent to whether adversary has the advantage on the guessing game.
 
 We define $Pr_1$ is the probability, while the adversary returns $s=1$ as $ID_U$ equals to $ID_{U'}$.
  And $Pr_2$ is the probability, while the adversary returns $s=1$ but $ID_U$ does not equal to $ID_{U'}$.
 Adversary has the advantage on the game means that
-\begin{equation}
-Pr_1-Pr_2>\sigma(n)
-\end{equation}
+\begin{equation*}
+Pr_1-Pr_2>\sigma(k)
+\end{equation*}
 
 While an adversary has the advantage on the guessing game, based on the challenger and adversary,
- we can build a PPT distinguishing algorithm $D$ that breaks DDH assumption.
+ we can build a PPT algorithm $\mathcal{D}$ that breaks DDH assumption.
 The algorithm is shown as Figure \ref{fig:dalgorithm}.
-That is, the input of $D$ in the form ($X$,$Y$,$Z$,$N$), while $X$,$Y$,$Z$,$N$ are points on the elliptic curve.
-The challenger receives the input and set $ID_{RP_j}=X$, $ID_{RP_{j'}}=Y$, $PID_{U,j}=[t_j]Z$, and $PID_{U',j'}= [t_{j'}] N$.
-The challenger input $<X, t_j, [t_j]Z>$ $<Y, t_{j'}, [t_{j'}] N>$ to the game. the adversary returns $r$.
-At the end, $D$ returns the $r$ from the adversary as the result.
+That is, the input of $\mathcal{D}$ in the form $(Q_1, Q_2, Q_3, Q_4)$, while $Q_i$ are points on $\mathbb{E}$.
+The challenger receives the input and set $ID_{RP_j}=Q_1$, $ID_{RP_{j'}}=Q_2$, $PID_{U,j}=[t_j]Q_3$, and $PID_{U',j'}= [t_{j'}] Q_4$.
+The challenger input $<Q_1, t_j, [t_j]Q_3>$ $<Q_2, t_{j'}, [t_{j'}] Q_4>$ to the game $\mathcal{G}$. the adversary returns $s$.
+At the end, $\mathcal{D}$ returns the $s$ from the adversary as the result.
 
-Now, we let ($P$, $aP$, $bP$, $abP$) and  ($P$, $aP$, $bP$, $cP$) be two inputs.
+Now, we let ($P$, $[a]P$, $[b]P$, $[ab]P$) and  ($P$, $[a]P$, $[b]P$, $[c]P$) be two inputs.
 Thus there is
 \begin{multline*}
-\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ Pr[D(P,aP,bP,abP)=1]=\\ Pr[A(P, t_j, [t_j][b]P, aP, t_{j'},[t_{j'}][ab]P)=1]=Pr_1\\\\
-Pr[D(P,aP,bP,cP)=1]=\ \ \ \ \ \ \ \ \ \
-\\ Pr[A(P, t_j, [t_j][b]P, aP, t_{j'},[t_{j'}][c/a] [a]P)=1]=Pr_2
+\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ Pr[\mathcal{D}(P,[a]P,[b]P,[ab]P)=1]=\\ Pr[\mathcal{G}(P, t_j, [t_j][b]P, aP, t_{j'},[t_{j'}][ab]P)=1]=Pr_1\\
+\\
+Pr[\mathcal{D}(P,aP,bP,cP)=1]=\ \ \ \ \ \ \ \ \ \
+\\ Pr[\mathcal{G}(P, t_j, [t_j][b]P, aP, t_{j'},[t_{j'}][c/a] [a]P)=1]=Pr_2
 \end{multline*}
-in the first equation $ID_{U} $ and $ ID_{U'}$ all equal to $b$, while in the second equation $ID_{U} =b$ does not equal to $ID_{U'} = c/a$.
-Due to DDH, we have
-\begin{equation}
-Pr_1-Pr_2=\sigma(n)
-\end{equation}
-There is a contradiction between equation (4) and equation (5). Therefore, an adversary cannot have the advantage on the guessing game. Thus, the RP-identity linkage attack is computationally impossible.
+in the first equation $ID_{U} = ID_{U'} = b$, so it is $Pr_1$
+ while in the second equation $ID_{U} =b$ but $ID_{U'} = c/a$ so it is $Pr_2$.
+
+
+Adversary has the advantage on the game means $Pr_1-Pr_2>\sigma(k)$,
+    which violate the ECDDH assumption.
+So an adversary cannot have the advantage on the guessing game,
+    and the RP-based identity linkage is computationally impossible.
 
 
 \begin{figure}[t]
