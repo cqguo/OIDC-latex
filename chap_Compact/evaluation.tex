@@ -1,13 +1,14 @@
 \subsection{Performance Evaluation}
 \label{sec:evaluation}
-++++++++
-
-The evaluation was performed on 3 machines,
-one (3.4GHz CPU, 8GB RAM, Windows 10) as IdP,
-one (3.1GHz CPU, 8GB RAM, Windows 10) as an RP,
-and the last one (2.9GHz CPU, 8GB RAM, Windows 10) as a user.
+Three machines connected in an isolated 1Gbps LAN,
+    build the experimental SSO environment.
+The CPUs are Intel Core i7-4770 3.4 GHz for the IdP,
+    Intel Core i7-4770S 3.1 GHz for the RP, and Intel Core i5-4210H 2.9 GHz for users.
+All these machines are configured with 8 GB RAM and 
+    installed Windows 10 as the operating system.
 The user agent is Chrome v75.0.3770.100.
-These machines are connected in an isolated 1Gbps network.
+
+++++++++
 
 %RP（不包括特定方案的SDK）大约需要230行JAVA代码
 %OIDC（MITREid）的SDK需要大约20行的JAVA代码，需要额外添加一个HTML文件（包含大约20行JavaScript代码）
@@ -22,19 +23,19 @@ These machines are connected in an isolated 1Gbps network.
 
 We compare UPPRESSO with MITREid Connect \cite{MITREid} and SPRESSO \cite{SPRESSO},
 where MITREid Connect provides open-source Java implementations \cite{MITREid} of IdP and RP's SDK and SPRESSO provides the JavaScript implementations based on node.js for all entities \cite{SPRESSO}.
+
+MITREid Connect runs with the standard implicit login flow of OIDC.
 They also adopt
 RSA-2048 and SHA-256 as the signature algorithm and the hash function, respectively.
-
 
 We implemented a Java RP based on Spring Boot framework for UPPRESSO and MITREid Connect, by integrating the corresponding SDK respectively.
 The RPs in all three schemes provide the same function, i.e.,   extracting the user's account from the identity token.
 We have measured the time for a user's login at an RP and calculated the average values of $1,000$ measurements.
 
-
 We divide a login instance into 3 phases according to the life-cycle of the identity token:
-\textbf{\em Identity token requesting} (Steps 1.1-4.3 in Figure \ref{fig:process}), the RP (and user) constructing and transmitting the request to IdP;
-\textbf{\em Identity token generation} (Steps 4.4-4.6 in Figure \ref{fig:process}), the IdP generating identity token (no user authentication);
-and \textbf{\em Identity token acceptance} (Steps 4.5-5.2 in Figure \ref{fig:process}), the RP server receives, verifies and parse the identity token relayed from the IdP.
+\textbf{\em the preparation and identity token requesting} (Steps 1-3 in Figure \ref{fig:process}), the RP (and user) constructing and transmitting the request to IdP;
+\textbf{\em Identity token generation} (Step 4 in Figure \ref{fig:process}), the IdP generating identity token (no user authentication);
+and \textbf{\em Identity token acceptance} (Step 5 in Figure \ref{fig:process}), the RP server receives, verifies and parse the identity token relayed from the IdP.
 % and \textbf{Identity token verification} (Steps 5.1 and 5.2 in Figure \ref{fig:process}), the RP verifying and parsing the identity token.
 
 The evaluation results are shown in Figure \ref{fig:evaluation}.

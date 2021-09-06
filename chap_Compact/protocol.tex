@@ -311,6 +311,9 @@ The IdP maintains the list of $PID_{RP}$ and deletes expired ones from it.
 \item[3.4] The RP verifies the IdP's signature, and accepts the result
  only if $PID_{RP}$ and $H(t)$ match those in the negotiation and it does not expire.
 \vspace{-\topsep}
+\item[3.5] The RP constructs an identity-token request with $PID_{RP}$ and $Enpt_{RP}$,
+    which is then forwarded to the IdP script through the RP script.
+\vspace{-\topsep}
 \end{itemize}
 $H(t)$ is a nonce to distinguish different login instances,
  because there is a very small probability that
@@ -324,24 +327,22 @@ This nonce prevents one $PID_{RP}$ registration result (and the subsequent ident
 The IdP calculates $PID_U = [ID_U]{PID_{RP}}$ and signs the identity token. % The processes are as follows.
 \begin{itemize}
 \vspace{-\topsep}
-\item[4.1] The RP constructs an identity-token request with $PID_{RP}$ and $Enpt_{RP}$,
-    which is then forwarded to the IdP script through the RP script.
+\item[4.1] On receiving an identity-token request,
+    the IdP authenticates the user if he has not been authenticated yet.
 \vspace{-\topsep}
-\item[4.2] The IdP authenticates the user if he has not been authenticated yet.
-\vspace{-\topsep}
-\item[4.3] The user checks the scope of the requested attributes.
+\item[4.2] The user checks the scope of the requested attributes.
 The IdP script verifies $PID_{RP}$ and $Enpt_{RP}$ in the request;
     that is, $PID_{RP}$ is the one registered in the previous step,
             and $Enpt_{RP}$ matches the one in $Cert_{RP}$.
 Then, the IdP script replaces $Enpt_{RP}$ with $PEnpt_{U}$ in the identity-token request
      and sends this modified request to the IdP.
 \vspace{-\topsep}
-\item [4.4] The IdP checks whether the received pair of $PID_{RP}$ and $PEnpt_U$ is in the list of unexpired $PID_{RP}$ or not,
+\item [4.3] The IdP checks whether the received pair of $PID_{RP}$ and $PEnpt_U$ is in the list of unexpired $PID_{RP}$ or not,
     and calculates $PID_U = [ID_U]{PID_{RP}}$ for the authenticated user.
 The IdP then signs an identity token $[PID_{RP}, PID_U, Iss, Validity, Attr]_{SK}$,
  where $Iss$ is the IdP's identity, $Validity$ is the validity period, and $Attr$ contains the requested attributes.
 \vspace{-\topsep}
-\item[4.5] The IdP sends the identity token to $PEnpt_{U}$.
+\item[4.4] The IdP sends the identity token to $PEnpt_{U}$.
 \vspace{-\topsep}
 \end{itemize}
 
