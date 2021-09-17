@@ -1,8 +1,8 @@
-\section{Discussions and Future Work}
+\section{Discussions}
 \label{sec:discussion}
 %We first discuss the scalability, security against DoS attack and OIDC authorization code flow support in UPPRESSO, and then present the extensions for UPPRESSO.
 
-In this section, we discuss some related issues and our future work.
+We discuss some related issues in this section.
 
 \begin{comment}
 %Scalbility
@@ -24,9 +24,21 @@ However, as the user has already been authenticated at the IdP, the IdP could id
 
 %授权码
 %兼容:目前只提供隐式模式,对其他模式与协议的兼容方法
-\vspace{1mm}\noindent{\textbf{OIDC authorization code flow support.}} The privacy-preserving functions $\mathcal{F}_{ID_{U} \mapsto PID_{U}}$, $\mathcal{F}_{ID_{RP} \mapsto PID_{RP}}$ and $\mathcal{F}_{PID_{U} \mapsto Account}$ can be integrated into OIDC authorization code flow directly, therefore  RP-based identity linkage and IdP-based login tracing are still prevented during the construction and parsing of identity token.
-The only privacy leakage is introduced by the transmission, as RP servers obtain the identity token directly from the IdP in this flow, which allows the IdP to obtain RP's network information (e.g., IP address).
-UPPRESSO needs to integrate existing anonymous networks (e.g., Tor)  to prevent this leakage.
+\vspace{1mm}\noindent{\textbf{Compatibility with the Authorization Code Flow.}}
+In the authorization code flow of OIDC,
+    the IdP does not directly send the identity token;
+        instead,
+            an access token is sent and forwarded to the RP,
+            and then the RP uses this access token to ask for identity tokens from the IdP.
+The identity-transformation functions $\mathcal{F}_{PID_{U}}$, $\mathcal{F}_{PID_{RP}}$ and $\mathcal{F}_{Account}$
+    can be integrated into the authorization code flow to generate identity tokens,
+ so that the privacy threats are still prevented in the generation and verification of identity tokens.
+However,
+    as the RP receives the identity token directly from the IdP in this flow,
+            it allows the IdP to obtain the RP's network information (e.g., IP address).
+Therefore,
+to prevent this leakage in the authorization code flow,
+    UPPRESSO needs to integrate anonymous networks (e.g., Tor) for the RP to ask for identity tokens.
 
 %平台无关
 %Similar as SPRESSO, we can integrated for***
@@ -60,7 +72,33 @@ UPPRESSO needs to integrate existing anonymous networks (e.g., Tor)  to prevent 
 
 
 %While USPRESS is designed for semi-honest IdP, it could be extended to prevent
-\noindent{\textbf{Malicious IdP mitigation.}} The IdP is assumed to assign a unique $ID_{RP}$ in $Cert_{RP}$ for each RP and generate the correct $PID_U$ for each login. The malicious IdP may attempt to provide the incorrect $ID_{RP}$ and $PID_U$, which could be prevented by integrating certificate transparency \cite{rfc6962} and user's identifier check \cite{SPRESSO}. With certificate transparency \cite{rfc6962}, the monitors  check the uniqueness of $ID_{RP}$ among all the certificates stored in the log server. To prevent the malicious IdP from injecting any incorrect $PID_U$, the user could provide a nickname to the RP for an extra check as in SPRESSO \cite{SPRESSO}.
 
-\noindent{\textbf{Identity linkage through cookie.}}
-In UPPRESSO, IdP does not provide any distinctive information (such as $ID_U$) of each user to RP, which avoids RP-based identity linkage. However, the cookie of each user may be exploited by RPs to correlate the same user. For instance, while the user has logged in to $RP_A$ with $Account_A$, RP may redirect the user's $Account_A$ to $RP_B$ through the hidden iframe. That is, as long as the user has logged in to $RP_B$ with $Account_B$, the user would be correlated. Moreover, this attack is not only appeared in SSO systems, but also existed in all user-account systems. However, this attack can be easily detected through multiple methods, such as checking the iframe in the script, observing redirection flow through browser network tool, and detecting the redirection based on the browser extension.
+
+%\noindent{\textbf{Malicious IdP mitigation.}} The IdP is assumed to assign a unique $ID_{RP}$ in $Cert_{RP}$ for each RP and generate the correct $PID_U$ for each login. The malicious IdP may attempt to provide the incorrect $ID_{RP}$ and $PID_U$, which could be prevented by integrating certificate transparency \cite{rfc6962} and user's identifier check \cite{SPRESSO}. With certificate transparency \cite{rfc6962}, the monitors  check the uniqueness of $ID_{RP}$ among all the certificates stored in the log server. To prevent the malicious IdP from injecting any incorrect $PID_U$, the user could provide a nickname to the RP for an extra check as in SPRESSO \cite{SPRESSO}.
+\vspace{1mm}
+\noindent{\textbf{Identity Linkage through Cookies.}}
+When a user logins multiple RPs on one device as different accounts,
+    the cookies might be exploited by malicious RPs to correlate the user.
+For instance,
+     when the user has logined $RP_j$ with $Acct_j$,
+     malicious $RP_j$ might try to redirect the user's $Acct_j$ to $RP_{j'}$ through a hidden iframe in the browser.
+That is, as long as he has logined $RP_{j'}$ with $Acct_{j'}$,
+     the user would be correlated.
+This attack does not appear only in SSO systems, but also exists in all web applications with accounts.
+Anyway,
+    this attack can be easily detected through multiple methods,
+ such as checking hidden iframes in the script
+  and detecting the redirection by browser extensions.
+
+\vspace{1mm}\noindent{\textbf{Implementation with Browser Extensions.}}
+To improve the portability of user agents,
+    the user functions of UPPRESSO are implemented by browser scripts.
+However,
+    these functions can be implemented with browser extensions,
+    which will result in much better performance.
+After some preliminary experiments,
+    we find that \textcolor{red}{at least 240 ms} will be saved for each login instance,
+    compared with the version implemented with  browser scripts.
+In this case,
+a user downloads and installs the browser extension,
+    before he visits an RP with the help of UPPRESSO.

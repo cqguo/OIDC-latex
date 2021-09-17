@@ -19,6 +19,36 @@
 \newcommand{\ENDDEFAULT}{\end{ALC@g}}
 \newcommand{\DEFAULTLINE}[1]{\STATE \textbf{default:} }
 
+
+\subsection{The Web Model}
+\label{subsec:webmodel}
+The Dolev-Yao model abstracts the entities in a system, such as browsers and web servers, as {\em atomic processes}, which communicate with each other through the {\em events}. \cite{SPRESSO} also defines {\em scripting processes} to model client-side scripting such as JavaScript, so a web system consists of a set of atomic and scripting processes. The state of a system, called a {\em configuration}, consists of the current states of all atomic processes and all the events that can be accepted by these processes. We list the definitions of these notations as below \cite{SPRESSO}.
+
+%\vspace{1mm}
+\noindent{\em Messages}  are the basic data carriers among web nodes, such as HTTP requests and responses.
+
+\noindent{\em Events} are the basic communication elements in the model. An event contains the addresses of sender and receiver and a message.
+%An event is of the form $\langle a, f, m \rangle$, where $a$ and $f$ represent the addresses of the sender and receiver respectively, and $m$ is the message to be transmitted.
+
+\noindent{\em Atomic Processes.} An {\em atomic Dolev-Yao (DY) process} is a tuple $p=$ $(I^p, Z^p, R^p,s_0^p )$, where $I^p$ is the set of addresses that the process listens to, $Z^p$ is the set of states (i.e., terms) that describes the process, $s_0^p$ is an initial state, and $R^p$ is the mapping from an input state $s \in Z^p$ and an event $e$ to a new state $s'$ and an event $e'$. %It is worth noting that for one process in a state, only a finite set of events can be accepted by the process as the state and event are defined as the input of $R^p$.
+Each atomic process also contains a set of nonces that it may use.
+
+\noindent{\em Scripting Processes} represent client-side scripts loaded by the browser to provide server-defined functions to the browser. However, a scripting process must rely on an atomic process, such as the browser, and provide the relation $R$ called by this atomic process.
+
+
+\noindent {\bf Web system.} We can represent the web infrastructure as a web system of the form ($\mathcal{W}$, $\mathcal{S}$, $\mathtt{script}$, $E^0$), where $\mathcal{W}$ is the set of atomic processes containing both honest and malicious processes, $\mathcal{S}$ is the set of scripting processes including honest and malicious scripts, $\mathtt{script}$ is the set of concrete script codes related to specific scripting processes in $\mathcal{S}$, and $E^0$ is the set of events acceptable to the processes in $\mathcal{W}$.
+
+\noindent A {\em configuration} of this web system is a tuple ($S, E, N$), where $S$ is the current states of all processes in $\mathcal{W}$, $E$ is the set of events that the processes accept, and $N$ is a global sequence of nonces that have not been used by the processes yet.
+
+\noindent A {\em run step} is the system migrating from configurations ($S, E, N$) to ($S', E', N'$) by processing an event $e \in E$.
+
+\noindent\textbf{The Formal Model of UPPRESSO.}
+Accordingly, we model UPPRESSO as a web system, which is defined as $\mathcal{UWS} = (\mathcal{W}, \mathcal{S}, \mathtt{script}, E^0)$. $\mathcal{W}$ is a finite set of atomic processes in UPPRESSO, which contains an IdP server process, a finite set of web servers for the honest RPs, a finite set of honest browsers, and a finite set of attacker processes. Here, we consider all the RP processes and browser processes are honest, and model an RP or a browser controlled by an adversary as an atomic attacker process.\
+$\mathcal{S}$ is a finite set of scripting processes, which contains {\sf script\_rp}, {\sf script\_idp} and {\sf script\_attacker}, where {\sf script\_rp} and {\sf script\_idp} are honest scripts downloaded by an RP process and the IdP process, and {\sf script\_attacker} denotes a script downloaded by an attacker process that exists in all browser processes.
+The details about each process are described in Appendix.
+
+
+
 \section{Web Model}
 \label{ape:model}
 
@@ -897,12 +927,4 @@ Therefore, $|Pr[\Gamma_1]-Pr[\Gamma_2]|=\sigma(n)$, where $\sigma(n)$ is negligi
 
 \end{comment}
 
-\begin{figure}[t]
-  \centering
-  \includegraphics[width=1\linewidth]{fig/dalgorithm.pdf}
-  \vspace{-5mm}
-  \caption{Distinguishing algorithm.}
-  \label{fig:dalgorithm}
-  \vspace{-5mm}
-\end{figure}
 %\end{appendices}
