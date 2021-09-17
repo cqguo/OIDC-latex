@@ -23,8 +23,8 @@ We compare UPPRESSO with MITREid Connect \cite{MITREid} and SPRESSO \cite{SPRESS
 In the evaluation,
     MITREid Connect runs with the standard implicit login flow of OIDC,
  while the identity tokens signed by the SPRESSO IdP are also forwarded by users to the RP,
-    similarly to the implicit login flow of OIDC. ++++++++
-In the identity tokens of SPRESSO, $ID_{RP}$ is xxxxxx.
+    similarly to the implicit login flow of OIDC. 
+In the identity tokens of SPRESSO, $ID_{RP}$ is the encrypted RP domain, while the one-time symmetric key only known by RP and user.
 They also configure RSA-2048 and SHA-256 as the signature algorithm and the hash function in the generation of identity tokens, respectively.
 
 
@@ -61,8 +61,8 @@ This overhead could be reduced by implicitly conducting this procedure when the 
 In the requesting, UPPRESSO requires 271 ms in total.
 The significant overhead  in UPPRESSO occurs when opening the new window and downloading the script from IdP,
  which needs about 104 ms.
-SPRESSO needs 19 ms for the RP to obtain IdP's public key and encrypt its domain (???why???),
-and MITREid Connect only needs 10 ms.
+SPRESSO needs 19 ms for the RP to obtain IdP's publicly accessible information, e.g., public key (SPRESSO allows a user to  assign any IdPs before login without prior registration) and encrypt its domain using a newly generated symmetric key.
+MITREid Connect only needs 10 ms.
 
 
 
