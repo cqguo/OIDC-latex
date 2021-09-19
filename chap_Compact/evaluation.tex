@@ -23,7 +23,7 @@ We compare UPPRESSO with MITREid Connect \cite{MITREid} and SPRESSO \cite{SPRESS
 In the evaluation,
     MITREid Connect runs with the standard implicit login flow of OIDC,
  while the identity tokens signed by the SPRESSO IdP are also forwarded by users to the RP,
-    similarly to the implicit login flow of OIDC. 
+    similarly to the implicit login flow of OIDC.
 In the identity tokens of SPRESSO, $ID_{RP}$ is the encrypted RP domain, while the one-time symmetric key only known by RP and user.
 They also configure RSA-2048 and SHA-256 as the signature algorithm and the hash function in the generation of identity tokens, respectively.
 
@@ -31,17 +31,18 @@ They also configure RSA-2048 and SHA-256 as the signature algorithm and the hash
 MITREid Connect provides open-source Java implementations of IdP and
 RP SDK,
  while SPRESSO implements all entities by JavaScript based on node.js.
-We then implemented the RPs based on Spring Boot for both UPPRESSO and MITREid Connect, by integrating the corresponding SDK respectively.
+We then implemented the RPs based on Spring Boot for UPPRESSO and MITREid Connect, by integrating the corresponding SDK.
 The RPs in three schemes provide the same function, i.e.,
-     extract the user's account from the verified identity token.
+     extract the user's account from verified identity tokens.
 
-We have measured the time for a user's login at an RP and calculated the average values of $1,000$ measurements.
+We measured the time for a user to login to the RP
+     and calculated the average values of $1,000$ measurements.
 We divide a login instance into 3 phases:
-\textbf{\em the preparation and identity token requesting} (Steps 1-3 in Figure \ref{fig:process}),
+{\em Preparation and identity token requesting} (Steps 1-3 in Figure \ref{fig:process}),
  the RP (and user) constructing and transmitting the request to IdP;
-\textbf{\em Identity token generation} (Step 4 in Figure \ref{fig:process}),
+{\em Identity token generation} (Step 4 in Figure \ref{fig:process}),
     the IdP generating identity token (no user authentication);
-and \textbf{\em Identity token acceptance} (Step 5 in Figure \ref{fig:process}),
+and {\em Identity token acceptance} (Step 5 in Figure \ref{fig:process}),
     the RP server receives, verifies and parse the identity token relayed from the IdP.
 % and \textbf{Identity token verification} (Steps 5.1 and 5.2 in Figure \ref{fig:process}), the RP verifying and parsing the identity token.
 
