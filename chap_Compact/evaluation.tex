@@ -47,23 +47,24 @@ and {\em Identity token acceptance} (Step 5 in Figure \ref{fig:process}),
     as the RP receives, verifies and parses the identity token.
 % and \textbf{Identity token verification} (Steps 5.1 and 5.2 in Figure \ref{fig:process}), the RP verifying and parsing the identity token.
 
-The results are shown in Figure \ref{fig:evaluation}.
-The overall times of SSO login are  113 ms, 308 ms, and 310 ms for MITREid Connect, SPRESSO, and UPPRESSO, respectively.
-The main overhead in UPPRESSO is to open the new window and download the scripts, which needs about 104 ms.
-Note that this overhead can be reduced by implicitly conducting this procedure when the user visits the RP website.
 
 
-\begin{figure}
+\begin{figure}[tb]
   \centering
   \includegraphics[width=0.9\linewidth]{fig/evaluation2.pdf}
   \caption{The time cost of SSO login flow.}
   \label{fig:evaluation}
 \end{figure}
 
-In the requesting, UPPRESSO requires 271 ms in total.
-The significant overhead  in UPPRESSO occurs when opening the new window and downloading the script from IdP,
- which needs about 104 ms.
-SPRESSO needs 19 ms for the RP to obtain IdP's publicly accessible information, e.g., public key (SPRESSO allows a user to  assign any IdPs before login without prior registration) and encrypt its domain using a newly generated symmetric key.
+The results are shown in Figure \ref{fig:evaluation}.
+The overall times of SSO login are  113 ms, 308 ms, and 310 ms for MITREid Connect, SPRESSO, and UPPRESSO, respectively.
+In the preparation and requesting, UPPRESSO requires 271 ms in total.
+The main overhead in UPPRESSO is to open the new window and download the scripts, which needs about 104 ms.
+This overhead can be reduced by silently conducting this procedure when the user visits the RP website,
+    by the implementation with browser extensions.
+SPRESSO needs 19 ms for an RP to obtain the IdP's publicly accessible information,
+    e.g., public key (SPRESSO allows a user to assign any IdPs before login without initial registrations)
+     and encrypt its domain using an ephemeral symmetric key.
 MITREid Connect only needs 10 ms.
 
 
