@@ -41,9 +41,9 @@ We divide a login flow into 3 phases:
 {\em Preparation and identity-token requesting} (Steps 1-3 in Figure \ref{fig:process}),
  as the RP constructs an identity-token request transmitted to the IdP, 
  cooperatively with the user sometimes;
-{\em Identity token generation} (Step 4),
+{\em Identity-token generation} (Step 4),
     when the IdP generates an identity token (but the user authentication is not included);
-and {\em Identity token acceptance} (Step 5 in Figure \ref{fig:process}),
+and {\em Identity-token acceptance} (Step 5 in Figure \ref{fig:process}),
     as the RP receives, verifies and parses the identity token.
 % and \textbf{Identity token verification} (Steps 5.1 and 5.2 in Figure \ref{fig:process}), the RP verifying and parsing the identity token.
 
@@ -57,30 +57,43 @@ and {\em Identity token acceptance} (Step 5 in Figure \ref{fig:process}),
 \end{figure}
 
 The results are shown in Figure \ref{fig:evaluation}.
-The overall times of SSO login are  113 ms, 308 ms, and 310 ms for MITREid Connect, SPRESSO, and UPPRESSO, respectively.
-In the preparation and requesting, UPPRESSO requires 271 ms in total.
+The overall times of SSO login are  113 ms, 310 ms, and 308 ms for MITREid Connect, UPPRESSO, and SPRESSO, respectively.
+In the preparation and requesting, MITREid Connect only needs 10 ms but
+    UPPRESSO requires 271 ms.
 The main overhead in UPPRESSO is to open the new window and download the scripts, which needs about 104 ms.
 This overhead can be reduced by silently conducting this procedure when the user visits the RP website,
     by the implementation with browser extensions.
-SPRESSO needs 19 ms for an RP to obtain the IdP's publicly accessible information,
-    e.g., public key (SPRESSO allows a user to assign any IdPs before login without initial registrations)
+SPRESSO needs 19 ms for an RP to obtain the IdP's public key %(SPRESSO allows a user to assign any IdPs before login without initial registrations)
      and encrypt its domain using an ephemeral symmetric key.
-MITREid Connect only needs 10 ms.
 
 
 
 %估计能减少多少，
-In the generation, UPPRESSO needs in total 34 ms, including computing $PID_U$, compared to MITREid Connect which only needs 32 ms.
-SPRESSO requires 71 ms, as it implements the IdP based on node.js and therefore can only adopt a JavaScript cryptographic library,
- while others adopt a more efficient Java library.
+In the identity-token generation,
+     UPPRESSO needs in total 34 ms.
+Compared with MITREid Connect,
+    it needs 2 more ms to calculate  $PID_U$.
+SPRESSO requires 71 ms to generate an identity token,
+    as it implements the IdP based on node.js and therefore can only adopt a JavaScript cryptographic library,
+ while a more efficient Java library is used in others.
 %As the processings in SPRESSO and MITREid Connect are the same, the processing time in SPRESSO may be reduced to 32 ms.
 %And, then the overall time in SPRESSO will be 269 ms, still larger than 254 ms in UPPRESSO.
 
 %transmission & extraction
-In the identity token acceptance, UPPRESSO only needs about 6 ms. % where the scripts relay the identity token to the RP server, and RP server verifies and parses the token.
-MITREid Connect requires the IdP to send the identity token to the RP's web page which then sends the token to the RP
+In the identity-token acceptance,
+ UPPRESSO only needs about 6 ms for the scripts to send an identity token to the RP,
+    which verifies it and calculates $Acct$.
+It takes 71 ms for MITREid Connect to accept this identity token:
+    when the identity token is redirected to the RP,
+        it must be carried within an URL, following  the fragment identifier \verb+#+ instead of \verb+?+,
+         due to the security considerations~\cite{de2014oauth},
+        so the token response 
+ 
+ . % where the scripts relay the identity token to the RP server, and RP server verifies and parses the token.
+MITREid Connect requires the IdP to send the identity token to the RP's web page,
+ which then sends the token to the RP
  through a JavaScript function, and needs 71 ms
- (The token carried within an URL must follow the fragment identifier \verb+#+ instead of the \verb+?+, for security considerations~\cite{de2014oauth}. As the parameters after the fragment identifier \verb+#+ will not be sent to server during an HTTP request, therefore, while the token response is redirected to the RP's server, the script must be downloaded from RP to parse the token and post it to server.).
+ (The token carried within an URL must follow the fragment identifier \verb+#+ instead of the \verb+?+, for As the parameters after the fragment identifier \verb+#+ will not be sent to server during an HTTP request, therefore, while the token response is redirected to the RP's server, the script must be downloaded from RP to parse the token and post it to server.).
 SPRESSO needs the longest time (210 ms) due to the complicated processing at the user's browser.
   %which needs the browser to obtain identity tokens from the IdP, download the JavaScript program from a trusted entity (forwarder), execute the program to decrypt RP's endpoint, send identity tokens to this endpoint (an RP's web page) who finally transmits the token to RP server.
 %In the evaluation, the forwarder and IdP are deployed in one machine, which doesn't introduce performance degradation based on the observation. % as  FWD and IdP work sequently for one login.
