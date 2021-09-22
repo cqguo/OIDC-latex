@@ -2,7 +2,7 @@
 \label{sec:discussion}
 %We first discuss the scalability, security against DoS attack and OIDC authorization code flow support in UPPRESSO, and then present the extensions for UPPRESSO.
 
-Some related issues are discussed in this section.
+%Some related issues are discussed in this section.
 
 \begin{comment}
 %Scalbility
@@ -75,30 +75,31 @@ to prevent this leakage in the authorization code flow,
 
 
 %\noindent{\textbf{Malicious IdP mitigation.}} The IdP is assumed to assign a unique $ID_{RP}$ in $Cert_{RP}$ for each RP and generate the correct $PID_U$ for each login. The malicious IdP may attempt to provide the incorrect $ID_{RP}$ and $PID_U$, which could be prevented by integrating certificate transparency \cite{rfc6962} and user's identifier check \cite{SPRESSO}. With certificate transparency \cite{rfc6962}, the monitors  check the uniqueness of $ID_{RP}$ among all the certificates stored in the log server. To prevent the malicious IdP from injecting any incorrect $PID_U$, the user could provide a nickname to the RP for an extra check as in SPRESSO \cite{SPRESSO}.
-\vspace{1mm}
-\noindent{\textbf{Identity Linkage through Cookies.}}
-When a user logins multiple RPs on one device as different accounts,
-    the cookies might be exploited by malicious RPs to correlate the user.
-For instance,
-     when the user has logined to $RP_j$ with $Acct_j$,
-     malicious $RP_j$ might try to redirect the user's $Acct_j$ to another $RP_{j'}$ through a hidden iframe in the browser.
-As long as he has logined to $RP_{j'}$ with $Acct_{j'}$,
-     two accounts would be correlated.
-This attack does not appear only in SSO systems, but also exists in all web applications with accounts.
-Anyway,
-    this attack can be easily detected through various methods,
- such as checking hidden iframes in the script
-  and detecting the redirection by browser extensions.
-
 \vspace{1mm}\noindent{\textbf{Implementation with Browser Extensions.}}
 To improve the portability of user agents,
-    the user functions of UPPRESSO are implemented by browser scripts.
+    the user functions of UPPRESSO are implemented by browser scripts in the prototype system.
 However,
     these functions can be implemented with browser extensions,
     which will result in much better performance.
-After some preliminary experiments,
-    we find that at least 102 ms will be saved for each login instance,
-    compared with the version implemented with  browser scripts.
 In this case,
-a user downloads and installs the browser extension,
+    a user downloads and installs the browser extension,
     before he visits an RP with the help of UPPRESSO.
+After some experiments while the IdP and RPs in the prototype system are unmodified,
+    we find that at least 102 ms will be saved for each login instance (i.e., about 208 ms in total),
+    compared with the version implemented with browser scripts.
+
+\vspace{1mm}
+\noindent{\textbf{Active Identity Linkage by Malicious RPs.}}
+When a user logins multiple RPs concurrently on one device as different accounts,
+        malicious RPs might actively correlate the accounts by online means.
+For instance,
+     when the user has logined to $RP_j$ with $Acct_j$,
+         malicious $RP_j$ might try to redirect the user's $Acct_j$ to another $RP_{j'}$ through a hidden iframe in the browser.
+As long as he has logined to $RP_{j'}$,
+     two accounts would be correlated by $RP_{j'}$.
+However, this active attack does not appear only in SSO systems, but also exists in all web applications with accounts.
+Anyway,
+    this attack can be easily prevented through various methods,
+ such as checking hidden iframes in the script
+  and detecting the redirection by browser extensions.
+
