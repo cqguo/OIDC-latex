@@ -50,7 +50,7 @@ an HTTP GET request for the domain {\sf exa.com/path?para=1} with empty header a
 An event is of the form $\langle a, f, m \rangle$, where $a$ and $f$ represent the addresses of the sender and receiver respectively, and $m$ is the message to be transmitted.
 
 \vspace{1mm}
-\noindent{\em Atomic Processes.} An {\em atomic Dolev-Yao (DY) process} is a tuple $p=$ $(I^p, Z^p, R^p,s_0^p )$, where $I^p$ is the set of addresses that the process listens to, $Z^p$ is the set of states (i.e., terms) that describes the process, $s_0^p$ is an initial state, and $R^p$ is the mapping from an input state $s \in Z^p$ and an event $e$ to a new state $s'$ and an event $e'$. It is worth noting that for one process in a state, only a finite set of events can be accepted by the process as the state and event are defined as the input of $R^p$.
+\noindent{\em Atomic Processes.} An {\em atomic Dolev-Yao (DY) process} is a tuple $p=$ $(I^p, Z^p, R^p,s_0^p )$, where $I^p$ is the set of addresses that the process listens to, $Z^p$ is the set of states (i.e., a set of terms) that describes the process, $s_0^p$ is an initial state, and $R^p$ is the mapping from an input state $s \in Z^p$ and an event $e$ to a new state $s'$ and an event $e'$. It is worth noting that for one process in a state, only a finite set of events can be accepted by the process as the state and event are defined as the input of $R^p$.
 Each atomic process also contains a set of nonces that it may use.
 
 \vspace{1mm}
@@ -71,7 +71,7 @@ Each atomic process also contains a set of nonces that it may use.
 
 
 \subsection{Data Format}
-Here we provide the details of the format of the messages we use to construct the UPPRESSO model.
+Here we provide the details of the  format of the frequent used \verb+messages+ to construct the web models.
 
 \vspace{1mm}
 \noindent\textbf{HTTP Messages}.
@@ -156,6 +156,9 @@ The \myss{tree} is the relations of the opened windows and documents, which are 
 
 \subsection{Model of UPPRESSO}
 In this section, we introduce the model of processes in UPPRESSO system, including IdP server process, RP server process, IdP scripting process and RP scripting process. We will focus on the state form and relation $R$. They can describe that what kind of event can be accepted by the process in each state, and the content of new output events and states.
+
+To be noticed is that, we only focus on the model of servers, browsers and the plain message transmissions among them in this paper, and neglect the HTTPS requests and other necessary Internet facilities (e.g., DNS server) deployed in the UPPRESSO system. 
+Because we assume that the internet architecture is well  built and HTTPS is well implemented, so that an adversary cannot conduct the attacks targeting these elements.
 \subsubsection{IdP Server Process}
 The state of IdP server process is a term in the form \myss{\myangle{ID, SignKey, sessions, users, RPs, Validity, Tokens}}. Other data stored at IdP but not used during SSO authentication are not mentioned here.
 \begin{itemize}
