@@ -1,12 +1,12 @@
 \section{Implementation and Evaluation}
 \label{sec:implementation}
 We have implemented the UPPRESSO prototype system, and evaluated its performance
- by comparing it with (\emph{a}) the PPID-based OIDC protocol
+ by comparing it with (\emph{a}) the PPID-based OIDC protocol \cite{MITREid} 
     which only prevents the RP-based identity linkage
-     and (\emph{b}) SPRESSO which only prevents the IdP-based login tracing.
+     and (\emph{b}) SPRESSO \cite{SPRESSO} which only prevents the IdP-based login tracing.
 
 \subsection{Prototype Implementation}
-Three identity-transformation functions are defined over
+First of all, three identity-transformation functions are defined over
         the NIST P256 elliptic curve.
 %randomly choose a 2048-bit prime as $p$, a 256-bit prime as $q$, and the  $q$-order generators as $ID_{RP}$.
 %$N_U$ and $ID_U$  are 256-bit random numbers.
@@ -20,7 +20,7 @@ The UPPRESSO IdP is built on top of MITREid Connect \cite{MITREid},
 We add 3 lines of Java code to calculate $PID_U$,
      about 20 lines to modify the way to send identity tokens,
     and about 50 lines to the function of RP Dynamic Registration to support the $PID_{RP}$ registration
-            (i.e., checking $PID_{RP}$ and signing the response with a validity period).
+            (i.e., checking $PID_{RP}$ and signing the response).
 The calculations of $ID_{RP}$, $PID_U$, and RSA signature are implemented based on Java built-in cryptographic libraries. %(e.g., BigInteger).
 
 The user-side function is implemented by scripts from the IdP and RPs,
@@ -38,7 +38,7 @@ The cryptographic computations, e.g., $Cert_{RP}$ verification and $PID_{RP}$ ne
 %Moreover, the chrome extension needs to construct cross-origin requests to communicate with the RP and IdP, which is forbidden by the default same-origin security policy. Therefore it is required to add the HTTP header \verb+Access-Control-Allow-Origin+ in the response of IdP and RP to accept only the request from the origin \verb+chrome-extension://chrome-id+ (\verb+chrome-id+ is uniquely assigned by the Google).
 
 We also provide a Java SDK for RPs to integrate UPPRESSO.
-The SDK provides two functions to encapsulate the complicated steps:
+The SDK provides two functions to encapsulate the steps:
  one to request identity tokens,
     and the other to derive the accounts from identity tokens.
 The SDK is implemented based on the Spring Boot framework  with about 1,000 lines of Java code

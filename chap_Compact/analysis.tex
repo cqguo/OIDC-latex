@@ -102,7 +102,7 @@ In the login flow,
     and verifies two signed responses (i.e., $PID_{RP}$ and $H(t)$ in the $PID_{RP}$ registration result,
             and $PID_{RP}$ and $PID_U$ in the identity token).
 After filtering out the redundant information (i.e., $PID_{RP}= [t]{ID_{RP}}$ and $Acct = [t^{-1}]PID_{U}$),
-    the RP actually receives $(ID_{RP}, t, PID_U)$ in each SSO login instance, where $PID_U = [ID_U][t]{ID_{RP}}$.
+    the RP actually receives only $(ID_{RP}, t, PID_U)$ in each SSO login instance, where $PID_U = [ID_U][t]{ID_{RP}}$.
 
 % 这个太简单了，不需要图
 %\begin{figure*}
@@ -116,7 +116,7 @@ After filtering out the redundant information (i.e., $PID_{RP}= [t]{ID_{RP}}$ an
 \begin{figure}[tb]
   \centering
   \includegraphics[width=1\linewidth]{fig/dalgorithm.pdf}
-  \caption{The algorithm based on the RP-based identity linkage.}
+  \caption{The algorithm based on the RP-based identity linkage, to solve the ECDDH problem.}
   \label{fig:dalgorithm}
 \end{figure}
 
@@ -124,7 +124,7 @@ In order to launch identity linkage,
     two RPs bring two triads received in SSO login instances, $(ID_{RP_j}$, $t_j$, $[ID_U][t_j]{ID_{RP_j}})$ and
     $(ID_{RP_{j'}}$, $t_{j'}$, $[ID_{U'}] [t_{j'}] {ID_{RP_{j'}}})$.
 We describe the attack of RP-based identity linkage as the following game $\mathcal{G}$ between an adversary and a challenger:
-    The adversary receives $(ID_{RP_j}$, $t_j$, $[ID_U][t_j]{ID_{RP_j}}, ID_{RP_{j'}}$, $t_{j'}$, $[ID_{U'}] [t_{j'}] {ID_{RP_{j'}}})$ from the challenger,
+    the adversary receives $(ID_{RP_j}$, $t_j$, $[ID_U][t_j]{ID_{RP_j}}, ID_{RP_{j'}}$, $t_{j'}$, $[ID_{U'}] [t_{j'}] {ID_{RP_{j'}}})$ from the challenger,
      and outputs the result $s$.
 The result is 1, when the adversary guesses that $ID_U = ID_{U'}$;
      otherwise, the adversary thinks they are unequal and $s=0$.
@@ -139,7 +139,7 @@ The successful RP-based identity linkage means
 We design a PPT algorithm $\mathcal{D}^*$ based on $\mathcal{G}$, shown in Figure \ref{fig:dalgorithm}.
 The input of $\mathcal{D}^*$ appears in the form of $(Q_1, Q_2, Q_3, Q_4)$, and each $Q_i$ is a point on $\mathbb{E}$.
 On receiving the input,
- the challenger of $\mathcal{G}$ randomly chooses $t_j$ and $t_{j'}$ from $(1,n)$,
+ the challenger of $\mathcal{G}$ randomly chooses $t_j$ and $t_{j'}$ in $(1,n)$,
    % and sets $ID_{RP_j}=Q_1$, $ID_{RP_{j'}}=Q_2$, $PID_{U,j}=[t_j]Q_3$, and $PID_{U',j'}= [t_{j'}] Q_4$.
     and sends $(Q_1, t_j, [t_j]Q_3, Q_2, t_{j'}, [t_{j'}] Q_4)$ to the adversary.
 Finally,
