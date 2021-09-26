@@ -157,14 +157,29 @@ sessionStorage, command \rangle \ \ \ \ \
 The \myss{tree} is the relations of the opened windows and documents, which are visible to this script. \myss{Docnonce} is the document nonce. The  \myss{Scriptstate} is a term of the form defined by each script. \myss{Scriptinputs} is the message transmitted to script. However, the \myss{scriptinputs} is defined as standardized forms, for example, postMessage is one of the forms of \myss{scriptinputs}. \myss{Cookies} is the set of cookies that belong to the document's origin. \myss{LocalStorage} is the storage space for browser and \myss{sessionStorage} is the space for each HTTP sessions.  \myss{Ids} is the set of user IDs while \myss{secret} is the password to corresponding user ID. The \myss{command} is the operation which is to be conducted by the browser. Here we only introduce the form of commands used in UPPRESSO system. We have defined the postMessage and XMLHTTPRequest (for HTTP request) message which are the \myss{commands}. Moreover, a term in the form \myss{\myangle{\mathtt{IFRAME}, URL, WindowNonce}} asks the browser to create this document's subwindow and it visits the server with the URL.
 
 
+An {\em atomic Dolev-Yao (DY) process} is a tuple $p=$ $(I^p, Z^p, R^p,s_0^p )$, where $I^p$ is the set of addresses that the process listens to, $Z^p$ is the set of states (i.e., a set of terms) that describes the process, $s_0^p$ is an initial state, and $R^p$ is the mapping from an input state $s \in Z^p$ and an event $e$ to a new state $s'$ and an event $e'$. It is worth noting that for one process in a state, only a finite set of events can be accepted by the process as the state and event are defined as the input of $R^p$.
+
 
 \subsection{Model of UPPRESSO}
-In this section, we introduce the model of processes in UPPRESSO system, including IdP server process, RP server process, IdP scripting process and RP scripting process. We will focus on the state form and relation $R$. They can describe that what kind of event can be accepted by the process in each state, and the content of new output events and states.
+In this section, we introduce the model of honest UPPRESSO system, in the form ($\mathcal{W}$, $\mathcal{S}$, $\mathtt{script}$, $E^0$).
+$\mathcal{W}$ is the set of atomic processes, including IdP server processes, RP server processes and browsers. 
+$\mathcal{S}$ is the set of scripting processes, containing of IdP scripting process and RP scripting process. 
+$\mathtt{script}$ is the set of detailed script codes, so that it is described here.
+$E^0$  is the set of events acceptable to the processes in $\mathcal{W}$, which is to be illustrated in the individual processes part.
+
+An atomic process is a tuple $p=$ $(I^p, Z^p, R^p,s_0^p )$, containing the addresses, states, and relations. 
+Here, we will focus on the state form and relation $R$. They can describe that what kind of event can be accepted by the process in each state, and the content of new output events and states.
+Similarly, the scripting process is described in the same way.
+
 
 To be noticed is that, we only focus on the model of servers, browsers and the plain message transmissions among them in this paper, and neglect the HTTPS requests and other necessary Internet facilities (e.g., DNS server) deployed in the UPPRESSO system. 
 Because we assume that the internet architecture is well  built and HTTPS is well implemented, so that an adversary cannot conduct the attacks targeting these elements.
+
+
 \subsubsection{IdP Server Process}
-The state of IdP server process is a term in the form \myss{\myangle{ID, SignKey, sessions, users, RPs, Validity, Tokens}}. Other data stored at IdP but not used during SSO authentication are not mentioned here.
+The state of IdP server process is described as a term in the form \myss{\myangle{ID, SignKey, sessions, users, RPs, Validity, Tokens}}. 
+That is,  the state of an IdP server  at the point in time can be sketched using these attributes.
+Other data stored at IdP but not used during SSO authentication are not mentioned here.
 \begin{itemize}
 \setlength\itemsep{-2pt}
 \item \myss{ID} is the identifier of IdP.
@@ -822,6 +837,8 @@ Finally, we have proved that the UPPRESSO system meets Requirement~\ref{req:idp}
 \end{algorithmic}
 \end{breakablealgorithm}
 
+
+\begin{comment}
 \section{Privacy Analysis}
 \label{sec:privacy}
 
@@ -856,8 +873,6 @@ Collusive RPs can act arbitrarily to correlate $PID_U$s at different RPs and gue
 \vspace{-5mm}
 \end{strip}
 
-
-\begin{comment}
 
 Next, we model the guessing Game to depict the interactions between the challenger and the adversary. First, we describe the challenger's actions in the Game as follows.
 \begin{itemize}
