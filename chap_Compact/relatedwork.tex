@@ -24,11 +24,28 @@ Anonymous SSO schemes are designed to allow users to access a service (i.e. RP) 
     without revealing their identities.
 Anonymous SSO systems was proposed for the global system for mobile (GSM) communications \cite{ElmuftiWRR08},
     and the notion of anonymous SSO was formalized \cite{WangWS13}.
-Privacy-preserving cryptographic primitives, such as group signature, zero-knowledge proof, etc.,
-     were adopted to design anonymous SSO schemes \cite{WangWS13,HanCSTW18}.
+Privacy-preserving primitives, such as group signature, zero-knowledge proof, Chebyshev Chaotic Maps and proxy re-verification
+scheme, etc.,
+     were adopted to design anonymous SSO schemes \cite{WangWS13,HanCSTW18,Lee18,HanCSTWW20}.
 %However, all above schemes cannot provide either the $ID_{U}$ directly or the function $\mathcal{F}_{ID_{U} \mapsto PID_{U}}$ and $\mathcal{F}_{PID_{U} \mapsto Account}$ allowing RP achieve the constant $Account$ for the same user. It breaks the basic requirement of \textbf{user identification}.
 Anonymous SSO schemes work for special application services,
     but are unapplicable to common systems that require user identification for customized services.
+
+\vspace{1mm}
+\noindent\textbf{Privacy-preserving authentication with user-maintained proof.} There is another thought to allow a user to achieve the convenient authentication without exposing her traceable identity to any parties, by maintaining the authentication proof herself. For example, FIDO~\cite{fidouaf} allows a user to generate the asymmetric key pair on her device and register the public key at an RP, so that the user can login to this RP with a challenge signed using the private key. Other schemes, such as El passo~\cite{ZhangKSZR21} and UnlimitID~\cite{IsaakidisHD16}, enable user to keep a secret
+s and require IdP to generate an identity proof for blinded s. Thus the user can prove that she is the owner of s to RP without exposing s to RP.
+However, there are still flaws in these systems.
+FIDO is only available on the qualified device with the support of FIDO secure hardware.
+In the El passo and UnlimitID systems, the user's identity is associated with the private s, therefore, if the user wants to login to the RP on a new device, she must import the large s into this device.
+As for the secure consideration, the secret must too large to remember, so that the solutions are not convenient for multi-device login.
+
+
+
+\vspace{1mm}
+\noindent\textbf{Single sign-off.} In SSO systems, once a user's IdP account is compromised, the adversary could hijack all her RPs' accounts.
+A backwards-compatible extension, named single sign-off, is proposed for OIDC.
+The single sign-off  allows the user to revoke all her identity tokens and notify all RPs to freeze her accounts \cite{GhasemisharifRC18}.
+The single sign-off could also be achieved in UPPRESSO, where the user needs to revoke the identity tokens at all RPs, as the IdP doesn't know which RPs the user visits.
 
 
 \vspace{1mm}
@@ -46,12 +63,8 @@ According to these formal proofs \cite{FettKS16, FettKS17},
 SAML 2.0 SSO is formally analyzed \cite{ArmandoCCCT08},
     and the RP identity is found not to be bound correctly in the identity tokens of its variant proposed by Google.
 
-\begin{comment}
-\noindent\textbf{Single sign-off.} In SSO systems, once a user's IdP account is compromised, the adversary could hijack all her RPs' accounts.
-A backwards-compatible extension, named single sign-off, is proposed for OIDC.
-The single sign-off  allows the user to revoke all her identity tokens and notify all RPs to freeze her accounts \cite{GhasemisharifRC18}.
-The single sign-off could also be achieved in UPPRESSO, where the user needs to revoke the identity tokens at all RPs, as the IdP doesn't know which RPs the user visits.
-\end{comment}
+
+
 
 
 \vspace{1mm}
@@ -65,23 +78,23 @@ The integrity of identity tokens was destroyed in SAML, OAuth and OIDC systems  
 due to software flaws, such as XML signature wrapping (XSW) \cite{SomorovskyMSKJ12}, incomplete verification by RPs \cite{WangCW12,WangZLG16,MainkaMSW17}, and IdP spoofing \cite{MainkaMS16,MainkaMSW17}.
 Vulnerabilities also break the RP designation of tokens,
     such as incorrect binding at IdPs \cite{YangLCZ18,WangZLG16} and insufficient verification by RPs \cite{MainkaMS16,MainkaMSW17,YangLCZ18}.
+Navas et al.~\cite{NavasB19} indicate the impactive threats on OIDC security and privacy.     
 Automatical tools, such as SSOScan \cite{ZhouE14}, OAuthTester \cite{YangLLZH16} and S3KVetter \cite{YangLCZ18},
  are designed to detect the violations of confidentiality, integrity, or RP designation in identity tokens.
-Besides, a flaw was found in Google Apps \cite{ArmandoCCCPS13}, allowing a malicious RP to hijack a user's authentication attempt and inject a payload to steal the cookie (or identity token) for another RP.
+ Wang et al.~\cite{ExplicatingSDK} propose the scheme, that combines manual effort and automated
+verification.
+%Besides, a flaw was found in Google Apps \cite{ArmandoCCCPS13}, allowing a malicious RP to hijack a user's authentication attempt and inject a payload to steal the cookie (or identity token) for another RP.
 
 
 
-\begin{comment}
+
 \noindent\textbf{Analysis on mobile SSO systems.}
 %1.	WebSSO中有browser来完成，2. Mobile SSO中，system browser和webview无法识别RP、IdP App可能被重打包。
 In mobile SSO systems, the IdP App, IdP-provided SDK (e.g., an encapsulated WebView) or system browser are adopted to redirect identity token from IdP App to RP App.
 However, none of them was trusted to ensure that the identity token could be only sent to the designated RP \cite{ChenPCTKT14,WangZLLYLG15}, as WebView and  system browser cannot authenticate RP App while the IdP App may be repackaged.
-%A framework named SecureOAuth \cite{MohsenS16} was proposed to harden the WebView-based SSO implementations in Android.
-%Ye et al. \cite{YeBWD15} performed an analysis of  SSO implementations for Android, and found a vulnerability of Facebook Login which leaked the Facebook's session cookie to the  malicious RP applications.
 Moreover, the SSO protocols needed to be modified to provide SSO services for mobile Apps, however these modifications were not well understood by RP developers \cite{ChenPCTKT14,YangLS17}.
 The top Android applications have been analyzed \cite{TowardsShehabM14,ChenPCTKT14,WangZLLYLG15,YangLS17,ShiWL19}, and vulnerabilities were found to break the confidentiality \cite{TowardsShehabM14,ChenPCTKT14,WangZLLYLG15,YangLS17,ShiWL19}, integrity \cite{ChenPCTKT14,YangLS17}, and RP designation \cite{ChenPCTKT14,ShiWL19} of identity token.
-%Automatic analyzing tools, MoSSOT \cite{ShiWL19}, was proposed to detect vulnerabilities in mobile SSO systems. %, and plenty of vulnerabilities were found in the top Android applications to break the confidentiality and RP designation of identity token.
-\end{comment}
+Besides, a flaw was found in Google Apps \cite{ArmandoCCCPS13}, allowing a malicious RP to hijack a user's authentication attempt and inject a payload to steal the cookie (or identity token) for another RP.
 
 %以下内容被拆分到上面三点内容了，但是注释内容有对论文的详细表述
 \begin{comment}
