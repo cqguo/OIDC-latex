@@ -22,13 +22,15 @@
 
 \section{The Security Proofs of UPPRESSO}
 \label{ape:model}
-In this section, 
-we  formally analyze  the security properties of UPPRESSO based on the Dolev-Yao style web model~\cite{SPRESSO}, which has been widely used in the formal analysis of SSO protocols such as OAuth 2.0~\cite{FettKS16} and OIDC~\cite{FettKS17}.
-That is, at the first, we give the detailed introduction about how to  indicate the entities (e.g., servers) and communications (e.g., HTTP request) of the web system with Dolev-Yao style web model.
-Then, we describe the model of frequent used data format (e.g., HTTP package) and entity  (e.g., browser). 
+We  formally analyze  the security properties of UPPRESSO based on the Dolev-Yao web model \cite{SPRESSO},
+ which has been widely used in the formal analysis of SSO protocols such as OAuth 2.0~\cite{FettKS16} and OIDC~\cite{FettKS17}.
+
+We first give the detailed introduction to describe the entities (e.g., servers) and communications (e.g., HTTP request) of a web system
+    with the Dolev-Yao web model.
+Then, we present the model of frequent used data format (e.g., HTTP package) and entity  (e.g., browser).
 Following, we present the modelling UPPRESSO system, containing the servers, scripts and the communications among them.
 Finally, we give the security proofs of UPPRESSO, that capture the tracks of all essential data, such as identity token, from its birth to being consumed, to guarantee the integrity and confidentiality.
-The data tracing is based on the well-built model.    
+%The data tracing is based on the well-built model.
 
 
 
@@ -87,9 +89,15 @@ an HTTP GET request for the domain {\sf exa.com/path?para=1} with empty header a
 
 The Dolev-Yao model abstracts the entities in a system, such as browsers and web servers, as {\em atomic processes}, which communicate with each other through the {\em events}. \cite{SPRESSO} also defines {\em scripting processes} to model client-side scripting such as JavaScript, so a web system consists of a set of atomic and scripting processes. The state of a system, called a {\em configuration}, consists of the current states of all atomic processes and all the events that can be accepted by these processes. We list the definitions of these notations as below~\cite{SPRESSO}.
 
+The Dolev-Yao model abstracts the entities in a system,
+ such as browsers and web servers, as {\em atomic processes},
+  which communicate with each other through the {\em events}.
+\cite{SPRESSO} also defines {\em script processes} to model client-side script such as JavaScript, so a web system consists of a set of atomic and script processes. The state of a system, called a {\em configuration}, consists of the current states of all atomic processes and all the events that can be accepted by these processes. We list the definitions of these notations as below~\cite{SPRESSO}.
+
+
 \vspace{1mm}
-\noindent{\em Messages} 
-are defined as formal terms without variables (i.e., ground terms) over a {\em signature}. 
+\noindent{\em Messages}
+are defined as formal terms without variables (i.e., ground terms) over a {\em signature}.
 The signature $\Sigma$ consists of a finite set of function symbols (with arity). For messages in this mode, the signature $\Sigma$ contains constants such as ASCII strings and nonce, sequence symbols such as n-ary sequences $\langle \rangle$, $\langle . \rangle$, $\langle . ,. \rangle$, and function symbols that model cryptographic primitives such as $\mathtt{encrypt}, \mathtt{decrypt}$ and digital signatures. For example, an HTTP request can be modeled as a ground term containing a type (e.g., $\mathtt{HTTPReq}$), a nonce, a method (e.g., $\mathtt{GET}$ or $\mathtt{POST}$), a domain, a path, URL parameters, request headers and a message body, over the $\Sigma$ in the sequence symbol format. So,
 an HTTP GET request for the domain {\sf exa.com/path?para=1} with empty header and body can be represented as: $m:=\langle\mathtt{HTTPReq},n,\mathtt{GET},exa.com,/path,\langle \langle para, 1\rangle \rangle ,\langle \rangle,\langle \rangle \rangle$.
 
@@ -102,13 +110,13 @@ An event is of the form $\langle a, f, m \rangle$, where $a$ and $f$ represent t
 Each atomic process also contains a set of nonces that it may use.
 
 \vspace{1mm}
-\noindent{\em Scripting Processes} represent client-side scripts loaded by the browser to provide server-defined functions to the browser. However, a scripting process must rely on an atomic process, such as the browser, and provide the relation $R$ called by this atomic process.
+\noindent{\em Script Processes} represent client-side scripts loaded by the browser to provide server-defined functions to the browser. However, a script process must rely on an atomic process, such as the browser, and provide the relation $R$ called by this atomic process.
 
 \vspace{1mm}
 \noindent{\em Equational theory} is defined as usual in Dolev-Yao models, which uses the symbol $\equiv$ to represent the congruence relation on terms. For example, $dec(enc(m, k), k)$ $\equiv$ $m$, where $k$ is a symmetric key.
 
 \vspace{1mm}
-\noindent {\bf Web system.} We can represent the web infrastructure as a web system of form ($\mathcal{W}$, $\mathcal{S}$, $\mathtt{script}$, $E^0$), where $\mathcal{W}$ is the set of atomic processes containing both honest and malicious processes, $\mathcal{S}$ is the set of scripting processes including honest and malicious scripts, $\mathtt{script}$ is the set of concrete script codes related to specific scripting processes in $\mathcal{S}$, and $E^0$ is the set of events acceptable to the processes in $\mathcal{W}$.
+\noindent {\bf Web system.} We can represent the web infrastructure as a web system of form ($\mathcal{W}$, $\mathcal{S}$, $\mathtt{script}$, $E^0$), where $\mathcal{W}$ is the set of atomic processes containing both honest and malicious processes, $\mathcal{S}$ is the set of script processes including honest and malicious scripts, $\mathtt{script}$ is the set of concrete script codes related to specific script processes in $\mathcal{S}$, and $E^0$ is the set of events acceptable to the processes in $\mathcal{W}$.
 
 \vspace{1mm}
 \noindent A {\em configuration} of this web system is a tuple ($S, E, N$), where $S$ is the current states of all processes in $\mathcal{W}$, $E$ is the set of events that the processes accept, and $N$ is a global sequence of nonces that have not been used by the processes yet.
@@ -170,12 +178,13 @@ The data used in UPPRESSO are defined in the following forms:
 \vspace{1mm}\noindent\textbf{Patten Matching}.  We define the term with the variable $*$ as the pattern, such as \myss{\myangle{a, b, *}}.
 The pattern matches any term which only replaces the $*$ with other terms. For instance,  \myss{\myangle{a, b, *}} matches \myss{\myangle{a, b, c}}.
 
-\subsection{Browser and Scripting Process Model}
-Browser is the essential party in web system, that most of users participates through a browser. 
+
+\subsection{Browser and Script Process Model}
+Browser is the essential party in web system, that most of users participates through a browser.
 In UPPRESSO, we assume that the browsers are honest and well developed, so that, we neglect  the detailed process of browser, such as constructing and parsing the HTTP package.
 Therefore, we only need to analyze how the browsers interactive with other parties in UPPRESSO system.
-Moreover, in UPPRESSO system, the message transmitted through a browser is constructing and parsing by the script, so that we only focus on how the scripting process runs in the browser. 
-We introduce the windows and documents of the browser model, which provides inputs and parses the outputs of the scripting process.
+Moreover, in UPPRESSO system, the message transmitted through a browser is constructing and parsing by the script, so that we only focus on how the script process runs in the browser.
+We introduce the windows and documents of the browser model, which provides inputs and parses the outputs of the script process.
 
 \vspace{1mm}
 \noindent\textbf{Window}. A window \myss{w} is a term of the form \myss{w = \myangle{nonce, documents, opener}}, representing the  the concrete browser window in the system. The \myss{nonce} is the window reference to identify each windows. The \myss{documents} is the set of documents (defined below) including the current document and cached documents (for example, the documents can be viewed via the ``forward" and ``back" buttons in the browser). The \myss{opener} represents the window in which this window is created, for instance, while a user clicks the href in document \myss{d} and it creates a new window \myss{w}, there is \myss{w.opener \equiv d.nonce}.
@@ -186,18 +195,18 @@ We introduce the windows and documents of the browser model, which provides inpu
   \ \ \ \langle nonce, location, referrer, script, scriptstate, \\
   scriptinputs, subwindows, active \rangle \ \ \
 \end{multline*}
-where document is the HTML content in the window.  The \myss{nonce} locates the document. \myss{Location} is the URL where the document is loaded. \myss{Referrer} is same as the Referer header defined in HTTP standard. The \myss{script} is the scripting process downloaded from each servers. \myss{scriptstate} is define by the script, different in each scripts. The \myss{scriptinputs} is the message transmitted into the scripting process. The \myss{subwindows} is the set of \myss{nonce} of document's created windows. \myss{active} represents whether this document is active or not.
+where document is the HTML content in the window.  The \myss{nonce} locates the document. \myss{Location} is the URL where the document is loaded. \myss{Referrer} is same as the Referer header defined in HTTP standard. The \myss{script} is the script process downloaded from each servers. \myss{scriptstate} is define by the script, different in each scripts. The \myss{scriptinputs} is the message transmitted into the script process. The \myss{subwindows} is the set of \myss{nonce} of document's created windows. \myss{active} represents whether this document is active or not.
 
 \vspace{1mm}
-\noindent\textbf{Scripting process}. A scripting process is the dependent process relying on the browser, which can be considered as a relation \myss{R} mapping a message input and a message output. And finally the browser will conduct the command in the output message. Here we give the description of the form of input and output.
+\noindent\textbf{Script process}. A script process is the dependent process relying on the browser, which can be considered as a relation \myss{R} mapping a message input and a message output. And finally the browser will conduct the command in the output message. Here we give the description of the form of input and output.
 \begin{itemize}
 \setlength\itemsep{-2pt}
-\item \textbf{Scripting Message Input. } The input is the term in the form
+\item \textbf{Script Message Input. } The input is the term in the form
 \begin{multline*}
 \langle tree, docnonce, scriptstate, stateinputs,cookies,\\
 localStorage, sessionStorage, ids, secret \rangle
 \end{multline*}
-\item \textbf{Scripting Message Output. }The output is the term in the form
+\item \textbf{Script Message Output. }The output is the term in the form
 \begin{multline*}
 \ \ \ \ \ \langle scriptstate, cookies, localStorage, \\
 sessionStorage, command \rangle \ \ \ \ \
@@ -211,22 +220,22 @@ An {\em atomic Dolev-Yao (DY) process} is a tuple $p=$ $(I^p, Z^p, R^p,s_0^p )$,
 
 \subsection{Model of UPPRESSO}
 In this section, we introduce the model of honest UPPRESSO system, in the form ($\mathcal{W}$, $\mathcal{S}$, $\mathtt{script}$, $E^0$).
-$\mathcal{W}$ is the set of atomic processes, including IdP server processes, RP server processes and browsers. 
-$\mathcal{S}$ is the set of scripting processes, containing of IdP scripting process and RP scripting process. 
+$\mathcal{W}$ is the set of atomic processes, including IdP server processes, RP server processes and browsers.
+$\mathcal{S}$ is the set of script processes, containing of IdP script process and RP script process.
 $\mathtt{script}$ is the set of detailed script codes, so that it is described here.
 $E^0$  is the set of events acceptable to the processes in $\mathcal{W}$, which is to be illustrated in the individual processes part.
 
-An atomic process is a tuple $p=$ $(I^p, Z^p, R^p,s_0^p )$, containing the addresses, states, and relations. 
+An atomic process is a tuple $p=$ $(I^p, Z^p, R^p,s_0^p )$, containing the addresses, states, and relations.
 Here, we will focus on the state form and relation $R$. They can describe that what kind of event can be accepted by the process in each state, and the content of new output events and states.
-Similarly, the scripting process is described in the same way.
+Similarly, the script process is described in the same way.
 
 
-To be noticed is that, we only focus on the model of servers, browsers and the plain message transmissions among them in this paper, and neglect the HTTPS requests and other necessary Internet facilities (e.g., DNS server) deployed in the UPPRESSO system. 
+To be noticed is that, we only focus on the model of servers, browsers and the plain message transmissions among them in this paper, and neglect the HTTPS requests and other necessary Internet facilities (e.g., DNS server) deployed in the UPPRESSO system.
 Because we assume that the internet architecture is well  built and HTTPS is well implemented, so that an adversary cannot conduct the attacks targeting these elements.
 
 
 \subsubsection{IdP Server Process}
-The state of IdP server process is described as a term in the form \myss{\myangle{ID, SignKey, sessions, users, RPs, Validity, Tokens}}. 
+The state of IdP server process is described as a term in the form \myss{\myangle{ID, SignKey, sessions, users, RPs, Validity, Tokens}}.
 That is,  the state of an IdP server  at the point in time can be sketched using these attributes.
 Other data stored at IdP but not used during SSO authentication are not mentioned here.
 \begin{itemize}
@@ -281,8 +290,8 @@ The relation of RP process $R^r$ is shown as Algorithm~\ref{alg2} in Appendix~\r
 
 
 
-\subsubsection{IdP scripting process}
-The state of IdP scripting process \myss{scriptstate} is a term in the form \myss{\myangle{IdPDomain, Parameters, q, refXHR}}, where
+\subsubsection{IdP script process}
+The state of IdP script process \myss{scriptstate} is a term in the form \myss{\myangle{IdPDomain, Parameters, q, refXHR}}, where
 \begin{itemize}
 \setlength\itemsep{-2pt}
 \item \myss{IdPDomain} is the IdP's host.
@@ -298,17 +307,17 @@ The new \myss{functions} are defined as follows.
   \item \myss{\mathtt{CHOOSEINPUT}(inputs,pattern)}. The first parameter is a set of messages, and the second parameter is a pattern. The result returned by the function is the message in \myss{inputs} matching the \myss{pattern}.
   \item \myss{\mathtt{RandomUrl}()} returns a newly generated host string.
 \end{itemize}
-The relation of IdP scripting process $script\_idp$ is shown in Appendix~\ref{ape:alg} Algorithm~\ref{alg3}.
+The relation of IdP script process $script\_idp$ is shown in Appendix~\ref{ape:alg} Algorithm~\ref{alg3}.
 
 
 
 
-\subsubsection{RP scripting process}
-The state of RP scripting process \myss{scriptstate} is a term in the form \myss{\langle IdPDomain}, \myss{RPDomain}, \myss{Parameters}, \myss{q}, \myss{refXHR\rangle}. The \myss{RPDomain} is the host string of the corresponding RP server, and other terms are defined in the same way as in IdP scripting process.
+\subsubsection{RP script process}
+The state of RP script process \myss{scriptstate} is a term in the form \myss{\langle IdPDomain}, \myss{RPDomain}, \myss{Parameters}, \myss{q}, \myss{refXHR\rangle}. The \myss{RPDomain} is the host string of the corresponding RP server, and other terms are defined in the same way as in IdP script process.
 
 Here, we define the function \myss{\mathtt{SUBWINDOW}(tree, docnonce)}, which takes the \myss{tree} defined above and the current document's \myss{nonce} as the input. And it selects the \myss{nonce} of the first window opened by this document as the output. However, if there is no opened windows, it returns  null.
 
-The relation of RP scripting process $script\_rp$ is shown in Appendix~\ref{ape:alg} Algorithm~\ref{alg4}.
+The relation of RP script process $script\_rp$ is shown in Appendix~\ref{ape:alg} Algorithm~\ref{alg4}.
 
 
 
@@ -680,7 +689,7 @@ Finally, we have proved that the UPPRESSO system meets Requirement~\ref{req:idp}
 \end{breakablealgorithm}
 
 
-\subsection{IdP scripting process}
+\subsection{IdP script process}
 \begin{breakablealgorithm}
   \caption{$script\_idp$}
   \label{alg3}
@@ -803,7 +812,7 @@ Finally, we have proved that the UPPRESSO system meets Requirement~\ref{req:idp}
 \end{breakablealgorithm}
 
 
-\subsection{RP scripting process}
+\subsection{RP script process}
 \begin{breakablealgorithm}
   \caption{$script\_rp$}
   \label{alg4}

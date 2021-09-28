@@ -36,8 +36,8 @@ We introduce the implicit flow and present our design and implementation based o
 \end{figure}
 
 As shown in Figure \ref{fig:OpenID}, a user firstly initiates a login request to an RP.
-Then, the RP constructs an identity-token request with its own identity,
-% the endpoint to receive the identity token % endpoint应该预先注册、固定的
+Then, the RP constructs an identity-token request with its own identity
+% the endpoint to receive the identity token % endpoint应该预先注册、固定的；这里不必强调这个
  and the scope of requested user attributes.
 This identity-token request is redirected to the IdP.
 After successfully authenticating the user,
@@ -47,14 +47,14 @@ The token contains a user identity (or pseudo-identity),
     the RP identity, a validity period, the requested user attributes, etc.
 %% If the RP endpoint has not been registered at the IdP, the IdP will return a warning to notify the user about potential identity token leakage. % 这里只是谈主线；各种错误情况太多，举不胜举
 Finally, the RP verifies the received identity token and
- allows the user to login as the identity in this token.
+ allows the user to login as the identity enclosed in this token.
 
 Before issuing the identity token,
     the IdP obtains the user's authorization to enclose the requested user attributes.
 %The identity token is usually signed by the IdP,
 %    and transmitted through secure channels such as TLS/HTTPS.
 The user's operations including authentication, redirection, authorization, and forwarding,
-    are implemented in a software called \emph{user agent} (i.e., a browser for web applications).
+    are implemented in a software called user agent (i.e., a browser for web applications).
 
 %extracts user's identifier and returns the authentication result to the user (Step 7).
 
@@ -75,7 +75,7 @@ After a successful registration,
 \subsection{Existing Privacy-Preserving Solutions for SSO}
 \label{subsec-solutions}
 Pairwise pseudonymous identifiers (PPIDs) are recommended by NIST \cite{NIST2017draft}
- and specified in several SSO protocols \cite{OpenIDConnect, SAMLIdentifier} to protect user privacy from curious RPs.
+ and specified in several SSO protocols \cite{OpenIDConnect, SAMLIdentifier} to protect user privacy against curious RPs.
 That is,
     when issuing an identity token,
         the IdP encloses a user pseudo-identity (but not the user identity at the IdP) in the token.
@@ -83,7 +83,7 @@ Given a user,
     the IdP assigns a unique PPID based on the target RP,
     so that collusive RPs cannot link the user's different PPIDs across these RPs.
 However, PPID-based approaches cannot prevent the IdP-based login tracing,
- since  to generate identify tokens the IdP still needs to know which RP the user visits.
+ since in the generation of identify tokens the IdP still needs to know which RP the user visits.
 
 BrowserID \cite{BrowserID} and SPRESSO \cite{SPRESSO} are proposed to defend SSO services against the IdP-based login tracing,
     but both solutions are instead vulnerable to the threat of RP-based identity linkage.
@@ -96,7 +96,7 @@ When a user logins to different RPs, the RPs could still extract the identical u
 Meanwhile,
     the RP of SPRESSO creates a one-time but verifiable pseudo-identity for itself in each login instance.
 Then, the IdP generates an identity token binding this RP pseudo-identity and the user identity. %and returns it through a trusted third-party entity called forwarder.
-Similarly, the RPs could link a user's multiple logins based on his unique user identity in these tokens.
+Similarly, the collusive RPs could link a user's multiple logins based on his user identity in these tokens.
 
 It is worth noting that PPIDs cannot be directly integrated in either BrowserID or SPRESSO.
 PPIDs are assigned in identity tokens based on the visited RP \cite{NIST2017draft,OpenIDConnect, SAMLIdentifier},
