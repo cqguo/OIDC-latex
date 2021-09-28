@@ -39,7 +39,10 @@ Finally, we give the security proofs of UPPRESSO, that capture the tracks of all
 
 \subsection{The Web Model}
 \label{subsec:webmodel}
-The Dolev-Yao model abstracts the entities in a system, such as browsers and web servers, as {\em atomic processes}, which communicate with each other through the {\em events}. \cite{SPRESSO} also defines {\em script processes} to model client-side script such as JavaScript, so a web system consists of a set of atomic and script processes. The state of a system, called a {\em configuration}, consists of the current states of all atomic processes and all the events that can be accepted by these processes. We list the definitions of these notations as below~\cite{SPRESSO}.
+The Dolev-Yao model abstracts the entities in a system,
+ such as browsers and web servers, as {\em atomic processes},
+  which communicate with each other through the {\em events}.
+\cite{SPRESSO} also defines {\em script processes} to model client-side script such as JavaScript, so a web system consists of a set of atomic and script processes. The state of a system, called a {\em configuration}, consists of the current states of all atomic processes and all the events that can be accepted by these processes. We list the definitions of these notations as below~\cite{SPRESSO}.
 
 \vspace{1mm}
 \noindent{\em Messages}
@@ -70,45 +73,6 @@ Each atomic process also contains a set of nonces that it may use.
 
 \vspace{1mm}
 \noindent A {\em run step} is the system migrating from configurations ($S, E, N$) to ($S', E', N'$) by processing an event $e \in E$.
-
-
-\subsection{Browser and Script Process Model}
-Browser is the essential party in web system, that most of users participates through a browser.
-In UPPRESSO, we assume that the browsers are honest and well developed, so that, we neglect  the detailed process of browser, such as constructing and parsing the HTTP package.
-Therefore, we only need to analyze how the browsers interactive with other parties in UPPRESSO system.
-Moreover, in UPPRESSO system, the message transmitted through a browser is constructing and parsing by the script, so that we only focus on how the script process runs in the browser.
-We introduce the windows and documents of the browser model, which provides inputs and parses the outputs of the script process.
-
-\vspace{1mm}
-\noindent\textbf{Window}. A window \myss{w} is a term of the form \myss{w = \myangle{nonce, documents, opener}}, representing the  the concrete browser window in the system. The \myss{nonce} is the window reference to identify each windows. The \myss{documents} is the set of documents (defined below) including the current document and cached documents (for example, the documents can be viewed via the ``forward" and ``back" buttons in the browser). The \myss{opener} represents the window in which this window is created, for instance, while a user clicks the href in document \myss{d} and it creates a new window \myss{w}, there is \myss{w.opener \equiv d.nonce}.
-
-\vspace{1mm}
-\noindent\textbf{Document}. A document \myss{d} is a term of the form
-\begin{multline*}
-  \ \ \ \langle nonce, location, referrer, script, scriptstate, \\
-  scriptinputs, subwindows, active \rangle \ \ \
-\end{multline*}
-where document is the HTML content in the window.  The \myss{nonce} locates the document. \myss{Location} is the URL where the document is loaded. \myss{Referrer} is same as the Referer header defined in HTTP standard. The \myss{script} is the script process downloaded from each servers. \myss{scriptstate} is define by the script, different in each scripts. The \myss{scriptinputs} is the message transmitted into the script process. The \myss{subwindows} is the set of \myss{nonce} of document's created windows. \myss{active} represents whether this document is active or not.
-
-\vspace{1mm}
-\noindent\textbf{Script process}. A script process is the dependent process relying on the browser, which can be considered as a relation \myss{R} mapping a message input and a message output. And finally the browser will conduct the command in the output message. Here we give the description of the form of input and output.
-\begin{itemize}
-\setlength\itemsep{-2pt}
-\item \textbf{Script Message Input. } The input is the term in the form
-\begin{multline*}
-\langle tree, docnonce, scriptstate, stateinputs,cookies,\\
-localStorage, sessionStorage, ids, secret \rangle
-\end{multline*}
-\item \textbf{Script Message Output. }The output is the term in the form
-\begin{multline*}
-\ \ \ \ \ \langle scriptstate, cookies, localStorage, \\
-sessionStorage, command \rangle \ \ \ \ \
-\end{multline*}
-\end{itemize}
-The \myss{tree} is the relations of the opened windows and documents, which are visible to this script. \myss{Docnonce} is the document nonce. The  \myss{Scriptstate} is a term of the form defined by each script. \myss{Scriptinputs} is the message transmitted to script. However, the \myss{scriptinputs} is defined as standardized forms, for example, postMessage is one of the forms of \myss{scriptinputs}. \myss{Cookies} is the set of cookies that belong to the document's origin. \myss{LocalStorage} is the storage space for browser and \myss{sessionStorage} is the space for each HTTP sessions.  \myss{Ids} is the set of user IDs while \myss{secret} is the password to corresponding user ID. The \myss{command} is the operation which is to be conducted by the browser. Here we only introduce the form of commands used in UPPRESSO system. We have defined the postMessage and XMLHTTPRequest (for HTTP request) message which are the \myss{commands}. Moreover, a term in the form \myss{\myangle{\mathtt{IFRAME}, URL, WindowNonce}} asks the browser to create this document's subwindow and it visits the server with the URL.
-
-
-An {\em atomic Dolev-Yao (DY) process} is a tuple $p=$ $(I^p, Z^p, R^p,s_0^p )$, where $I^p$ is the set of addresses that the process listens to, $Z^p$ is the set of states (i.e., a set of terms) that describes the process, $s_0^p$ is an initial state, and $R^p$ is the mapping from an input state $s \in Z^p$ and an event $e$ to a new state $s'$ and an event $e'$. It is worth noting that for one process in a state, only a finite set of events can be accepted by the process as the state and event are defined as the input of $R^p$.
 
 
 \subsection{Data Format}
@@ -161,6 +125,45 @@ The data used in UPPRESSO are defined in the following forms:
 
 \vspace{1mm}\noindent\textbf{Patten Matching}.  We define the term with the variable $*$ as the pattern, such as \myss{\myangle{a, b, *}}.
 The pattern matches any term which only replaces the $*$ with other terms. For instance,  \myss{\myangle{a, b, *}} matches \myss{\myangle{a, b, c}}.
+
+
+\subsection{Browser and Script Process Model}
+Browser is the essential party in web system, that most of users participates through a browser.
+In UPPRESSO, we assume that the browsers are honest and well developed, so that, we neglect  the detailed process of browser, such as constructing and parsing the HTTP package.
+Therefore, we only need to analyze how the browsers interactive with other parties in UPPRESSO system.
+Moreover, in UPPRESSO system, the message transmitted through a browser is constructing and parsing by the script, so that we only focus on how the script process runs in the browser.
+We introduce the windows and documents of the browser model, which provides inputs and parses the outputs of the script process.
+
+\vspace{1mm}
+\noindent\textbf{Window}. A window \myss{w} is a term of the form \myss{w = \myangle{nonce, documents, opener}}, representing the  the concrete browser window in the system. The \myss{nonce} is the window reference to identify each windows. The \myss{documents} is the set of documents (defined below) including the current document and cached documents (for example, the documents can be viewed via the ``forward" and ``back" buttons in the browser). The \myss{opener} represents the window in which this window is created, for instance, while a user clicks the href in document \myss{d} and it creates a new window \myss{w}, there is \myss{w.opener \equiv d.nonce}.
+
+\vspace{1mm}
+\noindent\textbf{Document}. A document \myss{d} is a term of the form
+\begin{multline*}
+  \ \ \ \langle nonce, location, referrer, script, scriptstate, \\
+  scriptinputs, subwindows, active \rangle \ \ \
+\end{multline*}
+where document is the HTML content in the window.  The \myss{nonce} locates the document. \myss{Location} is the URL where the document is loaded. \myss{Referrer} is same as the Referer header defined in HTTP standard. The \myss{script} is the script process downloaded from each servers. \myss{scriptstate} is define by the script, different in each scripts. The \myss{scriptinputs} is the message transmitted into the script process. The \myss{subwindows} is the set of \myss{nonce} of document's created windows. \myss{active} represents whether this document is active or not.
+
+\vspace{1mm}
+\noindent\textbf{Script process}. A script process is the dependent process relying on the browser, which can be considered as a relation \myss{R} mapping a message input and a message output. And finally the browser will conduct the command in the output message. Here we give the description of the form of input and output.
+\begin{itemize}
+\setlength\itemsep{-2pt}
+\item \textbf{Script Message Input. } The input is the term in the form
+\begin{multline*}
+\langle tree, docnonce, scriptstate, stateinputs,cookies,\\
+localStorage, sessionStorage, ids, secret \rangle
+\end{multline*}
+\item \textbf{Script Message Output. }The output is the term in the form
+\begin{multline*}
+\ \ \ \ \ \langle scriptstate, cookies, localStorage, \\
+sessionStorage, command \rangle \ \ \ \ \
+\end{multline*}
+\end{itemize}
+The \myss{tree} is the relations of the opened windows and documents, which are visible to this script. \myss{Docnonce} is the document nonce. The  \myss{Scriptstate} is a term of the form defined by each script. \myss{Scriptinputs} is the message transmitted to script. However, the \myss{scriptinputs} is defined as standardized forms, for example, postMessage is one of the forms of \myss{scriptinputs}. \myss{Cookies} is the set of cookies that belong to the document's origin. \myss{LocalStorage} is the storage space for browser and \myss{sessionStorage} is the space for each HTTP sessions.  \myss{Ids} is the set of user IDs while \myss{secret} is the password to corresponding user ID. The \myss{command} is the operation which is to be conducted by the browser. Here we only introduce the form of commands used in UPPRESSO system. We have defined the postMessage and XMLHTTPRequest (for HTTP request) message which are the \myss{commands}. Moreover, a term in the form \myss{\myangle{\mathtt{IFRAME}, URL, WindowNonce}} asks the browser to create this document's subwindow and it visits the server with the URL.
+
+
+An {\em atomic Dolev-Yao (DY) process} is a tuple $p=$ $(I^p, Z^p, R^p,s_0^p )$, where $I^p$ is the set of addresses that the process listens to, $Z^p$ is the set of states (i.e., a set of terms) that describes the process, $s_0^p$ is an initial state, and $R^p$ is the mapping from an input state $s \in Z^p$ and an event $e$ to a new state $s'$ and an event $e'$. It is worth noting that for one process in a state, only a finite set of events can be accepted by the process as the state and event are defined as the input of $R^p$.
 
 
 \subsection{Model of UPPRESSO}
