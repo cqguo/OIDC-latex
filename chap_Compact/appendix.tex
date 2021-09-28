@@ -35,8 +35,56 @@ The data tracing is based on the well-built model.
 
 %For brevity, we focus on the modifications introduced by UPPRESSO in this paper and neglect the proofs for the security of DNS and HTTPS requests. We refer interested readers to~\cite{SPRESSO} for details.
 
-\subsection{The Web Model}
+
+
+\subsection{The Modelling Web System}
 \label{subsec:webmodel}
+Based on Dolev-Yao style model, the web  infrastructure can be modelled as the form ($\mathcal{W}$, $\mathcal{S}$, $\mathtt{script}$, $E^0$). The definitions of these notations is described as below.
+\begin{itemize}
+\item $\mathcal{W}$ is the set of \textbf{atomic processes}. An atomic process represents an independent entity in the web system, such as browser and web server. 
+\item $\mathcal{S}$ is the set of \textbf{scripting processes}. That is, besides the atomic processes in the web system, there are also entities processing data and communicating with other entities, but unable to run independently without other atomic processes. These entities are denoted as scripting processes, i.e., the JavaScript code in the web system.
+\item $\mathtt{script}$ is the set of concrete script codes related to specific scripting processes in $\mathcal{S}$.
+\item $E^0$ is the set of \textbf{events} acceptable to the processes in $\mathcal{W}$. An event is the basic communication elements in the model, representing atomic process A sending a message to atomic process B. 
+\end{itemize}
+
+
+
+\vspace{1mm}
+\noindent\textbf{Atomic process}. The atomic process is the modelling web nodes, in the form ($I^p$, $Z^p$, $R^p$, $s_0^p$). The definitions of these notations is described as below.
+\begin{itemize}
+\item $I^p$ is the set of addresses that the process listens to.
+\item  $Z^p$ is the set of \textbf{states} that describes the process. The state is the formal \textbf{term}.
+\item $R^p$ is the \textbf{relation} between the input, state $s \in Z^p$ and an event $e$, to the output, the new state $s' \in Z^p$ and an event $e'$. It means that, at one time point, while the process is on state $s$ and receive the event $e$, it would transition to state $s'$ and send the event $e'$ to other process.
+\item $s_0^p$ is an initial state.
+\end{itemize}
+
+\vspace{1mm}
+\noindent\textbf{Term}. Term is the basic element in Dolev-Yao style model, to describe the modelled system. 
+It contains constants such as ASCII strings and nonce, sequence symbols such as n-ary sequences $\langle \rangle$, $\langle . \rangle$, $\langle . ,. \rangle$, and function symbols that model cryptographic primitives such as $\mathtt{encrypt}, \mathtt{decrypt}$ and digital signatures.
+For example, an HTTP request can be modelled as a term containing a type (e.g., $\mathtt{HTTPReq}$), a nonce, a method (e.g., $\mathtt{GET}$ or $\mathtt{POST}$), a domain, a path, URL parameters, request headers and a message body, over the $\Sigma$ in the sequence symbol format. So,
+an HTTP GET request for the domain {\sf exa.com/path?para=1} with empty header and body can be described as: $m:=\langle\mathtt{HTTPReq},n,\mathtt{GET},exa.com,/path,\langle \langle para, 1\rangle \rangle ,\langle \rangle,\langle \rangle \rangle$.
+
+\vspace{1mm}
+\noindent\textbf{State}. State is the term consisted of basic terms, to sketch the atomic process at the point of time. For example, the state of a login server can be simplistically described as the term $\langle CookieList,UserList \rangle$, while the $CookieList$ maintains the visitors' cookies with the corresponding login state, and the $UserList$ maintains the user ids and their corresponding passwords.
+
+
+\vspace{1mm}
+\noindent\textbf{Relation}. The relation the modelled procedure, showing how the entity deal with the received message. For example, while the login server receive the login request from a visitor (the request is denoted as the event $e$), the input of the relation is $e$ and current state $\langle CookieList,UserList \rangle$.   The server verifies the visitor's identity with the $UserList$ and set the login result to $CookieList$ (transitioning to $CookieList'$). Thus the output is the login response $e'$ and the new state $\langle CookieList',UserList \rangle$. 
+
+
+\vspace{1mm}
+\noindent\textbf{Scripting process}. A scripting process is the modelling JavaScript code, as a relation $R$, representing the server-defined functions, while the input and output are handled by the browser.
+
+
+\vspace{1mm}
+\noindent\textbf{Event}. The event  the formal term $\langle a, f, m \rangle$, where $a$ and $f$ represent the addresses of the sender and receiver respectively, and $m$ is the message to be transmitted.
+
+
+
+
+
+\begin{comment}
+
 The Dolev-Yao model abstracts the entities in a system, such as browsers and web servers, as {\em atomic processes}, which communicate with each other through the {\em events}. \cite{SPRESSO} also defines {\em scripting processes} to model client-side scripting such as JavaScript, so a web system consists of a set of atomic and scripting processes. The state of a system, called a {\em configuration}, consists of the current states of all atomic processes and all the events that can be accepted by these processes. We list the definitions of these notations as below~\cite{SPRESSO}.
 
 \vspace{1mm}
@@ -69,6 +117,7 @@ Each atomic process also contains a set of nonces that it may use.
 \vspace{1mm}
 \noindent A {\em run step} is the system migrating from configurations ($S, E, N$) to ($S', E', N'$) by processing an event $e \in E$.
 
+\end{comment}
 
 \subsection{Data Format}
 Here we provide the details of the  format of the frequent used \verb+messages+ to construct the web models.
@@ -456,7 +505,7 @@ Finally, we have proved that the UPPRESSO system meets Requirement~\ref{req:idp}
   \label{alg1}
   \begin{algorithmic}[1]
   \REQUIRE \myss{\myangle{a, f, m}, s}
-  \mystate{\myss{s:=s'}}
+  \mystate{\myss{s':=s}}
   \mystate{\myss{n, method, path, parameters, headers, body} \textbf{such that}}\\
   \ \ \myss{\myangle{\mathtt{HTTPReq},n,method,path,parameters,headers,body} \equiv m}\\
   \ \ \textbf{if} \myss{possible}; \textbf{otherwise} stop \myss{\myangle{}, s'}
