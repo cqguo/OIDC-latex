@@ -5,9 +5,9 @@
 \subsection{Identity-Transformation Functions}
 \label{subsec:overview}
 
-\begin{figure*}[h]
+\begin{figure*}[!t]
   \centering
-  \includegraphics[width=0.8\textwidth,keepaspectratio]{fig/process-js.pdf}
+  \includegraphics[height=0.8\textheight,keepaspectratio]{fig/process-js.pdf}
   \caption{The SSO login flow of UPPRESSO.}
   \label{fig:process}
 \end{figure*}
@@ -256,6 +256,9 @@ Each user registers once at the IdP to set up a unique user identifier $ID_U$ an
 \vspace{1mm}
 \noindent\textbf{SSO Login.} An SSO login instance is typically launched through a browser,
 when a user requests to login an RP.
+In this figure, vertical bars stand for entity in the UPPRESSO system. 
+At the user side, the vertical bars represent the browser's windows which are the containers of IdP and RP scripts. 
+To be noticed is that, after a window is opened, the script in this window may change. For example, in this figure, a window is opened at step 1.2, and the script in this window belongs to the RP. However, after the redirection at step 1.3, it visits the IdP server and downloads the script, so that the script inside this window changes into the IdP script. The main difference is that, the IdP script is only trusted by IdP server and allowed to communicate with IdP server. And so does RP script.
 %, which calls three identifier-transformation functions following the login flow as shown in Figure \ref{fig:process}.
 %Once a user attempts to login an RP, the SSO login is initiated.
 %We use the OIDC implicit protocol flow as an example, to demonstrate  how to integrate the three functions $\mathcal{F}_{ID_{U} \mapsto PID_{U}}$, $\mathcal{F}_{ID_{RP} \mapsto PID_{RP}}$ and $\mathcal{F}_{PID_{U} \mapsto Account}$ into the typical SSO systems.
@@ -275,7 +278,6 @@ The redirection to the IdP downloads the IdP script.
 \vspace{-\topsep}\end{itemize}
 
 
-\vspace{0.5mm}
 \noindent{\em 2. RP Identity Transformation.}
 The user and the RP negotiate $PID_{RP} = [t]{ID_{RP}}$.
 \begin{itemize}
@@ -294,7 +296,6 @@ It then creates a random endpoint $PEnpt_{U}$ for this login instance,
 
 %It is important to ensure that the RP endpoint is not tampered with by the adversary. In other OIDC systems, the IdP obtains the RP endpoint from RP registration and verifies the endpoint in the identity-token request. However, the IdP in UPPRESSO sees only a one-time endpoint. So, we ask the user to verify the correctness of the RP endpoint using the RP certificate. %which is signed by the IdP.
 
-\vspace{0.5mm}
 \noindent{\em 3. ${PID_{RP}}$ Registration.}
 The user registers the ephemeral $PID_{RP}$ at the IdP.
 It is conducted by the IdP script in the user's browser. %Otherwise, the IdP can associate $PID_{RP}$ and $ID_{RP}$.
@@ -306,13 +307,13 @@ It is conducted by the IdP script in the user's browser. %Otherwise, the IdP can
 \vspace{-\topsep}
 \item[3.2] The IdP checks the list of unexpired $PID_{RP}$
     to verify the received $PID_{RP}$ is a unique point on $\mathbb{E}$ among them.
-Then, it signs the response $[PID_{RP}, H(t), Validity]_{SK}$,
+Then, it signs the response $[PID_{RP}, H(t), Validity]_{SK}$, denoted as $RegToken$, 
  where $Validity$ indicates when $PID_{RP}$ will expire (typically, in 3 to 5 minutes).
 The IdP maintains the list of $PID_{RP}$ and deletes expired ones from it.
 \vspace{-\topsep}
-\item[3.3] The IdP script forwards the registration result to the RP through the RP script.
+\item[3.3] The IdP script forwards the $RegToken$ to the RP through the RP script.
 \vspace{-\topsep}
-\item[3.4] The RP verifies the IdP's signature, and accepts the result
+\item[3.4] The RP verifies the IdP's signature, and accepts the $RegToken$
  only if $PID_{RP}$ and $H(t)$ match those in the negotiation and it does not expire.
 \vspace{-\topsep}
 \item[3.5] The RP constructs an identity-token request with $PID_{RP}$ and $Enpt_{RP}$,
@@ -326,7 +327,6 @@ $H(t)$ is a nonce to distinguish different login instances,
 This nonce prevents one $PID_{RP}$ registration result (and the subsequent identity token)
      from being accepted by multiple RPs.
 
-\vspace{0.5mm}
 \noindent{\em 4. Identity-Token Generation.}
 The IdP calculates $PID_U = [ID_U]{PID_{RP}}$ and signs the identity token. % The processes are as follows.
 \begin{itemize}
@@ -350,7 +350,6 @@ The IdP then signs an identity token $[PID_{RP}, PID_U, Iss, Validity, Attr]_{SK
 \vspace{-\topsep}
 \end{itemize}
 
-\vspace{0.5mm}
 \noindent{\em 5. $Acct$ Calculation.}
 The RP verifies the identity token and allows the user to login.
 \begin{itemize}
