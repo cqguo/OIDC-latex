@@ -22,10 +22,10 @@ OIDC supports three types of user login flows: implicit flow, authorization code
 %In the implicit flow, an {\em id token} is generated as the identity token, which contains a user identifier, an RP identifier, the issuer (i.e., IdP), the validity period, and other requested attributes. The IdP signs the id token using its private key to ensure integrity, and sends it to the RP through the user.
 %In the authorization code flow, the IdP binds an authorization code with the RP, and sends it to the RP through the user; then, the RP establishes an HTTPS connection to the IdP and uses the authorization code with the RP's credential to obtain the user's identifier and other attributes.
 %UPPRESSO is compatible with all three flows.
-These flows mainly result from the differences of the communication steps to request and receive identity tokens,
+These flows mainly result from the different steps to request and receive identity tokens,
     but work with the common security requirements of identity tokens.
 We introduce the implicit flow and present our design and implementation based on this flow,
-    the extensions to support the authorization code flow will be discussed in Section \ref{sec:discussion}.
+    and the extensions to support the authorization code flow is discussed in Section \ref{sec:discussion}.
 
 \begin{figure}[t]
   \centering
@@ -60,7 +60,7 @@ The user's operations including authentication, redirection, authorization, and 
 
 \vspace{1mm}
 \noindent\textbf{RP Dynamic Registration.}
-In addition to the out-of-band registrations,
+In addition to the manual registrations,
     OIDC also supports dynamic registrations
     for an RP to register by online means \cite{DynamicRegistration}.
 The (unregistered) RP sends a registration request
@@ -83,20 +83,20 @@ Given a user,
     the IdP assigns a unique PPID based on the target RP,
     so that collusive RPs cannot link the user's different PPIDs across these RPs.
 However, PPID-based approaches cannot prevent the IdP-based login tracing,
- since in the generation of identify tokens the IdP still needs to know which RP the user visits.
+ since in the generation of identify tokens the IdP needs to know which RP the user is visiting.
 
 BrowserID \cite{BrowserID} and SPRESSO \cite{SPRESSO} are proposed to defend SSO services against the IdP-based login tracing,
     but both solutions are instead vulnerable to the threat of RP-based identity linkage.
 In BrowserID (and its prototypes known as Mozilla Persona \cite{persona} and Firefox Accounts \cite{FirefoxAccount}),
  the IdP issues a special ``token'' to bind the user identity to a short-lived public key,
  so that the user uses the corresponding private key to sign a ``subsidiary'' identity token
-    to bind his identity with the target RP's identity and send both tokens to the RP.
+    to bind his identity with the target RP's identity and then send both tokens to the RP.
 When a user logins to different RPs, the RPs could still extract the identical user identities
     from different pairs of tokens and link these logins.
 Meanwhile,
     the RP of SPRESSO creates a one-time but verifiable pseudo-identity for itself in each login instance.
 Then, the IdP generates an identity token binding this RP pseudo-identity and the user identity. %and returns it through a trusted third-party entity called forwarder.
-Similarly, the collusive RPs could link a user's multiple logins based on his user identity in these tokens.
+Similarly, the collusive RPs could link a user's multiple logins based on his permanent user identity in these tokens.
 
 It is worth noting that PPIDs cannot be directly integrated in either BrowserID or SPRESSO.
 PPIDs are assigned in identity tokens based on the visited RP \cite{NIST2017draft,OpenIDConnect, SAMLIdentifier},
