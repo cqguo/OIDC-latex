@@ -22,17 +22,17 @@
 \vspace{1mm}
 \noindent\textbf{Formal Analysis on SSO Protocols.}
 %The SSO standards (e.g., SAML, OAuth, and OIDC) have been formally analyzed.
-Fett et al. \cite{FettKS16, FettKS17} formally analyze OAuth 2.0 and OIDC based on an expressive Dolev-Yao model \cite{FettKS14},
-    and presented two attacks, i.e., 307 redirect and IdP mix-up attacks.
-When the IdP misuses an HTTP 307 status code for redirection, the sensitive information (e.g., credentials) entered at the IdP
-    will  be leaked to the RP through  the user's browser.
-The IdP mix-up attack confuses the RP about which IdP is used and the victim RP sends the token to a malicious IdP,
- which breaks the confidentiality of identity tokens.
+Fett et al. \cite{FettKS16, FettKS17} formally analyze OAuth 2.0 and OIDC using an expressive Dolev-Yao style model \cite{FettKS14},
+    and presented two attacks, i.e., the attacks of 307 redirection and IdP mix-up.
+%When the IdP misuses an HTTP 307 status code for redirection, the sensitive information (e.g., credentials) entered at the IdP
+ %   will  be leaked to the RP through  the user's browser.
+%The IdP mix-up attack confuses the RP about which IdP is used and the victim RP sends the token to a malicious IdP,
+% which breaks the confidentiality of identity tokens.
 According to these formal proofs \cite{FettKS16, FettKS17},
     OAuth 2.0 and OIDC are secure except these two attacks.
 %UPPRESSO could be integrated into OIDC, which simplifies its security analysis.
-SAML 2.0 SSO is formally analyzed \cite{ArmandoCCCT08},
-    and the RP identity is found not to be bound correctly in the identity tokens of its variant proposed by Google.
+SAML-based SSO is also formally analyzed \cite{ArmandoCCCT08},
+    and the RP identity is found not to be bound correctly in the identity tokens of its variant designed by Google.
 
 
 
@@ -41,19 +41,25 @@ SAML 2.0 SSO is formally analyzed \cite{ArmandoCCCT08},
 \vspace{1mm}
 \noindent\textbf{Vulnerabilities of SSO Implementations.}
 Various vulnerabilities were found in SSO implementations,
-    and then exploited to launch impersonation and identity injection attacks
+    which could be exploited to launch impersonation and identity injection attacks
      by breaking the confidentiality \cite{WangCW12,ccsSunB12,ArmandoCCCPS13,DiscoveringJCS,dimvaLiM16}, integrity \cite{WangCW12,SomorovskyMSKJ12,WangZLG16,MainkaMS16, MainkaMSW17,dimvaLiM16} or RP designation \cite{WangZLG16,MainkaMS16,MainkaMSW17,YangLCZ18,dimvaLiM16} of identity tokens.
-Wang et al. \cite{WangCW12} analyzed the SSO services of Google and Facebook from the view of browser-relayed traffics
-    and found logic flaws in the IdPs and RPs to break the confidentiality and integrity of identity tokens.
-The integrity of identity tokens was destroyed in SAML, OAuth and OIDC systems  \cite{SomorovskyMSKJ12,WangCW12,WangZLG16,MainkaMS16, MainkaMSW17},
-due to software flaws, such as XML signature wrapping (XSW) \cite{SomorovskyMSKJ12}, incomplete verification by RPs \cite{WangCW12,WangZLG16,MainkaMSW17}, and IdP spoofing \cite{MainkaMS16,MainkaMSW17}.
+Wang et al. \cite{WangCW12} analyzed the SSO services of Google and Facebook %from the view of browser-relayed traffics
+    and found logic flaws in the IdPs and RPs.  % to break the confidentiality and integrity of identity tokens.
+In fact,
+    the integrity of identity tokens was found to be vulnerable in lots of SSO systems  \cite{SomorovskyMSKJ12,WangCW12,WangZLG16,MainkaMS16, MainkaMSW17}
+due to software flaws, such as XML signature wrapping \cite{SomorovskyMSKJ12},
+ incomplete verification by RPs \cite{WangCW12,WangZLG16,MainkaMSW17}, and IdP spoofing \cite{MainkaMS16,MainkaMSW17}.
 Vulnerabilities also break the RP designation of tokens,
-    such as incorrect binding at IdPs \cite{YangLCZ18,WangZLG16} and insufficient verification by RPs \cite{MainkaMS16,MainkaMSW17,YangLCZ18}.
-Navas et al. \cite{NavasB19} indicate the impactive threats on OIDC security and privacy.
-Automatical tools, such as SSOScan \cite{ZhouE14}, OAuthTester \cite{YangLLZH16} and S3KVetter \cite{YangLCZ18},
- are designed to detect the violations of confidentiality, integrity, or RP designation in identity tokens.
- Wang et al. \cite{ExplicatingSDK} propose the scheme, that combines manual effort and automated
-verification.
+    such as incorrect binding at the IdP \cite{YangLCZ18,WangZLG16} and insufficient verification by RPs \cite{MainkaMS16,MainkaMSW17,YangLCZ18}.
+
+Automatic tools, such as SSOScan \cite{ZhouE14}, OAuthTester \cite{YangLLZH16} and S3KVetter \cite{YangLCZ18},
+ are designed to detect the violations of confidentiality, integrity, or RP designation of SSO identity tokens.
+Wang et al. \cite{ExplicatingSDK} also present a tool to detect the vulnerable applications
+    constructed on top of authentication/authorization SDKs,
+     due to the implicit assumptions in these SDKs.
+Besides,
+    Navas et al. \cite{NavasB19} discussed the possible attack patterns of the specification and implementations of OIDC.
+
 %Besides, a flaw was found in Google Apps \cite{ArmandoCCCPS13}, allowing a malicious RP to hijack a user's authentication attempt and inject a payload to steal the cookie (or identity token) for another RP.
 
 
@@ -61,7 +67,7 @@ verification.
 In mobile SSO systems, the IdP App, IdP-provided SDK (e.g., an encapsulated WebView) or system browser are adopted to redirect identity token from IdP App to RP App.
 However, none of them was trusted to ensure that the identity token could be only sent to the designated RP \cite{ChenPCTKT14,WangZLLYLG15}, as WebView and  system browser cannot authenticate RP App while the IdP App may be repackaged.
 Moreover, the SSO protocols needed to be modified to provide SSO services for mobile Apps, however these modifications were not well understood by RP developers \cite{ChenPCTKT14,YangLS17}.
-The top Android applications have been analyzed \cite{TowardsShehabM14,ChenPCTKT14,WangZLLYLG15,YangLS17,ShiWL19}, and vulnerabilities were found to break the confidentiality \cite{TowardsShehabM14,ChenPCTKT14,WangZLLYLG15,YangLS17,ShiWL19}, integrity \cite{ChenPCTKT14,YangLS17}, and RP designation \cite{ChenPCTKT14,ShiWL19} of identity token.
+The top Android applications have been analyzed, and vulnerabilities were found to break the confidentiality \cite{TowardsShehabM14,ChenPCTKT14,WangZLLYLG15,YangLS17,ShiWL19}, integrity \cite{ChenPCTKT14,YangLS17}, and RP designation \cite{ChenPCTKT14,ShiWL19} of identity token.
 Besides, a flaw was found in Google Apps \cite{ArmandoCCCPS13}, allowing a malicious RP to hijack a user's authentication attempt and inject a payload to steal the cookie (or identity token) for another RP.
 
 \vspace{1mm}
