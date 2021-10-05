@@ -23,7 +23,7 @@
 \noindent\textbf{Formal Analysis on SSO Protocols.}
 %The SSO standards (e.g., SAML, OAuth, and OIDC) have been formally analyzed.
 Fett et al. \cite{FettKS16, FettKS17} formally analyze OAuth 2.0 and OIDC using an expressive Dolev-Yao style model \cite{FettKS14},
-    and presented two attacks, i.e., the attacks of 307 redirection and IdP mix-up.
+    and presented the attacks of 307 redirection and IdP mix-up.
 %When the IdP misuses an HTTP 307 status code for redirection, the sensitive information (e.g., credentials) entered at the IdP
  %   will  be leaked to the RP through  the user's browser.
 %The IdP mix-up attack confuses the RP about which IdP is used and the victim RP sends the token to a malicious IdP,
@@ -40,7 +40,7 @@ SAML-based SSO is also formally analyzed \cite{ArmandoCCCT08},
 
 \vspace{1mm}
 \noindent\textbf{Vulnerabilities of SSO Implementations.}
-Various vulnerabilities were found in SSO implementations,
+Various vulnerabilities were found in SSO implementations for web applications,
     which could be exploited to launch impersonation and identity injection attacks
      by breaking the confidentiality \cite{WangCW12,ccsSunB12,ArmandoCCCPS13,DiscoveringJCS,dimvaLiM16}, integrity \cite{WangCW12,SomorovskyMSKJ12,WangZLG16,MainkaMS16, MainkaMSW17,dimvaLiM16} or RP designation \cite{WangZLG16,MainkaMS16,MainkaMSW17,YangLCZ18,dimvaLiM16} of identity tokens.
 Wang et al. \cite{WangCW12} analyzed the SSO services of Google and Facebook %from the view of browser-relayed traffics
@@ -75,13 +75,16 @@ Vulnerabilities were found in lots of Android applications,
 A software flaw was found in Google Apps \cite{ArmandoCCCPS13}, allowing a malicious RP to hijack a user's authentication attempt and inject a payload to steal the cookie (or identity token) for another RP.
 
 %\vspace{1mm} \noindent\textbf{Single Sign-Off.} 
-In SSO systems, once a user's IdP account is compromised, the adversary could hijack all her RPs' accounts.
-An extension, named single sign-off, is proposed for OIDC.
-Single sign-off  allows the user to revoke all her identity tokens and notify all RPs to freeze her accounts \cite{GhasemisharifRC18}.
-The design of single sign-off can also be achieved in UPPRESSO,
-    where the user (or user agent) needs to revoke the identity tokens at all RPs,
-     as the IdP does not know which RPs the user visits.
-
+In SSO systems, once a user account at the IdP is compromised,
+    the adversaries will control all his accounts at the RPs.
+An extension to OIDC, named single sign-off \cite{GhasemisharifRC18}, is proposed and then
+        the IdP helps the victim user 
+ to revoke all his identity tokens and logout from all RPs.
+%The design of single sign-off can also be integrated in UPPRESSO,
+%    where the user (or user agent) needs to revoke the identity tokens at all RPs,
+%     as the IdP does not know which RPs the user visits.
+% 单点登出的问题，我觉得并不能解决。
+% 因为在攻击情况下，合法用户并不知道哪些RP被攻击者登录。
 
 %以下内容被拆分到上面三点内容了，但是注释内容有对论文的详细表述
 \begin{comment}
@@ -138,7 +141,7 @@ Anonymous SSO schemes work for special applications,
 \noindent\textbf{Privacy-preserving authentication with user-maintained proof.}
 There is another thought to allow a user to achieve the convenient authentication without exposing her traceable identity to any parties,
  by maintaining the authentication proof herself.
-For example, FIDO \cite{fidouaf} allows a user to generate the asymmetric key pair on her device and register the public key at an RP, so that the user can login to this RP with a challenge signed using the private key. Other schemes, such as El passo \cite{ZhangKSZR21} and UnlimitID \cite{IsaakidisHD16}, enable user to keep a secret
+For example, FIDO \cite{fidouaf} allows a user to generate the asymmetric key pair on her device and register the public key at an RP, so that the user can login to this RP with a challenge signed using the private key. Other schemes, such as  EL PASSO \cite{ZhangKSZR21} and UnlimitID \cite{IsaakidisHD16}, enable user to keep a secret
 s and require IdP to generate an identity proof for blinded s. Thus the user can prove that she is the owner of s to RP without exposing s to RP.
 However, there are still flaws in these systems.
 FIDO is only available on the qualified device with the support of FIDO secure hardware.
