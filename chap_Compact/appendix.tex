@@ -22,16 +22,16 @@
 
 \section{The Security Proofs of UPPRESSO}
 \label{ape:model}
-In this section, 
+In this section,
 we  formally analyze  the security properties of UPPRESSO based on the Dolev-Yao style web model~\cite{SPRESSO}, which has been widely used in the formal analysis of SSO protocols such as OAuth 2.0~\cite{FettKS16} and OIDC~\cite{FettKS17}.
 That is, at the first, we give the detailed description of how to translate a web system into the Dolev-Yao style web model.
 Following, we present the modelling UPPRESSO system, containing normal data and each entities (including browser, servers, and scripts).
 %the servers, scripts and the communications among them.
 %introduction about how to  indicate the entities (e.g., servers) and communications (e.g., HTTP request) of the web system with Dolev-Yao style web model.
-%Then, we describe the model of frequent used data format (e.g., HTTP package) and entity  (e.g., browser). 
+%Then, we describe the model of frequent used data format (e.g., HTTP package) and entity  (e.g., browser).
 %Following, we present the modelling UPPRESSO system, containing the servers, scripts and the communications among them.
 Finally, we give the security proofs of UPPRESSO, that capture the tracks of all essential data, such as identity token, from its birth to being consumed, to guarantee the integrity and confidentiality.
-The data tracing is based on the well-built model.    
+The data tracing is based on the well-built model.
 
 
 
@@ -40,10 +40,10 @@ The data tracing is based on the well-built model.
 \label{subsec:webmodel}
 Based on Dolev-Yao style model, the web  infrastructure can be modelled as the form $\mathcal{WS}$=($\mathcal{W}$, $\mathcal{S}$, $\mathtt{script}$, $E^0$). The definitions of these notations is described as below.
 \begin{itemize}
-\item $\mathcal{W}$ is the set of \textbf{atomic processes}. An atomic process represents an independent entity in the web system, such as browser and web server. 
+\item $\mathcal{W}$ is the set of \textbf{atomic processes}. An atomic process represents an independent entity in the web system, such as browser and web server.
 \item $\mathcal{S}$ is the set of \textbf{scripting processes}. That is, besides the atomic processes in the web system, there are also entities processing data and communicating with other entities, but unable to run independently without other atomic processes. These entities are denoted as scripting processes, i.e., the JavaScript code in the web system.
 \item $\mathtt{script}$ is the set of concrete script codes related to specific scripting processes in $\mathcal{S}$.
-\item $E^0$ is the set of \textbf{events} acceptable to the processes in $\mathcal{W}$. An event is the basic communication elements in the model, representing atomic process A sending a message to atomic process B. 
+\item $E^0$ is the set of \textbf{events} acceptable to the processes in $\mathcal{W}$. An event is the basic communication elements in the model, representing atomic process A sending a message to atomic process B.
 \end{itemize}
 
 
@@ -58,13 +58,13 @@ Based on Dolev-Yao style model, the web  infrastructure can be modelled as the f
 \end{itemize}
 
 \vspace{1mm}
-\noindent\textbf{Term}. Term is the basic element in Dolev-Yao style model, to describe the modelled system. 
+\noindent\textbf{Term}. Term is the basic element in Dolev-Yao style model, to describe the modelled system.
 It contains constants such as ASCII strings and nonce, sequence symbols such as n-ary sequences $\langle \rangle$, $\langle . \rangle$, $\langle . ,. \rangle$, and function symbols that model cryptographic primitives such as $\mathtt{encrypt}, \mathtt{decrypt}$ and digital signatures.
 For example, an HTTP request can be modelled as a term containing a type (e.g., $\mathtt{HTTPReq}$), a nonce, a method (e.g., $\mathtt{GET}$ or $\mathtt{POST}$), a domain, a path, URL parameters, request headers and a message body, over the $\Sigma$ in the sequence symbol format. So,
 an HTTP GET request for the domain {\sf exa.com/path?para=1} with empty header and body can be described as: $m:=\langle\mathtt{HTTPReq},n,\mathtt{GET},exa.com,/path,\langle \langle para, 1\rangle \rangle ,\langle \rangle,\langle \rangle \rangle$.
 
 \vspace{1mm}
-\noindent\textbf{Operations over terms}. 
+\noindent\textbf{Operations over terms}.
 \begin{itemize}
 \item \textbf{Equational theory}. Equational theory is defined as usual in Dolev-Yao models, which uses the symbol $\equiv$ to represent the congruence relation on terms. For example, $dec(enc(m, k), k)$ $\equiv$ $m$, where $k$ is a symmetric key.
 \item \textbf{Patten Matching}.  We define the term with the variable $*$ as the pattern, such as \myss{\myangle{a, b, *}}.
@@ -78,7 +78,7 @@ The pattern matches any term which only replaces the $*$ with other terms. For i
 
 
 \vspace{1mm}
-\noindent\textbf{Relation}. The relation the modelled procedure, showing how the entity deal with the received message. For example, while the login server receive the login request from a visitor (the request is denoted as the event $e$), the input of the relation is $e$ and current state $\langle CookieList,UserList \rangle$.   The server verifies the visitor's identity with the $UserList$ and set the login result to $CookieList$ (transitioning to $CookieList'$). Thus the output is the login response $e'$ and the new state $\langle CookieList',UserList \rangle$. 
+\noindent\textbf{Relation}. The relation the modelled procedure, showing how the entity deal with the received message. For example, while the login server receive the login request from a visitor (the request is denoted as the event $e$), the input of the relation is $e$ and current state $\langle CookieList,UserList \rangle$.   The server verifies the visitor's identity with the $UserList$ and set the login result to $CookieList$ (transitioning to $CookieList'$). Thus the output is the login response $e'$ and the new state $\langle CookieList',UserList \rangle$.
 
 
 \vspace{1mm}
@@ -94,16 +94,16 @@ The pattern matches any term which only replaces the $*$ with other terms. For i
 
 \subsection{Modelling UPPRESSO System}
 In this section, we introduce the model of honest UPPRESSO system, in the form $\mathcal{UWS}$=($\mathcal{W}$, $\mathcal{S}$, $\mathtt{script}$, $E^0$).
-$\mathcal{W}$ is the set of atomic processes, including IdP server processes, RP server processes and browsers. 
-$\mathcal{S}$ is the set of scripting processes, containing of IdP scripting process and RP scripting process. 
+$\mathcal{W}$ is the set of atomic processes, including IdP server processes, RP server processes and browsers.
+$\mathcal{S}$ is the set of scripting processes, containing of IdP scripting process and RP scripting process.
 $\mathtt{script}$ is the set of detailed script codes, so that it is described here.
 $E^0$  is the set of events acceptable to the processes in $\mathcal{W}$, which is to be illustrated in the individual processes part.
 
-An atomic process is a tuple $p=$ $(I^p, Z^p, R^p,s_0^p )$, containing the addresses, states, and relations. 
+An atomic process is a tuple $p=$ $(I^p, Z^p, R^p,s_0^p )$, containing the addresses, states, and relations.
 Here, we will focus on the state form and relation $R$. They can describe that what kind of event can be accepted by the process in each state, and the content of new output events and states.
 Similarly, the scripting process is described in the same way.
 
-To be noticed is that, we only focus on the model of servers, browsers and the plain message transmissions among them in this paper, and neglect the HTTPS requests and other necessary Internet facilities (e.g., DNS server) deployed in the UPPRESSO system. 
+To be noticed is that, we only focus on the model of servers, browsers and the plain message transmissions among them in this paper, and neglect the HTTPS requests and other necessary Internet facilities (e.g., DNS server) deployed in the UPPRESSO system.
 Because we assume that the internet architecture is well  built and HTTPS is well implemented, so that an adversary cannot conduct the attacks targeting these elements.
 
 \subsubsection{Modelling Normal Data}
@@ -148,7 +148,7 @@ XMLHTTPRequest is the HTTP message transmitted  by scripts in the browser. That 
 
 \subsubsection{Modelling IdP and RP Servers}
 \vspace{1mm}\noindent\textbf{IdP Server Process}.
-The state of IdP server process is described as a term in the form \myss{\myangle{ID, SignKey, sessions, users, RPs, Validity, Tokens}}. 
+The state of IdP server process is described as a term in the form \myss{\myangle{ID, SignKey, sessions, users, RPs, Validity, Tokens}}.
 That is,  the state of an IdP server  at the point in time can be sketched using these attributes.
 Other data stored at IdP but not used during SSO authentication are not mentioned here.
 \begin{itemize}
@@ -202,10 +202,10 @@ The relation of RP process $R^r$ is shown as Algorithm~\ref{alg2} in Appendix~\r
 
 
 \subsubsection{Modelling Browser}
-Browser is the essential party in web system, that most of users participates through a browser. 
+Browser is the essential party in web system, that most of users participates through a browser.
 In UPPRESSO, we assume that the browsers are honest and well developed, so that, we neglect  the detailed process of browser, such as constructing and parsing the HTTP package.
 Therefore, we only need to analyze how the browsers interactive with other parties in UPPRESSO system.
-Moreover, in UPPRESSO system, the message transmitted through a browser is constructing and parsing by the script, so that we only focus on how the scripting process runs in the browser. 
+Moreover, in UPPRESSO system, the message transmitted through a browser is constructing and parsing by the script, so that we only focus on how the scripting process runs in the browser.
 We introduce the windows and documents of the browser model, which provides inputs and parses the outputs of the scripting process.
 
 \vspace{1mm}
@@ -272,8 +272,8 @@ The relation of RP scripting process $script\_rp$ is shown in Appendix~\ref{ape:
 
 We assume that all the network messages are transmitted using HTTPS, postMessage messages are protected by the browser, and the browsers are  honest, so web attackers can never break the security of UPPRESSO.
 
-We provide the detailed proof on the security of UPPRESSO. The security definition of UPPRESSO is that the system must ensure only the legitimate user can login an honest RP under her unique account. We consider the visits to RP's resource paths are controlled by the visitors' cookies, so that the attacker can break the security only when he owns the cookie bound to the honest user. 
-However, according to the same origin policy, the cookie is never leaked to any adversary, so the UPPRESSO  system is vulnerable only when a adversary's cookie is bound with the honest user's identity. 
+We provide the detailed proof on the security of UPPRESSO. The security definition of UPPRESSO is that the system must ensure only the legitimate user can login an honest RP under her unique account. We consider the visits to RP's resource paths are controlled by the visitors' cookies, so that the attacker can break the security only when he owns the cookie bound to the honest user.
+However, according to the same origin policy, the cookie is never leaked to any adversary, so the UPPRESSO  system is vulnerable only when a adversary's cookie is bound with the honest user's identity.
 Based on the model of RP server process model, at Line 64-83, we can find that only when the RP accept a visitor's token, it would bound this visitor with the identity derived from this token.
 Therefore, we can propose the Theorem about the secure UPPRESSO system.
 \begin{theorem}
@@ -302,8 +302,8 @@ An honest RP would not accept the token issued for another RP (\textbf(the RP de
 \label{lemma:RPdesignation}
 \end{lemma}
 \begin{proof}
-We can find that an RP server finally accept the $PID_U$ in an token at Line 77 in Algorithm~\ref{alg2}, after the verification at Line 73. The $PID_{RP}$ retrieved at Line 69, must be verified at Line 44. 
-The content verified at Line 44 is received from IdP server, generated at Line 41~\ref{alg1} and protected by the signature generated at Line 42. 
+We can find that an RP server finally accept the $PID_U$ in an token at Line 77 in Algorithm~\ref{alg2}, after the verification at Line 73. The $PID_{RP}$ retrieved at Line 69, must be verified at Line 44.
+The content verified at Line 44 is received from IdP server, generated at Line 41~\ref{alg1} and protected by the signature generated at Line 42.
 According to the verification at 32, the content containing $PID_{RP}$ is unique during the valid time.
 Moreover, according to Line 42, 44 (the $N_U$ used at Line 42 is set  at  Line 15, used for generating $PID_{RP}$ at Line 13), the $PID_{RP}$ must be resigned for this RP, as no other RP cannot generate the same $PID_{RP}$ with this $N_U$.
 As it has been proved at Lemma~\ref{lemma:confidentiality}, an malicious RP cannot receive the valid token issued for another RP, therefore, the adversary would not receive the token including an honest RP's $PID_{RP}$ from honest user.
@@ -326,8 +326,7 @@ At Line 16 the \myss{Cert} is verified with the public key in the scriptstate, w
 Therefore, this lemma is proved.
 \end{proof}
 
-In conclusion, these lemmas prove that the UPPRESSO system satisfies the requirements of the secure system. 
-Therefore, UPPRESSO is secure.
+These lemmas prove that the UPPRESSO system satisfies the requirements of the secure system.
 
 
 
