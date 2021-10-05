@@ -79,7 +79,7 @@ In SSO systems, once a user account at the IdP is compromised,
     the adversaries will control all his accounts at the RPs.
 An extension to OIDC, named single sign-off \cite{GhasemisharifRC18}, is proposed and then
         the IdP helps the victim user 
- to revoke all his identity tokens and logout from all RPs.
+ to revoke all his active identity tokens and logout from these RPs.
 %The design of single sign-off can also be integrated in UPPRESSO,
 %    where the user (or user agent) needs to revoke the identity tokens at all RPs,
 %     as the IdP does not know which RPs the user visits.
@@ -138,15 +138,28 @@ Anonymous SSO schemes work for special applications,
     but are unapplicable to common systems that require user identification for customized services.
 
 \vspace{1mm}
-\noindent\textbf{Privacy-preserving authentication with user-maintained proof.}
-There is another thought to allow a user to achieve the convenient authentication without exposing her traceable identity to any parties,
- by maintaining the authentication proof herself.
-For example, FIDO \cite{fidouaf} allows a user to generate the asymmetric key pair on her device and register the public key at an RP, so that the user can login to this RP with a challenge signed using the private key. Other schemes, such as  EL PASSO \cite{ZhangKSZR21} and UnlimitID \cite{IsaakidisHD16}, enable user to keep a secret
-s and require IdP to generate an identity proof for blinded s. Thus the user can prove that she is the owner of s to RP without exposing s to RP.
-However, there are still flaws in these systems.
-FIDO is only available on the qualified device with the support of FIDO secure hardware.
-In the El passo and UnlimitID systems, the user's identity is associated with the private s, therefore, if the user wants to login to the RP on a new device, she must import the large s into this device.
-As for the secure consideration, the secret must too large to remember, so that the solutions are not convenient for multi-device login.
+\noindent\textbf{Certified Anonymous Credential.}
+EL PASSO \cite{ZhangKSZR21} 
+    requires a user to keep a permanent secret on his device.
+After authenticating the user,
+    the trusted third party (TTP) issues a certified long-term anonymous credential, also kept on the user's device.
+Once attempting to login to any RP,
+    the user proves that he is the owner of this credential to the RP without exposing the secret;
+even if a credential is used for multiple RPs,
+    this anonymous credential \cite{anon-credential} prevents collusive RPs from linking these login instances.
+UnlimitID \cite{IsaakidisHD16} presents similar designs.
+TTP-certified anonymous credentials protect user privacy in the SSO scenarios \cite{ZhangKSZR21,IsaakidisHD16},
+    but the user has to  by himself management user attributes and the accounts at different RPs.
+FIDO \cite{fidouaf} allows a user to generate a key pair on her FIDO-certified device
+    and register the public key at an RP, so that the user logins to this RP with the corresponding private key.
+FIDO supports multiple key pairs for different RPs on one device,
+        and the RP-based linkage is also considered and prevented in the registration flow.
 
-
-
+In EL PASSO, UnlimitID or FIDO,
+    the most inconvenient operations for a user,
+        is to notify each RP when a credential or FIDO device is lost or compromised,
+because a user is authenticated by the RP with certified anonymous credentials.
+On the contrary,
+    in the SSO systems (and also UPPRESSO)
+        the user only needs to renew his credential at the IdP if it is stolen,
+    as authentication happens between a user and the IdP (and an RP only verifies tokens).
