@@ -9,7 +9,7 @@ We design three identity-transformation functions,
      $\mathcal{F}_{PID_{RP}}$, $\mathcal{F}_{PID_{U}}$ and $\mathcal{F}_{Acct}$,
     over an elliptic curve $\mathbb{E}$,
      where $G$ is a base point (or generator) of this elliptic curve and the order of $G$ is a prime number denoted as $n$.
-Table \ref{tbl:notations-protocol} lists the notations used in the design,
+Table \ref{tbl:notations-protocol} lists the notations,
     and the subscript $j$ and/or the superscript $i$ may be omitted when no ambiguity.
 
 %the NIST elliptic curve $P$-256,
@@ -46,14 +46,13 @@ Table \ref{tbl:notations-protocol} lists the notations used in the design,
 \end{table}
 
 
-First of all,
-    $ID_U$ is a unique integer satisfying $1<ID_U<n$,
+$ID_U$ is a unique integer satisfying $1<ID_U<n$,
     and $ID_{RP}$ is a unique point on $\mathbb{E}$.
 When a user is registering,
             a unique random number $u$ $(1 < u < n)$ is generated and $ID_U = u$ is assigned to this user;
     when an RP is initially registering at the IdP,
-            a random number $r$ $(1 < r < n)$ is generated and $ID_{RP} = [r]G$ is assigned to this RP.
-
+            a unique random number $r$ $(1 < r < n)$ is generated and $ID_{RP} = [r]G$ is assigned to this RP.
+Here, $[r]G$ is the addition of $G$ on the curve $r$ times.
 % For each RP, the IdP selects a random number $r$, where $1 < r < q$, and computes a unique $ID_{RP}$ as:
 %\begin{equation}
   %  ID_{RP} = g^{r} \bmod p
@@ -100,7 +99,7 @@ On receiving an identity-token request with $ID_U$ and $PID_{RP}$,
 \vspace{1mm}
 \noindent {\bf $\boldsymbol{PID_U}$-$\boldsymbol{Acct}$ Transformation.}
 In the negotiation of $PID_{RP}$,
-    the user also sends the trapdoor $t$ to the target RP.
+    the user sends the trapdoor $t$ to the target RP.
 So the RP also calculates $PID_{RP}$ to verify the designated RP pseudo-identity in identity tokens.
 After verifying an identity-token binding $PID_U$ and $PID_{RP}$,
     the RP calculates $Acct$ as below.
@@ -155,7 +154,7 @@ We propose the following designs specific for web applications,
 and these designs enable UPPRESSO to provide SSO services for users with standard browsers.
 More efficient but less portable implementations with browser extensions %and/or plug-ins
  are discussed in Section \ref{sec:discussion}.
-Besides,
+Moreover,
     if a user visits the IdP and RPs through a client software,
         these specific designs become unnecessary and the performance will be improved.
 
@@ -167,7 +166,7 @@ In existing SSO protocols,
 This instructs the browser to forward it correctly;
     otherwise, the confidentiality of identity tokens might be broken.
 
-Because the IdP of UPPRESSO is not aware of the visited RP and then cannot set the RP endpoints,
+Because the UPPRESSO IdP is not aware of the visited RP and then cannot set the RP endpoints,
         \emph{RP certificates} are designed to instructs the user agents (or browsers) about RP endpoints.
 An RP certificate is a message signed by the IdP, binding the RP's identity and its endpoint.
 This certificate is sent by the RP in the login flow,
@@ -177,19 +176,19 @@ Secondly,
     browser scripts are needed to implement the functions by users,
         including the generation of $t$ and $PID_{RP}$,
             and the dealing with RP certificates and endpoints,
-            for these are not standard functions of a browser.
+            for they are not standard functions of a browser.
 Two scripts, one downloaded from the IdP and the other from the target RP,
-    work together (with the standard  browser functions) as a user agent of UPPRESSO.
+    work together (with the standard  browser functions) as the user agent of UPPRESSO.
 The RP script maintains the communications with the RP,
     and it does not communicates directly with the IdP because an HTTP request launched by the RP script
             will automatically carry a \verb+Referer+ HTTP header, which discloses the RP's domain.
 The IdP script downloaded from the honest IdP,
     is responsible for the communications with the IdP,
-    while two scripts communicates with each other through the \verb+postMessage+ HTML5 API.
+    and two scripts communicates with each other through the \verb+postMessage+ HTML5 API.
 
 
 Finally,
-    the IdP's public key is downloaded in the IdP script to verify RP certificates, which are sent from the RP.
+    the IdP's public key is downloaded in the IdP script to verify RP certificates. %, which are sent from the RP.
 So the user agent does not configure anything locally,
     as it does in most existing SSO systems.
 
@@ -199,7 +198,7 @@ So the user agent does not configure anything locally,
 
 \begin{figure*}[!t]
   \centering
-  \includegraphics[height=0.8\textheight,keepaspectratio]{fig/process-js.pdf}
+  \includegraphics[height=0.82\textheight]{fig/process-js.pdf}
   \caption{The SSO login flow of UPPRESSO.}
   \label{fig:process}
 \end{figure*}
@@ -219,8 +218,8 @@ Then, the IdP keeps $SK$ secret, while $PK$ is publicly known.
 
 \vspace{1mm}
 \noindent\textbf{RP Initial Registration.} Each RP launches
-    an initial registration process once to finish configurations.
-In particular, an RP registers itself at the IdP to obtain its unique identifier $ID_{RP}$
+    an initial registration operation once to finish configurations.
+In particular, an RP registers itself at the IdP to obtain $ID_{RP}$
  and the corresponding RP certificate $Cert_{RP}$ as follows:
 \begin{enumerate}
 \vspace{-\topsep}\item
@@ -254,20 +253,37 @@ The RP verifies $Cert_{RP}$ using $PK$,
 
 \vspace{1mm}
 \noindent\textbf{User Registration.}
-UPPRESSO adopts a similar user registration process as the ones in other SSO systems.
-Each user registers once at the IdP to set up a unique user identifier $ID_U$ and the corresponding user credential.
+UPPRESSO adopts a similar user registration operation as the ones in other SSO systems.
+Each user registers once at the IdP to set up a unique user identity $ID_U$ and the corresponding credential.
 %$ID_U$ can be chosen by the user or the IdP, as long as it is unique for each user.
 
 \vspace{1mm}
 \noindent\textbf{SSO Login.} An SSO login instance is typically launched through a browser,
 when a user requests to login an RP.
-In this figure, vertical bars stand for entity in the UPPRESSO system.
-At the user side, the vertical bars represent the browser's windows which are the containers of IdP and RP scripts.
-To be noticed is that, after a window is opened, the script in this window may change. For example, in this figure, a window is opened at step 1.2, and the script in this window belongs to the RP. However, after the redirection at step 1.3, it visits the IdP server and downloads the script, so that the script inside this window changes into the IdP script. The main difference is that, the IdP script is only trusted by IdP server and allowed to communicate with IdP server. And so does RP script.
-%, which calls three identifier-transformation functions following the login flow as shown in Figure \ref{fig:process}.
-%Once a user attempts to login an RP, the SSO login is initiated.
-%We use the OIDC implicit protocol flow as an example, to demonstrate  how to integrate the three functions $\mathcal{F}_{ID_{U} \mapsto PID_{U}}$, $\mathcal{F}_{ID_{RP} \mapsto PID_{RP}}$ and $\mathcal{F}_{PID_{U} \mapsto Account}$ into the typical SSO systems.
+
 It consists of five steps, namely script downloading, RP identity transformation, $PID_{RP}$ registration, identity-token generation, and $Acct$ calculation, as shown in Figure \ref{fig:process}.
+In this figure,
+    the operations by the IdP are linked by a vertical line,
+        so are the RP's operations.
+Two vertical lines split the user's operations into two groups (i.e., two browser windows),
+    one of which is to communicate with the IdP,
+                 and the other with the target RP.
+Each solid horizontal line means some messages between the user and the IdP (or the RP),
+            and each dotted line means a \verb+postMessage+ invocation between two scripts (or windows) within the browser.
+
+%In this figure, vertical bars stand for entity in the UPPRESSO system.
+%At the user side, the vertical bars represent the browser's windows which are the containers of IdP and RP scripts.
+%After a window is opened, the script in this window may change.
+%For example, a window is opened at Step 1.2, and the script in this window belongs to the RP.
+%However, after the redirection at Step 1.3, it visits the IdP server and downloads the script,
+% so that the script inside this window changes into the IdP script.
+%The main difference is that,
+% the IdP script is only trusted by IdP server and allowed to communicate with IdP server.
+% So does the RP script.
+
+%%%, which calls three identifier-transformation functions following the login flow as shown in Figure \ref{fig:process}.
+%%%Once a user attempts to login an RP, the SSO login is initiated.
+%%%We use the OIDC implicit protocol flow as an example, to demonstrate  how to integrate the three functions $\mathcal{F}_{ID_{U} \mapsto PID_{U}}$, $\mathcal{F}_{ID_{RP} \mapsto PID_{RP}}$ and $\mathcal{F}_{PID_{U} \mapsto Account}$ into the typical SSO systems.
 
 \vspace{0.5mm}
 \noindent 1. {\em Script Downloading.}
@@ -277,7 +293,7 @@ The browser downloads the scripts from the IdP and the visited RP.
 When attempting to visit any protected resources at the RP,
     the user downloads the RP script.
 \vspace{-\topsep}\item[1.2]
-The RP script opens a window in the browser to visit the login path at the RP, which is redirected to the IdP.
+The RP script opens a window in the browser to visit the login path at the RP, which is then redirected to the IdP.
 \vspace{-\topsep}\item[1.3]
 The redirection to the IdP downloads the IdP script.
 \vspace{-\topsep}\end{itemize}
@@ -295,7 +311,8 @@ the RP verifies $1 < t < n$ and calculates $PID_{RP}$.
 The RP replies with $Cert_{RP}$, which is then transmitted from the RP script to the IdP script through \verb+postMessage+.
 \vspace{-\topsep}\item[2.3] The IdP script verifies $Cert_{RP}$, extracts $ID_{RP}$ and $Enpt_{RP}$ from $Cert_{RP}$ and calculates $PID_{RP}=[t]{ID_{RP}}$.
 It then creates a random endpoint $PEnpt_{U}$ for this login instance,
-    as the RP endpoint required by IdP.
+    to receive identity tokens from the IdP.
+    % as the RP endpoint required by IdP.我们已经修改了协议，IdP并不require什么
 \vspace{-\topsep}
 \end{itemize}
 
@@ -312,13 +329,13 @@ It is conducted by the IdP script in the user's browser. %Otherwise, the IdP can
 \vspace{-\topsep}
 \item[3.2] The IdP checks the list of unexpired $PID_{RP}$
     to verify the received $PID_{RP}$ is a unique point on $\mathbb{E}$ among them.
-Then, it signs the response $[PID_{RP}, H(t), Validity]_{SK}$, denoted as $RegToken$,
+Then, it signs the response $[PID_{RP}, H(t), Validity]_{SK}$, %denoted as $RegToken$, 避免多余概念
  where $Validity$ indicates when $PID_{RP}$ will expire (typically, in 3 to 5 minutes).
 The IdP maintains the list of $PID_{RP}$ and deletes expired ones from it.
 \vspace{-\topsep}
-\item[3.3] The IdP script forwards the $RegToken$ to the RP through the RP script.
+\item[3.3] The IdP script forwards the registration result to the RP through the RP script.
 \vspace{-\topsep}
-\item[3.4] The RP verifies the IdP's signature, and accepts the $RegToken$
+\item[3.4] The RP verifies the IdP's signature, and accepts the result
  only if $PID_{RP}$ and $H(t)$ match those in the negotiation and it does not expire.
 \vspace{-\topsep}
 \item[3.5] The RP constructs an identity-token request with $PID_{RP}$ and $Enpt_{RP}$,
@@ -336,17 +353,18 @@ This nonce prevents one $PID_{RP}$ registration result (and the subsequent ident
 The IdP calculates $PID_U = [ID_U]{PID_{RP}}$ and signs the identity token. % The processes are as follows.
 \begin{itemize}
 \vspace{-\topsep}
-\item[4.1] On receiving an identity-token request,
-    the IdP authenticates the user if he has not been authenticated yet.
-\vspace{-\topsep}
-\item[4.2] The user checks the scope of the requested attributes.
-The IdP script verifies $PID_{RP}$ and $Enpt_{RP}$ in the request;
-    that is, $PID_{RP}$ is the one registered in the previous step,
+\item[4.1]
+The IdP script checks that $PID_{RP}$ is the one registered in Step 3.1
             and $Enpt_{RP}$ matches the one in $Cert_{RP}$.
 Then, the IdP script replaces $Enpt_{RP}$ with $PEnpt_{U}$ in the identity-token request
      and sends this modified request to the IdP.
 \vspace{-\topsep}
-\item [4.3] The IdP checks whether the received pair of $PID_{RP}$ and $PEnpt_U$ is in the list of unexpired $PID_{RP}$ or not,
+\item[4.2] On receiving an identity-token request,
+    the IdP authenticates the user if he has not been authenticated yet.
+\vspace{-\topsep}
+\item [4.3] 
+After obtaining the user's authorization to enclose the requested attributes,
+the IdP checks whether the received pair of $PID_{RP}$ and $PEnpt_U$ is in the list of unexpired $PID_{RP}$ or not,
     and calculates $PID_U = [ID_U]{PID_{RP}}$ for the authenticated user.
 The IdP then signs an identity token $[PID_{RP}, PID_U, Iss, Validity, Attr]_{SK}$,
  where $Iss$ is the IdP's identity, $Validity$ is the validity period, and $Attr$ contains the requested attributes.
@@ -367,7 +385,7 @@ The IdP script forwards this token to the RP script,
 It also verifies $PID_{RP}$ in the token is consistent with the one negotiated in the previous step.
 Then, the RP extracts $PID_U$, calculates $Acct = [t^{-1}]{PID_U}$.
 \vspace{-\topsep}
-\item [5.3] The RP returns the result back to user, and allows the user to login as $Acct$.
+\item [5.3] The RP returns the login result, and allows the user to login as $Acct$.
 \vspace{-\topsep}
 \end{itemize}
 
@@ -527,8 +545,10 @@ The RP verifies the identity token, including the signature, validity period, an
 
 \subsection{Compatibility with OIDC}
 \label{subsec:compatible}
-We explain the compatibility with OIDC as below,
-    and this compatibility helps us to analyze, implement and deploy UPPRESSO.
+%We explain the compatibility with OIDC,
+%    and this compatibility helps us to analyze, implement and deploy UPPRESSO.
+% 这句话前面已经说过了
+
 
 Among the five steps of the SSO login flow in UPPRESSO,
     the script downloading prepares the user agent.
