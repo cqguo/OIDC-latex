@@ -101,7 +101,7 @@ On receiving an identity-token request with $ID_U$ and $PID_{RP}$,
 In the negotiation of $PID_{RP}$,
     the user sends the trapdoor $t$ to the target RP.
 So the RP also calculates $PID_{RP}$ to verify the designated RP pseudo-identity in identity tokens.
-After verifying an identity-token binding $PID_U$ and $PID_{RP}$,
+After verifying an identity token binding $PID_U$ and $PID_{RP}$,
     the RP calculates $Acct$ as below.
 %As $n$ is a prime number and $1< N_U < n$, $n$ is coprime to $N_U$. So, there always exists a $T$ that satisfies $T N_U = 1 \bmod n$.
 %\begin{equation}
@@ -265,7 +265,7 @@ It consists of five steps, namely script downloading, RP identity transformation
 In this figure,
     the operations by the IdP are linked by a vertical line,
         so are the RP's operations.
-Two vertical lines split the user's operations into two groups (i.e., two browser windows),
+Two vertical lines split the user's operations into two groups (i.e., in two browser windows),
     one of which is to communicate with the IdP,
                  and the other with the target RP.
 Each solid horizontal line means some messages between the user and the IdP (or the RP),
@@ -308,7 +308,7 @@ Then, the RP script sends $t$ to the RP.
 \vspace{-\topsep}\item[2.2] On receiving $t$,
 the RP verifies $1 < t < n$ and calculates $PID_{RP}$.
 %To acknowledge the negotiation of $PID_{RP}$,
-The RP replies with $Cert_{RP}$, which is then transmitted from the RP script to the IdP script through \verb+postMessage+.
+The RP replies with $Cert_{RP}$, which is then transmitted from the RP script to the IdP script.  % through \verb+postMessage+.
 \vspace{-\topsep}\item[2.3] The IdP script verifies $Cert_{RP}$, extracts $ID_{RP}$ and $Enpt_{RP}$ from $Cert_{RP}$ and calculates $PID_{RP}=[t]{ID_{RP}}$.
 It then creates a random endpoint $PEnpt_{U}$ for this login instance,
     to receive identity tokens from the IdP.
@@ -557,7 +557,7 @@ The user agent deals with the communications between the IdP and the RP,
 In UPPRESSO,
     when sending the identity-token request,
         the script replaces $Enpt_{RP}$ with $PEnpt_{U}$,
-    and when forwarding the identity-token,
+    and when forwarding the identity token,
             the script forwards this token to $Enpt_{RP}$ maintained by the script itself.
 
 In the step of RP identity transformation, most operations are conducted by the user agent while the RP only receives $t$ to calculate $PID_{RP}$ and sends $Cert_{RP}$.
