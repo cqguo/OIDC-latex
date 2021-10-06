@@ -8,7 +8,8 @@
 %Scalbility
 \vspace{1mm}\noindent{\textbf{Scalability.}} The adversary cannot exhaust $ID_{RP}$ and $PID_{RP}$.
 For $ID_{RP}$, it is generated only in RP's initial registration.
-For $PID_{RP}$,  in practice, we only need to ensure all $PID_{RP}$s are different among the unexpired identity token (the number denoted as $a$). We assume that IdP doesn't perform the uniqueness check, and then calculate the probability that at least two $PID_{RP}$s are equal in these $a$ ones. The probability is $1-\prod_{i=0}^{a-1}(1-i/q)$ which increases with $a$.
+For $PID_{RP}$,  in practice, we only need to ensure all $PID_{RP}$s are different among the unexpired identity token (the number denoted as $a$).
+We assume that IdP does not perform the uniqueness check, and then calculate the probability that at least two $PID_{RP}$s are equal in these $a$ ones. The probability is $1-\prod_{i=0}^{a-1}(1-i/q)$ which increases with $a$.
 For an IdP with throughput $2*10^8$ req/s, when the validity period of the identity token ($PID_{RP}$) is set as 5 minutes, $a$ is less than $2^{36}$, then the probability is less than $2^{-183}$ for 256-bit $q$ (the order of base point $G$ on \verb+P-256+).
 %Moreover, as this probability is negligible, the uniqueness check of $PID_{RP}$, i.e., the $PID_{RP}$ registration, could be removed in the SSO login process, and this optimization can be adopted when this negligible probability is acceptable by the users and RPs.
 
@@ -90,7 +91,7 @@ After some experiments while the IdP and RPs in the prototype system are unmodif
 
 \vspace{1mm}
 \noindent{\textbf{Active Identity Linkage by Malicious RPs.}}
-When a user logins multiple RPs concurrently on one device as different accounts,
+When a user logins to multiple RPs concurrently on one device as different accounts,
         malicious RPs might actively correlate the accounts by online means.
 For instance,
      when the user has logined to $RP_j$ with $Acct_j$,
