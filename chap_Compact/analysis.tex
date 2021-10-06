@@ -67,12 +67,16 @@ Moreover, the adversary cannot retrieve the $PID_{RP}$ from the honest user logi
 \vspace{1mm}
 \noindent\textbf{Formal analysis.} To provide the more convincing evidence that the UPPRESSO is secure, we formally analyze security properties of UPPRESSO based on the Dolev-Yao style web model~\cite{SPRESSO}, which has been widely used in the formal analysis of SSO protocols such as OAuth 2.0~\cite{FettKS16} and OIDC~\cite{FettKS17}.
 The Dolev-Yao model abstracts the entities in a system, such as browsers and web servers, as {\em atomic processes}, which communicate with each other through the {\em events}. It also defines {\em script processes} to model client-side script, i.e.,  JavaScript code, so a web system consists of a set of atomic and scripting processes.
-
-
 Then based on the modelling web system, we can trace the sensitive data, such as the identity token, from it being generated to being consumed, so that it can be guaranteed that the sensitive data is not stolen or tempered by an adversary. 
 For example, we can locate the generation of identity token in the UPPRESSO, and trace to the source where the $PID_U$ and other attributes contained in this token are generated and transmitted, to confirm no adversary can control them. 
 Following, the track of identity token is also monitor to guaranteed there is no adversary able to retrieve this token.
 
+In the UPPRESSO system, it contains an IdP server process, a finite set of web servers for the honest RPs, a finite set of honest browsers, and a finite set of attacker processes. Here, we consider all the RP processes and browser processes are honest, and model an RP or a browser controlled by an adversary as an atomic attacker process. 
+It also contains {\sf script\_rp}, {\sf script\_idp} and {\sf script\_attacker}, where {\sf script\_rp} and {\sf script\_idp} are honest scripts downloaded by an RP process and the IdP process, and {\sf script\_attacker} denotes a script downloaded by an attacker process that exists in all browser processes.
+Based on the well modelled system, it is formally proved that, 
+the \textbf{confidentiality}, \textbf{RP designation}, \textbf{integrity} and \textbf{user identification} requirements are satisfied by UPPRESSO system. 
+
+The details about Dolev-Yao style web model and security proof of UPPRESSO is  shown in the Appendix.
 
 
 
