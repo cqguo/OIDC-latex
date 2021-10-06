@@ -27,7 +27,7 @@ There is no event leaking the identity tokens to any malicious entity other than
 First of all, the communications among the IdP, RPs and users,
     are protected by TLS,
     and the \verb+postMessage+ HTML5 API ensures the dedicated channels between two scripts within the user agent,
-    so that adversaries cannot eavesdrop the transmission of identity tokens.
+    so that adversaries cannot eavesdrop the identity tokens.
 Meanwhile, the honest IdP sends the identity token only to the authenticated user,
     and this user forwards it to the RP through $Enpt_{RP}$.
 The binding of $Enpt_{RP}$ and $ID_{RP}$ is ensured by the RP certificate,
@@ -42,11 +42,13 @@ The RP calculates $PID_{RP}$ by itself with the trapdoor $t$ sent from the user,
     and checks $PID_{RP}$ in the identity token.
 So the target RP will accept this token.
 Meanwhile,
-        the honest IdP guarantees, within its validity period, the $PID_{RP}$ will be dynamically registered only once.% $PID_{RP}$ will be bound in some identity token.
+        the honest IdP guarantees, within its validity period, the $PID_{RP}$ will be registered only once
+        (i.e., designate only one RP).
+% $PID_{RP}$ will be bound in some identity token.
 
 \vspace{1mm}
 \noindent\textbf{Integrity.}
-The identity token binds $ID_U$ and $ID_{RP}$,
+The identity token binds $ID_U$ and $ID_{RP}$
     implicitly or explicitly, and any breaking will result in some failed check or verification.
 The integrity is ensured by the IdP's signatures:
  (\emph{a}) the identity token binding $PID_U$ and $PID_{RP}$, is signed by the IdP,
