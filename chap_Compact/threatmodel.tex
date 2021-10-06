@@ -6,19 +6,19 @@
 
 This section presents the threat model and assumptions of UPPRESSO.
 Then,
-    we design three identity-transformation functions satisfying with the requirements,
-    and the detailed protocols.
+    we design three identity-transformation functions satisfying with the privacy requirements,
+    and present the detailed protocols.
 The compatibility with OIDC is also discussed,
-    which helps the adoption and deployment of UPPRESSO.
+    which will helps the adoption and deployment of UPPRESSO.
 
 %Similar as other SSO systems (e.g., SAML and OIDC), UPPRESSO consists of an IdP and multiple RPs and users.
 %The IdP provides user authentication services for all RPs.
 %Next, we describe the threat model and some assumptions. %about these entities.
 
 \subsection{Threat Model}
-The UPPRESSO IdP is curious-but-honest,
+The IdP is curious-but-honest,
  while some users and RPs could be compromised. % or even collude with each other.
-Malicious users and RPs might behave arbitrarily or collude with each other,
+Malicious users and RPs behave arbitrarily and might collude with each other,
  attempting to break the security and privacy guarantees for benign users.
 
 %While, the IdP will follow the protocol correctly, and is only curious about the user's privacy.
@@ -36,7 +36,10 @@ So, adversaries cannot forge such tokens or certificates.
 %should not collude with malicious RPs or users,
 %For example, the IdP ensures the uniqueness of $ID_{RP}$ and $ID_{U}$ when an RP or a user registers, and calculates the pseudo-identity as the UPPRESSO protocol specifies.
 %However,
-We do not consider the collusion of the IdP and RPs.
+We do not consider the collusion of the IdP and RPs in this paper.
+    If the IdP could collude with an RP,
+        a user would finish a login instance completely with collusive entities 
+        and it is rather impossible to prevent the IdP-based login tracing in this case.
 
 %User's goal: 向IdP发送identity token，使IdP认为自己是另一个victim
 %方式：1）已经拥有有效的identity token，希望与IdP协商出相同的PID_RP；2）通过篡改或者伪造identity token来实现攻击
@@ -44,12 +47,12 @@ We do not consider the collusion of the IdP and RPs.
 \vspace{1mm}
 \noindent \textbf{Malicious Users.}
 We assume the adversary could control a set of users,
- by stealing users' credentials or registering Sybil accounts at the IdP and RPs.
+ by stealing users' credentials or registering Sybil accounts in the system.
 %These malicious users aim
 %to break the security of UPPRESSO.
 They want to impersonate a victim user at honest RPs, or allure a victim user to login to an honest RP under the adversary's account.
 %To achieve this, they could behave arbitrarily \cite{WangCW12, SomorovskyMSKJ12}.
-For example, a malicious user might
+A malicious user might
     modify, insert, drop or replay a message, or behave arbitrarily in any SSO login instances.
 
 % the forwarding messages (requests of identity token, identity token,  RP registration request and result, and etc.),
@@ -79,7 +82,7 @@ or, it might manipulate $PID_{RP}$ to affect the generation of $PID_U$,
 \noindent \textbf{Collusive Users and RPs.} %In particular,
 Malicious users and RPs might collude %with each other
         to break the security and privacy guarantees for benign users.
-For example, an adversary could first pretend to be an honest RP and allure victim users to forward an identity token to it.
+For example, an adversary could first pretend to be an honest RP and allure victim users to forward an identity token to him.
     With the valid identity token, it could impersonate the victim user and login to the honest RP.
 %For example, malicious users and RPs may manipulate $PID_U$ and $PID_{RP}$ in an identity token collusively to perform the impersonation or identity injection attacks.
 %Or,
@@ -98,7 +101,7 @@ Therefore, the privacy leakage due to user re-identification by distinctive attr
 
 TLS is adopted to secure the communications between honest entities,
  and the adopted cryptographic primitives are secure.
-The software stack deployed at honest entities is correctly implemented,
+The software stack of honest entities is correctly implemented,
      so it transmits messages to the receivers as expected.
 
 We focus on the privacy attacks introduced by the design of SSO protocols,
