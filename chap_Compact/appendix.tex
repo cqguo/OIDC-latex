@@ -351,8 +351,8 @@ An honest user must always login to the honest RP on her own identity (\textbf{t
 \label{lemma:userIdentification}
 \end{lemma}
 \begin{proof}
-We can find that, the RP accepts the user's identity at Line 83, Relation~\ref{alg2}. And the identity is generated at Line 79, based on the $PID_U$  retrieved from the token and the trapdoor $T$. 
-The $T$ is generated at Line 14, set at Line 17, and never changed, as the multiplicative inverse of $N_U$. 
+We can find that, the RP accepts the user's identity at Line 83, Relation~\ref{alg2}. And the identity is generated at Line 79, based on the $PID_U$  retrieved from the token and the trapdoor $t^{-1}$. 
+The $t^{-1}$ is generated at Line 14, set at Line 17, and never changed, as the multiplicative inverse of $N_U$. 
 According to Lemma~\ref{lemma:integrity}, only the IdP can generate an token, so that the token must be issued at Line 65, Relation~\ref{alg1}. 
 IdP generates the $PID_U$ based on the $PID_{RP}$ and user's $ID_U$. 
 According to Lemma~\ref{lemma:RPdesignation}, while the $PID_{RP}$ is accepted by an RP, the $PID_{RP}$ must be the generated between the RP and user. 
@@ -363,7 +363,7 @@ Moreover, an adversary may lead the honest user to upload the adversary's token 
 While the honest user has already negotiated the $PID_{RP}$ with the RP.
 The opener of the IdP script must be the RP script.
 As the $N_U$ generated at Line 7, Relation~\ref{alg3}, and $PID_{RP}$ generated at Line 21, Relation~\ref{alg3} and Line 13, Relation~\ref{alg2}.
-The $N_U$ is only sent to RP script at Line 8, Relation~\ref{alg3}, and RP server at Line 18, Relation~\ref{alg4}.
+The $t$ is only sent to RP script at Line 8, Relation~\ref{alg3}, and RP server at Line 18, Relation~\ref{alg4}.
 The $PID_{RP}$ is only sent to IdP server at Line 28 and 90, Relation~\ref{alg3}. Moreover, the registration result including the $PID_{RP}$ is sent to IdP script at Line  36, Relation~\ref{alg1}, RP script at Line 40, Relation~\ref{alg3}, RP server at Line 36, Relation~\ref{alg4}. An adversary can never know the $PID_{RP}$ negotiated between the honest user and RP.
 While the honest user has not negotiated the $PID_{RP}$ with the RP yet, the \verb+session+[$PID_{RP}$] at Line 69, Relation~\ref{alg2} and other similar attributes must be empty, as the $Cookie$ used at Line 58 belongs to the honest user and the negotiation between Line 10-20 does not conducted by the user. 
 Therefore, an adversary cannot lead the honest RP to accept the malicious token from the honest user.
@@ -390,7 +390,7 @@ UPPRESSO is the secure SSO system.
   \caption{\textbf{IdP\_Process\_Relation}}
   \label{alg1}
   \begin{algorithmic}[1]
-  \REQUIRE \myss{\myangle{a, f, m}, s}
+  \REQUIRE \myss{\myangle{a, b, m}, s}
   \mystate{\myss{s':=s}}
   \mystate{\myss{n, method, path, parameters, headers, body} \textbf{such that}}\\
   \ \ \myss{\myangle{\mathtt{HTTPReq},n,method,path,parameters,headers,body} \equiv m}\\
@@ -405,21 +405,21 @@ UPPRESSO is the secure SSO system.
   \mystate{\myss{password:=body[password]}}
   \myif{password \not\equiv \mathtt{SecretOfID}(username)}
   \mystate{\myss{m' :=\myangle{\mathtt{HTTPResp},n,200,\myangle{},\mathtt{LoginFailure}}}}
-  \mystop{f,a,m'}
+  \mystop{b, a,m'}
   \ENDIF
   \mystate{\myss{session[uid] := \mathtt{UIDOfUser}(username)}}
   \mystate{\myss{m' :=\myangle{\mathtt{HTTPResp},n,200,\myangle{},\mathtt{LoginSucess}}}}
-  \mystop{f,a,m'}
+  \mystop{b, a,m'}
   \myelse{path \equiv /loginInfo}
   \mystate{\myss{cookie := headers[Cookie]}}
   \mystate{\myss{session := s'.sessions[cookie]}}
   \mystate{\myss{username := session[username]}}
   \myif{username \not\equiv \mathtt{null}}
   \mystate{\myss{m' := \myangle{\mathtt{HTTPResp},n,200,\myangle{},\mathtt{Logged}}}}
-  \mystop{f,a,m'}
+  \mystop{b, a,m'}
   \ENDIF
   \mystate{\myss{m' := \myangle{\mathtt{HTTPResp},n,200,\myangle{},\mathtt{Unlogged}}}}
-  \mystop{f,a,m'}
+  \mystop{b, a,m'}
   \myelse{path \equiv /dynamicRegistration}
   \mystate{\myss{PID_{RP} := body[PID_{RP}]}}
  \mystate{\myss{Endpoint := body[Endpoint]}}
@@ -429,7 +429,7 @@ UPPRESSO is the secure SSO system.
   \mystate{\myss{Sig := \mathtt{Sig}(Content, s'.SignKey)}}
   \mystate{\myss{RegistrationResult := \myangle{Content, Sig}}}
   \mystate{\myss{m' := \myangle{\mathtt{HTTPResp}, n, 200, \myangle{}, RegistrationResult}}}
-  \mystop{f,a,m'}
+  \mystop{b, a,m'}
   \ENDIF
   \mystate{\myss{Validity := \mathtt{CurrentTime} ()+ s'.Validity}}
  \mystate{\myss{s'.RPs := s'.RPs +  ^{\myangle{}} \myangle{PID_{RP}, Endpoint, Validity}}}
@@ -437,20 +437,20 @@ UPPRESSO is the secure SSO system.
   \mystate{\myss{Sig := \mathtt{Sig}(Content, s'.SignKey)}}
   \mystate{\myss{RegistrationResult := \myangle{Content, Sig}}}
   \mystate{\myss{m' := \myangle{\mathtt{HTTPResp}, n, 200, \myangle{}, RegistrationResult}}}
-  \mystop{f,a,m'}
+  \mystop{b, a,m'}
   \myelse{path \equiv /authorize}
   \mystate{\myss{cookie := headers[Cookie]}}
   \mystate{\myss{session := s'.sessions[cookie]}}
   \mystate{\myss{username := session[username]}}
   \myif{username \equiv \mathtt{null}}
   \mystate{\myss{m' := \myangle{\mathtt{HTTPResp}, n, 200, \myangle{}, \mathtt{Fail}}}}
-  \mystop{f,a,m'}
+  \mystop{b, a,m'}
   \ENDIF
   \mystate{\myss{PID_{RP} := parameters[PID_{RP}]}}
   \mystate{\myss{Endpoint := parameters[Endpoint]}}
   \myif{PID_{RP} \notin \mathtt{ListOfPID}() \lor Endpoint \notin \mathtt{EndpointsOfRP}(PID_{RP})}
   \mystate{\myss{m' := \myangle{\mathtt{HTTPResp}, n, 200, \myangle{}, \mathtt{Fail}}}}
-  \mystop{f,a,m'}
+  \mystop{b, a,m'}
   \ENDIF
   \mystate{\myss{ID_U := session[uid]}}
   \mystate{\myss{PID_U := \mathtt{Multiply}(PID_{RP}, ID_U)}}
@@ -472,7 +472,7 @@ UPPRESSO is the secure SSO system.
   \caption{\textbf{RP\_Process\_Relation}}
   \label{alg2}
   \begin{algorithmic}[1]
-  \REQUIRE \myss{\myangle{a, f, m}, s}
+  \REQUIRE \myss{\myangle{a, b, m}, s}
   \mystate{\myss{s:=s'}}
   \mystate{\myss{n, method, path, parameters, headers, body} \textbf{such that}}\\
   \ \ \myss{\myangle{\mathtt{HTTPReq},n,method,path,parameters,headers,body} \equiv m}\\
@@ -486,12 +486,12 @@ UPPRESSO is the secure SSO system.
   \myelse{path \equiv /startNegotiation}
   \mystate{\myss{cookie := headers[Cookie]}}
   \mystate{\myss{session := s'.sessions[cookie]}}
-  \mystate{\myss{N_U := parameters[N_U]}}
-  \mystate{\myss{PID_{RP} := \mathtt{Multiply}(s'.ID_{RP}, N_U)}}
-  \mystate{\myss{T:= \mathtt{ExEU}(N_U, s'.IdP.q)}}
-  \mystate{\myss{session[N_U] := N_U}}
+  \mystate{\myss{t := parameters[t]}}
+  \mystate{\myss{PID_{RP} := \mathtt{Multiply}(s'.ID_{RP}, t)}}
+  \mystate{\myss{t^{-1}:= \mathtt{ExEU}(t, s'.IdP.q)}}
+  \mystate{\myss{session[t] := t}}
   \mystate{\myss{session[PID_{RP}] := PID_{RP}}}
-  \mystate{\myss{session[t] := T}}
+  \mystate{\myss{session[t^{-1}] := t^{-1}}}
   \mystate{\myss{session[state] := expectRegistration}}
   \mystate{\myss{m' := \myangle{\mathtt{HTTPResp}, n, 200, \myangle{}, \myangle{Cert, s'.Cert}}}}
  \mystop{f, a, m'}
@@ -515,8 +515,8 @@ UPPRESSO is the secure SSO system.
   \mystop{f, a, m'}
   \ENDIF
   \mystate{\myss{PID_{RP} := session[PID_{RP}]}}
-  \mystate{\myss{N_U := session[N_U]}}
-  \mystate{\myss{Nonce := \mathtt{Hash}( N_U)}}
+  \mystate{\myss{t := session[t]}}
+  \mystate{\myss{Nonce := \mathtt{Hash}( t)}}
   \mystate{\myss{Time := \mathtt{CurrentTime}()}}
   \myif{PID_{RP} \not\equiv Content.PID_{RP} \lor Nonce \not\equiv Content.Nonce \lor Time > Content.Validity}
   \mystate{\myss{m' := \myangle{\mathtt{HTTPResp}, n, 200, \myangle{}, \mathtt{Fail}}}}
@@ -552,8 +552,8 @@ UPPRESSO is the secure SSO system.
   \mystop{f, a, m'}
   \ENDIF
   \mystate{\myss{PID_U := Content.PID_U}}
-  \mystate{\myss{T := session[t]}}
-  \mystate{\myss{Account := \mathtt{Multiply}(PID_U, T)}}
+  \mystate{\myss{t^{-1} := session[t^{-1}]}}
+  \mystate{\myss{Account := \mathtt{Multiply}(PID_U, t^{-1})}}
   \myif{Account \in \mathtt{ListOfUser}()}
   \mystate{\myss{\mathtt{RegisterUser}(Account)}}
   \ENDIF
@@ -578,9 +578,9 @@ UPPRESSO is the secure SSO system.
   \mystate{\myss{IdPDomain := s'.IdPDomain}}
   \SWITCH{\myss{s'.q}}
     \CASE{\myss{start}}
-      \mystate{\myss{N_U := \mathtt{Random}()}}
-      \mystate{\myss{command := \myangle{\mathtt{POSTMESSAGE}, target, \myangle{\myangle{N_U, N_U}}, \mathtt{null}}}}
-      \mystate{\myss{s'.Parameters[N_U] := N_U}}
+      \mystate{\myss{t := \mathtt{Random}()}}
+      \mystate{\myss{command := \myangle{\mathtt{POSTMESSAGE}, target, \myangle{\myangle{t, t}}, \mathtt{null}}}}
+      \mystate{\myss{s'.Parameters[t] := t}}
       \mystate{\myss{s'.q := expectCert}}
     \ENDCASE
     \CASE{\myss{expectCert}}
@@ -592,12 +592,12 @@ UPPRESSO is the secure SSO system.
       \mystate{\myss{\textbf{stop}\ \myangle{}}}
       \ENDIF
        \mystate{\myss{s'.Parameters[Cert] := Cert}}
-      \mystate{\myss{N_U := s'.Parameters[N_U]}}
-      \mystate{\myss{PID_{RP} := \mathtt{Multiply}(Cert.Content.ID_{RP}, N_U)}}
+      \mystate{\myss{t := s'.Parameters[t]}}
+      \mystate{\myss{PID_{RP} := \mathtt{Multiply}(Cert.Content.ID_{RP}, t)}}
       \mystate{\myss{s'.Parameters[PID_{RP}] := PID_{RP}}}
       \mystate{\myss{Endpoint := \mathtt{RandomUrl}()}}
       \mystate{\myss{s'.Parameters[Endpoint] := Endpoint}}
-      \mystate{\myss{Nonce := \mathtt{Hash}(N_U)}}
+      \mystate{\myss{Nonce := \mathtt{Hash}(t)}}
       \mystate{\myss{Url := \myangle{\mathtt{URL}, \mathtt{S}, IdPDomain, /dynamicRegistration,\myangle{} }}}
       \mystate{\myss{s'.refXHR :=  \mathtt{Random}()}}
       \mystate{\myss{command : = \langle\mathtt{XMLHTTPREQUEST}, Url, \mathtt{POST},} \\\ \ \ \ \myss{ \myangle{\myangle{PID_{RP}, PID_{RP}}, \myangle{Nonce, Nonce}, \myangle{Endpoint, Endpoint}}, s'.refXHR\rangle}}
@@ -704,16 +704,16 @@ UPPRESSO is the secure SSO system.
     \CASE{\myss{start}}
     \mystate{\myss{Url := \myangle{\mathtt{URL}, \mathtt{S}, RPDomain, /login, \myangle{}}}}
     \mystate{\myss{command := \myangle{\mathtt{IFRAME}, Url, \_SELF}}}
-    \mystate{\myss{s'.q := expectN_U}}
+    \mystate{\myss{s'.q := expectt}}
     \ENDCASE
-    \CASE{\myss{expectN_U}}
+    \CASE{\myss{expectt}}
     \mystate{\myss{pattern := \myangle{\mathtt{POSTMESSAGE}, *, Content, *}}}
       \mystate{\myss{input := \mathtt{CHOOSEINPUT}(scriptinputs,pattern)}}
       \myif{input \not\equiv \mathtt{null}}
-      \mystate{\myss{N_U := input.Content[N_U]}}
+      \mystate{\myss{t := input.Content[t]}}
       \mystate{\myss{Url := \myangle{\mathtt{URL}, \mathtt{S}, RPDomain, /startNegotiation, \myangle{}}}}
       \mystate{\myss{s'.refXHR :=  \mathtt{Random}()}}
-      \mystate{\myss{command : = \myangle{\mathtt{XMLHTTPREQUEST}, Url, \mathtt{POST},\myangle{\myangle{N_U, N_U}}, s'.refXHR}}}
+      \mystate{\myss{command : = \myangle{\mathtt{XMLHTTPREQUEST}, Url, \mathtt{POST},\myangle{\myangle{t, t}}, s'.refXHR}}}
       \mystate{\myss{s'.q := expectCert}}
       \ENDIF
       \ENDCASE
@@ -781,7 +781,7 @@ UPPRESSO is the secure SSO system.
 In this section, we will give the privacy proof and show that UPPRESSO is secure against both IdP-based login tracing and RP-based identity linkage attacks.
 
 \noindent\textbf{IdP-based login tracing.}
-As shown in figure~\ref{fig:process}, the only information that is related to the RP's identity and is accessible to the IdP is $PID_{RP}$, which is converted from $ID_{RP}$ using a random $N_U$. Since $N_U$ is randomly chosen from $\mathbb{Z}_n$ by the user and the IdP ha no control of the process, the IdP should treat $PID_{RP}$ as being randomly chosen from $\mathbb{G}$. So, the IdP cannot recognize the RP nor derive its real identity. Therefore, IdP-based identity linkage becomes impossible in UPPRESSO.
+As shown in figure~\ref{fig:process}, the only information that is related to the RP's identity and is accessible to the IdP is $PID_{RP}$, which is converted from $ID_{RP}$ using a random $t$. Since $t$ is randomly chosen from $\mathbb{Z}_n$ by the user and the IdP ha no control of the process, the IdP should treat $PID_{RP}$ as being randomly chosen from $\mathbb{G}$. So, the IdP cannot recognize the RP nor derive its real identity. Therefore, IdP-based identity linkage becomes impossible in UPPRESSO.
 
 Next, we will prove that UPPRESSO prevents RP-based identity linkage based on the Decisional Diffie-Hellman (DDH) assumption~\cite{GoldwasserK16}. Here, we briefly introduce the DDH assumption:
 %\noindent\textbf{The DDH Assumption.}
@@ -814,13 +814,13 @@ Next, we model the guessing Game to depict the interactions between the challeng
 \vspace{-\topsep}
 \item[-] {\em Initialization:} In initialization, the challenger generates $ID_{RP}$s and $ID_U$s for multiple RPs and users using the initialization algorithm $Setup(G,n)$, where $G$ and $n$ are defined in table~\ref{tbl:notations}.
 \vspace{-\topsep}
-\item[-] {\em Random number generation:} When the challenger receives the $ID_{RP}$s from the adversary, it generates a random $N_U \in \mathbb{Z}_n$ for each $ID_{RP}$ using the algorithm $Random(n)$. %$N_U$ will be used to generate the corresponding $PID_{RP}$.
+\item[-] {\em Random number generation:} When the challenger receives the $ID_{RP}$s from the adversary, it generates a random $t \in \mathbb{Z}_n$ for each $ID_{RP}$ using the algorithm $Random(n)$. %$t$ will be used to generate the corresponding $PID_{RP}$.
 \vspace{-\topsep}
-\item[-] {\em $PID_U$ generation:} When the challenger receives an $PID_{RP}$, it first verifies if the $PID_{RP}$ is generated for $ID_{RP}$ with the corresponding $N_U$, using the algorithm $Verify(ID_{RP},PID_{RP},N_U)$. Then, it generates the $PID_U$ with the algorithm $F_{PID_U}(ID_U,PID_{RP})$ and sends it to the adversary.
+\item[-] {\em $PID_U$ generation:} When the challenger receives an $PID_{RP}$, it first verifies if the $PID_{RP}$ is generated for $ID_{RP}$ with the corresponding $t$, using the algorithm $Verify(ID_{RP},PID_{RP},t)$. Then, it generates the $PID_U$ with the algorithm $F_{PID_U}(ID_U,PID_{RP})$ and sends it to the adversary.
 %\vspace{-\topsep}
 \end{itemize}
 
-To prove the privacy of UPPRESSO against RP-based identity linkage, we define three Games, as shown in figure~\ref{fig:game}. First, based on the above description, we model the $ID_U$-guessing game following the UPPRESSO design as $\mathtt{Game 0}$ : (1) First, the adversary receives two $ID_{RP}$s (i.e., $ID_{RP1}$ and $ID_{RP2}$) and three $N_U$s (i.e., $n_1$, $n_2$, and $n_3$). It then generates three $PID_{RP}$s accordingly. From the challenger's view, three $PID_{RP}$s are related to three $N_U$s, respectively. (2) Then, the challenger generates $PID_U$s for different $PID_{RP}$s, using two $ID_U$s (i.e., $u_1$ and $u_2$). %generated in the initialization phase.
+To prove the privacy of UPPRESSO against RP-based identity linkage, we define three Games, as shown in figure~\ref{fig:game}. First, based on the above description, we model the $ID_U$-guessing game following the UPPRESSO design as $\mathtt{Game 0}$ : (1) First, the adversary receives two $ID_{RP}$s (i.e., $ID_{RP1}$ and $ID_{RP2}$) and three $t$s (i.e., $n_1$, $n_2$, and $n_3$). It then generates three $PID_{RP}$s accordingly. From the challenger's view, three $PID_{RP}$s are related to three $t$s, respectively. (2) Then, the challenger generates $PID_U$s for different $PID_{RP}$s, using two $ID_U$s (i.e., $u_1$ and $u_2$). %generated in the initialization phase.
 In particular, the challenger generates $PID_{U1}$ from $ID_{U1}$ directly, and selects a random number $b \in \{0, 1\}$ to generate $PID_{U2}=ID_{Ub} \cdot PID_{RP2}$, and $PID_{U3}=ID_{U(1-b)} \cdot PID_{RP3}$. (3) Finally, the adversary sends its guess $b'$ to the challenger. If $b'=b$, the adversary wins the game.
 
 We define the event [$b'=b$] in $\mathtt{Game 0}$ as $\Gamma$. If the adversary has no advantage in guessing $b$ correctly, which indicates the $PID_U$s are generated from the same $ID_U$, the probability $Pr[\Gamma]$ should be 1/2. Therefore, we conclude that in $\mathtt{Game 0}$, UPPRESSO is secure against RP-based identity linkage if and only if $Pr[\Gamma]=1/2$.
