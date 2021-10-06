@@ -41,20 +41,19 @@ SAML-based SSO is also analyzed \cite{ArmandoCCCT08},
 \vspace{1mm}
 \noindent\textbf{Vulnerabilities of SSO Implementations.}
 Various vulnerabilities were found in SSO implementations for web applications,
-    which could be exploited to launch impersonation and identity injection attacks
+    which could be exploited to launch  attacks of impersonation and identity injection,
      by breaking the confidentiality \cite{WangCW12,ccsSunB12,ArmandoCCCPS13,DiscoveringJCS,dimvaLiM16}, integrity \cite{WangCW12,SomorovskyMSKJ12,WangZLG16,MainkaMS16, MainkaMSW17,dimvaLiM16} or RP designation \cite{WangZLG16,MainkaMS16,MainkaMSW17,YangLCZ18,dimvaLiM16} of identity tokens.
-Wang et al. \cite{WangCW12} analyzed the SSO services of Google and Facebook %from the view of browser-relayed traffics
+Wang et al. \cite{WangCW12} analyzed the SSO services of Google and Facebook, %from the view of browser-relayed traffics
     and found logic flaws in the IdPs and RPs.  % to break the confidentiality and integrity of identity tokens.
-In fact,
-    the integrity of identity tokens was found to be vulnerable in lots of SSO systems  \cite{SomorovskyMSKJ12,WangCW12,WangZLG16,MainkaMS16, MainkaMSW17}
+The integrity of identity tokens was found vulnerable in lots of SSO systems  \cite{SomorovskyMSKJ12,WangCW12,WangZLG16,MainkaMS16, MainkaMSW17}
 due to software flaws, such as XML signature wrapping \cite{SomorovskyMSKJ12},
  incomplete verification by RPs \cite{WangCW12,WangZLG16,MainkaMSW17}, and IdP spoofing \cite{MainkaMS16,MainkaMSW17}.
-Vulnerabilities also break the RP designation of tokens,
+Vulnerabilities also break the RP designation of identity tokens,
     such as incorrect binding at the IdP \cite{YangLCZ18,WangZLG16} and insufficient verification by RPs \cite{MainkaMS16,MainkaMSW17,YangLCZ18}.
 
 Automatic tools, such as SSOScan \cite{ZhouE14}, OAuthTester \cite{YangLLZH16} and S3KVetter \cite{YangLCZ18},
  are designed to detect the violations of confidentiality, integrity, or RP designation of SSO identity tokens.
-Wang et al. \cite{ExplicatingSDK} also present a tool to detect the vulnerable applications
+Wang et al. \cite{ExplicatingSDK} present a tool to detect the vulnerable applications
     constructed on top of authentication/authorization SDKs,
      due to the implicit assumptions in these SDKs.
 Besides,
@@ -65,18 +64,18 @@ Besides,
 
 %1.	WebSSO中有browser来完成，2. Mobile SSO中，system browser和webview无法识别RP、IdP App可能被重打包。
 In mobile SSO applications,
-    the IdP App, IdP-provided SDK (e.g., an encapsulated WebView) or system browser
+    the IdP App, IdP-provided SDKs (e.g., an encapsulated WebView) or system browsers
          are responsible for redirecting identity tokens from the IdP App to RP Apps.
 However, none of them ensures that the identity tokens are sent to the designated RP only \cite{ChenPCTKT14,WangZLLYLG15},
     because a WebView or the system browser cannot authenticate the RP Apps and the IdP App may be repackaged.
-The SSO protocols needed to be modified to work for mobile Apps, but these modifications are not well understood by RP developers \cite{ChenPCTKT14,YangLS17}.
-Vulnerabilities were found in lots of Android applications,
+The SSO protocols are modified to work for mobile Apps, but these modifications are not well understood by RP developers \cite{ChenPCTKT14,YangLS17}.
+Vulnerabilities were disclosed in lots of Android applications,
     to break the confidentiality \cite{TowardsShehabM14,ChenPCTKT14,WangZLLYLG15,YangLS17,ShiWL19}, integrity \cite{ChenPCTKT14,YangLS17}, and RP designation \cite{ChenPCTKT14,ShiWL19} of SSO identity tokens.
 A software flaw was found in Google Apps \cite{ArmandoCCCPS13}, allowing a malicious RP to hijack a user's authentication attempt and inject a payload to steal the cookie (or identity token) for another RP.
 
 %\vspace{1mm} \noindent\textbf{Single Sign-Off.}
 Once a user account at the IdP is compromised,
-    the adversaries will control all his accounts at the RPs.
+    the adversaries will control all his accounts at all RPs.
 An extension to OIDC, named single sign-off \cite{GhasemisharifRC18}, is proposed and then
         the IdP helps the victim user
  to revoke all his active identity tokens and logout from these RPs.
