@@ -64,7 +64,16 @@ That is,
  $\mathcal{F}_{Acct}(PID_{U}^i, PID_{RP}^i) = \mathcal{F}_{Acct}(PID_{U}^{i'}, PID_{RP}^{i'}) = [ID_U]ID_{RP}$.
 Moreover, the adversary cannot retrieve the $PID_{RP}$ from the honest user login to an honest RP, as the user and RP would not send the $PID_{RP}$ and $t$ to any adversary party. Therefore, even the adversary lead the honest to send the adversary's token to an honest RP, the RP would not accept this token anyway.
 
-To provide the more convincing evidence that the UPPRESSO is secure, we 
+\vspace{1mm}
+\noindent\textbf{Formal analysis.} To provide the more convincing evidence that the UPPRESSO is secure, we formally analyze security properties of UPPRESSO based on the Dolev-Yao style web model~\cite{SPRESSO}, which has been widely used in the formal analysis of SSO protocols such as OAuth 2.0~\cite{FettKS16} and OIDC~\cite{FettKS17}.
+The Dolev-Yao model abstracts the entities in a system, such as browsers and web servers, as {\em atomic processes}, which communicate with each other through the {\em events}. It also defines {\em script processes} to model client-side script, i.e.,  JavaScript code, so a web system consists of a set of atomic and scripting processes.
+
+
+Then based on the modelling web system, we can trace the sensitive data, such as the identity token, from it being generated to being consumed, so that it can be guaranteed that the sensitive data is not stolen or tempered by an adversary. 
+For example, we can locate the generation of identity token in the UPPRESSO, and trace to the source where the $PID_U$ and other attributes contained in this token are generated and transmitted, to confirm no adversary can control them. 
+Following, the track of identity token is also monitor to guaranteed there is no adversary able to retrieve this token.
+
+
 
 
 
