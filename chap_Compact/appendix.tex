@@ -22,28 +22,27 @@
 
 \section{The Security Proofs of UPPRESSO}
 \label{ape:model}
-In this section,
+In this section, 
 we  formally analyze  the security properties of UPPRESSO based on the Dolev-Yao style web model~\cite{SPRESSO}, which has been widely used in the formal analysis of SSO protocols such as OAuth 2.0~\cite{FettKS16} and OIDC~\cite{FettKS17}.
 That is, at the first, we give the detailed description of how to translate a web system into the Dolev-Yao style web model.
 Following, we present the modelling UPPRESSO system, containing normal data and each entities (including browser, servers, and scripts).
 %the servers, scripts and the communications among them.
 %introduction about how to  indicate the entities (e.g., servers) and communications (e.g., HTTP request) of the web system with Dolev-Yao style web model.
-%Then, we describe the model of frequent used data format (e.g., HTTP package) and entity  (e.g., browser).
+%Then, we describe the model of frequent used data format (e.g., HTTP package) and entity  (e.g., browser). 
 %Following, we present the modelling UPPRESSO system, containing the servers, scripts and the communications among them.
 Finally, we give the security proofs of UPPRESSO, that capture the tracks of all essential data, such as identity token, from its birth to being consumed, to guarantee the integrity and confidentiality.
-The data tracing is based on the well-built model.
+The data tracing is based on the well-built model.    
 
 
 
 
 \subsection{The Modelling Web System}
 \label{subsec:webmodel}
-Based on Dolev-Yao style model, the web  infrastructure can be modelled as the form $\mathcal{WS}$=($\mathcal{W}$, $\mathcal{S}$, $\mathtt{script}$, $E^0$). The definitions of these notations is described as below.
+Based on Dolev-Yao style model, the web  infrastructure can be modelled as the form $\mathcal{WS}$=($\mathcal{W}$, $\mathcal{S}$, $E^0$). The definitions of these notations is described as below.
 \begin{itemize}
-\item $\mathcal{W}$ is the set of \textbf{atomic processes}. An atomic process represents an independent entity in the web system, such as browser and web server.
+\item $\mathcal{W}$ is the set of \textbf{atomic processes}. An atomic process represents an independent entity in the web system, such as browser and web server. 
 \item $\mathcal{S}$ is the set of \textbf{scripting processes}. That is, besides the atomic processes in the web system, there are also entities processing data and communicating with other entities, but unable to run independently without other atomic processes. These entities are denoted as scripting processes, i.e., the JavaScript code in the web system.
-\item $\mathtt{script}$ is the set of concrete script codes related to specific scripting processes in $\mathcal{S}$.
-\item $E^0$ is the set of \textbf{events} acceptable to the processes in $\mathcal{W}$. An event is the basic communication elements in the model, representing atomic process A sending a message to atomic process B.
+\item $E^0$ is the set of self-triggering \textbf{events} initially acceptable to the processes in $\mathcal{W}$. An event is the basic communication elements in the model, representing atomic process A sending a message to atomic process B. 
 \end{itemize}
 
 
@@ -58,13 +57,13 @@ Based on Dolev-Yao style model, the web  infrastructure can be modelled as the f
 \end{itemize}
 
 \vspace{1mm}
-\noindent\textbf{Term}. Term is the basic element in Dolev-Yao style model, to describe the modelled system.
+\noindent\textbf{Term}. Term is the basic element in Dolev-Yao style model, to describe the modelled system. 
 It contains constants such as ASCII strings and nonce, sequence symbols such as n-ary sequences $\langle \rangle$, $\langle . \rangle$, $\langle . ,. \rangle$, and function symbols that model cryptographic primitives such as $\mathtt{encrypt}, \mathtt{decrypt}$ and digital signatures.
 For example, an HTTP request can be modelled as a term containing a type (e.g., $\mathtt{HTTPReq}$), a nonce, a method (e.g., $\mathtt{GET}$ or $\mathtt{POST}$), a domain, a path, URL parameters, request headers and a message body, over the $\Sigma$ in the sequence symbol format. So,
 an HTTP GET request for the domain {\sf exa.com/path?para=1} with empty header and body can be described as: $m:=\langle\mathtt{HTTPReq},n,\mathtt{GET},exa.com,/path,\langle \langle para, 1\rangle \rangle ,\langle \rangle,\langle \rangle \rangle$.
 
 \vspace{1mm}
-\noindent\textbf{Operations over terms}.
+\noindent\textbf{Operations over terms}. 
 \begin{itemize}
 \item \textbf{Equational theory}. Equational theory is defined as usual in Dolev-Yao models, which uses the symbol $\equiv$ to represent the congruence relation on terms. For example, $dec(enc(m, k), k)$ $\equiv$ $m$, where $k$ is a symmetric key.
 \item \textbf{Patten Matching}.  We define the term with the variable $*$ as the pattern, such as \myss{\myangle{a, b, *}}.
@@ -78,15 +77,16 @@ The pattern matches any term which only replaces the $*$ with other terms. For i
 
 
 \vspace{1mm}
-\noindent\textbf{Relation}. The relation the modelled procedure, showing how the entity deal with the received message. For example, while the login server receive the login request from a visitor (the request is denoted as the event $e$), the input of the relation is $e$ and current state $\langle CookieList,UserList \rangle$.   The server verifies the visitor's identity with the $UserList$ and set the login result to $CookieList$ (transitioning to $CookieList'$). Thus the output is the login response $e'$ and the new state $\langle CookieList',UserList \rangle$.
+\noindent\textbf{Relation}. The relation the modelled procedure, showing how the entity deal with the received message. For example, while the login server receive the login request from a visitor (the request is denoted as the event $e$), the input of the relation is $e$ and current state $\langle CookieList,UserList \rangle$.   The server verifies the visitor's identity with the $UserList$ and set the login result to $CookieList$ (transitioning to $CookieList'$). Thus the output is the login response $e'$ and the new state $\langle CookieList',UserList \rangle$. 
 
 
 \vspace{1mm}
 \noindent\textbf{Scripting process}. A scripting process is the modelling JavaScript code, as a relation $R$, representing the server-defined functions, while the input and output are handled by the browser.
+To be noticed is that, the script process is addressed by the \verb+Origin+ property, as the the protocol, hostname and port number of a URL. That is, while a script sends the messages to another script process and set the \verb+Origin+ value as the IdP domain, only the script downloaded from IdP server can receive this message.
 
 
 \vspace{1mm}
-\noindent\textbf{Event}. The event  the formal term $\langle a, f, m \rangle$, where $a$ and $f$ represent the addresses of the sender and receiver respectively, and $m$ is the message to be transmitted.
+\noindent\textbf{Event}. The event  the formal term $\langle a, b, m \rangle$, where $a$ and $b$ represent the addresses of the sender and receiver respectively, and $m$ is the message to be transmitted.
 
 
 
@@ -94,16 +94,16 @@ The pattern matches any term which only replaces the $*$ with other terms. For i
 
 \subsection{Modelling UPPRESSO System}
 In this section, we introduce the model of honest UPPRESSO system, in the form $\mathcal{UWS}$=($\mathcal{W}$, $\mathcal{S}$, $\mathtt{script}$, $E^0$).
-$\mathcal{W}$ is the set of atomic processes, including IdP server processes, RP server processes and browsers.
-$\mathcal{S}$ is the set of scripting processes, containing of IdP scripting process and RP scripting process.
+$\mathcal{W}$ is the set of atomic processes, including IdP server processes, RP server processes and browsers. 
+$\mathcal{S}$ is the set of scripting processes, containing of IdP scripting process and RP scripting process. 
 $\mathtt{script}$ is the set of detailed script codes, so that it is described here.
 $E^0$  is the set of events acceptable to the processes in $\mathcal{W}$, which is to be illustrated in the individual processes part.
 
-An atomic process is a tuple $p=$ $(I^p, Z^p, R^p,s_0^p )$, containing the addresses, states, and relations.
+An atomic process is a tuple $p=$ $(I^p, Z^p, R^p,s_0^p )$, containing the addresses, states, and relations. 
 Here, we will focus on the state form and relation $R$. They can describe that what kind of event can be accepted by the process in each state, and the content of new output events and states.
 Similarly, the scripting process is described in the same way.
 
-To be noticed is that, we only focus on the model of servers, browsers and the plain message transmissions among them in this paper, and neglect the HTTPS requests and other necessary Internet facilities (e.g., DNS server) deployed in the UPPRESSO system.
+To be noticed is that, we only focus on the model of servers, browsers and the plain message transmissions among them in this paper, and neglect the HTTPS requests and other necessary Internet facilities (e.g., DNS server) deployed in the UPPRESSO system. 
 Because we assume that the internet architecture is well  built and HTTPS is well implemented, so that an adversary cannot conduct the attacks targeting these elements.
 
 \subsubsection{Modelling Normal Data}
@@ -148,12 +148,12 @@ XMLHTTPRequest is the HTTP message transmitted  by scripts in the browser. That 
 
 \subsubsection{Modelling IdP and RP Servers}
 \vspace{1mm}\noindent\textbf{IdP Server Process}.
-The state of IdP server process is described as a term in the form \myss{\myangle{ID, SignKey, sessions, users, RPs, Validity, Tokens}}.
+The state of IdP server process is described as a term in the form \myss{\myangle{ID, SignKey, sessions, users, RPs, Validity, Tokens}}. 
 That is,  the state of an IdP server  at the point in time can be sketched using these attributes.
 Other data stored at IdP but not used during SSO authentication are not mentioned here.
 \begin{itemize}
 \setlength\itemsep{-2pt}
-\item \myss{ID} is the identity of IdP.
+\item \myss{ID} is the identifier of IdP.
 %\item \myss{p} is the large prime mentioned before.
 \item \myss{SignKey} is the private key used by IdP to generate signatures.
 \item \myss{sessions} is the term in the form of \myss{\myangle{\myangle{Cookie, session}}}, the Cookie uniquely identifies the session and sessions store the  browser uploaded messages.
@@ -174,7 +174,7 @@ To make the description clearer, we also provide the \myss{functions} to define 
 \item \myss{\mathtt{CurrentTime()}} is the system current time.
 \end{itemize}
 
-The relation of IdP process $R^i$ is shown as Algorithm~\ref{alg1} in Appendix~\ref{ape:alg}.
+The relation of IdP process $R^i$ is shown as Relation~\ref{alg1} in Appendix~\ref{ape:alg}.
 
 
 
@@ -198,15 +198,21 @@ The new \myss{functions} are defined as follows:
   \item \myss{\mathtt{Random}()} generates a fresh random number.
   \item \myss{\mathtt{RegisterUser}(Account)} add the new user with \myss{Account} into RP's user list.
 \end{itemize}
-The relation of RP process $R^r$ is shown as Algorithm~\ref{alg2} in Appendix~\ref{ape:alg}.
+The relation of RP process $R^r$ is shown as Relation~\ref{alg2} in Appendix~\ref{ape:alg}.
 
 
 \subsubsection{Modelling Browser}
-Browser is the essential party in web system, that most of users participates through a browser.
+Browser is the essential party in web system, that most of users participates through a browser. 
 In UPPRESSO, we assume that the browsers are honest and well developed, so that, we neglect  the detailed process of browser, such as constructing and parsing the HTTP package.
 Therefore, we only need to analyze how the browsers interactive with other parties in UPPRESSO system.
-Moreover, in UPPRESSO system, the message transmitted through a browser is constructing and parsing by the script, so that we only focus on how the scripting process runs in the browser.
+Moreover, in UPPRESSO system, the message transmitted through a browser is constructing and parsing by the script, so that we only focus on how the scripting process runs in the browser. 
+
+In the browser, a window is the basic unit that shows the content to user. 
+In a window, the document (Document Object Model, DOM) represents the whole page contained in this window. 
+The script is one of node in the document.
 We introduce the windows and documents of the browser model, which provides inputs and parses the outputs of the scripting process.
+
+
 
 \vspace{1mm}
 \noindent\textbf{Window}. A window \myss{w} is a term of the form \myss{w = \myangle{nonce, documents, opener}}, representing the  the concrete browser window in the system. The \myss{nonce} is the window reference to identify each windows. The \myss{documents} is the set of documents (defined below) including the current document and cached documents (for example, the documents can be viewed via the ``forward" and ``back" buttons in the browser). The \myss{opener} represents the window in which this window is created, for instance, while a user clicks the href in document \myss{d} and it creates a new window \myss{w}, there is \myss{w.opener \equiv d.nonce}.
@@ -255,7 +261,7 @@ The new \myss{functions} are defined as follows.
   \item \myss{\mathtt{CHOOSEINPUT}(inputs,pattern)}. The first parameter is a set of messages, and the second parameter is a pattern. The result returned by the function is the message in \myss{inputs} matching the \myss{pattern}.
   \item \myss{\mathtt{RandomUrl}()} returns a newly generated host string.
 \end{itemize}
-The relation of IdP scripting process $script\_idp$ is shown in Appendix~\ref{ape:alg} Algorithm~\ref{alg3}.
+The relation of IdP scripting process $script\_idp$ is shown in Appendix~\ref{ape:alg} Relation~\ref{alg3}.
 
 
 
@@ -266,20 +272,33 @@ The state of RP scripting process \myss{scriptstate} is a term in the form \myss
 
 Here, we define the function \myss{\mathtt{SUBWINDOW}(tree, docnonce)}, which takes the \myss{tree} defined above and the current document's \myss{nonce} as the input. And it selects the \myss{nonce} of the first window opened by this document as the output. However, if there is no opened windows, it returns  null.
 
-The relation of RP scripting process $script\_rp$ is shown in Appendix~\ref{ape:alg} Algorithm~\ref{alg4}.
+The relation of RP scripting process $script\_rp$ is shown in Appendix~\ref{ape:alg} Relation~\ref{alg4}.
 
 \subsection{Proof of Security}
 
 We assume that all the network messages are transmitted using HTTPS, postMessage messages are protected by the browser, and the browsers are  honest, so web attackers can never break the security of UPPRESSO.
 
-We provide the detailed proof on the security of UPPRESSO. The security definition of UPPRESSO is that the system must ensure only the legitimate user can login an honest RP under her unique account. We consider the visits to RP's resource paths are controlled by the visitors' cookies, so that the attacker can break the security only when he owns the cookie bound to the honest user.
-However, according to the same origin policy, the cookie is never leaked to any adversary, so the UPPRESSO  system is vulnerable only when a adversary's cookie is bound with the honest user's identity.
+We provide the detailed proof on the security of UPPRESSO. The security definition of UPPRESSO is that the system must ensure only the legitimate user can login an honest RP under her unique account. We consider the visits to RP's resource paths are controlled by the visitors' cookies, so that the attacker can break the security only when he owns the cookie bound to the honest user. 
+However, according to the same origin policy, the cookie is never leaked to any adversary, so the UPPRESSO  system is vulnerable only when a adversary's cookie is bound with the honest user's identity. 
 Based on the model of RP server process model, at Line 64-83, we can find that only when the RP accept a visitor's token, it would bound this visitor with the identity derived from this token.
 Therefore, we can propose the Theorem about the secure UPPRESSO system.
-\begin{theorem}
-Let $\mathcal{UWS}$ be a UPPRESSO web system, $\mathcal{UWS}$ is secure \textbf{iff} for any honest RP $r$ $\in $ $\mathcal{W}$, it would not derive an honest user's identity from the token while the token belongs to an adversary.
-\end{theorem}
-That is, the requirements of secure UPPRESSO system can be described as following lemmas.
+\begin{definition}
+%Let $\mathcal{UWS}$ be a UPPRESSO web system, $\mathcal{UWS}$ is secure \textbf{iff} for any honest RP $r$ $\in $ $\mathcal{W}$, it would not derive an honest user's identity from the token while the token belongs to an adversary.
+An SSO system is secure \textbf{iff} for any honest RP, it would not derive an honest user's identity from the token while the token belongs to an adversary.
+\end{definition}
+
+That is, the requirements of secure SSO system can be described as follows.
+\begin{itemize}
+\item An adversary cannot achieve an honest user's token issued for an honest RP (\textbf{the confidentiality}).
+\item An honest RP would not accept the token issued for another RP (\textbf(the RP designation)).
+\item Attacker cannot forge or modify the IdP-issued proofs (\textbf{the integrity}).
+\item An honest user must always login to the honest RP on her own identity (\textbf{the user identification}).
+\end{itemize}
+
+Here, we are going to prove that, in the UPRESSO system, the following lemmas are always workable.
+
+
+
 \begin{lemma}
 An adversary cannot achieve an honest user's token issued for an honest RP (\textbf{the confidentiality}).
 \label{lemma:confidentiality}
@@ -288,10 +307,10 @@ An adversary cannot achieve an honest user's token issued for an honest RP (\tex
 Here we only need to prove that attackers cannot receive \myss{Token} from other honest processes.
 \begin{itemize}
 \setlength\itemsep{-2pt}
-\item Attacker cannot obtain the \myss{Token} from RP server.  We check all the messages sent by the RP server at Line 4, 7, 19, 25, 31, 36, 45, 55, 61, 66, 74, 84 in Algorithm~\ref{alg2}. It is easy to prove that the RP server does not send any \myss{Token} to other processes.
-\item Attacker cannot obtain the \myss{Token} from RP script. The  messages sent by RP script can be classified into two classes. 1) The messages at Line 18, 36, 56 in Algorithm~\ref{alg4}  are sent to the RPDomain which is set at Line 4, so that attackers cannot receive these messages. 2) The messages at Line 26,  46 only carry the contents received from RP server, and we have proved that RP server does not send any \myss{Token}. Therefore, attackers cannot receive the \myss{Token} from RP script.
-\item Attacker cannot obtain the \myss{Token} from IdP server.  Considering the messages at Line 4, 12, 16, 23, 26, 36, 44, 51, 67 in Algorithm~\ref{alg1}, we find that only the message at Line 67 carries the \myss{Token}. This \myss{Token} is generated at Line 65, following the trace where the \myss{Content} at Line 63, the \myss{PID_U} at Line 61, the \myss{ID_U} at Line 60, the \myss{session} at Line 48, and finally the \myss{cookie} at Line 47. That is, the receiver of \myss{Token}  must be the owner of the \myss{cookie} in which session that saves the parameter \myss{ID_U} . The \myss{ID_U} is set at Line 15 after verifying the password and never modified. As we assume that passwords cannot be known to attackers,  attackers cannot obtain the \myss{Token} from IdP server.
-\item Attacker cannot obtain the \myss{Token} from IdP script. As the proof provided above, only IdP sends the \myss{Token} with the message at Line 67 in Algorithm~\ref{alg1}, the IdP script can only receive the \myss{Token} at  Line 99 in Algorithm~\ref{alg3}. Here we are going to prove that the token issued for user $u$'s login to RP $r$ (denoted as \myss{t(u,r)}) can only be  sent to the corresponding RP server through IdP script. The receiver of \myss{t(u,r)} is restricted by the \myss{RPOrigin} at Line 100, which is set at Line 55. The host in the \myss{RPOrigin} is verified using the one included in \myss{Cert} at Line 51. If the \myss{Cert} belong to \myss{r}, the attacker cannot obtain the \myss{t(u,r)}. Now we give the proof that the \myss{Cert} belongs to \myss{r}. Firstly we define the negotiated \myss{PID_{RP}} in \myss{t(u,r)} as \myss{p}. That is the \myss{PID_{RP}} at Line 69 in Algorithm~\ref{alg2}  must equal to \myss{p} and the \myss{PID_{RP}} is verified at Line 44 with the \myss{RegistrationToken}. This verification cannot be bypassed due to the state check at Line 60. At the same validity period, the IdP script needs to send the registration request with same \myss{p}  and receive the successful registration result. As the IdP checks the uniqueness of \myss{PID_{RP}} at  Line 32 in Algorithm~\ref{alg1}. The \myss{r} and IdP script must share the same \myss{RegistrationToken}. As the \myss{RegistrationToken} contains the \myss{\mathtt{Hash}(N_U)}, the IdP script and \myss{r} must share the same \myss{ID_{RP}}. Therefore, the  \myss{Cert} saved as the IdP scriptstate parameter must belong to \myss{r}.
+\item Attacker cannot obtain the \myss{Token} from RP server.  We check all the messages sent by the RP server at Line 4, 7, 19, 25, 31, 36, 45, 55, 61, 66, 74, 84 in Relation~\ref{alg2}. It is easy to prove that the RP server does not send any \myss{Token} to other processes.
+\item Attacker cannot obtain the \myss{Token} from RP script. The  messages sent by RP script can be classified into two classes. 1) The messages at Line 18, 36, 56 in Relation~\ref{alg4}  are sent to the RPDomain which is set at Line 4, so that attackers cannot receive these messages. 2) The messages at Line 26,  46 only carry the contents received from RP server, and we have proved that RP server does not send any \myss{Token}. Therefore, attackers cannot receive the \myss{Token} from RP script.
+\item Attacker cannot obtain the \myss{Token} from IdP server.  Considering the messages at Line 4, 12, 16, 23, 26, 36, 44, 51, 67 in Relation~\ref{alg1}, we find that only the message at Line 67 carries the \myss{Token}. This \myss{Token} is generated at Line 65, following the trace where the \myss{Content} at Line 63, the \myss{PID_U} at Line 61, the \myss{ID_U} at Line 60, the \myss{session} at Line 48, and finally the \myss{cookie} at Line 47. That is, the receiver of \myss{Token}  must be the owner of the \myss{cookie} in which session that saves the parameter \myss{ID_U} . The \myss{ID_U} is set at Line 15 after verifying the password and never modified. As we assume that passwords cannot be known to attackers,  attackers cannot obtain the \myss{Token} from IdP server.
+\item Attacker cannot obtain the \myss{Token} from IdP script. As the proof provided above, only IdP sends the \myss{Token} with the message at Line 67 in Relation~\ref{alg1}, the IdP script can only receive the \myss{Token} at  Line 99 in Relation~\ref{alg3}. Here we are going to prove that the token issued for user $u$'s login to RP $r$ (denoted as \myss{t(u,r)}) can only be  sent to the corresponding RP server through IdP script. The receiver of \myss{t(u,r)} is restricted by the \myss{RPOrigin} at Line 100, which is set at Line 55. The host in the \myss{RPOrigin} is verified using the one included in \myss{Cert} at Line 51. If the \myss{Cert} belong to \myss{r}, the attacker cannot obtain the \myss{t(u,r)}. Now we give the proof that the \myss{Cert} belongs to \myss{r}. Firstly we define the negotiated \myss{PID_{RP}} in \myss{t(u,r)} as \myss{p}. That is the \myss{PID_{RP}} at Line 69 in Relation~\ref{alg2}  must equal to \myss{p} and the \myss{PID_{RP}} is verified at Line 44 with the \myss{RegistrationToken}. This verification cannot be bypassed due to the state check at Line 60. At the same validity period, the IdP script needs to send the registration request with same \myss{p}  and receive the successful registration result. As the IdP checks the uniqueness of \myss{PID_{RP}} at  Line 32 in Relation~\ref{alg1}. The \myss{r} and IdP script must share the same \myss{RegistrationToken}. As the \myss{RegistrationToken} contains the \myss{\mathtt{Hash}(N_U)}, the IdP script and \myss{r} must share the same \myss{ID_{RP}}. Therefore, the  \myss{Cert} saved as the IdP scriptstate parameter must belong to \myss{r}.
 \end{itemize}
 Therefore, attackers cannot  learn users' valid identity proofs.
 \end{proof}
@@ -302,8 +321,8 @@ An honest RP would not accept the token issued for another RP (\textbf(the RP de
 \label{lemma:RPdesignation}
 \end{lemma}
 \begin{proof}
-We can find that an RP server finally accept the $PID_U$ in an token at Line 77 in Algorithm~\ref{alg2}, after the verification at Line 73. The $PID_{RP}$ retrieved at Line 69, must be verified at Line 44.
-The content verified at Line 44 is received from IdP server, generated at Line 41~\ref{alg1} and protected by the signature generated at Line 42.
+We can find that an RP server finally accept the $PID_U$ in an token at Line 77 in Relation~\ref{alg2}, after the verification at Line 73. The $PID_{RP}$ retrieved at Line 69, must be verified at Line 44. 
+The content verified at Line 44 is received from IdP server, generated at Line 41~\ref{alg1} and protected by the signature generated at Line 42. 
 According to the verification at 32, the content containing $PID_{RP}$ is unique during the valid time.
 Moreover, according to Line 42, 44 (the $N_U$ used at Line 42 is set  at  Line 15, used for generating $PID_{RP}$ at Line 13), the $PID_{RP}$ must be resigned for this RP, as no other RP cannot generate the same $PID_{RP}$ with this $N_U$.
 As it has been proved at Lemma~\ref{lemma:confidentiality}, an malicious RP cannot receive the valid token issued for another RP, therefore, the adversary would not receive the token including an honest RP's $PID_{RP}$ from honest user.
@@ -318,15 +337,44 @@ Attacker cannot forge or modify the IdP-issued proofs (\textbf{the integrity}).
 The IdP-issued proofs include the \myss{Cert} used in \myss{script\_idp}, the \myss{RegistrationResult} and \myss{Token} used in \myss{P^r} . We can easily find that the IdP does not send the private key to any processes so that the attackers cannot obtain the private key. Then we only need to prove that all the proofs are well verified.
 \begin{itemize}
 \setlength\itemsep{-2pt}
-\item \myss{Cert} is used at Line 21, 52 in Algorithm~\ref{alg3}. At Line 21, the \myss{Cert} has already been verified at Line 16. At Line 52, the \myss{Cert} is picked from the state parameters, and the cert parameter is set at Line 19.  At Line 19, the \myss{Cert} has already been verified at Line 16.
-At Line 16 the \myss{Cert} is verified with the public key in the scriptstate, where the key is considered initially honest and the key is not modified at Algorithm~\ref{alg3}. Therefore, \myss{Cert} cannot be forged or modified.
-\item \myss{RegistrationResult} is used in Algorithm~\ref{alg2} from Line 35 to 55, which is verified at Line 30. The public key is initially set in the RP and never modified. Therefore, \myss{RegistrationResult} cannot be forged or modified.
-\item \myss{Token} is used in Algorithm~\ref{alg2} from Line 69 to 84 after Line 65 where it is verified.  As proved before, the public key is honestly set and never modified. Therefore, \myss{Token} cannot be forged or modified.
+\item \myss{Cert} is used at Line 21, 52 in Relation~\ref{alg3}. At Line 21, the \myss{Cert} has already been verified at Line 16. At Line 52, the \myss{Cert} is picked from the state parameters, and the cert parameter is set at Line 19.  At Line 19, the \myss{Cert} has already been verified at Line 16.
+At Line 16 the \myss{Cert} is verified with the public key in the scriptstate, where the key is considered initially honest and the key is not modified at Relation~\ref{alg3}. Therefore, \myss{Cert} cannot be forged or modified.
+\item \myss{RegistrationResult} is used in Relation~\ref{alg2} from Line 35 to 55, which is verified at Line 30. The public key is initially set in the RP and never modified. Therefore, \myss{RegistrationResult} cannot be forged or modified.
+\item \myss{Token} is used in Relation~\ref{alg2} from Line 69 to 84 after Line 65 where it is verified.  As proved before, the public key is honestly set and never modified. Therefore, \myss{Token} cannot be forged or modified.
 \end{itemize}
 Therefore, this lemma is proved.
 \end{proof}
 
-These lemmas prove that the UPPRESSO system satisfies the requirements of the secure system.
+
+\begin{lemma}
+An honest user must always login to the honest RP on her own identity (\textbf{the user identification}).
+\label{lemma:userIdentification}
+\end{lemma}
+\begin{proof}
+We can find that, the RP accepts the user's identity at Line 83, Relation~\ref{alg2}. And the identity is generated at Line 79, based on the $PID_U$  retrieved from the token and the trapdoor $t^{-1}$. 
+The $t^{-1}$ is generated at Line 14, set at Line 17, and never changed, as the multiplicative inverse of $N_U$. 
+According to Lemma~\ref{lemma:integrity}, only the IdP can generate an token, so that the token must be issued at Line 65, Relation~\ref{alg1}. 
+IdP generates the $PID_U$ based on the $PID_{RP}$ and user's $ID_U$. 
+According to Lemma~\ref{lemma:RPdesignation}, while the $PID_{RP}$ is accepted by an RP, the $PID_{RP}$ must be the generated between the RP and user. 
+According to Lemma~\ref{lemma:confidentiality}, the $ID_U$ must belongs to the honest user. 
+Therefore, the user's identity must equal with the constant $ [ID_U]ID_{RP}$.
+
+Moreover, an adversary may lead the honest user to upload the adversary's token to an RP. 
+While the honest user has already negotiated the $PID_{RP}$ with the RP.
+The opener of the IdP script must be the RP script.
+As the $N_U$ generated at Line 7, Relation~\ref{alg3}, and $PID_{RP}$ generated at Line 21, Relation~\ref{alg3} and Line 13, Relation~\ref{alg2}.
+The $t$ is only sent to RP script at Line 8, Relation~\ref{alg3}, and RP server at Line 18, Relation~\ref{alg4}.
+The $PID_{RP}$ is only sent to IdP server at Line 28 and 90, Relation~\ref{alg3}. Moreover, the registration result including the $PID_{RP}$ is sent to IdP script at Line  36, Relation~\ref{alg1}, RP script at Line 40, Relation~\ref{alg3}, RP server at Line 36, Relation~\ref{alg4}. An adversary can never know the $PID_{RP}$ negotiated between the honest user and RP.
+While the honest user has not negotiated the $PID_{RP}$ with the RP yet, the \verb+session+[$PID_{RP}$] at Line 69, Relation~\ref{alg2} and other similar attributes must be empty, as the $Cookie$ used at Line 58 belongs to the honest user and the negotiation between Line 10-20 does not conducted by the user. 
+Therefore, an adversary cannot lead the honest RP to accept the malicious token from the honest user.
+\end{proof}
+
+In conclusion, four lemmas prove that the UPPRESSO system satisfies the requirements of the secure SSO system. 
+Therefore, the following theorem is workable.
+\begin{theorem}
+UPPRESSO is the secure SSO system. 
+\end{theorem}
+
 
 
 
@@ -334,15 +382,15 @@ These lemmas prove that the UPPRESSO system satisfies the requirements of the se
 
 \onecolumn
 
-\section{Algorithm}
+\section{Relations}
 \label{ape:alg}
 
 \subsection{IdP process}
 \begin{breakablealgorithm}
-  \caption{$R^i$}
+  \caption{\textbf{IdP\_Process\_Relation}}
   \label{alg1}
   \begin{algorithmic}[1]
-  \REQUIRE \myss{\myangle{a, f, m}, s}
+  \REQUIRE \myss{\myangle{a, b, m}, s}
   \mystate{\myss{s':=s}}
   \mystate{\myss{n, method, path, parameters, headers, body} \textbf{such that}}\\
   \ \ \myss{\myangle{\mathtt{HTTPReq},n,method,path,parameters,headers,body} \equiv m}\\
@@ -357,21 +405,21 @@ These lemmas prove that the UPPRESSO system satisfies the requirements of the se
   \mystate{\myss{password:=body[password]}}
   \myif{password \not\equiv \mathtt{SecretOfID}(username)}
   \mystate{\myss{m' :=\myangle{\mathtt{HTTPResp},n,200,\myangle{},\mathtt{LoginFailure}}}}
-  \mystop{f,a,m'}
+  \mystop{b, a,m'}
   \ENDIF
   \mystate{\myss{session[uid] := \mathtt{UIDOfUser}(username)}}
   \mystate{\myss{m' :=\myangle{\mathtt{HTTPResp},n,200,\myangle{},\mathtt{LoginSucess}}}}
-  \mystop{f,a,m'}
+  \mystop{b, a,m'}
   \myelse{path \equiv /loginInfo}
   \mystate{\myss{cookie := headers[Cookie]}}
   \mystate{\myss{session := s'.sessions[cookie]}}
   \mystate{\myss{username := session[username]}}
   \myif{username \not\equiv \mathtt{null}}
   \mystate{\myss{m' := \myangle{\mathtt{HTTPResp},n,200,\myangle{},\mathtt{Logged}}}}
-  \mystop{f,a,m'}
+  \mystop{b, a,m'}
   \ENDIF
   \mystate{\myss{m' := \myangle{\mathtt{HTTPResp},n,200,\myangle{},\mathtt{Unlogged}}}}
-  \mystop{f,a,m'}
+  \mystop{b, a,m'}
   \myelse{path \equiv /dynamicRegistration}
   \mystate{\myss{PID_{RP} := body[PID_{RP}]}}
  \mystate{\myss{Endpoint := body[Endpoint]}}
@@ -381,7 +429,7 @@ These lemmas prove that the UPPRESSO system satisfies the requirements of the se
   \mystate{\myss{Sig := \mathtt{Sig}(Content, s'.SignKey)}}
   \mystate{\myss{RegistrationResult := \myangle{Content, Sig}}}
   \mystate{\myss{m' := \myangle{\mathtt{HTTPResp}, n, 200, \myangle{}, RegistrationResult}}}
-  \mystop{f,a,m'}
+  \mystop{b, a,m'}
   \ENDIF
   \mystate{\myss{Validity := \mathtt{CurrentTime} ()+ s'.Validity}}
  \mystate{\myss{s'.RPs := s'.RPs +  ^{\myangle{}} \myangle{PID_{RP}, Endpoint, Validity}}}
@@ -389,20 +437,20 @@ These lemmas prove that the UPPRESSO system satisfies the requirements of the se
   \mystate{\myss{Sig := \mathtt{Sig}(Content, s'.SignKey)}}
   \mystate{\myss{RegistrationResult := \myangle{Content, Sig}}}
   \mystate{\myss{m' := \myangle{\mathtt{HTTPResp}, n, 200, \myangle{}, RegistrationResult}}}
-  \mystop{f,a,m'}
+  \mystop{b, a,m'}
   \myelse{path \equiv /authorize}
   \mystate{\myss{cookie := headers[Cookie]}}
   \mystate{\myss{session := s'.sessions[cookie]}}
   \mystate{\myss{username := session[username]}}
   \myif{username \equiv \mathtt{null}}
   \mystate{\myss{m' := \myangle{\mathtt{HTTPResp}, n, 200, \myangle{}, \mathtt{Fail}}}}
-  \mystop{f,a,m'}
+  \mystop{b, a,m'}
   \ENDIF
   \mystate{\myss{PID_{RP} := parameters[PID_{RP}]}}
   \mystate{\myss{Endpoint := parameters[Endpoint]}}
   \myif{PID_{RP} \notin \mathtt{ListOfPID}() \lor Endpoint \notin \mathtt{EndpointsOfRP}(PID_{RP})}
   \mystate{\myss{m' := \myangle{\mathtt{HTTPResp}, n, 200, \myangle{}, \mathtt{Fail}}}}
-  \mystop{f,a,m'}
+  \mystop{b, a,m'}
   \ENDIF
   \mystate{\myss{ID_U := session[uid]}}
   \mystate{\myss{PID_U := \mathtt{Multiply}(PID_{RP}, ID_U)}}
@@ -421,10 +469,10 @@ These lemmas prove that the UPPRESSO system satisfies the requirements of the se
 
 \subsection{RP process}
 \begin{breakablealgorithm}
-  \caption{$R^r$}
+  \caption{\textbf{RP\_Process\_Relation}}
   \label{alg2}
   \begin{algorithmic}[1]
-  \REQUIRE \myss{\myangle{a, f, m}, s}
+  \REQUIRE \myss{\myangle{a, b, m}, s}
   \mystate{\myss{s:=s'}}
   \mystate{\myss{n, method, path, parameters, headers, body} \textbf{such that}}\\
   \ \ \myss{\myangle{\mathtt{HTTPReq},n,method,path,parameters,headers,body} \equiv m}\\
@@ -438,12 +486,12 @@ These lemmas prove that the UPPRESSO system satisfies the requirements of the se
   \myelse{path \equiv /startNegotiation}
   \mystate{\myss{cookie := headers[Cookie]}}
   \mystate{\myss{session := s'.sessions[cookie]}}
-  \mystate{\myss{N_U := parameters[N_U]}}
-  \mystate{\myss{PID_{RP} := \mathtt{Multiply}(s'.ID_{RP}, N_U)}}
-  \mystate{\myss{T:= \mathtt{ExEU}(N_U, s'.IdP.q)}}
-  \mystate{\myss{session[N_U] := N_U}}
+  \mystate{\myss{t := parameters[t]}}
+  \mystate{\myss{PID_{RP} := \mathtt{Multiply}(s'.ID_{RP}, t)}}
+  \mystate{\myss{t^{-1}:= \mathtt{ExEU}(t, s'.IdP.q)}}
+  \mystate{\myss{session[t] := t}}
   \mystate{\myss{session[PID_{RP}] := PID_{RP}}}
-  \mystate{\myss{session[t] := T}}
+  \mystate{\myss{session[t^{-1}] := t^{-1}}}
   \mystate{\myss{session[state] := expectRegistration}}
   \mystate{\myss{m' := \myangle{\mathtt{HTTPResp}, n, 200, \myangle{}, \myangle{Cert, s'.Cert}}}}
  \mystop{f, a, m'}
@@ -467,8 +515,8 @@ These lemmas prove that the UPPRESSO system satisfies the requirements of the se
   \mystop{f, a, m'}
   \ENDIF
   \mystate{\myss{PID_{RP} := session[PID_{RP}]}}
-  \mystate{\myss{N_U := session[N_U]}}
-  \mystate{\myss{Nonce := \mathtt{Hash}( N_U)}}
+  \mystate{\myss{t := session[t]}}
+  \mystate{\myss{Nonce := \mathtt{Hash}( t)}}
   \mystate{\myss{Time := \mathtt{CurrentTime}()}}
   \myif{PID_{RP} \not\equiv Content.PID_{RP} \lor Nonce \not\equiv Content.Nonce \lor Time > Content.Validity}
   \mystate{\myss{m' := \myangle{\mathtt{HTTPResp}, n, 200, \myangle{}, \mathtt{Fail}}}}
@@ -504,8 +552,8 @@ These lemmas prove that the UPPRESSO system satisfies the requirements of the se
   \mystop{f, a, m'}
   \ENDIF
   \mystate{\myss{PID_U := Content.PID_U}}
-  \mystate{\myss{T := session[t]}}
-  \mystate{\myss{Account := \mathtt{Multiply}(PID_U, T)}}
+  \mystate{\myss{t^{-1} := session[t^{-1}]}}
+  \mystate{\myss{Account := \mathtt{Multiply}(PID_U, t^{-1})}}
   \myif{Account \in \mathtt{ListOfUser}()}
   \mystate{\myss{\mathtt{RegisterUser}(Account)}}
   \ENDIF
@@ -520,7 +568,7 @@ These lemmas prove that the UPPRESSO system satisfies the requirements of the se
 
 \subsection{IdP scripting process}
 \begin{breakablealgorithm}
-  \caption{$script\_idp$}
+  \caption{\textbf{IdP\_Script\_Relation}}
   \label{alg3}
   \begin{algorithmic}[1]
   \REQUIRE \myss{\myangle{tree, docnonce, scriptstate, scriptinputs, cookies, localStorage, sessionStorage, ids, secret}}
@@ -530,9 +578,9 @@ These lemmas prove that the UPPRESSO system satisfies the requirements of the se
   \mystate{\myss{IdPDomain := s'.IdPDomain}}
   \SWITCH{\myss{s'.q}}
     \CASE{\myss{start}}
-      \mystate{\myss{N_U := \mathtt{Random}()}}
-      \mystate{\myss{command := \myangle{\mathtt{POSTMESSAGE}, target, \myangle{\myangle{N_U, N_U}}, \mathtt{null}}}}
-      \mystate{\myss{s'.Parameters[N_U] := N_U}}
+      \mystate{\myss{t := \mathtt{Random}()}}
+      \mystate{\myss{command := \myangle{\mathtt{POSTMESSAGE}, target, \myangle{\myangle{t, t}}, \mathtt{null}}}}
+      \mystate{\myss{s'.Parameters[t] := t}}
       \mystate{\myss{s'.q := expectCert}}
     \ENDCASE
     \CASE{\myss{expectCert}}
@@ -544,12 +592,12 @@ These lemmas prove that the UPPRESSO system satisfies the requirements of the se
       \mystate{\myss{\textbf{stop}\ \myangle{}}}
       \ENDIF
        \mystate{\myss{s'.Parameters[Cert] := Cert}}
-      \mystate{\myss{N_U := s'.Parameters[N_U]}}
-      \mystate{\myss{PID_{RP} := \mathtt{Multiply}(Cert.Content.ID_{RP}, N_U)}}
+      \mystate{\myss{t := s'.Parameters[t]}}
+      \mystate{\myss{PID_{RP} := \mathtt{Multiply}(Cert.Content.ID_{RP}, t)}}
       \mystate{\myss{s'.Parameters[PID_{RP}] := PID_{RP}}}
       \mystate{\myss{Endpoint := \mathtt{RandomUrl}()}}
       \mystate{\myss{s'.Parameters[Endpoint] := Endpoint}}
-      \mystate{\myss{Nonce := \mathtt{Hash}(N_U)}}
+      \mystate{\myss{Nonce := \mathtt{Hash}(t)}}
       \mystate{\myss{Url := \myangle{\mathtt{URL}, \mathtt{S}, IdPDomain, /dynamicRegistration,\myangle{} }}}
       \mystate{\myss{s'.refXHR :=  \mathtt{Random}()}}
       \mystate{\myss{command : = \langle\mathtt{XMLHTTPREQUEST}, Url, \mathtt{POST},} \\\ \ \ \ \myss{ \myangle{\myangle{PID_{RP}, PID_{RP}}, \myangle{Nonce, Nonce}, \myangle{Endpoint, Endpoint}}, s'.refXHR\rangle}}
@@ -641,9 +689,9 @@ These lemmas prove that the UPPRESSO system satisfies the requirements of the se
 \end{breakablealgorithm}
 
 
-\subsection{RP scripting process}
+\subsection{RP script process}
 \begin{breakablealgorithm}
-  \caption{$script\_rp$}
+  \caption{\textbf{RP\_Script\_Relation}}
   \label{alg4}
   \begin{algorithmic}[1]
 \REQUIRE \myss{\myangle{tree, docnonce, scriptstate, scriptinputs, cookies, localStorage, sessionStorage, ids, secret}}
@@ -656,16 +704,16 @@ These lemmas prove that the UPPRESSO system satisfies the requirements of the se
     \CASE{\myss{start}}
     \mystate{\myss{Url := \myangle{\mathtt{URL}, \mathtt{S}, RPDomain, /login, \myangle{}}}}
     \mystate{\myss{command := \myangle{\mathtt{IFRAME}, Url, \_SELF}}}
-    \mystate{\myss{s'.q := expectN_U}}
+    \mystate{\myss{s'.q := expectt}}
     \ENDCASE
-    \CASE{\myss{expectN_U}}
+    \CASE{\myss{expectt}}
     \mystate{\myss{pattern := \myangle{\mathtt{POSTMESSAGE}, *, Content, *}}}
       \mystate{\myss{input := \mathtt{CHOOSEINPUT}(scriptinputs,pattern)}}
       \myif{input \not\equiv \mathtt{null}}
-      \mystate{\myss{N_U := input.Content[N_U]}}
+      \mystate{\myss{t := input.Content[t]}}
       \mystate{\myss{Url := \myangle{\mathtt{URL}, \mathtt{S}, RPDomain, /startNegotiation, \myangle{}}}}
       \mystate{\myss{s'.refXHR :=  \mathtt{Random}()}}
-      \mystate{\myss{command : = \myangle{\mathtt{XMLHTTPREQUEST}, Url, \mathtt{POST},\myangle{\myangle{N_U, N_U}}, s'.refXHR}}}
+      \mystate{\myss{command : = \myangle{\mathtt{XMLHTTPREQUEST}, Url, \mathtt{POST},\myangle{\myangle{t, t}}, s'.refXHR}}}
       \mystate{\myss{s'.q := expectCert}}
       \ENDIF
       \ENDCASE
@@ -733,7 +781,7 @@ These lemmas prove that the UPPRESSO system satisfies the requirements of the se
 In this section, we will give the privacy proof and show that UPPRESSO is secure against both IdP-based login tracing and RP-based identity linkage attacks.
 
 \noindent\textbf{IdP-based login tracing.}
-As shown in figure~\ref{fig:process}, the only information that is related to the RP's identity and is accessible to the IdP is $PID_{RP}$, which is converted from $ID_{RP}$ using a random $N_U$. Since $N_U$ is randomly chosen from $\mathbb{Z}_n$ by the user and the IdP ha no control of the process, the IdP should treat $PID_{RP}$ as being randomly chosen from $\mathbb{G}$. So, the IdP cannot recognize the RP nor derive its real identity. Therefore, IdP-based identity linkage becomes impossible in UPPRESSO.
+As shown in figure~\ref{fig:process}, the only information that is related to the RP's identity and is accessible to the IdP is $PID_{RP}$, which is converted from $ID_{RP}$ using a random $t$. Since $t$ is randomly chosen from $\mathbb{Z}_n$ by the user and the IdP ha no control of the process, the IdP should treat $PID_{RP}$ as being randomly chosen from $\mathbb{G}$. So, the IdP cannot recognize the RP nor derive its real identity. Therefore, IdP-based identity linkage becomes impossible in UPPRESSO.
 
 Next, we will prove that UPPRESSO prevents RP-based identity linkage based on the Decisional Diffie-Hellman (DDH) assumption~\cite{GoldwasserK16}. Here, we briefly introduce the DDH assumption:
 %\noindent\textbf{The DDH Assumption.}
@@ -766,13 +814,13 @@ Next, we model the guessing Game to depict the interactions between the challeng
 \vspace{-\topsep}
 \item[-] {\em Initialization:} In initialization, the challenger generates $ID_{RP}$s and $ID_U$s for multiple RPs and users using the initialization algorithm $Setup(G,n)$, where $G$ and $n$ are defined in table~\ref{tbl:notations}.
 \vspace{-\topsep}
-\item[-] {\em Random number generation:} When the challenger receives the $ID_{RP}$s from the adversary, it generates a random $N_U \in \mathbb{Z}_n$ for each $ID_{RP}$ using the algorithm $Random(n)$. %$N_U$ will be used to generate the corresponding $PID_{RP}$.
+\item[-] {\em Random number generation:} When the challenger receives the $ID_{RP}$s from the adversary, it generates a random $t \in \mathbb{Z}_n$ for each $ID_{RP}$ using the algorithm $Random(n)$. %$t$ will be used to generate the corresponding $PID_{RP}$.
 \vspace{-\topsep}
-\item[-] {\em $PID_U$ generation:} When the challenger receives an $PID_{RP}$, it first verifies if the $PID_{RP}$ is generated for $ID_{RP}$ with the corresponding $N_U$, using the algorithm $Verify(ID_{RP},PID_{RP},N_U)$. Then, it generates the $PID_U$ with the algorithm $F_{PID_U}(ID_U,PID_{RP})$ and sends it to the adversary.
+\item[-] {\em $PID_U$ generation:} When the challenger receives an $PID_{RP}$, it first verifies if the $PID_{RP}$ is generated for $ID_{RP}$ with the corresponding $t$, using the algorithm $Verify(ID_{RP},PID_{RP},t)$. Then, it generates the $PID_U$ with the algorithm $F_{PID_U}(ID_U,PID_{RP})$ and sends it to the adversary.
 %\vspace{-\topsep}
 \end{itemize}
 
-To prove the privacy of UPPRESSO against RP-based identity linkage, we define three Games, as shown in figure~\ref{fig:game}. First, based on the above description, we model the $ID_U$-guessing game following the UPPRESSO design as $\mathtt{Game 0}$ : (1) First, the adversary receives two $ID_{RP}$s (i.e., $ID_{RP1}$ and $ID_{RP2}$) and three $N_U$s (i.e., $n_1$, $n_2$, and $n_3$). It then generates three $PID_{RP}$s accordingly. From the challenger's view, three $PID_{RP}$s are related to three $N_U$s, respectively. (2) Then, the challenger generates $PID_U$s for different $PID_{RP}$s, using two $ID_U$s (i.e., $u_1$ and $u_2$). %generated in the initialization phase.
+To prove the privacy of UPPRESSO against RP-based identity linkage, we define three Games, as shown in figure~\ref{fig:game}. First, based on the above description, we model the $ID_U$-guessing game following the UPPRESSO design as $\mathtt{Game 0}$ : (1) First, the adversary receives two $ID_{RP}$s (i.e., $ID_{RP1}$ and $ID_{RP2}$) and three $t$s (i.e., $n_1$, $n_2$, and $n_3$). It then generates three $PID_{RP}$s accordingly. From the challenger's view, three $PID_{RP}$s are related to three $t$s, respectively. (2) Then, the challenger generates $PID_U$s for different $PID_{RP}$s, using two $ID_U$s (i.e., $u_1$ and $u_2$). %generated in the initialization phase.
 In particular, the challenger generates $PID_{U1}$ from $ID_{U1}$ directly, and selects a random number $b \in \{0, 1\}$ to generate $PID_{U2}=ID_{Ub} \cdot PID_{RP2}$, and $PID_{U3}=ID_{U(1-b)} \cdot PID_{RP3}$. (3) Finally, the adversary sends its guess $b'$ to the challenger. If $b'=b$, the adversary wins the game.
 
 We define the event [$b'=b$] in $\mathtt{Game 0}$ as $\Gamma$. If the adversary has no advantage in guessing $b$ correctly, which indicates the $PID_U$s are generated from the same $ID_U$, the probability $Pr[\Gamma]$ should be 1/2. Therefore, we conclude that in $\mathtt{Game 0}$, UPPRESSO is secure against RP-based identity linkage if and only if $Pr[\Gamma]=1/2$.
