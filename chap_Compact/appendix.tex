@@ -276,10 +276,23 @@ We provide the detailed proof on the security of UPPRESSO. The security definiti
 However, according to the same origin policy, the cookie is never leaked to any adversary, so the UPPRESSO  system is vulnerable only when a adversary's cookie is bound with the honest user's identity. 
 Based on the model of RP server process model, at Line 64-83, we can find that only when the RP accept a visitor's token, it would bound this visitor with the identity derived from this token.
 Therefore, we can propose the Theorem about the secure UPPRESSO system.
-\begin{theorem}
-Let $\mathcal{UWS}$ be a UPPRESSO web system, $\mathcal{UWS}$ is secure \textbf{iff} for any honest RP $r$ $\in $ $\mathcal{W}$, it would not derive an honest user's identity from the token while the token belongs to an adversary.
-\end{theorem}
-That is, the requirements of secure UPPRESSO system can be described as following lemmas.
+\begin{definition}
+%Let $\mathcal{UWS}$ be a UPPRESSO web system, $\mathcal{UWS}$ is secure \textbf{iff} for any honest RP $r$ $\in $ $\mathcal{W}$, it would not derive an honest user's identity from the token while the token belongs to an adversary.
+An SSO system is secure \textbf{iff} for any honest RP, it would not derive an honest user's identity from the token while the token belongs to an adversary.
+\end{definition}
+
+That is, the requirements of secure SSO system can be described as follows.
+\begin{itemize}
+\item An adversary cannot achieve an honest user's token issued for an honest RP (\textbf{the confidentiality}).
+\item An honest RP would not accept the token issued for another RP (\textbf(the RP designation)).
+\item Attacker cannot forge or modify the IdP-issued proofs (\textbf{the integrity}).
+\item An honest user must always login to the honest RP on her own identity (\textbf{the user identification}).
+\end{itemize}
+
+Here, we are going to prove that, in the UPRESSO system, the following lemmas are always workable.
+
+
+
 \begin{lemma}
 An adversary cannot achieve an honest user's token issued for an honest RP (\textbf{the confidentiality}).
 \label{lemma:confidentiality}
@@ -326,8 +339,36 @@ At Line 16 the \myss{Cert} is verified with the public key in the scriptstate, w
 Therefore, this lemma is proved.
 \end{proof}
 
-In conclusion, these lemmas prove that the UPPRESSO system satisfies the requirements of the secure system. 
-Therefore, UPPRESSO is secure.
+
+\begin{lemma}
+An honest user must always login to the honest RP on her own identity (\textbf{the user identification}).
+\label{lemma:userIdentification}
+\end{lemma}
+\begin{proof}
+We can find that, the RP accepts the user's identity at Line 83, Algorithm~\ref{alg2}. And the identity is generated at Line 79, based on the $PID_U$  retrieved from the token and the trapdoor $T$. 
+The $T$ is generated at Line 14, set at Line 17, and never changed, as the multiplicative inverse of $N_U$. 
+According to Lemma~\ref{lemma:integrity}, only the IdP can generate an token, so that the token must be issued at Line 65, Algorithm~\ref{alg1}. 
+IdP generates the $PID_U$ based on the $PID_{RP}$ and user's $ID_U$. 
+According to Lemma~\ref{lemma:RPdesignation}, while the $PID_{RP}$ is accepted by an RP, the $PID_{RP}$ must be the generated between the RP and user. 
+According to Lemma~\ref{lemma:confidentiality}, the $ID_U$ must belongs to the honest user. 
+Therefore, the user's identity must equal with the constant $ [ID_U]ID_{RP}$.
+
+Moreover, an adversary may lead the honest user to upload the adversary's token to an RP. 
+While the honest user has already negotiated the $PID_{RP}$ with the RP.
+The opener of the IdP script must be the RP script.
+As the $N_U$ generated at Line 7, Algorithm~\ref{alg3}, and $PID_{RP}$ generated at Line 21, Algorithm~\ref{alg3} and Line 13, Algorithm~\ref{alg2}.
+The $N_U$ is only sent to RP script at Line 8, Algorithm~\ref{alg3}, and RP server at Line 18, Algorithm~\ref{alg4}.
+The $PID_{RP}$ is only sent to IdP server at Line 28 and 90, Algorithm~\ref{alg3}. Moreover, the registration result including the $PID_{RP}$ is sent to IdP script at Line  36, Algorithm~\ref{alg1}, RP script at Line 40, Algorithm~\ref{alg3}, RP server at Line 36, Algorithm~\ref{alg4}. An adversary can never know the $PID_{RP}$ negotiated between the honest user and RP.
+While the honest user has not negotiated the $PID_{RP}$ with the RP yet, the \verb+session+[$PID_{RP}$] at Line 69, Algorithm~\ref{alg2} and other similar attributes must be empty, as the $Cookie$ used at Line 58 belongs to the honest user and the negotiation between Line 10-20 does not conducted by the user. 
+Therefore, an adversary cannot lead the honest RP to accept the malicious token from the honest user.
+\end{proof}
+
+In conclusion, four lemmas prove that the UPPRESSO system satisfies the requirements of the secure SSO system. 
+Therefore, the following theorem is workable.
+\begin{theorem}
+UPPRESSO is the secure SSO system. 
+\end{theorem}
+
 
 
 
