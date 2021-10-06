@@ -16,9 +16,15 @@ The RP always derives an identical permanent account from different identity tok
 That is,
     in the user's any $i$-th and $i'$-th ($i \neq i'$) login instances to the RP,
  $\mathcal{F}_{Acct}(PID_{U}^i, PID_{RP}^i) = \mathcal{F}_{Acct}(PID_{U}^{i'}, PID_{RP}^{i'}) = [ID_U]ID_{RP}$.
-Moreover, adversaries cannot retrieve $PID_{RP}$ from a user's login to any honest RP,
-    as the user and the RP would not send $PID_{RP}$ and $t$ to any adversary party.
-Therefore, even the adversary lead the honest to send the adversary's token to an honest RP, the RP would not accept this token anyway.
+ 
+Moreover, an adversary may lead the honest user to send the adversary's token to an honest RP (e.g., through CSRF attack), so that the user would login to an RP under the adversary's account, and upload the sensitive date to adversary's account.
+To make sure it is not possible in the UPPRESSO system, we consider the problem in two situations, the negotiation of $PID_{RP}$ between honest user and RP is accomplished or not.
+While the negotiation of $PID_{RP}$ is not finished, once the RP receives the identity token and verifies the $PID_{RP}$ (step 5.2), it would find out that the prior calculated $PID_{RP}$ (step 2.2) does not exis, so that RP would not accept this token.
+As the negotiation of $PID_{RP}$ is finished, the adversary may steal the $PID_{RP}$ or $t$ to construct the malicious token.
+However, the communications between RP script and IdP script are protected by browser, and the communications between browser and servers are protected by TLS. And the man-in-the-middle attack between RP script and IdP script is not possible, as the opened window must download the honest IdP script due to the redirection (step 1.2-1.3). 
+Thus, an adversary cannot retrieve the $PID_{RP}$ negotiated between honest RP and user, so that it cannot construct the token acceptable to the RP.
+Therefore, the adversary cannot make the user login to an RP under the adversary's account.
+
 
 
 \vspace{1mm}
