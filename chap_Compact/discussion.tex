@@ -5,22 +5,22 @@
 %Some related issues are discussed in this section.
 
 
-%Scalbility
-\vspace{1mm}\noindent{\textbf{Scalability.}} The adversary cannot exhaust $ID_{RP}$ and $PID_{RP}$.
-For $ID_{RP}$, it is generated only in RP's initial registration.
-For $PID_{RP}$,  in practice, we only need to ensure all $PID_{RP}$s are different among the unexpired identity token (the number denoted as $a$).
-We assume that IdP does not perform the uniqueness check, and then calculate the probability that at least two $PID_{RP}$s are equal in these $a$ ones. The probability is $1-\prod_{i=0}^{a-1}(1-i/q)$ which increases with $a$.
-For an IdP with throughput $2*10^8$ req/s, when the validity period of the identity token ($PID_{RP}$) is set as 5 minutes, $a$ is less than $2^{36}$, then the probability is less than $2^{-183}$ for 256-bit $q$ (the order of base point $G$ on \verb+P-256+).
-%Moreover, as this probability is negligible, the uniqueness check of $PID_{RP}$, i.e., the $PID_{RP}$ registration, could be removed in the SSO login process, and this optimization can be adopted when this negligible probability is acceptable by the users and RPs.
+%%Scalbility
+%\vspace{1mm}\noindent{\textbf{Scalability.}} The adversary cannot exhaust $ID_{RP}$ and $PID_{RP}$.
+%For $ID_{RP}$, it is generated only in RP's initial registration.
+%For $PID_{RP}$,  in practice, we only need to ensure all $PID_{RP}$s are different among the unexpired identity token (the number denoted as $a$).
+%We assume that IdP does not perform the uniqueness check, and then calculate the probability that at least two $PID_{RP}$s are equal in these $a$ ones. The probability is $1-\prod_{i=0}^{a-1}(1-i/q)$ which increases with $a$.
+%For an IdP with throughput $2*10^8$ req/s, when the validity period of the identity token ($PID_{RP}$) is set as 5 minutes, $a$ is less than $2^{36}$, then the probability is less than $2^{-183}$ for 256-bit $q$ (the order of base point $G$ on \verb+P-256+).
+%%Moreover, as this probability is negligible, the uniqueness check of $PID_{RP}$, i.e., the $PID_{RP}$ registration, could be removed in the SSO login process, and this optimization can be adopted when this negligible probability is acceptable by the users and RPs.
 
-%DoS
-%Security against ID exhaustion DoS
-%1.用户被鉴别过的，可以事后审计的； 2. IdP， 本来对OIDC是做一次数字签名， 加了一次模幂，资源消耗 --> DoS attack
-\vspace{1mm}\noindent{\textbf{Security against DoS attack.}}
-The adversary may attempt to perform DoS attack on the IdP and RP. For example, the adversary may act as a user to invoke the $PID_{RP}$ registration and identity token generation at the IdP, which requires the IdP to perform two signature generations and one modular exponentiation.
-However, as the user has already been authenticated at the IdP, the IdP could identify the malicious users based on audit, in addition to the existing DoS mitigation schemes.
-%The adversary may act as a user requesting to log into an RP, and make the RP perform two modular exponentiations.
-%The RP could previously calculated a set of $Y_{RP}$s to mitigate this attack.
+%%DoS
+%%Security against ID exhaustion DoS
+%%1.用户被鉴别过的，可以事后审计的； 2. IdP， 本来对OIDC是做一次数字签名， 加了一次模幂，资源消耗 --> DoS attack
+%\vspace{1mm}\noindent{\textbf{Security against DoS attack.}}
+%The adversary may attempt to perform DoS attack on the IdP and RP. For example, the adversary may act as a user to invoke the $PID_{RP}$ registration and identity token generation at the IdP, which requires the IdP to perform two signature generations and one modular exponentiation.
+%However, as the user has already been authenticated at the IdP, the IdP could identify the malicious users based on audit, in addition to the existing DoS mitigation schemes.
+%%The adversary may act as a user requesting to log into an RP, and make the RP perform two modular exponentiations.
+%%The RP could previously calculated a set of $Y_{RP}$s to mitigate this attack.
 
 
 %授权码
@@ -91,16 +91,16 @@ After some experiments while the IdP and RPs in the prototype system are unmodif
 
 \vspace{1mm}
 \noindent{\textbf{Active Identity Linkage by Malicious RPs.}}
-When a user logins to multiple RPs concurrently on one device as different accounts,
+When a user logins to multiple RPs \emph{concurrently} on one device as different accounts,
         malicious RPs might actively correlate the accounts by online means.
 For instance,
      when the user has logined to $RP_j$ with $Acct_j$,
          malicious $RP_j$ might try to redirect $Acct_j$ to another $RP_{j'}$ through a hidden iframe in the browser.
 As long as he has logined to $RP_{j'}$,
      two accounts would be correlated by $RP_{j'}$.
-However, this active attack does not appear only in SSO systems, but also exists in all web applications.
+This active attack appears not only in SSO systems, but also exists in all web applications.
 Anyway,
-    this attack can be easily prevented through various methods,
+    it can be prevented through various methods,
  such as checking hidden iframes in the script
   and detecting the redirection by browser extensions.
 
