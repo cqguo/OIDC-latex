@@ -73,22 +73,32 @@ Thus,
 We also formally analyze the security properties of UPPRESSO,
      based on the Dolev-Yao style model \cite{SPRESSO},
  which has been used in the formal analysis of SSO protocols such as OAuth 2.0 \cite{FettKS16} and OIDC \cite{FettKS17}.
-
-
 The Dolev-Yao model abstracts the entities in a system,
     such as browsers and web servers,
     as {\em atomic processes}, which communicate with each other through {\em events}.
 It also defines {\em script processes} to model client-side scripts, i.e.,  JavaScript code,
  so a web system consists of a set of atomic and script processes.
-Then based on the modelling web system, we can trace the sensitive data, such as the identity token, from it being generated to being consumed, so that it can be guaranteed that the sensitive data is not stolen or tempered by an adversary.
-For example, we can locate the generation of identity token in the UPPRESSO, and trace to the source where the $PID_U$ and other attributes contained in this token are generated and transmitted, to confirm no adversary can control them.
-Following, the track of identity token is also monitor to guaranteed there is no adversary able to retrieve this token.
 
-In the UPPRESSO system, it contains an IdP server process, a finite set of web servers for the honest RPs, a finite set of honest browsers, and a finite set of attacker processes. Here, we consider all the RP processes and browser processes are honest, and model an RP or a browser controlled by an adversary as an atomic attacker process.
-It also contains {\sf script\_rp}, {\sf script\_idp} and {\sf script\_attacker}, where {\sf script\_rp} and {\sf script\_idp} are honest scripts downloaded by an RP process and the IdP process, and {\sf script\_attacker} denotes a script downloaded by an attacker process that exists in all browser processes.
-Based on the well modelled system, it is formally proved that,
-\textbf{Confidentiality}, \textbf{RP designation}, \textbf{integrity} and \textbf{user identification} are all satisfied by UPPRESSO.
+The UPPRESSO system contains an IdP server process,
+    a finite set of web servers for honest RPs, a finite set of honest browsers, and a finite set of attacker processes.
+Here, we consider all RP processes and browser processes are honest,
+ while model an RP or a browser controlled by an adversary as an atomic attacker process.
+It also contains {\sf script\_rp}, {\sf script\_idp} and {\sf script\_attacker},
+    where {\sf script\_rp} and {\sf script\_idp} are honest scripts downloaded from an RP process and the IdP process, respectively,
+         and {\sf script\_attacker} denotes a script downloaded by an attacker process that exists in all browser processes.
 
+After modelling UPPRESSO by the Dolev-Yao style model,
+    we trace the sensitive data, especial an identity token,
+        starting when it is generated and ending when it is consumed,
+ to ensure that an identity token is not stolen or tempered by adversaries.
+For example, we locate the generation of an identity token in the UPPRESSO, and trace back to the sources
+    where $PID_U$, $PID_{RP}$ and other values enclosed in this token are generated and transmitted,
+     to confirm no adversary able to retrieve the token.
+The trace of identity tokens also ensure that no adversary manipulates them.
+
+Finally,
+    we formally prove that,
+\emph{user identification}, \emph{RP designation}, \emph{confidentiality}, and \emph{integrity} are satisfied in UPPRESSO.
 The details on the Dolev-Yao style model and the security proof of UPPRESSO are in the appendix.
 
 
