@@ -12,19 +12,31 @@ UPPRESSO satisfies with the four security requirements of identity tokens in SSO
 
 \vspace{1mm}
 \noindent\textbf{User Identification.}
-The RP always derives an identical permanent account from different identity tokens binding $PID_U$ and $PID_{RP}$.
+First of all, the RP always derives an identical permanent account from different identity tokens binding $PID_U$ and $PID_{RP}$.
 That is,
     in the user's any $i$-th and $i'$-th ($i \neq i'$) login instances to the RP,
  $\mathcal{F}_{Acct}(PID_{U}^i, PID_{RP}^i) = \mathcal{F}_{Acct}(PID_{U}^{i'}, PID_{RP}^{i'}) = [ID_U]ID_{RP}$.
 
-Moreover, an adversary may lead the honest user to send the adversary's token to an honest RP (e.g., through CSRF attack), so that the user would login to an RP under the adversary's account, and upload the sensitive date to adversary's account.
-To make sure it is not possible in the UPPRESSO system, we consider the problem in two situations, the negotiation of $PID_{RP}$ between honest user and RP is accomplished or not.
-While the negotiation of $PID_{RP}$ is not finished, once the RP receives the identity token and verifies the $PID_{RP}$ (step 5.2), it would find out that the prior calculated $PID_{RP}$ (step 2.2) does not exis, so that RP would not accept this token.
-As the negotiation of $PID_{RP}$ is finished, the adversary may steal the $PID_{RP}$ or $t$ to construct the malicious token.
-However, the communications between RP script and IdP script are protected by browser, and the communications between browser and servers are protected by TLS. And the man-in-the-middle attack between RP script and IdP script is not possible, as the opened window must download the honest IdP script due to the redirection (step 1.2-1.3).
+An adversary might try allure an honest user to login under the adversary's account,
+    by injecting his identity token into the user's communications with the RP.
+Such identity injection attacks is impossible in UPPRESSO as follows.
+If the negotiation of $PID_{RP}$ is not finished yet,
+    the RP will reject the malicious token.
+Even when $PID_{RP}$ has been negotiated,
+    the adversary cannot eavesdrop $PID_{RP}$ because the communications between RP script and IdP script are protected by browser, and the communications between browser and servers are protected by TLS.
 Thus, an adversary cannot retrieve the $PID_{RP}$ negotiated between honest RP and user, so that it cannot construct the token acceptable to the RP.
-Therefore, the adversary cannot make the user login to an RP under the adversary's account.
 
+\vspace{1mm}
+\noindent\textbf{RP Designation.}
+An identity token binding $PID_U$ and $PID_{RP}$,
+    designates the target RP, and only the target RP.
+The RP calculates $PID_{RP}$ by itself with the trapdoor $t$ sent from the user,
+    and checks $PID_{RP}$ in the identity token.
+So the target RP will accept this token.
+Meanwhile,
+        the honest IdP guarantees, within its validity period, the $PID_{RP}$ will be registered only once
+        (i.e., designate only one RP).
+% $PID_{RP}$ will be bound in some identity token.
 
 
 \vspace{1mm}
@@ -39,18 +51,6 @@ Meanwhile, the honest IdP sends the identity token only to the authenticated use
 The binding of $Enpt_{RP}$ and $ID_{RP}$ is ensured by the RP certificate,
 so only the designated target RP receives this identity token.
 %The detailed process of proof is shown in Appendix.
-
-\vspace{1mm}
-\noindent\textbf{RP Designation.}
-An identity token binding $PID_U$ and $PID_{RP}$,
-    designates the target RP, and only the target RP.
-The RP calculates $PID_{RP}$ by itself with the trapdoor $t$ sent from the user,
-    and checks $PID_{RP}$ in the identity token.
-So the target RP will accept this token.
-Meanwhile,
-        the honest IdP guarantees, within its validity period, the $PID_{RP}$ will be registered only once
-        (i.e., designate only one RP).
-% $PID_{RP}$ will be bound in some identity token.
 
 \vspace{1mm}
 \noindent\textbf{Integrity.}
