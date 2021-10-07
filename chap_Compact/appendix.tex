@@ -41,7 +41,7 @@ The data tracing is based on the well-built model.
 Based on Dolev-Yao style model, the web  infrastructure can be modelled as the form $\mathcal{WS}$=($\mathcal{W}$, $\mathcal{S}$, $E^0$). The definitions of these notations is described as below.
 \begin{itemize}
 \item $\mathcal{W}$ is the set of \textbf{atomic processes}. An atomic process represents an independent entity in the web system, such as browser and web server.
-\item $\mathcal{S}$ is the set of \textbf{scripting processes}. That is, besides the atomic processes in the web system, there are also entities processing data and communicating with other entities, but unable to run independently without other atomic processes. These entities are denoted as scripting processes, i.e., the JavaScript code in the web system.
+\item $\mathcal{S}$ is the set of \textbf{script processes}. That is, besides the atomic processes in the web system, there are also entities processing data and communicating with other entities, but unable to run independently without other atomic processes. These entities are denoted as script processes, i.e., the JavaScript code in the web system.
 \item $E^0$ is the set of self-triggering \textbf{events} initially acceptable to the processes in $\mathcal{W}$. An event is the basic communication elements in the model, representing atomic process A sending a message to atomic process B.
 \end{itemize}
 
@@ -81,7 +81,7 @@ The pattern matches any term which only replaces the $*$ with other terms. For i
 
 
 \vspace{1mm}
-\noindent\textbf{Scripting process}. A scripting process is the modelling JavaScript code, as a relation $R$, representing the server-defined functions, while the input and output are handled by the browser.
+\noindent\textbf{Script process}. A script process is the modelling JavaScript code, as a relation $R$, representing the server-defined functions, while the input and output are handled by the browser.
 To be noticed is that, the script process is addressed by the \verb+Origin+ property, as the the protocol, hostname and port number of a URL. That is, while a script sends the messages to another script process and set the \verb+Origin+ value as the IdP domain, only the script downloaded from IdP server can receive this message.
 
 
@@ -95,13 +95,13 @@ To be noticed is that, the script process is addressed by the \verb+Origin+ prop
 \subsection{Modelling UPPRESSO System}
 In this section, we introduce the model of honest UPPRESSO system, in the form $\mathcal{UWS}$=($\mathcal{W}$, $\mathcal{S}$, $\mathtt{script}$, $E^0$).
 $\mathcal{W}$ is the set of atomic processes, including IdP server processes, RP server processes and browsers.
-$\mathcal{S}$ is the set of scripting processes, containing of IdP scripting process and RP scripting process.
+$\mathcal{S}$ is the set of script processes, containing of IdP script process and RP script process.
 $\mathtt{script}$ is the set of detailed script codes, so that it is described here.
 $E^0$  is the set of events acceptable to the processes in $\mathcal{W}$, which is to be illustrated in the individual processes part.
 
 An atomic process is a tuple $p=$ $(I^p, Z^p, R^p,s_0^p )$, containing the addresses, states, and relations.
 Here, we will focus on the state form and relation $R$. They can describe that what kind of event can be accepted by the process in each state, and the content of new output events and states.
-Similarly, the scripting process is described in the same way.
+Similarly, the script process is described in the same way.
 
 To be noticed is that, we only focus on the model of servers, browsers and the plain message transmissions among them in this paper, and neglect the HTTPS requests and other necessary Internet facilities (e.g., DNS server) deployed in the UPPRESSO system.
 Because we assume that the internet architecture is well  built and HTTPS is well implemented, so that an adversary cannot conduct the attacks targeting these elements.
@@ -205,12 +205,12 @@ The relation of RP process $R^r$ is shown as Relation~\ref{alg2} in Appendix~\re
 Browser is the essential party in web system, that most of users participates through a browser.
 In UPPRESSO, we assume that the browsers are honest and well developed, so that, we neglect  the detailed process of browser, such as constructing and parsing the HTTP package.
 Therefore, we only need to analyze how the browsers interactive with other parties in UPPRESSO system.
-Moreover, in UPPRESSO system, the message transmitted through a browser is constructing and parsing by the script, so that we only focus on how the scripting process runs in the browser.
+Moreover, in UPPRESSO system, the message transmitted through a browser is constructing and parsing by the script, so that we only focus on how the script process runs in the browser.
 
 In the browser, a window is the basic unit that shows the content to user.
 In a window, the document (Document Object Model, DOM) represents the whole page contained in this window.
 The script is one of node in the document.
-We introduce the windows and documents of the browser model, which provides inputs and parses the outputs of the scripting process.
+We introduce the windows and documents of the browser model, which provides inputs and parses the outputs of the script process.
 
 
 
@@ -223,19 +223,19 @@ We introduce the windows and documents of the browser model, which provides inpu
   \ \ \ \langle nonce, location, referrer, script, scriptstate, \\
   scriptinputs, subwindows, active \rangle \ \ \
 \end{multline*}
-where document is the HTML content in the window.  The \myss{nonce} locates the document. \myss{Location} is the URL where the document is loaded. \myss{Referrer} is same as the Referer header defined in HTTP standard. The \myss{script} is the scripting process downloaded from each servers. \myss{scriptstate} is define by the script, different in each scripts. The \myss{scriptinputs} is the message transmitted into the scripting process. The \myss{subwindows} is the set of \myss{nonce} of document's created windows. \myss{active} represents whether this document is active or not.
+where document is the HTML content in the window.  The \myss{nonce} locates the document. \myss{Location} is the URL where the document is loaded. \myss{Referrer} is same as the Referer header defined in HTTP standard. The \myss{script} is the script process downloaded from each servers. \myss{scriptstate} is define by the script, different in each scripts. The \myss{scriptinputs} is the message transmitted into the script process. The \myss{subwindows} is the set of \myss{nonce} of document's created windows. \myss{active} represents whether this document is active or not.
 
 
 \subsubsection{Modelling IdP and RP scripts}
-The scripting process is the dependent process relying on the browser, which can be considered as a relation \myss{R} mapping a message input and a message output. And finally the browser will conduct the command in the output message. Here we give the description of the form of input and output.
+The script process is the dependent process relying on the browser, which can be considered as a relation \myss{R} mapping a message input and a message output. And finally the browser will conduct the command in the output message. Here we give the description of the form of input and output.
 \begin{itemize}
 \setlength\itemsep{-2pt}
-\item \textbf{Scripting Message Input. } The input is the term in the form
+\item \textbf{Script Message Input. } The input is the term in the form
 \begin{multline*}
 \langle tree, docnonce, scriptstate, stateinputs,cookies,\\
 localStorage, sessionStorage, ids, secret \rangle
 \end{multline*}
-\item \textbf{Scripting Message Output. }The output is the term in the form
+\item \textbf{Script Message Output. }The output is the term in the form
 \begin{multline*}
 \ \ \ \ \ \langle scriptstate, cookies, localStorage, \\
 sessionStorage, command \rangle \ \ \ \ \
@@ -244,8 +244,8 @@ sessionStorage, command \rangle \ \ \ \ \
 The \myss{tree} is the relations of the opened windows and documents, which are visible to this script. \myss{Docnonce} is the document nonce. The  \myss{Scriptstate} is a term of the form defined by each script. \myss{Scriptinputs} is the message transmitted to script. However, the \myss{scriptinputs} is defined as standardized forms, for example, postMessage is one of the forms of \myss{scriptinputs}. \myss{Cookies} is the set of cookies that belong to the document's origin. \myss{LocalStorage} is the storage space for browser and \myss{sessionStorage} is the space for each HTTP sessions.  \myss{Ids} is the set of user IDs while \myss{secret} is the password to corresponding user ID. The \myss{command} is the operation which is to be conducted by the browser. Here we only introduce the form of commands used in UPPRESSO system. We have defined the postMessage and XMLHTTPRequest (for HTTP request) message which are the \myss{commands}. Moreover, a term in the form \myss{\myangle{\mathtt{IFRAME}, URL, WindowNonce}} asks the browser to create this document's subwindow and it visits the server with the URL.
 
 \vspace{1mm}
-\noindent\textbf{IdP scripting process}
-The state of IdP scripting process \myss{scriptstate} is a term in the form \myss{\myangle{IdPDomain, Parameters, q, refXHR}}, where
+\noindent\textbf{IdP script process}
+The state of IdP script process \myss{scriptstate} is a term in the form \myss{\myangle{IdPDomain, Parameters, q, refXHR}}, where
 \begin{itemize}
 \setlength\itemsep{-2pt}
 \item \myss{IdPDomain} is the IdP's host.
@@ -261,18 +261,18 @@ The new \myss{functions} are defined as follows.
   \item \myss{\mathtt{CHOOSEINPUT}(inputs,pattern)}. The first parameter is a set of messages, and the second parameter is a pattern. The result returned by the function is the message in \myss{inputs} matching the \myss{pattern}.
   \item \myss{\mathtt{RandomUrl}()} returns a newly generated host string.
 \end{itemize}
-The relation of IdP scripting process $script\_idp$ is shown in Appendix~\ref{ape:alg} Relation~\ref{alg3}.
+The relation of IdP script process $script\_idp$ is shown in Appendix~\ref{ape:alg} Relation~\ref{alg3}.
 
 
 
 
 \vspace{1mm}
-\noindent\textbf{RP scripting process}
-The state of RP scripting process \myss{scriptstate} is a term in the form \myss{\langle IdPDomain}, \myss{RPDomain}, \myss{Parameters}, \myss{q}, \myss{refXHR\rangle}. The \myss{RPDomain} is the host string of the corresponding RP server, and other terms are defined in the same way as in IdP scripting process.
+\noindent\textbf{RP script process}
+The state of RP script process \myss{scriptstate} is a term in the form \myss{\langle IdPDomain}, \myss{RPDomain}, \myss{Parameters}, \myss{q}, \myss{refXHR\rangle}. The \myss{RPDomain} is the host string of the corresponding RP server, and other terms are defined in the same way as in IdP script process.
 
 Here, we define the function \myss{\mathtt{SUBWINDOW}(tree, docnonce)}, which takes the \myss{tree} defined above and the current document's \myss{nonce} as the input. And it selects the \myss{nonce} of the first window opened by this document as the output. However, if there is no opened windows, it returns  null.
 
-The relation of RP scripting process $script\_rp$ is shown in Appendix~\ref{ape:alg} Relation~\ref{alg4}.
+The relation of RP script process $script\_rp$ is shown in Appendix~\ref{ape:alg} Relation~\ref{alg4}.
 
 \subsection{Proof of Security}
 
@@ -566,7 +566,7 @@ UPPRESSO is the secure SSO system.
 \end{breakablealgorithm}
 
 
-\subsection{IdP scripting process}
+\subsection{IdP script process}
 \begin{breakablealgorithm}
   \caption{\textbf{IdP\_Script\_Relation}}
   \label{alg3}

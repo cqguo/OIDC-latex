@@ -46,7 +46,7 @@ Meanwhile,
 There is no event leaking the identity tokens to any malicious entity other than the authenticated user and the designated RP.
 First of all, the communications among the IdP, RPs and users,
     are protected by TLS,
-    and the \verb+postMessage+ HTML5 API ensures the dedicated channels between two scripts within the user agent,
+    and the \verb+postMessage+ HTML5 API ensures the dedicated channels between two scripts within the browser,
     so that adversaries cannot eavesdrop the identity tokens.
 Meanwhile, the honest IdP sends the identity token only to the authenticated user,
     and this user forwards it to the RP through $Enpt_{RP}$.
@@ -70,8 +70,16 @@ Thus,
 %The detailed process of proof is shown in Appendix.
 
 \vspace{1mm}
-\noindent\textbf{Formal analysis.} To provide the more convincing evidence that the UPPRESSO is secure, we formally analyze security properties of UPPRESSO based on the Dolev-Yao style web model~\cite{SPRESSO}, which has been widely used in the formal analysis of SSO protocols such as OAuth 2.0~\cite{FettKS16} and OIDC~\cite{FettKS17}.
-The Dolev-Yao model abstracts the entities in a system, such as browsers and web servers, as {\em atomic processes}, which communicate with each other through the {\em events}. It also defines {\em script processes} to model client-side script, i.e.,  JavaScript code, so a web system consists of a set of atomic and scripting processes.
+We also formally analyze the security properties of UPPRESSO,
+     based on the Dolev-Yao style model \cite{SPRESSO},
+ which has been used in the formal analysis of SSO protocols such as OAuth 2.0 \cite{FettKS16} and OIDC \cite{FettKS17}.
+
+
+The Dolev-Yao model abstracts the entities in a system,
+    such as browsers and web servers,
+    as {\em atomic processes}, which communicate with each other through {\em events}.
+It also defines {\em script processes} to model client-side scripts, i.e.,  JavaScript code,
+ so a web system consists of a set of atomic and script processes.
 Then based on the modelling web system, we can trace the sensitive data, such as the identity token, from it being generated to being consumed, so that it can be guaranteed that the sensitive data is not stolen or tempered by an adversary.
 For example, we can locate the generation of identity token in the UPPRESSO, and trace to the source where the $PID_U$ and other attributes contained in this token are generated and transmitted, to confirm no adversary can control them.
 Following, the track of identity token is also monitor to guaranteed there is no adversary able to retrieve this token.
@@ -81,7 +89,7 @@ It also contains {\sf script\_rp}, {\sf script\_idp} and {\sf script\_attacker},
 Based on the well modelled system, it is formally proved that,
 \textbf{Confidentiality}, \textbf{RP designation}, \textbf{integrity} and \textbf{user identification} are all satisfied by UPPRESSO.
 
-The details about Dolev-Yao style web model and security proof of UPPRESSO is in the appendix.
+The details on the Dolev-Yao style model and the security proof of UPPRESSO are in the appendix.
 
 
 
