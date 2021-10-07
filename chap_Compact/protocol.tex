@@ -165,9 +165,9 @@ In existing SSO protocols,
 This instructs the browser to forward it correctly;
     otherwise, confidentiality of identity tokens might be broken.
 
-Because the UPPRESSO IdP is not aware of the visited RP and then cannot set the RP endpoints,
+Because the UPPRESSO IdP is not aware of the visited RP and cannot set the RP endpoints,
         \emph{RP certificates} are designed to instructs the user agents (or browsers) about RP endpoints.
-An RP certificate is a message signed by the IdP, binding the RP's identity and its endpoint.
+An RP certificate is a document signed by the IdP, binding the RP's identity and its endpoint.
 This certificate is sent by the RP in the login flow,
     so that the user is able to forward the identity tokens to this verified endpoint.
 
@@ -180,7 +180,7 @@ Two scripts, one downloaded from the IdP and the other from the target RP,
     work together (with the standard  browser functions) as the user agent of UPPRESSO.
 The RP script maintains the communications with the RP,
     and it does not communicates directly with the IdP because an HTTP request launched by the RP script
-            will automatically carry a \verb+Referer+ HTTP header, which discloses the RP's domain.
+            will automatically carry an HTTP \verb+Referer+ header, which discloses the RP's domain.
 The IdP script downloaded from the honest IdP,
     is responsible for the communications with the IdP,
     and two scripts communicates with each other through the \verb+postMessage+ HTML5 API.
@@ -217,7 +217,7 @@ Then, the IdP keeps $SK$ secret, while $PK$ is publicly known.
 
 \vspace{1mm}
 \noindent\textbf{RP Initial Registration.} Each RP launches
-    an initial registration operation once to finish configurations.
+    an initial registration operation to finish configurations.
 In particular, an RP registers itself at the IdP to obtain $ID_{RP}$
  and the corresponding RP certificate $Cert_{RP}$ as follows:
 \begin{enumerate}
