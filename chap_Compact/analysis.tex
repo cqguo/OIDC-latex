@@ -17,14 +17,16 @@ That is,
     in the user's any $i$-th and $i'$-th ($i \neq i'$) login instances to the RP,
  $\mathcal{F}_{Acct}(PID_{U}^i, PID_{RP}^i) = \mathcal{F}_{Acct}(PID_{U}^{i'}, PID_{RP}^{i'}) = [ID_U]ID_{RP}$.
 
-An adversary might try allure an honest user to login under the adversary's account,
-    by injecting his identity token into the user's communications with the RP.
-Such identity injection attacks is impossible in UPPRESSO as follows.
+An adversary might try allure a user to login under the adversary's account,
+    by injecting his identity token into the user's communications with an honest RP.
+Such identity injection attacks are impossible in UPPRESSO as follows.
 If the negotiation of $PID_{RP}$ is not finished yet,
     the RP will reject the malicious token.
 Even when $PID_{RP}$ has been negotiated,
-    the adversary cannot eavesdrop $PID_{RP}$ because the communications between RP script and IdP script are protected by browser, and the communications between browser and servers are protected by TLS.
-Thus, an adversary cannot retrieve the $PID_{RP}$ negotiated between honest RP and user, so that it cannot construct the token acceptable to the RP.
+    it is kept unknown to the adversary because the communications between two scripts are controlled by a browser
+     and the communications between the browser and the IdP (or the RP) are protected by TLS.
+Thus, an adversary cannot obtain $PID_{RP}$ dynamically negotiated between an honest RP and the user,
+     so it cannot construct an identity token acceptable to the RP.
 
 \vspace{1mm}
 \noindent\textbf{RP Designation.}
