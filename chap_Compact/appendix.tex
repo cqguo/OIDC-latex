@@ -40,11 +40,14 @@ Finally, we give the security proofs of UPPRESSO, that capture the tracks of all
 
 \subsection{The Dolev-Yao Style Web Model}
 \label{subsec:webmodel}
-Based on Dolev-Yao style model, the web  infrastructure can be modelled as the form of $(\mathcal{W}$, $\mathcal{S}$, $E^0)$. The definitions of these notations is described as below.
+Based on Dolev-Yao style models,
+ the web infrastructure is modelled as the form of $(\mathcal{W}$, $\mathcal{S}$, $E^0)$.
+These notations are explained as below.
 \begin{itemize}
-\item $\mathcal{W}$ is the set of \textbf{atomic processes}. An atomic process represents an independent entity in the web system, such as browser and web server.
-\item $\mathcal{S}$ is the set of \textbf{script processes}. That is, besides the atomic processes in the web system, there are also entities processing data and communicating with other entities, but unable to run independently without other atomic processes. These entities are denoted as script processes, i.e., the JavaScript code in the web system.
-\item $E^0$ is the set of self-triggering \textbf{events} initially acceptable to the processes in $\mathcal{W}$. An event is the basic communication elements in the model, representing atomic process A sending a message to atomic process B.
+\item $\mathcal{W}$ is the set of \emph{atomic processes}.
+    An atomic process represents an independent entity in the web system, such as browser and web server.
+\item $\mathcal{S}$ is the set of \emph{script processes}. Besides the atomic processes in the web system, there are also entities processing data and communicating with other entities, but unable to run independently without other atomic processes. These entities are denoted as script processes, i.e., JavaScript code with a browser.
+\item $E^0$ is the set of self-triggering \emph{events} initially acceptable to the processes in $\mathcal{W}$. An event is the basic communication elements in the model, representing atomic process A sending a message to atomic process B.
 \end{itemize}
 
 
@@ -53,31 +56,36 @@ Based on Dolev-Yao style model, the web  infrastructure can be modelled as the f
 \noindent\textbf{Atomic process}. The atomic process is the modelling web nodes, in the form ($I^p$, $Z^p$, $R^p$, $s_0^p$). The definitions of these notations is described as below.
 \begin{itemize}
 \item $I^p$ is the set of addresses that the process listens to.
-\item  $Z^p$ is the set of \textbf{states} that describes the process. The state is the formal \textbf{term}.
-\item $R^p$ is the \textbf{relation} between the input, state $s \in Z^p$ and an event $e$, to the output, the new state $s' \in Z^p$ and an event $e'$. It means that, at one time point, while the process is on state $s$ and receive the event $e$, it would transition to state $s'$ and send the event $e'$ to other process.
-\item $s_0^p$ is an initial state.
+\item  $Z^p$ is the set of \textbf{states} that describes the process. %The state is the formal \textbf{term}.
+\item $R^p$ is the \textbf{relation} between the input, state $s \in Z^p$ and an event $e$,
+ to the output, the new state $s' \in Z^p$ and another event $e'$.
+It means that, at one time point, while the process is on state $s$ and receive the event $e$, it would transition to state $s'$ and send the event $e'$ to other processes.
+\item $s_0^p$ is the initial state.
 \end{itemize}
 
 \vspace{1mm}
 \noindent\textbf{Term}. Term is the basic element in Dolev-Yao style model, to describe the modelled system.
-It contains constants such as ASCII strings and nonce, sequence symbols such as n-ary sequences $\langle \rangle$, $\langle . \rangle$, $\langle . ,. \rangle$, and function symbols that model cryptographic primitives such as $\mathtt{encrypt}, \mathtt{decrypt}$ and digital signatures.
-For example, an HTTP request can be modelled as a term containing a type (e.g., $\mathtt{HTTPReq}$), a nonce, a method (e.g., $\mathtt{GET}$ or $\mathtt{POST}$), a domain, a path, URL parameters, request headers and a message body, over the $\Sigma$ in the sequence symbol format. So,
-an HTTP GET request for the domain {\sf exa.com/path?para=1} with empty header and body can be described as: $m:=\langle\mathtt{HTTPReq},n,\mathtt{GET},exa.com,/path,\langle \langle para, 1\rangle \rangle ,\langle \rangle,\langle \rangle \rangle$.
+It contains constants such as ASCII strings and nonce, sequence symbols such as n-ary sequences $\langle \rangle$, $\langle . \rangle$, $\langle . ,. \rangle$, and function symbols that model cryptographic primitives such as $\mathtt{sign}$, $\mathtt{verify}$ and $\mathtt{hash}$.
+For example, an HTTP request is expressed as a term containing a type (e.g., $\mathtt{HTTPReq}$), a nonce, a method (e.g., $\mathtt{GET}$ or $\mathtt{POST}$), a domain, a path, URL parameters, request headers and a message body. % over the $\Sigma$ in the sequence symbol format.
+So,
+an HTTP GET request for the domain {\sf exa.com/path?para=1} with empty header and body can be described as $m:=\langle\mathtt{HTTPReq},n,\mathtt{GET},exa.com,/path,\langle \langle para, 1\rangle \rangle ,\langle \rangle,\langle \rangle \rangle$.
 
 \vspace{1mm}
-\noindent\textbf{Operations over terms}.
+\noindent\textbf{Operations over terms}. The following operations are defined.
 \begin{itemize}
-\item \textbf{Equational theory}. Equational theory is defined as usual in Dolev-Yao style models,
- which uses the symbol $\equiv$ to represent the congruence relation on terms.
+\item \textbf{Equational theory}. Equational theory %is defined as usual in Dolev-Yao style models, 这句话没有意义
+ uses the symbol $\equiv$ to represent the congruence relation on terms.
  For example, $dec(enc(m, k), k)$ $\equiv$ $m$, where $k$ is a symmetric key.
-\item \textbf{Patten Matching}.  We define the term with the variable $*$ as the pattern, such as \myss{\myangle{a, b, *}}.
+\item \textbf{Pattern Matching}.  We define the term with the variable $*$ as the pattern, such as \myss{\myangle{a, b, *}}.
 The pattern matches any term which only replaces the $*$ with other terms. For instance,  \myss{\myangle{a, b, *}} matches \myss{\myangle{a, b, c}}.
 \item \textbf{Retrieve attributes from standardized term}. Standardized term is the data in the fixed format, for instance, the HTTP request is the standardized data in the form \myss{\langle\mathtt{HTTPReq}}, \myss{nonce}, \myss{method}, \myss{host}, \myss{path}, \myss{parameters}, \myss{headers}, \myss{body\rangle}.  We assume there is an HTTP request \myss{r :=}  \myss{\langle\mathtt{HTTPReq}},  \myss{n},  \myss{\mathtt{GET}},  \myss{example.com},  \myss{/path},  \myss{\myangle{}},  \myss{\myangle{}},  \myss{\myangle{}\rangle}, here we define the operation on the $r$. That is, the elements in $r$ can be accessed in the form \myss{r.name}, such that \myss{r.method \equiv \mathtt{GET}},  \myss{r.path \equiv /path} and \myss{r.body \equiv \myangle{}}.
 \item \textbf{Retrieve attributes from dictionary term}. Dictionary term is the data in the form \myss{\myangle{\myangle{name, value}, \myangle{name, value}, \dotsc}}, for instance the \myss{body} in HTTP request is dictionary data. We assume there is a \myss{body := \myangle{\myangle{username, alice}, \myangle{password, 123}}}, here we define the operation on the $body$. That is, we can access the elements in \myss{body} in the form \myss{body[name]}, such that \myss{body[username] \equiv alice} and \myss{body[password] \equiv 123}. We can also add the new attributes to the dictionary, for example after we set \myss{body[age] := 18}, the \myss{body} are changed into\myss{ \myangle{\myangle{username, alice}, \myangle{password, 123}, \myangle{age, 18}}}.
 \end{itemize}
 
 \vspace{1mm}
-\noindent\textbf{State}. State is the term consisted of basic terms, to sketch the atomic process at the point of time. For example, the state of a login server can be simplistically described as the term $\langle CookieList,UserList \rangle$, while the $CookieList$ maintains the visitors' cookies with the corresponding login state, and the $UserList$ maintains the user ids and their corresponding passwords.
+\noindent\textbf{State}. State is the term consisted of basic terms, to sketch the atomic process at the point of time. For example, the state of a login server can be simplistically described as the term $\langle CookieList,UserList \rangle$,
+    while the $CookieList$ maintains the visitors' cookies with the corresponding login state,
+    and the $UserList$ maintains all user identities (either logined or unlogined) and their corresponding credential verifiers.
 
 
 \vspace{1mm}
@@ -85,12 +93,15 @@ The pattern matches any term which only replaces the $*$ with other terms. For i
 
 
 \vspace{1mm}
-\noindent\textbf{Script process}. A script process is the modelling JavaScript code, as a relation $R$, representing the server-defined functions, while the input and output are handled by the browser.
-To be noticed is that, the script process is addressed by the \verb+Origin+ property, as the the protocol, hostname and port number of a URL. That is, while a script sends the messages to another script process and set the \verb+Origin+ value as the IdP domain, only the script downloaded from IdP server can receive this message.
+\noindent\textbf{Script process}. A script process is the formulation of browser scripts as a relation $R$,
+    representing the server-defined functions,
+    while the input and output are handled by the browser.
+A script process is addressed by the \verb+Origin+ property, as the the protocol, hostname and port number of a URL. That is, while a script sends the messages to another script process and set the \verb+Origin+ value as the IdP domain,
+ only the script downloaded from IdP server receives this message.
 
 
 \vspace{1mm}
-\noindent\textbf{Event}. The event  the formal term $\langle a, b, m \rangle$, where $a$ and $b$ represent the addresses of the sender and receiver respectively, and $m$ is the message to be transmitted.
+\noindent\textbf{Event}. The event  the formal term $\langle a, b, m \rangle$, where $a$ and $b$ represent the addresses of the sender and receiver respectively, and $m$ is the message transmitted.
 
 
 
@@ -104,15 +115,13 @@ $\mathtt{script}$ is the set of detailed script codes, so that it is described h
 $E^0$  is the set of events acceptable to the processes in $\mathcal{W}$, which is to be illustrated in the individual processes part.
 
 
-To be noticed is that, we only focus on the model of servers, browsers and the plain message transmissions among them in this paper, and neglect the HTTPS requests and other necessary Internet facilities (e.g., DNS server) deployed in the UPPRESSO system.
+We only focus on the model of servers, browsers and the plain message transmissions among them in this paper, and neglect the HTTPS requests and other necessary Internet facilities (e.g., DNS server) deployed in the UPPRESSO system.
 Because we assume that the internet architecture is well  built and HTTPS is well implemented, so that an adversary cannot conduct the attacks targeting these elements.
 
-This section is organized as follows. At first, we introduce the model of normal basic data (representing data in the form of terms), such as HTTP package, which is to be used to construct more complex models.
-Then we give the detailed description about the models IdP and RP servers in UPPRESSO system.
-At the end, the models of browser and scripts are also introduced.
+%This section is organized as follows. At first, we introduce the model of normal basic data (representing data in the form of terms), such as HTTP package, which is to be used to construct more complex models. Then we give the detailed description about the models IdP and RP servers in UPPRESSO system. At the end, the models of browser and scripts are also introduced.
 
 
-\subsubsection{Model of Normal Data}
+\subsubsection{The Data Transmitted}
 At the very beginning, we provide the modelling normal data, such HTTP messages, used to construct UPPRESSO model.
 
 \vspace{1mm}
@@ -152,7 +161,7 @@ PostMessage is used in the browser for transmitting messages between scripts. Th
 \vspace{1mm}\noindent\textbf{XMLHTTPREQUEST}.
 XMLHTTPRequest is the HTTP message transmitted  by scripts in the browser. That is, the XMLHTTPRequest is converted from the HTTP message by the browser. The XMLHTTPRequest package is defined as the term in the form \myss{\myangle{\mathtt{XMLHTTPREQUEST}, URL, methods, Body, nonce}} can be converted into HTTP request message by the browser, and \myss{\myangle{\mathtt{XMLHTTPREQUEST}, Body, nonce}}  is converted from HTTP response message.
 
-\subsubsection{Models of IdP and RP Servers}
+\subsubsection{The Servers of IdP and RP}
 An atomic process is a tuple $p=$ $(I^p, Z^p, R^p,s_0^p )$, containing the addresses, states, and relations.
 Here, we will focus on the state form and relation $R$. They can describe that what kind of event can be accepted by the process in each state, and the content of new output events and states.
 
