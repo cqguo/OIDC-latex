@@ -22,6 +22,18 @@
 %%The adversary may act as a user requesting to log into an RP, and make the RP perform two modular exponentiations.
 %%The RP could previously calculated a set of $Y_{RP}$s to mitigate this attack.
 
+\vspace{1mm}\noindent{\textbf{Applicability.}}
+The identity-transformation functions, i.e., $\mathcal{F}_{PID_{RP}}()$, $\mathcal{F}_{PID_U}()$, and $\mathcal{F}_{Acct}()$,
+    are applicable to various SSO scenarios
+        (e.g., web application, mobile App, and even native software),
+    because these designs do not depend on any special implementation or runtime environment.
+Although the prototype system runs for web applications,
+    it is feasible to apply the identity-transformation functions to other SSO scenarios
+        to protect user privacy.
+    
+%In this paper, the functions are implemented based on the elliptic curve algorithm and the mechanism provided by OIDC system.
+%However, the transformation functions can also be implemented based on other mechanisms according to the protocol and environment, for example, the TPM may be used to take responsibility to transform identities.
+
 
 %授权码
 %兼容:目前只提供隐式模式,对其他模式与协议的兼容方法
@@ -77,12 +89,6 @@ to prevent this leakage in the authorization code flow,
 
 %\noindent{\textbf{Malicious IdP mitigation.}} The IdP is assumed to assign a unique $ID_{RP}$ in $Cert_{RP}$ for each RP and generate the correct $PID_U$ for each login. The malicious IdP may attempt to provide the incorrect $ID_{RP}$ and $PID_U$, which could be prevented by integrating certificate transparency \cite{rfc6962} and user's identifier check \cite{SPRESSO}. With certificate transparency \cite{rfc6962}, the monitors  check the uniqueness of $ID_{RP}$ among all the certificates stored in the log server. To prevent the malicious IdP from injecting any incorrect $PID_U$, the user could provide a nickname to the RP for an extra check as in SPRESSO \cite{SPRESSO}.
 
-
-\vspace{1mm}\noindent{\textbf{Applicability.}}
-In this paper, we propose the idea, that the privacy-protection problem of SSO can be converted into the identity-transformation challenge. 
-This challenge is to design the three identity-transformation functions, $\mathcal{F}_{PID_{RP}}()$, $\mathcal{F}_{PID_U}(ID_U, PID_{RP}) = PID_{U}$, and $\mathcal{F}_{Acct}(PID_{U}, PID_{RP}) = Acct$. 
-In this paper, the functions are implemented based on the elliptic curve algorithm and the mechanism provided by OIDC system. 
-However, the transformation functions can also be implemented based on other mechanisms according to the protocol and environment, for example, the TPM may be used to take responsibility to transform identities.
 
 
 \vspace{1mm}\noindent{\textbf{Implementation with Browser Extensions.}}
