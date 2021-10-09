@@ -79,17 +79,17 @@ an HTTP GET request for the domain {\sf exa.com/path?para=1} with empty header a
 \item \textbf{Patten Matching}.  We define the term with the variable $*$ as the pattern, such as \myss{\myangle{a, b, *}}.
 The pattern matches any term which only replaces the $*$ with other terms. For instance,  \myss{\myangle{a, b, *}} matches \myss{\myangle{a, b, c}}.
 \item \textbf{Retrieve attributes from formatted term}. Formatted term is the data in the specific format, for instance, the HTTP request is the formatted data in the form \myss{\langle\mathtt{HTTPReq}}, \myss{nonce}, \myss{method}, \myss{host}, \myss{path}, \myss{parameters}, \myss{headers}, \myss{body\rangle}.  We assume there is an HTTP request \myss{r :=}  \myss{\langle\mathtt{HTTPReq}},  \myss{n},  \myss{\mathtt{GET}},  \myss{example.com},  \myss{/path},  \myss{\myangle{}},  \myss{\myangle{}},  \myss{\myangle{}\rangle}, here we define the operation on the $r$. That is, the elements in $r$ can be accessed in the form \myss{r.name}, such that \myss{r.method \equiv \mathtt{GET}},  \myss{r.path \equiv /path} and \myss{r.body \equiv \myangle{}}.
-\item \textbf{Retrieve attributes from dictionary term}. Dictionary term is the data in the form \myss{\myangle{\myangle{name, value}, \myangle{name, value}, \dotsc}}, for instance the \myss{body} in HTTP request is dictionary data. We assume there is a \myss{body := \myangle{\myangle{username, alice}, \myangle{password, 123}}}, here we define the operation on the $body$. That is, we can access the elements in \myss{body} in the form \myss{body[name]}, such that \myss{body[username] \equiv alice} and \myss{body[password] \equiv 123}. We can also add the new attributes to the dictionary, for example after we set \myss{body[age] := 18}, the \myss{body} are changed into\myss{ \myangle{\myangle{username, alice}, \myangle{password, 123}, \myangle{age, 18}}}.
+\item \textbf{Retrieve attributes from dictionary term}. Dictionary term is the data in the form \myss{\myangle{\myangle{type, value}, \myangle{type, value}, \dotsc}}, for instance the \myss{body} in HTTP request is dictionary data. We assume there is a \myss{body := \myangle{\myangle{username, alice}, \myangle{password, 123}}}, here we define the operation on the $body$. That is, we can access the elements in \myss{body} in the form \myss{body[name]}, such that \myss{body[username] \equiv alice} and \myss{body[password] \equiv 123}. We can also add the new attributes to the dictionary, for example after we set \myss{body[age] := 18}, the \myss{body} are changed into\myss{ \myangle{\myangle{username, alice}, \myangle{password, 123}, \myangle{age, 18}}}.
 \end{itemize}
 
 \vspace{1mm}
-\noindent\textbf{State}. State is the term consisted of basic terms, to sketch the atomic process at the point of time. For example, the state of a login server can be simplistically described as the term $\langle CookieList,UserList \rangle$,
-    while the $CookieList$ maintains the visitors' cookies with the corresponding login state,
+\noindent\textbf{State}. State is the term consisted of basic terms, to sketch the atomic process at the point of time. For example, the state of a login server can be simplistically described as the term $\langle SessionList,UserList \rangle$,
+    while the $SessionList$ maintains the visitors' cookies with the corresponding login state,
     and the $UserList$ maintains all user identities (either logined or unlogined) and their corresponding credential verifiers.
 
 
 \vspace{1mm}
-\noindent\textbf{Relation}. The relation represents the model of procedure, showing how the entity deal with the received message. For example, while the login server receive the login request from a visitor (the request is denoted as the event $e$), the input of the relation is $e$ and current state $\langle CookieList,UserList \rangle$.   The server verifies the visitor's identity with the $UserList$ and set the login result to $CookieList$ (transitioning to $CookieList'$). Thus the output is the login response $e'$ and the new state $\langle CookieList',UserList \rangle$.
+\noindent\textbf{Relation}. The relation represents the model of procedure, showing how the entity deal with the received message. For example, while the login server receive the login request from a visitor (the request is denoted as the event $e$), the input of the relation is $e$ and current state $\langle SessionList,UserList \rangle$.   The server verifies the visitor's identity with the $UserList$ and add the login result into $SessionList$ (transitioning to $SessionList'$). Thus the output is the login response $e'$ and the new state $\langle SessionList',UserList \rangle$.
 
 
 \vspace{1mm}
@@ -143,8 +143,8 @@ The details are defined as follows:
  \item \myss{host} is the constant string domain of visited server.
  \item \myss{path} is the constant string representing the concrete resource of the server.
  \item \myss{parameters} contains the parameters carried by the url as the form \myss{\myangle{\myangle{name, value}, \myangle{name, value}, \dotsc}}, for example, the \myss{parameters} in the url \myss{http://www.example.com?type=confirm}  is \myss{\myangle{\myangle{type, confirm}}}.
- \item \myss{headers} is the header content of each HTTP messages as the form \myss{\myangle{\myangle{name, value}, \myangle{name, value}, \dotsc}}, such as \myss{\langle\myangle{Referer, http://www.example.com},} \myss{\myangle{Cookies, c}\rangle}.
- \item \myss{body} is the body content carried by HTTP \myss{\mathtt{POST}} request or HTTP response in the form \myss{\myangle{\myangle{name, value}, \myangle{name, value}, \dotsc}}.
+ \item \myss{headers} is the header content of each HTTP messages as the form \myss{\myangle{\myangle{type, value}, \myangle{type, value}, \dotsc}}, such as \myss{\langle\myangle{Referer, http://www.example.com},} \myss{\myangle{Cookies, c}\rangle}.
+ \item \myss{body} is the body content carried by HTTP \myss{\mathtt{POST}} request or HTTP response in the form \myss{\myangle{\myangle{type, value}, \myangle{type, value}, \dotsc}}.
   \item \myss{status} is the HTTP status code defined by HTTP standard, such as 200, 302 and 404.
 \end{itemize}
 
@@ -166,7 +166,7 @@ Here, we will focus on the state form and relation $R$. They can describe that w
 
 
 \vspace{1mm}\noindent\textbf{IdP Server Process}.
-The state of IdP server process is described as a term in the form \myss{\myangle{Issuer, SK, sessions, users, RPs, Validity, Tokens}}.
+The state of IdP server process is described as a term in the form \myss{\myangle{Issuer, SK, SessionList, users, RPs, Validity, Tokens}}.
 That is,  the state of an IdP server  at the point in time can be sketched using these attributes.
 Other data stored at IdP but not used during SSO authentication are not mentioned here.
 \begin{itemize}
@@ -174,17 +174,17 @@ Other data stored at IdP but not used during SSO authentication are not mentione
 \item \myss{Issuer} is the identifier of IdP.
 %\item \myss{p} is the large prime mentioned before.
 \item \myss{SK} is the private key used by IdP to generate signatures.
-\item \myss{Sessions} is the term in the form of \myss{\myangle{\myangle{cookie, session}}}, the cookie uniquely identifies the session and sessions store the  browser uploaded messages.
+\item \myss{SessionList} is the term in the form of \myss{\myangle{\myangle{cookie, session}}}, the cookie uniquely identifies the session storing the  browser uploaded messages.
 \item \myss{UserList} is the set of user's information, including  \myss{username, credential, ID_U}  and other attributes.
 \item \myss{RPs} is the set of RP information which consists of ID of RP \myss{(PID_{RP})}, \myss{Endpoints} (i.e., the set of RP's validity endpoints) and \myss{Validity}.
 \item \myss{Validity} is the validity for IdP generated signatures.
-\item \myss{Tokens} is the set of IdP generated Identity proofs.
+\item \myss{Tokens} is the set of IdP generated Identity tokens.
 \end{itemize}
 To make the description clearer, we define the \myss{functions} to express the relations.
 \begin{itemize}
 \setlength\itemsep{-2pt}
-\item \myss{\mathtt{CredentialVerify(u,credential)}} is used to verify whether credential belongs to user $u$.
-\item \myss{\mathtt{UIDOfUser(u)}} is used to search the user \myss{u}'s \myss{ID_U}.
+\item \myss{\mathtt{CredentialVerify(credential)}} is used to authenticate the user.
+\item \myss{\mathtt{UIDOfUser(credential)}} is used to search the user's \myss{ID_U}.
 \item \myss{\mathtt{ListOfPID()}} is the set of IDs of registered RP.
 \item \myss{\mathtt{EndpointsOfRP(r)}} is the set of endpoints registered by the RP with ID \myss{r}.
 %\item \myss{\mathtt{ModPow(a, b, c)}} is the result of \myss{a^b \mod c}.
@@ -199,8 +199,8 @@ The relation of IdP process $R^i$ is shown as Relation~\ref{alg1} in Appendix~\r
 
 
 \vspace{1mm}\noindent\textbf{RP server process}.
-The state of RP server process is a term in the form \myss{\myangle{ID_{RP}, Enpt, IdP, Cert, Sessions, UserList}}.
-% Other attributes are not mentioned here.
+The state of RP server process is a term in the form \myss{\myangle{ID_{RP}, Enpt, IdP, Cert, SessionList, UserList}}. %Other attributes are not mentioned here.
+
 \begin{itemize}
 \setlength\itemsep{-2pt}
 \item \myss{ID_{RP}} and \myss{Enpt} are RP's registered information at IdP.
@@ -208,16 +208,16 @@ The state of RP server process is a term in the form \myss{\myangle{ID_{RP}, Enp
 \item \myss{IdP} is the term of the form \myss{\langle ScriptUrl}, %\myss{q},
     \myss{PK \rangle}, where \myss{ScriptUrl} is the site to download IdP script, %\myss{q} is the large prime defined before,
      and \myss{PK} is the public key used to verify the IdP signed messages.
-\item \myss{Sessions} is same as it in IdP process.
+\item \myss{SessionList} is same as it in IdP process.
 \item \myss{UserList} is the set of users registered at this RP, each user is uniquely identified by the \myss{Acct}.
 \end{itemize}
 
 The new \myss{functions} are defined as follows:
 \begin{itemize}
 \setlength\itemsep{-2pt}
- \item \myss{\mathtt{ExEU}(a, q)} is the Extended Euclidean algorithm, which calculates  \myss{a^{-1} \mod q}.
+ \item \myss{\mathtt{Inverse}(a)}  calculates the trapdoor in UPPRESSO system.
   \item \myss{\mathtt{Random}()} generates a fresh random number.
-  \item \myss{\mathtt{RegisterUser}(Acct)} add the new user with \myss{Acct} into RP's user list.
+  \item \myss{\mathtt{AddUser}(Acct)} add the new user with \myss{Acct} into RP's user list.
 \end{itemize}
 The relation of RP process $R^r$ is shown as Relation~\ref{alg2} in Appendix~\ref{ape:alg}.
 
@@ -274,13 +274,13 @@ The \myss{tree} is the structure of the opened windows and documents, which are 
 
 \vspace{1mm}
 \noindent\textbf{IdP script process}
-The state of IdP script process \myss{scriptstate} is a term in the form \myss{\myangle{IdPDomain, Parameters, q, refXHR}}, where
+The state of IdP script process \myss{scriptstate} is a term in the form \myss{\myangle{IdPDomain, Parameters, phase, refXHR}}, where
 \begin{itemize}
 \setlength\itemsep{-2pt}
 \item \myss{IdPDomain} is the IdP's host.
 \item \myss{Parameters} is used to store the parameters received from other processes.
 %\item \myss{p} is the large prime defined before.
-\item \myss{q} is used to label the procedure point in the login.
+\item \myss{phase} is used to label the procedure point in the login.
 \item \myss{refXHR} is the nonce to map HTTP request and response.
 \end{itemize}
 The new \myss{functions} are defined as follows.
@@ -289,15 +289,17 @@ The new \myss{functions} are defined as follows.
  \item \myss{\mathtt{PARENTWINDOW}(tree,docID)}. The first parameter is the input relation tree defined before, and the second parameter is the $ID_d$ of a document. The output returned by the function is the current window's opener's $ID_w$ (null if it doesn't exist nor it is invisible to this document).
   \item \myss{\mathtt{CHOOSEINPUT}(inputs,pattern)}. The first parameter is a set of messages, and the second parameter is a pattern. The result returned by the function is the message in \myss{inputs} matching the \myss{pattern}.
   \item \myss{\mathtt{RandomUrl}()} returns a newly generated host string.
+    \item \myss{\mathtt{CredentialofUser}(user,secret)} creates the user's credential for authentication.
 \end{itemize}
 The relation of IdP script process $script\_idp$ is shown in Appendix~\ref{ape:alg} Relation~\ref{alg3}.
 
 
 
 
+
 \vspace{1mm}
 \noindent\textbf{RP script process}
-The state of RP script process \myss{scriptstate} is a term in the form \myss{\langle IdPDomain}, \myss{RPDomain}, \myss{Parameters}, \myss{q}, \myss{refXHR\rangle}. The \myss{RPDomain} is the host string of the corresponding RP server, and other terms are defined in the same way as in IdP script process.
+The state of RP script process \myss{scriptstate} is a term in the form \myss{\langle IdPDomain}, \myss{RPDomain}, \myss{Parameters}, \myss{phase}, \myss{refXHR\rangle}. The \myss{RPDomain} is the host string of the corresponding RP server, and other terms are defined in the same way as in IdP script process.
 
 Here, we define the function \myss{\mathtt{SUBWINDOW}(tree, docID)}, which takes the \myss{tree} defined above and the current document's \myss{ID_d} as the input. And it selects the \myss{ID_w} of the first window opened by this document as the output. However, if there is no opened windows, it returns  null.
 
@@ -341,10 +343,10 @@ Here we only need to prove that attackers cannot receive \myss{Token} from other
 \setlength\itemsep{-2pt}
 \item Attacker cannot obtain the \myss{Token} from RP server.  We check all the messages sent by the RP server at Line 4, 7, 19, 25, 31, 36, 45, 55, 61, 66, 74, 84 in Relation~\ref{alg2}. It is easy to prove that the RP server does not send any \myss{Token} to other processes.
 \item Attacker cannot obtain the \myss{Token} from RP script. The  messages sent by RP script can be classified into two classes. 1) The messages at Line 18, 36, 56 in Relation~\ref{alg4}  are sent to the RPDomain which is set at Line 4, so that attackers cannot receive these messages. 2) The messages at Line 26,  46 only carry the contents received from RP server, and we have proved that RP server does not send any \myss{Token}. Therefore, attackers cannot receive the \myss{Token} from RP script.
-\item Attacker cannot obtain the \myss{Token} from IdP server.  Considering the messages at Line 4, 12, 16, 23, 26, 36, 44, 51, 67 in Relation~\ref{alg1}, we find that only the message at Line 67 carries the \myss{Token}. This \myss{Token} is generated at Line 65, following the trace where the \myss{Content} at Line 63, the \myss{PID_U} at Line 61, the \myss{ID_U} at Line 60, the \myss{session} at Line 48, and finally the \myss{cookie} at Line 47. That is, the receiver of \myss{Token}  must be the owner of the \myss{cookie} in which session that saves the parameter \myss{ID_U} . The \myss{ID_U} is set at Line 15 after verifying the password and never modified. As we assume that passwords cannot be known to attackers,  attackers cannot obtain the \myss{Token} from IdP server.
-\item Attacker cannot obtain the \myss{Token} from IdP script. As the proof provided above, only IdP sends the \myss{Token} with the message at Line 67 in Relation~\ref{alg1}, the IdP script can only receive the \myss{Token} at  Line 99 in Relation~\ref{alg3}. Here we are going to prove that the token issued for user $u$'s login to RP $r$ (denoted as \myss{t(u,r)}) can only be  sent to the corresponding RP server through IdP script. The receiver of \myss{t(u,r)} is restricted by the \myss{RPOrigin} at Line 100, which is set at Line 55. The host in the \myss{RPOrigin} is verified using the one included in \myss{Cert} at Line 51. If the \myss{Cert} belong to \myss{r}, the attacker cannot obtain the \myss{t(u,r)}. Now we give the proof that the \myss{Cert} belongs to \myss{r}. Firstly we define the negotiated \myss{PID_{RP}} in \myss{t(u,r)} as \myss{p}. That is the \myss{PID_{RP}} at Line 69 in Relation~\ref{alg2}  must equal to \myss{p} and the \myss{PID_{RP}} is verified at Line 44 with the \myss{RegistrationToken}. This verification cannot be bypassed due to the state check at Line 60. At the same validity period, the IdP script needs to send the registration request with same \myss{p}  and receive the successful registration result. As the IdP checks the uniqueness of \myss{PID_{RP}} at  Line 32 in Relation~\ref{alg1}. The \myss{r} and IdP script must share the same \myss{RegistrationToken}. As the \myss{RegistrationToken} contains the \myss{\mathtt{Hash}(N_U)}, the IdP script and \myss{r} must share the same \myss{ID_{RP}}. Therefore, the  \myss{Cert} saved as the IdP scriptstate parameter must belong to \myss{r}.
+\item Attacker cannot obtain the \myss{Token} from IdP server.  Considering the messages at Line 4, 11, 15, 22, 25, 35, 43, 50, 66 in Relation~\ref{alg1}, we find that only the message at Line 66 carries the \myss{Token}. This \myss{Token} is generated at Line 64, following the trace where the \myss{Content} at Line 62, the \myss{PID_U} at Line 60, the \myss{ID_U} at Line 59, the \myss{session} at Line 47, and finally the \myss{cookie} at Line 46. That is, the receiver of \myss{Token}  must be the owner of the \myss{cookie} in which session that saves the parameter \myss{ID_U} . The \myss{ID_U} is set at Line 14 after verifying the password and never modified. As we assume that passwords cannot be known to attackers,  attackers cannot obtain the \myss{Token} from IdP server.
+\item Attacker cannot obtain the \myss{Token} from IdP script. As the proof provided above, only IdP sends the \myss{Token} with the message at Line 66 in Relation~\ref{alg1}, the IdP script can only receive the \myss{Token} at  Line 99 in Relation~\ref{alg3}. Here we are going to prove that the token issued for user $u$'s login to RP $r$ (denoted as \myss{t(u,r)}) can only be  sent to the corresponding RP server through IdP script. The receiver of \myss{t(u,r)} is restricted by the \myss{RPOrigin} at Line 100, which is set at Line 55. The host in the \myss{RPOrigin} is verified using the one included in \myss{Cert} at Line 51. If the \myss{Cert} belong to \myss{r}, the attacker cannot obtain the \myss{t(u,r)}. Now we give the proof that the \myss{Cert} belongs to \myss{r}. Firstly we define the negotiated \myss{PID_{RP}} in \myss{t(u,r)} as \myss{p}. That is the \myss{PID_{RP}} at Line 69 in Relation~\ref{alg2}  must equal to \myss{p} and the \myss{PID_{RP}} is verified at Line 44 with the \myss{RegistrationToken}. This verification cannot be bypassed due to the state check at Line 60. At the same validity period, the IdP script needs to send the registration request with same \myss{p}  and receive the successful registration result. As the IdP checks the uniqueness of \myss{PID_{RP}} at  Line 31 in Relation~\ref{alg1}. The \myss{r} and IdP script must share the same \myss{RegistrationToken}. As the \myss{RegistrationToken} contains the \myss{\mathtt{Hash}(t)}, the IdP script and \myss{r} must share the same \myss{ID_{RP}}. Therefore, the  \myss{Cert} saved as the IdP scriptstate parameter must belong to \myss{r}.
 \end{itemize}
-Therefore, attackers cannot  learn users' valid identity proofs.
+Therefore, attackers cannot  learn users' valid identity tokens.
 \end{proof}
 
 
@@ -354,9 +356,9 @@ An honest RP would not accept the token issued for another RP ({\em RP designati
 \end{lemma}
 \begin{proof}
 We can find that an RP server finally accept the $PID_U$ in an token at Line 77 in Relation~\ref{alg2}, after the verification at Line 73. The $PID_{RP}$ retrieved at Line 69, must be verified at Line 44.
-The content verified at Line 44 is received from IdP server, generated at Line 41, Relation~\ref{alg1} and protected by the signature generated at Line 42.
-According to the verification at 32, the content containing $PID_{RP}$ is unique during the valid time.
-Moreover, according to Line 42, 44 (the $N_U$ used at Line 42 is set  at  Line 15, used for generating $PID_{RP}$ at Line 13), the $PID_{RP}$ must be resigned for this RP, as no other RP cannot generate the same $PID_{RP}$ with this $N_U$.
+The content verified at Line 43 is received from IdP server, generated at Line 40, Relation~\ref{alg1} and protected by the signature generated at Line 41.
+According to the verification at 31, the content containing $PID_{RP}$ is unique during the valid time.
+Moreover, according to Line 42, 44 (the $t$ used at Line 42 is set  at  Line 15, used for generating $PID_{RP}$ at Line 13), the $PID_{RP}$ must be resigned for this RP, as no other RP cannot generate the same $PID_{RP}$ with this $t$.
 As it has been proved at Lemma~\ref{lemma:confidentiality}, an malicious RP cannot receive the valid token issued for another RP, therefore, the adversary would not receive the token including an honest RP's $PID_{RP}$ from honest user.
 \end{proof}
 
@@ -384,8 +386,8 @@ An honest user must always login to the honest RP on her own identity ({\em user
 \end{lemma}
 \begin{proof}
 We can find that, the RP accepts the user's identity at Line 83, Relation~\ref{alg2}. And the identity is generated at Line 79, based on the $PID_U$  retrieved from the token and the trapdoor $t^{-1}$.
-The $t^{-1}$ is generated at Line 14, set at Line 17, and never changed, as the multiplicative inverse of $N_U$.
-According to Lemma~\ref{lemma:integrity}, only the IdP can generate an token, so that the token must be issued at Line 65, Relation~\ref{alg1}.
+The $t^{-1}$ is generated at Line 14, set at Line 17, and never changed, as the multiplicative inverse of $t$.
+According to Lemma~\ref{lemma:integrity}, only the IdP can generate an token, so that the token must be issued at Line 64, Relation~\ref{alg1}.
 IdP generates the $PID_U$ based on the $PID_{RP}$ and user's $ID_U$.
 According to Lemma~\ref{lemma:RPdesignation}, while the $PID_{RP}$ is accepted by an RP, the $PID_{RP}$ must be the generated between the RP and user.
 According to Lemma~\ref{lemma:confidentiality}, the $ID_U$ must belongs to the honest user.
@@ -394,9 +396,9 @@ Therefore, the user's identity must equal with the constant $ [ID_U]ID_{RP}$.
 Moreover, an adversary may lead the honest user to upload the adversary's token to an RP.
 While the honest user has already negotiated the $PID_{RP}$ with the RP.
 The opener of the IdP script must be the RP script.
-As the $N_U$ generated at Line 7, Relation~\ref{alg3}, and $PID_{RP}$ generated at Line 21, Relation~\ref{alg3} and Line 13, Relation~\ref{alg2}.
+As the $t$ generated at Line 7, Relation~\ref{alg3}, and $PID_{RP}$ generated at Line 21, Relation~\ref{alg3} and Line 13, Relation~\ref{alg2}.
 The $t$ is only sent to RP script at Line 8, Relation~\ref{alg3}, and RP server at Line 18, Relation~\ref{alg4}.
-The $PID_{RP}$ is only sent to IdP server at Line 28 and 90, Relation~\ref{alg3}. Moreover, the registration result including the $PID_{RP}$ is sent to IdP script at Line  36, Relation~\ref{alg1}, RP script at Line 40, Relation~\ref{alg3}, RP server at Line 36, Relation~\ref{alg4}. An adversary can never know the $PID_{RP}$ negotiated between the honest user and RP.
+The $PID_{RP}$ is only sent to IdP server at Line 28 and 90, Relation~\ref{alg3}. Moreover, the registration result including the $PID_{RP}$ is sent to IdP script at Line  35, Relation~\ref{alg1}, RP script at Line 40, Relation~\ref{alg3}, RP server at Line 36, Relation~\ref{alg4}. An adversary can never know the $PID_{RP}$ negotiated between the honest user and RP.
 While the honest user has not negotiated the $PID_{RP}$ with the RP yet, the \verb+session+[$PID_{RP}$] at Line 69, Relation~\ref{alg2} and other similar attributes must be empty, as the $Cookie$ used at Line 58 belongs to the honest user and the negotiation between Line 10-20 does not conducted by the user.
 Therefore, an adversary cannot lead the honest RP to accept the malicious token from the honest user.
 \end{proof}
@@ -440,21 +442,21 @@ The detailed procedure of dealing with these events is shown as follows.
   \mystop{b, a, m'}
   \myelse{path \equiv /login}
   \mystate{\myss{cookie := headers[Cookie]}}
-  \mystate{\myss{session := s'.Sessions[cookie]}}
-  \mystate{\myss{username:=body[username]}}
+  \mystate{\myss{session := s'.SessionList[cookie]}}
+  %\mystate{\myss{username:=body[username]}}
   \mystate{\myss{credential:=body[credential]}}
-  \myif{CredentialVerify(username, credential)}
+  \myif{CredentialVerify(credential)}
   \mystate{\myss{m' :=\myangle{\mathtt{HTTPResp},n,200,\myangle{},\mathtt{LoginFailure}}}}
   \mystop{b, a,m'}
   \ENDIF
-  \mystate{\myss{session[uid] := \mathtt{UIDOfUser}(username)}}
+  \mystate{\myss{session[uid] := \mathtt{UIDOfUser}(credential)}}
   \mystate{\myss{m' :=\myangle{\mathtt{HTTPResp},n,200,\myangle{},\mathtt{LoginSucess}}}}
   \mystop{b, a,m'}
   \myelse{path \equiv /loginInfo}
   \mystate{\myss{cookie := headers[Cookie]}}
-  \mystate{\myss{session := s'.sessions[cookie]}}
-  \mystate{\myss{username := session[username]}}
-  \myif{username \not\equiv \mathtt{null}}
+  \mystate{\myss{session := s'.SessionList[cookie]}}
+  \mystate{\myss{uid := session[uid]}}
+  \myif{uid \not\equiv \mathtt{null}}
   \mystate{\myss{m' := \myangle{\mathtt{HTTPResp},n,200,\myangle{},\mathtt{Logged}}}}
   \mystop{b, a,m'}
   \ENDIF
@@ -480,7 +482,7 @@ The detailed procedure of dealing with these events is shown as follows.
   \mystop{b, a,m'}
   \myelse{path \equiv /authorize}
   \mystate{\myss{cookie := headers[Cookie]}}
-  \mystate{\myss{session := s'.Sessions[cookie]}}
+  \mystate{\myss{session := s'.SessionList[cookie]}}
   \mystate{\myss{username := session[username]}}
   \myif{username \equiv \mathtt{null}}
   \mystate{\myss{m' := \myangle{\mathtt{HTTPResp}, n, 200, \myangle{}, \mathtt{Fail}}}}
@@ -527,10 +529,10 @@ The detailed procedure of dealing with these events is shown as follows.
   \mystop{b, a, m'}
   \myelse{path \equiv /startNegotiation}
   \mystate{\myss{cookie := headers[Cookie]}}
-  \mystate{\myss{session := s'.Sessions[cookie]}}
+  \mystate{\myss{session := s'.SessionList[cookie]}}
   \mystate{\myss{t := parameters[t]}}
   \mystate{\myss{PID_{RP} := \mathtt{Multiply}(s'.ID_{RP}, t)}}
-  \mystate{\myss{t^{-1}:= \mathtt{ExEU}(t, s'.IdP.q)}}
+  \mystate{\myss{t^{-1}:= \mathtt{Inverse}(t)}}
   \mystate{\myss{session[t] := t}}
   \mystate{\myss{session[PID_{RP}] := PID_{RP}}}
   \mystate{\myss{session[t^{-1}] := t^{-1}}}
@@ -539,7 +541,7 @@ The detailed procedure of dealing with these events is shown as follows.
  \mystop{b, a, m'}
  \myelse{path \equiv /registrationResult}
  \mystate{\myss{cookie := headers[Cookie]}}
-  \mystate{\myss{session := s'.Sessions[cookie]}}
+  \mystate{\myss{session := s'.SessionList[cookie]}}
   \myif{session[state] \not\equiv expectRegistration}
   \mystate{\myss{m' := \myangle{\mathtt{HTTPResp}, n, 200, \myangle{}, \mathtt{Fail}}}}
   \mystop{b, a, m'}
@@ -575,7 +577,7 @@ The detailed procedure of dealing with these events is shown as follows.
   \mystop{b, a, m'}
   \myelse{path \equiv /uploadToken}
  \mystate{\myss{cookie := headers[Cookie]}}
-  \mystate{\myss{session := s'.Sessions[cookie]}}
+  \mystate{\myss{session := s'.SessionList[cookie]}}
   \myif{session[state] \not\equiv expectToken}
   \mystate{\myss{m' := \myangle{\mathtt{HTTPResp}, n, 200, \myangle{}, \mathtt{Fail}}}}
   \mystop{b, a, m'}
@@ -596,8 +598,8 @@ The detailed procedure of dealing with these events is shown as follows.
   \mystate{\myss{PID_U := Content.PID_U}}
   \mystate{\myss{t^{-1} := session[t^{-1}]}}
   \mystate{\myss{Acct := \mathtt{Multiply}(PID_U, t^{-1})}}
-  \myif{Acct \in \mathtt{ListOfUser}()}
-  \mystate{\myss{\mathtt{RegisterUser}(Acct)}}
+  \myif{Acct \not\in \mathtt{ListOfUser}()}
+  \mystate{\myss{\mathtt{AddUser}(Acct)}}
   \ENDIF
   \mystate{\myss{session[user] := Acct}}
   \mystate{\myss{m' := \myangle{\mathtt{HTTPResp}, n, 200, \myangle{}, \mathtt{LoginSuccess}}}}
@@ -624,12 +626,12 @@ The detailed procedure of dealing with these events is shown as follows.
   \mystate{\myss{command := \myangle{}}}
   \mystate{\myss{target := \mathtt{PARENTWINDOW}(tree,docID)}}
   \mystate{\myss{IdPDomain := s'.IdPDomain}}
-  \SWITCH{\myss{s'.q}}
+  \SWITCH{\myss{s'.phsae}}
     \CASE{\myss{start}}
       \mystate{\myss{t := \mathtt{Random}()}}
       \mystate{\myss{command := \myangle{\mathtt{POSTMESSAGE}, target, \myangle{\myangle{t, t}}, \mathtt{null}}}}
       \mystate{\myss{s'.Parameters[t] := t}}
-      \mystate{\myss{s'.q := expectCert}}
+      \mystate{\myss{s'.phase := expectCert}}
     \ENDCASE
     \CASE{\myss{expectCert}}
       \mystate{\myss{pattern := \myangle{\mathtt{POSTMESSAGE}, *, Content, *}}}
@@ -649,7 +651,7 @@ The detailed procedure of dealing with these events is shown as follows.
       \mystate{\myss{Url := \myangle{\mathtt{URL}, \mathtt{S}, IdPDomain, /dynamicRegistration,\myangle{} }}}
       \mystate{\myss{s'.refXHR :=  \mathtt{Random}()}}
       \mystate{\myss{command : = \langle\mathtt{XMLHTTPREQUEST}, Url, \mathtt{POST},} \\\ \ \ \ \myss{ \myangle{\myangle{PID_{RP}, PID_{RP}}, \myangle{Nonce, Nonce}, \myangle{Enpt, Enpt}}, s'.refXHR\rangle}}
-      \mystate{\myss{s'.q := expectRegistrationResult}}
+      \mystate{\myss{s'.phase := expectRegistrationResult}}
        \ENDIF
       \ENDCASE
       \CASE{expectRegistrationResult}
@@ -658,11 +660,11 @@ The detailed procedure of dealing with these events is shown as follows.
       \myif{input \not\equiv \mathtt{null} \land input.Content[RegistrationResult].type \equiv OK}
       \mystate{\myss{RegistrationResult := input.Body[RegistrationResult]}}
       \myif{ RegistrationResult.Content.Result \not\equiv OK}
-      \mystate{\myss{s'.q := stop}}
+      \mystate{\myss{s'.phase := stop}}
       \mystate{\myss{\textbf{stop}\ \myangle{}}}
       \ENDIF
       \mystate{\myss{command := \myangle{\mathtt{POSTMESSAGE}, target, \myangle{\myangle{RegistrationResult, RegistrationResult}}, \mathtt{null}}}}
-      \mystate{\myss{s'.q := expectProofRquest}}
+      \mystate{\myss{s'.phase := expectProofRquest}}
       \ENDIF
       \ENDCASE
       \CASE{expectProofRquest}
@@ -674,14 +676,14 @@ The detailed procedure of dealing with these events is shown as follows.
        \mystate{\myss{s'.Parameters[Nonce] := input.Content[Nonce]}}
        \mystate{\myss{Cert := s'.Parameters[Cert]}}
       \myif{Enpt_{RP} \not\equiv Cert.Content.Enpt \lor PID_{RP} \not\equiv s'.Parameters[PID_{RP}]}
-      \mystate{\myss{s'.q := stop}}
+      \mystate{\myss{s'.phase := stop}}
       \mystate{\myss{\textbf{stop}\ \myangle{}}}
       \ENDIF
        \mystate{\myss{s'.Parameters[Enpt_{RP}] := Enpt_{RP}}}
       \mystate{\myss{Url := \myangle{\mathtt{URL}, \mathtt{S}, IdPDomain, /loginInfo, \myangle{}}}}
       \mystate{\myss{s'.refXHR :=  \mathtt{Random}()}}
       \mystate{\myss{command : = \myangle{\mathtt{XMLHTTPREQUEST}, Url, \mathtt{GET},\myangle{}, s'.refXHR}}}
-      \mystate{\myss{s'.q := expectLoginState}}
+      \mystate{\myss{s'.phase := expectLoginState}}
       \ENDIF
       \ENDCASE
       \CASE{expectLoginState}
@@ -689,11 +691,11 @@ The detailed procedure of dealing with these events is shown as follows.
       \mystate{\myss{input := \mathtt{CHOOSEINPUT}(scriptinputs,pattern) }}
       \myif{input \not\equiv \mathtt{null}}
       \myif{input.Body \equiv \mathtt{Logged}}
-      \mystate{\myss{username \in ids}}
+      \mystate{\myss{user \in ids}}
       \mystate{\myss{Url := \myangle{\mathtt{URL}, \mathtt{S}, IdPDomain, /login, \myangle{}}}}
      \ mystate{\myss{s'.refXHR :=  \mathtt{Random}()}}
-      \mystate{\myss{command : = \myangle{\mathtt{XMLHTTPREQUEST}, Url, \mathtt{POST},\myangle{\myangle{username, username}, \myangle{credential, secret}}, s'.refXHR}}}
-      \mystate{\myss{s'.q := expectLoginResult}}
+      \mystate{\myss{command : = \myangle{\mathtt{XMLHTTPREQUEST}, Url, \mathtt{POST}, \myangle{credential, \mathtt{CredentialofUser}(user,secret)}}, s'.refXHR}}
+      \mystate{\myss{s'.phase := expectLoginResult}}
       \myelse{input.Body \equiv \mathtt{Unlogged}}
       \mystate{\myss{PID_{RP} := s'.Parameters[PID_{RP}]}}
       \mystate{\myss{Enpt := s'.Parameters[Enpt]}}
@@ -701,7 +703,7 @@ The detailed procedure of dealing with these events is shown as follows.
       \mystate{\myss{Url := \langle \mathtt{URL}, \mathtt{S}, IdPDomain, /authorize,}\\\ \ \ \  \myss{\myangle{\myangle{PID_{RP}, PID_{RP}}, \myangle{Enpt, Enpt}, \myangle{Nonce, Nonce}} \rangle}}
       \mystate{\myss{s'.refXHR :=  \mathtt{Random}()}}
       \mystate{\myss{command : = \myangle{\mathtt{XMLHTTPREQUEST}, Url, \mathtt{GET},\myangle{}, s'.refXHR}}}
-      \mystate{\myss{s'.q := expectToken}}
+      \mystate{\myss{s'.phase := expectToken}}
       \ENDIF
       \ENDIF
       \ENDCASE
@@ -718,7 +720,7 @@ The detailed procedure of dealing with these events is shown as follows.
       \mystate{\myss{Url := \langle \mathtt{URL}, \mathtt{S}, IdPDomain, /authorize,}\\\ \ \ \  \myss{\myangle{\myangle{PID_{RP}, PID_{RP}}, \myangle{Enpt, Enpt}, \myangle{Nonce, Nonce}} \rangle}}
       \mystate{\myss{s'.refXHR :=  \mathtt{Random}()}}
       \mystate{\myss{command : = \myangle{\mathtt{XMLHTTPREQUEST}, Url, \mathtt{GET},\myangle{}, s'.refXHR}}}
-      \mystate{\myss{s'.q := expectToken}}
+      \mystate{\myss{s'.phase := expectToken}}
       \ENDIF
       \ENDCASE
       \CASE{expectToken}
@@ -728,7 +730,7 @@ The detailed procedure of dealing with these events is shown as follows.
       \mystate{\myss{Token := input.Body[Token]}}
       \mystate{\myss{RPOringin := \myangle{s'.Parameters[Enpt_{RP}], \mathtt{S}}}}
       \mystate{\myss{command := \myangle{\mathtt{POSTMESSAGE},target,\myangle{Token,Token},RPOrigin}}}
-      \mystate{\myss{s .q := stop}}
+      \mystate{\myss{s .phase := stop}}
      \ENDIF
     \ENDCASE
   \ENDSWITCH
@@ -754,11 +756,11 @@ The detailed procedure of dealing with these events is shown as follows.
   \mystate{\myss{IdPWindow := \mathtt{SUBWINDOW}(tree,docnonce).ID_w}}
   \mystate{\myss{RPDomain := s'.RPDomain}}
   \mystate{\myss{IdPOringin := \myangle{s'.IdPDomian, \mathtt{S}}}}
-  \SWITCH{\myss{s'.q}}
+  \SWITCH{\myss{s'.phase}}
     \CASE{\myss{start}}
     \mystate{\myss{Url := \myangle{\mathtt{URL}, \mathtt{S}, RPDomain, /login, \myangle{}}}}
     \mystate{\myss{command := \myangle{\mathtt{IFRAME}, Url, \_SELF}}}
-    \mystate{\myss{s'.q := expectt}}
+    \mystate{\myss{s'.phase := expectt}}
     \ENDCASE
     \CASE{\myss{expectt}}
     \mystate{\myss{pattern := \myangle{\mathtt{POSTMESSAGE}, *, Content, *}}}
@@ -768,7 +770,7 @@ The detailed procedure of dealing with these events is shown as follows.
       \mystate{\myss{Url := \myangle{\mathtt{URL}, \mathtt{S}, RPDomain, /startNegotiation, \myangle{}}}}
       \mystate{\myss{s'.refXHR :=  \mathtt{Random}()}}
       \mystate{\myss{command : = \myangle{\mathtt{XMLHTTPREQUEST}, Url, \mathtt{POST},\myangle{\myangle{t, t}}, s'.refXHR}}}
-      \mystate{\myss{s'.q := expectCert}}
+      \mystate{\myss{s'.phase := expectCert}}
       \ENDIF
       \ENDCASE
       \CASE{\myss{expectCert}}
@@ -777,7 +779,7 @@ The detailed procedure of dealing with these events is shown as follows.
       \myif{input \not\equiv \mathtt{null}}
       \mystate{\myss{Cert := input.Content[Cert]}}
       \mystate{\myss{command := \myangle{\mathtt{POSTMESSAGE}, IdPWindow, \myangle{\myangle{Cert, Cert}}, IdPOringin}}}
-      \mystate{\myss{s'.q := expectRegistrationResult}}
+      \mystate{\myss{s'.phase := expectRegistrationResult}}
       \ENDIF
       \ENDCASE
       \CASE{\myss{expectRegistrationResult}}
@@ -788,7 +790,7 @@ The detailed procedure of dealing with these events is shown as follows.
       \mystate{\myss{Url := \myangle{\mathtt{URL}, \mathtt{S}, RPDomain, /registrationResult, \myangle{}}}}
       \mystate{\myss{s'.refXHR :=  \mathtt{Random}()}}
       \mystate{\myss{command : = \myangle{\mathtt{XMLHTTPREQUEST}, Url, \mathtt{POST},\myangle{\myangle{RegistrationResult, RegistrationResult}}, s'.refXHR}}}
-      \mystate{\myss{s'.q := expectTokenRequest}}
+      \mystate{\myss{s'.phase := expectTokenRequest}}
       \ENDIF
       \ENDCASE
       \CASE{\myss{expectTokenRequest}}
@@ -799,7 +801,7 @@ The detailed procedure of dealing with these events is shown as follows.
       \mystate{\myss{Enpt := input.Content.Body[Enpt]}}
       \mystate{\myss{Nonce := input.Content.Body[Nonce]}}
       \mystate{\myss{command := \langle\mathtt{POSTMESSAGE}, IdPWindow}, \\\ \ \ \  \myss{\myangle{\myangle{PID_{RP}, PID_{RP}}, \myangle{Enpt, Enpt}, \myangle{Nonce, Nonce}},  IdPOringin\rangle}}
-      \mystate{\myss{s'.q := expectToken}}
+      \mystate{\myss{s'.phase := expectToken}}
       \ENDIF
       \ENDCASE
       \CASE{\myss{expectToken}}
@@ -810,7 +812,7 @@ The detailed procedure of dealing with these events is shown as follows.
       \mystate{\myss{Url := \myangle{\mathtt{URL}, \mathtt{S}, RPDomain, /uploadToken, \myangle{}}}}
       \mystate{\myss{s'.refXHR :=  \mathtt{Random}()}}
       \mystate{\myss{command : = \myangle{\mathtt{XMLHTTPREQUEST}, Url, \mathtt{POST},\myangle{\myangle{Token, Token}}, s'.refXHR}}}
-      \mystate{\myss{s'.q := expectLoginResult}}
+      \mystate{\myss{s'.phase := expectLoginResult}}
       \ENDIF
       \ENDCASE
       \CASE{\myss{expectLoginResult}}
