@@ -174,7 +174,7 @@ Other data stored at IdP but not used during SSO authentication are not mentione
 \item \myss{Issuer} is the identifier of IdP.
 %\item \myss{p} is the large prime mentioned before.
 \item \myss{SK} is the private key used by IdP to generate signatures.
-\item \myss{Sessions} is the term in the form of \myss{\myangle{\myangle{Cookie, Session}}}, the Cookie uniquely identifies the session and sessions store the  browser uploaded messages.
+\item \myss{Sessions} is the term in the form of \myss{\myangle{\myangle{cookie, session}}}, the cookie uniquely identifies the session and sessions store the  browser uploaded messages.
 \item \myss{UserList} is the set of user's information, including  \myss{username, credential, ID_U}  and other attributes.
 \item \myss{RPs} is the set of RP information which consists of ID of RP \myss{(PID_{RP})}, \myss{Endpoints} (i.e., the set of RP's validity endpoints) and \myss{Validity}.
 \item \myss{Validity} is the validity for IdP generated signatures.
@@ -183,7 +183,7 @@ Other data stored at IdP but not used during SSO authentication are not mentione
 To make the description clearer, we define the \myss{functions} to express the relations.
 \begin{itemize}
 \setlength\itemsep{-2pt}
-\item \myss{\mathtt{SecretOfID(u)}} is used to search the user \myss{u}'s password.
+\item \myss{\mathtt{CredentialVerify(u,credential)}} is used to verify whether credential belongs to user $u$.
 \item \myss{\mathtt{UIDOfUser(u)}} is used to search the user \myss{u}'s \myss{ID_U}.
 \item \myss{\mathtt{ListOfPID()}} is the set of IDs of registered RP.
 \item \myss{\mathtt{EndpointsOfRP(r)}} is the set of endpoints registered by the RP with ID \myss{r}.
@@ -425,13 +425,13 @@ The detailed procedure of dealing with these events is shown as follows.
   \ \ \textbf{if} \myss{possible}; \textbf{otherwise} stop \myss{\myangle{}, s'}
   \myif{path \equiv /script}
   \mystate{\myss{m':=\myangle{\mathtt{HTTPResp},n,200, \myangle{}, \mathtt{IdPScript}}}}
-  \mystop{f, a, m'}
+  \mystop{b, a, m'}
   \myelse{path \equiv /login}
   \mystate{\myss{cookie := headers[Cookie]}}
-  \mystate{\myss{session := s'.sessions[cookie]}}
+  \mystate{\myss{session := s'.Sessions[cookie]}}
   \mystate{\myss{username:=body[username]}}
-  \mystate{\myss{password:=body[password]}}
-  \myif{password \not\equiv \mathtt{SecretOfID}(username)}
+  \mystate{\myss{credential:=body[credential]}}
+  \myif{CredentialVerify(username, credential)}
   \mystate{\myss{m' :=\myangle{\mathtt{HTTPResp},n,200,\myangle{},\mathtt{LoginFailure}}}}
   \mystop{b, a,m'}
   \ENDIF
@@ -450,45 +450,45 @@ The detailed procedure of dealing with these events is shown as follows.
   \mystop{b, a,m'}
   \myelse{path \equiv /dynamicRegistration}
   \mystate{\myss{PID_{RP} := body[PID_{RP}]}}
- \mystate{\myss{Endpoint := body[Endpoint]}}
+ \mystate{\myss{Enpt := body[Enpt]}}
   \mystate{\myss{Nonce := body[Nonce]}}
   \myif{PID_{RP} \in \mathtt{ListOfPID()}}
   \mystate{\myss{Content :=\myangle{Fail, PID_{RP}, Nonce}}}
-  \mystate{\myss{Sig := \mathtt{Sig}(Content, s'.SignKey)}}
+  \mystate{\myss{Sig := \mathtt{SigSign}(Content, s'.SK)}}
   \mystate{\myss{RegistrationResult := \myangle{Content, Sig}}}
   \mystate{\myss{m' := \myangle{\mathtt{HTTPResp}, n, 200, \myangle{}, RegistrationResult}}}
   \mystop{b, a,m'}
   \ENDIF
   \mystate{\myss{Validity := \mathtt{CurrentTime} ()+ s'.Validity}}
- \mystate{\myss{s'.RPs := s'.RPs +  ^{\myangle{}} \myangle{PID_{RP}, Endpoint, Validity}}}
+ \mystate{\myss{s'.RPs := s'.RPs +  ^{\myangle{}} \myangle{PID_{RP}, Enpt, Validity}}}
   \mystate{\myss{Content := \myangle{OK, PID_{RP}, Nonce, Validity}}}
-  \mystate{\myss{Sig := \mathtt{Sig}(Content, s'.SignKey)}}
+  \mystate{\myss{Sig := \mathtt{Sig}(Content, s'.SK)}}
   \mystate{\myss{RegistrationResult := \myangle{Content, Sig}}}
   \mystate{\myss{m' := \myangle{\mathtt{HTTPResp}, n, 200, \myangle{}, RegistrationResult}}}
   \mystop{b, a,m'}
   \myelse{path \equiv /authorize}
   \mystate{\myss{cookie := headers[Cookie]}}
-  \mystate{\myss{session := s'.sessions[cookie]}}
+  \mystate{\myss{session := s'.Sessions[cookie]}}
   \mystate{\myss{username := session[username]}}
   \myif{username \equiv \mathtt{null}}
   \mystate{\myss{m' := \myangle{\mathtt{HTTPResp}, n, 200, \myangle{}, \mathtt{Fail}}}}
   \mystop{b, a,m'}
   \ENDIF
   \mystate{\myss{PID_{RP} := parameters[PID_{RP}]}}
-  \mystate{\myss{Endpoint := parameters[Endpoint]}}
-  \myif{PID_{RP} \notin \mathtt{ListOfPID}() \lor Endpoint \notin \mathtt{EndpointsOfRP}(PID_{RP})}
+  \mystate{\myss{Enpt := parameters[Enpt]}}
+  \myif{PID_{RP} \notin \mathtt{ListOfPID}() \lor Enpt \notin \mathtt{EndpointsOfRP}(PID_{RP})}
   \mystate{\myss{m' := \myangle{\mathtt{HTTPResp}, n, 200, \myangle{}, \mathtt{Fail}}}}
   \mystop{b, a,m'}
   \ENDIF
   \mystate{\myss{ID_U := session[uid]}}
   \mystate{\myss{PID_U := \mathtt{Multiply}(PID_{RP}, ID_U)}}
   \mystate{\myss{Validity := \mathtt{CurrentTime} ()+ s'.Validity}}
-  \mystate{\myss{Content := \myangle{PID_{RP}, PID_U, s'.ID, Validity}}}
-  \mystate{\myss{Sig := \mathtt{Sig}(Content, s'.SignKey)}}
+  \mystate{\myss{Content := \myangle{PID_{RP}, PID_U, s'.Issuer, Validity}}}
+  \mystate{\myss{Sig := \mathtt{SigSign}(Content, s'.SK)}}
   \mystate{\myss{Token := \myangle{Content, Sig}}}
   \mystate{\myss{s'.Tokens := s'.Tokens + ^{\myangle{}}Token}}
   \mystate{\myss{m' := \myangle{\mathtt{HTTPResp}, n, 200, \myangle{}, \myangle{Token, Token}}}}
-  \mystop{f, a, m'}
+  \mystop{b, a, m'}
   \ENDIF
   \mystop{}
   \end{algorithmic}
@@ -503,19 +503,19 @@ The detailed procedure of dealing with these events is shown as follows.
   \label{alg2}
   \begin{algorithmic}[1]
   \REQUIRE \myss{\myangle{a, b, m}, s}
-  \mystate{\myss{s:=s'}}
+  \mystate{\myss{s':=s}}
   \mystate{\myss{n, method, path, parameters, headers, body} \textbf{such that}}\\
   \ \ \myss{\myangle{\mathtt{HTTPReq},n,method,path,parameters,headers,body} \equiv m}\\
   \ \ \textbf{if} \myss{possible}; \textbf{otherwise} stop \myss{\myangle{}, s'}
   \myif{path \equiv /script}
 \mystate{\myss{m':=\myangle{\mathtt{HTTPResp},n,200, \myangle{}, \mathtt{RPScript}}}}
-  \mystop{f, a, m'}
+  \mystop{b, a, m'}
   \myelse{path \equiv /login}
   \mystate{\myss{m'  := \myangle{\mathtt{HTTPResp},n,302,\myangle{\myangle{Location, s'.IdP.ScriptUrl}}, \myangle{}}}}
-  \mystop{f, a, m'}
+  \mystop{b, a, m'}
   \myelse{path \equiv /startNegotiation}
   \mystate{\myss{cookie := headers[Cookie]}}
-  \mystate{\myss{session := s'.sessions[cookie]}}
+  \mystate{\myss{session := s'.Sessions[cookie]}}
   \mystate{\myss{t := parameters[t]}}
   \mystate{\myss{PID_{RP} := \mathtt{Multiply}(s'.ID_{RP}, t)}}
   \mystate{\myss{t^{-1}:= \mathtt{ExEU}(t, s'.IdP.q)}}
@@ -524,25 +524,25 @@ The detailed procedure of dealing with these events is shown as follows.
   \mystate{\myss{session[t^{-1}] := t^{-1}}}
   \mystate{\myss{session[state] := expectRegistration}}
   \mystate{\myss{m' := \myangle{\mathtt{HTTPResp}, n, 200, \myangle{}, \myangle{Cert, s'.Cert}}}}
- \mystop{f, a, m'}
+ \mystop{b, a, m'}
  \myelse{path \equiv /registrationResult}
  \mystate{\myss{cookie := headers[Cookie]}}
-  \mystate{\myss{session := s'.sessions[cookie]}}
+  \mystate{\myss{session := s'.Sessions[cookie]}}
   \myif{session[state] \not\equiv expectRegistration}
   \mystate{\myss{m' := \myangle{\mathtt{HTTPResp}, n, 200, \myangle{}, \mathtt{Fail}}}}
-  \mystop{f, a, m'}
+  \mystop{b, a, m'}
   \ENDIF
   \mystate{\myss{RegistrationResult := body[RegistrationResult]}}
   \mystate{\myss{Content:=RegistrationResult.Content}}
-  \myif{\mathtt{checksig}(Content, RegistrationResult.Sig, s'.IdP.PubKey) \equiv \mathtt{FALSE}}
+  \myif{\mathtt{SigVerify}(Content, RegistrationResult.Sig, s'.IdP.PK) \equiv \mathtt{FALSE}}
   \mystate{\myss{m' := \myangle{\mathtt{HTTPResp}, n, 200, \myangle{}, \mathtt{Fail}}}}
   \mystate{\myss{session := \mathtt{null}}}
-  \mystop{f, a, m'}
+  \mystop{b, a, m'}
   \ENDIF
   \myif{Content.Result \not\equiv OK}
   \mystate{\myss{m' := \myangle{\mathtt{HTTPResp}, n, 200, \myangle{}, \mathtt{Fail}}}}
   \mystate{\myss{session := \mathtt{null}}}
-  \mystop{f, a, m'}
+  \mystop{b, a, m'}
   \ENDIF
   \mystate{\myss{PID_{RP} := session[PID_{RP}]}}
   \mystate{\myss{t := session[t]}}
@@ -551,27 +551,27 @@ The detailed procedure of dealing with these events is shown as follows.
   \myif{PID_{RP} \not\equiv Content.PID_{RP} \lor Nonce \not\equiv Content.Nonce \lor Time > Content.Validity}
   \mystate{\myss{m' := \myangle{\mathtt{HTTPResp}, n, 200, \myangle{}, \mathtt{Fail}}}}
   \mystate{\myss{session := \mathtt{null}}}
-  \mystop{f, a, m'}
+  \mystop{b, a, m'}
   \ENDIF
   \mystate{\myss{session[PIDValidity] := Content.Validity}}
-  \mystate{\myss{Endpoint \in s'.Endpoints}}
+  \mystate{\myss{Enpt \equiv s'.Enpt}}
   \mystate{\myss{session[state] := expectToken}}
   \mystate{\myss{Nonce' := \mathtt{Random}()}}
   \mystate{\myss{session[Nonce] := Nonce'}}
-  \mystate{\myss{Body := \myangle{PID_{RP}, Endpoint, Nonce'}}}
+  \mystate{\myss{Body := \myangle{PID_{RP}, Enpt, Nonce'}}}
   \mystate{\myss{m' := \myangle{\mathtt{HTTPResp}, n, 200, \myangle{}, Body}}}
-  \mystop{f, a, m'}
+  \mystop{b, a, m'}
   \myelse{path \equiv /uploadToken}
  \mystate{\myss{cookie := headers[Cookie]}}
-  \mystate{\myss{session := s'.sessions[cookie]}}
+  \mystate{\myss{session := s'.Sessions[cookie]}}
   \myif{session[state] \not\equiv expectToken}
   \mystate{\myss{m' := \myangle{\mathtt{HTTPResp}, n, 200, \myangle{}, \mathtt{Fail}}}}
-  \mystop{f, a, m'}
+  \mystop{b, a, m'}
   \ENDIF
   \mystate{\myss{Token := body[Token]}}
-  \myif{\mathtt{checksig}(Token.Content, Token.Sig, s'.IdP.PubKey) \equiv \mathtt{FALSE}}
+  \myif{\mathtt{checksig}(Token.Content, Token.Sig, s'.IdP.PK) \equiv \mathtt{FALSE}}
   \mystate{\myss{m' := \myangle{\mathtt{HTTPResp}, n, 200, \myangle{}, \mathtt{Fail}}}}
-  \mystop{f, a, m'}
+  \mystop{b, a, m'}
   \ENDIF
   \mystate{\myss{PID_{RP} := session[PID_{RP}]}}
   \mystate{\myss{Time := \mathtt{CurrentTime}()}}
@@ -579,17 +579,17 @@ The detailed procedure of dealing with these events is shown as follows.
   \mystate{\myss{Content := Token.Content}}
   \myif{PID_{RP} \not\equiv Content.PID_{RP} \lor Time>Content.Validity \lor Time>PIDValidity}
   \mystate{\myss{m' := \myangle{\mathtt{HTTPResp}, n, 200, \myangle{}, \mathtt{Fail}}}}
-  \mystop{f, a, m'}
+  \mystop{b, a, m'}
   \ENDIF
   \mystate{\myss{PID_U := Content.PID_U}}
   \mystate{\myss{t^{-1} := session[t^{-1}]}}
-  \mystate{\myss{Account := \mathtt{Multiply}(PID_U, t^{-1})}}
-  \myif{Account \in \mathtt{ListOfUser}()}
-  \mystate{\myss{\mathtt{RegisterUser}(Account)}}
+  \mystate{\myss{Acct := \mathtt{Multiply}(PID_U, t^{-1})}}
+  \myif{Acct \in \mathtt{ListOfUser}()}
+  \mystate{\myss{\mathtt{RegisterUser}(Acct)}}
   \ENDIF
-  \mystate{\myss{session[user] := Account}}
+  \mystate{\myss{session[user] := Acct}}
   \mystate{\myss{m' := \myangle{\mathtt{HTTPResp}, n, 200, \myangle{}, \mathtt{LoginSuccess}}}}
-  \mystop{f, a, m'}
+  \mystop{b, a, m'}
   \ENDIF
   \mystop{}
   \end{algorithmic}
@@ -607,10 +607,10 @@ The detailed procedure of dealing with these events is shown as follows.
   \caption{\textbf{IdP\_Script\_Relation}}
   \label{alg3}
   \begin{algorithmic}[1]
-  \REQUIRE \myss{\myangle{tree, docnonce, scriptstate, scriptinputs, cookies, localStorage, sessionStorage, ids, secret}}
+  \REQUIRE \myss{\myangle{tree, docID, scriptstate, scriptinputs, cookies, localStorage, sessionStorage, ids, secret}}
   \mystate{\myss{ s' := scriptstate}}
   \mystate{\myss{command := \myangle{}}}
-  \mystate{\myss{target := \mathtt{PARENTWINDOW}(tree,docnonce)}}
+  \mystate{\myss{target := \mathtt{PARENTWINDOW}(tree,docID)}}
   \mystate{\myss{IdPDomain := s'.IdPDomain}}
   \SWITCH{\myss{s'.q}}
     \CASE{\myss{start}}
@@ -631,12 +631,12 @@ The detailed procedure of dealing with these events is shown as follows.
       \mystate{\myss{t := s'.Parameters[t]}}
       \mystate{\myss{PID_{RP} := \mathtt{Multiply}(Cert.Content.ID_{RP}, t)}}
       \mystate{\myss{s'.Parameters[PID_{RP}] := PID_{RP}}}
-      \mystate{\myss{Endpoint := \mathtt{RandomUrl}()}}
-      \mystate{\myss{s'.Parameters[Endpoint] := Endpoint}}
+      \mystate{\myss{Enpt := \mathtt{RandomUrl}()}}
+      \mystate{\myss{s'.Parameters[Enpt] := Enpt}}
       \mystate{\myss{Nonce := \mathtt{Hash}(t)}}
       \mystate{\myss{Url := \myangle{\mathtt{URL}, \mathtt{S}, IdPDomain, /dynamicRegistration,\myangle{} }}}
       \mystate{\myss{s'.refXHR :=  \mathtt{Random}()}}
-      \mystate{\myss{command : = \langle\mathtt{XMLHTTPREQUEST}, Url, \mathtt{POST},} \\\ \ \ \ \myss{ \myangle{\myangle{PID_{RP}, PID_{RP}}, \myangle{Nonce, Nonce}, \myangle{Endpoint, Endpoint}}, s'.refXHR\rangle}}
+      \mystate{\myss{command : = \langle\mathtt{XMLHTTPREQUEST}, Url, \mathtt{POST},} \\\ \ \ \ \myss{ \myangle{\myangle{PID_{RP}, PID_{RP}}, \myangle{Nonce, Nonce}, \myangle{Enpt, Enpt}}, s'.refXHR\rangle}}
       \mystate{\myss{s'.q := expectRegistrationResult}}
        \ENDIF
       \ENDCASE
@@ -658,14 +658,14 @@ The detailed procedure of dealing with these events is shown as follows.
       \mystate{\myss{input := \mathtt{CHOOSEINPUT}(scriptinputs,pattern)}}
       \myif{input \not\equiv \mathtt{null}}
        \mystate{\myss{PID_{RP} := input.Content[PID_{RP}]}}
-       \mystate{\myss{Endpoint_{RP} := input.Content[Endpoint]}}
+       \mystate{\myss{Enpt_{RP} := input.Content[Enpt]}}
        \mystate{\myss{s'.Parameters[Nonce] := input.Content[Nonce]}}
        \mystate{\myss{Cert := s'.Parameters[Cert]}}
-      \myif{Endpoint_{RP} \notin Cert.Content.Endpoints \lor PID_{RP} \not\equiv s'.Parameters[PID_{RP}]}
+      \myif{Enpt_{RP} \not\equiv Cert.Content.Enpt \lor PID_{RP} \not\equiv s'.Parameters[PID_{RP}]}
       \mystate{\myss{s'.q := stop}}
       \mystate{\myss{\textbf{stop}\ \myangle{}}}
       \ENDIF
-       \mystate{\myss{s'.Parameters[Endpoint_{RP}] := Endpoint_{RP}}}
+       \mystate{\myss{s'.Parameters[Enpt_{RP}] := Enpt_{RP}}}
       \mystate{\myss{Url := \myangle{\mathtt{URL}, \mathtt{S}, IdPDomain, /loginInfo, \myangle{}}}}
       \mystate{\myss{s'.refXHR :=  \mathtt{Random}()}}
       \mystate{\myss{command : = \myangle{\mathtt{XMLHTTPREQUEST}, Url, \mathtt{GET},\myangle{}, s'.refXHR}}}
@@ -680,13 +680,13 @@ The detailed procedure of dealing with these events is shown as follows.
       \mystate{\myss{username \in ids}}
       \mystate{\myss{Url := \myangle{\mathtt{URL}, \mathtt{S}, IdPDomain, /login, \myangle{}}}}
      \ mystate{\myss{s'.refXHR :=  \mathtt{Random}()}}
-      \mystate{\myss{command : = \myangle{\mathtt{XMLHTTPREQUEST}, Url, \mathtt{POST},\myangle{\myangle{username, username}, \myangle{password, secret}}, s'.refXHR}}}
+      \mystate{\myss{command : = \myangle{\mathtt{XMLHTTPREQUEST}, Url, \mathtt{POST},\myangle{\myangle{username, username}, \myangle{credential, secret}}, s'.refXHR}}}
       \mystate{\myss{s'.q := expectLoginResult}}
       \myelse{input.Body \equiv \mathtt{Unlogged}}
       \mystate{\myss{PID_{RP} := s'.Parameters[PID_{RP}]}}
-      \mystate{\myss{Endpoint := s'.Parameters[Endpoint]}}
+      \mystate{\myss{Enpt := s'.Parameters[Enpt]}}
       \mystate{\myss{Nonce := s'.Parameters[Nonce]}}
-      \mystate{\myss{Url := \langle \mathtt{URL}, \mathtt{S}, IdPDomain, /authorize,}\\\ \ \ \  \myss{\myangle{\myangle{PID_{RP}, PID_{RP}}, \myangle{Endpoint, Endpoint}, \myangle{Nonce, Nonce}} \rangle}}
+      \mystate{\myss{Url := \langle \mathtt{URL}, \mathtt{S}, IdPDomain, /authorize,}\\\ \ \ \  \myss{\myangle{\myangle{PID_{RP}, PID_{RP}}, \myangle{Enpt, Enpt}, \myangle{Nonce, Nonce}} \rangle}}
       \mystate{\myss{s'.refXHR :=  \mathtt{Random}()}}
       \mystate{\myss{command : = \myangle{\mathtt{XMLHTTPREQUEST}, Url, \mathtt{GET},\myangle{}, s'.refXHR}}}
       \mystate{\myss{s'.q := expectToken}}
@@ -701,9 +701,9 @@ The detailed procedure of dealing with these events is shown as follows.
       \mystate{\myss{\textbf{stop}\ \myangle{}}}
       \ENDIF
       \mystate{\myss{PID_{RP} := s'.Parameters[PID_{RP}]}}
-      \mystate{\myss{Endpoint := s'.Parameters[Endpoint]}}
+      \mystate{\myss{Enpt := s'.Parameters[Enpt]}}
       \mystate{\myss{Nonce := s'.Parameters[Nonce]}}
-      \mystate{\myss{Url := \langle \mathtt{URL}, \mathtt{S}, IdPDomain, /authorize,}\\\ \ \ \  \myss{\myangle{\myangle{PID_{RP}, PID_{RP}}, \myangle{Endpoint, Endpoint}, \myangle{Nonce, Nonce}} \rangle}}
+      \mystate{\myss{Url := \langle \mathtt{URL}, \mathtt{S}, IdPDomain, /authorize,}\\\ \ \ \  \myss{\myangle{\myangle{PID_{RP}, PID_{RP}}, \myangle{Enpt, Enpt}, \myangle{Nonce, Nonce}} \rangle}}
       \mystate{\myss{s'.refXHR :=  \mathtt{Random}()}}
       \mystate{\myss{command : = \myangle{\mathtt{XMLHTTPREQUEST}, Url, \mathtt{GET},\myangle{}, s'.refXHR}}}
       \mystate{\myss{s'.q := expectToken}}
@@ -714,7 +714,7 @@ The detailed procedure of dealing with these events is shown as follows.
       \mystate{\myss{input := \mathtt{CHOOSEINPUT}(scriptinputs,pattern) }}
       \myif{input \not\equiv \mathtt{null}}
       \mystate{\myss{Token := input.Body[Token]}}
-      \mystate{\myss{RPOringin := \myangle{s'.Parameters[Endpoint_{RP}], \mathtt{S}}}}
+      \mystate{\myss{RPOringin := \myangle{s'.Parameters[Enpt_{RP}], \mathtt{S}}}}
       \mystate{\myss{command := \myangle{\mathtt{POSTMESSAGE},target,\myangle{Token,Token},RPOrigin}}}
       \mystate{\myss{s .q := stop}}
      \ENDIF
@@ -736,10 +736,10 @@ The detailed procedure of dealing with these events is shown as follows.
   \caption{\textbf{RP\_Script\_Relation}}
   \label{alg4}
   \begin{algorithmic}[1]
-\REQUIRE \myss{\myangle{tree, docnonce, scriptstate, scriptinputs, cookies, localStorage, sessionStorage, ids, secret}}
+\REQUIRE \myss{\myangle{tree, docID, scriptstate, scriptinputs, cookies, localStorage, sessionStorage, ids, secret}}
 \mystate{\myss{ s' := scriptstate}}
   \mystate{\myss{command := \myangle{}}}
-  \mystate{\myss{IdPWindow := \mathtt{SUBWINDOW}(tree,docnonce).nonce}}
+  \mystate{\myss{IdPWindow := \mathtt{SUBWINDOW}(tree,docnonce).ID_w}}
   \mystate{\myss{RPDomain := s'.RPDomain}}
   \mystate{\myss{IdPOringin := \myangle{s'.IdPDomian, \mathtt{S}}}}
   \SWITCH{\myss{s'.q}}
@@ -784,9 +784,9 @@ The detailed procedure of dealing with these events is shown as follows.
       \mystate{\myss{input := \mathtt{CHOOSEINPUT}(scriptinputs,pattern) }}
       \myif{input \not\equiv \mathtt{null}}
       \mystate{\myss{PID_{RP} := input.Content.Body[PID_{RP}]}}
-      \mystate{\myss{Endpoint := input.Content.Body[Endpoint]}}
+      \mystate{\myss{Enpt := input.Content.Body[Enpt]}}
       \mystate{\myss{Nonce := input.Content.Body[Nonce]}}
-      \mystate{\myss{command := \langle\mathtt{POSTMESSAGE}, IdPWindow}, \\\ \ \ \  \myss{\myangle{\myangle{PID_{RP}, PID_{RP}}, \myangle{Endpoint, Endpoint}, \myangle{Nonce, Nonce}},  IdPOringin\rangle}}
+      \mystate{\myss{command := \langle\mathtt{POSTMESSAGE}, IdPWindow}, \\\ \ \ \  \myss{\myangle{\myangle{PID_{RP}, PID_{RP}}, \myangle{Enpt, Enpt}, \myangle{Nonce, Nonce}},  IdPOringin\rangle}}
       \mystate{\myss{s'.q := expectToken}}
       \ENDIF
       \ENDCASE
@@ -806,7 +806,7 @@ The detailed procedure of dealing with these events is shown as follows.
       \mystate{\myss{input := \mathtt{CHOOSEINPUT}(scriptinputs,pattern) }}
       \myif{input \not\equiv \mathtt{null}}
       \myif{input.Body \equiv \mathtt{LoginSuccess}}
-      \mystate{\myss{LoadHomepage}}
+      \mystate{Load Homepage}
       \ENDIF
       \ENDIF
     \ENDCASE
