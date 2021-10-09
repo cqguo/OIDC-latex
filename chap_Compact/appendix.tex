@@ -53,14 +53,14 @@ These notations are explained as below.
 
 
 \vspace{1mm}
-\noindent\textbf{Atomic process}. The atomic process is the modelling web nodes, in the form ($I^p$, $Z^p$, $R^p$, $s_0^p$). The definitions of these notations is described as below.
+\noindent\textbf{Atomic process}. The atomic process is the modelling web nodes, in the form ($I^p$, $Z^p$, $R^p$, $z_0^p$). The definitions of these notations is described as below.
 \begin{itemize}
 \item $I^p$ is the set of addresses that the process listens to.
-\item  $Z^p$ is the set of \textbf{states} that describes the process. %The state is the formal \textbf{term}.
-\item $R^p$ is the \textbf{relation} between the input, state $s \in Z^p$ and an event $e$,
+\item  $Z^p$ is the set of {\em states} that describes the process. %The state is the formal \textbf{term}.
+\item $R^p$ is the {\em relation} between the input, state $s \in Z^p$ and an event $e$,
  to the output, the new state $s' \in Z^p$ and another event $e'$.
 It means that, at one time point, while the process is on state $s$ and receive the event $e$, it would transition to state $s'$ and send the event $e'$ to other processes.
-\item $s_0^p$ is the initial state.
+\item $z_0^p$ is the initial state.
 \end{itemize}
 
 \vspace{1mm}
@@ -68,17 +68,17 @@ It means that, at one time point, while the process is on state $s$ and receive 
 It contains constants such as ASCII strings and nonce, sequence symbols such as n-ary sequences $\langle \rangle$, $\langle . \rangle$, $\langle . ,. \rangle$, and function symbols that model cryptographic primitives such as $\mathtt{sign}$, $\mathtt{verify}$ and $\mathtt{hash}$.
 For example, an HTTP request is expressed as a term containing a type (e.g., $\mathtt{HTTPReq}$), a nonce, a method (e.g., $\mathtt{GET}$ or $\mathtt{POST}$), a domain, a path, URL parameters, request headers and a message body. % over the $\Sigma$ in the sequence symbol format.
 So,
-an HTTP GET request for the domain {\sf exa.com/path?para=1} with empty header and body can be described as $m:=\langle\mathtt{HTTPReq},n,\mathtt{GET},exa.com,/path,\langle \langle para, 1\rangle \rangle ,\langle \rangle,\langle \rangle \rangle$.
+an HTTP GET request for the domain {\sf exa.com/path?para=1} with empty header and body can be described as $\langle\mathtt{HTTPReq},n,\mathtt{GET},exa.com,/path,\langle \langle para, 1\rangle \rangle ,\langle \rangle,\langle \rangle \rangle$.
 
 \vspace{1mm}
 \noindent\textbf{Operations over terms}. The following operations are defined.
 \begin{itemize}
 \item \textbf{Equational theory}. Equational theory
  uses the symbol $\equiv$ to represent the congruence relation on terms, and $\not\equiv$ for non-congruence relation.
- For example, while there are the data $Data$, its signature $Sig$, and the corresponding public key $PubKey$, the relation can be described as $\mathtt{checkSig}(Data, Sig, PubKey)\equiv \mathtt{TRUE}$.
+ For example, while there are the data $Data$, its signature $Sig$, and the corresponding public key $PK$, the relation can be described as $\mathtt{SigVerify}(Data, Sig, PubKey)\equiv \mathtt{TRUE}$.
 \item \textbf{Patten Matching}.  We define the term with the variable $*$ as the pattern, such as \myss{\myangle{a, b, *}}.
 The pattern matches any term which only replaces the $*$ with other terms. For instance,  \myss{\myangle{a, b, *}} matches \myss{\myangle{a, b, c}}.
-\item \textbf{Retrieve attributes from standardized term}. Standardized term is the data in the fixed format, for instance, the HTTP request is the standardized data in the form \myss{\langle\mathtt{HTTPReq}}, \myss{nonce}, \myss{method}, \myss{host}, \myss{path}, \myss{parameters}, \myss{headers}, \myss{body\rangle}.  We assume there is an HTTP request \myss{r :=}  \myss{\langle\mathtt{HTTPReq}},  \myss{n},  \myss{\mathtt{GET}},  \myss{example.com},  \myss{/path},  \myss{\myangle{}},  \myss{\myangle{}},  \myss{\myangle{}\rangle}, here we define the operation on the $r$. That is, the elements in $r$ can be accessed in the form \myss{r.name}, such that \myss{r.method \equiv \mathtt{GET}},  \myss{r.path \equiv /path} and \myss{r.body \equiv \myangle{}}.
+\item \textbf{Retrieve attributes from formatted term}. Formatted term is the data in the fixed format, for instance, the HTTP request is the formatted data in the form \myss{\langle\mathtt{HTTPReq}}, \myss{nonce}, \myss{method}, \myss{host}, \myss{path}, \myss{parameters}, \myss{headers}, \myss{body\rangle}.  We assume there is an HTTP request \myss{r :=}  \myss{\langle\mathtt{HTTPReq}},  \myss{n},  \myss{\mathtt{GET}},  \myss{example.com},  \myss{/path},  \myss{\myangle{}},  \myss{\myangle{}},  \myss{\myangle{}\rangle}, here we define the operation on the $r$. That is, the elements in $r$ can be accessed in the form \myss{r.name}, such that \myss{r.method \equiv \mathtt{GET}},  \myss{r.path \equiv /path} and \myss{r.body \equiv \myangle{}}.
 \item \textbf{Retrieve attributes from dictionary term}. Dictionary term is the data in the form \myss{\myangle{\myangle{name, value}, \myangle{name, value}, \dotsc}}, for instance the \myss{body} in HTTP request is dictionary data. We assume there is a \myss{body := \myangle{\myangle{username, alice}, \myangle{password, 123}}}, here we define the operation on the $body$. That is, we can access the elements in \myss{body} in the form \myss{body[name]}, such that \myss{body[username] \equiv alice} and \myss{body[password] \equiv 123}. We can also add the new attributes to the dictionary, for example after we set \myss{body[age] := 18}, the \myss{body} are changed into\myss{ \myangle{\myangle{username, alice}, \myangle{password, 123}, \myangle{age, 18}}}.
 \end{itemize}
 
@@ -161,21 +161,21 @@ PostMessage is used in the browser for transmitting messages between scripts. Th
 XMLHTTPRequest is the HTTP message transmitted  by scripts in the browser. That is, the XMLHTTPRequest is converted from the HTTP message by the browser. The XMLHTTPRequest package is defined as the term in the form \myss{\myangle{\mathtt{XMLHTTPREQUEST}, URL, methods, Body, nonce}} can be converted into HTTP request message by the browser, and \myss{\myangle{\mathtt{XMLHTTPREQUEST}, Body, nonce}}  is converted from HTTP response message.
 
 \subsubsection{The Servers of IdP and RP}
-An atomic process is a tuple $p=$ $(I^p, Z^p, R^p,s_0^p )$, containing the addresses, states, and relations.
+An atomic process is a tuple $p=$ $(I^p, Z^p, R^p,z_0^p )$, containing the addresses, states, and relations.
 Here, we will focus on the state form and relation $R$. They can describe that what kind of event can be accepted by the process in each state, and the content of new output events and states.
 
 
 \vspace{1mm}\noindent\textbf{IdP Server Process}.
-The state of IdP server process is described as a term in the form \myss{\myangle{ID, SignKey, sessions, users, RPs, Validity, Tokens}}.
+The state of IdP server process is described as a term in the form \myss{\myangle{Issuer, SK, sessions, users, RPs, Validity, Tokens}}.
 That is,  the state of an IdP server  at the point in time can be sketched using these attributes.
 Other data stored at IdP but not used during SSO authentication are not mentioned here.
 \begin{itemize}
 \setlength\itemsep{-2pt}
-\item \myss{ID} is the identifier of IdP.
+\item \myss{Issuer} is the identifier of IdP.
 %\item \myss{p} is the large prime mentioned before.
-\item \myss{SignKey} is the private key used by IdP to generate signatures.
-\item \myss{sessions} is the term in the form of \myss{\myangle{\myangle{Cookie, session}}}, the Cookie uniquely identifies the session and sessions store the  browser uploaded messages.
-\item \myss{users} is the set of user's information, including  \myss{username, password, ID_U}  and other attributes.
+\item \myss{SK} is the private key used by IdP to generate signatures.
+\item \myss{Sessions} is the term in the form of \myss{\myangle{\myangle{Cookie, Session}}}, the Cookie uniquely identifies the session and sessions store the  browser uploaded messages.
+\item \myss{UserList} is the set of user's information, including  \myss{username, credential, ID_U}  and other attributes.
 \item \myss{RPs} is the set of RP information which consists of ID of RP \myss{(PID_{RP})}, \myss{Endpoints} (i.e., the set of RP's validity endpoints) and \myss{Validity}.
 \item \myss{Validity} is the validity for IdP generated signatures.
 \item \myss{Tokens} is the set of IdP generated Identity proofs.
@@ -199,14 +199,14 @@ The relation of IdP process $R^i$ is shown as Relation~\ref{alg1} in Appendix~\r
 
 
 \vspace{1mm}\noindent\textbf{RP server process}.
-The state of RP server process is a term in the form \myss{\myangle{ID_{RP}, Endpoints, IdP, Cert, sessions, users}}. Other attributes are not mentioned here.
+The state of RP server process is a term in the form \myss{\myangle{ID_{RP}, Enpt, IdP, Cert, Sessions, UserList}}. Other attributes are not mentioned here.
 \begin{itemize}
 \setlength\itemsep{-2pt}
-\item \myss{ID_{RP}} and \myss{Endpoints} are RP's registered information at IdP.
-\item \myss{Cert} is the IdP signed RP information containing \myss{ID_{RP}, Endpoints} and other attributes.
-\item \myss{IdP} is the term of the form \myss{\langle ScriptUrl}, \myss{q}, \myss{PubKey \rangle}, where \myss{ScriptUrl} is the site to download IdP script, \myss{q} is the large prime defined before, and \myss{PubKey} is the public key used to verify the IdP signed messages.
-\item \myss{sessions} is same as it in IdP process.
-\item \myss{users} is the set of users registered at this RP, each user is uniquely identified by the \myss{Account}.
+\item \myss{ID_{RP}} and \myss{Enpt} are RP's registered information at IdP.
+\item \myss{Cert} is the IdP signed RP information containing \myss{ID_{RP}, Enpt} and other attributes.
+\item \myss{IdP} is the term of the form \myss{\langle ScriptUrl}, \myss{q}, \myss{PK \rangle}, where \myss{ScriptUrl} is the site to download IdP script, \myss{q} is the large prime defined before, and \myss{PK} is the public key used to verify the IdP signed messages.
+\item \myss{Sessions} is same as it in IdP process.
+\item \myss{UserList} is the set of users registered at this RP, each user is uniquely identified by the \myss{Acct}.
 \end{itemize}
 
 The new \myss{functions} are defined as follows:
@@ -214,7 +214,7 @@ The new \myss{functions} are defined as follows:
 \setlength\itemsep{-2pt}
  \item \myss{\mathtt{ExEU}(a, q)} is the Extended Euclidean algorithm, which calculates  \myss{a^{-1} \mod q}.
   \item \myss{\mathtt{Random}()} generates a fresh random number.
-  \item \myss{\mathtt{RegisterUser}(Account)} add the new user with \myss{Account} into RP's user list.
+  \item \myss{\mathtt{RegisterUser}(Acct)} add the new user with \myss{Acct} into RP's user list.
 \end{itemize}
 The relation of RP process $R^r$ is shown as Relation~\ref{alg2} in Appendix~\ref{ape:alg}.
 
@@ -234,15 +234,16 @@ The model of opened windows, documents and downloaded scripts are all the part o
 
 
 \vspace{1mm}
-\noindent\textbf{Window}. A window \myss{w} is a term of the form \myss{w = \myangle{nonce, documents, opener}}, representing the  the concrete browser window in the system. The \myss{nonce} is the window reference to identify each windows. The \myss{documents} is the set of documents (defined below) including the current document and cached documents (for example, the documents can be viewed via the ``forward" and ``back" buttons in the browser). The \myss{opener} represents the window in which this window is created, for instance, while a user clicks the href in document \myss{d} and it creates a new window \myss{w}, there is \myss{w.opener \equiv d.nonce}.
+\noindent\textbf{Window}. A window \myss{w} is a term of the form \myss{w = \myangle{ID_w, documents, opener}}, representing the  the concrete browser window in the system. The \myss{ID_w} is the window reference to identify each windows. The \myss{documents} is the set of documents (defined below) including the current document and cached documents (for example, the documents can be viewed via the ``forward" and ``back" buttons in the browser). The \myss{opener} represents the window in which this window is created, for instance, while a user clicks the href in document \myss{d} and it creates a new window \myss{w}, there is \myss{w.opener \equiv d.ID_d}.
 
 \vspace{1mm}
 \noindent\textbf{Document}. A document \myss{d} is a term of the form
 \begin{multline*}
-  \ \ \ \langle nonce, location, referrer, script, scriptstate, \\
+  \ \ \ \langle ID_d, location, referrer, script, scriptstate, \\
   scriptinputs, subwindows, active \rangle \ \ \
 \end{multline*}
-where document is the HTML content in the window.  The \myss{nonce} locates the document. \myss{Location} is the URL where the document is loaded. \myss{Referrer} is same as the Referer header defined in HTTP standard. The \myss{script} is the script process downloaded from each servers. \myss{scriptstate} is define by the script, different in each scripts. The \myss{scriptinputs} is the message transmitted into the script process. The \myss{subwindows} is the set of \myss{nonce} of document's created windows. \myss{active} represents whether this document is active or not.
+where document is the page content in the window.  The \myss{ID_d} locates the document. \myss{Location} is the URL where the document is loaded. \myss{Referrer} is same as the Referer header defined in HTTP standard. The \myss{script} is the script process downloaded from each servers. \myss{scriptstate} is define by the script, different in each scripts. The \myss{scriptinputs} is the message transmitted into the script process. The \myss{subwindows} is the set of \myss{ID_w} of document's created windows. \myss{active} represents whether this document is active or not.
+
 
 
 \subsubsection{The IdP Script and the RP Script}
@@ -251,7 +252,7 @@ The script process is the dependent process relying on the browser, which can be
 \setlength\itemsep{-2pt}
 \item \textbf{Script Message Input. } The input is the term in the form
 \begin{multline*}
-\langle tree, docnonce, scriptstate, stateinputs,cookies,\\
+\langle tree, docID, scriptstate, stateinputs,cookies,\\
 localStorage, sessionStorage, ids, secret \rangle
 \end{multline*}
 \item \textbf{Script Message Output. }The output is the term in the form
@@ -260,7 +261,7 @@ localStorage, sessionStorage, ids, secret \rangle
 sessionStorage, command \rangle \ \ \ \ \
 \end{multline*}
 \end{itemize}
-The \myss{tree} is the relations of the opened windows and documents, which are visible to this script. \myss{Docnonce} is the document nonce, representing a document. The  \myss{Scriptstate} is a term of the form defined by each script. \myss{Scriptinputs} is the message transmitted to script. However, the \myss{scriptinputs} is defined as standardized forms, for example, postMessage is one of the forms of \myss{scriptinputs}. \myss{Cookies} is the set of cookies that belong to the document's origin. \myss{LocalStorage} is the storage space for browser and \myss{sessionStorage} is the space for each HTTP sessions.  \myss{Ids} is the set of user IDs while \myss{secret} is the password to corresponding user ID. The \myss{command} is the operation which is to be conducted by the browser. Here we only introduce the form of commands used in UPPRESSO system. We have defined the postMessage and XMLHTTPRequest (for HTTP request) message which are the \myss{commands}. Moreover, a term in the form \myss{\myangle{\mathtt{IFRAME}, URL, WindowNonce}} asks the browser to create this document's subwindow and it visits the server with the URL.
+The \myss{tree} is the structure of the opened windows and documents, which are visible to this script. \myss{DocID} is the document $ID_d$, representing a document. The  \myss{Scriptstate} is a term of the form defined by each script. \myss{Scriptinputs} is the message transmitted to script. However, the \myss{scriptinputs} is defined as standardized forms, for example, postMessage is one of the forms of \myss{scriptinputs}. \myss{Cookies} is the set of cookies that belong to the document's origin. \myss{LocalStorage} is the storage space for browser and \myss{sessionStorage} is the space for each HTTP sessions.  \myss{Ids} is the set of user IDs while \myss{secret} is the password to corresponding user ID. The \myss{command} is the operation which is to be conducted by the browser. Here we only introduce the form of commands used in UPPRESSO system. We have defined the postMessage and XMLHTTPRequest (for HTTP request) message which are the \myss{commands}. Moreover, a term in the form \myss{\myangle{\mathtt{IFRAME}, URL, WindowID}} asks the browser to create this document's subwindow and it visits the server with the URL.
 
 \vspace{1mm}
 \noindent\textbf{IdP script process}
@@ -276,7 +277,7 @@ The state of IdP script process \myss{scriptstate} is a term in the form \myss{\
 The new \myss{functions} are defined as follows.
 \begin{itemize}
 \setlength\itemsep{-2pt}
- \item \myss{\mathtt{PARENTWINDOW}(tree,docnonce)}. The first parameter is the input relation tree defined before, and the second parameter is the nonce of a document. The output returned by the function is the current window's opener's nonce (null if it doesn't exist nor it is invisible to this document).
+ \item \myss{\mathtt{PARENTWINDOW}(tree,docID)}. The first parameter is the input relation tree defined before, and the second parameter is the $ID_d$ of a document. The output returned by the function is the current window's opener's $ID_w$ (null if it doesn't exist nor it is invisible to this document).
   \item \myss{\mathtt{CHOOSEINPUT}(inputs,pattern)}. The first parameter is a set of messages, and the second parameter is a pattern. The result returned by the function is the message in \myss{inputs} matching the \myss{pattern}.
   \item \myss{\mathtt{RandomUrl}()} returns a newly generated host string.
 \end{itemize}
@@ -289,7 +290,7 @@ The relation of IdP script process $script\_idp$ is shown in Appendix~\ref{ape:a
 \noindent\textbf{RP script process}
 The state of RP script process \myss{scriptstate} is a term in the form \myss{\langle IdPDomain}, \myss{RPDomain}, \myss{Parameters}, \myss{q}, \myss{refXHR\rangle}. The \myss{RPDomain} is the host string of the corresponding RP server, and other terms are defined in the same way as in IdP script process.
 
-Here, we define the function \myss{\mathtt{SUBWINDOW}(tree, docnonce)}, which takes the \myss{tree} defined above and the current document's \myss{nonce} as the input. And it selects the \myss{nonce} of the first window opened by this document as the output. However, if there is no opened windows, it returns  null.
+Here, we define the function \myss{\mathtt{SUBWINDOW}(tree, docID)}, which takes the \myss{tree} defined above and the current document's \myss{ID_d} as the input. And it selects the \myss{ID_w} of the first window opened by this document as the output. However, if there is no opened windows, it returns  null.
 
 The relation of RP script process $script\_rp$ is shown in Appendix~\ref{ape:alg} Relation~\ref{alg4}.
 
@@ -302,15 +303,15 @@ Moreover, the RP must also make sure that, an honest user would always login to 
 Therefore, we can propose the Theorem about the secure UPPRESSO system.
 \begin{definition}
 %Let $\mathcal{UWS}$ be a UPPRESSO web system, $\mathcal{UWS}$ is secure \textbf{iff} for any honest RP $r$ $\in $ $\mathcal{W}$, it would not derive an honest user's identity from the token while the token belongs to an adversary.
-An SSO system is secure \textbf{iff} for any honest RP, it would not derive an honest user's identity from the token while the token belongs to an adversary, or derive an incorrect identity from the token sent by an honest user.
+An SSO system is secure {\em iff} for any honest RP, it would not derive an honest user's identity from the token while the token belongs to an adversary, or derive an incorrect identity from the token sent by an honest user.
 \end{definition}
 
 That is, the requirements of secure SSO system can be described as follows.
 \begin{itemize}
-\item An adversary cannot achieve an honest user's token issued for an honest RP (\textbf{confidentiality}).
-\item An honest RP would not accept the token issued for another RP (\textbf{RP designation}).
-\item Attacker cannot forge or modify the IdP-issued proofs (\textbf{integrity}).
-\item An honest user must always login to the honest RP on her own identity (\textbf{user identification}).
+\item An adversary cannot achieve an honest user's token issued for an honest RP ({\em confidentiality}).
+\item An honest RP would not accept the token issued for another RP ({\em RP designation}).
+\item Attacker cannot forge or modify the IdP-issued proofs ({\em integrity}).
+\item An honest user must always login to the honest RP on her own identity ({\em user identification}).
 \end{itemize}
 
 We assume that all the network messages are transmitted using HTTPS, postMessage messages are protected by the browser, and the browsers are  honest, so web attackers can never break the security of UPPRESSO.
@@ -319,7 +320,7 @@ Here, we are going to prove that, in the UPRESSO system, the following lemmas ar
 
 
 \begin{lemma}
-An adversary cannot achieve an honest user's token issued for an honest RP (\textbf{confidentiality}).
+An adversary cannot achieve an honest user's token issued for an honest RP ({\em confidentiality}).
 \label{lemma:confidentiality}
 \end{lemma}
 \begin{proof}
@@ -336,7 +337,7 @@ Therefore, attackers cannot  learn users' valid identity proofs.
 
 
 \begin{lemma}
-An honest RP would not accept the token issued for another RP (\textbf{RP designation}).
+An honest RP would not accept the token issued for another RP ({\em RP designation}).
 \label{lemma:RPdesignation}
 \end{lemma}
 \begin{proof}
@@ -349,7 +350,7 @@ As it has been proved at Lemma~\ref{lemma:confidentiality}, an malicious RP cann
 
 
 \begin{lemma}
-Attacker cannot forge or modify the IdP-issued proofs (\textbf{integrity}).
+Attacker cannot forge or modify the IdP-issued proofs ({\em integrity}).
 \label{lemma:integrity}
 \end{lemma}
 \begin{proof}
@@ -366,7 +367,7 @@ Therefore, this lemma is proved.
 
 
 \begin{lemma}
-An honest user must always login to the honest RP on her own identity (\textbf{user identification}).
+An honest user must always login to the honest RP on her own identity ({\em user identification}).
 \label{lemma:userIdentification}
 \end{lemma}
 \begin{proof}
