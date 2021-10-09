@@ -304,12 +304,15 @@ Here, we define the function \myss{\mathtt{SUBWINDOW}(tree, docID)}, which takes
 The relation of RP script process $script\_rp$ is shown in Appendix~\ref{ape:alg} Relation~\ref{alg4}.
 
 \subsection{Proofs of Security}
-In this section, we provide the detailed proof on the security of UPPRESSO. The security definition of UPPRESSO is that the system must ensure only the legitimate user can login to an honest RP under her unique account.
-We consider the visits to RP's resource paths are controlled by the visitors' cookies, so that the attacker can break the security only when he owns the cookie bound to the honest user.
-However, according to the same origin policy, the cookie is never leaked to any adversary, so the UPPRESSO  system is vulnerable only when a adversary's cookie is bound with the honest user's identity.
-Based on the model of RP server process model, at Line 64-83, we can find that only when the RP accept a visitor's token, it would bound this visitor with the identity derived from this token.
+The security definition of UPPRESSO is that the system must ensure only the legitimate user logins to an honest RP under his unique account.
+We consider the visits to RP's resource paths are controlled by the visitors' cookies,
+ so that the attacker could break the security only when he owns the cookie bound to the honest user.
+However, according to the same origin policy, a cookie is never leaked to any adversary, so the UPPRESSO system is vulnerable only when a adversary's cookie is bound with the honest user's identity.
+Based on the model of RP server process, at Line 64-83, we find that only when the RP accepts a visitor's identity token,
+    it will bind this visitor with the identity derived from this token.
 Moreover, the RP must also make sure that, an honest user would always login to the server with her constant identity.
-Therefore, we can propose the Theorem about the secure UPPRESSO system.
+Therefore, we propose the definition about the secure UPPRESSO system.
+
 \begin{definition}
 %Let $\mathcal{UWS}$ be a UPPRESSO web system, $\mathcal{UWS}$ is secure \textbf{iff} for any honest RP $r$ $\in $ $\mathcal{W}$, it would not derive an honest user's identity from the token while the token belongs to an adversary.
 An SSO system is secure {\em iff} for any honest RP, it would not derive an honest user's identity from the token while the token belongs to an adversary, or derive an incorrect identity from the token sent by an honest user.
