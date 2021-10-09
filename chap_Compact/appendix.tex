@@ -22,12 +22,14 @@
 
 \section{The Security Proofs of UPPRESSO}
 \label{ape:model}
-We  formally analyze  the security properties of UPPRESSO based on the Dolev-Yao style model \cite{SPRESSO}.
+We formally analyze  the security properties of UPPRESSO based on the Dolev-Yao style web model as follows.
 %which has been widely used in the formal analysis of SSO protocols such as OAuth 2.0~\cite{FettKS16} and OIDC~\cite{FettKS17}.
 % 这句话说了很多次，在appendix中，就只留着基本的技术信息。
-
-That is, at the first, we give the detailed description of how to translate a web system into the Dolev-Yao style web model.
-Following, we present the model of UPPRESSO system, containing normal data and each entities (including browser, servers, and scripts).
+We first describe the expressive Dolev-Yao style model of the web infrastructure.
+Then,
+    we formulate the UPPRESSO system using this model,
+        including all entities (i.e., browsers, servers, and scripts) and the transmitted data.
+%    present the model of UPPRESSO system, containing normal data and each entities (including browser, servers, and scripts).
 %the servers, scripts and the communications among them.
 %introduction about how to  indicate the entities (e.g., servers) and communications (e.g., HTTP request) of the web system with Dolev-Yao style web model.
 %Then, we describe the model of frequent used data format (e.g., HTTP package) and entity  (e.g., browser).
@@ -65,7 +67,9 @@ an HTTP GET request for the domain {\sf exa.com/path?para=1} with empty header a
 \vspace{1mm}
 \noindent\textbf{Operations over terms}.
 \begin{itemize}
-\item \textbf{Equational theory}. Equational theory is defined as usual in Dolev-Yao models, which uses the symbol $\equiv$ to represent the congruence relation on terms. For example, $dec(enc(m, k), k)$ $\equiv$ $m$, where $k$ is a symmetric key.
+\item \textbf{Equational theory}. Equational theory is defined as usual in Dolev-Yao style models,
+ which uses the symbol $\equiv$ to represent the congruence relation on terms.
+ For example, $dec(enc(m, k), k)$ $\equiv$ $m$, where $k$ is a symmetric key.
 \item \textbf{Patten Matching}.  We define the term with the variable $*$ as the pattern, such as \myss{\myangle{a, b, *}}.
 The pattern matches any term which only replaces the $*$ with other terms. For instance,  \myss{\myangle{a, b, *}} matches \myss{\myangle{a, b, c}}.
 \item \textbf{Retrieve attributes from standardized term}. Standardized term is the data in the fixed format, for instance, the HTTP request is the standardized data in the form \myss{\langle\mathtt{HTTPReq}}, \myss{nonce}, \myss{method}, \myss{host}, \myss{path}, \myss{parameters}, \myss{headers}, \myss{body\rangle}.  We assume there is an HTTP request \myss{r :=}  \myss{\langle\mathtt{HTTPReq}},  \myss{n},  \myss{\mathtt{GET}},  \myss{example.com},  \myss{/path},  \myss{\myangle{}},  \myss{\myangle{}},  \myss{\myangle{}\rangle}, here we define the operation on the $r$. That is, the elements in $r$ can be accessed in the form \myss{r.name}, such that \myss{r.method \equiv \mathtt{GET}},  \myss{r.path \equiv /path} and \myss{r.body \equiv \myangle{}}.
