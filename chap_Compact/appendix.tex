@@ -34,9 +34,8 @@ Then,
 %introduction about how to  indicate the entities (e.g., servers) and communications (e.g., HTTP request) of the web system with Dolev-Yao style web model.
 %Then, we describe the model of frequent used data format (e.g., HTTP package) and entity  (e.g., browser).
 %Following, we present the modelling UPPRESSO system, containing the servers, scripts and the communications among them.
-Finally, we give the security proofs of UPPRESSO, that capture the tracks of all essential data, such as identity token, from its birth to being consumed, to guarantee integrity and confidentiality.
-
-
+Finally, we finish the security proofs of UPPRESSO
+        by tracing the identity tokens in this model.
 
 \subsection{The Dolev-Yao Style Web Model}
 \label{subsec:webmodel}
@@ -46,8 +45,12 @@ These notations are explained as below.
 \begin{itemize}
 \item $\mathcal{W}$ is the set of \emph{atomic processes}.
     An atomic process represents an independent entity in the web system, such as browser and web server.
-\item $\mathcal{S}$ is the set of \emph{script processes}. Besides the atomic processes in the web system, there are also entities processing data and communicating with other entities, but unable to run independently without other atomic processes. These entities are denoted as script processes, i.e., JavaScript code with a browser.
-\item $E^0$ is the set of self-triggering \emph{events} initially acceptable to the processes in $\mathcal{W}$. An event is the basic communication elements in the model, representing atomic process A sending a message to atomic process B.
+\item $\mathcal{S}$ is the set of \emph{script processes}. Besides the atomic processes in the web system,
+    there are also entities processing data and communicating with other entities,
+    but cannot run independently without other atomic processes.
+    These entities are called called script processes, e.g., JavaScript code within a browser.
+\item $E^0$ is the set of \emph{events} acceptable to the processes in $\mathcal{W}$.
+    An event is the basic communication elements in the model, representing atomic process A sending a message to atomic process B.
 \end{itemize}
 
 
@@ -64,18 +67,20 @@ It means that, at one time point, while the process is on state $s$ and receive 
 \end{itemize}
 
 \vspace{1mm}
-\noindent\textbf{Term}. Term is the basic element in Dolev-Yao style model, to describe the modelled system.
-It contains constants such as ASCII strings and nonce, sequence symbols such as n-ary sequences $\langle \rangle$, $\langle . \rangle$, $\langle . ,. \rangle$, and function symbols that model cryptographic primitives such as $\mathtt{sign}$, $\mathtt{verify}$ and $\mathtt{hash}$.
+\noindent\textbf{Term}. Terms are the basic elements in Dolev-Yao style models,
+     to describe the modelled system.
+It contains constants such as ASCII strings and nonce, sequence symbols such as $n$-ary sequences $\langle \rangle$, $\langle . \rangle$, $\langle . ,. \rangle$, and function symbols that model cryptographic primitives such as $\mathtt{SigSign}$, $\mathtt{SigVerify}$ and $\mathtt{Hash}$.
 For example, an HTTP request is expressed as a term containing a type (e.g., $\mathtt{HTTPReq}$), a nonce, a method (e.g., $\mathtt{GET}$ or $\mathtt{POST}$), a domain, a path, URL parameters, request headers and a message body. % over the $\Sigma$ in the sequence symbol format.
 So,
-an HTTP GET request for the domain {\sf exa.com/path?para=1} with empty header and body can be described as $\langle\mathtt{HTTPReq},n,\mathtt{GET},exa.com,/path,\langle \langle para, 1\rangle \rangle ,\langle \rangle,\langle \rangle \rangle$.
+an HTTP GET request for the domain {\sf exa.com/path?para=1} with empty header and body is described as $\langle\mathtt{HTTPReq},n,\mathtt{GET},exa.com,/path,\langle \langle para, 1\rangle \rangle ,\langle \rangle,\langle \rangle \rangle$.
 
 \vspace{1mm}
 \noindent\textbf{Operations over terms}. The following operations are defined.
 \begin{itemize}
 \item \textbf{Equational theory}. Equational theory
  uses the symbol $\equiv$ to represent the congruence relation on terms, and $\not\equiv$ for non-congruence relation.
- For example, while there are the data $Data$, its signature $Sig$, and the corresponding public key $PK$, the relation can be described as $\mathtt{SigVerify}(Data, Sig, PK)\equiv \mathtt{TRUE}$.
+ For example, while there are the data $Data$, its signature $Sig$, and the corresponding public key $PK$,
+  the relation is described as $\mathtt{SigVerify}(Data, Sig, PK)\equiv \mathtt{TRUE}$.
 \item \textbf{Patten Matching}.  We define the term with the variable $*$ as the pattern, such as \myss{\myangle{a, b, *}}.
 The pattern matches any term which only replaces the $*$ with other terms. For instance,  \myss{\myangle{a, b, *}} matches \myss{\myangle{a, b, c}}.
 \item \textbf{Retrieve attributes from formatted term}. Formatted term is the data in the specific format, for instance, the HTTP request is the formatted data in the form \myss{\langle\mathtt{HTTPReq}}, \myss{nonce}, \myss{method}, \myss{host}, \myss{path}, \myss{parameters}, \myss{headers}, \myss{body\rangle}.  We assume there is an HTTP request \myss{r :=}  \myss{\langle\mathtt{HTTPReq}},  \myss{n},  \myss{\mathtt{GET}},  \myss{example.com},  \myss{/path},  \myss{\myangle{}},  \myss{\myangle{}},  \myss{\myangle{}\rangle}, here we define the operation on the $r$. That is, the elements in $r$ can be accessed in the form \myss{r.name}, such that \myss{r.method \equiv \mathtt{GET}},  \myss{r.path \equiv /path} and \myss{r.body \equiv \myangle{}}.
@@ -96,7 +101,7 @@ The pattern matches any term which only replaces the $*$ with other terms. For i
 \noindent\textbf{Script process}. A script process is the formulation of browser scripts as a relation $R$,
     representing the server-defined functions,
     while the input and output are handled by the browser.
-A script process is addressed by the \verb+Origin+ property, as the the protocol, hostname and port number of a URL. That is, while a script sends the messages to another script process and set the \verb+Origin+ value as the IdP domain,
+A script process is controlled by the \verb+Origin+ property, as the the protocol, hostname and port number of a URL. That is, while a script sends the messages to another script process and set the \verb+Origin+ value as the IdP domain,
  only the script downloaded from IdP server receives this message.
 
 
