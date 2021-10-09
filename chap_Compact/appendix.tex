@@ -205,7 +205,9 @@ The state of RP server process is a term in the form \myss{\myangle{ID_{RP}, Enp
 \setlength\itemsep{-2pt}
 \item \myss{ID_{RP}} and \myss{Enpt} are RP's registered information at IdP.
 \item \myss{Cert} is the IdP signed RP information containing \myss{ID_{RP}, Enpt} and other attributes.
-\item \myss{IdP} is the term of the form \myss{\langle ScriptUrl}, \myss{q}, \myss{PK \rangle}, where \myss{ScriptUrl} is the site to download IdP script, \myss{q} is the large prime defined before, and \myss{PK} is the public key used to verify the IdP signed messages.
+\item \myss{IdP} is the term of the form \myss{\langle ScriptUrl}, %\myss{q},
+    \myss{PK \rangle}, where \myss{ScriptUrl} is the site to download IdP script, %\myss{q} is the large prime defined before,
+     and \myss{PK} is the public key used to verify the IdP signed messages.
 \item \myss{Sessions} is same as it in IdP process.
 \item \myss{UserList} is the set of users registered at this RP, each user is uniquely identified by the \myss{Acct}.
 \end{itemize}
@@ -222,28 +224,34 @@ The relation of RP process $R^r$ is shown as Relation~\ref{alg2} in Appendix~\re
 
 \subsubsection{Browser}
 %In UPPRESSO, we assume that the browsers are honest and well developed, so that, we neglect  the detailed process of browser, such as constructing and parsing the HTTP package.
-We analyze how the browsers interactive with other parties in UPPRESSO system.
+We analyze how the browsers interact with other parties in UPPRESSO system.
 Moreover, in UPPRESSO system, the message transmitted through a browser is constructing and parsing by the script, so that we only focus on how the script process runs in the browser.
 
 In the browser, a window is the basic unit that shows the content to user.
-In a window, the document (Document Object Model, DOM) represents the whole page contained in this window.
+In a window, the document %(Document Object Model, DOM)
+ represents the whole page contained in this window.
 The script is one of node in the document.
 We introduce the windows and documents of the browser model, which provides inputs and parses the outputs of the script process.
-The model of opened windows, documents and downloaded scripts are all the part of state of a browser.
+The model of opened windows, documents and downloaded scripts are parts of the state of a browser.
 %For a better reading experience, in this section, we only introduce the model of window and document, and the models of IdP and RP scripts are provided in next section
 
 
 
 \vspace{1mm}
-\noindent\textbf{Window}. A window \myss{w} is a term of the form \myss{w = \myangle{ID_w, documents, opener}}, representing the  the concrete browser window in the system. The \myss{ID_w} is the window reference to identify each windows. The \myss{documents} is the set of documents (defined below) including the current document and cached documents (for example, the documents can be viewed via the ``forward" and ``back" buttons in the browser). The \myss{opener} represents the window in which this window is created, for instance, while a user clicks the href in document \myss{d} and it creates a new window \myss{w}, there is \myss{w.opener \equiv d.ID_d}.
+\noindent\textbf{Window}. A window \myss{w} is a term of the form \myss{w = \myangle{ID_w, documents, opener}}, representing the  the concrete browser window in the system. The \myss{ID_w} is the window reference to identify each windows.
+The \myss{documents} is the set of documents (defined below) including the current document and cached documents (for example, the documents can be viewed via the ``forward" and ``back" buttons in the browser).
+The \myss{opener} represents the window from which this window is created,
+    for instance, while a user clicks the href in document \myss{d} and it creates a new window \myss{w},
+    there is \myss{w.opener \equiv d.ID_d}.
 
 \vspace{1mm}
 \noindent\textbf{Document}. A document \myss{d} is a term of the form
 \begin{multline*}
   \ \ \ \langle ID_d, location, referrer, script, scriptstate, \\
-  scriptinputs, subwindows, active \rangle \ \ \
+  scriptinputs, subwindows\rangle \ \ \
 \end{multline*}
-where document is the page content in the window.  The \myss{ID_d} locates the document. \myss{Location} is the URL where the document is loaded. \myss{Referrer} is same as the Referer header defined in HTTP standard. The \myss{script} is the script process downloaded from each servers. \myss{scriptstate} is define by the script, different in each scripts. The \myss{scriptinputs} is the message transmitted into the script process. The \myss{subwindows} is the set of \myss{ID_w} of document's created windows. \myss{active} represents whether this document is active or not.
+where document is the page content in the window.  The \myss{ID_d} locates the document. \myss{Location} is the URL where the document is loaded. \myss{Referrer} is same as the Referer header defined in HTTP standard. The \myss{script} is the script process downloaded from each servers. \myss{scriptstate} is define by the script, different in each scripts. The \myss{scriptinputs} is the message transmitted into the script process. The \myss{subwindows} is the set of \myss{ID_w} of document's created windows.
+ %\myss{active} represents whether this document is active or not.
 
 
 
