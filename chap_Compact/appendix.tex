@@ -122,13 +122,14 @@ $E^0$  is the set of events acceptable to the processes in $\mathcal{W}$, which 
 
 
 We only focus on the model of servers, browsers and the plain message transmissions among them in this paper, and neglect the HTTPS requests and other necessary Internet facilities (e.g., DNS server) deployed in the UPPRESSO system.
-Because we assume that the internet architecture is well  built and HTTPS is well implemented, so that an adversary cannot conduct the attacks targeting these elements.
+Because we assume that the internet architecture is well  built and HTTPS is well implemented,
+ so that an adversary cannot conduct the attacks targeting these layers.
 
 %This section is organized as follows. At first, we introduce the model of normal basic data (representing data in the form of terms), such as HTTP package, which is to be used to construct more complex models. Then we give the detailed description about the models IdP and RP servers in UPPRESSO system. At the end, the models of browser and scripts are also introduced.
 
 
-\subsubsection{The Data Transmitted}
-At the very beginning, we provide the modelling normal data, such HTTP messages, used to construct UPPRESSO model.
+\subsubsection{The Data Transmitted and Processed}
+We provide the modelling normal data, such HTTP messages, used to construct UPPRESSO model.
 
 \vspace{1mm}
 \noindent\textbf{HTTP Messages}.
@@ -169,11 +170,11 @@ XMLHTTPRequest is the HTTP message transmitted  by scripts in the browser. That 
 
 \subsubsection{The Servers of IdP and RP}
 An atomic process is a tuple $p=$ $(I^p, Z^p, R^p,z_0^p )$, containing the addresses, states, and relations.
-Here, we will focus on the state form and relation $R$. They can describe that what kind of event can be accepted by the process in each state, and the content of new output events and states.
+%They can describe that what kind of event can be accepted by the process in each state, and the content of new output events and states.
 
 
-\vspace{1mm}\noindent\textbf{IdP Server Process}.
-The state of IdP server process is described as a term in the form \myss{\myangle{Issuer, SK, SessionList, users, RPs, Validity, Tokens}}.
+\vspace{1mm}\noindent\textbf{IdP Process}.
+The state of IdP process is described as a term in the form \myss{\myangle{Issuer, SK, SessionList, UserList, RPs, Validity, Tokens}}.
 That is,  the state of an IdP server  at the point in time can be sketched using these attributes.
 Other data stored at IdP but not used during SSO authentication are not mentioned here.
 \begin{itemize}
@@ -183,17 +184,18 @@ Other data stored at IdP but not used during SSO authentication are not mentione
 \item \myss{SK} is the private key used by IdP to generate signatures.
 \item \myss{SessionList} is the term in the form of \myss{\myangle{\myangle{cookie, session}}}, the cookie uniquely identifies the session storing the  browser uploaded messages.
 \item \myss{UserList} is the set of user's information, including  \myss{username, credential, ID_U}  and other attributes.
-\item \myss{RPs} is the set of RP information which consists of ID of RP \myss{(PID_{RP})}, \myss{Endpoints} (i.e., the set of RP's validity endpoints) and \myss{Validity}.
+\item \myss{RPs} is the set of RP information which consists of ephemeral ID of RP \myss{(PID_{RP})},
+    \myss{Endpoints} (i.e., the set of RP's validity endpoints) and \myss{Validity}.
 \item \myss{Validity} is the validity for IdP generated signatures.
 \item \myss{Tokens} is the set of IdP generated Identity tokens.
 \end{itemize}
-To make the description clearer, we define the \myss{functions} to express the relations.
+We also define the \myss{functions} in the relations.
 \begin{itemize}
 \setlength\itemsep{-2pt}
 \item \myss{\mathtt{CredentialVerify(credential)}} is used to authenticate the user.
 \item \myss{\mathtt{UIDOfUser(credential)}} is used to search the user's \myss{ID_U}.
-\item \myss{\mathtt{ListOfPID()}} is the set of IDs of registered RP.
-\item \myss{\mathtt{EndpointsOfRP(r)}} is the set of endpoints registered by the RP with ID \myss{r}.
+\item \myss{\mathtt{ListOfPID()}} is the set of PIDs of registered RP in some login instance.
+\item \myss{\mathtt{EndpointsOfRP(r)}} is the endpoint registered by the IdP script with PID \myss{r}.
 %\item \myss{\mathtt{ModPow(a, b, c)}} is the result of \myss{a^b \mod c}.
 \item \myss{\mathtt{Multiply(P, a)}} is the result of \myss{aP}, where $P$ is the point on elliptic curve and $a$ is the integer.
 \item \myss{\mathtt{CurrentTime()}} is the system current time.
@@ -211,7 +213,7 @@ The state of RP server process is a term in the form \myss{\myangle{ID_{RP}, Enp
 \begin{itemize}
 \setlength\itemsep{-2pt}
 \item \myss{ID_{RP}} and \myss{Enpt} are RP's registered information at IdP.
-\item \myss{Cert} is the IdP signed RP information containing \myss{ID_{RP}, Enpt} and other attributes.
+\item \myss{Cert} is the IdP-signed message containing \myss{ID_{RP}, Enpt} and other attributes.
 \item \myss{IdP} is the term of the form \myss{\langle ScriptUrl}, %\myss{q},
     \myss{PK \rangle}, where \myss{ScriptUrl} is the site to download IdP script, %\myss{q} is the large prime defined before,
      and \myss{PK} is the public key used to verify the IdP signed messages.
@@ -219,10 +221,10 @@ The state of RP server process is a term in the form \myss{\myangle{ID_{RP}, Enp
 \item \myss{UserList} is the set of users registered at this RP, each user is uniquely identified by the \myss{Acct}.
 \end{itemize}
 
-The new \myss{functions} are defined as follows:
+The \myss{functions} are defined as follows:
 \begin{itemize}
 \setlength\itemsep{-2pt}
- \item \myss{\mathtt{Inverse}(a)}  calculates the trapdoor in UPPRESSO system.
+ \item \myss{\mathtt{Inverse}(t)}  calculates the trapdoor in UPPRESSO system.
   \item \myss{\mathtt{Random}()} generates a fresh random number.
   \item \myss{\mathtt{AddUser}(Acct)} add the new user with \myss{Acct} into RP's user list.
 \end{itemize}
@@ -231,15 +233,15 @@ The relation of RP process $R^r$ is shown as Relation~\ref{alg2} in Appendix~\re
 
 \subsubsection{Browser}
 %In UPPRESSO, we assume that the browsers are honest and well developed, so that, we neglect  the detailed process of browser, such as constructing and parsing the HTTP package.
-We analyze how the browsers interact with other parties in UPPRESSO system.
-Moreover, in UPPRESSO system, the message transmitted through a browser is constructing and parsing by the script, so that we only focus on how the script process runs in the browser.
+We analyze how the browsers interact with other parties in UPPRESSO.
+In UPPRESSO the message transmitted through a browser is constructing and parsing by the script, so that we only focus on how the script process runs in the browser.
 
 In the browser, a window is the basic unit that shows the content to user.
 In a window, the document %(Document Object Model, DOM)
  represents the whole page contained in this window.
-The script is one of node in the document.
+The script is one node in the document.
 We introduce the windows and documents of the browser model, which provides inputs and parses the outputs of the script process.
-The model of opened windows, documents and downloaded scripts are parts of the state of a browser.
+The opened windows, documents and downloaded scripts are parts of the state of a browser.
 %For a better reading experience, in this section, we only introduce the model of window and document, and the models of IdP and RP scripts are provided in next section
 
 
@@ -247,17 +249,18 @@ The model of opened windows, documents and downloaded scripts are parts of the s
 \vspace{1mm}
 \noindent\textbf{Window}. A window \myss{w} is a term of the form \myss{w = \myangle{ID_w, documents, opener}}, representing the  the concrete browser window in the system. The \myss{ID_w} is the window reference to identify each windows.
 The \myss{documents} is the set of documents (defined below) including the current document and cached documents (for example, the documents can be viewed via the ``forward" and ``back" buttons in the browser).
-The \myss{opener} represents the window from which this window is created,
+The \myss{opener} represents the document from which this window is created,
     for instance, while a user clicks the href in document \myss{d} and it creates a new window \myss{w},
     there is \myss{w.opener \equiv d.ID_d}.
 
 \vspace{1mm}
-\noindent\textbf{Document}. A document \myss{d} is a term of the form
+\noindent\textbf{Document}. A document \myss{d} is the web page content in the browser window,
+    a term of the form
 \begin{multline*}
   \ \ \ \langle ID_d, location, referrer, script, scriptstate, \\
   scriptinputs, subwindows\rangle \ \ \
 \end{multline*}
-where document is the page content in the window.  The \myss{ID_d} locates the document. \myss{Location} is the URL where the document is loaded. \myss{Referrer} is same as the Referer header defined in HTTP standard. The \myss{script} is the script process downloaded from each servers. \myss{scriptstate} is define by the script, different in each scripts. The \myss{scriptinputs} is the message transmitted into the script process. The \myss{subwindows} is the set of \myss{ID_w} of document's created windows.
+The \myss{ID_d} locates the document. \myss{Location} is the URL where the document is loaded. \myss{Referrer} is same as the Referer header defined in HTTP standard. The \myss{script} is the script process downloaded from each servers. \myss{scriptstate} is define by the script, different in each scripts. The \myss{scriptinputs} is the message transmitted into the script process. The \myss{subwindows} is the set of \myss{ID_w} of document's created windows.
  %\myss{active} represents whether this document is active or not.
 
 
@@ -269,15 +272,18 @@ The script process is the dependent process relying on the browser, which can be
 \item \textbf{Script Message Input. } The input is the term in the form
 \begin{multline*}
 \langle tree, docID, scriptstate, stateinputs,cookies,\\
-localStorage, sessionStorage, ids, secret \rangle
+ids, secret \rangle
 \end{multline*}
 \item \textbf{Script Message Output. }The output is the term in the form
 \begin{multline*}
-\ \ \ \ \ \langle scriptstate, cookies, localStorage, \\
-sessionStorage, command \rangle \ \ \ \ \
+\ \ \ \ \ \langle scriptstate, cookies, \\
+command \rangle \ \ \ \ \
 \end{multline*}
 \end{itemize}
-The \myss{tree} is the structure of the opened windows and documents, which are visible to this script. \myss{DocID} is the document $ID_d$, representing a document. The  \myss{Scriptstate} is a term of the form defined by each script. \myss{Scriptinputs} is the message transmitted to script. However, the \myss{scriptinputs} is defined as standardized forms, for example, postMessage is one of the forms of \myss{scriptinputs}. \myss{Cookies} is the set of cookies that belong to the document's origin. \myss{LocalStorage} is the storage space for browser and \myss{sessionStorage} is the space for each HTTP sessions.  \myss{Ids} is the set of user IDs while \myss{secret} is the password to corresponding user ID. The \myss{command} is the operation which is to be conducted by the browser. Here we only introduce the form of commands used in UPPRESSO system. We have defined the postMessage and XMLHTTPRequest (for HTTP request) message which are the \myss{commands}. Moreover, a term in the form \myss{\myangle{\mathtt{IFRAME}, URL, WindowID}} asks the browser to create this document's subwindow and it visits the server with the URL.
+The \myss{tree} is the structure of the opened windows and documents, which are visible to this script. \myss{DocID} is the document $ID_d$, representing a document. The  \myss{Scriptstate} is a term of the form defined by each script. \myss{Scriptinputs} is the message transmitted to script. However, the \myss{scriptinputs} is defined as formatted term,
+ for example, postMessage is one of the forms of \myss{scriptinputs}. \myss{Cookies} is the set of cookies that belong to the document's origin. \myss{Ids} is the set of user IDs while \myss{secret} is the password to corresponding user ID. The \myss{command} is the operation which is to be conducted by the browser. Here we only introduce the form of commands used in UPPRESSO.
+ We have defined the postMessage and XMLHTTPRequest (for HTTP request) message which are the \myss{commands}.
+ Moreover, a term in the form \myss{\myangle{\mathtt{IFRAME}, URL, WindowID}} asks the browser to create this document's subwindow and it visits the server with the URL.
 
 \vspace{1mm}
 \noindent\textbf{IdP script process}
@@ -632,7 +638,7 @@ The detailed procedure of dealing with these events is shown as follows.
   \caption{\textbf{IdP\_Script\_Relation}}
   \label{alg3}
   \begin{algorithmic}[1]
-  \REQUIRE \myss{\myangle{tree, docID, scriptstate, scriptinputs, cookies, localStorage, sessionStorage, ids, secret}}
+  \REQUIRE \myss{\myangle{tree, docID, scriptstate, scriptinputs, cookies, ids, secret}}
   \mystate{\myss{ s' := scriptstate}}
   \mystate{\myss{command := \myangle{}}}
   \mystate{\myss{target := \mathtt{PARENTWINDOW}(tree,docID)}}
@@ -745,7 +751,7 @@ The detailed procedure of dealing with these events is shown as follows.
      \ENDIF
     \ENDCASE
   \ENDSWITCH
-\mystate{\myss{\textbf{stop}\ \myangle{s',cookies,localStorage,sessionStorage,command}}}
+\mystate{\myss{\textbf{stop}\ \myangle{s',cookies,command}}}
     \end{algorithmic}
 \end{breakablealgorithm}
 
@@ -761,7 +767,7 @@ The detailed procedure of dealing with these events is shown as follows.
   \caption{\textbf{RP\_Script\_Relation}}
   \label{alg4}
   \begin{algorithmic}[1]
-\REQUIRE \myss{\myangle{tree, docID, scriptstate, scriptinputs, cookies, localStorage, sessionStorage, ids, secret}}
+\REQUIRE \myss{\myangle{tree, docID, scriptstate, scriptinputs, cookies, ids, secret}}
 \mystate{\myss{ s' := scriptstate}}
   \mystate{\myss{command := \myangle{}}}
   \mystate{\myss{IdPWindow := \mathtt{SUBWINDOW}(tree,docnonce).ID_w}}
