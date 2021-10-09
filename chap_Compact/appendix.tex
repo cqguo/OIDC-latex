@@ -318,13 +318,17 @@ Therefore, we propose the definition about the secure UPPRESSO system.
 An SSO system is secure {\em iff} for any honest RP, it would not derive an honest user's identity from the token while the token belongs to an adversary, or derive an incorrect identity from the token sent by an honest user.
 \end{definition}
 
-That is, the requirements of secure SSO system can be described as follows.
+\begin{theorem}
+When the IdP is honest,
+the sufficient requirements of secure SSO system can be described as follows.
+% 注意，这个是充分非必要条件
 \begin{itemize}
 \item An adversary cannot achieve an honest user's token issued for an honest RP ({\em confidentiality}).
 \item An honest RP would not accept the token issued for another RP ({\em RP designation}).
 \item Attacker cannot forge or modify the IdP-issued proofs ({\em integrity}).
 \item An honest user must always login to the honest RP on her own identity ({\em user identification}).
 \end{itemize}
+\end{theorem}
 
 We assume that all the network messages are transmitted using HTTPS, postMessage messages are protected by the browser, and the browsers are  honest, so web attackers can never break the security of UPPRESSO.
 Here, we are going to prove that, in the UPRESSO system, the following lemmas are always workable.
@@ -401,11 +405,11 @@ While the honest user has not negotiated the $PID_{RP}$ with the RP yet, the \ve
 Therefore, an adversary cannot lead the honest RP to accept the malicious token from the honest user.
 \end{proof}
 
-In conclusion, four lemmas prove that the UPPRESSO system satisfies the requirements of the secure SSO system.
-Therefore, the following theorem is proved.
 \begin{theorem}
-UPPRESSO is the secure SSO system.
+UPPRESSO is a secure SSO system, if the IdP is honest.
 \end{theorem}
+In conclusion, four lemmas prove that the UPPRESSO system satisfies the sufficient requirements of the secure SSO system.
+Therefore, UPPRESSO is proved secure.
 
 
 
