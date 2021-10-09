@@ -73,10 +73,10 @@ an HTTP GET request for the domain {\sf exa.com/path?para=1} with empty header a
 \vspace{1mm}
 \noindent\textbf{Operations over terms}. The following operations are defined.
 \begin{itemize}
-\item \textbf{Equational theory}. Equational theory %is defined as usual in Dolev-Yao style models, 这句话没有意义
- uses the symbol $\equiv$ to represent the congruence relation on terms.
- For example, $dec(enc(m, k), k)$ $\equiv$ $m$, where $k$ is a symmetric key.
-\item \textbf{Pattern Matching}.  We define the term with the variable $*$ as the pattern, such as \myss{\myangle{a, b, *}}.
+\item \textbf{Equational theory}. Equational theory
+ uses the symbol $\equiv$ to represent the congruence relation on terms, and $\not\equiv$ for non-congruence relation.
+ For example, while there are the data $Data$, its signature $Sig$, and the corresponding public key $PubKey$, the relation can be described as $\mathtt{checkSig}(Data, Sig, PubKey)\equiv \mathtt{TRUE}$.
+\item \textbf{Patten Matching}.  We define the term with the variable $*$ as the pattern, such as \myss{\myangle{a, b, *}}.
 The pattern matches any term which only replaces the $*$ with other terms. For instance,  \myss{\myangle{a, b, *}} matches \myss{\myangle{a, b, c}}.
 \item \textbf{Retrieve attributes from standardized term}. Standardized term is the data in the fixed format, for instance, the HTTP request is the standardized data in the form \myss{\langle\mathtt{HTTPReq}}, \myss{nonce}, \myss{method}, \myss{host}, \myss{path}, \myss{parameters}, \myss{headers}, \myss{body\rangle}.  We assume there is an HTTP request \myss{r :=}  \myss{\langle\mathtt{HTTPReq}},  \myss{n},  \myss{\mathtt{GET}},  \myss{example.com},  \myss{/path},  \myss{\myangle{}},  \myss{\myangle{}},  \myss{\myangle{}\rangle}, here we define the operation on the $r$. That is, the elements in $r$ can be accessed in the form \myss{r.name}, such that \myss{r.method \equiv \mathtt{GET}},  \myss{r.path \equiv /path} and \myss{r.body \equiv \myangle{}}.
 \item \textbf{Retrieve attributes from dictionary term}. Dictionary term is the data in the form \myss{\myangle{\myangle{name, value}, \myangle{name, value}, \dotsc}}, for instance the \myss{body} in HTTP request is dictionary data. We assume there is a \myss{body := \myangle{\myangle{username, alice}, \myangle{password, 123}}}, here we define the operation on the $body$. That is, we can access the elements in \myss{body} in the form \myss{body[name]}, such that \myss{body[username] \equiv alice} and \myss{body[password] \equiv 123}. We can also add the new attributes to the dictionary, for example after we set \myss{body[age] := 18}, the \myss{body} are changed into\myss{ \myangle{\myangle{username, alice}, \myangle{password, 123}, \myangle{age, 18}}}.
@@ -108,10 +108,9 @@ A script process is addressed by the \verb+Origin+ property, as the the protocol
 
 
 \subsection{The Formulation of UPPRESSO}
-In this section, we introduce the model of honest UPPRESSO system, in the form of $(\mathcal{W}$, $\mathcal{S}$, $\mathtt{script}$, $E^0)$.
+In this section, we introduce the model of honest UPPRESSO system, in the form of $(\mathcal{W}$, $\mathcal{S}$, $E^0)$.
 $\mathcal{W}$ is the set of atomic processes, including IdP server processes, RP server processes and browsers.
 $\mathcal{S}$ is the set of script processes, containing of IdP script process and RP script process.
-$\mathtt{script}$ is the set of detailed script codes, so that it is described here.
 $E^0$  is the set of events acceptable to the processes in $\mathcal{W}$, which is to be illustrated in the individual processes part.
 
 
