@@ -22,8 +22,7 @@
 
 \section{The Security Proofs of UPPRESSO}
 \label{ape:model}
-In this section,
-we  formally analyze  the security properties of UPPRESSO based on the Dolev-Yao style web model~\cite{SPRESSO}.
+We  formally analyze  the security properties of UPPRESSO based on the Dolev-Yao style model \cite{SPRESSO}.
 %which has been widely used in the formal analysis of SSO protocols such as OAuth 2.0~\cite{FettKS16} and OIDC~\cite{FettKS17}.
 % 这句话说了很多次，在appendix中，就只留着基本的技术信息。
 
@@ -34,8 +33,6 @@ Following, we present the model of UPPRESSO system, containing normal data and e
 %Then, we describe the model of frequent used data format (e.g., HTTP package) and entity  (e.g., browser).
 %Following, we present the modelling UPPRESSO system, containing the servers, scripts and the communications among them.
 Finally, we give the security proofs of UPPRESSO, that capture the tracks of all essential data, such as identity token, from its birth to being consumed, to guarantee integrity and confidentiality.
-The data tracing is based on the well-built model.
-
 
 
 
@@ -108,7 +105,7 @@ Because we assume that the internet architecture is well  built and HTTPS is wel
 
 This section is organized as follows. At first, we introduce the model of normal basic data (representing data in the form of terms), such as HTTP package, which is to be used to construct more complex models.
 Then we give the detailed description about the models IdP and RP servers in UPPRESSO system.
-At the end, the models of browser and scripts are also introduced. 
+At the end, the models of browser and scripts are also introduced.
 
 
 \subsubsection{Model of Normal Data}
@@ -219,13 +216,13 @@ Moreover, in UPPRESSO system, the message transmitted through a browser is const
 In the browser, a window is the basic unit that shows the content to user.
 In a window, the document (Document Object Model, DOM) represents the whole page contained in this window.
 The script is one of node in the document.
-We introduce the windows and documents of the browser model, which provides inputs and parses the outputs of the script process. 
+We introduce the windows and documents of the browser model, which provides inputs and parses the outputs of the script process.
 The model of opened windows, documents and downloaded scripts are all the part of state of a browser. For a better reading experience, in this section, we only introduce the model of window and document, and the models of IdP and RP scripts are provided in next section
 
 
 
 \vspace{1mm}
-\noindent\textbf{Window}. A window \myss{w} is a term of the form \myss{w = \myangle{nonce, documents, opener}}, representing the  the concrete browser window in the system. The \myss{nonce} is the window reference to identify each windows. The \myss{documents} is the set of documents (defined below) including the current document and cached documents (for example, the documents can be viewed via the ``forward" and ``back" buttons in the browser). The \myss{opener} represents the window in which this window is created, for instance, while a user clicks the href in document \myss{d} and it creates a new window \myss{w}, there is \myss{w.opener \equiv d.nonce}. 
+\noindent\textbf{Window}. A window \myss{w} is a term of the form \myss{w = \myangle{nonce, documents, opener}}, representing the  the concrete browser window in the system. The \myss{nonce} is the window reference to identify each windows. The \myss{documents} is the set of documents (defined below) including the current document and cached documents (for example, the documents can be viewed via the ``forward" and ``back" buttons in the browser). The \myss{opener} represents the window in which this window is created, for instance, while a user clicks the href in document \myss{d} and it creates a new window \myss{w}, there is \myss{w.opener \equiv d.nonce}.
 
 \vspace{1mm}
 \noindent\textbf{Document}. A document \myss{d} is a term of the form
@@ -285,7 +282,7 @@ Here, we define the function \myss{\mathtt{SUBWINDOW}(tree, docnonce)}, which ta
 The relation of RP script process $script\_rp$ is shown in Appendix~\ref{ape:alg} Relation~\ref{alg4}.
 
 \subsection{Proof of Security}
-In this section, we provide the detailed proof on the security of UPPRESSO. The security definition of UPPRESSO is that the system must ensure only the legitimate user can login to an honest RP under her unique account. 
+In this section, we provide the detailed proof on the security of UPPRESSO. The security definition of UPPRESSO is that the system must ensure only the legitimate user can login to an honest RP under her unique account.
 We consider the visits to RP's resource paths are controlled by the visitors' cookies, so that the attacker can break the security only when he owns the cookie bound to the honest user.
 However, according to the same origin policy, the cookie is never leaked to any adversary, so the UPPRESSO  system is vulnerable only when a adversary's cookie is bound with the honest user's identity.
 Based on the model of RP server process model, at Line 64-83, we can find that only when the RP accept a visitor's token, it would bound this visitor with the identity derived from this token.
@@ -586,7 +583,7 @@ The detailed procedure of dealing with these events is shown as follows.
 
 
 \subsection{IdP script process}
-The IdP script process accepts the events, 
+The IdP script process accepts the events,
 (a) self-triggering events  for starting $PID_{RP}$ negotiation;
 (b) the postMessage from other scripts for sending the $Cert$, and request of identity token;
 (c) the HTTP response for transmitting registration result and identity token.
@@ -715,7 +712,7 @@ The detailed procedure of dealing with these events is shown as follows.
 
 
 \subsection{RP script process}
-The RP script process accepts the events, 
+The RP script process accepts the events,
 (a) self-triggering events  for opening the new window;
 (b) the postMessage from other scripts for $PID_{RP}$ negotiation, posting registration result and identity token;
 (c) the HTTP response for downloading the RP $Cert$, retrieving identity token request and confirming login result.
