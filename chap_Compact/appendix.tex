@@ -108,8 +108,7 @@ where $a$ and $b$ represent the addresses of the sender and receiver, respective
 \noindent\textbf{Script process}. A script process is the formulation of browser scripts as a relation $R$,
     representing the server-defined functions,
     while the input and output are handled by the browser.
-A script process is addressed by the \verb+Origin+ property, as the the protocol, hostname and port of a URL.
-That is, if a script sends the messages to another script process and set the \verb+Origin+ value as the IdP domain,
+A script process is addressed by the \verb+Origin+ property, as the the protocol and hostname of a URL. That is, while a script sends the messages to another script process and set the \verb+Origin+ value as the IdP domain,
  only the script downloaded from IdP server receives this message.
 
 
@@ -154,7 +153,7 @@ The details are defined as follows:
  \item \myss{method} is one of the HTTP methods, \myss{\mathtt{GET}} and \myss{\mathtt{POST}}.
  \item \myss{host} is the constant string domain of visited server.
  \item \myss{path} is the constant string representing the concrete resource of the server.
- \item \myss{parameters} contains the parameters carried by the url as the form \myss{\myangle{\myangle{name, value}, \myangle{name, value}, \dotsc}}, for example, the \myss{parameters} in the url \myss{http://www.example.com?type=confirm}  is \myss{\myangle{\myangle{type, confirm}}}.
+ \item \myss{parameters} contains the parameters carried by the url as the form \myss{\myangle{\myangle{type, value}, \myangle{type, value}, \dotsc}}, for example, the \myss{parameters} in the url \myss{http://www.example.com?type=confirm}  is \myss{\myangle{\myangle{type, confirm}}}.
  \item \myss{headers} is the header content of each HTTP messages as the form \myss{\myangle{\myangle{type, value}, \myangle{type, value}, \dotsc}}, such as \myss{\langle\myangle{Referer, http://www.example.com},} \myss{\myangle{Cookies, c}\rangle}.
  \item \myss{body} is the body content carried by HTTP \myss{\mathtt{POST}} request or HTTP response in the form \myss{\myangle{\myangle{type, value}, \myangle{type, value}, \dotsc}}.
   \item \myss{status} is the HTTP status code defined by HTTP standard, such as 200, 302 and 404.
@@ -177,8 +176,8 @@ An atomic process is a tuple $p=$ $(I^p, Z^p, R^p,z_0^p )$, containing the addre
 %They can describe that what kind of event can be accepted by the process in each state, and the content of new output events and states.
 
 
-\vspace{1mm}\noindent\textbf{IdP}.
-The state of IdP process is described as a term in the form \myss{\myangle{Issuer, SK, SessionList, UserList, RPs, Validity, Tokens}}.
+\vspace{1mm}\noindent\textbf{IdP Server Process}.
+The state of IdP process is described as a term in the form \myss{\myangle{Issuer, SK, SessionList, UserList, RPList, Validity, TokenList}}.
 That is,  the state of an IdP server  at the point in time can be sketched using these attributes.
 %Other data stored at IdP but not used during SSO authentication are not mentioned here.
 \begin{itemize}
@@ -187,11 +186,10 @@ That is,  the state of an IdP server  at the point in time can be sketched using
 %\item \myss{p} is the large prime mentioned before.
 \item \myss{SK} is the private key used by IdP to generate signatures.
 \item \myss{SessionList} is the term in the form of \myss{\myangle{\myangle{cookie, session}}}, the cookie uniquely identifies the session storing the  browser uploaded messages.
-\item \myss{UserList} is the set of user's information, including  \myss{username, credential, ID_U}  and other attributes.
-\item \myss{RPs} is the set of RP information which consists of ephemeral ID of RP \myss{(PID_{RP})},
-    \myss{Endpoints} (i.e., the set of RP's validity endpoints) and \myss{Validity}.
+\item \myss{UserList} is the set of user's information, including  \myss{ID_U}  and other attributes.
+\item \myss{RPList} is the set of registered RP information which consists of ID of RP \myss{(PID_{RP})}, \myss{Enpt}  and \myss{Validity}.
 \item \myss{Validity} is the validity for IdP generated signatures.
-\item \myss{Tokens} is the set of IdP generated Identity tokens.
+\item \myss{TokenList} is the set of IdP generated Identity tokens.
 \end{itemize}
 We also define the \myss{functions} in the relations.
 \begin{itemize}
@@ -285,8 +283,8 @@ command \rangle \ \ \ \ \
 \end{multline*}
 \end{itemize}
 The \myss{tree} is the structure of the opened windows and documents, which are visible to this script. \myss{DocID} is the document $ID_d$, representing a document. The  \myss{Scriptstate} is a term of the form defined by each script. \myss{Scriptinputs} is the message transmitted to script. However, the \myss{scriptinputs} is defined as formatted term,
- for example, postMessage is one of the forms of \myss{scriptinputs}. \myss{Cookies} is the set of cookies that belong to the document's origin. \myss{Ids} is the set of user IDs while \myss{secret} is the password to corresponding user ID. The \myss{command} is the operation which is to be conducted by the browser. Here we only introduce the form of commands used in UPPRESSO.
- We have defined the postMessage and XMLHTTPRequest (for HTTP request) message which are the \myss{commands}.
+for example, postMessage is one of the forms of \myss{scriptinputs}. \myss{Cookies} is the set of cookies that belong to the document's origin. \myss{Ids} is the set of user IDs while \myss{secret} is the password to corresponding user ID. The \myss{command} is the operation which is to be conducted by the browser. Here we only introduce the form of commands used in UPPRESSO.
+We have defined the postMessage and XMLHTTPRequest (for HTTP request) message which are the \myss{commands}.
  Moreover, a term in the form \myss{\myangle{\mathtt{IFRAME}, URL, WindowID}} asks the browser to create this document's subwindow and it visits the server with the URL.
 
 \vspace{1mm}
@@ -323,33 +321,52 @@ Here, we define the function \myss{\mathtt{SUBWINDOW}(tree, docID)}, which takes
 The relation of RP script process $script\_rp$ is shown in Appendix~\ref{ape:alg} Relation~\ref{alg4}.
 
 \subsection{Proofs of Security}
-The security definition of UPPRESSO is that the system must ensure only the legitimate user logins to an honest RP under his unique account.
-We consider the visits to RP's resource paths are controlled by the visitors' cookies,
- so that the attacker could break the security only when he owns the cookie bound to the honest user.
-However, according to the same origin policy, a cookie is never leaked to any adversary, so the UPPRESSO system is vulnerable only when a adversary's cookie is bound with the honest user's identity.
-Based on the model of RP server process, at Line 64-83, we find that only when the RP accepts a visitor's identity token,
-    it will bind this visitor with the identity derived from this token.
+The security definition of SSO system is that the system must ensure only the legitimate user logins to an honest RP under his unique account.
+%We consider the visits to RP's resource paths are controlled by the visitors' cookies,
+% so that the attacker could break the security only when he owns the cookie bound to the honest user.
+%However, according to the same origin policy, a cookie is never leaked to any adversary, so the SSO system is vulnerable only when a adversary's cookie is bound with the honest user's identity.
+%In the SSO system, only when the RP accepts a visitor's identity token,
+%    it will bind this visitor with the identity derived from this token.
 Moreover, the RP must also make sure that, an honest user would always login to the server with her constant identity.
 Therefore, we propose the definition about the secure UPPRESSO system.
 
 \begin{definition}
 %Let $\mathcal{UWS}$ be a UPPRESSO web system, $\mathcal{UWS}$ is secure \textbf{iff} for any honest RP $r$ $\in $ $\mathcal{W}$, it would not derive an honest user's identity from the token while the token belongs to an adversary.
-An SSO system is secure {\em iff} for any honest RP, it would not derive an honest user's identity from the token while the token belongs to an adversary, or derive an incorrect identity from the token sent by an honest user.
+An SSO system is secure {\em iff} the honest user's privilege and privacy at an honest RP would never be accessible to any adversaries.
+%for any honest RP, it would derive the constant identity from an accepted token, while the identity must belong to the user or the collusive participators.  
+%it would only derive the constant identity belong to the user or the collusive participators, who upload the IdP issued   
+%not derive an honest user's identity from the token while the token belongs to an adversary, or derive an incorrect identity from the token sent by an honest user.
 \end{definition}
 
 \begin{theorem}
-When the IdP is honest,
+\label{theorem:requirements}
+When the IdP is honest and RP server is not vulnerable,
 the sufficient requirements of secure SSO system can be described as follows.
 % 注意，这个是充分非必要条件
 \begin{itemize}
 \item An adversary cannot achieve an honest user's token issued for an honest RP ({\em confidentiality}).
 \item An honest RP would not accept the token issued for another RP ({\em RP designation}).
-\item Attacker cannot forge or modify the IdP-issued proofs ({\em integrity}).
+\item Attacker cannot forge or modify the IdP-issued tokens ({\em integrity}).
 \item An honest user must always login to the honest RP on her own identity ({\em user identification}).
 \end{itemize}
 \end{theorem}
 
-We assume that all the network messages are transmitted using HTTPS, postMessage messages are protected by the browser, and the browsers are  honest, so web attackers can never break the security of UPPRESSO.
+\begin{proof}
+As RP server is not vulnerable, an adversary may only try to break the security of SSO system in following ways, (1) visiting the RP server in the honest user's identity (achieving the privilege and privacy), or (2) alluring the honest user to visit the RP in the adversary's identity (only achieving the privacy).
+
+An adversary can only visit the RP in the honest user's identity, while it uploads an identity token to the RP and RP derives the honest user's account from it. 
+Although this kind of attack can also be conducted by stealing the honest user's cookie, it is not considered here due to the same origin policy.
+The adversary may achieve an identity token in three ways, (a) achieving identity token from a user, (b) asking for the identity token from IdP as a user, and (c) forging or tempering the identity token it self. However, these attempts of attack are not possible as long as the requirements in the theorem are satisfied.
+The {\em confidentiality} and {\em RP designation} guarantees that any token received from an honest user would not be accepted by any other honest RPs.
+The identity token issued for the adversary can only represent the adversary's identity.
+The {\em integrity} guarantees that the adversary cannot forge or temper the identity token.
+
+Moreover, the {\em user identification} guarantees that the honest user would not visit the RP in the adversary's identity.
+
+Therefore, the theorem~\ref{theorem:requirements} is proved.
+\end{proof}
+
+We assume that in UPPRESSO system, all the network messages are transmitted using HTTPS, postMessage messages are protected by the browser, and the browsers are  honest, so web attackers can never break the security of UPPRESSO.
 Here, we are going to prove that, in the UPRESSO system, the following lemmas are always workable.
 
 
@@ -427,8 +444,11 @@ Therefore, an adversary cannot lead the honest RP to accept the malicious token 
 \begin{theorem}
 UPPRESSO is a secure SSO system, if the IdP is honest.
 \end{theorem}
+\begin{proof}
 In conclusion, four lemmas prove that the UPPRESSO system satisfies the sufficient requirements of the secure SSO system.
 Therefore, UPPRESSO is proved secure.
+\end{proof}
+
 
 
 
@@ -495,7 +515,7 @@ The detailed procedure of dealing with these events is shown as follows.
   \mystop{b, a,m'}
   \ENDIF
   \mystate{\myss{Validity := \mathtt{CurrentTime} ()+ s'.Validity}}
- \mystate{\myss{s'.RPs := s'.RPs +  ^{\myangle{}} \myangle{PID_{RP}, Enpt, Validity}}}
+ \mystate{\myss{s'.RPList := s'.RPList +  ^{\myangle{}} \myangle{PID_{RP}, Enpt, Validity}}}
   \mystate{\myss{Content := \myangle{OK, PID_{RP}, Nonce, Validity}}}
   \mystate{\myss{Sig := \mathtt{Sig}(Content, s'.SK)}}
   \mystate{\myss{RegistrationResult := \myangle{Content, Sig}}}
@@ -504,8 +524,8 @@ The detailed procedure of dealing with these events is shown as follows.
   \myelse{path \equiv /authorize}
   \mystate{\myss{cookie := headers[Cookie]}}
   \mystate{\myss{session := s'.SessionList[cookie]}}
-  \mystate{\myss{username := session[username]}}
-  \myif{username \equiv \mathtt{null}}
+  \mystate{\myss{uid := session[uid]}}
+  \myif{uid \equiv \mathtt{null}}
   \mystate{\myss{m' := \myangle{\mathtt{HTTPResp}, n, 200, \myangle{}, \mathtt{Fail}}}}
   \mystop{b, a,m'}
   \ENDIF
@@ -521,7 +541,7 @@ The detailed procedure of dealing with these events is shown as follows.
   \mystate{\myss{Content := \myangle{PID_{RP}, PID_U, s'.Issuer, Validity}}}
   \mystate{\myss{Sig := \mathtt{SigSign}(Content, s'.SK)}}
   \mystate{\myss{Token := \myangle{Content, Sig}}}
-  \mystate{\myss{s'.Tokens := s'.Tokens + ^{\myangle{}}Token}}
+  \mystate{\myss{s'.TokenList := s'.TokenList + ^{\myangle{}}Token}}
   \mystate{\myss{m' := \myangle{\mathtt{HTTPResp}, n, 200, \myangle{}, \myangle{Token, Token}}}}
   \mystop{b, a, m'}
   \ENDIF
@@ -685,10 +705,10 @@ The detailed procedure of dealing with these events is shown as follows.
       \mystate{\myss{\textbf{stop}\ \myangle{}}}
       \ENDIF
       \mystate{\myss{command := \myangle{\mathtt{POSTMESSAGE}, target, \myangle{\myangle{RegistrationResult, RegistrationResult}}, \mathtt{null}}}}
-      \mystate{\myss{s'.phase := expectProofRquest}}
+      \mystate{\myss{s'.phase := expectTokenRquest}}
       \ENDIF
       \ENDCASE
-      \CASE{expectProofRquest}
+      \CASE{expecTokenRquest}
       \mystate{\myss{pattern := \myangle{\mathtt{POSTMESSAGE}, *, Content, *}}}
       \mystate{\myss{input := \mathtt{CHOOSEINPUT}(scriptinputs,pattern)}}
       \myif{input \not\equiv \mathtt{null}}
