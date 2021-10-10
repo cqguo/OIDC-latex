@@ -108,8 +108,7 @@ where $a$ and $b$ represent the addresses of the sender and receiver, respective
 \noindent\textbf{Script process}. A script process is the formulation of browser scripts as a relation $R$,
     representing the server-defined functions,
     while the input and output are handled by the browser.
-A script process is addressed by the \verb+Origin+ property, as the the protocol, hostname and port of a URL.
-That is, if a script sends the messages to another script process and set the \verb+Origin+ value as the IdP domain,
+A script process is addressed by the \verb+Origin+ property, as the the protocol and hostname of a URL. That is, while a script sends the messages to another script process and set the \verb+Origin+ value as the IdP domain,
  only the script downloaded from IdP server receives this message.
 
 
@@ -154,7 +153,7 @@ The details are defined as follows:
  \item \myss{method} is one of the HTTP methods, \myss{\mathtt{GET}} and \myss{\mathtt{POST}}.
  \item \myss{host} is the constant string domain of visited server.
  \item \myss{path} is the constant string representing the concrete resource of the server.
- \item \myss{parameters} contains the parameters carried by the url as the form \myss{\myangle{\myangle{name, value}, \myangle{name, value}, \dotsc}}, for example, the \myss{parameters} in the url \myss{http://www.example.com?type=confirm}  is \myss{\myangle{\myangle{type, confirm}}}.
+ \item \myss{parameters} contains the parameters carried by the url as the form \myss{\myangle{\myangle{type, value}, \myangle{type, value}, \dotsc}}, for example, the \myss{parameters} in the url \myss{http://www.example.com?type=confirm}  is \myss{\myangle{\myangle{type, confirm}}}.
  \item \myss{headers} is the header content of each HTTP messages as the form \myss{\myangle{\myangle{type, value}, \myangle{type, value}, \dotsc}}, such as \myss{\langle\myangle{Referer, http://www.example.com},} \myss{\myangle{Cookies, c}\rangle}.
  \item \myss{body} is the body content carried by HTTP \myss{\mathtt{POST}} request or HTTP response in the form \myss{\myangle{\myangle{type, value}, \myangle{type, value}, \dotsc}}.
   \item \myss{status} is the HTTP status code defined by HTTP standard, such as 200, 302 and 404.
@@ -177,8 +176,8 @@ An atomic process is a tuple $p=$ $(I^p, Z^p, R^p,z_0^p )$, containing the addre
 %They can describe that what kind of event can be accepted by the process in each state, and the content of new output events and states.
 
 
-\vspace{1mm}\noindent\textbf{IdP}.
-The state of IdP process is described as a term in the form \myss{\myangle{Issuer, SK, SessionList, UserList, RPs, Validity, Tokens}}.
+\vspace{1mm}\noindent\textbf{IdP Server Process}.
+The state of IdP server process is described as a term in the form \myss{\myangle{Issuer, SK, SessionList, UserList, RPList, Validity, TokenList}}.
 That is,  the state of an IdP server  at the point in time can be sketched using these attributes.
 %Other data stored at IdP but not used during SSO authentication are not mentioned here.
 \begin{itemize}
@@ -187,11 +186,10 @@ That is,  the state of an IdP server  at the point in time can be sketched using
 %\item \myss{p} is the large prime mentioned before.
 \item \myss{SK} is the private key used by IdP to generate signatures.
 \item \myss{SessionList} is the term in the form of \myss{\myangle{\myangle{cookie, session}}}, the cookie uniquely identifies the session storing the  browser uploaded messages.
-\item \myss{UserList} is the set of user's information, including  \myss{username, credential, ID_U}  and other attributes.
-\item \myss{RPs} is the set of RP information which consists of ephemeral ID of RP \myss{(PID_{RP})},
-    \myss{Endpoints} (i.e., the set of RP's validity endpoints) and \myss{Validity}.
+\item \myss{UserList} is the set of user's information, including  \myss{ID_U}  and other attributes.
+\item \myss{RPList} is the set of registered RP information which consists of ID of RP \myss{(PID_{RP})}, \myss{Enpt}  and \myss{Validity}.
 \item \myss{Validity} is the validity for IdP generated signatures.
-\item \myss{Tokens} is the set of IdP generated Identity tokens.
+\item \myss{TokenList} is the set of IdP generated Identity tokens.
 \end{itemize}
 We also define the \myss{functions} in the relations.
 \begin{itemize}
@@ -284,10 +282,12 @@ ids, secret \rangle
 command \rangle \ \ \ \ \
 \end{multline*}
 \end{itemize}
-The \myss{tree} is the structure of the opened windows and documents, which are visible to this script. \myss{DocID} is the document $ID_d$, representing a document. The  \myss{Scriptstate} is a term of the form defined by each script. \myss{Scriptinputs} is the message transmitted to script. However, the \myss{scriptinputs} is defined as formatted term,
- for example, postMessage is one of the forms of \myss{scriptinputs}. \myss{Cookies} is the set of cookies that belong to the document's origin. \myss{Ids} is the set of user IDs while \myss{secret} is the password to corresponding user ID. The \myss{command} is the operation which is to be conducted by the browser. Here we only introduce the form of commands used in UPPRESSO.
- We have defined the postMessage and XMLHTTPRequest (for HTTP request) message which are the \myss{commands}.
- Moreover, a term in the form \myss{\myangle{\mathtt{IFRAME}, URL, WindowID}} asks the browser to create this document's subwindow and it visits the server with the URL.
+The \myss{tree} is the structure of the opened windows and documents, which are visible to this script. \myss{DocID} is the document $ID_d$, representing a document.
+ The  \myss{Scriptstate} is a term of the form defined by each script. \myss{Scriptinputs} is the message transmitted to script. 
+ However, the \myss{scriptinputs} is defined as formatted forms, for example, postMessage is one of the forms of \myss{scriptinputs}. \myss{Cookies} is the set of cookies that belong to the document's origin. 
+ \myss{LocalStorage} is the storage space for browser and \myss{sessionStorage} is the space for each HTTP sessions.  \myss{Ids} is the set of user IDs while \myss{secret} is the password to corresponding user ID. The \myss{command} is the operation which is to be conducted by the browser. 
+ Here we only introduce the form of commands used in UPPRESSO system. 
+ We have defined the postMessage and XMLHTTPRequest (for HTTP request) message which are the \myss{commands}. Moreover, a term in the form \myss{\myangle{\mathtt{IFRAME}, URL, WindowID}} asks the browser to create this document's subwindow and it visits the server with the URL.
 
 \vspace{1mm}
 \noindent\textbf{IdP script process}
@@ -348,7 +348,7 @@ the sufficient requirements of secure SSO system can be described as follows.
 \begin{itemize}
 \item An adversary cannot achieve an honest user's token issued for an honest RP ({\em confidentiality}).
 \item An honest RP would not accept the token issued for another RP ({\em RP designation}).
-\item Attacker cannot forge or modify the IdP-issued proofs ({\em integrity}).
+\item Attacker cannot forge or modify the IdP-issued tokens ({\em integrity}).
 \item An honest user must always login to the honest RP on her own identity ({\em user identification}).
 \end{itemize}
 \end{theorem}
@@ -517,7 +517,7 @@ The detailed procedure of dealing with these events is shown as follows.
   \mystop{b, a,m'}
   \ENDIF
   \mystate{\myss{Validity := \mathtt{CurrentTime} ()+ s'.Validity}}
- \mystate{\myss{s'.RPs := s'.RPs +  ^{\myangle{}} \myangle{PID_{RP}, Enpt, Validity}}}
+ \mystate{\myss{s'.RPList := s'.RPList +  ^{\myangle{}} \myangle{PID_{RP}, Enpt, Validity}}}
   \mystate{\myss{Content := \myangle{OK, PID_{RP}, Nonce, Validity}}}
   \mystate{\myss{Sig := \mathtt{Sig}(Content, s'.SK)}}
   \mystate{\myss{RegistrationResult := \myangle{Content, Sig}}}
@@ -526,8 +526,8 @@ The detailed procedure of dealing with these events is shown as follows.
   \myelse{path \equiv /authorize}
   \mystate{\myss{cookie := headers[Cookie]}}
   \mystate{\myss{session := s'.SessionList[cookie]}}
-  \mystate{\myss{username := session[username]}}
-  \myif{username \equiv \mathtt{null}}
+  \mystate{\myss{uid := session[uid]}}
+  \myif{uid \equiv \mathtt{null}}
   \mystate{\myss{m' := \myangle{\mathtt{HTTPResp}, n, 200, \myangle{}, \mathtt{Fail}}}}
   \mystop{b, a,m'}
   \ENDIF
@@ -543,7 +543,7 @@ The detailed procedure of dealing with these events is shown as follows.
   \mystate{\myss{Content := \myangle{PID_{RP}, PID_U, s'.Issuer, Validity}}}
   \mystate{\myss{Sig := \mathtt{SigSign}(Content, s'.SK)}}
   \mystate{\myss{Token := \myangle{Content, Sig}}}
-  \mystate{\myss{s'.Tokens := s'.Tokens + ^{\myangle{}}Token}}
+  \mystate{\myss{s'.TokenList := s'.TokenList + ^{\myangle{}}Token}}
   \mystate{\myss{m' := \myangle{\mathtt{HTTPResp}, n, 200, \myangle{}, \myangle{Token, Token}}}}
   \mystop{b, a, m'}
   \ENDIF
@@ -707,10 +707,10 @@ The detailed procedure of dealing with these events is shown as follows.
       \mystate{\myss{\textbf{stop}\ \myangle{}}}
       \ENDIF
       \mystate{\myss{command := \myangle{\mathtt{POSTMESSAGE}, target, \myangle{\myangle{RegistrationResult, RegistrationResult}}, \mathtt{null}}}}
-      \mystate{\myss{s'.phase := expectProofRquest}}
+      \mystate{\myss{s'.phase := expectTokenRquest}}
       \ENDIF
       \ENDCASE
-      \CASE{expectProofRquest}
+      \CASE{expecTokenRquest}
       \mystate{\myss{pattern := \myangle{\mathtt{POSTMESSAGE}, *, Content, *}}}
       \mystate{\myss{input := \mathtt{CHOOSEINPUT}(scriptinputs,pattern)}}
       \myif{input \not\equiv \mathtt{null}}
