@@ -22,12 +22,12 @@ Meanwhile,
         the honest IdP guarantees that, within its validity period, the $PID_{RP}$ will be registered only once.
 % $PID_{RP}$ will be bound in some identity token.
 A honest RP is ready to accept an identity token binding $PID_{RP}$, only after it receives the signed $PID_{RP}$-registration result.
-Because both $PID_{RP}$ and $H(t)$ in the registration result are checked and then the registration result $[PID_{RP}, H(t), Validity]_{SK}$ is acceptable to only one honest RP,
+Because both $PID_{RP}$ and $H(t)$ in the registration result are checked by the RP and then the registration result $[PID_{RP}, H(t), Validity]_{SK}$ is acceptable to only one honest RP,
             the identity token designates only one RP.
 
 \vspace{1mm}
 \noindent\textbf{User Identification.}
-First of all, an honest RP always derives an identical permanent account from different identity tokens binding $PID_U$ and $PID_{RP}$.
+An honest RP always derives an identical permanent account from different identity tokens binding $PID_U$ and $PID_{RP}$.
 That is,
     in the user's any $i$-th and $i'$-th ($i \neq i'$) login instances to the RP,
  $\mathcal{F}_{Acct}(PID_{U}^i, PID_{RP}^i) = \mathcal{F}_{Acct}(PID_{U}^{i'}, PID_{RP}^{i'}) = [ID_U]ID_{RP}$.
@@ -43,8 +43,8 @@ For example,
 If the generated $t$ and $t'$ happen to satisfy that $PID_{RP} = [t]ID_{RP_j} = [tr]G = [t'r']G = [t']ID_{RP_{j'}}$,
     these collusive users could arbitrarily choose to register either $[PID_{RP}, PEnpt_U, H(t)]$ or $[PID_{RP}, PEnpt_{U'}, H(t')]$ at the IdP,
         to receive an identity token binding either $PID_U = [u]PID_{RP}$ or $PID_{U'} = [u']PID_{RP}$
-         (and $PID_{RP}$).\footnote{Such a token designates either $RP_j$ or $RP_{j'}$,
-    but only one RP for there is only one acceptable $PID_{RP}$-registration result, which is signed by the IdP.
+         (and also $PID_{RP}$).\footnote{Such a token designates either $RP_j$ or $RP_{j'}$,
+    but only one RP for there is only one acceptable $PID_{RP}$-registration result which is signed by the IdP.
     So RP designation is not violated in this case.}
 However,
     when such a token is presented to $RP_j$, the calculated $Acct$ is $[ur]G$ or $[u'r't't^{-1}]G = [u'r]G$;
@@ -84,7 +84,7 @@ The identity token binds $ID_U$ and $ID_{RP}$
     implicitly or explicitly, and any breaking will result in some failed check or verification in the login flow.
 The integrity is ensured by the IdP's signatures:
  (\emph{a}) the identity token binding $PID_U$ and $PID_{RP}$, is signed by the IdP,
-  and (\emph{b}) the relationship between $PID_{RP}$ and $t$ (or collision-free $H(t)$) is also bound by the IdP's signature
+  and (\emph{b}) the relationship between $PID_{RP}$ and $t$ (or collision-free $H(t)$) is also bound 
     in the $PID_{RP}$-registration result.
 Thus,
     $ID_U$ and $ID_{RP}$ are actually bound by the IdP's signatures,
@@ -98,25 +98,25 @@ Thus,
 We also formally analyze the security properties of UPPRESSO,
      based on an Dolev-Yao style model of the web infrastructure \cite{SPRESSO},
  which has been used in the formal analysis of SSO protocols such as OAuth 2.0 \cite{FettKS16} and OIDC \cite{FettKS17}.
-The Dolev-Yao web model abstracts the entities in a system,
+The Dolev-Yao style model abstracts the entities in a web system,
     such as browsers and web servers,
     as {\em atomic processes}, which communicate with each other through {\em events}.
 It also defines {\em script processes} to formulate client-side scripts, i.e.,  JavaScript code,
  so a web system consists of a set of atomic and script processes.
 
-The UPPRESSO system contains an IdP server process,
+The UPPRESSO system contains an IdP process,
     a finite set of web servers for honest RPs, a finite set of honest browsers, and a finite set of attacker processes.
 Here, we consider all RP processes and browser processes are honest,
- while model an RP or a browser controlled by an adversary as an atomic attacker process.
+ while model an RP or a browser controlled by an adversary as atomic attacker processes.
 It also contains {\sf script\_rp}, {\sf script\_idp} and {\sf script\_attacker},
     where {\sf script\_rp} and {\sf script\_idp} are honest scripts downloaded from an RP process and the IdP process, respectively,
          and {\sf script\_attacker} denotes a script downloaded by an attacker process that exists in all browser processes.
 
 After formulating UPPRESSO by the Dolev-Yao style model,
-    we trace the sensitive data, especial an identity token,
+    we trace the identity token,
         starting when it is generated and ending when it is consumed,
  to ensure that an identity token is not stolen or tempered by adversaries.
-For example, we locate the generation of an identity token in the UPPRESSO, and trace back to the sources
+For example, we locate the generation of an identity token in UPPRESSO, and trace back to the sources
     where $PID_U$, $PID_{RP}$ and other values enclosed in this token are generated and transmitted,
      to ensure that no adversary able to retrieve or manipulate them.
 The tracing of identity tokens also confirm no adversary retrieves the token.
@@ -138,11 +138,11 @@ We show that UPPRESSO effectively prevents the attacks of IdP-based login tracin
 The information accessible to the IdP and derived from the RP's identity,
     is only $PID_{RP}$, where $PID_{RP} = [t]ID_{RP}$ is calculated by the user.
 Because  (\emph{a}) $t$ is a number randomly chosen from $(1,n)$ by the user and kept secret to the IdP
- and (\emph{b}) $ID_{RP} = [r]G$ and $G$ is the base point,
+ and (\emph{b}) $ID_{RP} = [r]G$ and $G$ is the base point of $\mathbb{E}$,
  the IdP has to view $PID_{RP}$ as randomly and independently chosen from $\mathbb{E}$,
-    and cannot distinguishes $[t]ID_{RP_j} = [tr]G$ from $[t']ID_{RP_{j'}} = [t'r']G$.
+    and cannot distinguish $[t]ID_{RP_j} = [tr]G$ from $[t']ID_{RP_{j'}} = [t'r']G$.
 So, the IdP cannot derive the RP's identity or link any pair of $PID_{RP}^i$ and $PID_{RP}^{i'}$,
-    and the IdP-based identity linkage is impossible.
+    and then the IdP-based identity linkage is impossible.
 
 \vspace{1mm}
 \noindent\textbf{RP-based Identity Linkage.}
@@ -172,7 +172,7 @@ Then, $\epsilon(k)$ becomes negligible with the security parameter $k$.
 
 In the login flow,
     an RP holds $ID_{RP}$ and $Acct$, receives $t$, calculates $PID_{RP}$,
-    and verifies two signed responses (i.e., $PID_{RP}$ and $H(t)$ in the $PID_{RP}$-registration result,
+    and verifies two signed messages (i.e., $PID_{RP}$ and $H(t)$ in the $PID_{RP}$-registration result,
             and $PID_{RP}$ and $PID_U$ in the identity token).
 After filtering out the redundant information (i.e., $PID_{RP}= [t]{ID_{RP}}$ and $Acct = [t^{-1}]PID_{U}$),
     the RP actually receives only $(ID_{RP}, t, PID_U)$ in each SSO login instance, where $PID_U = [ID_U][t]{ID_{RP}}$.
@@ -193,7 +193,7 @@ We describe the attack of RP-based identity linkage as the following game $\math
     the adversary receives $(ID_{RP_j}$, $t_j$, $[ID_U][t_j]{ID_{RP_j}}, ID_{RP_{j'}}$, $t_{j'}$, $[ID_{U'}] [t_{j'}] {ID_{RP_{j'}}})$ from the challenger,
      and outputs the result $s$.
 The result is 1, when the adversary guesses that $ID_U = ID_{U'}$;
-     otherwise, the adversary thinks they are unequal and $s=0$.
+     otherwise, the adversary thinks they are different users (i.e., $ID_U \neq ID_{U'}$) and $s=0$.
 %The game is shown as Figure \ref{fig:game}.
 
 We define $Pr_c$ as the probability that
@@ -210,7 +210,7 @@ The successful RP-based identity linkage means
 \end{figure}
 
 We design a PPT algorithm $\mathcal{D}^*$ based on $\mathcal{G}$, shown in Figure \ref{fig:dalgorithm}.
-The input of $\mathcal{D}^*$ appears in the form of $(Q_1, Q_2, Q_3, Q_4)$, and each $Q_i$ is a point on $\mathbb{E}$.
+The input of $\mathcal{D}^*$ is in the form of $(Q_1, Q_2, Q_3, Q_4)$, and each $Q_i$ is a point on $\mathbb{E}$.
 On receiving the input,
  the challenger of $\mathcal{G}$ randomly chooses $t_j$ and $t_{j'}$ in $(1,n)$,
    % and sets $ID_{RP_j}=Q_1$, $ID_{RP_{j'}}=Q_2$, $PID_{U,j}=[t_j]Q_3$, and $PID_{U',j'}= [t_{j'}] Q_4$.
