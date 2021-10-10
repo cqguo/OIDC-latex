@@ -334,13 +334,15 @@ Therefore, we propose the definition about the secure UPPRESSO system.
 
 \begin{definition}
 %Let $\mathcal{UWS}$ be a UPPRESSO web system, $\mathcal{UWS}$ is secure \textbf{iff} for any honest RP $r$ $\in $ $\mathcal{W}$, it would not derive an honest user's identity from the token while the token belongs to an adversary.
-An SSO system is secure {\em iff} for any honest RP, it would derive the constant identity from an accepted token, while the identity must belong to the user or the collusive participators.  
+An SSO system is secure {\em iff} the honest user's privilege and privacy at an honest RP would never be accessible to any adversaries.
+%for any honest RP, it would derive the constant identity from an accepted token, while the identity must belong to the user or the collusive participators.  
 %it would only derive the constant identity belong to the user or the collusive participators, who upload the IdP issued   
 %not derive an honest user's identity from the token while the token belongs to an adversary, or derive an incorrect identity from the token sent by an honest user.
 \end{definition}
 
 \begin{theorem}
-When the IdP is honest,
+\label{theorem:requirements}
+When the IdP is honest and RP server is not vulnerable,
 the sufficient requirements of secure SSO system can be described as follows.
 % 注意，这个是充分非必要条件
 \begin{itemize}
@@ -352,10 +354,21 @@ the sufficient requirements of secure SSO system can be described as follows.
 \end{theorem}
 
 \begin{proof}
+As RP server is not vulnerable, an adversary may only try to break the security of SSO system in following ways, (1) visiting the RP server in the honest user's identity (achieving the privilege and privacy), or (2) alluring the honest user to visit the RP in the adversary's identity (only achieving the privacy).
 
+An adversary can only visit the RP in the honest user's identity, while it uploads an identity token to the RP and RP derives the honest user's account from it. 
+Although this kind of attack can also be conducted by stealing the honest user's cookie, it is not considered here due to the same origin policy.
+The adversary may achieve an identity token in three ways, (a) achieving identity token from a user, (b) asking for the identity token from IdP as a user, and (c) forging or tempering the identity token it self. However, these attempts of attack are not possible as long as the requirements in the theorem are satisfied.
+The {\em confidentiality} and {\em RP designation} guarantees that any token received from an honest user would not be accepted by any other honest RPs.
+The identity token issued for the adversary can only represent the adversary's identity.
+The {\em integrity} guarantees that the adversary cannot forge or temper the identity token.
+
+Moreover, the {\em user identification} guarantees that the honest user would not visit the RP in the adversary's identity.
+
+Therefore, the theorem~\ref{theorem:requirements} is proved.
 \end{proof}
 
-We assume that all the network messages are transmitted using HTTPS, postMessage messages are protected by the browser, and the browsers are  honest, so web attackers can never break the security of UPPRESSO.
+We assume that in UPPRESSO system, all the network messages are transmitted using HTTPS, postMessage messages are protected by the browser, and the browsers are  honest, so web attackers can never break the security of UPPRESSO.
 Here, we are going to prove that, in the UPRESSO system, the following lemmas are always workable.
 
 
@@ -433,8 +446,11 @@ Therefore, an adversary cannot lead the honest RP to accept the malicious token 
 \begin{theorem}
 UPPRESSO is a secure SSO system, if the IdP is honest.
 \end{theorem}
+\begin{proof}
 In conclusion, four lemmas prove that the UPPRESSO system satisfies the sufficient requirements of the secure SSO system.
 Therefore, UPPRESSO is proved secure.
+\end{proof}
+
 
 
 
