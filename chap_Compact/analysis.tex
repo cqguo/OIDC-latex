@@ -44,13 +44,15 @@ If the generated $t$ and $t'$ happen to satisfy that $PID_{RP} = [t]ID_{RP_j} = 
     these collusive users could arbitrarily choose to register either $[PID_{RP}, PEnpt_U, H(t)]$ or $[PID_{RP}, PEnpt_{U'}, H(t')]$ at the IdP,
         to receive an identity token binding either $PID_U = [u]PID_{RP}$ or $PID_{U'} = [u']PID_{RP}$
          (and also $PID_{RP}$).\footnote{Such a token designates either $RP_j$ or $RP_{j'}$,
-    but only one RP for there is only one acceptable $PID_{RP}$-registration result which is signed by the IdP.
+    but only one RP because there is only one acceptable $PID_{RP}$-registration result which is signed by the IdP.
     So RP designation is not violated in this case.}
 However,
-    when such a token is presented to $RP_j$, the calculated $Acct$ is $[ur]G$ or $[u'r't't^{-1}]G = [u'r]G$;
-    when it is presented to $RP_{j'}$, $[urtt'^{-1}]G = [ur']G$ or $[u'r']G$ is calculated.
-That is, the calculated account is still the authenticated user's account at the RP,
-    and this does not result in any attack.
+    when such a token is signed for $RP_j$, the calculated $Acct$ is $[ur]G$ or $[u'r't't^{-1}]G = [u'r]G$;
+    when it is signed for $RP_{j'}$, $[urtt'^{-1}]G = [ur']G$ or $[u'r']G$ is calculated.
+That is, 
+        even in this collusive case,
+    the calculated account is still the authenticated user's account at the RP,
+    and it does not result in any attack.
 
 
 %An adversary might try allure a user to login under the adversary's account,
@@ -84,7 +86,7 @@ The identity token binds $ID_U$ and $ID_{RP}$
     implicitly or explicitly, and any breaking will result in some failed check or verification in the login flow.
 The integrity is ensured by the IdP's signatures:
  (\emph{a}) the identity token binding $PID_U$ and $PID_{RP}$, is signed by the IdP,
-  and (\emph{b}) the relationship between $PID_{RP}$ and $t$ (or collision-free $H(t)$) is also bound 
+  and (\emph{b}) the relationship between $PID_{RP}$ and $t$ (or collision-free $H(t)$) is also bound
     in the $PID_{RP}$-registration result.
 Thus,
     $ID_U$ and $ID_{RP}$ are actually bound by the IdP's signatures,
@@ -132,7 +134,7 @@ The details on the Dolev-Yao web model and the security proof of UPPRESSO are in
 
 \subsection{Privacy}
 We show that UPPRESSO effectively prevents the attacks of IdP-based login tracing and RP-based identity linkage,
-    when $t$ is protected well and unknown to the IdP.
+    when $t$ is protected well and kept unknown to the IdP.
 
 \vspace{1mm}
 \noindent\textbf{IdP-based Login Tracing.}
@@ -148,8 +150,9 @@ So, the IdP cannot derive the RP's identity or link any pair of $PID_{RP}^i$ and
 \vspace{1mm}
 \noindent\textbf{RP-based Identity Linkage.}
 We prove UPPRESSO prevents the RP-based identity linkage,
- based on the elliptic curve decision Diffie-Hellman (ECDDH) assumption \cite{GoldwasserK16} as below.
+ based on the elliptic curve decision Diffie-Hellman (ECDDH) assumption \cite{GoldwasserK16}.
 %We briefly introduce the ECDDH assumption.
+
 Let $\mathbb{E}$ be an elliptic curve over a finite field $\mathbb{F}_q$,
     and $P$ be a point on $\mathbb{E}$ of order $n$.
 For any probabilistic polynomial time (PPT) algorithm $\mathcal{D}$,
@@ -187,10 +190,10 @@ After filtering out the redundant information (i.e., $PID_{RP}= [t]{ID_{RP}}$ an
 %\end{figure*}
 
 
-In order to launch identity linkage,
+In the RP-based identity linkage,
     two RPs bring two triads received in SSO login instances, $(ID_{RP_j}$, $t_j$, $[ID_U][t_j]{ID_{RP_j}})$ and
     $(ID_{RP_{j'}}$, $t_{j'}$, $[ID_{U'}] [t_{j'}] {ID_{RP_{j'}}})$.
-We describe the attack of RP-based identity linkage as the following game $\mathcal{G}$ between an adversary and a challenger:
+We describe the attack as the following game $\mathcal{G}$ between an adversary and a challenger:
     the adversary receives $(ID_{RP_j}$, $t_j$, $[ID_U][t_j]{ID_{RP_j}}, ID_{RP_{j'}}$, $t_{j'}$, $[ID_{U'}] [t_{j'}] {ID_{RP_{j'}}})$ from the challenger,
      and outputs the result $s$.
 The result is 1, when the adversary guesses that $ID_U = ID_{U'}$;
@@ -217,7 +220,7 @@ On receiving the input,
    % and sets $ID_{RP_j}=Q_1$, $ID_{RP_{j'}}=Q_2$, $PID_{U,j}=[t_j]Q_3$, and $PID_{U',j'}= [t_{j'}] Q_4$.
     and sends $(Q_1, t_j, [t_j]Q_3, Q_2, t_{j'}, [t_{j'}] Q_4)$ to the adversary.
 Finally,
-    $\mathcal{D}^*$ directly outputs $s$ from the adversary as the result of $\mathcal{D}^*$.
+    it directly outputs $s$ from the adversary in $\mathcal{G}$ as the result of $\mathcal{D}^*$.
 
 Let ($P$, $[x]P$, $[y]P$, $[xy]P$) and  ($P$, $[x]P$, $[y]P$, $[z]P$) be two inputs of $\mathcal{D}^*$.
 Thus, we obtain
