@@ -108,6 +108,8 @@ where $a$ and $b$ represent the addresses of the sender and receiver, respective
 \noindent\textbf{Script process}. A script process is the formulation of browser scripts as a relation $R$,
     representing the server-defined functions,
     while the input and output are handled by the browser.
+The script process does not maintain any state itself, while the \verb+scriptstate+ is stored by the browser in each documents. 
+The \verb+scriptstate+ is transmitted to script process as the part of input, when the script process is invoked to process the event.     
 A script process is addressed by the \verb+Origin+ property, as the the protocol and hostname of a URL. That is, while a script sends the messages to another script process and set the \verb+Origin+ value as the IdP domain,
  only the script downloaded from IdP server receives this message.
 
@@ -268,28 +270,22 @@ The \myss{ID_d} locates the document. \myss{Location} is the URL where the docum
 
 
 \subsubsection{The IdP Script and the RP Script}
-The script process is the dependent process relying on the browser, which can be considered as a relation \myss{R} mapping a message input and a message output. And finally the browser will conduct the command in the output message. Here we give the description of the form of input and output.
-\begin{itemize}
-\setlength\itemsep{-2pt}
-\item \textbf{Script Message Input. } The input is the term in the form
-\begin{multline*}
-\langle tree, docID, scriptstate, stateinputs,cookies,\\
-ids, secret \rangle
-\end{multline*}
-\item \textbf{Script Message Output. }The output is the term in the form
-\begin{multline*}
-\ \ \ \ \ \langle scriptstate, cookies, \\
-command \rangle \ \ \ \ \
-\end{multline*}
-\end{itemize}
-The \myss{tree} is the structure of the opened windows and documents, which are visible to this script. \myss{DocID} is the document $ID_d$, representing a document. The  \myss{Scriptstate} is a term of the form defined by each script. \myss{Scriptinputs} is the message transmitted to script. However, the \myss{scriptinputs} is defined as formatted term,
-for example, postMessage is one of the forms of \myss{scriptinputs}. \myss{Cookies} is the set of cookies that belong to the document's origin. \myss{Ids} is the set of user IDs while \myss{secret} is the password to corresponding user ID. The \myss{command} is the operation which is to be conducted by the browser. Here we only introduce the form of commands used in UPPRESSO.
-We have defined the postMessage and XMLHTTPRequest (for HTTP request) message which are the \myss{commands}.
- Moreover, a term in the form \myss{\myangle{\mathtt{IFRAME}, URL, WindowID}} asks the browser to create this document's subwindow and it visits the server with the URL.
+The script process is the dependent process relying on the browser, which can be considered as a relation \myss{R} mapping a message input and a message output. And finally the browser will conduct the command in the output message. 
+A script can be modelled as the tuple containing the input, output and relation.
+
 
 \vspace{1mm}
-\noindent\textbf{IdP script process}
-The state of IdP script process \myss{scriptstate} is a term in the form \myss{\myangle{IdPDomain, Parameters, phase, refXHR}}, where
+\noindent\textbf{IdP script process.}
+At the first, we give the description of the formate of input.
+The input is the formatted term
+\begin{multline*}
+\langle tree, docID, scriptstate, stateinputs, cookies, ids, secret \rangle
+\end{multline*}
+The \myss{tree} is the structure of the opened windows and documents, which are visible to this script. \myss{DocID} is the document $ID_d$, representing a document. \myss{Scriptinputs} is the message transmitted to script. However, the \myss{scriptinputs} is defined as formatted term,
+for example, postMessage is one of the forms of \myss{scriptinputs}. \myss{Cookies} is the set of cookies that belong to the document's origin. \myss{Ids} is the set of users while \myss{secret} is the credential of corresponding user. 
+
+
+The state of IdP script process \myss{scriptstate} is the formatted term \myss{\myangle{IdPDomain, Parameters, phase, refXHR}}, where
 \begin{itemize}
 \setlength\itemsep{-2pt}
 \item \myss{IdPDomain} is the IdP's host.
@@ -298,7 +294,22 @@ The state of IdP script process \myss{scriptstate} is a term in the form \myss{\
 \item \myss{phase} is used to label the procedure point in the login.
 \item \myss{refXHR} is the nonce to map HTTP request and response.
 \end{itemize}
-The new \myss{functions} are defined as follows.
+
+
+The output is the formatted term
+\begin{multline*}
+\ \langle scriptstate, cookies, command \rangle \ 
+\end{multline*}
+The \myss{scriptstate} and \myss{cookies} are transitioned to a new state.
+The \myss{command} is the operation which is to be conducted by the browser. Here we only introduce the form of commands used in UPPRESSO.
+We have defined the postMessage and XMLHTTPRequest (for HTTP request) message which are the \myss{commands}.
+ Moreover, a formatted term \myss{\myangle{\mathtt{IFRAME}, URL, WindowID}} asks the browser to create this document's subwindow and it visits the server with the URL.
+ 
+
+
+
+The relation of IdP script process $script\_idp$ is shown in Appendix~\ref{ape:alg} Relation~\ref{alg3}.
+ The new \myss{functions} in relation are defined as follows.
 \begin{itemize}
 \setlength\itemsep{-2pt}
  \item \myss{\mathtt{PARENTWINDOW}(tree,docID)}. The first parameter is the input relation tree defined before, and the second parameter is the $ID_d$ of a document. The output returned by the function is the current window's opener's $ID_w$ (null if it doesn't exist nor it is invisible to this document).
@@ -306,19 +317,25 @@ The new \myss{functions} are defined as follows.
   \item \myss{\mathtt{RandomUrl}()} returns a newly generated host string.
     \item \myss{\mathtt{CredentialofUser}(user,secret)} creates the user's credential for authentication.
 \end{itemize}
-The relation of IdP script process $script\_idp$ is shown in Appendix~\ref{ape:alg} Relation~\ref{alg3}.
-
 
 
 
 
 \vspace{1mm}
 \noindent\textbf{RP script process}
-The state of RP script process \myss{scriptstate} is a term in the form \myss{\langle IdPDomain}, \myss{RPDomain}, \myss{Parameters}, \myss{phase}, \myss{refXHR\rangle}. The \myss{RPDomain} is the host string of the corresponding RP server, and other terms are defined in the same way as in IdP script process.
+The input is the formatted term
+\begin{multline*}
+\ \langle tree, docID, scriptstate, stateinputs, cookies\rangle \ 
+\end{multline*}
+While the output is the formatted term
+\begin{multline*}
+\ \langle scriptstate, cookies, command \rangle \ 
+\end{multline*}
+The state of RP script process \myss{scriptstate} is the formatted term \myss{\langle IdPDomain}, \myss{RPDomain}, \myss{Parameters}, \myss{phase}, \myss{refXHR\rangle}. The \myss{RPDomain} is the host string of the corresponding RP server, and other terms are defined in the same way as in IdP script process.
+Other terms are same as them in IdP script
 
-Here, we define the function \myss{\mathtt{SUBWINDOW}(tree, docID)}, which takes the \myss{tree} defined above and the current document's \myss{ID_d} as the input. And it selects the \myss{ID_w} of the first window opened by this document as the output. However, if there is no opened windows, it returns  null.
 
-The relation of RP script process $script\_rp$ is shown in Appendix~\ref{ape:alg} Relation~\ref{alg4}.
+The relation of RP script process $script\_rp$ is shown in Appendix~\ref{ape:alg} Relation~\ref{alg4}. We define the function \myss{\mathtt{SUBWINDOW}(tree, docID)}, which takes the \myss{tree} defined above and the current document's \myss{ID_d} as the input. And it selects the \myss{ID_w} of the first window opened by this document as the output. However, if there is no opened windows, it returns  null.
 
 \subsection{Proofs of Security}
 The security definition of SSO system is that the system must ensure only the legitimate user logins to an honest RP under his unique account.
