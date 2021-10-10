@@ -11,35 +11,58 @@ UPPRESSO satisfies the four security requirements of identity tokens in SSO serv
 % 这个版本，先不管附录。
 
 \vspace{1mm}
+\noindent\textbf{RP Designation.}
+An identity token binding $PID_U$ and $PID_{RP}$,
+    designates the target RP, and only the target RP.
+An honest RP calculates $PID_{RP}$ by itself with the trapdoor $t$ sent from the user,
+    and checks $PID_{RP}$ in the $PID_{RP}$-registration result and the identity token.
+So the target RP will accept this token.
+
+Meanwhile,
+        the honest IdP guarantees that, within its validity period, the $PID_{RP}$ will be registered only once.
+% $PID_{RP}$ will be bound in some identity token.
+A honest RP is ready to accept an identity token binding $PID_{RP}$, only after it receives the signed $PID_{RP}$-registration result.
+Because both $PID_{RP}$ and $H(t)$ in the registration result are checked and then the registration result $[PID_{RP}, H(t), Validity]_{SK}$ is acceptable to only one honest RP,
+            the identity token designates only one RP.
+
+\vspace{1mm}
 \noindent\textbf{User Identification.}
-First of all, the RP always derives an identical permanent account from different identity tokens binding $PID_U$ and $PID_{RP}$.
+First of all, an honest RP always derives an identical permanent account from different identity tokens binding $PID_U$ and $PID_{RP}$.
 That is,
     in the user's any $i$-th and $i'$-th ($i \neq i'$) login instances to the RP,
  $\mathcal{F}_{Acct}(PID_{U}^i, PID_{RP}^i) = \mathcal{F}_{Acct}(PID_{U}^{i'}, PID_{RP}^{i'}) = [ID_U]ID_{RP}$.
 
-An adversary might try allure a user to login under the adversary's account,
-    by injecting his identity token into the user's communications with an honest RP.
-Such identity injection attacks are impossible in UPPRESSO as follows.
-If the negotiation of $PID_{RP}$ is not finished yet,
-    the RP will reject the malicious token.
-Even when $PID_{RP}$ has been negotiated,
-    it is kept unknown to the adversary because the communications between two scripts are controlled by a browser
-     and the communications between the browser and the IdP (or the RP) are protected by TLS.
-Thus, an adversary cannot obtain $PID_{RP}$ dynamically negotiated between an honest RP and the user,
-     so it cannot construct an identity token acceptable to the RP.
+In the calculation of $Acct = [t^{-1}]PID_U = [t^{-1}][u]PID_{RP}$,
+$t$ and $PID_{RP}$ are checked by the honest RP in the $PID_{RP}$-registration result,
+    and $PID_U$ is calculated by the IdP based on (\emph{a}) the authenticated user, i.e., $ID_U = u$,
+            and (\emph{b}) the registered $PID_{RP}$.
+Thus, the calculated account is always exactly the authenticated user's account at the RP (i.e., $[ID_U]ID_{RP}$).
+For example,
+    two malicious users, whose identities are $ID_U = u$ and $ID_{U'} = u'$,
+    could attempt to login to $RP_j$ and $RP_{j'}$, respectively.
+If the generated $t$ and $t'$ happen to satisfy that $PID_{RP} = [t]ID_{RP_j} = [tr]G = [t'r']G = [t']ID_{RP_{j'}}$,
+    these collusive users could arbitrarily choose to register either $[PID_{RP}, PEnpt_U, H(t)]$ or $[PID_{RP}, PEnpt_{U'}, H(t')]$ at the IdP,
+        to receive an identity token binding either $PID_U = [u]PID_{RP}$ or $PID_{U'} = [u']PID_{RP}$
+         (and $PID_{RP}$).\footnote{Such a token designates either $RP_j$ or $RP_{j'}$,
+    but only one RP for there is only one acceptable $PID_{RP}$-registration result. So RP designation is not violated in this case.}
+However,
+    when such a token is presented to $RP_j$, the calculated $Acct$ is $[ur]G$ or $[u'r't't^{-1}]G = [u'r]G$;
+    when it is presented to $RP_{j'}$, $[urtt'^{-1}]G = [ur']G$ or $[u'r']G$ is calculated.
+That is, the calculated account is still the authenticated user's account at the RP,
+    this does not result in any attack.
 
-\vspace{1mm}
-\noindent\textbf{RP Designation.}
-An identity token binding $PID_U$ and $PID_{RP}$,
-    designates the target RP, and only the target RP.
-The RP calculates $PID_{RP}$ by itself with the trapdoor $t$ sent from the user,
-    and checks $PID_{RP}$ in the identity token.
-So the target RP will accept this token.
-Meanwhile,
-        the honest IdP guarantees, within its validity period, the $PID_{RP}$ will be registered only once
-        (i.e., designate only one RP).
-% $PID_{RP}$ will be bound in some identity token.
 
+%An adversary might try allure a user to login under the adversary's account,
+%    by injecting his identity token into the user's communications with an honest RP.
+%Such identity injection attacks are impossible in UPPRESSO as follows.
+%If the negotiation of $PID_{RP}$ is not finished yet,
+%    the RP will reject the malicious token.
+%Even when $PID_{RP}$ has been negotiated,
+%    it is kept unknown to the adversary because the communications between two scripts are controlled by a browser
+%     and the communications between the browser and the IdP (or the RP) are protected by TLS.
+%Thus, an adversary cannot obtain $PID_{RP}$ dynamically negotiated between an honest RP and the user,
+%     so it cannot construct an identity token acceptable to the RP.
+%
 
 \vspace{1mm}
 \noindent\textbf{Confidentiality.}
@@ -50,17 +73,18 @@ First of all, the communications among the IdP, RPs and users,
     so that adversaries cannot eavesdrop the identity tokens.
 Meanwhile, the honest IdP sends the identity token only to the authenticated user,
     and this user forwards it to the RP through $Enpt_{RP}$.
-The binding of $Enpt_{RP}$ and $ID_{RP}$ is ensured by the RP certificate,
+The binding of $Enpt_{RP}$ and $ID_{RP}$ is ensured by the signed RP certificate,
 so only the designated target RP receives this identity token.
 %The detailed process of proof is shown in Appendix.
 
 \vspace{1mm}
 \noindent\textbf{Integrity.}
 The identity token binds $ID_U$ and $ID_{RP}$
-    implicitly or explicitly, and any breaking will result in some failed check or verification.
+    implicitly or explicitly, and any breaking will result in some failed check or verification in the login flow.
 The integrity is ensured by the IdP's signatures:
  (\emph{a}) the identity token binding $PID_U$ and $PID_{RP}$, is signed by the IdP,
-  and (\emph{b}) the relationship between $PID_{RP}$ and $t$ (or collision-free $H(t)$) is also bound by the IdP's signature in the $PID_{RP}$ registration result.
+  and (\emph{b}) the relationship between $PID_{RP}$ and $t$ (or collision-free $H(t)$) is also bound by the IdP's signature
+    in the $PID_{RP}$-registration result.
 Thus,
     $ID_U$ and $ID_{RP}$ are actually bound by the IdP's signatures,
         due to the one-to-one mapping between (\emph{a}) the pair of $ID_U$ and $ID_{RP}$ and (\emph{b}) the triad of $PID_U$, $PID_{RP}$, and $t$.
@@ -147,7 +171,7 @@ Then, $\epsilon(k)$ becomes negligible with the security parameter $k$.
 
 In the login flow,
     an RP holds $ID_{RP}$ and $Acct$, receives $t$, calculates $PID_{RP}$,
-    and verifies two signed responses (i.e., $PID_{RP}$ and $H(t)$ in the $PID_{RP}$ registration result,
+    and verifies two signed responses (i.e., $PID_{RP}$ and $H(t)$ in the $PID_{RP}$-registration result,
             and $PID_{RP}$ and $PID_U$ in the identity token).
 After filtering out the redundant information (i.e., $PID_{RP}= [t]{ID_{RP}}$ and $Acct = [t^{-1}]PID_{U}$),
     the RP actually receives only $(ID_{RP}, t, PID_U)$ in each SSO login instance, where $PID_U = [ID_U][t]{ID_{RP}}$.

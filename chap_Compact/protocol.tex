@@ -120,7 +120,7 @@ From Equations \ref{equ:PIDRP}, \ref{equ:PIDU} and \ref{equ:Account}, it is deri
 %   = {ID_{RP}}^{ID_U} \bmod p
 %\end{multline}
 \begin{equation*}
-   Acct =  [t^{-1}utr \bmod n]PID_{U} = [ur]G = [ID_U]ID_{RP}
+   Acct =  [t^{-1}utr \bmod n]G = [ur]G = [ID_U]ID_{RP}
    \label{equ:AccountNotChanged}
 \end{equation*}
 
@@ -167,13 +167,14 @@ This instructs the browser to forward it correctly;
 
 Because in UPPRESSO the IdP is not aware of the visited RP and cannot set the RP endpoints,
         \emph{RP certificates} are designed to instructs the user agents (or browsers) about RP endpoints.
-An RP certificate is a document signed by the IdP, binding the RP's identity and its endpoint.
+An RP certificate is a document signed by the IdP in the RP registration,
+     binding the RP's identity and its endpoint.
 This certificate is sent by the RP in the login flow,
-    so that the user is able to forward the identity tokens to this verified endpoint.
+    so a user is able to forward the identity tokens to this verified endpoint.
 
 Secondly,
     browser scripts are needed to implement the functions by users,
-        including the generation of $t$ and $PID_{RP}$,
+        including the generation of $t$ and $PID_{RP}$
             and the dealing with RP certificates and endpoints,
             for they are not standard functions of a browser.
 Two scripts, one downloaded from the IdP and the other from the target RP,
@@ -181,7 +182,7 @@ Two scripts, one downloaded from the IdP and the other from the target RP,
 The RP script maintains the communications with the RP,
     and it does not communicates directly with the IdP because an HTTP request launched by the RP script
             will automatically carry an HTTP \verb+Referer+ header, which discloses the RP's domain.
-The IdP script downloaded from the honest IdP,
+The IdP script downloaded from the IdP,
     is responsible for the communications with the IdP,
     and two scripts communicates with each other through the \verb+postMessage+ HTML5 API.
 
@@ -191,7 +192,7 @@ Finally,
 So the user agent does not configure anything locally,
     as it does in most existing SSO systems.
 
-\subsection{UPPRESSO Protocols}
+\subsection{The UPPRESSO Protocols}
 \label{implementations}
 
 
@@ -222,7 +223,7 @@ In particular, an RP registers itself at the IdP to obtain $ID_{RP}$
  and the corresponding RP certificate $Cert_{RP}$ as follows:
 \begin{enumerate}
 \vspace{-\topsep}\item
-The RP sends a registration request to the IdP, including the RP endpoint to receive identity tokens,
+The RP sends a registration request to the IdP, including the endpoint to receive identity tokens,
     and other optional information.
 \vspace{-\topsep}\item
 The IdP generates a unique random number $r$, calculates $ID_{RP} = [r]G$,
@@ -252,7 +253,7 @@ The RP verifies $Cert_{RP}$ using $PK$,
 
 \vspace{1mm}
 \noindent\textbf{User Registration.}
-UPPRESSO adopts a similar user registration operation as the ones in other SSO systems.
+UPPRESSO adopts a similar user registration operation as the ones in existing SSO systems.
 Each user registers once at the IdP to set up a unique user identity $ID_U$ and the corresponding credential.
 %$ID_U$ can be chosen by the user or the IdP, as long as it is unique for each user.
 
@@ -317,21 +318,21 @@ It then creates a random endpoint $PEnpt_{U}$ for this login instance,
 %It is important to ensure that the RP endpoint is not tampered with by the adversary. In other OIDC systems, the IdP obtains the RP endpoint from RP registration and verifies the endpoint in the identity-token request. However, the IdP in UPPRESSO sees only a one-time endpoint. So, we ask the user to verify the correctness of the RP endpoint using the RP certificate. %which is signed by the IdP.
 
 \noindent{\em 3. ${PID_{RP}}$ Registration.}
-The user registers an ephemeral $PID_{RP}$ at the IdP.
-It is conducted by the IdP script. %Otherwise, the IdP can associate $PID_{RP}$ and $ID_{RP}$.
+The user dynamically registers an ephemeral $PID_{RP}$ at the IdP.
+%It is conducted by the IdP script. %Otherwise, the IdP can associate $PID_{RP}$ and $ID_{RP}$.
 \begin{itemize}
 %\setlength{\itemsep}{0pt plus 1pt}
 \vspace{-\topsep}
-\item[3.1] The IdP script sends the $PID_{RP}$ registration request $[PID_{RP}, PEnpt_U, H(t)]$ to the IdP,
+\item[3.1] The IdP script sends the $PID_{RP}$-registration request $[PID_{RP}, PEnpt_U, H(t)]$ to the IdP,
     where $H()$ is a collision-free one-way hash function.
 \vspace{-\topsep}
 \item[3.2] The IdP checks the list of unexpired $PID_{RP}$
     to verify the received $PID_{RP}$ is a unique point on $\mathbb{E}$ among them.
 Then, it signs the response $[PID_{RP}, H(t), Validity]_{SK}$, %denoted as $RegToken$, ±‹√‚∂‡”‡∏≈ƒÓ
  where $Validity$ indicates when $PID_{RP}$ will expire (typically, in 3 to 5 minutes).
-The IdP maintains the list of $PID_{RP}$ and deletes expired ones from it.
+The IdP maintains the list of unexpired $[PID_{RP}, PEnpt_U, H(t), Validity]$ and periodically deletes expired ones from it.
 \vspace{-\topsep}
-\item[3.3] The IdP script forwards the registration result to the RP through the RP script.
+\item[3.3] The IdP script forwards the $PID_{RP}$-registration result to the RP through the RP script.
 \vspace{-\topsep}
 \item[3.4] The RP verifies the IdP's signature, and accepts the registration result
  only if $PID_{RP}$ and $H(t)$ match those in the negotiation and it does not expire.
@@ -340,12 +341,18 @@ The IdP maintains the list of $PID_{RP}$ and deletes expired ones from it.
     which is then forwarded to the IdP script through the RP script.
 \vspace{-\topsep}
 \end{itemize}
-$H(t)$ is a nonce to distinguish different login instances,
+The $PID_{RP}$-registration result signed by the IdP
+    ensures that $PID_{RP}$ is \emph{unique} within its validity;
+        otherwise, RP designation is broken.
+$H(t)$ is a \emph{necessary} nonce to distinguish different login instances,
  because there is a very small probability that
   an identical $PID_{RP}$ is calculated for two RPs from two different pairs of $ID_{RP}$ and $t$
-   (i.e., $[t]ID_{RP_j} = [tr]G = [t'r']G = [t']ID_{RP_{j'}}$).
-This nonce prevents one $PID_{RP}$ registration result (and the subsequent identity token)
-     from being accepted by multiple RPs.
+   (i.e., $[t]ID_{RP_j} = [tr]G = [t'r']G = [t']ID_{RP_{j'}}$);
+otherwise,
+                although $PID_{RP}$ is unique within its validity from the IdP's view,
+                     multiple RPs still share an identical $PID_{RP}$.
+This nonce prevents one $PID_{RP}$-registration result (and the subsequent identity token)
+     from being accepted by different RPs.
 
 \noindent{\em 4. Identity-Token Generation.}
 The IdP calculates $PID_U = [ID_U]{PID_{RP}}$ and signs the identity token. % The processes are as follows.
@@ -390,11 +397,14 @@ Then, the RP extracts $PID_U$, and calculates $Acct = [t^{-1}]{PID_U}$.
 
 If any verification or check fails in some step,
  the flow will be halted immediately.
-For example, the user halts
+For example, the user halts the flow
     if $Cert_{RP}$ is invalid or
     $PID_{RP}$ in the identity-token request is inconsistent with the negotiated one.
-The IdP rejects the identity-token request, if the pair of $PID_{RP}$ and $Endpoint_U$ is not in the unexpired list.
-Or, the RP rejects the login request
+The IdP rejects a $PID_{RP}$-registration request,
+    if there is any unexpired but identical $PID_{RP}$ in the list,
+    and the RP rejects identity tokens until it accepts a $PID_{RP}$-registration result.
+The IdP rejects an identity-token request, if the pair of $PID_{RP}$ and $PEnpt_U$ is not in the unexpired list.
+Or, the RP rejects an identity token
     if $PID_{RP}$ in the token does not match the negotiated one.
 
 
@@ -550,9 +560,9 @@ The RP verifies the identity token, including the signature, validity period, an
 
 Among the five steps of the SSO login flow in UPPRESSO,
     the script downloading prepares the user agent.
-The user agent deals with the communications between the IdP and the RP,
-    which are redirected by browsers in OIDC.
-In UPPRESSO,
+The user agent of SSO deals with the communications between the IdP and the RP,
+    which are  redirected by browsers in OIDC.
+On the other hand, in UPPRESSO
     when sending the identity-token request,
         the script replaces $Enpt_{RP}$ with $PEnpt_{U}$,
     and then
@@ -562,7 +572,7 @@ In the step of RP identity transformation, most operations are conducted by the 
  while the RP only receives $t$ to calculate $PID_{RP}$ and sends $Cert_{RP}$.
 The operations in the $PID_{RP}$ registration are almost identical to those in the RP Dynamic Registration of OIDC \cite{DynamicRegistration},
     except that
-    the OIDC IdP assigns the RP's identity  while this (pseudo-)identity in UPPRESSO is generated by the registered entity.
+    in OIDC the IdP assigns the RP's identity  while in UPPRESSO this (pseudo-)identity is generated by the registered entity.
 
 The operations in the steps of identity-token generation and $Acct$ calculation,
     are actually identical to those in the implicit SSO login flow of OIDC \cite{OpenIDConnect},
