@@ -1,7 +1,7 @@
 \section{Implementation and Evaluation}
 \label{sec:implementation}
 We have implemented the UPPRESSO prototype system, and evaluated its performance
- by comparing it with (\emph{a}) the PPID-based OIDC protocol \cite{MITREid}
+ by comparing it with (\emph{a}) the PPID-enhanced OIDC protocol \cite{MITREid}
     which only prevents the RP-based identity linkage
      and (\emph{b}) SPRESSO \cite{SPRESSO} which only prevents the IdP-based login tracing.
 
@@ -17,10 +17,10 @@ RSA-2048 and SHA-256 are adopted as the signature algorithm and the hash functio
 The IdP is built on top of MITREid Connect \cite{MITREid},
     an open-source OIDC Java implementation, %certificated by the OpenID Foundation \cite{OIDF},
     and only small modifications are needed as follows.
-We add 3 lines of Java code to calculate $PID_U$,
+We add only 3 lines of Java code to calculate $PID_U$,
      about 20 lines to modify the way to send identity tokens,
-    and about 50 lines to the function of RP Dynamic Registration to support the $PID_{RP}$ registration
-            (i.e., checking $PID_{RP}$ and signing the response).
+    and about 50 lines to the function of RP Dynamic Registration to support the step of $PID_{RP}$ registration
+            (i.e., checking $PID_{RP}$ and signing the registration result).
 The calculations of $ID_{RP}$, $PID_U$, and RSA signature are implemented based on Java built-in cryptographic libraries. %(e.g., BigInteger).
 
 The user-side function is implemented by scripts from the IdP and RPs,
@@ -37,8 +37,8 @@ The cryptographic computations, e.g., $Cert_{RP}$ verification and $PID_{RP}$ ne
 
 %Moreover, the chrome extension needs to construct cross-origin requests to communicate with the RP and IdP, which is forbidden by the default same-origin security policy. Therefore it is required to add the HTTP header \verb+Access-Control-Allow-Origin+ in the response of IdP and RP to accept only the request from the origin \verb+chrome-extension://chrome-id+ (\verb+chrome-id+ is uniquely assigned by the Google).
 
-We also provide a Java SDK for RPs to integrate UPPRESSO.
-The SDK provides two functions to encapsulate the steps:
+We also provide a Java SDK for RPs in UPPRESSO.
+The SDK provides two functions to encapsulate the protocol steps:
  one to request identity tokens,
     and the other to derive the accounts from identity tokens.
 The SDK is implemented based on the Spring Boot framework  with about 1,000 lines of Java code
