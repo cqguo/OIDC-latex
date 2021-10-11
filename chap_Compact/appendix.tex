@@ -109,8 +109,8 @@ where $a$ and $b$ represent the addresses of the sender and receiver, respective
 \noindent\textbf{Script process}. A script process is the formulation of browser scripts as a relation $R$,
     representing the server-defined functions,
     while the input and output are handled by the browser.
-The script process does not maintain any state itself, while the \verb+scriptstate+ is stored by the browser in each documents. 
-The \verb+scriptstate+ is transmitted to script process as the part of input, when the script process is invoked to process the event.     
+The script process does not maintain any state itself, while the \verb+scriptstate+ is stored by the browser in each documents.
+The \verb+scriptstate+ is transmitted to script process as the part of input, when the script process is invoked to process the event.
 A script process is addressed by the \verb+Origin+ property, as the the protocol and hostname of a URL. That is, while a script sends the messages to another script process and set the \verb+Origin+ value as the IdP domain,
  only the script downloaded from IdP server receives this message.
 
@@ -272,7 +272,7 @@ The \myss{ID_d} locates the document. \myss{Location} is the URL where the docum
 
 
 \subsubsection{The IdP Script and the RP Script}
-The script process is the dependent process relying on the browser, which can be considered as a relation \myss{R} mapping a message input and a message output. And finally the browser will conduct the command in the output message. 
+The script process is the dependent process relying on the browser, which can be considered as a relation \myss{R} mapping a message input and a message output. And finally the browser will conduct the command in the output message.
 A script can be modelled as the tuple containing the input, output and relation.
 
 
@@ -284,7 +284,7 @@ The input is the formatted term
 \langle tree, docID, scriptstate, stateinputs, cookies, ids, secret \rangle
 \end{multline*}
 The \myss{tree} is the structure of the opened windows and documents, which are visible to this script. \myss{DocID} is the document $ID_d$, representing a document. \myss{Scriptinputs} is the message transmitted to script. However, the \myss{scriptinputs} is defined as formatted term,
-for example, postMessage is one of the forms of \myss{scriptinputs}. \myss{Cookies} is the set of cookies that belong to the document's origin. \myss{Ids} is the set of users while \myss{secret} is the credential of corresponding user. 
+for example, postMessage is one of the forms of \myss{scriptinputs}. \myss{Cookies} is the set of cookies that belong to the document's origin. \myss{Ids} is the set of users while \myss{secret} is the credential of corresponding user.
 
 
 The state of IdP script process \myss{scriptstate} is the formatted term \myss{\myangle{IdPDomain, Parameters, phase, refXHR}}, where
@@ -300,13 +300,13 @@ The state of IdP script process \myss{scriptstate} is the formatted term \myss{\
 
 The output is the formatted term
 \begin{multline*}
-\ \langle scriptstate, cookies, command \rangle \ 
+\ \langle scriptstate, cookies, command \rangle \
 \end{multline*}
 The \myss{scriptstate} and \myss{cookies} are transitioned to a new state.
 The \myss{command} is the operation which is to be conducted by the browser. Here we only introduce the form of commands used in UPPRESSO.
 We have defined the postMessage and XMLHTTPRequest (for HTTP request) message which are the \myss{commands}.
  Moreover, a formatted term \myss{\myangle{\mathtt{IFRAME}, URL, WindowID}} asks the browser to create this document's subwindow and it visits the server with the URL.
- 
+
 
 
 
@@ -327,11 +327,11 @@ The relation of IdP script process $script\_idp$ is shown in Appendix~\ref{ape:a
 \noindent\textbf{RP script process}
 The input is the formatted term
 \begin{multline*}
-\ \langle tree, docID, scriptstate, stateinputs, cookies\rangle \ 
+\ \langle tree, docID, scriptstate, stateinputs, cookies\rangle \
 \end{multline*}
 While the output is the formatted term
 \begin{multline*}
-\ \langle scriptstate, cookies, command \rangle \ 
+\ \langle scriptstate, cookies, command \rangle \
 \end{multline*}
 The state of RP script process \myss{scriptstate} is the formatted term \myss{\langle IdPDomain}, \myss{RPDomain}, \myss{Parameters}, \myss{phase}, \myss{refXHR\rangle}. The \myss{RPDomain} is the host string of the corresponding RP server, and other terms are defined in the same way as in IdP script process.
 Other terms are same as them in IdP script
@@ -340,50 +340,97 @@ Other terms are same as them in IdP script
 The relation of RP script process $script\_rp$ is shown in Appendix~\ref{ape:alg} Relation~\ref{alg4}. We define the function \myss{\mathtt{SUBWINDOW}(tree, docID)}, which takes the \myss{tree} defined above and the current document's \myss{ID_d} as the input. And it selects the \myss{ID_w} of the first window opened by this document as the output. However, if there is no opened windows, it returns  null.
 
 \subsection{Proofs of Security}
-The security definition of SSO system is that the system must ensure only the legitimate user logins to an honest RP under his unique account.
+A secure SSO service ensures that only the legitimate user logins to an honest RP under his unique account.
 %We consider the visits to RP's resource paths are controlled by the visitors' cookies,
 % so that the attacker could break the security only when he owns the cookie bound to the honest user.
 %However, according to the same origin policy, a cookie is never leaked to any adversary, so the SSO system is vulnerable only when a adversary's cookie is bound with the honest user's identity.
 %In the SSO system, only when the RP accepts a visitor's identity token,
 %    it will bind this visitor with the identity derived from this token.
-Moreover, the RP must also make sure that, an honest user would always login to the server with her constant identity.
-Therefore, we propose the definition about the secure UPPRESSO system.
+%It also sures that, an honest user logins to the RP always under his constant account.
+%Therefore, we propose the definition about the secure UPPRESSO system.
 
 \begin{definition}
 %Let $\mathcal{UWS}$ be a UPPRESSO web system, $\mathcal{UWS}$ is secure \textbf{iff} for any honest RP $r$ $\in $ $\mathcal{W}$, it would not derive an honest user's identity from the token while the token belongs to an adversary.
-An SSO system is secure {\em iff} in a honest user's any login instance to an honest RP, the derived accounts are identical and unique to others users' at this RP.
+An SSO system is secure,
+    if and only if,
+    in a honest user's all login instances to an honest RP,
+     the derived accounts are identical and unique to any accounts derived in other login instances to this RP  (by either honest or malicious entities).
 %the honest user's privilege and privacy at an honest RP would never be accessible to any adversaries.
-%for any honest RP, it would derive the constant identity from an accepted token, while the identity must belong to the user or the collusive participators.  
-%it would only derive the constant identity belong to the user or the collusive participators, who upload the IdP issued   
+%for any honest RP, it would derive the constant identity from an accepted token, while the identity must belong to the user or the collusive participators.
+%it would only derive the constant identity belong to the user or the collusive participators, who upload the IdP issued
 %not derive an honest user's identity from the token while the token belongs to an adversary, or derive an incorrect identity from the token sent by an honest user.
 \end{definition}
 
 \begin{theorem}
 \label{theorem:requirements}
-When the IdP is honest and RP server is not vulnerable,
-the sufficient requirements of secure SSO system can be described as follows.
+When the IdP is honest, %and RP server is not vulnerable, %我们不要求所有RP都是honest，我们只是要求在honest RP上能够获得该有的结果
+    the following properties of an identity token
+            which is verified by an RP to derive the account in a login instance,
+   result in a secure SSO system:
 % 注意，这个是充分非必要条件
 \begin{itemize}
-\item An adversary cannot achieve an honest user's token issued for an honest RP ({\em confidentiality}).
-\item An honest RP would not accept the token issued for another RP ({\em RP designation}).
-\item Attacker cannot forge or modify the IdP-issued tokens ({\em integrity}).
-\item An honest user must always login to the honest RP on her own identity ({\em user identification}).
+\item \emph{\textbf{Integrity}}~An honest RP accepts only identity tokens issued by the IdP,
+            and any forged or modified identity token will be detected by the RP.
+\item \emph{\textbf{Confidentiality}}~An identity token issued by the Idp,
+    is accessible to only
+                the authenticated user and the target RP,
+                    in addition to the IdP.
+\item \emph{\textbf{User Identification}}~The user (pseudo-)identity bound in the identity token identifies
+        the user authenticated by the IdP, and only this user,
+ within its validity.
+ % 能够被算出来的account，对应了the authenticated user；而且仅有这个user
+\item  \emph{\textbf{RP Designation}}~The RP (pseudo-)identity bound in the identity token
+     identifies the target RP, and only this RP,
+ within its validity.
+ % 仅有一个RP与之对应。
+%\item An honest RP would not accept the token issued for another RP ({\em RP designation}).
+%\item Attacker cannot forge or modify the IdP-issued tokens ({\em integrity}).
+%\item An honest user must always login to the honest RP on her own identity ({\em user identification}).
+%\item An adversary cannot achieve an honest user's token issued for an honest RP ({\em confidentiality}).
 \end{itemize}
 \end{theorem}
 
 \begin{proof}
-As RP server is not vulnerable, an adversary may only try to break the security of SSO system in following ways, (1) visiting the RP server in the honest user's identity (achieving the privilege and privacy), or (2) alluring the honest user to visit the RP in the adversary's identity (only achieving the privacy).
+These four properties are sufficient conditions of a secure SSO system.
+First of all,
+    integrity ensures that any identity token acceptable to the honest RP,
+                is issued the IdP.
+Then, provided that the IdP is honest,
+    confidentiality ensures that
+            only the authenticated user and the target RP of an acceptable identity token are able to
+                present this identity token in some instances, with adversaries sometimes.
+                    
+User identification enables the honest RP to identify the authenticated user in the verification of an identity token
+    and a honest user only presents identity token accessible to himself,
+        so that the derived accounts in a honest user's all login instances are identical
+            and unique to the accounts derived in other honest users' login instances;
+            otherwise, a token does not identify the authenticated user.
 
-An adversary can only visit the RP in the honest user's identity, while it uploads an identity token to the RP and RP derives the honest user's account from it. 
-Although this kind of attack can also be conducted by stealing the honest user's cookie, it is not considered here due to the same origin policy.
-The adversary may achieve an identity token in three ways, (a) achieving identity token from a user, (b) asking for the identity token from IdP as a user, and (c) forging or tempering the identity token it self. However, these attempts of attack are not possible as long as the requirements in the theorem are satisfied.
-The {\em confidentiality} and {\em RP designation} guarantees that any token received from an honest user would not be accepted by any other honest RPs.
-The identity token issued for the adversary can only represent the adversary's identity.
-The {\em integrity} guarantees that the adversary cannot forge or temper the identity token.
+Because an honest RP accepts only identity tokens designating itself,
+            RP designation prevents an identity token from being accept by an honest RP which is not the target.
+Thus, although confidentiality does not prevent a malicious user or RP from presenting the identity token in attacks,
+            (\emph{a}) such an identity token will not be accepted by any honest RP,
+                        if it is presented by the malicious RP which is the target RP of this token,
+                and (\emph{b}) if such an identity token is presented by the malicious user and accepted by an honest RP which is designated in this token,
+                        only this malicious user's account will be derived and then unique to others,
+                            for user identification ensures only the authenticated is identified.
+Therefore,
+        in a honest user's some login instance to an honest RP,
+             the derived account is unique to any accounts derived in even a malicious user's login instances to this RP.
+%
+%
+%an adversary may only try to break the security of SSO system in following ways, (1) visiting the RP server in the honest user's identity (achieving the privilege and privacy), or (2) alluring the honest user to visit the RP in the adversary's identity (only achieving the privacy).
+%
+%An adversary can only visit the RP in the honest user's identity, while it uploads an identity token to the RP and RP derives the honest user's account from it.
+%The adversary may achieve an identity token in three ways, (a) achieving identity token from a user, (b) asking for the identity token from IdP as a user, and (c) forging or tempering the identity token it self. However, these attempts of attack are not possible as long as the requirements in the theorem are satisfied.
+%The {\em confidentiality} and {\em RP designation} guarantees that any token received from an honest user would not be accepted by any other honest RPs.
+%The identity token issued for the adversary can only represent the adversary's identity.
+%The {\em integrity} guarantees that the adversary cannot forge or temper the identity token.
+%
+%Moreover, the {\em user identification} guarantees that the honest user would not visit the RP in the adversary's identity.
 
-Moreover, the {\em user identification} guarantees that the honest user would not visit the RP in the adversary's identity.
-
-Therefore, the theorem~\ref{theorem:requirements} is proved.
+Finally, as an honest RP accepts only unexpired identity token,
+    the  within-its-validity identification requirements of user identification and RP designation are sufficient.
 \end{proof}
 
 We assume that in UPPRESSO system, all the network messages are transmitted using HTTPS, postMessage messages are protected by the browser, and the browsers are  honest, so web attackers can never break the security of UPPRESSO.
