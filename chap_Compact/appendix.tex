@@ -181,7 +181,7 @@ An atomic process is a tuple $p=$ $(I^p, Z^p, R^p,z_0^p )$, containing the addre
 
 
 \vspace{1mm}\noindent\textbf{IdP Server Process}.
-The state of IdP process is described as a term in the form \myss{\myangle{Issuer, SK, SessionList, UserList, RPList, Validity, TokenList}}.
+The state of IdP process is described as a term in the form $\langle Issuer$, $SK$, $SessionList$, $UserList$, $RPList$, $Validity$,  $TokenList\rangle$.
 That is,  the state of an IdP server  at the point in time can be sketched using these attributes.
 %Other data stored at IdP but not used during SSO authentication are not mentioned here.
 \begin{itemize}
@@ -439,24 +439,26 @@ Here, we are going to prove that, in the UPRESSO system, the following lemmas ar
 
 
 \begin{lemma}
-An adversary cannot achieve an honest user's token issued for an honest RP ({\em confidentiality}).
+In the UPPRESSO system, an identity token issued by the Idp, is accessible to only the authenticated user and the target RP, in addition to the IdP.
 \label{lemma:confidentiality}
 \end{lemma}
 \begin{proof}
-Here we only need to prove that attackers cannot receive \myss{Token} from other honest processes.
+Here we only need to prove that attackers cannot retrieve the token from other non-collusive processes.
 \begin{itemize}
 \setlength\itemsep{-2pt}
-\item Attacker cannot obtain the \myss{Token} from RP server.  We check all the messages sent by the RP server at Line 4, 7, 19, 25, 31, 36, 45, 55, 61, 66, 74, 84 in Relation~\ref{alg2}. It is easy to prove that the RP server does not send any \myss{Token} to other processes.
-\item Attacker cannot obtain the \myss{Token} from RP script. The  messages sent by RP script can be classified into two classes. 1) The messages at Line 18, 36, 56 in Relation~\ref{alg4}  are sent to the RPDomain which is set at Line 4, so that attackers cannot receive these messages. 2) The messages at Line 26,  46 only carry the contents received from RP server, and we have proved that RP server does not send any \myss{Token}. Therefore, attackers cannot receive the \myss{Token} from RP script.
-\item Attacker cannot obtain the \myss{Token} from IdP server.  Considering the messages at Line 4, 11, 15, 22, 25, 35, 43, 50, 66 in Relation~\ref{alg1}, we find that only the message at Line 66 carries the \myss{Token}. This \myss{Token} is generated at Line 64, following the trace where the \myss{Content} at Line 62, the \myss{PID_U} at Line 60, the \myss{ID_U} at Line 59, the \myss{session} at Line 47, and finally the \myss{cookie} at Line 46. That is, the receiver of \myss{Token}  must be the owner of the \myss{cookie} in which session that saves the parameter \myss{ID_U} . The \myss{ID_U} is set at Line 14 after verifying the password and never modified. As we assume that passwords cannot be known to attackers,  attackers cannot obtain the \myss{Token} from IdP server.
-\item Attacker cannot obtain the \myss{Token} from IdP script. As the proof provided above, only IdP sends the \myss{Token} with the message at Line 66 in Relation~\ref{alg1}, the IdP script can only receive the \myss{Token} at  Line 99 in Relation~\ref{alg3}. Here we are going to prove that the token issued for user $u$'s login to RP $r$ (denoted as \myss{t(u,r)}) can only be  sent to the corresponding RP server through IdP script. The receiver of \myss{t(u,r)} is restricted by the \myss{RPOrigin} at Line 100, which is set at Line 55. The host in the \myss{RPOrigin} is verified using the one included in \myss{Cert} at Line 51. If the \myss{Cert} belong to \myss{r}, the attacker cannot obtain the \myss{t(u,r)}. Now we give the proof that the \myss{Cert} belongs to \myss{r}. Firstly we define the negotiated \myss{PID_{RP}} in \myss{t(u,r)} as \myss{p}. That is the \myss{PID_{RP}} at Line 69 in Relation~\ref{alg2}  must equal to \myss{p} and the \myss{PID_{RP}} is verified at Line 44 with the \myss{RegistrationToken}. This verification cannot be bypassed due to the state check at Line 60. At the same validity period, the IdP script needs to send the registration request with same \myss{p}  and receive the successful $PID_{RP}$-registration result. As the IdP checks the uniqueness of \myss{PID_{RP}} at  Line 31 in Relation~\ref{alg1}. The \myss{r} and IdP script must share the same \myss{RegistrationToken}. As the \myss{RegistrationToken} contains the \myss{\mathtt{Hash}(t)}, the IdP script and \myss{r} must share the same \myss{ID_{RP}}. Therefore, the  \myss{Cert} saved as the IdP scriptstate parameter must belong to \myss{r}.
+\item Attacker cannot obtain the identity token from RP server.  We check all the messages sent by the RP server at Line 4, 7, 19, 25, 31, 36, 45, 55, 61, 66, 74, 84 in Relation~\ref{alg2}. It is easy to prove that the RP server does not send any token to other processes.
+\item Attacker cannot obtain the identity token from RP script. The  messages sent by RP script can be classified into two classes. 1) The messages at Line 18, 36, 56 in Relation~\ref{alg4}  are sent to the RPDomain which is set at Line 4, so that attackers cannot receive these messages. 2) The messages at Line 26,  46 only carry the contents received from RP server, and we have proved that RP server does not send any token. Therefore, attackers cannot receive the \myss{Token} from RP script.
+\item Attacker cannot obtain the identity token from IdP server.  Considering the messages at Line 4, 11, 15, 22, 25, 35, 43, 50, 66 in Relation~\ref{alg1}, we find that only the message at Line 66 carries the token. This token is generated at Line 64, following the trace where the \myss{Content} at Line 62, the \myss{PID_U} at Line 60, the \myss{ID_U} at Line 59, the \myss{session} at Line 47, and finally the \myss{cookie} at Line 46. That is, the receiver of token must be the owner of the \myss{cookie} in which session that saves the parameter \myss{ID_U} . The \myss{ID_U} is set at Line 14 after verifying the credential and never modified. As we assume that passwords cannot be known to attackers,  attackers cannot obtain the identity token from IdP server.
+\item Attacker cannot obtain the identity token from IdP script. As the proof provided above, only IdP sends the token with the message at Line 66 in Relation~\ref{alg1}, the IdP script can only receive the token at  Line 99 in Relation~\ref{alg3}. Here we are going to prove that the token issued for user $u$'s login to RP $r$ (denoted as \myss{t(u,r)}) can only be  sent to the corresponding RP server through IdP script. The receiver of \myss{t(u,r)} is restricted by the \myss{RPOrigin} at Line 100, which is set at Line 55. The host in the \myss{RPOrigin} is verified using the one included in \myss{Cert} at Line 51. If the \myss{Cert} belong to \myss{r}, the attacker cannot obtain the \myss{t(u,r)}. Now we give the proof that the \myss{Cert} belongs to \myss{r}. Firstly we define the negotiated \myss{PID_{RP}} in \myss{t(u,r)} as \myss{p}. That is the \myss{PID_{RP}} at Line 69 in Relation~\ref{alg2}  must equal to \myss{p} and the \myss{PID_{RP}} is verified at Line 44 with the \myss{RegistrationToken}. This verification cannot be bypassed due to the state check at Line 60. At the same validity period, the IdP script needs to send the registration request with same \myss{p}  and receive the successful $PID_{RP}$-registration result. As the IdP checks the uniqueness of \myss{PID_{RP}} at  Line 31 in Relation~\ref{alg1}. The \myss{r} and IdP script must share the same \myss{RegistrationToken}. As the \myss{RegistrationToken} contains the \myss{\mathtt{Hash}(t)}, the IdP script and \myss{r} must share the same \myss{ID_{RP}}. Therefore, the  \myss{Cert} saved as the IdP scriptstate parameter must belong to \myss{r}.
 \end{itemize}
 Therefore, attackers cannot  learn users' valid identity tokens.
 \end{proof}
 
 
 \begin{lemma}
-An honest RP would not accept the token issued for another RP ({\em RP designation}).
+In the UPPRESSO system, the RP (pseudo-)identity bound in the identity token
+     identifies the target RP, and only this RP,
+ within its validity.
 \label{lemma:RPdesignation}
 \end{lemma}
 \begin{proof}
@@ -469,11 +471,17 @@ As it has been proved at Lemma~\ref{lemma:confidentiality}, an malicious RP cann
 
 
 \begin{lemma}
-Attacker cannot forge or modify the IdP-issued proofs ({\em integrity}).
+In the UPPRESSO system, an honest RP accepts only identity tokens issued by the IdP,
+            and any forged or modified identity token will be rejected by the RP.
 \label{lemma:integrity}
 \end{lemma}
 \begin{proof}
-The IdP-issued proofs include the \myss{Cert} used in \myss{script\_idp}, the \myss{RegistrationResult} and \myss{Token} used in \myss{P^r} . We can easily find that the IdP does not send the private key to any processes so that the attackers cannot obtain the private key. Then we only need to prove that all the proofs are well verified.
+%The IdP-issued tokens include the \myss{Cert} used in \myss{script\_idp}, the \myss{RegistrationResult} and \myss{Token} used in \myss{P^r} . 
+The $Acct$ derived from the identity token by an RP, is generated based on the $t^(-1)$ according to Line 79, Relation~\ref{alg2}.
+It can be found out  that, the integrity of $t^{-1}$ is protected by the IdP issued registration result, according to Line 41-44, Relation~\ref{alg2}.
+The integrity of $ID_{RP}$ finally contained in the derived $Acct$ is protected by $Cert$, according to Line 15-21, Relation~\ref{alg3}.
+Thus, here we would prove the integrity of identity token, RP $Cert$ and registration result.
+We can easily find that the IdP does not send the private key to any processes so that the attackers cannot obtain the private key. Then we only need to prove that all the proofs are well verified.
 \begin{itemize}
 \setlength\itemsep{-2pt}
 \item \myss{Cert} is used at Line 21, 52 in Relation~\ref{alg3}. At Line 21, the \myss{Cert} has already been verified at Line 16. At Line 52, the \myss{Cert} is picked from the state parameters, and the cert parameter is set at Line 19.  At Line 19, the \myss{Cert} has already been verified at Line 16.
@@ -486,7 +494,9 @@ Therefore, this lemma is proved.
 
 
 \begin{lemma}
-An honest user must always login to the honest RP on her own identity ({\em user identification}).
+In the UPPRESSO system, the user (pseudo-)identity bound in the identity token identifies
+        the user authenticated by the IdP, and only this user,
+ within its validity.
 \label{lemma:userIdentification}
 \end{lemma}
 \begin{proof}
@@ -496,11 +506,10 @@ According to Lemma~\ref{lemma:integrity}, only the IdP can generate an token, so
 IdP generates the $PID_U$ based on the $PID_{RP}$ and user's $ID_U$.
 According to Lemma~\ref{lemma:RPdesignation}, while the $PID_{RP}$ is accepted by an RP, the $PID_{RP}$ must be the generated between the RP and user.
 According to Lemma~\ref{lemma:confidentiality}, the $ID_U$ must belongs to the honest user.
-Therefore, the user's identity must equal with the constant $ [ID_U]ID_{RP}$.
+Therefore, the user's identity must equal with the constant $ [ID_U]ID_{RP}$, and unique to other users' $Acct$s at this RP.
 
-Moreover, an adversary may lead the honest user to upload the adversary's token to an RP.
-While the honest user has already negotiated the $PID_{RP}$ with the RP.
-The opener of the IdP script must be the RP script.
+Moreover, an adversary may lead the honest user to upload the adversary's token to an RP, so that the honest user may use the same $Acct$ as the adversary's.
+While the honest user has already negotiated the $PID_{RP}$ with the RP, the opener of the IdP script must be the RP script.
 As the $t$ generated at Line 7, Relation~\ref{alg3}, and $PID_{RP}$ generated at Line 21, Relation~\ref{alg3} and Line 13, Relation~\ref{alg2}.
 The $t$ is only sent to RP script at Line 8, Relation~\ref{alg3}, and RP server at Line 18, Relation~\ref{alg4}.
 The $PID_{RP}$ is only sent to IdP server at Line 28 and 90, Relation~\ref{alg3}. Moreover, the $PID_{RP}$-registration result including the $PID_{RP}$ is sent to IdP script at Line  35, Relation~\ref{alg1}, RP script at Line 40, Relation~\ref{alg3}, RP server at Line 36, Relation~\ref{alg4}. An adversary can never know the $PID_{RP}$ negotiated between the honest user and RP.
