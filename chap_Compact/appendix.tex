@@ -214,7 +214,7 @@ The relation of IdP process $R^i$ is shown as Relation~\ref{alg1} in Appendix~\r
 
 
 \vspace{1mm}\noindent\textbf{RP server process}.
-The state of RP process is a term in the form \myss{\myangle{ID_{RP}, Enpt, IdP, Cert, SessionList, UserList}}. %Other attributes are not mentioned here.
+The state of RP process is the formatted term \myss{\myangle{ID_{RP}, Enpt, IdP, Cert, SessionList, UserList}}. %Other attributes are not mentioned here.
 
 \begin{itemize}
 \setlength\itemsep{-2pt}
@@ -253,20 +253,35 @@ The opened windows, documents and downloaded scripts are parts of the state of a
 
 
 \vspace{1mm}
-\noindent\textbf{Window}. A window \myss{w} is a term of the form \myss{w = \myangle{ID_w, documents, opener}}, representing the  the concrete browser window in the system. The \myss{ID_w} is the window reference to identify each windows.
-The \myss{documents} is the set of documents (defined below) including the current document and cached documents (for example, the documents can be viewed via the ``forward" and ``back" buttons in the browser).
-The \myss{opener} represents the document from which this window is created,
+\noindent\textbf{Window}. A window \myss{w} is a formatted term \myss{w = \myangle{ID_w, documents, opener}}, representing the concrete browser window in the system. 
+\begin{itemize}
+\item The \myss{ID_w} is the window reference to identify each windows.
+\item The \myss{documents} is the set of documents (defined below) including the current document and cached documents (for example, the documents can be viewed via the ``forward" and ``back" buttons in the browser).
+\item The \myss{opener} represents the document from which this window is created,
     for instance, while a user clicks the href in document \myss{d} and it creates a new window \myss{w},
     there is \myss{w.opener \equiv d.ID_d}.
+\end{itemize}
+
+
+
 
 \vspace{1mm}
 \noindent\textbf{Document}. A document \myss{d} is the web page content in the browser window,
-    a term of the form
+    in the formatted term
 \begin{multline*}
   \ \ \ \langle ID_d, location, referrer, script, scriptstate, \\
   scriptinputs, subwindows\rangle \ \ \
 \end{multline*}
-The \myss{ID_d} locates the document. \myss{Location} is the URL where the document is loaded. \myss{Referrer} is same as the Referer header defined in HTTP standard. The \myss{script} is the script process downloaded from each servers. \myss{scriptstate} is define by the script, different in each scripts. The \myss{scriptinputs} is the message transmitted into the script process. The \myss{subwindows} is the set of \myss{ID_w} of document's created windows.
+\begin{itemize}
+\item The \myss{ID_d} locates the document.
+\item \myss{Location} is the URL where the document is loaded.
+\item \myss{Referrer} is same as the Referer header defined in HTTP standard.
+\item The \myss{script} is the script process downloaded from each servers.
+\item \myss{scriptstate} is define by the script, different in each scripts.
+\item The \myss{scriptinputs} is the message transmitted into the script process.
+\item The \myss{subwindows} is the set of \myss{ID_w} of document's created windows.
+\end{itemize}
+      
  %\myss{active} represents whether this document is active or not.
 
 
@@ -283,11 +298,19 @@ The input is the formatted term
 \begin{multline*}
 \langle tree, docID, scriptstate, stateinputs, cookies, ids, secret \rangle
 \end{multline*}
-The \myss{tree} is the structure of the opened windows and documents, which are visible to this script. \myss{DocID} is the document $ID_d$, representing a document. \myss{Scriptinputs} is the message transmitted to script. However, the \myss{scriptinputs} is defined as formatted term,
-for example, postMessage is one of the forms of \myss{scriptinputs}. \myss{Cookies} is the set of cookies that belong to the document's origin. \myss{Ids} is the set of users while \myss{secret} is the credential of corresponding user.
+\begin{itemize}
+\item The \myss{tree} is the structure of the opened windows and documents, which are visible to this script.
+\item \myss{DocID} is the document $ID_d$, representing a document. \myss{Scriptinputs} is the message transmitted to script.
+\item The \myss{scriptinputs} is defined as formatted term, for example, postMessage is one of the forms of \myss{scriptinputs}.
+\item \myss{Cookies} is the set of cookies that belong to the document's origin.
+\item \myss{Ids} is the set of users while \myss{secret} is the credential of corresponding user.
+\end{itemize}
 
 
-The state of IdP script process \myss{scriptstate} is the formatted term \myss{\myangle{IdPDomain, Parameters, phase, refXHR}}, where
+The state of IdP script process \myss{scriptstate} is the formatted term
+\begin{multline*}
+ \ \myangle{IdPDomain, Parameters, phase, refXHR}\ 
+ \end{multline*}
 \begin{itemize}
 \setlength\itemsep{-2pt}
 \item \myss{IdPDomain} is the IdP's host.
@@ -520,13 +543,15 @@ According to Lemma~\ref{lemma:RPdesignation}, while the $PID_{RP}$ is accepted b
 According to Lemma~\ref{lemma:confidentiality}, the $ID_U$ must belongs to the honest user.
 Therefore, the user's identity must equal with the constant $ [ID_U]ID_{RP}$, and unique to other users' $Acct$s at this RP.
 
-Moreover, an adversary may lead the honest user to upload the adversary's token to an RP, so that the honest user may use the same $Acct$ as the adversary's.
+Moreover, an adversary may allure the honest user to upload the adversary's token to an RP, so that the honest user may use the same $Acct$ as the adversary's.
 While the honest user has already negotiated the $PID_{RP}$ with the RP, the opener of the IdP script must be the RP script.
 As the $t$ generated at Line 7, Relation~\ref{alg3}, and $PID_{RP}$ generated at Line 21, Relation~\ref{alg3} and Line 13, Relation~\ref{alg2}.
 The $t$ is only sent to RP script at Line 8, Relation~\ref{alg3}, and RP server at Line 18, Relation~\ref{alg4}.
 The $PID_{RP}$ is only sent to IdP server at Line 28 and 90, Relation~\ref{alg3}. Moreover, the $PID_{RP}$-registration result including the $PID_{RP}$ is sent to IdP script at Line  35, Relation~\ref{alg1}, RP script at Line 40, Relation~\ref{alg3}, RP server at Line 36, Relation~\ref{alg4}. An adversary can never know the $PID_{RP}$ negotiated between the honest user and RP.
 While the honest user has not negotiated the $PID_{RP}$ with the RP yet, the \verb+session+[$PID_{RP}$] at Line 69, Relation~\ref{alg2} and other similar attributes must be empty, as the $Cookie$ used at Line 58 belongs to the honest user and the negotiation between Line 10-20 does not conducted by the user.
 Therefore, an adversary cannot lead the honest RP to accept the malicious token from the honest user.
+
+This lemma is proved.
 \end{proof}
 
 \begin{theorem}
