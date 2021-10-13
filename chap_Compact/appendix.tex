@@ -214,7 +214,7 @@ The relation of IdP process $R^i$ is shown as Relation~\ref{alg1} in Appendix~\r
 
 
 \vspace{1mm}\noindent\textbf{RP server process}.
-The state of RP process is a term in the form \myss{\myangle{ID_{RP}, Enpt, IdP, Cert, SessionList, UserList}}. %Other attributes are not mentioned here.
+The state of RP process is the formatted term \myss{\myangle{ID_{RP}, Enpt, IdP, Cert, SessionList, UserList}}. %Other attributes are not mentioned here.
 
 \begin{itemize}
 \setlength\itemsep{-2pt}
@@ -253,20 +253,35 @@ The opened windows, documents and downloaded scripts are parts of the state of a
 
 
 \vspace{1mm}
-\noindent\textbf{Window}. A window \myss{w} is a term of the form \myss{w = \myangle{ID_w, documents, opener}}, representing the  the concrete browser window in the system. The \myss{ID_w} is the window reference to identify each windows.
-The \myss{documents} is the set of documents (defined below) including the current document and cached documents (for example, the documents can be viewed via the ``forward" and ``back" buttons in the browser).
-The \myss{opener} represents the document from which this window is created,
+\noindent\textbf{Window}. A window \myss{w} is a formatted term \myss{w = \myangle{ID_w, documents, opener}}, representing the concrete browser window in the system. 
+\begin{itemize}
+\item The \myss{ID_w} is the window reference to identify each windows.
+\item The \myss{documents} is the set of documents (defined below) including the current document and cached documents (for example, the documents can be viewed via the ``forward" and ``back" buttons in the browser).
+\item The \myss{opener} represents the document from which this window is created,
     for instance, while a user clicks the href in document \myss{d} and it creates a new window \myss{w},
     there is \myss{w.opener \equiv d.ID_d}.
+\end{itemize}
+
+
+
 
 \vspace{1mm}
 \noindent\textbf{Document}. A document \myss{d} is the web page content in the browser window,
-    a term of the form
+    in the formatted term
 \begin{multline*}
   \ \ \ \langle ID_d, location, referrer, script, scriptstate, \\
   scriptinputs, subwindows\rangle \ \ \
 \end{multline*}
-The \myss{ID_d} locates the document. \myss{Location} is the URL where the document is loaded. \myss{Referrer} is same as the Referer header defined in HTTP standard. The \myss{script} is the script process downloaded from each servers. \myss{scriptstate} is define by the script, different in each scripts. The \myss{scriptinputs} is the message transmitted into the script process. The \myss{subwindows} is the set of \myss{ID_w} of document's created windows.
+\begin{itemize}
+\item The \myss{ID_d} locates the document.
+\item \myss{Location} is the URL where the document is loaded.
+\item \myss{Referrer} is same as the Referer header defined in HTTP standard.
+\item The \myss{script} is the script process downloaded from each servers.
+\item \myss{scriptstate} is define by the script, different in each scripts.
+\item The \myss{scriptinputs} is the message transmitted into the script process.
+\item The \myss{subwindows} is the set of \myss{ID_w} of document's created windows.
+\end{itemize}
+      
  %\myss{active} represents whether this document is active or not.
 
 
@@ -283,11 +298,19 @@ The input is the formatted term
 \begin{multline*}
 \langle tree, docID, scriptstate, stateinputs, cookies, ids, secret \rangle
 \end{multline*}
-The \myss{tree} is the structure of the opened windows and documents, which are visible to this script. \myss{DocID} is the document $ID_d$, representing a document. \myss{Scriptinputs} is the message transmitted to script. However, the \myss{scriptinputs} is defined as formatted term,
-for example, postMessage is one of the forms of \myss{scriptinputs}. \myss{Cookies} is the set of cookies that belong to the document's origin. \myss{Ids} is the set of users while \myss{secret} is the credential of corresponding user.
+\begin{itemize}
+\item The \myss{tree} is the structure of the opened windows and documents, which are visible to this script.
+\item \myss{DocID} is the document $ID_d$, representing a document. \myss{Scriptinputs} is the message transmitted to script.
+\item The \myss{scriptinputs} is defined as formatted term, for example, postMessage is one of the forms of \myss{scriptinputs}.
+\item \myss{Cookies} is the set of cookies that belong to the document's origin.
+\item \myss{Ids} is the set of users while \myss{secret} is the credential of corresponding user.
+\end{itemize}
 
 
-The state of IdP script process \myss{scriptstate} is the formatted term \myss{\myangle{IdPDomain, Parameters, phase, refXHR}}, where
+The state of IdP script process \myss{scriptstate} is the formatted term
+\begin{multline*}
+ \ \myangle{IdPDomain, Parameters, phase, refXHR}\ 
+ \end{multline*}
 \begin{itemize}
 \setlength\itemsep{-2pt}
 \item \myss{IdPDomain} is the IdP's host.
@@ -451,7 +474,8 @@ Here we only need to prove that attackers cannot retrieve the token from other n
 \item Attacker cannot obtain the identity token from IdP server.  Considering the messages at Line 4, 11, 15, 22, 25, 35, 43, 50, 66 in Relation~\ref{alg1}, we find that only the message at Line 66 carries the token. This token is generated at Line 64, following the trace where the \myss{Content} at Line 62, the \myss{PID_U} at Line 60, the \myss{ID_U} at Line 59, the \myss{session} at Line 47, and finally the \myss{cookie} at Line 46. That is, the receiver of token must be the owner of the \myss{cookie} in which session that saves the parameter \myss{ID_U} . The \myss{ID_U} is set at Line 14 after verifying the credential and never modified. As we assume that passwords cannot be known to attackers,  attackers cannot obtain the identity token from IdP server.
 \item Attacker cannot obtain the identity token from IdP script. As the proof provided above, only IdP sends the token with the message at Line 66 in Relation~\ref{alg1}, the IdP script can only receive the token at  Line 99 in Relation~\ref{alg3}. Here we are going to prove that the token issued for user $u$'s login to RP $r$ (denoted as \myss{t(u,r)}) can only be  sent to the corresponding RP server through IdP script. The receiver of \myss{t(u,r)} is restricted by the \myss{RPOrigin} at Line 100, which is set at Line 55. The host in the \myss{RPOrigin} is verified using the one included in \myss{Cert} at Line 51. If the \myss{Cert} belong to \myss{r}, the attacker cannot obtain the \myss{t(u,r)}. Now we give the proof that the \myss{Cert} belongs to \myss{r}. Firstly we define the negotiated \myss{PID_{RP}} in \myss{t(u,r)} as \myss{p}. That is the \myss{PID_{RP}} at Line 69 in Relation~\ref{alg2}  must equal to \myss{p} and the \myss{PID_{RP}} is verified at Line 44 with the \myss{RegistrationToken}. This verification cannot be bypassed due to the state check at Line 60. At the same validity period, the IdP script needs to send the registration request with same \myss{p}  and receive the successful $PID_{RP}$-registration result. As the IdP checks the uniqueness of \myss{PID_{RP}} at  Line 31 in Relation~\ref{alg1}. The \myss{r} and IdP script must share the same \myss{RegistrationToken}. As the \myss{RegistrationToken} contains the \myss{\mathtt{Hash}(t)}, the IdP script and \myss{r} must share the same \myss{ID_{RP}}. Therefore, the  \myss{Cert} saved as the IdP scriptstate parameter must belong to \myss{r}.
 \end{itemize}
-Therefore, attackers cannot  learn users' valid identity tokens.
+Therefore, attackers cannot learn users' valid identity tokens.
+This lemma is proved.
 \end{proof}
 
 
@@ -462,11 +486,22 @@ In the UPPRESSO system, the RP (pseudo-)identity bound in the identity token
 \label{lemma:RPdesignation}
 \end{lemma}
 \begin{proof}
-We can find that an RP server finally accept the $PID_U$ in an token at Line 77 in Relation~\ref{alg2}, after the verification at Line 73. The $PID_{RP}$ retrieved at Line 69, must be verified at Line 44.
-The content verified at Line 43 is received from IdP server, generated at Line 40, Relation~\ref{alg1} and protected by the signature generated at Line 41.
-According to the verification at 31, the content containing $PID_{RP}$ is unique during the valid time.
+We can find that an RP server finally accept the $PID_U$ in an token at Line 77 in Relation~\ref{alg2}, after the verification at Line 73. 
+While $PID_U$ is accepted, the $PID_{RP}$ must equal with the stored one retrieved at Line 69 and verified at Line 44, Relation~\ref{alg2}.
+The stored $PID_{RP}$ is included in the registration result verified at Line 43, Relation~\ref{alg2}, received from IdP server.
+Thus, the $PID_{RP}$ is only valid at the RP received the corresponding registration result.
+
+Moreover, this registration result is generated at Line 40, Relation~\ref{alg1} and protected by the signature generated at Line 41.
+According to the verification at 31, Relation~\ref{alg1}, the $PID_{RP}$ is unique during the valid time, so that no other registration results containing this $PID_{RP}$ exists.
 Moreover, according to Line 42, 44 (the $t$ used at Line 42 is set  at  Line 15, used for generating $PID_{RP}$ at Line 13), the $PID_{RP}$ must be resigned for this RP, as no other RP cannot generate the same $PID_{RP}$ with this $t$.
-As it has been proved at Lemma~\ref{lemma:confidentiality}, an malicious RP cannot receive the valid token issued for another RP, therefore, the adversary would not receive the token including an honest RP's $PID_{RP}$ from honest user.
+So only one RP is able to achieve the corresponding registration result of an $PID_{RP}$.
+
+Based on the two facts, (1) the $PID_{RP}$ is only valid at the RP received the corresponding registration result, and (2) only one RP is able to achieve the corresponding registration result of an $PID_{RP}$. 
+It can be inferred that the $PID_{RP}$ is only valid at one specific RP. 
+
+Therefore, this lemma is proved.
+ 
+%As it has been proved at Lemma~\ref{lemma:confidentiality}, an malicious RP cannot receive the valid token issued for another RP, therefore, the adversary would not receive the token including an honest RP's $PID_{RP}$ from honest user.
 \end{proof}
 
 
@@ -508,13 +543,15 @@ According to Lemma~\ref{lemma:RPdesignation}, while the $PID_{RP}$ is accepted b
 According to Lemma~\ref{lemma:confidentiality}, the $ID_U$ must belongs to the honest user.
 Therefore, the user's identity must equal with the constant $ [ID_U]ID_{RP}$, and unique to other users' $Acct$s at this RP.
 
-Moreover, an adversary may lead the honest user to upload the adversary's token to an RP, so that the honest user may use the same $Acct$ as the adversary's.
+Moreover, an adversary may allure the honest user to upload the adversary's token to an RP, so that the honest user may use the same $Acct$ as the adversary's.
 While the honest user has already negotiated the $PID_{RP}$ with the RP, the opener of the IdP script must be the RP script.
 As the $t$ generated at Line 7, Relation~\ref{alg3}, and $PID_{RP}$ generated at Line 21, Relation~\ref{alg3} and Line 13, Relation~\ref{alg2}.
 The $t$ is only sent to RP script at Line 8, Relation~\ref{alg3}, and RP server at Line 18, Relation~\ref{alg4}.
 The $PID_{RP}$ is only sent to IdP server at Line 28 and 90, Relation~\ref{alg3}. Moreover, the $PID_{RP}$-registration result including the $PID_{RP}$ is sent to IdP script at Line  35, Relation~\ref{alg1}, RP script at Line 40, Relation~\ref{alg3}, RP server at Line 36, Relation~\ref{alg4}. An adversary can never know the $PID_{RP}$ negotiated between the honest user and RP.
 While the honest user has not negotiated the $PID_{RP}$ with the RP yet, the \verb+session+[$PID_{RP}$] at Line 69, Relation~\ref{alg2} and other similar attributes must be empty, as the $Cookie$ used at Line 58 belongs to the honest user and the negotiation between Line 10-20 does not conducted by the user.
 Therefore, an adversary cannot lead the honest RP to accept the malicious token from the honest user.
+
+This lemma is proved.
 \end{proof}
 
 \begin{theorem}
