@@ -42,7 +42,7 @@ Therefore,
     however, in the commonly-used SSO protocols, the user only needs to renew his only credential at the IdP if it is compromised.
 
 
-This is a very important reason that the SSO protocols are widely deployed.
+This is a very important reason that the existing SSO protocols are widely deployed in the real world.
 This feature enables an SSO system such as OIDC and OAuth 2.0 to adopt any authentication mechanism
  (password, one-time password, 2-factor authentication, FIDO, etc.) for the IdP to authenticate users, which is actually independent of the SSO protocol.
 
@@ -164,31 +164,67 @@ Although the computations in UPPRESSO are heavier than those in OIDC,
                 and no long-term user secret is bound or verified in these steps.
 These compatible designs will help the adoption and deployment of UPPRESSO.
 
-As the reviewer pointed out
+As the reviewer pointed out, 
+    in the authorization code flow, the IdP server and the RP communicate directly, so that the IdP will know to whom it is talking.
+However,
+        in UPPRESSO there is no RP identity in the access token which is used to return the identity token,
+            and there is no RP identity in this identity token, either.
+So, if the access token is not verified using a symmetric key between the IdP and an RP (but by signatures instead),
+    the authorization code flow will be supported well in UPPRESSO,
+        when anonymous networks (e.g., Tor) for the RP to ask for identity tokens.
 
 \subsection*{Review 2}
 \noindent\textbf{2.1 Motivation}
 
 Lack of motivation or justification on the hardness of combining existing solutions that separately solves IdP-based login tracing and RP-based identifier linkage problems.
 
-\vspace{1mm}\noindent\textbf{Our improvement}
-
-\vspace{1mm}\noindent\textbf{2.2 Contribution and related work}
-Contributions are not clear for the individual building blocks.
-
-This may not be the first protocol that solves both privacy issues. An existing work is not compared with.
-
-Even though the privacy problems, which are being targeted to solve, are separately addressed by the prior art, it seems achieving privacy against both problems is not trivial because of the privacy dilemma behind the existing solutions. However, this point is not well-justified in the paper. Furthermore, it is not clear that if the individual solutions are also novel compared to the existing work.
-
-
-The authors claim that this is the first system that solves both privacy problems at the same time. However, the following work also claims the same. I would like to see a comparison with this system.
-
-``EL PASSO: Privacy-preserving, Asynchronous Single Sign-On''
-
-
 How hard is combining existing solutions, SPRESSO and PPID, to prevent both privacy problems? Or are these two protocols not compatible with each other?
 
 \vspace{1mm}\noindent\textbf{Our improvement}
+In Section 2.2 we explain why PPIDs cannot be directly integrated in either BrowserID or SPRESSO.
+PPIDs are assigned in identity tokens based on the visited RP, but the IdP receives (\emph{a}) nothing about the
+visited RP in BrowserID or (\emph{b}) an ephemeral pseudo-identity of the RP in SPRESSO.
+
+Then, in Section 3.2, we explain the identify dilemma of privacy-preserving SSO.
+This identify dilemma is different from existing protocols involving authentication steps,
+    as we explain in 1.1 Related work (for Review 1).
+This identity problem is essential for a ``pure'' SSO protocol to protect user privacy.
+
+\vspace{1mm}\noindent\textbf{2.2 Contribution and related work}
+Contributions are not clear for the individual building blocks.
+This may not be the first protocol that solves both privacy issues. An existing work is not compared with.
+The authors claim that this is the first system that solves both privacy problems at the same time. However, the following work also claims the same. I would like to see a comparison with this system.
+
+\noindent``EL PASSO: Privacy-preserving, Asynchronous Single Sign-On''
+
+Even though the privacy problems, which are being targeted to solve, are separately addressed by the prior art,
+ it seems achieving privacy against both problems is not trivial because of the privacy dilemma behind the existing solutions.
+However, this point is not well-justified in the paper.
+Furthermore, it is not clear that if the individual solutions are also novel compared to the existing work.
+
+\vspace{1mm}\noindent\textbf{Our improvement}
+As also mentioned by Review 1, EL PASSO claims that it is an SSO protocol protecting user privacy against both the curious IdP and collusive RPs.
+However, it is not a ``pure'' SSO protocol. In fact, we call it a scheme of Certified RP-Verified Credential, in Section 2.3 Extended Related Works.
+
+In EL PASSO and some other solutions,
+    a user is authenticated by the RP with his credentials
+            to prove that he owns the long-term secret;
+            on the contrary,
+ in the commonly-used SSO protocols    the authentication steps between the user and the RP do not exist.
+In the commonly-used SSO systems and privacy-preserving SSO solutions
+    such as BrowserID, SPRESSO and also UPPRESSO,
+    authentication happens only between a user and the IdP,
+    and an RP verifies only tokens generated by the IdP.
+Therefore,
+        a user needs to notify each RP one by one when a credential is lost or compromised in EL PASSO,
+    because the user is authenticated by the target RP (in addition to the authentication by the IdP);
+however, in the commonly-used SSO protocols, the user only needs to renew his only credential at the IdP if it is compromised.
+
+This is a very important reason that the existing SSO protocols are widely deployed in the real world.
+This feature enables an SSO system such as OIDC and OAuth 2.0 to adopt any authentication mechanism
+ (password, one-time password, 2-factor authentication, FIDO, etc.) for the IdP to authenticate users,
+  which is actually independent of the SSO protocol.
+This explanation is presented in Section 3.3.
 
 \vspace{1mm}\noindent\textbf{2.3 Writing}
 Some sections are hard to follow due to excessive use of notations, and figures are not self-explanatory.
