@@ -149,7 +149,7 @@ In the authorization code flow, the IdP server and the RP communicate directly, 
 
 \vspace{1mm}\noindent\textbf{Our improvement}
 We have revised these statements. We list the modifications when we implemented the prototype system in Section 6.1:
-We add only 3 lines of Java code to calculate PIDU, about 20 lines to modify the way to send identity tokens,
+We add only 3 lines of Java code to calculate $PID_U$, about 20 lines to modify the way to send identity tokens,
  and about 50 lines to the function of RP Dynamic Registration to support the step of $PID_{RP}$ registration.
 We also provide a Java SDK for RPs in UPPRESSO. 
 The SDK provides two functions to encapsulate the protocol steps:
@@ -224,13 +224,7 @@ This is a very important reason that the existing SSO protocols are widely deplo
 This feature enables an SSO system such as OIDC and OAuth 2.0 to adopt any authentication mechanism
  (password, one-time password, 2-factor authentication, FIDO, etc.) for the IdP to authenticate users,
   which is actually independent of the SSO protocol.
-This explanation is presented in Section 3.3.
-
-\vspace{1mm}\noindent\textbf{2.3 Writing}
-Some sections are hard to follow due to excessive use of notations, and figures are not self-explanatory.
-
-Some clarification on the text could improve the readability. For instance, it is not clear that PIDrp= NuIDrp at page 7, bullet 2.3, is a regular multiplication or an operation on elliptic curve cryptography.
-
+This explanation is also presented in Section 3.3.
 
 \noindent\textbf{2.3 Usability}
 
@@ -238,9 +232,31 @@ The paper also is not discussing about the user acceptance of this new design.
 Okay, it does not require major updates to build the whole system, but still requires modifications on IdP and RP sides.
 It would be very useful to include such an analysis about how the new protocol affects the usability of existing OIDC.
 Or, how easy it will be to deploy/convince RPs and IdPs for the new design.
-
 What is the user acceptance and usability of your system compared to existing OIDC protocols?
 
 \vspace{1mm}\noindent\textbf{Our improvement}
+
+This issue is explained well by the prototype implementation in Section 6.1.
+We finish the prototype system on top of open-source MITREid Connect,
+    and we add about 75 lines of Java code.
+The user functions are implemented by about 350 lines of JavaScript code,
+    which is portable for a standard browser.
+
+We also provide a Java SDK for RPs in UPPRESSO.
+The SDK provides two functions to encapsulate the protocol steps:
+one to request identity tokens, and the other to derive the accounts from identity tokens.
+ The SDK is implemented based on the Spring Boot framework with about 1,000 lines of Java code
+  and cryptographic computations are implemented based on the Spring Security library.
+An RP only needs to invoke these two functions for the integration.
+
+\vspace{1mm}\noindent\textbf{2.4 Writing}
+Some sections are hard to follow due to excessive use of notations, and figures are not self-explanatory.
+
+Some clarification on the text could improve the readability. For instance, it is not clear that $PID_{rp}= NuID_{rp}$ at page 7, bullet 2.3, is a regular multiplication or an operation on elliptic curve cryptography.
+
+\vspace{1mm}\noindent\textbf{Our improvement}
+We have polished this manuscript for several times.
+All notations are explained in Tables 1 and 2.
+Figure 3 is re-drawn to explain the steps of UPPRESSO.
 
 \end{document}
