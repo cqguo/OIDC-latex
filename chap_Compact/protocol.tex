@@ -284,62 +284,62 @@ Each solid horizontal line means some messages between the user and the IdP (or 
 %%%Once a user attempts to login an RP, the SSO login is initiated.
 %%%We use the OIDC implicit protocol flow as an example, to demonstrate  how to integrate the three functions $\mathcal{F}_{ID_{U} \mapsto PID_{U}}$, $\mathcal{F}_{ID_{RP} \mapsto PID_{RP}}$ and $\mathcal{F}_{PID_{U} \mapsto Account}$ into the typical SSO systems.
 
-\vspace{0.5mm}
+\vspace{1mm}
 \noindent 1. {\em Script Downloading.}
 The browser downloads the scripts from the IdP and the visited RP.
 \begin{itemize}
-\vspace{-\topsep}\item[1.1]
+\item[1.1]
 When attempting to visit any protected resources at the RP,
     the user downloads the RP script.
-\vspace{-\topsep}\item[1.2]
+\item[1.2]
 The RP script opens a window in the browser to visit the login path at the RP, which is then redirected to the IdP.
-\vspace{-\topsep}\item[1.3]
+\item[1.3]
 The redirection to the IdP downloads the IdP script.
-\vspace{-\topsep}\end{itemize}
+\end{itemize}
 
-
+\vspace{1mm}
 \noindent{\em 2. RP Identity Transformation.}
 The user and the RP negotiate $PID_{RP} = [t]{ID_{RP}}$.
 \begin{itemize}
 %\setlength{\itemsep}{0pt plus 1pt}
-\vspace{-\topsep}\item[2.1] The IdP script in the browser chooses a random number $t$ ($1 < t <n$) and sends it to the RP script through \verb+postMessage+.
+\item[2.1] The IdP script in the browser chooses a random number $t$ ($1 < t <n$) and sends it to the RP script through \verb+postMessage+.
 Then, the RP script sends $t$ to the RP.
-\vspace{-\topsep}\item[2.2] On receiving $t$,
+\item[2.2] On receiving $t$,
 the RP verifies $1 < t < n$ and calculates $PID_{RP}$.
 %To acknowledge the negotiation of $PID_{RP}$,
 The RP replies with $Cert_{RP}$, which is then transmitted from the RP script to the IdP script.  % through \verb+postMessage+.
-\vspace{-\topsep}\item[2.3] The IdP script verifies $Cert_{RP}$, extracts $ID_{RP}$ and $Enpt_{RP}$ from $Cert_{RP}$ and calculates $PID_{RP}=[t]{ID_{RP}}$.
+\item[2.3] The IdP script verifies $Cert_{RP}$, extracts $ID_{RP}$ and $Enpt_{RP}$ from $Cert_{RP}$ and calculates $PID_{RP}=[t]{ID_{RP}}$.
 It then creates a random endpoint $PEnpt_{U}$ for this login instance,
     to receive identity tokens from the IdP.
     % as the RP endpoint required by IdP.我们已经修改了协议，IdP并不require什么
-\vspace{-\topsep}
+
 \end{itemize}
 
 %It is important to ensure that the RP endpoint is not tampered with by the adversary. In other OIDC systems, the IdP obtains the RP endpoint from RP registration and verifies the endpoint in the identity-token request. However, the IdP in UPPRESSO sees only a one-time endpoint. So, we ask the user to verify the correctness of the RP endpoint using the RP certificate. %which is signed by the IdP.
-
+\vspace{1mm}
 \noindent{\em 3. ${PID_{RP}}$ Registration.}
 The user dynamically registers an ephemeral $PID_{RP}$ at the IdP.
 %It is conducted by the IdP script. %Otherwise, the IdP can associate $PID_{RP}$ and $ID_{RP}$.
 \begin{itemize}
 %\setlength{\itemsep}{0pt plus 1pt}
-\vspace{-\topsep}
+
 \item[3.1] The IdP script sends the $PID_{RP}$-registration request $[PID_{RP}, PEnpt_U, H(t)]$ to the IdP,
     where $H()$ is a collision-free one-way hash function.
-\vspace{-\topsep}
+
 \item[3.2] The IdP checks the list of unexpired $PID_{RP}$
     to verify the received $PID_{RP}$ is a unique point on $\mathbb{E}$ among them.
 Then, it signs the response $[PID_{RP}, H(t), Validity]_{SK}$, %denoted as $RegToken$, 避免多余概念
  where $Validity$ indicates when $PID_{RP}$ will expire (typically, in 3 to 5 minutes).
 The IdP maintains the list of unexpired $[PID_{RP}, PEnpt_U, H(t), Validity]$ and periodically deletes expired ones from it.
-\vspace{-\topsep}
+
 \item[3.3] The IdP script forwards the $PID_{RP}$-registration result to the RP through the RP script.
-\vspace{-\topsep}
+
 \item[3.4] The RP verifies the IdP's signature, and accepts the registration result
  only if $PID_{RP}$ and $H(t)$ match those in the negotiation and it does not expire.
-\vspace{-\topsep}
+
 \item[3.5] The RP constructs an identity-token request with $PID_{RP}$ and $Enpt_{RP}$,
     which is then forwarded to the IdP script through the RP script.
-\vspace{-\topsep}
+
 \end{itemize}
 The $PID_{RP}$-registration result signed by the IdP
     ensures that $PID_{RP}$ is \emph{unique} within its validity;
@@ -357,44 +357,46 @@ otherwise,
 This nonce prevents one $PID_{RP}$-registration result (and the subsequent identity token)
      from being accepted by different RPs.
 
+\vspace{1mm}
 \noindent{\em 4. Identity-Token Generation.}
 The IdP calculates $PID_U = [ID_U]{PID_{RP}}$ and signs the identity token. % The processes are as follows.
 \begin{itemize}
-\vspace{-\topsep}
+
 \item[4.1]
 The IdP script checks that $PID_{RP}$ is the one registered in Step 3.1
             and $Enpt_{RP}$ matches the one in $Cert_{RP}$.
 Then, the IdP script replaces $Enpt_{RP}$ with $PEnpt_{U}$ in the identity-token request
      and sends this modified request to the IdP.
-\vspace{-\topsep}
+
 \item[4.2] On receiving an identity-token request,
     the IdP authenticates the user if he has not been authenticated yet.
-\vspace{-\topsep}
+
 \item [4.3]
 After obtaining the user's authorization to enclose the requested attributes,
 the IdP checks whether the received pair of $PID_{RP}$ and $PEnpt_U$ is in the list of unexpired $PID_{RP}$ or not,
     and calculates $PID_U = [ID_U]{PID_{RP}}$ for the authenticated user.
 The IdP then signs an identity token $[PID_{RP}, PID_U, Issuer, Validity, Attr]_{SK}$,
  where $Issuer$ is the IdP's identity, $Validity$ is the validity period, and $Attr$ contains the requested attributes.
-\vspace{-\topsep}
+
 \item[4.4] The IdP sends the identity token to $PEnpt_{U}$.
-\vspace{-\topsep}
+
 \end{itemize}
 
+\vspace{1mm}
 \noindent{\em 5. $Acct$ Calculation.}
 The RP verifies the identity token and allows the user to login.
 \begin{itemize}
 %\setlength{\itemsep}{0pt plus 1pt}
-\vspace{-\topsep}
+
 \item [5.1]
 The IdP script forwards this token to the RP script,
     which then sends it to the RP through $Enpt_{RP}$.
-\vspace{-\topsep}\item[5.2] The RP verifies the identity token, including the IdP's signature and its validity period.
+\item[5.2] The RP verifies the identity token, including the IdP's signature and its validity period.
 It also verifies $PID_{RP}$ in the token is consistent with the one negotiated in Step 2.2.
 Then, the RP extracts $PID_U$, and calculates $Acct = [t^{-1}]{PID_U}$.
-\vspace{-\topsep}
+
 \item [5.3] The RP returns the login result, and allows the user to login as $Acct$.
-\vspace{-\topsep}
+
 \end{itemize}
 
 
