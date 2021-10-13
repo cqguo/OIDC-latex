@@ -60,12 +60,13 @@ The user's operations including authentication, redirection, authorization, and 
 
 As described above, a ``pure'' SSO protocol does not include any authentication step,
     and there is no authentication step between users and an RP.
-This feature of commonly-used SSO protocols brings advantages as below.
-It enables the IdP to authenticate a user by any appropriate means (e.g., password, two-factor authentication, one-time password, etc.).
-If a credential was lost or compromised,
+This feature of commonly-used SSO protocols \cite{OpenIDConnect,rfc6749,SAML} brings advantages as below.
+It enables the IdP to authenticate a user by any appropriate means (e.g., password, two-factor authentication, one-time password,
+        and smart card).
+Therefore, if a credential was lost or compromised,
     the user only needs renew it at the IdP;
-        however, if a user needs to also prove something to the RP (i.e., some authentication steps are involved),
-                the user has to notify each RP in this case.
+        however, if a user needs to prove something to the RP (i.e., some authentication steps are involved),
+                the user has to notify each RP if this secret was leaked.
 
 
 \vspace{1mm}
@@ -75,7 +76,7 @@ In addition to the manual registrations,
     for an RP to register by online means \cite{DynamicRegistration}.
 The (unregistered) RP sends a registration request
         with endpoints to receive identity tokens (and also other optional information),
-        to the IdP's dynamic-registration endpoint.
+        to the IdP.
 After a successful registration,
  the IdP assigns a unique identity to this RP in the response.
 
