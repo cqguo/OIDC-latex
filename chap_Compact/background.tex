@@ -47,7 +47,7 @@ The token contains a user identity (or pseudo-identity),
     the RP identity, a validity period, the requested user attributes, etc.
 %% If the RP endpoint has not been registered at the IdP, the IdP will return a warning to notify the user about potential identity token leakage. % 这里只是谈主线；各种错误情况太多，举不胜举
 Finally, the RP verifies the received identity token and
- allows the user to login as the identity enclosed in this token.
+ allows the user to login as the (pseudo-)identity enclosed in this token.
 
 Before issuing the identity token,
     the IdP obtains the user's authorization to enclose the requested user attributes.
@@ -60,13 +60,15 @@ The user's operations including authentication, redirection, authorization, and 
 
 As described above, a ``pure'' SSO protocol does not include any authentication step,
     and there is no authentication step between users and an RP.
+An RP only verifies tokens issued by the IdP.
 This feature of commonly-used SSO protocols \cite{OpenIDConnect,rfc6749,SAML} brings advantages as below.
 It enables the IdP to authenticate a user by any appropriate means (e.g., password, two-factor authentication, one-time password,
         and smart card).
 Therefore, if a credential was lost or compromised,
-    the user only needs renew it at the IdP;
-        however, if a user needs to prove something to the RP (i.e., some authentication steps are involved),
-                the user has to notify each RP if this secret was leaked (or even the user logins from another computer).
+    the user only needs renew it at the IdP.
+However, if a user needs to prove some secret to the RP and this secret is valid across multiple login instance
+    (i.e., some authentication steps are involved in fact),
+                the user has to notify each RP if this secret was leaked  or lost. %(or even the user logins from another computer).
 
 
 \vspace{1mm}
@@ -102,11 +104,11 @@ In BrowserID (and its prototypes known as Mozilla Persona \cite{persona} and Fir
  so that the user uses the corresponding private key to sign a ``subsidiary'' identity token
     to bind his identity with the target RP's identity and then sends both tokens to the RP.
 When a user logins to different RPs, the RPs could still extract the identical user identities
-    from different these tokens and link these login instances.
+    from different pairs of tokens and link these login instances.
 Meanwhile,
     in SPRESSO an RP creates a one-time but verifiable pseudo-identity for itself in each login instance.
 Then, the IdP generates an identity token binding this RP pseudo-identity and the user identity. %and returns it through a trusted third-party entity called forwarder.
-Similarly, the collusive RPs could link a user's multiple login instances based on his permanent user identity in these tokens.
+Similarly, collusive RPs could link a user's multiple login instances based on his permanent user identity in these tokens.
 
 PPIDs cannot be directly integrated in either BrowserID or SPRESSO.
 PPIDs are assigned in identity tokens based on the visited RP \cite{NIST2017draft,OpenIDConnect, SAMLIdentifier},

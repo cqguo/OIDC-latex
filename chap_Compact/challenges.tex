@@ -140,19 +140,20 @@ That is,
 
 We illustrate the relationships among the identities and pseudo-identities in identity tokens in Figure \ref{fig:IDCorrelation}.
 The red and green blocks represent permanent identities and ephemeral pseudo-identities, respectively.
-The arrows denote how the pseudo-identities are transformed.
+The arrows denote how the (pseudo-)identities are transformed.
 The figure describes the {\em identity dilemma} of privacy-preserving SSO:
 \begin{quote}
 Given an authenticated user and an unknown RP (i.e., permanent $ID_U$ and ephemeral $PID_{RP}$),
     the IdP is expected to generate an ephemeral pseudo-identity (i.e., $PID_{U}$)
      which will be correlated with the user's permanent identity at this RP (i.e., $Acct$),
-     with knowing nothing about the RP's identity or the user's account at this RP (i.e., $ID_{RP}$ or $Acct$).
+     while knowing nothing about the RP's identity or the user's account at this RP (i.e., $ID_{RP}$ or $Acct$).
 \end{quote}
 
 \emph{We explicitly distinguish a user's identity at the RP, i.e., the account,
      from \emph{(a)} the user's identity at the IdP and \emph{(b)} the user's pseudo-identity in identity tokens.}
-This conceptualization is proposed for the first time, to the best of our knowledge,
-    and it essentially helps to effectively build the identity-transformation framework.
+This conceptualization %is proposed for the first time, to the best of our knowledge,
+   % and it 
+    essentially helps to effectively build the identity-transformation framework.
 
 
 \begin{figure}
@@ -192,7 +193,7 @@ Given $ID_U$ and $ID_{RP}$, $Acct$ keeps unchanged;
 \end{itemize}
 
 
-In an SSO login flow with identity-transformation functions,
+In an SSO login flow with the identity-transformation functions,
     a user firstly negotiates an ephemeral $PID_{RP}$ with the target RP.
 Then, an identity-token request with $PID_{RP}$ is sent by the user to the IdP.
 After authenticating the user as $ID_U$, the IdP calculates an ephemeral $PID_U$ based on $ID_U$ and the received $PID_{RP}$,
@@ -204,13 +205,13 @@ Finally, after verifying the designated RP pseudo-identity in the token,
 %To achieve this goal, UPPRESSO constructs three transformation functions in an integrated way to support {\em transformed RP designation} and {\em trapdoor user identification}, where (a) different $PID_U$s and $PID_{RP}$s are dynamically generated in different logins; (b) in each login session, $PID_{RP}$ is used to assist the generation of $PID_U$, which helps to link $PID_U$ to $Account$ using the trapdoor of this login session.%; and (c) when a user logs in to an RP multiple times, the RP can correlate each pair of $PID_U$ and $PID_{RP} with an invariant $Account$.
 
 The identity-transformation functions
-        will satisfy the privacy requirements,
-    while the authentication steps are kept independent of the SSO protocol.
-In particular,
-    as shown in Figure \ref{fig:OpenID},
-        the  authentication steps are conducted only between a user and the IdP,
-            and these steps do not deal with identity tokens.
-After the identity-transformation functions are integrated,
+        satisfy the privacy requirements,
+    while the authentication steps are still kept independent of the ``pure'' SSO protocol.
+%In particular,
+%    as shown in Figure \ref{fig:OpenID},
+%        the  authentication steps are conducted only between a user and the IdP,
+%            and these steps do not deal with identity tokens.
+In particular, after the identity-transformation functions are integrated in a privacy-preserving SSO system,
     the steps dealing with identity tokens do not involve any user credentials,
         as those in the commonly-used SSO protocols \cite{OpenIDConnect,rfc6749,SAML}.
 
