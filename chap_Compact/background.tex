@@ -58,6 +58,16 @@ The user's operations including authentication, redirection, authorization, and 
 
 %extracts user's identifier and returns the authentication result to the user (Step 7).
 
+As described above, a ``pure'' SSO protocol does not include any authentication step,
+    and there is no authentication step between users and an RP.
+This feature of commonly-used SSO protocols brings advantages as below.
+It enables the IdP to authenticate a user by any appropriate means (e.g., password, two-factor authentication, one-time password, etc.).
+If a credential was lost or compromised,
+    the user only needs renew it at the IdP;
+        however, if a user needs to also prove something to the RP (i.e., some authentication steps are involved),
+                the user has to notify each RP in this case.
+
+
 \vspace{1mm}
 \noindent\textbf{RP Dynamic Registration.}
 In addition to the manual registrations,
@@ -82,7 +92,7 @@ Given a user,
     the IdP assigns a unique PPID based on the target RP,
     so that collusive RPs cannot link the user's different PPIDs across these RPs.
 PPID-based approaches cannot prevent the IdP-based login tracing,
- since in the generation of identify tokens the IdP needs to know which RP the user is visiting.
+ since in the generation of identity tokens the IdP needs to know which RP the user is visiting.
 
 BrowserID \cite{BrowserID} and SPRESSO \cite{SPRESSO} are proposed to defend SSO services against the IdP-based login tracing,
     but both solutions are instead vulnerable to the threat of RP-based identity linkage.
