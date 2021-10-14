@@ -24,14 +24,18 @@
 
 %\vspace{1mm}
 \noindent{\textbf{Applicability.}}
-The identity-transformation functions, i.e., $\mathcal{F}_{PID_{RP}}()$, $\mathcal{F}_{PID_U}()$, and $\mathcal{F}_{Acct}()$,
+Three identity-transformation functions, i.e., $\mathcal{F}_{PID_{RP}}()$, $\mathcal{F}_{PID_U}()$, and $\mathcal{F}_{Acct}()$,
     are applicable to various SSO scenarios
         (e.g., web application, mobile App, and even native software),
     because these designs do not depend on any special implementation or runtime environment.
 Although the prototype system runs for web applications,
     it is feasible to apply the identity-transformation functions to other SSO scenarios
         to protect user privacy.
-
+Moreover,
+    because the authentication steps are independent of the UPPRESSO protocol,
+the IdP can choose any appropriate mechanism to authenticate users.
+    
+    
 %In this paper, the functions are implemented based on the elliptic curve algorithm and the mechanism provided by OIDC system.
 %However, the transformation functions can also be implemented based on other mechanisms according to the protocol and environment, for example, the TPM may be used to take responsibility to transform identities.
 
@@ -102,9 +106,9 @@ However,
     which will result in much better performance.
 In this case,
     a user downloads and installs the browser extension,
-    before he visits an RP.
+    before he visits the RPs.
 After some experiments while the IdP and RPs in the prototype system are unmodified,
-    we find that at least 102 ms will be saved for each instance (i.e., about 208 ms in total for a login instance),
+    we find that at least 102 ms will be saved for each login instance (i.e., about 208 ms in total),
     compared with the version implemented with browser scripts.
 
 \vspace{1mm}
@@ -114,7 +118,7 @@ $ID_U$, $PID_{RP}$, $PEnpt_U$, $H(t)$, and $PID_U$)
         with some collusive RPs,
 UPPRESSO still provides secure SSO services,
     provided that the signed identity tokens are sent to the authenticated users only.
-Moreover, in this case, a user's login activities at the other honest RPs,
+Moreover, in this case, a user's login activities at the other RPs,
         are still protected from the IdP and these collusive RPs,
         because a triad of $t$, $PID_U$ and $PID_{RP}$ is ephemeral and independent of each other.
 
