@@ -33,8 +33,8 @@ That is,
  $\mathcal{F}_{Acct}(PID_{U}^i, PID_{RP}^i) = \mathcal{F}_{Acct}(PID_{U}^{i'}, PID_{RP}^{i'}) = [ID_U]ID_{RP}$.
 
 In the calculation of $Acct = [t^{-1}]PID_U = [t^{-1}][u]PID_{RP}$,
-$t$ and $PID_{RP}$ are checked by the honest RP in the $PID_{RP}$-registration result,
-    and $PID_U$ is calculated by the IdP based on (\emph{a}) the authenticated user, i.e., $ID_U = u$,
+$t$ and $PID_{RP}$ have been checked by the honest RP in the $PID_{RP}$-registration result,
+    and $PID_U$ is calculated by the honest IdP based on (\emph{a}) the authenticated user, i.e., $ID_U = u$,
             and (\emph{b}) the registered $PID_{RP}$.
 Thus, the calculated account is always exactly the authenticated user's account at the RP (i.e., $[ID_U]ID_{RP}$).
 For example,
@@ -44,7 +44,7 @@ If the generated $t$ and $t'$ happen to satisfy that $PID_{RP} = [t]ID_{RP_j} = 
     these collusive users could arbitrarily choose to register either $[PID_{RP}, PEnpt_U, H(t)]$ or $[PID_{RP}, PEnpt_{U'}, H(t')]$ at the IdP,
         to receive an identity token binding either $PID_U = [u]PID_{RP}$ or $PID_{U'} = [u']PID_{RP}$
          (and also $PID_{RP}$).\footnote{Such a token designates either $RP_j$ or $RP_{j'}$,
-    but only one RP because there is only one acceptable $PID_{RP}$-registration result which is signed by the IdP.
+    but only one honest RP because there is only one acceptable $PID_{RP}$-registration result which is signed by the IdP.
     So RP designation is not violated in this case.}
 However,
     when such a token is signed for $RP_j$, the calculated $Acct$ is $[ur]G$ or $[u'r't't^{-1}]G = [u'r]G$;
@@ -83,7 +83,7 @@ so only the designated target RP receives this identity token.
 \vspace{1mm}
 \noindent\textbf{Integrity.}
 The identity token binds $ID_U$ and $ID_{RP}$
-    implicitly or explicitly, and any breaking will result in some failed check or verification in the login flow.
+    implicitly, and any breaking will result in some failed check or verification in the login flow.
 The integrity is ensured by the IdP's signatures:
  (\emph{a}) the identity token binding $PID_U$ and $PID_{RP}$, is signed by the IdP,
   and (\emph{b}) the relationship between $PID_{RP}$ and $t$ (or collision-free $H(t)$) is also bound
@@ -120,13 +120,13 @@ After formulating UPPRESSO by the Dolev-Yao style model,
  to ensure that an identity token is not stolen or tempered by adversaries.
 For example, we locate the generation of an identity token in UPPRESSO, and trace back to the sources
     where $PID_U$, $PID_{RP}$ and other values enclosed in this token are generated and transmitted,
-     to ensure that no adversary able to retrieve or manipulate them.
+     to ensure that no adversary is able to retrieve or manipulate them.
 The tracing of identity tokens also confirm no adversary retrieves the token.
 
 Finally,
     we formally prove that,
 \emph{user identification}, \emph{RP designation}, \emph{confidentiality}, and \emph{integrity} are fulfilled in UPPRESSO.
-The details on the Dolev-Yao web model and the security proof of UPPRESSO are in the appendix.
+The details on the Dolev-Yao web model and the security proofs of UPPRESSO are in the appendix.
 
 
 
@@ -148,7 +148,7 @@ So, the IdP cannot derive the RP's identity or link any pair of $PID_{RP}^i$ and
 
 \vspace{1mm}
 \noindent\textbf{RP-based Identity Linkage.}
-We prove UPPRESSO prevents the RP-based identity linkage,
+We prove that UPPRESSO prevents the RP-based identity linkage,
  based on the elliptic curve decision Diffie-Hellman (ECDDH) assumption \cite{GoldwasserK16}.
 %We briefly introduce the ECDDH assumption.
 
@@ -247,4 +247,4 @@ The adversary has non-negligible advantages in $\mathcal{G}$ means
     and then $\mathcal{D}^*$ significantly distinguishes ($P$, $[x]P$, $[y]P$, $[xy]P$) from  ($P$, $[x]P$, $[y]P$, $[z]P$),
     which violates the ECDDH assumption.
 So the adversary has no advantages in the game,
-    and the RP-based identity linkage is computationally impossible.
+    and the RP-based identity linkage is computationally impossible in UPPRESSO.
