@@ -421,13 +421,13 @@ First of all,
 Then, provided that the IdP is honest,
     confidentiality further ensures that
             only the authenticated user and the target RP of an acceptable identity token are able to
-                present this identity token in some login instances, collusive with adversaries sometimes.
+                present this token in some login instances,  sometimes collusive with adversaries.
 
 User identification enables the honest RP to identify the authenticated user in the verification of an identity token
-    and an honest user only presents identity token accessible to himself,
-        so that the derived accounts in the honest user's all login instances are identical
-            and unique to the accounts derived in other honest users' login instances;
-            otherwise, a token does not identify the authenticated user and user identification is violated.
+    and an honest user only presents identity tokens accessible to himself,
+        so that the derived accounts in the honest user's all login instances are identical.
+And this account is unique to the accounts derived in other honest users' login instances;
+            otherwise, a token does not uniquely identify the authenticated user and user identification is violated.
 
 Because an honest RP accepts only identity tokens designating itself,
             RP designation prevents an identity token from being accept by an honest RP which is not the target.
@@ -453,13 +453,15 @@ Therefore,
 %Moreover, the {\em user identification} guarantees that the honest user would not visit the RP in the adversary's identity.
 
 Finally, as an honest RP accepts only unexpired identity token,
-    the  within-its-validity identification requirements of user identification and RP designation are sufficient.
+    the  within-its-validity constraint of user identification and RP designation are sufficient.
 \end{proof}
 
 We assume that in UPPRESSO system, all network messages are transmitted using HTTPS,
  \verb+postMessage+  messages are protected by the browser,
- and the browsers are  honest, so web attackers can never break the security of UPPRESSO.
-Here, we are going to prove that, in the UPRESSO system, the following lemmas are always workable.
+ and the browser is free of software flaws,
+  and then web attackers can never break the security of UPPRESSO.
+Next,
+    we prove that, in the UPRESSO system, these properties are satisfied.
 
 
 
@@ -468,7 +470,7 @@ Here, we are going to prove that, in the UPRESSO system, the following lemmas ar
 \label{lemma:confidentiality}
 \end{lemma}
 \begin{proof}
-Here we only need to prove that attackers cannot retrieve the token from other non-collusive processes.
+We only need to prove that attackers cannot retrieve the token from other non-collusive processes.
 \begin{itemize}
 \setlength\itemsep{-2pt}
 \item Attacker cannot obtain the identity token from RP server.  We check all the messages sent by the RP server at Line 4, 7, 19, 25, 31, 36, 45, 55, 61, 66, 74, 84 in Relation~\ref{alg2}. It is easy to prove that the RP server does not send any token to other processes.
@@ -477,7 +479,7 @@ Here we only need to prove that attackers cannot retrieve the token from other n
 \item Attacker cannot obtain the identity token from IdP script. As the proof provided above, only IdP sends the token with the message at Line 66 in Relation~\ref{alg1}, the IdP script can only receive the token at  Line 99 in Relation~\ref{alg3}. Here we are going to prove that the token issued for user $u$'s login to RP $r$ (denoted as \myss{t(u,r)}) can only be  sent to the corresponding RP server through IdP script. The receiver of \myss{t(u,r)} is restricted by the \myss{RPOrigin} at Line 100, which is set at Line 55. The host in the \myss{RPOrigin} is verified using the one included in \myss{Cert} at Line 51. If the \myss{Cert} belong to \myss{r}, the attacker cannot obtain the \myss{t(u,r)}. Now we give the proof that the \myss{Cert} belongs to \myss{r}. Firstly we define the negotiated \myss{PID_{RP}} in \myss{t(u,r)} as \myss{p}. That is the \myss{PID_{RP}} at Line 69 in Relation~\ref{alg2}  must equal to \myss{p} and the \myss{PID_{RP}} is verified at Line 44 with the \myss{RegistrationToken}. This verification cannot be bypassed due to the state check at Line 60. At the same validity period, the IdP script needs to send the registration request with same \myss{p}  and receive the successful $PID_{RP}$-registration result. As the IdP checks the uniqueness of \myss{PID_{RP}} at  Line 31 in Relation~\ref{alg1}. The \myss{r} and IdP script must share the same \myss{RegistrationToken}. As the \myss{RegistrationToken} contains the \myss{\mathtt{Hash}(t)}, the IdP script and \myss{r} must share the same \myss{ID_{RP}}. Therefore, the  \myss{Cert} saved as the IdP scriptstate parameter must belong to \myss{r}.
 Thus, the identity token would only be sent to the script in the corresponding RP's origin.
 \end{itemize}
-Therefore, attackers cannot learn users' valid identity tokens.
+Therefore, attackers cannot learn any valid identity tokens.
 This lemma is proved.
 \end{proof}
 
@@ -489,7 +491,7 @@ This lemma is proved.
 \label{lemma:RPdesignation}
 \end{lemma}
 \begin{proof}
-We can find that an RP server finally accept the $PID_U$ in an token at Line 77 in Relation~\ref{alg2}, after the verification at Line 73.
+An RP server finally accepts the $PID_U$ in an token at Line 77 in Relation~\ref{alg2}, after the verification at Line 73.
 While $PID_U$ is accepted, the $PID_{RP}$ must equal with the stored one retrieved at Line 69 and verified at Line 44, Relation~\ref{alg2}.
 The stored $PID_{RP}$ is included in the registration result verified at Line 43, Relation~\ref{alg2}, received from IdP server.
 Thus, the $PID_{RP}$ is only valid at the RP received the corresponding registration result.
@@ -538,7 +540,7 @@ Therefore, this lemma is proved.
 \label{lemma:userIdentification}
 \end{lemma}
 \begin{proof}
-We can find that, the RP accepts the user's identity at Line 83, Relation~\ref{alg2}. And the identity is generated at Line 79, based on the $PID_U$  retrieved from the token and the trapdoor $t^{-1}$.
+The RP accepts the user's identity at Line 83, Relation~\ref{alg2}. And the identity is generated at Line 79, based on the $PID_U$  retrieved from the token and the trapdoor $t^{-1}$.
 The $t^{-1}$ is generated at Line 14, set at Line 17, and never changed, as the multiplicative inverse of $t$.
 According to Lemma~\ref{lemma:integrity}, only the IdP can generate an token, so that the token must be issued at Line 64, Relation~\ref{alg1}.
 IdP generates the $PID_U$ based on the $PID_{RP}$ and user's $ID_U$.
