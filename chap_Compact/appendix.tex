@@ -567,19 +567,24 @@ Therefore, this lemma is proved.
 \label{lemma:userIdentification}
 \end{lemma}
 \begin{proof}
-The RP accepts the user's identity at Line 83, Relation~\ref{alg2}. And the identity is generated at Line 79, based on the $PID_U$  retrieved from the token and the trapdoor $t^{-1}$.
+The RP accepts the user's identity at Line 83 in Relation~\ref{alg2}.
+And the identity is generated at Line 79, based on the $PID_U$  retrieved from the token and the trapdoor $t^{-1}$.
 The $t^{-1}$ is generated at Line 14, set at Line 17, and never changed, as the multiplicative inverse of $t$.
-According to Lemma~\ref{lemma:integrity}, only the IdP can generate an token, so that the token must be issued at Line 64, Relation~\ref{alg1}.
-IdP generates the $PID_U$ based on the $PID_{RP}$ and user's $ID_U$.
-According to Lemma~\ref{lemma:RPdesignation}, while the $PID_{RP}$ is accepted by an RP, the $PID_{RP}$ must be the generated between the RP and user.
+According to Lemma~\ref{lemma:integrity}, only the IdP generates an acceptable identity token,
+ so that the token must be issued at Line 64 in Relation~\ref{alg1}.
+The IdP generates the $PID_U$ based on the $PID_{RP}$ and user's $ID_U$.
+According to Lemma~\ref{lemma:RPdesignation},
+     if the $PID_{RP}$ is accepted by an RP, the $PID_{RP}$ must be the generated between the RP and the user.
 According to Lemma~\ref{lemma:confidentiality}, the $ID_U$ must belongs to the honest user.
 Therefore, the user's identity must equal with the constant $ [ID_U]ID_{RP}$, and unique to other users' $Acct$s at this RP.
 
 Moreover, an adversary may allure the honest user to upload the adversary's token to an RP, so that the honest user may use the same $Acct$ as the adversary's.
 While the honest user has already negotiated the $PID_{RP}$ with the RP, the opener of the IdP script must be the RP script.
-As the $t$ generated at Line 7, Relation~\ref{alg3}, and $PID_{RP}$ generated at Line 21, Relation~\ref{alg3} and Line 13, Relation~\ref{alg2}.
-The $t$ is only sent to RP script at Line 8, Relation~\ref{alg3}, and RP server at Line 18, Relation~\ref{alg4}.
-The $PID_{RP}$ is only sent to IdP server at Line 28 and 90, Relation~\ref{alg3}. Moreover, the $PID_{RP}$-registration result including the $PID_{RP}$ is sent to IdP script at Line  35, Relation~\ref{alg1}, RP script at Line 40, Relation~\ref{alg3}, RP server at Line 36, Relation~\ref{alg4}. An adversary can never know the $PID_{RP}$ negotiated between the honest user and RP.
+    As the $t$ generated at Line 7, Relation~\ref{alg3}, and $PID_{RP}$ generated at Line 21 in Relation~\ref{alg3} and Line 13 in Relation~\ref{alg2}.
+The $t$ is only sent to the RP script at Line 8 in Relation~\ref{alg3}, and the RP server at Line 18 in Relation~\ref{alg4}.
+The $PID_{RP}$ is only sent to the IdP server at Lines 28 and 90 in Relation~\ref{alg3}.
+Moreover, the $PID_{RP}$-registration result including the $PID_{RP}$ is sent to the IdP script at Line  35 in Relation~\ref{alg1}, the RP script at Line 40 in Relation~\ref{alg3}, RP server at Line 36 in Relation~\ref{alg4}.
+An adversary can never know the $PID_{RP}$ negotiated between the honest user and RP.
 While the honest user has not negotiated the $PID_{RP}$ with the RP yet, the \verb+session+[$PID_{RP}$] at Line 69, Relation~\ref{alg2} and other similar attributes must be empty, as the $Cookie$ used at Line 58 belongs to the honest user and the negotiation between Line 10-20 does not conducted by the user.
 Therefore, an adversary cannot lead the honest RP to accept the malicious token from the honest user.
 \end{proof}
