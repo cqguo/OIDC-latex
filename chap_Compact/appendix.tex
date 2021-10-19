@@ -151,7 +151,6 @@ An HTTP response message is the formatted term,
 \end{equation*}
 The details are defined as follows:
 \begin{itemize}
-\setlength\itemsep{-2pt}
  \item \myss{\mathtt{HTTPReq}} and \myss{\mathtt{HTTPResp}} denote the types of messages.
  \item \myss{nonce} is a random number that maps the response to the corresponding request.
  \item \myss{method} is one of the HTTP methods, \myss{\mathtt{GET}} and \myss{\mathtt{POST}}.
@@ -174,7 +173,7 @@ $$\myangle{\mathtt{URL}, protocol,host,path,parameters}$$
 \end{itemize} 
 
 \vspace{1mm}\noindent\textbf{Origin}.
-An Origin is a term \myss{\myangle{host, protocol}} that can represent the server that a script is downloaded from, where \myss{host} and \myss{protocol} are the same as in URL.
+An Origin is the formatted term \myss{\myangle{host, protocol}} that can represent the server that a script is downloaded from, where \myss{host} and \myss{protocol} are the same as in URL.
 
 \vspace{1mm}\noindent\textbf{POSTMESSAGE}.
 PostMessage is used in the browser for transmitting messages between scripts. The postMessage package is defined as the formatted term $$\myangle{\mathtt{POSTMESSAGE}, target, content, origin}$$ 
@@ -199,11 +198,13 @@ An atomic process is a tuple $p=$ $(I^p, Z^p, R^p,z_0^p )$, containing the addre
 
 
 \vspace{1mm}\noindent\textbf{IdP Server Process}.
-The state of IdP process is described as the formatted term $\langle Issuer$, $SK$, $SessionList$, $UserList$, $RPList$, $Validity$,  $TokenList\rangle$.
+The state of IdP process is described as the formatted term,
+\begin{multline*}
+\ \ \ \ \ \ \ \ \ \langle Issuer, SK, SessionList, UserList, \\RPList, Validity,  TokenList \rangle \ \ \ \ \ \ \ \ \ 
+\end{multline*}
 That is,  the state of an IdP server  at the point in time can be sketched using these attributes.
 %Other data stored at IdP but not used during SSO authentication are not mentioned here.
 \begin{itemize}
-\setlength\itemsep{-2pt}
 \item \myss{Issuer} is the identifier of IdP.
 %\item \myss{p} is the large prime mentioned before.
 \item \myss{SK} is the private key used by IdP to generate signatures.
@@ -215,14 +216,13 @@ That is,  the state of an IdP server  at the point in time can be sketched using
 \end{itemize}
 We also define the \myss{functions} in the relations.
 \begin{itemize}
-\setlength\itemsep{-2pt}
-\item \myss{\mathtt{CredentialVerify(credential)}} is used to authenticate the user.
-\item \myss{\mathtt{UIDOfUser(credential)}} is used to search the user's \myss{ID_U}.
-\item \myss{\mathtt{ListOfPID()}} is the set of PIDs of registered RP in some login instance.
-\item \myss{\mathtt{EndpointsOfRP(r)}} is the endpoint registered by the IdP script with PID \myss{r}.
+\item \myss{\mathtt{CredentialVerify(credential)}} returns the authentication result of a user.
+\item \myss{\mathtt{UIDOfUser(credential)}} returns the $ID_U$ of a user.
+\item \myss{\mathtt{ListOfPID()}} returns the set of $PID_{RP}$s of the registered RPs in the valid period.
+\item \myss{\mathtt{EnptOfRP(PID_{RP})}} returns the endpoint bound with this $PID_{RP}$ at IdP.
 %\item \myss{\mathtt{ModPow(a, b, c)}} is the result of \myss{a^b \mod c}.
-\item \myss{\mathtt{Multiply(P, a)}} is the result of \myss{aP}, where $P$ is the point on elliptic curve and $a$ is the integer.
-\item \myss{\mathtt{CurrentTime()}} is the system current time.
+\item \myss{\mathtt{Multiply(P, a)}} returns the result of \myss{[a]P}, where $P$ is the point on elliptic curve and $a$ is the integer.
+\item \myss{\mathtt{CurrentTime()}} returns the current system time.
 \end{itemize}
 
 The relation of IdP process $R^i$ is shown as Relation~\ref{alg1} in Appendix~\ref{ape:alg}.
@@ -232,14 +232,17 @@ The relation of IdP process $R^i$ is shown as Relation~\ref{alg1} in Appendix~\r
 
 
 \vspace{1mm}\noindent\textbf{RP server process}.
-The state of RP process is the formatted term \myss{\myangle{ID_{RP}, Enpt, IdP, Cert, SessionList, UserList}}. %Other attributes are not mentioned here.
+The state of RP process is the formatted term, 
+\begin{multline*}
+\ \langle ID_{RP}, Enpt, IdP, Cert, SessionList, UserList \rangle \ 
+ \end{multline*}
 
 \begin{itemize}
-\setlength\itemsep{-2pt}
-\item \myss{ID_{RP}} and \myss{Enpt} are RP's registered information at IdP.
+\item \myss{ID_{RP}} is the iRP's identifier assigned by IdP.
+\item  \myss{Enpt} is the RP's address for uploading the identity token.
 \item \myss{Cert} is the IdP-signed message containing \myss{ID_{RP}, Enpt} and other attributes.
-\item \myss{IdP} is the term of the form \myss{\langle ScriptUrl}, %\myss{q},
-    \myss{PK \rangle}, where \myss{ScriptUrl} is the site to download IdP script, %\myss{q} is the large prime defined before,
+\item \myss{IdP} is the term of the form \myss{\langle ScriptUrl}, 
+    \myss{PK \rangle}, where \myss{ScriptUrl} is the site to download IdP script, 
      and \myss{PK} is the public key used to verify the IdP signed messages.
 \item \myss{SessionList} is same as it in IdP process.
 \item \myss{UserList} is the set of users registered at this RP, each user is uniquely identified by the \myss{Acct}.
@@ -247,10 +250,9 @@ The state of RP process is the formatted term \myss{\myangle{ID_{RP}, Enpt, IdP,
 
 The \myss{functions} are defined as follows:
 \begin{itemize}
-\setlength\itemsep{-2pt}
- \item \myss{\mathtt{Inverse}(t)}  calculates the trapdoor in UPPRESSO system.
-  \item \myss{\mathtt{Random}()} generates a fresh random number.
-  \item \myss{\mathtt{AddUser}(Acct)} add the new user with \myss{Acct} into RP's user list.
+ \item \myss{\mathtt{Inverse}(t)} is used to calculate the trapdoor in UPPRESSO system.
+  \item \myss{\mathtt{Random}()} returns a fresh random number.
+  \item \myss{\mathtt{AddUser}(Acct)} is used to add the new user with \myss{Acct} into RP's user list.
 \end{itemize}
 The relation of RP process $R^r$ is shown as Relation~\ref{alg2} in Appendix~\ref{ape:alg}.
 
@@ -700,7 +702,7 @@ The detailed procedure of dealing with these events is shown as follows.
   \ENDIF
   \mystate{\myss{PID_{RP} := parameters[PID_{RP}]}}
   \mystate{\myss{Enpt := parameters[Enpt]}}
-  \myif{PID_{RP} \notin \mathtt{ListOfPID}() \lor Enpt \notin \mathtt{EndpointsOfRP}(PID_{RP})}
+  \myif{PID_{RP} \notin \mathtt{ListOfPID}() \lor Enpt \notin \mathtt{EnptOfRP}(PID_{RP})}
   \mystate{\myss{m' := \myangle{\mathtt{HTTPResp}, n, 200, \myangle{}, \mathtt{Fail}}}}
   \mystop{b, a,m'}
   \ENDIF
