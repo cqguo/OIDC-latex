@@ -225,7 +225,7 @@ We also define the \myss{functions} in the relations.
 \item \myss{\mathtt{CurrentTime()}} returns the current system time.
 \end{itemize}
 
-The relation of IdP process $R^i$ is shown as Relation~\ref{alg1} in Appendix~\ref{ape:alg}.
+The relation of IdP process is shown as Relation~\ref{alg1} in Appendix~\ref{ape:alg}.
 
 
 
@@ -254,13 +254,13 @@ The \myss{functions} are defined as follows:
   \item \myss{\mathtt{Random}()} returns a fresh random number.
   \item \myss{\mathtt{AddUser}(Acct)} is used to add the new user with \myss{Acct} into RP's user list.
 \end{itemize}
-The relation of RP process $R^r$ is shown as Relation~\ref{alg2} in Appendix~\ref{ape:alg}.
+The relation of RP process is shown as Relation~\ref{alg2} in Appendix~\ref{ape:alg}.
 
 
 \subsubsection{Browser}
 %In UPPRESSO, we assume that the browsers are honest and well developed, so that, we neglect  the detailed process of browser, such as constructing and parsing the HTTP package.
-We analyze how the browsers interact with other parties in UPPRESSO.
-In UPPRESSO the message transmitted through a browser is constructing and parsing by the script, so that we only focus on how the script process runs in the browser.
+In this section, we analyze how the browsers interact with other parties in UPPRESSO.
+In UPPRESSO system, the message transmitted through a browser is constructing and parsing by the script, so that we only focus on how the script process runs in the browser.
 
 In the browser, a window is the basic unit that shows the content to user.
 In a window, the document %(Document Object Model, DOM)
@@ -273,7 +273,9 @@ The opened windows, documents and downloaded scripts are parts of the state of a
 
 
 \vspace{1mm}
-\noindent\textbf{Window}. A window \myss{w} is a formatted term \myss{w = \myangle{ID_w, documents, opener}}, representing the concrete browser window in the system.
+\noindent\textbf{Window}. A window is the formatted term,  
+$$\langle ID_w, documents, opener \rangle$$
+It represents the concrete browser window in the system.
 \begin{itemize}
 \item The \myss{ID_w} is the window reference to identify each windows.
 \item The \myss{documents} is the set of documents (defined below) including the current document and cached documents (for example, the documents can be viewed via the ``forward" and ``back" buttons in the browser).
@@ -286,7 +288,7 @@ The opened windows, documents and downloaded scripts are parts of the state of a
 
 
 \vspace{1mm}
-\noindent\textbf{Document}. A document \myss{d} is the web page content in the browser window,
+\noindent\textbf{Document}. A document is the web page content in the browser window,
     in the formatted term
 \begin{multline*}
   \ \ \ \langle ID_d, location, referrer, script, scriptstate, \\
@@ -299,7 +301,7 @@ The opened windows, documents and downloaded scripts are parts of the state of a
 \item The \myss{script} is the script process downloaded from each servers.
 \item \myss{scriptstate} is define by the script, different in each scripts.
 \item The \myss{scriptinputs} is the message transmitted into the script process.
-\item The \myss{subwindows} is the set of \myss{ID_w} of document's created windows.
+\item The \myss{subwindows} is the set of \myss{ID_w} of document-created windows.
 \end{itemize}
 
  %\myss{active} represents whether this document is active or not.
@@ -316,12 +318,12 @@ A script can be modelled as the tuple containing the input, output and relation.
 At the first, we give the description of the formate of input.
 The input is the formatted term
 \begin{multline*}
-\langle tree, docID, scriptstate, stateinputs, cookies, ids, secret \rangle
+\langle tree, ID_d, scriptstate, stateinputs, cookies, ids, secret \rangle
 \end{multline*}
 \begin{itemize}
 \item The \myss{tree} is the structure of the opened windows and documents, which are visible to this script.
-\item \myss{DocID} is the document $ID_d$, representing a document. \myss{Scriptinputs} is the message transmitted to script.
-\item The \myss{scriptinputs} is defined as formatted term, for example, postMessage is one of the forms of \myss{scriptinputs}.
+\item \myss{ID_d} is the document's ID, representing the document containing this script. 
+\item \myss{Scriptinputs} is the message transmitted to script. The \myss{scriptinputs} is defined as formatted term, for example, postMessage is one of the forms of \myss{scriptinputs}.
 \item \myss{Cookies} is the set of cookies that belong to the document's origin.
 \item \myss{Ids} is the set of users while \myss{secret} is the credential of corresponding user.
 \end{itemize}
@@ -332,7 +334,6 @@ The state of IdP script process \myss{scriptstate} is the formatted term
  \ \myangle{IdPDomain, Parameters, phase, refXHR}\
  \end{multline*}
 \begin{itemize}
-\setlength\itemsep{-2pt}
 \item \myss{IdPDomain} is the IdP's host.
 \item \myss{Parameters} is used to store the parameters received from other processes.
 %\item \myss{p} is the large prime defined before.
@@ -356,11 +357,10 @@ We have defined the postMessage and XMLHTTPRequest (for HTTP request) message wh
 The relation of IdP script process $script\_idp$ is shown in Appendix~\ref{ape:alg} Relation~\ref{alg3}.
  The new \myss{functions} in relation are defined as follows.
 \begin{itemize}
-\setlength\itemsep{-2pt}
- \item \myss{\mathtt{PARENTWINDOW}(tree,docID)}. The first parameter is the input relation tree defined before, and the second parameter is the $ID_d$ of a document. The output returned by the function is the current window's opener's $ID_w$ (null if it doesn't exist nor it is invisible to this document).
-  \item \myss{\mathtt{CHOOSEINPUT}(inputs,pattern)}. The first parameter is a set of messages, and the second parameter is a pattern. The result returned by the function is the message in \myss{inputs} matching the \myss{pattern}.
+ \item \myss{\mathtt{PARENTWINDOW}(tree,ID_d)}. The first parameter is the input relation tree defined before, and the second parameter is the ID of a document. It returns the current window's opener's $ID_w$ (null if it doesn't exist nor it is invisible to this document).
+  \item \myss{\mathtt{CHOOSEINPUT}(inputs,pattern)}. The first parameter is a set of script inputs, and the second parameter is a pattern. The result returned by the function is the input in \myss{inputs} matching the \myss{pattern}.
   \item \myss{\mathtt{RandomUrl}()} returns a newly generated host string.
-    \item \myss{\mathtt{CredentialofUser}(user,secret)} creates the user's credential for authentication.
+    \item \myss{\mathtt{CredentialofUser}(user,secret)} returns the user's credential for authentication.
 \end{itemize}
 
 
@@ -376,11 +376,13 @@ While the output is the formatted term
 \begin{multline*}
 \ \langle scriptstate, cookies, command \rangle \
 \end{multline*}
-The state of RP script process \myss{scriptstate} is the formatted term \myss{\langle IdPDomain}, \myss{RPDomain}, \myss{Parameters}, \myss{phase}, \myss{refXHR\rangle}. The \myss{RPDomain} is the host string of the corresponding RP server, and other terms are defined in the same way as in IdP script process.
+The state of RP script process \myss{scriptstate} is the formatted term, 
+$$\langle IdPDomain, RPDomain, Parameters, phase, refXHR\rangle$$
+The \myss{RPDomain} is the host string of the corresponding RP server, and other terms are defined in the same way as in IdP script process.
 Other terms are same as them in IdP script
 
 
-The relation of RP script process $script\_rp$ is shown in Appendix~\ref{ape:alg} Relation~\ref{alg4}. We define the function \myss{\mathtt{SUBWINDOW}(tree, docID)}, which takes the \myss{tree} defined above and the current document's \myss{ID_d} as the input. And it selects the \myss{ID_w} of the first window opened by this document as the output. However, if there is no opened windows, it returns  null.
+The relation of RP script process $script\_rp$ is shown as Relation~\ref{alg4}, Appendix~\ref{ape:alg}. We define the function \myss{\mathtt{SUBWINDOW}(tree, ID_d)}, which takes the \myss{tree} defined above and the current document's \myss{ID_d} as the input. And it selects the \myss{ID_w} of the first window opened by this document as the output. However, if there is no opened windows, it returns  null.
 
 \subsection{Proofs of Security}
 A secure SSO service ensures that only the legitimate user logins to an honest RP under his account.
@@ -833,10 +835,10 @@ The detailed procedure of dealing with these events is shown as follows.
   \caption{\textbf{IdP\_Script\_Relation}}
   \label{alg3}
   \begin{algorithmic}[1]
-  \REQUIRE \myss{\myangle{tree, docID, scriptstate, scriptinputs, cookies, ids, secret}}
+  \REQUIRE \myss{\myangle{tree, ID_d, scriptstate, scriptinputs, cookies, ids, secret}}
   \mystate{\myss{ s' := scriptstate}}
   \mystate{\myss{command := \myangle{}}}
-  \mystate{\myss{target := \mathtt{PARENTWINDOW}(tree,docID)}}
+  \mystate{\myss{target := \mathtt{PARENTWINDOW}(tree,ID_d)}}
   \mystate{\myss{IdPDomain := s'.IdPDomain}}
   \SWITCH{\myss{s'.phsae}}
     \CASE{\myss{start}}
@@ -963,7 +965,7 @@ The detailed procedure of dealing with these events is shown as follows.
   \caption{\textbf{RP\_Script\_Relation}}
   \label{alg4}
   \begin{algorithmic}[1]
-\REQUIRE \myss{\myangle{tree, docID, scriptstate, scriptinputs, cookies, ids, secret}}
+\REQUIRE \myss{\myangle{tree, ID_d, scriptstate, scriptinputs, cookies, ids, secret}}
 \mystate{\myss{ s' := scriptstate}}
   \mystate{\myss{command := \myangle{}}}
   \mystate{\myss{IdPWindow := \mathtt{SUBWINDOW}(tree,docnonce).ID_w}}
