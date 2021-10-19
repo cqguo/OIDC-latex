@@ -67,7 +67,7 @@ So,
 an HTTP GET request {\sf exa.com/path?para=1} with empty headers and bodys is expressed as $\langle\mathtt{HTTPReq},n,\mathtt{GET},exa.com,/path,\langle \langle para, 1\rangle \rangle ,\langle \rangle,\langle \rangle \rangle$.
 
 \vspace{1mm}
-\noindent\textbf{Operations over terms}. The operations are defined.
+\noindent\noindent\textbf{Operations over terms}. The operations are defined as follows.
 \begin{itemize}
 \item \textbf{Equational theory}. Equational theory
  uses the symbol $\equiv$ to represent the congruence relation on terms, and $\not\equiv$ for non-congruence relation.
@@ -121,10 +121,10 @@ A script process is addressed by the \verb+Origin+ property, as the the protocol
 \subsection{The Formulation of UPPRESSO}
 In this section, we introduce the model of UPPRESSO,
      in the form of $(\mathcal{W}$, $\mathcal{S}$, $E^0)$.
-$\mathcal{W}$ is the set of atomic processes, including IdP processes, RP processes and browsers.
+$\mathcal{W}$ is the set of atomic processes, including IdP processes, RP processes and browser processes.
 $\mathcal{S}$ is the set of script processes, containing of IdP script process and RP script process.
 $E^0$  is the set of self-triggering events acceptable to the processes in $\mathcal{W}$.
-In the UPPRESSO system, the self-triggering events are sent while the RP and IdP scripts are loaded. The self-triggering event for RP script is used to create the new window for download IdP script. The self-triggering event for IdP script is used to start the $PID_{RP}$ negotiation.
+In the UPPRESSO system, the self-triggering events are triggered after the RP and IdP scripts are loaded. The self-triggering event for RP script is used to create the new window to download IdP script. The self-triggering event for IdP script is used to start the $PID_{RP}$ negotiation.
 % which is to be illustrated in the individual processes part.
 
 
@@ -140,12 +140,12 @@ We provide the modelling normal data, such HTTP messages, used to construct UPPR
 
 \vspace{1mm}
 \noindent\textbf{HTTP Messages}.
-An HTTP request message is the term of the form
+An HTTP request message is the formatted term,
 \begin{multline*}
 \ \ \ \ \ \ \ \ \langle \mathtt{HTTPReq}, nonce, method, host, path, \\
 parameters, headers, body\rangle \ \ \ \ \ \ \ \
 \end{multline*}
-An HTTP response message is the term of the form
+An HTTP response message is the formatted term,
 \begin{equation*}
     \myangle{\mathtt{HTTPResp}, nonce, status, headers, body}
 \end{equation*}
@@ -157,23 +157,41 @@ The details are defined as follows:
  \item \myss{method} is one of the HTTP methods, \myss{\mathtt{GET}} and \myss{\mathtt{POST}}.
  \item \myss{host} is the constant string domain of visited server.
  \item \myss{path} is the constant string representing the concrete resource of the server.
- \item \myss{parameters} contains the parameters carried by the url as the form \myss{\myangle{\myangle{type, value}, \myangle{type, value}, \dotsc}}, for example, the \myss{parameters} in the url \myss{http://www.example.com?type=confirm}  is \myss{\myangle{\myangle{type, confirm}}}.
- \item \myss{headers} is the header content of each HTTP messages as the form \myss{\myangle{\myangle{type, value}, \myangle{type, value}, \dotsc}}, such as \myss{\langle\myangle{Referer, http://www.example.com},} \myss{\myangle{Cookies, c}\rangle}.
- \item \myss{body} is the body content carried by HTTP \myss{\mathtt{POST}} request or HTTP response in the form \myss{\myangle{\myangle{type, value}, \myangle{type, value}, \dotsc}}.
+\item \myss{parameters} contains the parameters carried by the url as the formatted term \myss{\myangle{\myangle{type, value}, \myangle{type, value}, \dotsc}}. 
+For example,  the HTTP request targeting to url \myss{http://www.example.com?type=confirm}  carries the \myss{parameters} as the formatted term \myss{\myangle{\myangle{type, confirm}}}.
+ \item \myss{headers} is the header content of each HTTP messages as the term \myss{\myangle{\myangle{type, value}, \myangle{type, value}, \dotsc}}, such as \myss{\langle\myangle{Referer, http://www.example.com},} \myss{\myangle{Cookies, c}\rangle}.
+\item \myss{body} is the content carried by HTTP \myss{\mathtt{POST}} request or HTTP response as the formatted term \myss{\myangle{\myangle{type, value}, \myangle{type, value}, \dotsc}}.
   \item \myss{status} is the HTTP status code defined by HTTP standard, such as 200, 302 and 404.
 \end{itemize}
 
 \vspace{1mm}\noindent\textbf{URL}.
-URL is a term \myss{\myangle{\mathtt{URL}, protocol,host,path,parameters}}, where \myss{\mathtt{URL}} is the type, \myss{protocol} is chosen in \myss{\{\mathtt{S}}, \myss{\mathtt{P}\}} as \myss{\mathtt{S}} stands for HTTPS and \myss{\mathtt{P}} stands for HTTP. The \myss{host, path}, and \myss{parameters} are the same as in HTTP messages.
+URL is the formatted term, 
+$$\myangle{\mathtt{URL}, protocol,host,path,parameters}$$
+\begin{itemize}
+\item \myss{\mathtt{URL}} is the type.
+\item \myss{protocol} is chosen in \myss{\{\mathtt{S}}, \myss{\mathtt{P}\}} as \myss{\mathtt{S}} stands for HTTPS and \myss{\mathtt{P}} stands for HTTP.
+\item The \myss{host, path}, and \myss{parameters} are the same as in HTTP messages.
+\end{itemize} 
 
 \vspace{1mm}\noindent\textbf{Origin}.
 An Origin is a term \myss{\myangle{host, protocol}} that can represent the server that a script is downloaded from, where \myss{host} and \myss{protocol} are the same as in URL.
 
 \vspace{1mm}\noindent\textbf{POSTMESSAGE}.
-PostMessage is used in the browser for transmitting messages between scripts. The postMessage package is defined as the form \myss{\myangle{\mathtt{POSTMESSAGE}, target, Content, Origin}}, where \myss{\mathtt{POSTMESSAGE}} is the type, \myss{target} is the constant nonce which stands for the receiver, \myss{Content} is the message transmitted and \myss{Origin} restricts the receiver.
+PostMessage is used in the browser for transmitting messages between scripts. The postMessage package is defined as the formatted term $$\myangle{\mathtt{POSTMESSAGE}, target, content, origin}$$ 
+\begin{itemize}
+\item \myss{\mathtt{POSTMESSAGE}} is the type.
+\item The \myss{target} is the constant nonce which stands for the receiver.
+\item \myss{Content} is the message transmitted.
+\item \myss{Origin} restricts the receiver.
+\end{itemize}
 
 \vspace{1mm}\noindent\textbf{XMLHTTPREQUEST}.
-XMLHTTPRequest is the HTTP message transmitted  by scripts in the browser. That is, the XMLHTTPRequest is converted from the HTTP message by the browser. The XMLHTTPRequest package is defined as the term in the form \myss{\myangle{\mathtt{XMLHTTPREQUEST}, URL, methods, Body, nonce}} can be converted into HTTP request message by the browser, and \myss{\myangle{\mathtt{XMLHTTPREQUEST}, Body, nonce}}  is converted from HTTP response message.
+XMLHTTPRequest is the HTTP message processed  by scripts in the browser. That is, the XMLHTTPRequest  package can as the following formatted term can be converted into HTTP request message by the browser.
+$$\myangle{\mathtt{XMLHTTPREQUEST}, URL, methods, body, nonce}$$ 
+
+The XMLHTTPRequest  package as the following formatted term is converted from HTTP response message.
+$$\myangle{\mathtt{XMLHTTPREQUEST}, body, nonce}$$  
+The $\mathtt{XMLHTTPREQUEST}$ is the type. Other attributes are defined similarly as them in HTTP message.
 
 \subsubsection{The Atomic Processes of IdP and RP}
 An atomic process is a tuple $p=$ $(I^p, Z^p, R^p,z_0^p )$, containing the addresses, states, relation and the initial state.
@@ -181,7 +199,7 @@ An atomic process is a tuple $p=$ $(I^p, Z^p, R^p,z_0^p )$, containing the addre
 
 
 \vspace{1mm}\noindent\textbf{IdP Server Process}.
-The state of IdP process is described as a term in the form $\langle Issuer$, $SK$, $SessionList$, $UserList$, $RPList$, $Validity$,  $TokenList\rangle$.
+The state of IdP process is described as the formatted term $\langle Issuer$, $SK$, $SessionList$, $UserList$, $RPList$, $Validity$,  $TokenList\rangle$.
 That is,  the state of an IdP server  at the point in time can be sketched using these attributes.
 %Other data stored at IdP but not used during SSO authentication are not mentioned here.
 \begin{itemize}
