@@ -67,7 +67,7 @@ So,
 an HTTP GET request {\sf exa.com/path?para=1} with empty headers and bodys is expressed as $\langle\mathtt{HTTPReq},n,\mathtt{GET},exa.com,/path,\langle \langle para, 1\rangle \rangle ,\langle \rangle,\langle \rangle \rangle$.
 
 \vspace{1mm}
-\noindent\textbf{Operations over terms}. The operations are defined as follows.
+\noindent\textbf{Operations over terms}. The operations are defined.
 \begin{itemize}
 \item \textbf{Equational theory}. Equational theory
  uses the symbol $\equiv$ to represent the congruence relation on terms, and $\not\equiv$ for non-congruence relation.
@@ -121,10 +121,10 @@ A script process is addressed by the \verb+Origin+ property, as the the protocol
 \subsection{The Formulation of UPPRESSO}
 In this section, we introduce the model of UPPRESSO,
      in the form of $(\mathcal{W}$, $\mathcal{S}$, $E^0)$.
-$\mathcal{W}$ is the set of atomic processes, including IdP processes, RP processes and browser processes.
+$\mathcal{W}$ is the set of atomic processes, including IdP processes, RP processes and browsers.
 $\mathcal{S}$ is the set of script processes, containing of IdP script process and RP script process.
 $E^0$  is the set of self-triggering events acceptable to the processes in $\mathcal{W}$.
-In the UPPRESSO system, the self-triggering events are triggered after the RP and IdP scripts are loaded. The self-triggering event for RP script is used to create the new window to download IdP script. The self-triggering event for IdP script is used to start the $PID_{RP}$ negotiation.
+In the UPPRESSO system, the self-triggering events are sent while the RP and IdP scripts are loaded. The self-triggering event for RP script is used to create the new window for download IdP script. The self-triggering event for IdP script is used to start the $PID_{RP}$ negotiation.
 % which is to be illustrated in the individual processes part.
 
 
@@ -140,56 +140,40 @@ We provide the modelling normal data, such HTTP messages, used to construct UPPR
 
 \vspace{1mm}
 \noindent\textbf{HTTP Messages}.
-An HTTP request message is the formatted term,
+An HTTP request message is the term of the form
 \begin{multline*}
 \ \ \ \ \ \ \ \ \langle \mathtt{HTTPReq}, nonce, method, host, path, \\
 parameters, headers, body\rangle \ \ \ \ \ \ \ \
 \end{multline*}
-An HTTP response message is the formatted term,
+An HTTP response message is the term of the form
 \begin{equation*}
     \myangle{\mathtt{HTTPResp}, nonce, status, headers, body}
 \end{equation*}
 The details are defined as follows:
 \begin{itemize}
+\setlength\itemsep{-2pt}
  \item \myss{\mathtt{HTTPReq}} and \myss{\mathtt{HTTPResp}} denote the types of messages.
  \item \myss{nonce} is a random number that maps the response to the corresponding request.
  \item \myss{method} is one of the HTTP methods, \myss{\mathtt{GET}} and \myss{\mathtt{POST}}.
  \item \myss{host} is the constant string domain of visited server.
  \item \myss{path} is the constant string representing the concrete resource of the server.
- \item \myss{parameters} contains the parameters carried by the url as the formatted term \myss{\myangle{\myangle{type, value}, \myangle{type, value}, \dotsc}}. 
- For example,  the HTTP request targeting to url \myss{http://www.example.com?type=confirm}  carries the \myss{parameters} as the formatted term \myss{\myangle{\myangle{type, confirm}}}.
- \item \myss{headers} is the header content of each HTTP messages as the term \myss{\myangle{\myangle{type, value}, \myangle{type, value}, \dotsc}}, such as \myss{\langle\myangle{Referer, http://www.example.com},} \myss{\myangle{Cookies, c}\rangle}.
- \item \myss{body} is the content carried by HTTP \myss{\mathtt{POST}} request or HTTP response as the formatted term \myss{\myangle{\myangle{type, value}, \myangle{type, value}, \dotsc}}.
+ \item \myss{parameters} contains the parameters carried by the url as the form \myss{\myangle{\myangle{type, value}, \myangle{type, value}, \dotsc}}, for example, the \myss{parameters} in the url \myss{http://www.example.com?type=confirm}  is \myss{\myangle{\myangle{type, confirm}}}.
+ \item \myss{headers} is the header content of each HTTP messages as the form \myss{\myangle{\myangle{type, value}, \myangle{type, value}, \dotsc}}, such as \myss{\langle\myangle{Referer, http://www.example.com},} \myss{\myangle{Cookies, c}\rangle}.
+ \item \myss{body} is the body content carried by HTTP \myss{\mathtt{POST}} request or HTTP response in the form \myss{\myangle{\myangle{type, value}, \myangle{type, value}, \dotsc}}.
   \item \myss{status} is the HTTP status code defined by HTTP standard, such as 200, 302 and 404.
 \end{itemize}
 
 \vspace{1mm}\noindent\textbf{URL}.
-URL is the formatted term, $$\myangle{\mathtt{URL}, protocol,host,path,parameters}$$
-\begin{itemize}
-\item \myss{\mathtt{URL}} is the type.
-\item \myss{protocol} is chosen in \myss{\{\mathtt{S}}, \myss{\mathtt{P}\}} as \myss{\mathtt{S}} stands for HTTPS and \myss{\mathtt{P}} stands for HTTP.
-\item The \myss{host, path}, and \myss{parameters} are the same as in HTTP messages.
-\end{itemize} 
+URL is a term \myss{\myangle{\mathtt{URL}, protocol,host,path,parameters}}, where \myss{\mathtt{URL}} is the type, \myss{protocol} is chosen in \myss{\{\mathtt{S}}, \myss{\mathtt{P}\}} as \myss{\mathtt{S}} stands for HTTPS and \myss{\mathtt{P}} stands for HTTP. The \myss{host, path}, and \myss{parameters} are the same as in HTTP messages.
 
 \vspace{1mm}\noindent\textbf{Origin}.
 An Origin is a term \myss{\myangle{host, protocol}} that can represent the server that a script is downloaded from, where \myss{host} and \myss{protocol} are the same as in URL.
 
 \vspace{1mm}\noindent\textbf{POSTMESSAGE}.
-PostMessage is used in the browser for transmitting messages between scripts. The postMessage package is defined as the formatted term $$\myangle{\mathtt{POSTMESSAGE}, target, content, origin}$$ 
-\begin{itemize}
-\item \myss{\mathtt{POSTMESSAGE}} is the type.
-\item The \myss{target} is the constant nonce which stands for the receiver.
-\item \myss{Content} is the message transmitted.
-\item \myss{Origin} restricts the receiver.
-\end{itemize}
+PostMessage is used in the browser for transmitting messages between scripts. The postMessage package is defined as the form \myss{\myangle{\mathtt{POSTMESSAGE}, target, Content, Origin}}, where \myss{\mathtt{POSTMESSAGE}} is the type, \myss{target} is the constant nonce which stands for the receiver, \myss{Content} is the message transmitted and \myss{Origin} restricts the receiver.
 
 \vspace{1mm}\noindent\textbf{XMLHTTPREQUEST}.
-XMLHTTPRequest is the HTTP message processed  by scripts in the browser. That is, the XMLHTTPRequest  package can as the following formatted term can be converted into HTTP request message by the browser.
-$$\myangle{\mathtt{XMLHTTPREQUEST}, URL, methods, body, nonce}$$ 
-
-The XMLHTTPRequest  package as the following formatted term is converted from HTTP response message.
-$$\myangle{\mathtt{XMLHTTPREQUEST}, body, nonce}$$  
-The $\mathtt{XMLHTTPREQUEST}$ is the type. Other attributes are defined similarly as them in HTTP message.
+XMLHTTPRequest is the HTTP message transmitted  by scripts in the browser. That is, the XMLHTTPRequest is converted from the HTTP message by the browser. The XMLHTTPRequest package is defined as the term in the form \myss{\myangle{\mathtt{XMLHTTPREQUEST}, URL, methods, Body, nonce}} can be converted into HTTP request message by the browser, and \myss{\myangle{\mathtt{XMLHTTPREQUEST}, Body, nonce}}  is converted from HTTP response message.
 
 \subsubsection{The Atomic Processes of IdP and RP}
 An atomic process is a tuple $p=$ $(I^p, Z^p, R^p,z_0^p )$, containing the addresses, states, relation and the initial state.
@@ -197,7 +181,7 @@ An atomic process is a tuple $p=$ $(I^p, Z^p, R^p,z_0^p )$, containing the addre
 
 
 \vspace{1mm}\noindent\textbf{IdP Server Process}.
-The state of IdP process is described as the formatted term  $\langle Issuer$, $SK$, $SessionList$, $UserList$, $RPList$, $Validity$,  $TokenList\rangle$.
+The state of IdP process is described as a term in the form $\langle Issuer$, $SK$, $SessionList$, $UserList$, $RPList$, $Validity$,  $TokenList\rangle$.
 That is,  the state of an IdP server  at the point in time can be sketched using these attributes.
 %Other data stored at IdP but not used during SSO authentication are not mentioned here.
 \begin{itemize}
@@ -379,7 +363,7 @@ Other terms are same as them in IdP script
 The relation of RP script process $script\_rp$ is shown in Appendix~\ref{ape:alg} Relation~\ref{alg4}. We define the function \myss{\mathtt{SUBWINDOW}(tree, docID)}, which takes the \myss{tree} defined above and the current document's \myss{ID_d} as the input. And it selects the \myss{ID_w} of the first window opened by this document as the output. However, if there is no opened windows, it returns  null.
 
 \subsection{Proofs of Security}
-A secure SSO service ensures that only the legitimate user logins to an honest RP under his unique account.
+A secure SSO service ensures that only the legitimate user logins to an honest RP under his account.
 %We consider the visits to RP's resource paths are controlled by the visitors' cookies,
 % so that the attacker could break the security only when he owns the cookie bound to the honest user.
 %However, according to the same origin policy, a cookie is never leaked to any adversary, so the SSO system is vulnerable only when a adversary's cookie is bound with the honest user's identity.
@@ -410,7 +394,7 @@ When the IdP is honest, %and RP server is not vulnerable, %我们不要求所有RP都是h
 \begin{itemize}
 \item \emph{\textbf{Integrity}}~An honest RP accepts only identity tokens issued by the IdP,
             and any forged or modified identity token will be rejected by the RP.
-\item \emph{\textbf{Confidentiality}}~An identity token issued by the Idp,
+\item \emph{\textbf{Confidentiality}}~An identity token issued by the IdP,
     is accessible to only
                 the authenticated user and the target RP,
                     in addition to the IdP.
@@ -472,17 +456,19 @@ Finally, as an honest RP accepts only unexpired identity token,
     the  within-its-validity constraint of user identification and RP designation are sufficient.
 \end{proof}
 
-We assume that in UPPRESSO system, all network messages are transmitted using HTTPS,
+We assume that in the UPPRESSO system, all network messages are transmitted using HTTPS,
  \verb+postMessage+  messages are protected by the browser,
- and the browser is free of software flaws,
-  and then web attackers can never break the security of UPPRESSO.
+ and the user browser is free of software vulnerabilities.
+ % and then web attackers could never break the security of UPPRESSO.
+ % 这句话我删去，说不清到底是指什么。否则，就是：已经假设“never break the security of UPPRESSO”，又来证明security。
 Next,
     we prove that, in the UPRESSO system, these properties are satisfied.
 
 
 
 \begin{lemma}
-\textbf{Confidentiality}~In the UPPRESSO system, an identity token issued by the Idp, is accessible to only the authenticated user and the target RP, in addition to the IdP.
+\textbf{Confidentiality}~In the UPPRESSO system, an identity token issued by the IdP,
+ is accessible to only the authenticated user and the target RP, in addition to the IdP.
 \label{lemma:confidentiality}
 \end{lemma}
 \begin{proof}
@@ -496,13 +482,13 @@ We check all the messages sent by the RP server at Line 4, 7, 19, 25, 31, 36, 45
 Messages sent by the RP script are classified into two classes. 1) The messages at Line 18, 36, 56 in Relation~\ref{alg4}  are sent to the RPDomain which is set at Line 4, so that attackers cannot receive these messages. 2) The messages at Line 26,  46 only carry the contents received from the RP server,
  and we have proved that the RP server does not send any token.
 Therefore, attackers cannot receive the token from the RP script.
-\item Attacker cannot obtain the identity token from the IdP server. 
+\item Attacker cannot obtain the identity token from the IdP server.
 Among the messages at Line 4, 11, 15, 22, 25, 35, 43, 50, 66 in Relation~\ref{alg1}, only the message at Line 66 carries the token.
 This token is generated at Line 64, following the trace of the \myss{Content} at Line 62, the \myss{PID_U} at Line 60, the \myss{ID_U} at Line 59, the \myss{session} at Line 47, and finally the \myss{cookie} at Line 46. That is, the receiver of token must be the owner of the \myss{cookie} in which session that saves the parameter \myss{ID_U}. The \myss{ID_U} is set at Line 14 after verifying the credential and will never be modified.
 As we assume that user credential cannot be known to attackers,
 attackers cannot obtain the identity token from the IdP server.
 \item The attacker cannot obtain the identity token from the IdP script.
-As the proof provided above, only the IdP sends the token with the message at Line 66 in Relation~\ref{alg1}, 
+As the proof provided above, only the IdP sends the token with the message at Line 66 in Relation~\ref{alg1},
 and the IdP script only receives the token at  Line 99 in Relation~\ref{alg3}.
 Here we are going to prove that the token issued for user $u$'s login to RP $r$ (denoted as \myss{t(u,r)}) can only be  sent to the corresponding RP server through the IdP script. The receiver of \myss{t(u,r)} is restricted by the \myss{RPOrigin} at Line 100, which is set at Line 55.
     The host in the \myss{RPOrigin} is verified using the one included in \myss{Cert} at Line 51.
@@ -542,7 +528,7 @@ Moreover, according to Line 42, 44 (the $t$ used at Line 42 is set  at  Line 15,
 So only one RP is able to achieve the corresponding registration result of an $PID_{RP}$.
 
 Based on the reasons above, (1) the $PID_{RP}$ is only valid at the RP received the corresponding registration result, and (2) only one RP is able to achieve the corresponding registration result of an $PID_{RP}$.
-Thus, 
+Thus,
     the $PID_{RP}$ is only valid at one specific RP,
         and this lemma is proved.
 %As it has been proved at Lemma~\ref{lemma:confidentiality}, an malicious RP cannot receive the valid token issued for another RP, therefore, the adversary would not receive the token including an honest RP's $PID_{RP}$ from honest user.
