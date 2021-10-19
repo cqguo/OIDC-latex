@@ -67,7 +67,7 @@ So,
 an HTTP GET request {\sf exa.com/path?para=1} with empty headers and bodys is expressed as $\langle\mathtt{HTTPReq},n,\mathtt{GET},exa.com,/path,\langle \langle para, 1\rangle \rangle ,\langle \rangle,\langle \rangle \rangle$.
 
 \vspace{1mm}
-\noindent\textbf{Operations over terms}. The operations are defined.
+\noindent\noindent\textbf{Operations over terms}. The operations are defined as follows.
 \begin{itemize}
 \item \textbf{Equational theory}. Equational theory
  uses the symbol $\equiv$ to represent the congruence relation on terms, and $\not\equiv$ for non-congruence relation.
@@ -121,10 +121,10 @@ A script process is addressed by the \verb+Origin+ property, as the the protocol
 \subsection{The Formulation of UPPRESSO}
 In this section, we introduce the model of UPPRESSO,
      in the form of $(\mathcal{W}$, $\mathcal{S}$, $E^0)$.
-$\mathcal{W}$ is the set of atomic processes, including IdP processes, RP processes and browsers.
+$\mathcal{W}$ is the set of atomic processes, including IdP processes, RP processes and browser processes.
 $\mathcal{S}$ is the set of script processes, containing of IdP script process and RP script process.
 $E^0$  is the set of self-triggering events acceptable to the processes in $\mathcal{W}$.
-In the UPPRESSO system, the self-triggering events are sent while the RP and IdP scripts are loaded. The self-triggering event for RP script is used to create the new window for download IdP script. The self-triggering event for IdP script is used to start the $PID_{RP}$ negotiation.
+In the UPPRESSO system, the self-triggering events are triggered after the RP and IdP scripts are loaded. The self-triggering event for RP script is used to create the new window to download IdP script. The self-triggering event for IdP script is used to start the $PID_{RP}$ negotiation.
 % which is to be illustrated in the individual processes part.
 
 
@@ -140,40 +140,57 @@ We provide the modelling normal data, such HTTP messages, used to construct UPPR
 
 \vspace{1mm}
 \noindent\textbf{HTTP Messages}.
-An HTTP request message is the term of the form
+An HTTP request message is the formatted term,
 \begin{multline*}
 \ \ \ \ \ \ \ \ \langle \mathtt{HTTPReq}, nonce, method, host, path, \\
 parameters, headers, body\rangle \ \ \ \ \ \ \ \
 \end{multline*}
-An HTTP response message is the term of the form
+An HTTP response message is the formatted term,
 \begin{equation*}
     \myangle{\mathtt{HTTPResp}, nonce, status, headers, body}
 \end{equation*}
 The details are defined as follows:
 \begin{itemize}
-\setlength\itemsep{-2pt}
  \item \myss{\mathtt{HTTPReq}} and \myss{\mathtt{HTTPResp}} denote the types of messages.
  \item \myss{nonce} is a random number that maps the response to the corresponding request.
  \item \myss{method} is one of the HTTP methods, \myss{\mathtt{GET}} and \myss{\mathtt{POST}}.
  \item \myss{host} is the constant string domain of visited server.
  \item \myss{path} is the constant string representing the concrete resource of the server.
- \item \myss{parameters} contains the parameters carried by the url as the form \myss{\myangle{\myangle{type, value}, \myangle{type, value}, \dotsc}}, for example, the \myss{parameters} in the url \myss{http://www.example.com?type=confirm}  is \myss{\myangle{\myangle{type, confirm}}}.
- \item \myss{headers} is the header content of each HTTP messages as the form \myss{\myangle{\myangle{type, value}, \myangle{type, value}, \dotsc}}, such as \myss{\langle\myangle{Referer, http://www.example.com},} \myss{\myangle{Cookies, c}\rangle}.
- \item \myss{body} is the body content carried by HTTP \myss{\mathtt{POST}} request or HTTP response in the form \myss{\myangle{\myangle{type, value}, \myangle{type, value}, \dotsc}}.
+\item \myss{parameters} contains the parameters carried by the url as the formatted term \myss{\myangle{\myangle{type, value}, \myangle{type, value}, \dotsc}}. 
+For example,  the HTTP request targeting to url \myss{http://www.example.com?type=confirm}  carries the \myss{parameters} as the formatted term \myss{\myangle{\myangle{type, confirm}}}.
+ \item \myss{headers} is the header content of each HTTP messages as the term \myss{\myangle{\myangle{type, value}, \myangle{type, value}, \dotsc}}, such as \myss{\langle\myangle{Referer, http://www.example.com},} \myss{\myangle{Cookies, c}\rangle}.
+\item \myss{body} is the content carried by HTTP \myss{\mathtt{POST}} request or HTTP response as the formatted term \myss{\myangle{\myangle{type, value}, \myangle{type, value}, \dotsc}}.
   \item \myss{status} is the HTTP status code defined by HTTP standard, such as 200, 302 and 404.
 \end{itemize}
 
 \vspace{1mm}\noindent\textbf{URL}.
-URL is a term \myss{\myangle{\mathtt{URL}, protocol,host,path,parameters}}, where \myss{\mathtt{URL}} is the type, \myss{protocol} is chosen in \myss{\{\mathtt{S}}, \myss{\mathtt{P}\}} as \myss{\mathtt{S}} stands for HTTPS and \myss{\mathtt{P}} stands for HTTP. The \myss{host, path}, and \myss{parameters} are the same as in HTTP messages.
+URL is the formatted term, 
+$$\myangle{\mathtt{URL}, protocol,host,path,parameters}$$
+\begin{itemize}
+\item \myss{\mathtt{URL}} is the type.
+\item \myss{protocol} is chosen in \myss{\{\mathtt{S}}, \myss{\mathtt{P}\}} as \myss{\mathtt{S}} stands for HTTPS and \myss{\mathtt{P}} stands for HTTP.
+\item The \myss{host, path}, and \myss{parameters} are the same as in HTTP messages.
+\end{itemize} 
 
 \vspace{1mm}\noindent\textbf{Origin}.
-An Origin is a term \myss{\myangle{host, protocol}} that can represent the server that a script is downloaded from, where \myss{host} and \myss{protocol} are the same as in URL.
+An Origin is the formatted term \myss{\myangle{host, protocol}} that can represent the server that a script is downloaded from, where \myss{host} and \myss{protocol} are the same as in URL.
 
 \vspace{1mm}\noindent\textbf{POSTMESSAGE}.
-PostMessage is used in the browser for transmitting messages between scripts. The postMessage package is defined as the form \myss{\myangle{\mathtt{POSTMESSAGE}, target, Content, Origin}}, where \myss{\mathtt{POSTMESSAGE}} is the type, \myss{target} is the constant nonce which stands for the receiver, \myss{Content} is the message transmitted and \myss{Origin} restricts the receiver.
+PostMessage is used in the browser for transmitting messages between scripts. The postMessage package is defined as the formatted term $$\myangle{\mathtt{POSTMESSAGE}, target, content, origin}$$ 
+\begin{itemize}
+\item \myss{\mathtt{POSTMESSAGE}} is the type.
+\item The \myss{target} is the constant nonce which stands for the receiver.
+\item \myss{Content} is the message transmitted.
+\item \myss{Origin} restricts the receiver.
+\end{itemize}
 
 \vspace{1mm}\noindent\textbf{XMLHTTPREQUEST}.
-XMLHTTPRequest is the HTTP message transmitted  by scripts in the browser. That is, the XMLHTTPRequest is converted from the HTTP message by the browser. The XMLHTTPRequest package is defined as the term in the form \myss{\myangle{\mathtt{XMLHTTPREQUEST}, URL, methods, Body, nonce}} can be converted into HTTP request message by the browser, and \myss{\myangle{\mathtt{XMLHTTPREQUEST}, Body, nonce}}  is converted from HTTP response message.
+XMLHTTPRequest is the HTTP message processed  by scripts in the browser. That is, the XMLHTTPRequest  package can as the following formatted term can be converted into HTTP request message by the browser.
+$$\myangle{\mathtt{XMLHTTPREQUEST}, URL, methods, body, nonce}$$ 
+
+The XMLHTTPRequest  package as the following formatted term is converted from HTTP response message.
+$$\myangle{\mathtt{XMLHTTPREQUEST}, body, nonce}$$  
+The $\mathtt{XMLHTTPREQUEST}$ is the type. Other attributes are defined similarly as them in HTTP message.
 
 \subsubsection{The Atomic Processes of IdP and RP}
 An atomic process is a tuple $p=$ $(I^p, Z^p, R^p,z_0^p )$, containing the addresses, states, relation and the initial state.
@@ -181,11 +198,13 @@ An atomic process is a tuple $p=$ $(I^p, Z^p, R^p,z_0^p )$, containing the addre
 
 
 \vspace{1mm}\noindent\textbf{IdP Server Process}.
-The state of IdP process is described as a term in the form $\langle Issuer$, $SK$, $SessionList$, $UserList$, $RPList$, $Validity$,  $TokenList\rangle$.
+The state of IdP process is described as the formatted term,
+\begin{multline*}
+\ \ \ \ \ \ \ \ \ \langle Issuer, SK, SessionList, UserList, \\RPList, Validity,  TokenList \rangle \ \ \ \ \ \ \ \ \ 
+\end{multline*}
 That is,  the state of an IdP server  at the point in time can be sketched using these attributes.
 %Other data stored at IdP but not used during SSO authentication are not mentioned here.
 \begin{itemize}
-\setlength\itemsep{-2pt}
 \item \myss{Issuer} is the identifier of IdP.
 %\item \myss{p} is the large prime mentioned before.
 \item \myss{SK} is the private key used by IdP to generate signatures.
@@ -197,31 +216,33 @@ That is,  the state of an IdP server  at the point in time can be sketched using
 \end{itemize}
 We also define the \myss{functions} in the relations.
 \begin{itemize}
-\setlength\itemsep{-2pt}
-\item \myss{\mathtt{CredentialVerify(credential)}} is used to authenticate the user.
-\item \myss{\mathtt{UIDOfUser(credential)}} is used to search the user's \myss{ID_U}.
-\item \myss{\mathtt{ListOfPID()}} is the set of PIDs of registered RP in some login instance.
-\item \myss{\mathtt{EndpointsOfRP(r)}} is the endpoint registered by the IdP script with PID \myss{r}.
+\item \myss{\mathtt{CredentialVerify(credential)}} returns the authentication result of a user.
+\item \myss{\mathtt{UIDOfUser(credential)}} returns the $ID_U$ of a user.
+\item \myss{\mathtt{ListOfPID()}} returns the set of $PID_{RP}$s of the registered RPs in the valid period.
+\item \myss{\mathtt{EnptOfRP(PID_{RP})}} returns the endpoint bound with this $PID_{RP}$ at IdP.
 %\item \myss{\mathtt{ModPow(a, b, c)}} is the result of \myss{a^b \mod c}.
-\item \myss{\mathtt{Multiply(P, a)}} is the result of \myss{aP}, where $P$ is the point on elliptic curve and $a$ is the integer.
-\item \myss{\mathtt{CurrentTime()}} is the system current time.
+\item \myss{\mathtt{Multiply(P, a)}} returns the result of \myss{[a]P}, where $P$ is the point on elliptic curve and $a$ is the integer.
+\item \myss{\mathtt{CurrentTime()}} returns the current system time.
 \end{itemize}
 
-The relation of IdP process $R^i$ is shown as Relation~\ref{alg1} in Appendix~\ref{ape:alg}.
+The relation of IdP process is shown as Relation~\ref{alg1} in Appendix~\ref{ape:alg}.
 
 
 
 
 
 \vspace{1mm}\noindent\textbf{RP server process}.
-The state of RP process is the formatted term \myss{\myangle{ID_{RP}, Enpt, IdP, Cert, SessionList, UserList}}. %Other attributes are not mentioned here.
+The state of RP process is the formatted term, 
+\begin{multline*}
+\ \langle ID_{RP}, Enpt, IdP, Cert, SessionList, UserList \rangle \ 
+ \end{multline*}
 
 \begin{itemize}
-\setlength\itemsep{-2pt}
-\item \myss{ID_{RP}} and \myss{Enpt} are RP's registered information at IdP.
+\item \myss{ID_{RP}} is the iRP's identifier assigned by IdP.
+\item  \myss{Enpt} is the RP's address for uploading the identity token.
 \item \myss{Cert} is the IdP-signed message containing \myss{ID_{RP}, Enpt} and other attributes.
-\item \myss{IdP} is the term of the form \myss{\langle ScriptUrl}, %\myss{q},
-    \myss{PK \rangle}, where \myss{ScriptUrl} is the site to download IdP script, %\myss{q} is the large prime defined before,
+\item \myss{IdP} is the term of the form \myss{\langle ScriptUrl}, 
+    \myss{PK \rangle}, where \myss{ScriptUrl} is the site to download IdP script, 
      and \myss{PK} is the public key used to verify the IdP signed messages.
 \item \myss{SessionList} is same as it in IdP process.
 \item \myss{UserList} is the set of users registered at this RP, each user is uniquely identified by the \myss{Acct}.
@@ -229,18 +250,17 @@ The state of RP process is the formatted term \myss{\myangle{ID_{RP}, Enpt, IdP,
 
 The \myss{functions} are defined as follows:
 \begin{itemize}
-\setlength\itemsep{-2pt}
- \item \myss{\mathtt{Inverse}(t)}  calculates the trapdoor in UPPRESSO system.
-  \item \myss{\mathtt{Random}()} generates a fresh random number.
-  \item \myss{\mathtt{AddUser}(Acct)} add the new user with \myss{Acct} into RP's user list.
+ \item \myss{\mathtt{Inverse}(t)} is used to calculate the trapdoor in UPPRESSO system.
+  \item \myss{\mathtt{Random}()} returns a fresh random number.
+  \item \myss{\mathtt{AddUser}(Acct)} is used to add the new user with \myss{Acct} into RP's user list.
 \end{itemize}
-The relation of RP process $R^r$ is shown as Relation~\ref{alg2} in Appendix~\ref{ape:alg}.
+The relation of RP process is shown as Relation~\ref{alg2} in Appendix~\ref{ape:alg}.
 
 
 \subsubsection{Browser}
 %In UPPRESSO, we assume that the browsers are honest and well developed, so that, we neglect  the detailed process of browser, such as constructing and parsing the HTTP package.
-We analyze how the browsers interact with other parties in UPPRESSO.
-In UPPRESSO the message transmitted through a browser is constructing and parsing by the script, so that we only focus on how the script process runs in the browser.
+In this section, we analyze how the browsers interact with other parties in UPPRESSO.
+In UPPRESSO system, the message transmitted through a browser is constructing and parsing by the script, so that we only focus on how the script process runs in the browser.
 
 In the browser, a window is the basic unit that shows the content to user.
 In a window, the document %(Document Object Model, DOM)
@@ -253,7 +273,9 @@ The opened windows, documents and downloaded scripts are parts of the state of a
 
 
 \vspace{1mm}
-\noindent\textbf{Window}. A window \myss{w} is a formatted term \myss{w = \myangle{ID_w, documents, opener}}, representing the concrete browser window in the system.
+\noindent\textbf{Window}. A window is the formatted term,  
+$$\langle ID_w, documents, opener \rangle$$
+It represents the concrete browser window in the system.
 \begin{itemize}
 \item The \myss{ID_w} is the window reference to identify each windows.
 \item The \myss{documents} is the set of documents (defined below) including the current document and cached documents (for example, the documents can be viewed via the ``forward" and ``back" buttons in the browser).
@@ -266,7 +288,7 @@ The opened windows, documents and downloaded scripts are parts of the state of a
 
 
 \vspace{1mm}
-\noindent\textbf{Document}. A document \myss{d} is the web page content in the browser window,
+\noindent\textbf{Document}. A document is the web page content in the browser window,
     in the formatted term
 \begin{multline*}
   \ \ \ \langle ID_d, location, referrer, script, scriptstate, \\
@@ -279,7 +301,7 @@ The opened windows, documents and downloaded scripts are parts of the state of a
 \item The \myss{script} is the script process downloaded from each servers.
 \item \myss{scriptstate} is define by the script, different in each scripts.
 \item The \myss{scriptinputs} is the message transmitted into the script process.
-\item The \myss{subwindows} is the set of \myss{ID_w} of document's created windows.
+\item The \myss{subwindows} is the set of \myss{ID_w} of document-created windows.
 \end{itemize}
 
  %\myss{active} represents whether this document is active or not.
@@ -296,12 +318,12 @@ A script can be modelled as the tuple containing the input, output and relation.
 At the first, we give the description of the formate of input.
 The input is the formatted term
 \begin{multline*}
-\langle tree, docID, scriptstate, stateinputs, cookies, ids, secret \rangle
+\langle tree, ID_d, scriptstate, stateinputs, cookies, ids, secret \rangle
 \end{multline*}
 \begin{itemize}
 \item The \myss{tree} is the structure of the opened windows and documents, which are visible to this script.
-\item \myss{DocID} is the document $ID_d$, representing a document. \myss{Scriptinputs} is the message transmitted to script.
-\item The \myss{scriptinputs} is defined as formatted term, for example, postMessage is one of the forms of \myss{scriptinputs}.
+\item \myss{ID_d} is the document's ID, representing the document containing this script. 
+\item \myss{Scriptinputs} is the message transmitted to script. The \myss{scriptinputs} is defined as formatted term, for example, postMessage is one of the forms of \myss{scriptinputs}.
 \item \myss{Cookies} is the set of cookies that belong to the document's origin.
 \item \myss{Ids} is the set of users while \myss{secret} is the credential of corresponding user.
 \end{itemize}
@@ -312,7 +334,6 @@ The state of IdP script process \myss{scriptstate} is the formatted term
  \ \myangle{IdPDomain, Parameters, phase, refXHR}\
  \end{multline*}
 \begin{itemize}
-\setlength\itemsep{-2pt}
 \item \myss{IdPDomain} is the IdP's host.
 \item \myss{Parameters} is used to store the parameters received from other processes.
 %\item \myss{p} is the large prime defined before.
@@ -333,14 +354,13 @@ We have defined the postMessage and XMLHTTPRequest (for HTTP request) message wh
 
 
 
-The relation of IdP script process $script\_idp$ is shown in Appendix~\ref{ape:alg} Relation~\ref{alg3}.
+The relation of IdP script process $script\_idp$ is shown as Relation~\ref{alg3}, Appendix~\ref{ape:alg}.
  The new \myss{functions} in relation are defined as follows.
 \begin{itemize}
-\setlength\itemsep{-2pt}
- \item \myss{\mathtt{PARENTWINDOW}(tree,docID)}. The first parameter is the input relation tree defined before, and the second parameter is the $ID_d$ of a document. The output returned by the function is the current window's opener's $ID_w$ (null if it doesn't exist nor it is invisible to this document).
-  \item \myss{\mathtt{CHOOSEINPUT}(inputs,pattern)}. The first parameter is a set of messages, and the second parameter is a pattern. The result returned by the function is the message in \myss{inputs} matching the \myss{pattern}.
+ \item \myss{\mathtt{PARENTWINDOW}(tree,ID_d)}. The first parameter is the input relation tree defined before, and the second parameter is the ID of a document. It returns the current window's opener's $ID_w$ (null if it doesn't exist nor it is invisible to this document).
+  \item \myss{\mathtt{CHOOSEINPUT}(inputs,pattern)}. The first parameter is a set of script inputs, and the second parameter is a pattern. The result returned by the function is the input in \myss{inputs} matching the \myss{pattern}.
   \item \myss{\mathtt{RandomUrl}()} returns a newly generated host string.
-    \item \myss{\mathtt{CredentialofUser}(user,secret)} creates the user's credential for authentication.
+    \item \myss{\mathtt{CredentialofUser}(user,secret)} returns the user's credential for authentication.
 \end{itemize}
 
 
@@ -356,11 +376,13 @@ While the output is the formatted term
 \begin{multline*}
 \ \langle scriptstate, cookies, command \rangle \
 \end{multline*}
-The state of RP script process \myss{scriptstate} is the formatted term \myss{\langle IdPDomain}, \myss{RPDomain}, \myss{Parameters}, \myss{phase}, \myss{refXHR\rangle}. The \myss{RPDomain} is the host string of the corresponding RP server, and other terms are defined in the same way as in IdP script process.
+The state of RP script process \myss{scriptstate} is the formatted term, 
+$$\langle IdPDomain, RPDomain, Parameters, phase, refXHR\rangle$$
+The \myss{RPDomain} is the host string of the corresponding RP server, and other terms are defined in the same way as in IdP script process.
 Other terms are same as them in IdP script
 
 
-The relation of RP script process $script\_rp$ is shown in Appendix~\ref{ape:alg} Relation~\ref{alg4}. We define the function \myss{\mathtt{SUBWINDOW}(tree, docID)}, which takes the \myss{tree} defined above and the current document's \myss{ID_d} as the input. And it selects the \myss{ID_w} of the first window opened by this document as the output. However, if there is no opened windows, it returns  null.
+The relation of RP script process $script\_rp$ is shown as Relation~\ref{alg4}, Appendix~\ref{ape:alg}. We define the function \myss{\mathtt{SUBWINDOW}(tree, ID_d)}, which takes the \myss{tree} defined above and the current document's \myss{ID_d} as the input. And it selects the \myss{ID_w} of the first window opened by this document as the output. However, if there is no opened windows, it returns  null.
 
 \subsection{Proofs of Security}
 A secure SSO service ensures that only the legitimate user logins to an honest RP under his account.
@@ -696,7 +718,7 @@ The detailed procedure of dealing with these events is shown as follows.
   \ENDIF
   \mystate{\myss{PID_{RP} := parameters[PID_{RP}]}}
   \mystate{\myss{Enpt := parameters[Enpt]}}
-  \myif{PID_{RP} \notin \mathtt{ListOfPID}() \lor Enpt \notin \mathtt{EndpointsOfRP}(PID_{RP})}
+  \myif{PID_{RP} \notin \mathtt{ListOfPID}() \lor Enpt \notin \mathtt{EnptOfRP}(PID_{RP})}
   \mystate{\myss{m' := \myangle{\mathtt{HTTPResp}, n, 200, \myangle{}, \mathtt{Fail}}}}
   \mystop{b, a,m'}
   \ENDIF
@@ -827,10 +849,10 @@ The detailed procedure of dealing with these events is shown as follows.
   \caption{\textbf{IdP\_Script\_Relation}}
   \label{alg3}
   \begin{algorithmic}[1]
-  \REQUIRE \myss{\myangle{tree, docID, scriptstate, scriptinputs, cookies, ids, secret}}
+  \REQUIRE \myss{\myangle{tree, ID_d, scriptstate, scriptinputs, cookies, ids, secret}}
   \mystate{\myss{ s' := scriptstate}}
   \mystate{\myss{command := \myangle{}}}
-  \mystate{\myss{target := \mathtt{PARENTWINDOW}(tree,docID)}}
+  \mystate{\myss{target := \mathtt{PARENTWINDOW}(tree,ID_d)}}
   \mystate{\myss{IdPDomain := s'.IdPDomain}}
   \SWITCH{\myss{s'.phsae}}
     \CASE{\myss{start}}
@@ -957,7 +979,7 @@ The detailed procedure of dealing with these events is shown as follows.
   \caption{\textbf{RP\_Script\_Relation}}
   \label{alg4}
   \begin{algorithmic}[1]
-\REQUIRE \myss{\myangle{tree, docID, scriptstate, scriptinputs, cookies, ids, secret}}
+\REQUIRE \myss{\myangle{tree, ID_d, scriptstate, scriptinputs, cookies, ids, secret}}
 \mystate{\myss{ s' := scriptstate}}
   \mystate{\myss{command := \myangle{}}}
   \mystate{\myss{IdPWindow := \mathtt{SUBWINDOW}(tree,docnonce).ID_w}}
