@@ -376,6 +376,12 @@ The relation of IdP script process $script\_idp$ is shown as Relation~\ref{alg3}
   \item \myss{\mathtt{RandomUrl}()} returns a newly generated host string.
     \item \myss{\mathtt{CredentialofUser}(user,secret)} returns the user's credential for authentication.
 \end{itemize}
+Among the functions, only the generation of random url is implemented dependently by the script.
+The retrieval of the parent window (the opener) is implemented by the browser, and it can be easily invoked in the script by using the browser-provided API.
+The \myss{\mathtt{CHOOSEINPUT}} function is conducted by the browser and transparent to the script developer. 
+For example, while the browser receives the HTTP response from the browser, it would decide witch callback function is invoked. 
+Moreover, the function \myss{\mathtt{CredentialofUser}} needs the participation on the user, for example, the user inputs her password in the web page. 
+
 
 
 
@@ -398,7 +404,7 @@ Other terms are same as them in IdP script
 
 The relation of RP script process $script\_rp$ is shown as Relation~\ref{alg4}, Appendix~\ref{ape:alg}.
 
-We define the function \myss{\mathtt{SUBWINDOW}(tree, docID)}, which takes the \myss{tree} defined above and the current document's \myss{docID} as the input. And it selects the $winID$ of the first window opened by this document as the output. However, if there is no opened windows, it returns  null.
+We define the function \myss{\mathtt{SUBWINDOW}(tree, docID)}, which takes the \myss{tree} defined above and the current document's \myss{docID} as the input. And it selects the $winID$ of the first window opened by this document as the output. However, if there is no opened windows, it returns  null. The retrieval of the sub window is similar with the retrieval of the parent window, the developer can simply achieve the sub window in the script by invoke the browser-provided API.
 
 \subsection{Proofs of Security}
 A secure SSO service ensures that only the legitimate user logins to an honest RP under his account.
