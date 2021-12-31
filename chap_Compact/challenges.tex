@@ -36,9 +36,9 @@ Integrity is necessary,
 So identity tokens are signed by the IdP and usually transmitted over HTTPS.
 
 These four security requirements (i.e., RP designation, user identification, confidentiality, and integrity) of SSO identity tokens
-     have been discussed and analyzed \cite{ArmandoCCCT08,FettKS16, FettKS17},
+     have been discussed \cite{ArmandoCCCT08,FettKS16, FettKS17},
      and
-     any vulnerabilities breaking one or more of these properties in SSO systems
+     vulnerabilities breaking any of these properties in SSO systems
             result in effective attacks \cite{SomorovskyMSKJ12, WangCW12, ArmandoCCCPS13, ZhouE14, WangZLLYLG15, WangZLG16, YangLLZH16, MainkaMS16, MainkaMSW17, YangLCZ18, YangLS17, ShiWL19, ChenPCTKT14, ccsSunB12, DiscoveringJCS, dimvaLiM16, CaoSBKVC14, TowardsShehabM14}.
 An adversary might attempt to login to an honest RP as a victim user (i.e., \emph{impersonation}),
  or allure a victim user to login to an honest RP as the attacker (i.e.,  \emph{identity injection}).
@@ -110,7 +110,7 @@ A valid identity token contains the identities (or pseudo-identities) of the aut
 Since the IdP authenticates users and always knows the user's identity (i.e., $ID_U$),
     in order to prevent the IdP-based login tracing,
     we shall not reveal the target RP's permanent identity (i.e., $ID_{RP}$) to the IdP in the login flow.
-So an \emph{ephemeral} pseudo-identity for the RP (i.e., $PID_{RP}$) shall be used in the communications with the IdP:
+So an \emph{ephemeral} pseudo-identity for the RP (i.e., $PID_{RP}$) shall be used in the identity-token request to the IdP:
 (\emph{a}) to ensure RP designation,
      $PID_{RP}$ shall be uniquely associated with the target RP;
     and (\emph{b}) the IdP cannot derive any information about $ID_{RP}$ from any $PID_{RP}^i$,
@@ -126,7 +126,7 @@ A pseudo-identity for the user (i.e., $PID_U$) shall be bound instead:
     which implies $PID_{U,j}$ for different RPs shall be independent of each other;
     (\emph{b}) in multiple login instances to the RP, $PID_U^i$ shall be independent of each other or generated ephemerally,
         to prevent the IdP-based login tracing;\footnote{If $PID_U^i$ is not completely independent of each other,
-         it implies the IdP could link multiple login instances which attempt to visit this RP.}
+         it implies the IdP could link multiple login instances which attempt to visit the RP.}
     and (\emph{c}) to ensure user identification,
     an \emph{ephemeral} $PID_{U}^i$ in each login instance shall facilitate the RP to correlate it
      with the \emph{permanent} account  at this RP (i.e., $Acct$).
