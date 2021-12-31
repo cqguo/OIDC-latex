@@ -22,7 +22,7 @@
 Single sign-on (SSO) systems such as OpenID Connect (OIDC) \cite{OpenIDConnect}, OAuth 2.0 \cite{rfc6749} and SAML \cite{SAML},
  are widely deployed in the Internet for identity management and authentication.
  With the help of SSO,
-  a user logins to a website, referred to as the \emph{relying party} (RP), using his identity registered at another web service,
+  a user logins to a website, referred to as the \emph{relying party} (RP), using his identity registered at another trusted web service,
    known as the \emph{identity provider} (IdP).
 An RP delegates user identification and authentication to the trusted IdP,
     which issues an \emph{identity token} (e.g., id token in OIDC or identity assertion in SAML) for a user to visit the RP after authenticating this user.
@@ -39,13 +39,13 @@ For example, in the widely-used OIDC systems,
      a user sends a login request to the target RP, % (Step 1),
 and the RP constructs an identity-token request with its identity (denoted as $ID_{RP}$ in this paper) and redirects the request to the IdP.
 After authenticating the user,
- the IdP issues an identity token binding the identities of both the user and the RP (i.e., $ID_U$ and $ID_{RP}$),
+ the IdP issues an identity token explicitly binding the identities of both the user and the RP (i.e., $ID_U$ and $ID_{RP}$),
     which is returned to the user and forwarded to the RP. %in Step 5.
 Finally, the RP verifies the identity token to decide whether the user is allowed to login or not.
 
 %However, SSO systems have been continuously found vulnerable and insecure \cite{WangCW12,ccsSunB12,SomorovskyMSKJ12,ArmandoCCCPS13,DiscoveringJCS,dimvaLiM16,WangZLG16,MainkaMS16, MainkaMSW17,YangLCZ18}.
 The wide adoption of SSO raises concerns on user privacy \cite{maler2008venn,NIST2017draft,BrowserID,SPRESSO},
- because SSO facilitates adversaries to track which RPs a user visits.
+ because SSO facilitates curious adversaries to track which RPs a user visits.
 %As shown in Fig. \ref{fig:OpenID},
 In order to issue identity tokens,
 in each login instance
@@ -60,7 +60,7 @@ Meanwhile, the RPs learn users identities from the identity tokens.
       to learn his online profile \cite{maler2008venn}.
 We denote this privacy risk as the {\em RP-based identity linkage}.
 %This threat is usually mitigated by pairwise pseudonymous identifiers (PPIDs) in practice \cite{NIST2017draft,OpenIDConnect, SAMLIdentifier}.
-All existing SSO protocols leak user privacy in different ways,
+Existing SSO protocols leak user privacy in different ways,
  and it is worth noting that
     \emph{these two kinds of privacy threats result from the designs of SSO protocols} \cite{NIST2017draft},
      but not any specific implementations of SSO services.
