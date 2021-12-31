@@ -130,7 +130,7 @@ The details on the Dolev-Yao web model and the detailed security proofs of UPPRE
 
 
 \subsection{Privacy}
-We show that UPPRESSO effectively prevents the attacks of IdP-based login tracing and RP-based identity linkage.
+UPPRESSO effectively prevents the attacks of IdP-based login tracing and RP-based identity linkage.
 
 \vspace{1mm}
 \noindent\textbf{IdP-based Login Tracing.}
@@ -139,9 +139,9 @@ The information accessible to the IdP and derived from the RP's identity,
 Because  (\emph{a}) $t$ is a number randomly chosen from $(1,n)$ by the user and kept secret to the IdP
  and (\emph{b}) $ID_{RP} = [r]G$ and $G$ is the base point (or generator) of $\mathbb{E}$,
  the IdP has to view $PID_{RP}$ as randomly and independently chosen from $\mathbb{E}$,
-    and cannot distinguish $[t]ID_{RP_j} = [tr]G$ from $[t']ID_{RP_{j'}} = [t'r']G$.
+    and cannot distinguish $[t]ID_{RP_j} = [tr]G$ from any $[t']ID_{RP_{j'}} = [t'r']G$.
 So, the IdP cannot derive the RP's identity or link any pair of $PID_{RP}^i$ and $PID_{RP}^{i'}$,
-    and then the IdP-based identity linkage is impossible.
+    and then the IdP-based login tracing is impossible.
 
 \vspace{1mm}
 \noindent\textbf{RP-based Identity Linkage.}
@@ -175,7 +175,7 @@ In the login flow,
     and verifies two signed messages (i.e., $PID_{RP}$ and $H(t)$ in the $PID_{RP}$-registration result,
             and $PID_{RP}$ and $PID_U$ in the identity token).
 After filtering out the redundant information (i.e., $PID_{RP}= [t]{ID_{RP}}$ and $Acct = [t^{-1}]PID_{U}$),
-    the RP actually receives only $(ID_{RP}, t, PID_U)$ in each SSO login instance, where $PID_U = [ID_U][t]{ID_{RP}}$.
+    the RP actually receives $\{ID_{RP}, t, PID_U\}$ in each SSO login instance, where $PID_U = [ID_U][t]{ID_{RP}}$.
 
 % 这个太简单了，不需要图
 %\begin{figure*}
@@ -187,10 +187,10 @@ After filtering out the redundant information (i.e., $PID_{RP}= [t]{ID_{RP}}$ an
 
 
 In the RP-based identity linkage,
-    two RPs bring two triads received in SSO login instances, $(ID_{RP_j}$, $t_j$, $[ID_U][t_j]{ID_{RP_j}})$ and
-    $(ID_{RP_{j'}}$, $t_{j'}$, $[ID_{U'}] [t_{j'}] {ID_{RP_{j'}}})$.
+    two RPs bring two triads received in SSO login instances, $\{ID_{RP_j}$, $t_j$, $[ID_U][t_j]{ID_{RP_j}}\}$ and
+    $\{ID_{RP_{j'}}$, $t_{j'}$, $[ID_{U'}] [t_{j'}] {ID_{RP_{j'}}}\}$.
 We describe the attack as the following game $\mathcal{G}$ between an adversary and a challenger:
-    the adversary receives $(ID_{RP_j}$, $t_j$, $[ID_U][t_j]{ID_{RP_j}}, ID_{RP_{j'}}$, $t_{j'}$, $[ID_{U'}] [t_{j'}] {ID_{RP_{j'}}})$ from the challenger,
+    the adversary receives $\{ID_{RP_j}$, $t_j$, $[ID_U][t_j]{ID_{RP_j}}, ID_{RP_{j'}}$, $t_{j'}$, $[ID_{U'}] [t_{j'}] {ID_{RP_{j'}}}\}$ from the challenger,
      and outputs the result $s$.
 The result is 1, when the adversary guesses that $ID_U = ID_{U'}$;
      otherwise, the adversary thinks they are different users (i.e., $ID_U \neq ID_{U'}$) and $s=0$.
@@ -210,13 +210,13 @@ The successful RP-based identity linkage means
 \end{figure}
 
 We design a PPT algorithm $\mathcal{D}^*$ based on $\mathcal{G}$, shown in Figure \ref{fig:dalgorithm}.
-The input of $\mathcal{D}^*$ is in the form of $(Q_1, Q_2, Q_3, Q_4)$, and each $Q_i$ is a point on $\mathbb{E}$.
+The input of $\mathcal{D}^*$ is in the form of $\{Q_1, Q_2, Q_3, Q_4\}$, and each $Q_i$ is a point on $\mathbb{E}$.
 On receiving the input,
  the challenger of $\mathcal{G}$ randomly chooses $t_j$ and $t_{j'}$ in $(1,n)$,
    % and sets $ID_{RP_j}=Q_1$, $ID_{RP_{j'}}=Q_2$, $PID_{U,j}=[t_j]Q_3$, and $PID_{U',j'}= [t_{j'}] Q_4$.
-    and sends $(Q_1, t_j, [t_j]Q_3, Q_2, t_{j'}, [t_{j'}] Q_4)$ to the adversary.
+    and sends $\{Q_1, t_j, [t_j]Q_3, Q_2, t_{j'}, [t_{j'}] Q_4\}$ to the adversary in $\mathcal{G}$.
 Finally,
-    it directly outputs $s$ from the adversary in $\mathcal{G}$ as the result of $\mathcal{D}^*$.
+    it directly outputs $s$ from $\mathcal{G}$ as the result of $\mathcal{D}^*$.
 
 Let ($P$, $[x]P$, $[y]P$, $[xy]P$) and  ($P$, $[x]P$, $[y]P$, $[z]P$) be two inputs of $\mathcal{D}^*$.
 Thus, we obtain
@@ -240,7 +240,7 @@ Equation \ref{eq:game-succed} is equal to $Pr_c$
 
 
 The adversary has non-negligible advantages in $\mathcal{G}$ means
-    $Pr_c - Pr_{\bar{c}}>\sigma(k)$,
+    $Pr_c - Pr_{\bar{c}}$ is non-negligible,
     and then $\mathcal{D}^*$ significantly distinguishes ($P$, $[x]P$, $[y]P$, $[xy]P$) from  ($P$, $[x]P$, $[y]P$, $[z]P$),
     which violates the ECDDH assumption.
 So the adversary has no advantages in the game,
