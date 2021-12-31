@@ -22,7 +22,7 @@ Meanwhile,
         the honest IdP guarantees that, within its validity period, the $PID_{RP}$ will be registered only once.
 % $PID_{RP}$ will be bound in some identity token.
 An honest RP is ready to accept an identity token binding $PID_{RP}$, only after it receives the signed $PID_{RP}$-registration result.
-Because both $PID_{RP}$ and $H(t)$ in the registration result are checked by the RP and then the registration result $[PID_{RP}, H(t), Validity]_{SK}$ is acceptable to only one honest RP,
+Because (\emph{a}) both $PID_{RP}$ and $H(t)$ in the registration result are checked by the RP and then (\emph{b}) the registration result $[PID_{RP}, H(t), Validity]_{SK}$ is acceptable to only one honest RP,
             the identity token designates only one RP.
 
 \vspace{1mm}
@@ -37,21 +37,18 @@ $t$ and $PID_{RP}$ have been checked by the honest RP in the $PID_{RP}$-registra
     and $PID_U$ is calculated by the honest IdP based on (\emph{a}) the authenticated user, i.e., $ID_U = u$,
             and (\emph{b}) the registered $PID_{RP}$.
 Thus, the calculated account is always exactly the authenticated user's account at the RP (i.e., $[ID_U]ID_{RP}$).
-For example,
-    two malicious users, whose identities are $ID_U = u$ and $ID_{U'} = u'$,
+Two malicious users, whose identities are $ID_U = u$ and $ID_{U'} = u'$,
     could attempt to login to $RP_j$ and $RP_{j'}$, respectively.
 If the generated $t$ and $t'$ happen to satisfy that $PID_{RP} = [t]ID_{RP_j} = [tr]G = [t'r']G = [t']ID_{RP_{j'}}$,
     these collusive users could arbitrarily choose to register either $[PID_{RP}, PEnpt_U, H(t)]$ or $[PID_{RP}, PEnpt_{U'}, H(t')]$ at the IdP,
-        to receive an identity token binding either $PID_U = [u]PID_{RP}$ or $PID_{U'} = [u']PID_{RP}$
-         (and also $PID_{RP}$).\footnote{Such a token designates either $RP_j$ or $RP_{j'}$,
+        to receive an identity token binding $PID_{RP}$ and either $PID_U = [u]PID_{RP}$ or $PID_{U'} = [u']PID_{RP}$.\footnote{Such a token designates either $RP_j$ or $RP_{j'}$,
     but only one honest RP because there is only one acceptable $PID_{RP}$-registration result which is signed by the IdP.
     So RP designation is not violated in this attack case.}
-However,
-    when such a token is signed for $RP_j$, the calculated $Acct$ is $[ur]G$ or $[u'r't't^{-1}]G = [u'r]G$;
-    when it is signed for $RP_{j'}$, $[urtt'^{-1}]G = [ur']G$ or $[u'r']G$ is calculated.
+When such a token is signed for $RP_j$, the calculated $Acct$ is $[ur]G$ or $[u'r't't^{-1}]G = [u'r]G$;
+    or, when it is signed for $RP_{j'}$, $[urtt'^{-1}]G = [ur']G$ or $[u'r']G$ is calculated.
 That is,
         even in this collusive case,
-    the calculated account is still the authenticated user's account at the RP,
+    the calculated account is still the authenticated user's account at the target RP,
     and it does not result in any attack.
 
 
@@ -77,7 +74,7 @@ First of all, the communications among the IdP, RPs and users,
 Meanwhile, the honest IdP sends the identity token only to the authenticated user,
     and this user forwards it to the RP through $Enpt_{RP}$.
 The binding of $Enpt_{RP}$ and $ID_{RP}$ is ensured by the signed RP certificate,
-so only the designated target RP receives this identity token.
+so only the designated target RP receives this token.
 %The detailed process of proof is shown in Appendix.
 
 \vspace{1mm}
@@ -87,7 +84,7 @@ The identity token binds $ID_U$ and $ID_{RP}$
 The integrity is ensured by the IdP's signatures:
  (\emph{a}) the identity token binding $PID_U$ and $PID_{RP}$, is signed by the IdP,
   and (\emph{b}) the relationship between $PID_{RP}$ and $t$ (or collision-free $H(t)$) is also bound
-    in the $PID_{RP}$-registration result.
+    in the signed $PID_{RP}$-registration result.
 Thus,
     $ID_U$ and $ID_{RP}$ are actually bound by the IdP's signatures,
         due to the one-to-one mapping between (\emph{a}) the pair of $ID_U$ and $ID_{RP}$ and (\emph{b}) the triad of $PID_U$, $PID_{RP}$, and $t$.
@@ -103,30 +100,30 @@ We also formally analyze the security properties of UPPRESSO,
 The Dolev-Yao style model abstracts the entities in a web system,
     such as browsers and web servers,
     as {\em atomic processes}, which communicate with each other through {\em events}.
-It also defines {\em script processes} to formulate client-side scripts, i.e.,  JavaScript code,
- so a web system consists of a set of atomic and script processes.
+It also defines {\em script processes} to formulate client-side scripts, i.e.,  JavaScript code.
+ % so a web system consists of a set of atomic and script processes.
 
 The UPPRESSO system contains an IdP process,
     a finite set of web servers for honest RPs, a finite set of honest browsers, and a finite set of attacker processes.
 Here, we consider all RP processes and browser processes are honest,
  while model an RP or a browser controlled by an adversary as atomic attacker processes.
-It also contains {\sf script\_rp}, {\sf script\_idp} and {\sf script\_attacker},
-    where {\sf script\_rp} and {\sf script\_idp} are honest scripts downloaded from an RP process and the IdP process, respectively,
-         and {\sf script\_attacker} denotes a script downloaded by an attacker process that exists in all browser processes.
+It also contains {\sf script\_rp} and {\sf script\_idp},  % and {\sf script\_attacker},
+    where {\sf script\_rp} and {\sf script\_idp} are honest scripts downloaded from an RP process and the IdP process, respectively.
+ %        and {\sf script\_attacker} denotes a script downloaded by an attacker process that exists in all browser processes.
 
 After formulating UPPRESSO by the Dolev-Yao style model,
     we trace the identity token,
-        starting when it is generated and ending when consumed,
+        starting when it is generated and ending when accepted by the RP,
  to ensure that an identity token is not leaked or tampered with.
 We locate the generation of an identity token in UPPRESSO, and trace back to the places
-    where $PID_U$, $PID_{RP}$ and other values enclosed in this token are generated and transmitted,
+    where $PID_U$, $PID_{RP}$ and other parameters enclosed in this token are generated and transmitted,
      to ensure that no adversary is able to retrieve or manipulate them.
 The tracing of identity tokens also confirm no adversary retrieves the token.
 
-Finally,
-    we formally prove that,
-\emph{user identification}, \emph{RP designation}, \emph{confidentiality}, and \emph{integrity} are fulfilled in UPPRESSO.
-The details on the Dolev-Yao web model and the security proofs of UPPRESSO are in the appendix.
+The details on the Dolev-Yao web model and the detailed security proofs of UPPRESSO are in the appendix.
+%Finally,
+%    we formally prove that,
+%\emph{user identification}, \emph{RP designation}, \emph{confidentiality}, and \emph{integrity} are fulfilled in UPPRESSO.
 
 
 
