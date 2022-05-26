@@ -10,20 +10,20 @@ UPPRESSO satisfies the four security requirements of identity tokens in SSO serv
 %while the detailed process of proof is provided in the Appendix.
 % 这个版本，先不管附录。
 
-\vspace{1mm}
-\noindent\textbf{RP Designation.}
-An identity token binding $PID_U$ and $PID_{RP}$,
-    designates the target RP, and only the target RP.
-An honest RP calculates $PID_{RP}$ by itself with the trapdoor $t$ sent from the user,
-    and checks $PID_{RP}$ in the $PID_{RP}$-registration result and the identity token.
-So the target RP will accept this token.
+%\vspace{1mm}
+%\noindent\textbf{RP Designation.}
+%An identity token binding $PID_U$ and $PID_{RP}$,
+%    designates the target RP, and only the target RP.
+%An honest RP calculates $PID_{RP}$ by itself with the trapdoor $t$ sent from the user,
+%    and checks $PID_{RP}$ in the $PID_{RP}$-registration result and the identity token.
+%So the target RP will accept this token.
 
-Meanwhile,
-        the honest IdP guarantees that, within its validity period, the $PID_{RP}$ will be registered only once.
+%Meanwhile,
+%        the honest IdP guarantees that, within its validity period, the $PID_{RP}$ will be registered only once.
 % $PID_{RP}$ will be bound in some identity token.
-An honest RP is ready to accept an identity token binding $PID_{RP}$, only after it receives the signed $PID_{RP}$-registration result.
-Because (\emph{a}) both $PID_{RP}$ and $H(t)$ in the registration result are checked by the RP and then (\emph{b}) the registration result $[PID_{RP}, H(t), Validity]_{SK}$ is acceptable to only one honest RP,
-            the identity token designates only one RP.
+%An honest RP is ready to accept an identity token binding $PID_{RP}$, only after it receives the signed $PID_{RP}$-registration result.
+%Because (\emph{a}) both $PID_{RP}$ and $H(t)$ in the registration result are checked by the RP and then (\emph{b}) the registration result $[PID_{RP}, H(t), Validity]_{SK}$ is acceptable to only one honest RP,
+%            the identity token designates only one RP.
 
 \vspace{1mm}
 \noindent\textbf{User Identification.}
@@ -33,9 +33,8 @@ That is,
  $\mathcal{F}_{Acct}(PID_{U}^i, PID_{RP}^i) = \mathcal{F}_{Acct}(PID_{U}^{i'}, PID_{RP}^{i'}) = [ID_U]ID_{RP}$.
 
 In the calculation of $Acct = [t^{-1}]PID_U = [t^{-1}][u]PID_{RP}$,
-$t$ and $PID_{RP}$ have been checked by the honest RP in the $PID_{RP}$-registration result,
-    and $PID_U$ is calculated by the honest IdP based on (\emph{a}) the authenticated user, i.e., $ID_U = u$,
-            and (\emph{b}) the registered $PID_{RP}$.
+%$t$ and $PID_{RP}$ have been checked by the honest RP in the $PID_{RP}$-registration result,
+$PID_U$ is calculated by the honest IdP based on (\emph{a}) the authenticated user, i.e., $ID_U = u$, and (\emph{b}) the received $PID_{RP}$, while this $PID_{RP}$ is generated based on $ID_{RP}$ and $t$ by the honest RP.
 Thus, the calculated account is always exactly the authenticated user's account at the RP (i.e., $[ID_U]ID_{RP}$).
 Two malicious users, whose identities are $ID_U = u$ and $ID_{U'} = u'$,
     could attempt to login to $RP_j$ and $RP_{j'}$, respectively.
@@ -94,7 +93,7 @@ Thus,
 %The detailed process of proof is shown in Appendix.
 
 \vspace{1mm}
-We also formally analyze the security properties of UPPRESSO,
+We also formally analyze the three security properties of UPPRESSO,
      based on an Dolev-Yao style model of the web infrastructure \cite{SPRESSO},
  which has been used in the formal analysis of SSO protocols such as OAuth 2.0 \cite{FettKS16} and OIDC \cite{FettKS17}.
 The Dolev-Yao style model abstracts the entities in a web system,
@@ -126,7 +125,8 @@ The details on the Dolev-Yao web model and the detailed security proofs of UPPRE
 %\emph{user identification}, \emph{RP designation}, \emph{confidentiality}, and \emph{integrity} are fulfilled in UPPRESSO.
 
 
-
+\vspace{1mm}
+\noindent\textbf{RP Designation.}
 
 
 \subsection{Privacy}

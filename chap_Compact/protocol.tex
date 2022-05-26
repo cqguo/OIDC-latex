@@ -40,7 +40,7 @@ Table \ref{tbl:notations-protocol} lists the notations,
 %    {$T$} & {The trapdoor to derive $Account$: $T=N_U^{-1} \bmod n$.} \\ \hline
     {$Enpt_{RP_j}$} & {The $j$-th RP's endpoint, to receive the identity tokens.} \\ \hline
     {$Cert_{RP_j}$} & {The RP certificate signed by the IdP, binding $ID_{RP_j}$ and $Enpt_{RP_j}$.} \\ \hline
-    {$PEnpt_{U,j}^i$} & {A user-generated random ``pseudo-endpoint'', in the user's $i$-th login instance to the $j$-th RP.} \\ \hline
+%    {$PEnpt_{U,j}^i$} & {A user-generated random "pseudo-endpoint'', in the user's $i$-th login instance to the $j$-th RP.} \\ \hline
     \end{tabular}
     \label{tbl:notations-protocol}
 \end{table}
@@ -197,7 +197,7 @@ So the user agent does not configure anything locally,
 
 \begin{figure*}[!t]
   \centering
-  \includegraphics[height=0.81\textheight]{fig/process-js.pdf}
+  \includegraphics[height=0.7\textheight]{fig/process-js.pdf}
   \caption{The SSO login flow of UPPRESSO.}
   \label{fig:process}
 \end{figure*}
@@ -255,7 +255,9 @@ This is similar to the ones in existing SSO systems.
 \vspace{1mm}
 \noindent\textbf{SSO Login.} An SSO login instance is typically launched through a browser,
 when a user requests to login to an RP.
-It consists of five steps, namely script downloading, RP identity transformation, $PID_{RP}$ registration, identity-token generation, and $Acct$ calculation, as shown in Figure \ref{fig:process}.
+It consists of four steps, namely script downloading, RP identity transformation, 
+%$PID_{RP}$ registration, 
+identity-token generation, and $Acct$ calculation, as shown in Figure \ref{fig:process}.
 In this figure,
     the operations by the IdP are linked by a vertical line,
         so are the RP's operations.
@@ -304,13 +306,14 @@ the RP verifies $1 < t < n$ and calculates $PID_{RP}$.
 %To acknowledge the negotiation of $PID_{RP}$,
 The RP replies with $Cert_{RP}$, which is then transmitted from the RP script to the IdP script.  % through \verb+postMessage+.
 \item[2.3] The IdP script verifies $Cert_{RP}$, extracts $ID_{RP}$ and $Enpt_{RP}$ from $Cert_{RP}$ and calculates $PID_{RP}=[t]{ID_{RP}}$.
-It then creates a random endpoint $PEnpt_{U}$ for this login instance,
-    to receive identity tokens from the IdP.
+%It then creates a random endpoint $PEnpt_{U}$ for this login instance,
+ %   to receive identity tokens from the IdP.
     % as the RP endpoint required by IdP.我们已经修改了协议，IdP并不require什么
 
 \end{itemize}
 
 %It is important to ensure that the RP endpoint is not tampered with by the adversary. In other OIDC systems, the IdP obtains the RP endpoint from RP registration and verifies the endpoint in the identity-token request. However, the IdP in UPPRESSO sees only a one-time endpoint. So, we ask the user to verify the correctness of the RP endpoint using the RP certificate. %which is signed by the IdP.
+\begin{comment}
 \vspace{1mm}
 \noindent{\em 3. ${PID_{RP}}$ Registration.}
 The user dynamically registers an ephemeral $PID_{RP}$ at the IdP.
@@ -351,46 +354,49 @@ otherwise,
                      multiple RPs still share an identical $PID_{RP}$.
 This nonce prevents one $PID_{RP}$-registration result (and also the subsequent identity token)
      from being accepted by different RPs.
+\end{comment}
+
 
 \vspace{1mm}
-\noindent{\em 4. Identity-Token Generation.}
+\noindent{\em 3. Identity-Token Generation.}
 The IdP calculates $PID_U = [ID_U]{PID_{RP}}$ and signs the identity token. % The processes are as follows.
 \begin{itemize}
 
-\item[4.1]
+\item[3.1]
 The IdP script checks that $PID_{RP}$ is the one registered in Step 3.1
             and $Enpt_{RP}$ matches the one in $Cert_{RP}$.
-Then, it replaces $Enpt_{RP}$ with $PEnpt_{U}$ in the identity-token request
-     and sends this modified request to the IdP.
+Then, it %replaces $Enpt_{RP}$ with $PEnpt_{U}$ in the identity-token request and 
+sends this identity-token request to the IdP.
 
-\item[4.2] On receiving an identity-token request,
+\item[3.2] On receiving an identity-token request,
     the IdP authenticates the user if he has not been authenticated yet.
 
-\item [4.3]
+\item [3.3]
 After obtaining the user's authorization to enclose the requested attributes,
-the IdP checks whether the received pair of $PID_{RP}$ and $PEnpt_U$ is in the list of unexpired $PID_{RP}$,
+the IdP checks whether the received $PID_{RP}$ is the valid parameter,
+%pair of $PID_{RP}$ and $PEnpt_U$ is in the list of unexpired $PID_{RP}$,
     and calculates $PID_U = [ID_U]{PID_{RP}}$ for the authenticated user.
 The IdP then signs an identity token $[PID_{RP}, PID_U, Issuer, Validity, Attr]_{SK}$,
  where $Issuer$ is the IdP's identity, $Validity$ indicates the validity period, and $Attr$ contains the requested attributes.
 
-\item[4.4] The IdP sends the identity token to $PEnpt_{U}$.
+\item[3.4] The IdP sends the identity token to $PEnpt_{U}$.
 
 \end{itemize}
 
 \vspace{1mm}
-\noindent{\em 5. $Acct$ Calculation.}
+\noindent{\em 4. $Acct$ Calculation.}
 The RP verifies the identity token and allows the user to login.
 \begin{itemize}
 %\setlength{\itemsep}{0pt plus 1pt}
 
-\item [5.1]
+\item [4.1]
 The IdP script forwards this token to the RP script,
     which then sends it to the RP through $Enpt_{RP}$.
-\item[5.2] The RP verifies the identity token, including the IdP's signature and its validity period.
+\item[4.2] The RP verifies the identity token, including the IdP's signature and its validity period.
 It also verifies $PID_{RP}$ in the token is consistent with the one negotiated in Step 2.2.
 Then, the RP extracts $PID_U$, and calculates $Acct = [t^{-1}]{PID_U}$.
 
-\item [5.3] The RP returns the login result, and allows the user to login as $Acct$.
+\item [4.3] The RP returns the login result, and allows the user to login as $Acct$.
 
 \end{itemize}
 
@@ -399,10 +405,12 @@ If any verification or check fails in some step,
  the flow will be halted immediately.
 For example, the user halts the flow
     if $Cert_{RP}$ is invalid. % or $PID_{RP}$ in the identity-token request is inconsistent with the negotiated one.
-The IdP rejects a $PID_{RP}$-registration request,
-    if there is any unexpired but identical $PID_{RP}$ in the list,
-    and the RP rejects identity tokens until it accepts a $PID_{RP}$-registration result.
-The IdP rejects an identity-token request, if the pair of $PID_{RP}$ and $PEnpt_U$ is not in the unexpired list.
+%The IdP rejects a $PID_{RP}$-registration request,
+%    if there is any unexpired but identical $PID_{RP}$ in the list,
+%    and
+
+%The RP rejects identity tokens until it accepts a $PID_{RP}$-registration result.
+The IdP rejects an identity-token request, if the received $PID_{RP}$ is not the valid point on $\mathbb{E}$.
 Or, the RP rejects an identity token
     if $PID_{RP}$ in the token does not match the negotiated one.
 
@@ -557,22 +565,22 @@ The RP verifies the identity token, including the signature, validity period, an
 % 这句话前面已经说过了
 
 
-Among the five steps of the SSO login flow in UPPRESSO,
+Among the four steps of the SSO login flow in UPPRESSO,
     the script downloading prepares the user agent.
 The user agent of SSO is responsible for the communications between the IdP and the RP,
     which are implemented by browser redirections in OIDC.
-On the other hand, in UPPRESSO
-    when sending the identity-token request,
-        the script replaces $Enpt_{RP}$ with $PEnpt_{U}$,
-    and then
-            the script forwards the identity token to $Enpt_{RP}$ which is extracted from the RP certificate.
+On the other hand, in UPPRESSO the script hides the $Enpt_{RP}$ from IdP,
+%in UPPRESSO
+ %   when sending the identity-token request,
+  %      the script replaces $Enpt_{RP}$ with $PEnpt_{U}$,
+    and then it forwards the identity token to $Enpt_{RP}$ which is extracted from the RP certificate, that avoids the identity token being sent to an adversary.
 
 In the step of RP identity transformation, most operations are conducted by the user agent,
  while the RP only receives $t$ to calculate $PID_{RP}$ and sends $Cert_{RP}$.
-The operations in the $PID_{RP}$ registration are almost identical to those in the RP Dynamic Registration of OIDC \cite{DynamicRegistration},
-    except that
-    in OIDC the IdP assigns the RP's identity  while in UPPRESSO this (pseudo-)identity is generated by the registered entity.
-Besides, the $PID_{RP}$ registration has a validity period.
+%The operations in the $PID_{RP}$ registration are almost identical to those in the RP Dynamic Registration of OIDC \cite{DynamicRegistration},
+   % except that
+   % in OIDC the IdP assigns the RP's identity  while in UPPRESSO this (pseudo-)identity is generated by the registered entity.
+%Besides, the $PID_{RP}$ registration has a validity period.
 
 The operations of identity-token generation and $Acct$ calculation,
     are actually identical to those in the implicit login flow of OIDC \cite{OpenIDConnect},

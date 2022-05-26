@@ -212,7 +212,7 @@ An atomic process is a tuple $p=$ $(I^p, Z^p, R^p,z_0^p )$, containing the addre
 \vspace{1mm}\noindent\textbf{IdP Server Process}.
 The state of IdP process is described as the formatted term,
 \begin{multline*}
-\ \ \ \ \ \ \ \ \ \langle Issuer, SK, SessionList, UserList, \\RPList, Validity,  TokenList \rangle \ \ \ \ \ \ \ \ \
+\langle Issuer, SK, SessionList, UserList, Validity,  TokenList \rangle
 \end{multline*}
 That is,  the state of an IdP server  at the point in time can be sketched using these attributes.
 %Other data stored at IdP but not used during SSO authentication are not mentioned here.
@@ -222,7 +222,7 @@ That is,  the state of an IdP server  at the point in time can be sketched using
 \item \myss{SK} is the private key used by IdP to generate signatures.
 \item \myss{SessionList} is the term in the form of \myss{\myangle{\myangle{cookie, session}}}, the cookie uniquely identifies the session storing the  browser uploaded messages.
 \item \myss{UserList} is the set of user's information, including  \myss{ID_U}  and other attributes.
-\item \myss{RPList} is the set of registered RP information which consists of ID of RP \myss{(PID_{RP})}, \myss{Enpt}  and \myss{Validity}.
+%\item \myss{RPList} is the set of registered RP information which consists of ID of RP \myss{(PID_{RP})}, \myss{Enpt}  and \myss{Validity}.
 \item \myss{Validity} is the validity for IdP generated signatures.
 \item \myss{TokenList} is the set of IdP generated Identity tokens.
 \end{itemize}
@@ -230,8 +230,8 @@ We also define the \myss{functions} in the relations.
 \begin{itemize}
 \item \myss{\mathtt{CredentialVerify(credential)}} returns the authentication result of a user.
 \item \myss{\mathtt{UIDOfUser(credential)}} returns the $ID_U$ of a user.
-\item \myss{\mathtt{ListOfPID()}} returns the set of $PID_{RP}$s of the registered RPs in the valid period.
-\item \myss{\mathtt{EnptOfRP(PID_{RP})}} returns the endpoint bound with this $PID_{RP}$ at IdP.
+%\item \myss{\mathtt{ListOfPID()}} returns the set of $PID_{RP}$s of the registered RPs in the valid period.
+%\item \myss{\mathtt{EnptOfRP(PID_{RP})}} returns the endpoint bound with this $PID_{RP}$ at IdP.
 %\item \myss{\mathtt{ModPow(a, b, c)}} is the result of \myss{a^b \mod c}.
 \item \myss{\mathtt{Multiply(P, a)}} returns the result of \myss{[a]P}, where $P$ is a point on the elliptic curve and $a$ is an integer.
 \item \myss{\mathtt{CurrentTime()}} returns the current system time.
@@ -373,10 +373,10 @@ The relation of IdP script process $script\_idp$ is shown as Relation~\ref{alg3}
 \begin{itemize}
  \item \myss{\mathtt{PARENTWINDOW}(tree,docID)}. The first parameter is the input relation tree defined before, and the second parameter is the ID of a document. It returns the current window's opener's $winID$ (null if it doesn't exist nor it is invisible to this document).
   \item \myss{\mathtt{CHOOSEINPUT}(inputs,pattern)}. The first parameter is a set of script inputs, and the second parameter is a pattern. The result returned by the function is the input in \myss{inputs} matching the \myss{pattern}.
-  \item \myss{\mathtt{RandomUrl}()} returns a newly generated host string.
+%  \item \myss{\mathtt{RandomUrl}()} returns a newly generated host string.
     \item \myss{\mathtt{CredentialofUser}(user,secret)} returns the user's credential for authentication.
 \end{itemize}
-Among the functions, only the generation of random url is implemented dependently by the script.
+%Among the functions, only the generation of random url is implemented dependently by the script.
 The retrieval of the parent window (the opener) is implemented by the browser, and it can be easily invoked in the script by using the browser-provided API.
 The \myss{\mathtt{CHOOSEINPUT}} function is conducted by the browser and transparent to the script developer. 
 For example, while the browser receives the HTTP response from the browser, it would decide witch callback function is invoked. 
