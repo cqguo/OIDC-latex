@@ -12,7 +12,7 @@ Then,
 \label{subsec:basicrequirements}
 %A dedicated, the bidirectional authenticated secure channel was proposed to improve the confidentiality and integrity of identity token \cite{CaoSBKVC14}.
 
-The primary goal of non-anonymous SSO services is secure user authentication \cite{SPRESSO},
+The primary goal of non-anonymous SSO services is secure user authentication and identification \cite{SPRESSO},
  to ensure that a \emph{legitimate} user can always login to an \emph{honest} RP as his permanent identity at this RP, %correlating multiple login instances,
     by presenting the \emph{identity tokens} issued by the \emph{honest} IdP.
 
@@ -28,12 +28,12 @@ The RP allows the token holder to login as the user identity (or pseudo-identity
 
 The SSO login flow implies \emph{confidentiality} and \emph{integrity} of identity tokens.
 An identity token shall be forwarded by the authenticated user to the target RP only,
-    not leaked to adversaries;
+    not leaked to any other parties;
         otherwise, an adversary who presents the token, would successfully login to this honest RP.
 Integrity is necessary,
-    to prevent adversaries from tampering with an identity token,
-        without being detected by the RPs.
-So identity tokens are signed by the IdP and usually transmitted over HTTPS.
+    to prevent adversaries from tampering with an identity token.
+   %     without being detected by the RPs.
+So identity tokens are signed by the IdP and usually transmitted over HTTPS \cite{OpenIDConnect,rfc6749,SAML}.
 
 These four security requirements (i.e., RP designation, user identification, confidentiality, and integrity) of SSO identity tokens
      have been discussed \cite{ArmandoCCCT08,FettKS16, FettKS17},
@@ -115,13 +115,13 @@ So an \emph{ephemeral} pseudo-identity for the RP (i.e., $PID_{RP}$) shall be us
      $PID_{RP}$ shall be uniquely associated with the target RP;
     and (\emph{b}) the IdP cannot derive any information about $ID_{RP}$ from any $PID_{RP}^i$,
         which implies $PID_{RP}^i$ in multiple login instances shall
-         be independent of each other.\footnote{Even when the target RP is kept unknown to the IdP,
+         be independent of each other.\footnote{While the target RP is kept unknown to the IdP,
             the IdP shall not link multiple login instances which attempt to visit this RP.}
    % the IdP-based login tracing is still effective, to correlate a user's multiple login instances.
 
 Next, in order to prevent the RP-based identity linkage,
  the IdP shall not directly enclose $ID_U$ in identity tokens.
-A pseudo-identity for the user (i.e., $PID_U$) shall be bound instead:
+A user pseudo-identity (i.e., $PID_U$) shall be bound instead:
     (\emph{a}) the RP cannot derive any information about $ID_U$ from any $PID_{U,j}$,
     which implies $PID_{U,j}$ for different RPs shall be independent of each other;
     (\emph{b}) in multiple login instances to the RP, $PID_U^i$ shall be independent of each other or generated ephemerally,
@@ -129,7 +129,7 @@ A pseudo-identity for the user (i.e., $PID_U$) shall be bound instead:
          it implies the IdP could link multiple login instances which attempt to visit the RP.}
     and (\emph{c}) to ensure user identification,
     an \emph{ephemeral} $PID_{U}^i$ in each login instance shall facilitate the RP to correlate it
-     with the \emph{permanent} account  at this RP (i.e., $Acct$).
+     with the \emph{permanent} account  (i.e., $Acct$) at this RP.
 
 
 Give a user,
@@ -186,7 +186,7 @@ From the RP's view,
     $\mathcal{F}_{PID_U}()$ is a one-way function and the calculated $PID_{U}$ appears a random variable.
 \item
 $\mathcal{F}_{Acct}(PID_{U}, PID_{RP}) = Acct$, calculated by the RP.
-Given $ID_U$ and $ID_{RP}$, $Acct$ keeps unchanged and unique to other accounts at this RP;
+Given $ID_U$ and $ID_{RP}$, $Acct$ keeps permanent and unique to other accounts at this RP;
     i.e., in the user's any $i$-th and $i'$-th ($i \neq i'$) login instances to the RP,
  $\mathcal{F}_{Acct}(PID_{U}^i, PID_{RP}^i) = \mathcal{F}_{Acct}(PID_{U}^{i'}, PID_{RP}^{i'})$.
 \end{itemize}
@@ -205,9 +205,10 @@ Finally, after verifying the designated RP pseudo-identity in the token,
 
 The identity-transformation functions
         satisfy the privacy requirements,
-    while the authentication steps are still kept independent of the ``pure'' SSO protocol.
-In particular, after the identity-transformation functions are integrated in an SSO system,
-    the steps dealing with identity tokens do not involve any user credentials,
+    while the authentication between users and the IdP is still
+    kept independent of the steps involving identity tokens.
+After the identity-transformation functions are integrated in an SSO system,
+    the steps dealing with identity tokens work compatibly with any type of user credentials (e.g., password, one-time password, multi-factor authentication, and smart card),
         as those in the commonly-used SSO protocols \cite{OpenIDConnect,rfc6749,SAML}.
 
 \begin{comment}
