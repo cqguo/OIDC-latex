@@ -525,41 +525,53 @@ So we only need to prove that an attacker cannot retrieve an identity token from
 %\item
 
 The attacker cannot obtain the identity token from an honest RP server.
-We check all the messages sent by the RP server at Line 4, 7, 19, 25, 31, 36, 45, 55, 61, 66, 74, 84 in Relation~\ref{alg2}.
+We check all the messages sent by the RP server at Line 4, 7, 18, 24, 29, 36, 46 in Relation~\ref{alg2}.
 The RP server does not send any token to other processes.
 
 %\item
 
 The attacker cannot obtain the identity token from the RP script.
-Messages sent by the RP script are classified into two classes. 1) The messages at Line 18, 36, 56 in Relation~\ref{alg4}  are sent to the RPDomain which is set at Line 4, so that attackers cannot receive these messages. 2) The messages at Line 26,  46 only carry the contents received from the RP server,
+Messages sent by the RP script are classified into two classes. 1) The messages at Line 18, 36, 40 in Relation~\ref{alg4} are sent to the $RPDomain$, while the value of $RPDomain$ is set at Line 4, so that attackers cannot receive these messages. 2) The \verb+postMessage+ message at Line 26 only carries the content received from the RP server,
  and we have proved that the RP server does not send any token.
 Therefore, attackers cannot receive the token from the RP script.
 
 %\item
 
 Attacker cannot obtain the identity token from the IdP server.
-Among the messages at Line 4, 11, 15, 22, 25, 35, 43, 50, 66 in Relation~\ref{alg1}, only the message at Line 66 carries the token.
-This token is generated at Line 64, following the trace of the \myss{Content} at Line 62, the \myss{PID_U} at Line 60, the \myss{ID_U} at Line 59, the \myss{session} at Line 47, and finally the \myss{cookie} at Line 46. That is, the receiver of token must be the owner of the \myss{cookie} in which session that saves the parameter \myss{ID_U}. The \myss{ID_U} is set at Line 14 after verifying the credential and will never be modified.
+Among the messages at Line 4, 11, 15, 22, 25, 32, 37, 47 in Relation~\ref{alg1}, only the message at Line 47 carries the token.
+This token is generated at Line 45, following the trace of the \myss{Content} at Line 43, the \myss{PID_U} at Line 41, the \myss{ID_U} at Line 40, the \myss{session} at Line 29, and finally the \myss{cookie} at Line 28. That is, the receiver of token must be the owner of the \myss{cookie} in which session that saves the parameter \myss{ID_U}. The \myss{ID_U} is set at Line 14 after verifying the credential and will never be modified.
 As we assume that user credential cannot be known to attackers,
 attackers cannot obtain the identity token from the IdP server.
 
 %\item
 
 The attacker cannot obtain the identity token from the IdP script.
-As the proof provided above, only the IdP sends the token with the message at Line 66 in Relation~\ref{alg1},
-and the IdP script only receives the token at  Line 99 in Relation~\ref{alg3}.
-Here we are going to prove that the token issued for user $u$'s login to RP $r$ (denoted as \myss{t(u,r)}) can only be  sent to the corresponding RP server through the IdP script. The receiver of \myss{t(u,r)} is restricted by the \myss{RPOrigin} at Line 100, which is set at Line 55.
-    The host in the \myss{RPOrigin} is verified using the one included in \myss{Cert} at Line 51.
-    If the \myss{Cert} belong to \myss{r}, the attacker cannot obtain the \myss{t(u,r)}.
-    Now we give the proof that the \myss{Cert} belongs to \myss{r}. Firstly we define the negotiated \myss{PID_{RP}} in \myss{t(u,r)} as \myss{p}.
-    That is the \myss{PID_{RP}} at Line 69 in Relation~\ref{alg2}  must equal to \myss{p} and the \myss{PID_{RP}} is verified at Line 44 with the \myss{RegistrationToken}.
-This verification cannot be bypassed due to the state check at Line 60.
-At the same validity period, the IdP script needs to send the registration request with same \myss{p}  and receive the successful $PID_{RP}$-registration result.
-As the honest IdP checks the uniqueness of \myss{PID_{RP}} at  Line 31 in Relation~\ref{alg1}.
-The \myss{r} and IdP script must share the same \myss{RegistrationToken}. As the \myss{RegistrationToken} contains \myss{\mathtt{Hash}(t)},
-    the IdP script and \myss{r} must share the same \myss{ID_{RP}}.
-    Therefore, the  \myss{Cert} saved as the IdP scriptstate parameter must belong to \myss{r}.
-Thus, the identity token would only be sent to the script in the corresponding RP's origin.
+As the proof provided above, only the IdP sends the token with the message at Line 47 in Relation~\ref{alg1},
+and the IdP script only receives the token at Line 62 in Relation~\ref{alg3}.
+According to the RP designation, a $PID_{RP}$ is uniquely mapping with an RP (i.e., the $ID_{RP}$).
+And the $ID_{RP}$ is uniquely mapping with an $RPDomain$, which is guaranteed by the IdP's signature.
+The receiver of token is restricted by the \myss{RPOrigin} at Line 64, while the value of $RPDomain$ is set at Line 63 according to the $Cert$.
+Thus, an identity token can be only sent to the targeting RP, while the IdP script can verify the mapping between $PID_{RP}$ and $RPDomain$.
+
+
+%Here we are going to prove that the token issued for user $u$'s login to RP $r$ (denoted as \myss{t(u,r)}) can only be sent to the targeting RP server through the IdP script. The receiver of \myss{t(u,r)} is restricted by the \myss{RPOrigin} at Line 64, while the value of $RPDomain$ is set at Line 63 according to the $Cert$.
+%    The value of \myss{Cert} is set at 19 and the signature is verified at Line 16.
+%    If the \myss{Cert} belong to \myss{r}, the attacker cannot obtain the \myss{t(u,r)}.
+%    According to the RP designation, a $PID_{RP}$ is uniquely mapping with an RP (i.e., the $ID_{RP}$).
+	
+ %   Thus, while the 
+   % Now we give the proof that the \myss{Cert} belongs to \myss{r}. 
+    
+    %Firstly we define the negotiated \myss{PID_{RP}} in \myss{t(u,r)} as \myss{p}.
+    
+%    That is the \myss{PID_{RP}} at Line 69 in Relation~\ref{alg2}  must equal to \myss{p} and the \myss{PID_{RP}} is verified at Line 44 with the \myss{RegistrationToken}.
+%This verification cannot be bypassed due to the state check at Line 60.
+%At the same validity period, the IdP script needs to send the registration request with same \myss{p}  and receive the successful $PID_{RP}$-registration result.
+%As the honest IdP checks the uniqueness of \myss{PID_{RP}} at  Line 31 in Relation~\ref{alg1}.
+%The \myss{r} and IdP script must share the same \myss{RegistrationToken}. As the \myss{RegistrationToken} contains \myss{\mathtt{Hash}(t)},
+%    the IdP script and \myss{r} must share the same \myss{ID_{RP}}.
+%    Therefore, the  \myss{Cert} saved as the IdP scriptstate parameter must belong to \myss{r}.
+%Thus, the identity token would only be sent to the script in the corresponding RP's origin.
 
 %\end{itemize}
 Therefore, attackers cannot learn any valid identity tokens and this lemma is proved.
@@ -573,23 +585,23 @@ Therefore, attackers cannot learn any valid identity tokens and this lemma is pr
 \label{lemma:RPdesignation}
 \end{lemma}
 \begin{proof}
-An RP server finally accepts an token at Line 77 in Relation~\ref{alg2}, after the verification of $PID_U$ at Line 73.
-If such a token is accepted, the $PID_{RP}$ must be equal to the stored one retrieved at Line 69 and verified at Line 44 in Relation~\ref{alg2}.
-The stored $PID_{RP}$ is included in the registration result verified at Line 43 in Relation~\ref{alg2}, received from the IdP server indirectly.
-Thus, the $PID_{RP}$ is only valid at the RP received the corresponding registration result.
+%An RP server finally accepts an token at Line 77 in Relation~\ref{alg2}, after the verification of $PID_U$ at Line 73.
+%If such a token is accepted, the $PID_{RP}$ must be equal to the stored one retrieved at Line 69 and verified at Line 44 in Relation~\ref{alg2}.
+%The stored $PID_{RP}$ is included in the registration result verified at Line 43 in Relation~\ref{alg2}, received from the IdP server indirectly.
+%Thus, the $PID_{RP}$ is only valid at the RP received the corresponding registration result.
 
-Moreover, this registration result is generated at Line 40 in Relation~\ref{alg1}
-     and protected by the signature generated at Line 41.
-According to the verification at 31 in Relation~\ref{alg1}, the $PID_{RP}$ is unique during the validity period,
-    so that no other registration results containing this $PID_{RP}$ exists.
-Moreover, according to Line 42, 44 (the $t$ used at Line 42 is set  at  Line 15, used for generating $PID_{RP}$ at Line 13),
-    the $PID_{RP}$ must be designated for this RP, as no other RP cannot generate the same $PID_{RP}$ with this $t$.
-So only one RP is able to achieve the corresponding registration result of an $PID_{RP}$.
+%Moreover, this registration result is generated at Line 40 in Relation~\ref{alg1}
+%     and protected by the signature generated at Line 41.
+%According to the verification at 31 in Relation~\ref{alg1}, the $PID_{RP}$ is unique during the validity period,
+%    so that no other registration results containing this $PID_{RP}$ exists.
+%Moreover, according to Line 42, 44 (the $t$ used at Line 42 is set  at  Line 15, used for generating $PID_{RP}$ at Line 13),
+%    the $PID_{RP}$ must be designated for this RP, as no other RP cannot generate the same $PID_{RP}$ with this $t$.
+%So only one RP is able to achieve the corresponding registration result of an $PID_{RP}$.
 
-Based on the reasons above evidences, (1) the $PID_{RP}$ is only valid at the RP received the corresponding registration result, and (2) only one RP is able to achieve the corresponding registration result of an $PID_{RP}$.
-Thus,
-    the $PID_{RP}$ is only valid at one specific RP,
-        and this lemma is proved.
+%Based on the reasons above evidences, (1) the $PID_{RP}$ is only valid at the RP received the corresponding registration result, and (2) only one RP is able to achieve the corresponding registration result of an $PID_{RP}$.
+%Thus,
+%    the $PID_{RP}$ is only valid at one specific RP,
+%        and this lemma is proved.
 %As it has been proved at Lemma~\ref{lemma:confidentiality}, an malicious RP cannot receive the valid token issued for another RP, therefore, the adversary would not receive the token including an honest RP's $PID_{RP}$ from honest user.
 \end{proof}
 
@@ -601,22 +613,27 @@ Thus,
 \end{lemma}
 \begin{proof}
 %The IdP-issued tokens include the \myss{Cert} used in \myss{script\_idp}, the \myss{RegistrationResult} and \myss{Token} used in \myss{P^r} .
-The $Acct$ derived from the identity token by an RP, is generated based on the $t^{-1}$ according to Line 79 in Relation~\ref{alg2}.
-The integrity of $t^{-1}$ is protected by the IdP issued registration result, according to Line 41-44 in Relation~\ref{alg2}.
-The integrity of $ID_{RP}$ finally contained in the derived $Acct$ is protected by $Cert$, according to Line 15-21, Relation~\ref{alg3}.
-Thus, here we would prove the integrity of identity token, RP $Cert$ and registration result.
-We can easily find that the IdP does not send the private key to any processes so that the attackers cannot obtain the private key. Then we only need to prove that all the proofs are well verified as below.
-\begin{itemize}
-\setlength\itemsep{-2pt}
-\item \myss{Cert} is used at Line 21, 52 in Relation~\ref{alg3}. At Line 21, the \myss{Cert} has already been verified at Line 16. At Line 52, the \myss{Cert} is picked from the state parameters, and the cert parameter is set at Line 19.  At Line 19, the \myss{Cert} has already been verified at Line 16.
-At Line 16 the \myss{Cert} is verified with the public key in the scriptstate,
-    where the key is considered initially honest and the key is not modified in Relation~\ref{alg3}.
-Therefore, \myss{Cert} cannot be forged or modified.
-\item \myss{RegistrationResult} is used in Relation~\ref{alg2} from Line 35 to 55, which is verified at Line 30.
-The IdP's public key is initially set in the RP and never modified.
-Therefore, \myss{RegistrationResult} cannot be forged or modified.
-\item \myss{Token} is used in Relation~\ref{alg2} from Line 69 to 84 after Line 65 where it is verified.  As proved before, the public key is honestly set and never modified. Therefore, \myss{Token} cannot be forged or modified.
-\end{itemize}
+The $Acct$ derived from the identity token by an RP, is generated based on the $PID_U$ in identity proof and $t^{-1}$ assigned at Line 40 in Relation~\ref{alg2}.
+According to RP designation, the $t$ is uniquely mapping the targeting RP.
+%The integrity of $t^{-1}$ is protected by the IdP issued registration result, according to Line 41-44 in Relation~\ref{alg2}.
+The integrity of $PID_{U}$ is guaranteed by the signature contained in the identity token. 
+%The integrity of $ID_{RP}$ finally contained in the derived $Acct$ is protected by $Cert$, according to Line 15-21, Relation~\ref{alg3}.
+Thus, here we would prove the integrity of identity token.%, RP $Cert$ and registration result.
+We can easily find that the IdP does not send the private key to any processes so that the attackers cannot obtain the private key. Then we only need to prove that the identity token is well signed and verified.
+%all the proofs are well verified as below.
+%\begin{itemize}
+%\setlength\itemsep{-2pt}
+%\item \myss{Cert} is used at Line 21, 52 in Relation~\ref{alg3}. At Line 21, the \myss{Cert} has already been verified at Line 16. At Line 52, the \myss{Cert} is picked from the state parameters, and the cert parameter is set at Line 19.  At Line 19, the \myss{Cert} has already been verified at Line 16.
+%At Line 16 the \myss{Cert} is verified with the public key in the scriptstate,
+%    where the key is considered initially honest and the key is not modified in Relation~\ref{alg3}.
+%Therefore, \myss{Cert} cannot be forged or modified.
+%\item \myss{RegistrationResult} is used in Relation~\ref{alg2} from Line 35 to 55, which is verified at Line 30.
+%The IdP's public key is initially set in the RP and never modified.
+%Therefore, \myss{RegistrationResult} cannot be forged or modified.
+%\item 
+\myss{Token} is used in Relation~\ref{alg2} from Line 34 to 39 after Line 28 where it is verified.  As proved before, the public key is honestly set and never modified. Therefore, \myss{Token} cannot be forged or modified.
+%\end{itemize}
+Moreover, an adversary may try to control the $ID_{RP}$ to generate the malicious $PID_{RP}$ and $PID_U$ to break the integrity indirectly, however, the proof of confidentiality has proved it's impossible.
 Therefore, this lemma is proved.
 \end{proof}
 
@@ -628,11 +645,11 @@ Therefore, this lemma is proved.
 \label{lemma:userIdentification}
 \end{lemma}
 \begin{proof}
-The RP accepts the user's identity at Line 83 in Relation~\ref{alg2}.
-And the identity is generated at Line 79, based on the $PID_U$  retrieved from the token and the trapdoor $t^{-1}$.
+The RP accepts the user's identity at Line 45 in Relation~\ref{alg2}.
+And the identity is generated at Line 41, based on the $PID_U$ retrieved from the token and the trapdoor $t^{-1}$.
 The $t^{-1}$ is generated at Line 14, set at Line 17, and never changed, as the multiplicative inverse of $t$.
 According to Lemma~\ref{lemma:integrity}, only the IdP generates an acceptable identity token,
- so that the token must be issued at Line 64 in Relation~\ref{alg1}.
+ so that the token must be issued at Line 45 in Relation~\ref{alg1}.
 The IdP generates the $PID_U$ based on the $PID_{RP}$ and user's $ID_U$.
 According to Lemma~\ref{lemma:RPdesignation},
      if the $PID_{RP}$ is accepted by an RP, the $PID_{RP}$ must be the generated between the RP and the user.
@@ -985,7 +1002,7 @@ The detailed procedure of dealing with these events is shown as follows.
       \mystate{\myss{input := \mathtt{CHOOSEINPUT}(scriptinputs,pattern) }}
       \myif{input \not\equiv \mathtt{null}}
       \mystate{\myss{Token := input.Body[Token]}}
-      \mystate{\myss{RPOringin := \myangle{s'.Parameters[Enpt_{RP}], \mathtt{S}}}}
+      \mystate{\myss{RPOringin := \myangle{s'.Parameters[Cert].Content.Enpt, \mathtt{S}}}}
       \mystate{\myss{command := \myangle{\mathtt{POSTMESSAGE},target,\myangle{Token,Token},RPOrigin}}}
       \mystate{\myss{s .phase := stop}}
      \ENDIF
