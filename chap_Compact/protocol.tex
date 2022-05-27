@@ -32,7 +32,7 @@ Table \ref{tbl:notations-protocol} lists the notations,
 %    {$n$} & {the order of the base point $G$.} \\ \hline
     {$ID_U$} & {$ID_U = u$, $1 < u < n$; the user's unique identity at the IdP.} \\ \hline
    {$ID_{RP_j}$} & {$ID_{RP} = [r]G$, $1 < r < n$; the $j$-th RP's unique identity.} \\ \hline
-    {$t$} & {The user-generated random number in a login instance, $1 < t < n$.} \\ \hline
+    {$t$} & {The user-generated random integer number in a login instance, $1 < t < n$.} \\ \hline
     {$PID_{RP_j}^i$} & {$PID_{RP} = [t]{ID_{RP}} = [tr]G$; the $j$-th RP's pseudo-identity, in the user's $i$-th login instance to this RP.} \\ \hline
     {$PID_{U,j}^i$} & {$PID_U = [{ID_U}]{PID_{RP}} = [utr]G$; the user's pseudo-identity, in the user's $i$-th login instance to the $j$-th RP.} \\ \hline
      {$Acct_j$} & {$Acct = [t^{-1}\bmod n]PID_{U} = [ID_U]ID_{RP} = [ur]G$; the user's account at the $j$-th RP.} \\ \hline
@@ -124,7 +124,7 @@ From Equations \ref{equ:PIDRP}, \ref{equ:PIDU} and \ref{equ:Account}, it is deri
    \label{equ:AccountNotChanged}
 \end{equation*}
 
-The RP obtains the identical permanent account from different identity tokens in multiple login instances,
+The RP derives the identical permanent account from different identity tokens in multiple login instances,
     with the help of $t$ from the user.
 Given a user, the accounts at different RPs are inherently unique.
 Moreover,
@@ -149,7 +149,7 @@ Therefore, it prevents IdP-based login tracing.
 
 
 
-\subsection{The Design Specific for Web Applications}
+\subsection{The Designs for Web Applications}
 We further propose the designs specific for web applications,
 and these designs enable UPPRESSO to provide SSO services for users with commercial-off-the-shelf (COTS) browsers.
 More efficient but less portable implementations with browser extensions %and/or plug-ins
@@ -161,7 +161,7 @@ First of all, in the SSO login flow,
     the user has to deal with RP endpoints (i.e., the URLs to receive identity tokens) by himself.
 In existing SSO protocols,
     an RP initially registers its endpoint at the IdP,
-        and then in each login instance, the IdP will set the endpoint in the identity-token response.
+        and then in each login instance, the IdP will set this endpoint in the identity-token response.
 This instructs the user browser to forward it correctly;
     otherwise, confidentiality of identity tokens might be broken.
 
@@ -184,7 +184,7 @@ The RP script maintains the communications with the RP,
             will automatically carry an HTTP \verb+Referer+ header, which discloses the RP's domain.
 The IdP script downloaded from the IdP,
     is responsible for the communications with the IdP,
-    and two scripts communicates with each other through the standard \verb+postMessage+ HTML5 API.
+    and two scripts communicates with each other within the user browser through the standard \verb+postMessage+ HTML5 API.
 
 
 The IdP's public key is downloaded in the IdP script to verify RP certificates. %, which are sent from the RP.
@@ -254,9 +254,9 @@ This is similar to the ones in existing SSO systems.
 
 \vspace{1mm}
 \noindent\textbf{SSO Login.} An SSO login instance is typically launched through a browser,
-when a user requests to login to an RP.
-It consists of four steps, namely script downloading, RP identity transformation, 
-%$PID_{RP}$ registration, 
+when a user attempts to login to an RP.
+It consists of four steps, namely script downloading, RP identity transformation,
+%$PID_{RP}$ registration,
 identity-token generation, and $Acct$ calculation, as shown in Figure \ref{fig:process}.
 In this figure,
     the operations by the IdP are linked by a vertical line,
@@ -365,7 +365,7 @@ The IdP calculates $PID_U = [ID_U]{PID_{RP}}$ and signs the identity token. % Th
 \item[3.1]
 The IdP script checks that $PID_{RP}$ is the one registered in Step 3.1
             and $Enpt_{RP}$ matches the one in $Cert_{RP}$.
-Then, it %replaces $Enpt_{RP}$ with $PEnpt_{U}$ in the identity-token request and 
+Then, it %replaces $Enpt_{RP}$ with $PEnpt_{U}$ in the identity-token request and
 sends this identity-token request to the IdP.
 
 \item[3.2] On receiving an identity-token request,
