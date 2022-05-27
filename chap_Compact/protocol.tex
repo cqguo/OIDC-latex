@@ -253,7 +253,7 @@ This is similar to the ones in existing SSO systems.
 %$ID_U$ can be chosen by the user or the IdP, as long as it is unique for each user.
 
 \vspace{1mm}
-\noindent\textbf{SSO Login.} An SSO login instance is typically launched through a browser,
+\noindent\textbf{SSO Login.} A login instance is typically launched through a browser,
 when a user attempts to login to an RP.
 It consists of four steps, namely script downloading, RP identity transformation,
 %$PID_{RP}$ registration,
@@ -366,20 +366,21 @@ The IdP calculates $PID_U = [ID_U]{PID_{RP}}$ and signs the identity token. % Th
 %The IdP script checks that $PID_{RP}$ is the one registered in Step 3.1
 %            and $Enpt_{RP}$ matches the one in $Cert_{RP}$.
 %Then, it %replaces $Enpt_{RP}$ with $PEnpt_{U}$ in the identity-token request and
-The IdP script starts the identity-token request by checking whether this user is authenticated by IdP.
+The IdP script requests an identity token for $PID_{RP}$.
+ %by checking whether this user is authenticated by IdP.
 
 \item[3.2] On receiving the request,
     the IdP authenticates the user if he has not been authenticated yet.
 
 \item [3.3]
 After obtaining the user's authorization to enclose the requested attributes,
-the IdP checks whether the received $PID_{RP}$ is the valid parameter,
-%pair of $PID_{RPs}$ and $PEnpt_Us$ is in the list of unexpired $PID_{RP}$, 
+the IdP checks whether the received $PID_{RP}$ is valid,
+%pair of $PID_{RPs}$ and $PEnpt_Us$ is in the list of unexpired $PID_{RP}$,
     and calculates $PID_U = [ID_U]{PID_{RP}}$ for the authenticated user.
 The IdP then signs an identity token $[PID_{RP}, PID_U, Issuer, Validity, Attr]_{SK}$,
  where $Issuer$ is the IdP's identity, $Validity$ indicates the validity period, and $Attr$ contains the requested attributes.
 
-\item[3.4] The IdP sends the identity token to $PEnpt_{U}$.
+\item[3.4] The IdP replies with the identity token.
 
 \end{itemize}
 
@@ -402,17 +403,16 @@ Then, the RP extracts $PID_U$, and calculates $Acct = [t^{-1}]{PID_U}$.
 
 
 If any verification or check fails in some step,
- the flow will be halted immediately.
+     the flow will be halted immediately.
 For example, the user halts the flow
-    if $Cert_{RP}$ is invalid. % or $PID_{RP}$ in the identity-token request is inconsistent with the negotiated one.
+    when receiving an invalid $Cert_{RP}$. % or $PID_{RP}$ in the identity-token request is inconsistent with the negotiated one.
 %The IdP rejects a $PID_{RP}$-registration request,
 %    if there is any unexpired but identical $PID_{RP}$ in the list,
 %    and
-
 %The RP rejects identity tokens until it accepts a $PID_{RP}$-registration result.
-The IdP rejects an identity-token request, if the received $PID_{RP}$ is not the valid point on $\mathbb{E}$.
+The IdP rejects an identity-token request, if the received $PID_{RP}$ is not on the elliptic curve $\mathbb{E}$.
 Or, the RP rejects an identity token
-    if $PID_{RP}$ in the token does not match the negotiated one.
+    when $PID_{RP}$ in the token does not match the negotiated one.
 
 
 \begin{comment}
@@ -573,7 +573,7 @@ On the other hand, in UPPRESSO the script hides the $Enpt_{RP}$ from IdP,
 %in UPPRESSO
  %   when sending the identity-token request,
   %      the script replaces $Enpt_{RP}$ with $PEnpt_{U}$,
-    and then it forwards the identity token to $Enpt_{RP}$ which is extracted from the RP certificate, that avoids the identity token being sent to an adversary.
+    and then it forwards the identity token to $Enpt_{RP}$ which is extracted from the RP certificate, that to protect the identity token from being sent to adversaries.
 
 In the step of RP identity transformation, most operations are conducted by the user agent,
  while the RP only receives $t$ to calculate $PID_{RP}$ and sends $Cert_{RP}$.
