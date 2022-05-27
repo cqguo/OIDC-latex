@@ -230,6 +230,7 @@ We also define the \myss{functions} in the relations.
 \begin{itemize}
 \item \myss{\mathtt{CredentialVerify(credential)}} returns the authentication result of a user.
 \item \myss{\mathtt{UIDOfUser(credential)}} returns the $ID_U$ of a user.
+\item \myss{\mathtt{IsValid(PID_{RP})}} returns the result whether $PID_{RP}$ is the valid point on elliptic curve.
 %\item \myss{\mathtt{ListOfPID()}} returns the set of $PID_{RP}$s of the registered RPs in the valid period.
 %\item \myss{\mathtt{EnptOfRP(PID_{RP})}} returns the endpoint bound with this $PID_{RP}$ at IdP.
 %\item \myss{\mathtt{ModPow(a, b, c)}} is the result of \myss{a^b \mod c}.
@@ -675,7 +676,8 @@ This section provides the detailed relations of the processes (including atomic 
 
 
 \subsection{IdP process}
-The IdP process only accepts the events, downloading scripts, accessing the login status of a cookie owner, authenticating with password, registering the $PID_{RP}$, and requiring the identity token.
+The IdP process only accepts the events, downloading scripts, accessing the login status of a cookie owner, authenticating with password, %registering the $PID_{RP}$, 
+and requiring the identity token.
 The detailed procedure of dealing with these events is shown as follows.
 
 \begin{breakablealgorithm}
@@ -707,29 +709,29 @@ The detailed procedure of dealing with these events is shown as follows.
   \mystate{\myss{session := s'.SessionList[cookie]}}
   \mystate{\myss{uid := session[uid]}}
   \myif{uid \not\equiv \mathtt{null}}
-  \mystate{\myss{m' := \myangle{\mathtt{HTTPResp},n,200,\myangle{},\mathtt{Logged}}}}
+  \mystate{\myss{m' := \myangle{\mathtt{HTTPResp},n,200,\myangle{},\mathtt{Authenticated}}}}
   \mystop{b, a,m'}
   \ENDIF
-  \mystate{\myss{m' := \myangle{\mathtt{HTTPResp},n,200,\myangle{},\mathtt{Unlogged}}}}
+  \mystate{\myss{m' := \myangle{\mathtt{HTTPResp},n,200,\myangle{},\mathtt{Unauthenticated}}}}
   \mystop{b, a,m'}
-  \myelse{path \equiv /dynamicRegistration}
-  \mystate{\myss{PID_{RP} := body[PID_{RP}]}}
- \mystate{\myss{Enpt := body[Enpt]}}
-  \mystate{\myss{Nonce := body[Nonce]}}
-  \myif{PID_{RP} \in \mathtt{ListOfPID()}}
-  \mystate{\myss{Content :=\myangle{Fail, PID_{RP}, Nonce}}}
-  \mystate{\myss{Sig := \mathtt{SigSign}(Content, s'.SK)}}
-  \mystate{\myss{RegistrationResult := \myangle{Content, Sig}}}
-  \mystate{\myss{m' := \myangle{\mathtt{HTTPResp}, n, 200, \myangle{}, RegistrationResult}}}
-  \mystop{b, a,m'}
-  \ENDIF
-  \mystate{\myss{Validity := \mathtt{CurrentTime} ()+ s'.Validity}}
- \mystate{\myss{s'.RPList := s'.RPList +  ^{\myangle{}} \myangle{PID_{RP}, Enpt, Validity}}}
-  \mystate{\myss{Content := \myangle{OK, PID_{RP}, Nonce, Validity}}}
-  \mystate{\myss{Sig := \mathtt{Sig}(Content, s'.SK)}}
-  \mystate{\myss{RegistrationResult := \myangle{Content, Sig}}}
-  \mystate{\myss{m' := \myangle{\mathtt{HTTPResp}, n, 200, \myangle{}, RegistrationResult}}}
-  \mystop{b, a,m'}
+  %\myelse{path \equiv /dynamicRegistration}
+ % \mystate{\myss{PID_{RP} := body[PID_{RP}]}}
+ %\mystate{\myss{Enpt := body[Enpt]}}
+ % \mystate{\myss{Nonce := body[Nonce]}}
+ % \myif{PID_{RP} \in \mathtt{ListOfPID()}}
+ % \mystate{\myss{Content :=\myangle{Fail, PID_{RP}, Nonce}}}
+ % \mystate{\myss{Sig := \mathtt{SigSign}(Content, s'.SK)}}
+ % \mystate{\myss{RegistrationResult := \myangle{Content, Sig}}}
+ % \mystate{\myss{m' := %\myangle{\mathtt{HTTPResp}, n, 200, \myangle{}, RegistrationResult}}}
+%  \mystop{b, a,m'}
+%  \ENDIF
+%  \mystate{\myss{Validity := \mathtt{CurrentTime} ()+ s'.Validity}}
+% \mystate{\myss{s'.RPList := s'.RPList +  ^{\myangle{}} \myangle{PID_{RP}, Enpt, Validity}}}
+%  \mystate{\myss{Content := \myangle{OK, PID_{RP}, Nonce, Validity}}}
+ % \mystate{\myss{Sig := \mathtt{Sig}(Content, s'.SK)}}
+%  \mystate{\myss{RegistrationResult := \myangle{Content, Sig}}}
+ % \mystate{\myss{m' := \myangle{\mathtt{HTTPResp}, n, 200, \myangle{}, RegistrationResult}}}
+ % \mystop{b, a,m'}
   \myelse{path \equiv /authorize}
   \mystate{\myss{cookie := headers[Cookie]}}
   \mystate{\myss{session := s'.SessionList[cookie]}}
@@ -739,8 +741,9 @@ The detailed procedure of dealing with these events is shown as follows.
   \mystop{b, a,m'}
   \ENDIF
   \mystate{\myss{PID_{RP} := parameters[PID_{RP}]}}
-  \mystate{\myss{Enpt := parameters[Enpt]}}
-  \myif{PID_{RP} \notin \mathtt{ListOfPID}() \lor Enpt \notin \mathtt{EnptOfRP}(PID_{RP})}
+ % \mystate{\myss{Enpt := parameters[Enpt]}}
+ % \myif{PID_{RP} \notin \mathtt{ListOfPID}() \lor Enpt \notin \mathtt{EnptOfRP}(PID_{RP})}
+ \myif{\mathtt{IsValid}(PID_{RP}) \equiv \mathtt{FALSE}}
   \mystate{\myss{m' := \myangle{\mathtt{HTTPResp}, n, 200, \myangle{}, \mathtt{Fail}}}}
   \mystop{b, a,m'}
   \ENDIF
@@ -760,7 +763,9 @@ The detailed procedure of dealing with these events is shown as follows.
 
 
 \subsection{RP process}
-The RP process only accepts the events, downloading scripts, redirecting to IdP server, negotiating the $PID_{RP}$, uploading the $PID_{RP}$-registration result and identity token.
+The RP process only accepts the events, downloading scripts, redirecting to IdP server, negotiating the $PID_{RP}$, 
+%uploading the $PID_{RP}$-registration result 
+and identity token.
 The detailed procedure of dealing with these events is shown as follows.
 \begin{breakablealgorithm}
   \caption{\textbf{RP\_Process\_Relation}}
@@ -786,45 +791,45 @@ The detailed procedure of dealing with these events is shown as follows.
   \mystate{\myss{session[t] := t}}
   \mystate{\myss{session[PID_{RP}] := PID_{RP}}}
   \mystate{\myss{session[t^{-1}] := t^{-1}}}
-  \mystate{\myss{session[state] := expectRegistration}}
+  \mystate{\myss{session[state] := expectToken}}
   \mystate{\myss{m' := \myangle{\mathtt{HTTPResp}, n, 200, \myangle{}, \myangle{Cert, s'.Cert}}}}
  \mystop{b, a, m'}
- \myelse{path \equiv /registrationResult}
- \mystate{\myss{cookie := headers[Cookie]}}
-  \mystate{\myss{session := s'.SessionList[cookie]}}
-  \myif{session[state] \not\equiv expectRegistration}
-  \mystate{\myss{m' := \myangle{\mathtt{HTTPResp}, n, 200, \myangle{}, \mathtt{Fail}}}}
-  \mystop{b, a, m'}
-  \ENDIF
-  \mystate{\myss{RegistrationResult := body[RegistrationResult]}}
-  \mystate{\myss{Content:=RegistrationResult.Content}}
-  \myif{\mathtt{SigVerify}(Content, RegistrationResult.Sig, s'.IdP.PK) \equiv \mathtt{FALSE}}
-  \mystate{\myss{m' := \myangle{\mathtt{HTTPResp}, n, 200, \myangle{}, \mathtt{Fail}}}}
-  \mystate{\myss{session := \mathtt{null}}}
-  \mystop{b, a, m'}
-  \ENDIF
-  \myif{Content.Result \not\equiv OK}
-  \mystate{\myss{m' := \myangle{\mathtt{HTTPResp}, n, 200, \myangle{}, \mathtt{Fail}}}}
-  \mystate{\myss{session := \mathtt{null}}}
-  \mystop{b, a, m'}
-  \ENDIF
-  \mystate{\myss{PID_{RP} := session[PID_{RP}]}}
-  \mystate{\myss{t := session[t]}}
-  \mystate{\myss{Nonce := \mathtt{Hash}( t)}}
-  \mystate{\myss{Time := \mathtt{CurrentTime}()}}
-  \myif{PID_{RP} \not\equiv Content.PID_{RP} \lor Nonce \not\equiv Content.Nonce \lor Time > Content.Validity}
-  \mystate{\myss{m' := \myangle{\mathtt{HTTPResp}, n, 200, \myangle{}, \mathtt{Fail}}}}
-  \mystate{\myss{session := \mathtt{null}}}
-  \mystop{b, a, m'}
-  \ENDIF
-  \mystate{\myss{session[PIDValidity] := Content.Validity}}
-  \mystate{\myss{Enpt \equiv s'.Enpt}}
-  \mystate{\myss{session[state] := expectToken}}
-  \mystate{\myss{Nonce' := \mathtt{Random}()}}
-  \mystate{\myss{session[Nonce] := Nonce'}}
-  \mystate{\myss{Body := \myangle{PID_{RP}, Enpt, Nonce'}}}
-  \mystate{\myss{m' := \myangle{\mathtt{HTTPResp}, n, 200, \myangle{}, Body}}}
-  \mystop{b, a, m'}
+% \myelse{path \equiv /registrationResult}
+% \mystate{\myss{cookie := headers[Cookie]}}
+%  \mystate{\myss{session := s'.SessionList[cookie]}}
+%  \myif{session[state] \not\equiv expectRegistration}
+%  \mystate{\myss{m' := \myangle{\mathtt{HTTPResp}, n, 200, \myangle{}, \mathtt{Fail}}}}
+%  \mystop{b, a, m'}
+%  \ENDIF
+%  \mystate{\myss{RegistrationResult := body[RegistrationResult]}}
+%  \mystate{\myss{Content:=RegistrationResult.Content}}
+%  \myif{\mathtt{SigVerify}(Content, RegistrationResult.Sig, s'.IdP.PK) \equiv \mathtt{FALSE}}
+%  \mystate{\myss{m' := \myangle{\mathtt{HTTPResp}, n, 200, \myangle{}, \mathtt{Fail}}}}
+%  \mystate{\myss{session := \mathtt{null}}}
+%  \mystop{b, a, m'}
+%  \ENDIF
+%  \myif{Content.Result \not\equiv OK}
+%  \mystate{\myss{m' := \myangle{\mathtt{HTTPResp}, n, 200, \myangle{}, \mathtt{Fail}}}}
+%  \mystate{\myss{session := \mathtt{null}}}
+%  \mystop{b, a, m'}
+ % \ENDIF
+ % \mystate{\myss{PID_{RP} := session[PID_{RP}]}}
+  %\mystate{\myss{t := session[t]}}
+  %\mystate{\myss{Nonce := \mathtt{Hash}( t)}}
+  %\mystate{\myss{Time := \mathtt{CurrentTime}()}}
+  %\myif{PID_{RP} \not\equiv Content.PID_{RP} \lor Nonce \not\equiv Content.Nonce \lor Time > Content.Validity}
+  %\mystate{\myss{m' := \myangle{\mathtt{HTTPResp}, n, 200, \myangle{}, \mathtt{Fail}}}}
+  %\mystate{\myss{session := \mathtt{null}}}
+  %\mystop{b, a, m'}
+  %\ENDIF
+  %\mystate{\myss{session[PIDValidity] := Content.Validity}}
+  %\mystate{\myss{Enpt \equiv s'.Enpt}}
+  %\mystate{\myss{session[state] := expectToken}}
+  %\mystate{\myss{Nonce' := \mathtt{Random}()}}
+  %\mystate{\myss{session[Nonce] := Nonce'}}
+  %\mystate{\myss{Body := \myangle{PID_{RP}, Enpt, Nonce'}}}
+  %\mystate{\myss{m' := \myangle{\mathtt{HTTPResp}, n, 200, \myangle{}, Body}}}
+  %\mystop{b, a, m'}
   \myelse{path \equiv /uploadToken}
  \mystate{\myss{cookie := headers[Cookie]}}
   \mystate{\myss{session := s'.SessionList[cookie]}}
@@ -839,9 +844,9 @@ The detailed procedure of dealing with these events is shown as follows.
   \ENDIF
   \mystate{\myss{PID_{RP} := session[PID_{RP}]}}
   \mystate{\myss{Time := \mathtt{CurrentTime}()}}
-  \mystate{\myss{PIDValidity := session[PIDValidity]}}
+ % \mystate{\myss{PIDValidity := session[PIDValidity]}}
   \mystate{\myss{Content := Token.Content}}
-  \myif{PID_{RP} \not\equiv Content.PID_{RP} \lor Time>Content.Validity \lor Time>PIDValidity}
+  \myif{PID_{RP} \not\equiv Content.PID_{RP} \lor Time>Content.Validity}
   \mystate{\myss{m' := \myangle{\mathtt{HTTPResp}, n, 200, \myangle{}, \mathtt{Fail}}}}
   \mystop{b, a, m'}
   \ENDIF
@@ -864,7 +869,9 @@ The detailed procedure of dealing with these events is shown as follows.
 The IdP script process is only invoked to process the events,
 (a) self-triggering events  for starting $PID_{RP}$ negotiation;
 (b) the postMessage from other scripts for sending the $Cert$, and request of identity token;
-(c) the HTTP response for transmitting $PID_{RP}$-registration result and identity token.
+(c) the HTTP response for transmitting 
+%$PID_{RP}$-registration result and 
+identity token.
 The detailed procedure of dealing with these events is shown as follows.
 
 \begin{breakablealgorithm}
@@ -895,41 +902,41 @@ The detailed procedure of dealing with these events is shown as follows.
       \mystate{\myss{t := s'.Parameters[t]}}
       \mystate{\myss{PID_{RP} := \mathtt{Multiply}(Cert.Content.ID_{RP}, t)}}
       \mystate{\myss{s'.Parameters[PID_{RP}] := PID_{RP}}}
-      \mystate{\myss{Enpt := \mathtt{RandomUrl}()}}
-      \mystate{\myss{s'.Parameters[Enpt] := Enpt}}
-      \mystate{\myss{Nonce := \mathtt{Hash}(t)}}
-      \mystate{\myss{Url := \myangle{\mathtt{URL}, \mathtt{S}, IdPDomain, /dynamicRegistration,\myangle{} }}}
-      \mystate{\myss{s'.refXHR :=  \mathtt{Random}()}}
-      \mystate{\myss{command : = \langle\mathtt{XMLHTTPREQUEST}, Url, \mathtt{POST},} \\\ \ \ \ \myss{ \myangle{\myangle{PID_{RP}, PID_{RP}}, \myangle{Nonce, Nonce}, \myangle{Enpt, Enpt}}, s'.refXHR\rangle}}
-      \mystate{\myss{s'.phase := expectRegistrationResult}}
-       \ENDIF
-      \ENDCASE
-      \CASE{expectRegistrationResult}
-      \mystate{\myss{pattern := \myangle{\mathtt{XMLHTTPREQUEST},Body,s'.refXHR}}}
-      \mystate{\myss{input := \mathtt{CHOOSEINPUT}(scriptinputs,pattern) }}
-      \myif{input \not\equiv \mathtt{null} \land input.Content[RegistrationResult].type \equiv OK}
-      \mystate{\myss{RegistrationResult := input.Body[RegistrationResult]}}
-      \myif{ RegistrationResult.Content.Result \not\equiv OK}
-      \mystate{\myss{s'.phase := stop}}
-      \mystate{\myss{\textbf{stop}\ \myangle{}}}
-      \ENDIF
-      \mystate{\myss{command := \myangle{\mathtt{POSTMESSAGE}, target, \myangle{\myangle{RegistrationResult, RegistrationResult}}, \mathtt{null}}}}
-      \mystate{\myss{s'.phase := expectTokenRquest}}
-      \ENDIF
-      \ENDCASE
-      \CASE{expecTokenRquest}
-      \mystate{\myss{pattern := \myangle{\mathtt{POSTMESSAGE}, *, Content, *}}}
-      \mystate{\myss{input := \mathtt{CHOOSEINPUT}(scriptinputs,pattern)}}
-      \myif{input \not\equiv \mathtt{null}}
-       \mystate{\myss{PID_{RP} := input.Content[PID_{RP}]}}
-       \mystate{\myss{Enpt_{RP} := input.Content[Enpt]}}
-       \mystate{\myss{s'.Parameters[Nonce] := input.Content[Nonce]}}
-       \mystate{\myss{Cert := s'.Parameters[Cert]}}
-      \myif{Enpt_{RP} \not\equiv Cert.Content.Enpt \lor PID_{RP} \not\equiv s'.Parameters[PID_{RP}]}
-      \mystate{\myss{s'.phase := stop}}
-      \mystate{\myss{\textbf{stop}\ \myangle{}}}
-      \ENDIF
-       \mystate{\myss{s'.Parameters[Enpt_{RP}] := Enpt_{RP}}}
+ %     \mystate{\myss{Enpt := \mathtt{RandomUrl}()}}
+ %     \mystate{\myss{s'.Parameters[Enpt] := Enpt}}
+ %     \mystate{\myss{Nonce := \mathtt{Hash}(t)}}
+ %     \mystate{\myss{Url := \myangle{\mathtt{URL}, \mathtt{S}, IdPDomain, /dynamicRegistration,\myangle{} }}}
+  %    \mystate{\myss{s'.refXHR :=  \mathtt{Random}()}}
+ %     \mystate{\myss{command : = \langle\mathtt{XMLHTTPREQUEST}, Url, \mathtt{POST},} \\\ \ \ \ \myss{ \myangle{\myangle{PID_{RP}, PID_{RP}}, \myangle{Nonce, Nonce}, \myangle{Enpt, Enpt}}, s'.refXHR\rangle}}
+ %     \mystate{\myss{s'.phase := expectRegistrationResult}}
+ %      \ENDIF
+%      \ENDCASE
+%      \CASE{expectRegistrationResult}
+ %     \mystate{\myss{pattern := \myangle{\mathtt{XMLHTTPREQUEST},Body,s'.refXHR}}}
+ %     \mystate{\myss{input := \mathtt{CHOOSEINPUT}(scriptinputs,pattern) }}
+ %     \myif{input \not\equiv \mathtt{null} \land input.Content[RegistrationResult].type \equiv OK}
+  %    \mystate{\myss{RegistrationResult := input.Body[RegistrationResult]}}
+   %   \myif{ RegistrationResult.Content.Result \not\equiv OK}
+  %    \mystate{\myss{s'.phase := stop}}
+  %    \mystate{\myss{\textbf{stop}\ \myangle{}}}
+  %    \ENDIF
+   %   \mystate{\myss{command := \myangle{\mathtt{POSTMESSAGE}, target, \myangle{\myangle{RegistrationResult, RegistrationResult}}, \mathtt{null}}}}
+  %    \mystate{\myss{s'.phase := expectTokenRquest}}
+   %   \ENDIF
+    %  \ENDCASE
+   %   \CASE{expecTokenRquest}
+   %   \mystate{\myss{pattern := \myangle{\mathtt{POSTMESSAGE}, *, Content, *}}}
+    %  \mystate{\myss{input := \mathtt{CHOOSEINPUT}(scriptinputs,pattern)}}
+    %  \myif{input \not\equiv \mathtt{null}}
+    %   \mystate{\myss{PID_{RP} := input.Content[PID_{RP}]}}
+   %    \mystate{\myss{Enpt_{RP} := input.Content[Enpt]}}
+   %    \mystate{\myss{s'.Parameters[Nonce] := input.Content[Nonce]}}
+   %    \mystate{\myss{Cert := s'.Parameters[Cert]}}
+   %   \myif{Enpt_{RP} \not\equiv Cert.Content.Enpt \lor PID_{RP} \not\equiv s'.Parameters[PID_{RP}]}
+   %   \mystate{\myss{s'.phase := stop}}
+   %   \mystate{\myss{\textbf{stop}\ \myangle{}}}
+    %  \ENDIF
+   %    \mystate{\myss{s'.Parameters[Enpt_{RP}] := Enpt_{RP}}}
       \mystate{\myss{Url := \myangle{\mathtt{URL}, \mathtt{S}, IdPDomain, /loginInfo, \myangle{}}}}
       \mystate{\myss{s'.refXHR :=  \mathtt{Random}()}}
       \mystate{\myss{command : = \myangle{\mathtt{XMLHTTPREQUEST}, Url, \mathtt{GET},\myangle{}, s'.refXHR}}}
@@ -940,17 +947,17 @@ The detailed procedure of dealing with these events is shown as follows.
       \mystate{\myss{pattern := \myangle{\mathtt{XMLHTTPREQUEST},Body,s'.refXHR}}}
       \mystate{\myss{input := \mathtt{CHOOSEINPUT}(scriptinputs,pattern) }}
       \myif{input \not\equiv \mathtt{null}}
-      \myif{input.Body \equiv \mathtt{Logged}}
+      \myif{input.Body \equiv \mathtt{Unanthenticated}}
       \mystate{\myss{user \in ids}}
       \mystate{\myss{Url := \myangle{\mathtt{URL}, \mathtt{S}, IdPDomain, /login, \myangle{}}}}
      \ mystate{\myss{s'.refXHR :=  \mathtt{Random}()}}
       \mystate{\myss{command : = \myangle{\mathtt{XMLHTTPREQUEST}, Url, \mathtt{POST}, \myangle{credential, \mathtt{CredentialofUser}(user,secret)}}, s'.refXHR}}
       \mystate{\myss{s'.phase := expectLoginResult}}
-      \myelse{input.Body \equiv \mathtt{Unlogged}}
+      \myelse{input.Body \equiv \mathtt{Authenticated}}
       \mystate{\myss{PID_{RP} := s'.Parameters[PID_{RP}]}}
-      \mystate{\myss{Enpt := s'.Parameters[Enpt]}}
-      \mystate{\myss{Nonce := s'.Parameters[Nonce]}}
-      \mystate{\myss{Url := \langle \mathtt{URL}, \mathtt{S}, IdPDomain, /authorize,}\\\ \ \ \  \myss{\myangle{\myangle{PID_{RP}, PID_{RP}}, \myangle{Enpt, Enpt}, \myangle{Nonce, Nonce}} \rangle}}
+     % \mystate{\myss{Enpt := s'.Parameters[Enpt]}}
+     % \mystate{\myss{Nonce := s'.Parameters[Nonce]}}
+      \mystate{\myss{Url := \langle \mathtt{URL}, \mathtt{S}, IdPDomain, /authorize,} \myss{\myangle{\myangle{PID_{RP}, PID_{RP}}} \rangle}}
       \mystate{\myss{s'.refXHR :=  \mathtt{Random}()}}
       \mystate{\myss{command : = \myangle{\mathtt{XMLHTTPREQUEST}, Url, \mathtt{GET},\myangle{}, s'.refXHR}}}
       \mystate{\myss{s'.phase := expectToken}}
@@ -965,9 +972,9 @@ The detailed procedure of dealing with these events is shown as follows.
       \mystate{\myss{\textbf{stop}\ \myangle{}}}
       \ENDIF
       \mystate{\myss{PID_{RP} := s'.Parameters[PID_{RP}]}}
-      \mystate{\myss{Enpt := s'.Parameters[Enpt]}}
-      \mystate{\myss{Nonce := s'.Parameters[Nonce]}}
-      \mystate{\myss{Url := \langle \mathtt{URL}, \mathtt{S}, IdPDomain, /authorize,}\\\ \ \ \  \myss{\myangle{\myangle{PID_{RP}, PID_{RP}}, \myangle{Enpt, Enpt}, \myangle{Nonce, Nonce}} \rangle}}
+    %  \mystate{\myss{Enpt := s'.Parameters[Enpt]}}
+     % \mystate{\myss{Nonce := s'.Parameters[Nonce]}}
+      \mystate{\myss{Url := \langle \mathtt{URL}, \mathtt{S}, IdPDomain, /authorize,}  \myss{\myangle{\myangle{PID_{RP}, PID_{RP}}} \rangle}}
       \mystate{\myss{s'.refXHR :=  \mathtt{Random}()}}
       \mystate{\myss{command : = \myangle{\mathtt{XMLHTTPREQUEST}, Url, \mathtt{GET},\myangle{}, s'.refXHR}}}
       \mystate{\myss{s'.phase := expectToken}}
@@ -993,8 +1000,12 @@ The detailed procedure of dealing with these events is shown as follows.
 \subsection{RP script process}
 The RP script process is only invoked to process the events,
 (a) self-triggering events  for opening the new window;
-(b) the postMessage from other scripts for $PID_{RP}$ negotiation, posting $PID_{RP}$-registration result and identity token;
-(c) the HTTP response for downloading the RP $Cert$, retrieving identity token request and confirming login result.
+(b) the postMessage from other scripts for $PID_{RP}$ negotiation, 
+%posting $PID_{RP}$-registration result 
+and identity token;
+(c) the HTTP response for downloading the RP $Cert$, 
+%retrieving identity token request 
+and confirming login result.
 The detailed procedure of dealing with these events is shown as follows.
 
 \begin{breakablealgorithm}
@@ -1030,28 +1041,28 @@ The detailed procedure of dealing with these events is shown as follows.
       \myif{input \not\equiv \mathtt{null}}
       \mystate{\myss{Cert := input.Content[Cert]}}
       \mystate{\myss{command := \myangle{\mathtt{POSTMESSAGE}, IdPWindow, \myangle{\myangle{Cert, Cert}}, IdPOringin}}}
-      \mystate{\myss{s'.phase := expectRegistrationResult}}
-      \ENDIF
-      \ENDCASE
-      \CASE{\myss{expectRegistrationResult}}
-      \mystate{\myss{pattern := \myangle{\mathtt{POSTMESSAGE}, *, Content, *}}}
-      \mystate{\myss{input := \mathtt{CHOOSEINPUT}(scriptinputs,pattern)}}
-      \myif{input \not\equiv \mathtt{null}}
-      \mystate{\myss{RegistrationResult := input.Content[RegistrationResult]}}
-      \mystate{\myss{Url := \myangle{\mathtt{URL}, \mathtt{S}, RPDomain, /registrationResult, \myangle{}}}}
-      \mystate{\myss{s'.refXHR :=  \mathtt{Random}()}}
-      \mystate{\myss{command : = \myangle{\mathtt{XMLHTTPREQUEST}, Url, \mathtt{POST},\myangle{\myangle{RegistrationResult, RegistrationResult}}, s'.refXHR}}}
-      \mystate{\myss{s'.phase := expectTokenRequest}}
-      \ENDIF
-      \ENDCASE
-      \CASE{\myss{expectTokenRequest}}
-      \mystate{\myss{pattern := \myangle{\mathtt{XMLHTTPREQUEST},Body,s'.refXHR}}}
-      \mystate{\myss{input := \mathtt{CHOOSEINPUT}(scriptinputs,pattern) }}
-      \myif{input \not\equiv \mathtt{null}}
-      \mystate{\myss{PID_{RP} := input.Content.Body[PID_{RP}]}}
-      \mystate{\myss{Enpt := input.Content.Body[Enpt]}}
-      \mystate{\myss{Nonce := input.Content.Body[Nonce]}}
-      \mystate{\myss{command := \langle\mathtt{POSTMESSAGE}, IdPWindow}, \\\ \ \ \  \myss{\myangle{\myangle{PID_{RP}, PID_{RP}}, \myangle{Enpt, Enpt}, \myangle{Nonce, Nonce}},  IdPOringin\rangle}}
+    %  \mystate{\myss{s'.phase := expectRegistrationResult}}
+     % \ENDIF
+     % \ENDCASE
+     % \CASE{\myss{expectRegistrationResult}}
+     % \mystate{\myss{pattern := \myangle{\mathtt{POSTMESSAGE}, *, Content, *}}}
+     % \mystate{\myss{input := \mathtt{CHOOSEINPUT}(scriptinputs,pattern)}}
+     % \myif{input \not\equiv \mathtt{null}}
+     % \mystate{\myss{RegistrationResult := input.Content[RegistrationResult]}}
+     % \mystate{\myss{Url := \myangle{\mathtt{URL}, \mathtt{S}, RPDomain, /registrationResult, \myangle{}}}}
+     % \mystate{\myss{s'.refXHR :=  \mathtt{Random}()}}
+      %\mystate{\myss{command : = \myangle{\mathtt{XMLHTTPREQUEST}, Url, \mathtt{POST},\myangle{\myangle{RegistrationResult, RegistrationResult}}, s'.refXHR}}}
+     % \mystate{\myss{s'.phase := expectTokenRequest}}
+     % \ENDIF
+     % \ENDCASE
+     % \CASE{\myss{expectTokenRequest}}
+     % \mystate{\myss{pattern := \myangle{\mathtt{XMLHTTPREQUEST},Body,s'.refXHR}}}
+     % \mystate{\myss{input := \mathtt{CHOOSEINPUT}(scriptinputs,pattern) }}
+     % \myif{input \not\equiv \mathtt{null}}
+     % \mystate{\myss{PID_{RP} := input.Content.Body[PID_{RP}]}}
+     % \mystate{\myss{Enpt := input.Content.Body[Enpt]}}
+     % \mystate{\myss{Nonce := input.Content.Body[Nonce]}}
+     % \mystate{\myss{command := \langle\mathtt{POSTMESSAGE}, IdPWindow}, \\\ \ \ \  \myss{\myangle{\myangle{PID_{RP}, PID_{RP}}, \myangle{Enpt, Enpt}, \myangle{Nonce, Nonce}},  IdPOringin\rangle}}
       \mystate{\myss{s'.phase := expectToken}}
       \ENDIF
       \ENDCASE
