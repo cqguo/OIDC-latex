@@ -68,29 +68,36 @@ Thus, the calculated account is always exactly the authenticated user's account 
 
 \vspace{1mm}
 \noindent\textbf{Confidentiality.}
-There is no event leaking the identity tokens to any malicious entity other than the authenticated user and the designated RP.
+No event leaks the identity tokens to any malicious entity other than the authenticated user and the designated RP.
 First of all, the communications among the IdP, RPs and users,
     are protected by HTTPS,
     and the \verb+postMessage+ HTML5 API ensures the dedicated channels between two scripts within the browser,
     so that adversaries cannot eavesdrop the identity tokens.
-Meanwhile, the honest IdP sends the identity token only to the authenticated user,
-    and this user forwards it to the RP through $Enpt_{RP}$.
-The binding of $Enpt_{RP}$ and $ID_{RP}$ is ensured by the signed RP certificate,
-so only the designated target RP receives this token.
+Meanwhile, the honest IdP sends the identity token only to the authenticated user 
+        (i.e., the IdP script in the browser).
+The IdP script forwards the token to the RP script
+ only when it is downloaded from the same website as $Enpt_{RP}$,
+and the binding of $Enpt_{RP}$ and $ID_{RP}$ is ensured by the signed RP certificate,
+    which is also verified by the IdP script.
+So only the designated target RP that holds $Enpt_{RP}$ and $ID_{RP}$ in the certificate,
+    receives this token.
+
+
 %The detailed process of proof is shown in Appendix.
 
 \vspace{1mm}
 \noindent\textbf{Integrity.}
-The identity token binds $ID_U$ and $ID_{RP}$
-    implicitly, and any breaking will result in some failed check or verification in the login flow.
+The identity token binds $Acct$ and $ID_{RP}$ implicitly,
+    and any breaking will result in some failed check or verification in the login flow.
 The integrity is ensured by the IdP's signatures:
- (\emph{a}) the identity token binding $PID_U$ and $PID_{RP}$, is signed by the IdP,
-  and (\emph{b}) the relationship between $PID_{RP}$ and $t$ is guaranteed by the proof of RP designation. According to RP designation, there would not be the $t$ and $t'$ happening to satisfy that $PID_{RP} = [t]ID_{RP_j} = [tr]G = [t'r']G = [t']ID_{RP_{j'}}$.
-  %(or collision-free $H(t)$) is also bound
-   % in the signed $PID_{RP}$-registration result.
+    the identity token binding $PID_U$ and $PID_{RP}$ is signed by the IdP.
+As the proof of RP designation,
+    there is no $t' \neq t$ but satisfying that $PID_{RP} = [t]ID_{RP_j} = [tr]G = [t'r']G = [t']ID_{RP_{j'}}$.
+That is, the identity token explicitly binding $PID_U$ and $PID_{RP}$,
+    matches only one $ID_{RP}$ (and also only one $Acct = [t^{-1}]PID_{U}$).
 Thus,
-    $ID_U$ and $ID_{RP}$ are actually bound by the IdP's signatures,
-        due to the one-to-one mapping between (\emph{a}) the pair of $ID_U$ and $ID_{RP}$ and (\emph{b}) the triad of $PID_U$, $PID_{RP}$, and $t$.
+    $Acct$ and $ID_{RP}$ are actually bound by the IdP's signatures,
+        due to the one-to-one mapping between (\emph{a}) the pair of $Acct$ and $ID_{RP}$ and (\emph{b}) the triad of $PID_U$, $PID_{RP}$, and $t$.
 
 %The detailed process of proof is shown in Appendix.
 
