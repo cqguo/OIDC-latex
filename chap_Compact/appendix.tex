@@ -30,7 +30,7 @@
 
 \section{The Security Proofs of UPPRESSO}
 \label{ape:model}
-We formally analyze  the security properties of UPPRESSO based on the Dolev-Yao style web model as follows.
+We formally analyze  the security properties of UPPRESSO as follows.
 %which has been widely used in the formal analysis of SSO protocols such as OAuth 2.0~\cite{FettKS16} and OIDC~\cite{FettKS17}.
 % 这句话说了很多次，在appendix中，就只留着基本的技术信息。
 We first describe the expressive Dolev-Yao style model of the web infrastructure.
@@ -43,7 +43,7 @@ Then,
 %Then, we describe the model of frequent used data format (e.g., HTTP package) and entity  (e.g., browser).
 %Following, we present the modelling UPPRESSO system, containing the servers, scripts and the communications among them.
 Finally, we finish the security proofs of UPPRESSO
-        by tracing the identity tokens in this model.
+        by analyzing the life cycle of identity tokens in this model.
 
 \subsection{The Dolev-Yao Style Web Model}
 \label{subsec:webmodel}
@@ -58,8 +58,10 @@ These notations are explained as below.
     but not running independently without atomic processes.
     These entities are called script processes, e.g., JavaScript code within a browser.
 \item $E^0$ is the set of self-triggering \emph{events} acceptable to the processes in $\mathcal{W}$.
-Events are the basic communication elements in the model, representing a message sent by a process to another process.
-The self-triggering event represents the start of the procedure in the web system. For example, while the script is loaded by the browser, the browser would generate the self-triggering event to start the script.
+Events are the basic communication elements in the model,
+    each of which represents a message sent by a process to another process.
+The self-triggering event represents the start of the procedure in the web system.
+ For example, while a script is loaded by the browser, the browser would generate the self-triggering event to start the script.
 \end{itemize}
 
 
@@ -68,23 +70,30 @@ The self-triggering event represents the start of the procedure in the web syste
 \noindent\textbf{Term}. Terms are the basic elements in Dolev-Yao style models.
    %  to describe the modelled system. 这一句就是废话，所有的东西都是to describe the modelled system
 It may contain constants such as ASCII strings and integers,
-    sequence symbols such as $k$-ary sequences ($k \leq 0$), %$\langle \rangle$, $\langle . \rangle$, $\langle . ,. \rangle$,
+    sequence symbols such as $k$-ary sequences ($k \geq 0$), %$\langle \rangle$, $\langle . \rangle$, $\langle . ,. \rangle$,
     or function symbols that model cryptographic primitives such as $\mathtt{SigSign}$, $\mathtt{SigVerify}$ and $\mathtt{Hash}$.
 For example, an HTTP request is expressed as a term containing a type (e.g., $\mathtt{HTTPReq}$), a nonce, a method (e.g., $\mathtt{GET}$ or $\mathtt{POST}$), a domain, a path, URL parameters, request headers and a message body. % over the $\Sigma$ in the sequence symbol format.
 So,
 an HTTP GET request {\sf exa.com/path?para=1} with empty headers and bodys is expressed as $\langle\mathtt{HTTPReq},n,\mathtt{GET},exa.com,/path,\langle \langle para, 1\rangle \rangle ,\langle \rangle,\langle \rangle \rangle$.
 
 \vspace{1mm}
-\noindent\noindent\textbf{Operations over terms}. The operations are defined as follows.
+\noindent\noindent\textbf{Operations over terms}. The following operations are defined.
 \begin{itemize}
 \item \textbf{Equational theory}. Equational theory
- uses the symbol $\equiv$ to represent the congruence relation on terms, and $\not\equiv$ for non-congruence relation.
- For example, while there are the data $Data$, its signature $Sig$, and the corresponding public key $PK$,
-  the relation is described as $\mathtt{SigVerify}(Data, Sig, PK)\equiv \mathtt{TRUE}$.
+ uses the symbol $\equiv$ to represent the congruence relation on terms,
+  and $\not\equiv$ for the non-congruence relation.
+ For example, while there are a message $m$, its signature $sig$, and the corresponding public key $PK$,
+  the relation is described as $\mathtt{SigVerify}(m, sig, PK)\equiv \mathtt{TRUE}$.
 \item \textbf{Patten Matching}.  We define the term with the variable $*$ as the pattern, such as \myss{\myangle{a, b, *}}.
 The pattern matches any term which only replaces the $*$ with other terms. For instance,  \myss{\myangle{a, b, *}} matches \myss{\myangle{a, b, c}}.
-\item \textbf{Retrieve attributes from formatted term}. Formatted term is the data in the specific format, for instance, the HTTP request is the formatted data in the form \myss{\langle\mathtt{HTTPReq}}, \myss{nonce}, \myss{method}, \myss{host}, \myss{path}, \myss{parameters}, \myss{headers}, \myss{body\rangle}.  We assume there is an HTTP request \myss{r :=}  \myss{\langle\mathtt{HTTPReq}},  \myss{n},  \myss{\mathtt{GET}},  \myss{example.com},  \myss{/path},  \myss{\myangle{}},  \myss{\myangle{}},  \myss{\myangle{}\rangle}, here we define the operation on the $r$. That is, the elements in $r$ can be accessed in the form \myss{r.name}, such that \myss{r.method \equiv \mathtt{GET}},  \myss{r.path \equiv /path} and \myss{r.body \equiv \myangle{}}.
-\item \textbf{Retrieve attributes from dictionary term}. Dictionary term is the data in the form \myss{\myangle{\myangle{type, value}, \myangle{type, value}, \dotsc}}, for instance the \myss{body} in HTTP request is dictionary data. We assume there is a \myss{body := \myangle{\myangle{username, alice}, \myangle{password, 123}}}, here we define the operation on the $body$. That is, we can access the elements in \myss{body} in the form \myss{body[name]}, such that \myss{body[username] \equiv alice} and \myss{body[password] \equiv 123}. We can also add the new attributes to the dictionary, for example after we set \myss{body[age] := 18}, the \myss{body} are changed into\myss{ \myangle{\myangle{username, alice}, \myangle{password, 123}, \myangle{age, 18}}}.
+\item \textbf{Retrieve attributes from a formatted term}.
+ A formatted term is a term in the specific format, for instance, the HTTP request is the formatted data in the form \myss{\langle\mathtt{HTTPReq}}, \myss{nonce}, \myss{method}, \myss{host}, \myss{path}, \myss{parameters}, \myss{headers}, \myss{body\rangle}.
+ We assume there is an HTTP request \myss{r :=}  \myss{\langle\mathtt{HTTPReq}},  \myss{n},  \myss{\mathtt{GET}},  \myss{example.com},  \myss{/path},  \myss{\myangle{}},  \myss{\myangle{}},  \myss{\myangle{}\rangle}, here we define the operation on $r$.
+ That is, the elements in $r$ can be accessed in the form \myss{r.name}, such that \myss{r.method \equiv \mathtt{GET}},  \myss{r.path \equiv /path} and \myss{r.body \equiv \myangle{}}.
+\item \textbf{Retrieve attributes from a dictionary term}.
+A dictionary term is  a term in the form \myss{\myangle{\myangle{type, value}, \myangle{type, value}, \dotsc}}, for instance the \myss{body} in HTTP request is dictionary data. We assume there is a \myss{body := \myangle{\myangle{username, ``Alice''}, \myangle{password, ``123456''}}}, here we define the operation on the $body$. That is, we can access the elements in \myss{body} in the form \myss{body[type]},
+ such that \myss{body[username] \equiv ``Alice''} and \myss{body[password] \equiv ``123456''}.
+We can also add the new attributes to the dictionary, for example after we set \myss{body[age] := 18}, the \myss{body} are changed into\myss{ \myangle{\myangle{username, ``Alice''}, \myangle{password, ``123456''}, \myangle{age, 18}}}.
 \end{itemize}
 
 \vspace{1mm}
@@ -95,7 +104,9 @@ For example, the state of a login server is described as the term $\langle Sessi
 
 
 \vspace{1mm}
-\noindent\textbf{Relation}. The relation represents the model of procedure, showing how the entity deal with the received message. For example, while the login server receive the login request from a visitor (the request is denoted as the event $e$), the input of the relation is $e$ and current state $\langle SessionList,UserList \rangle$.   The server verifies the visitor's identity with the $UserList$ and add the login result into $SessionList$ (transitioning to $SessionList'$). Thus the output is the login response $e'$ and the new state $\langle SessionList',UserList \rangle$.
+\noindent\textbf{Relation}. The relation represents the model of procedure, showing how the entity deal with the received message. For example, while the login server receive the login request from a visitor (the request is denoted as the event $e$),
+ the input of the relation is $e$ and current state $\langle SessionList,UserList \rangle$.
+ The server verifies the visitor's identity with the $UserList$ and add the login result into $SessionList$ (transitioning to $SessionList'$). Thus the output is the login response event $e'$ and the new state $\langle SessionList',UserList \rangle$.
 
 
 
@@ -117,8 +128,9 @@ where $a$ and $b$ represent the addresses of the sender and receiver, respective
 \noindent\textbf{Script process}. A script process is the formulation of browser scripts as a relation $R$,
     representing the server-defined functions,
     while the input and output are handled by the browser.
-The script process does not maintain any state itself, while the \verb+scriptstate+ is stored by the browser in each documents.
-The \verb+scriptstate+ is transmitted to script process as the part of input, when the script process is invoked to process the event.
+A script process does not maintain any state itself,
+ while the \verb+scriptstate+ is stored by the browser in each documents.
+The \verb+scriptstate+ is transmitted to the script process as the part of input, when a script process is invoked to process an event.
 A script process is addressed by the \verb+Origin+ property, as the the protocol and hostname of a URL. That is, while a script sends the messages to another script process and set the \verb+Origin+ value as the IdP domain,
  only the script downloaded from IdP server receives this message.
 
@@ -163,8 +175,8 @@ The details are defined as follows:
  \item \myss{nonce} is a random number that maps the response to the corresponding request.
  \item \myss{method} is one of the HTTP methods, \myss{\mathtt{GET}} and \myss{\mathtt{POST}}.
  \item \myss{host} is the constant string domain of visited server.
- \item \myss{path} is the constant string representing the concrete resource of the server.
-\item \myss{parameters} contains the parameters carried by the url as the formatted term \myss{\myangle{\myangle{type, value}, \myangle{type, value}, \dotsc}}. 
+ \item \myss{path} is the constant string representing the certain resource of the server.
+\item \myss{parameters} contains the parameters carried by the url as the formatted term \myss{\myangle{\myangle{type, value}, \myangle{type, value}, \dotsc}}.
 For example,  the HTTP request targeting to url \myss{http://www.example.com?type=confirm}  carries the \myss{parameters} as the formatted term \myss{\myangle{\myangle{type, confirm}}}.
  \item \myss{headers} is the header content of each HTTP messages as the term \myss{\myangle{\myangle{type, value}, \myangle{type, value}, \dotsc}}, such as \myss{\langle\myangle{Referer, http://www.example.com},} \myss{\myangle{Cookies, c}\rangle}.
 \item \myss{body} is the content carried by HTTP \myss{\mathtt{POST}} request or HTTP response as the formatted term \myss{\myangle{\myangle{type, value}, \myangle{type, value}, \dotsc}}.
@@ -172,19 +184,19 @@ For example,  the HTTP request targeting to url \myss{http://www.example.com?typ
 \end{itemize}
 
 \vspace{1mm}\noindent\textbf{URL}.
-URL is the formatted term, 
+URL is the formatted term,
 $$\myangle{\mathtt{URL}, protocol,host,path,parameters}$$
 \begin{itemize}
 \item \myss{\mathtt{URL}} is the type.
 \item \myss{protocol} is chosen in \myss{\{\mathtt{S}}, \myss{\mathtt{P}\}} as \myss{\mathtt{S}} stands for HTTPS and \myss{\mathtt{P}} stands for HTTP.
 \item The \myss{host, path}, and \myss{parameters} are the same as in HTTP messages.
-\end{itemize} 
+\end{itemize}
 
 \vspace{1mm}\noindent\textbf{Origin}.
 An Origin is the formatted term \myss{\myangle{host, protocol}} that can represent the server that a script is downloaded from, where \myss{host} and \myss{protocol} are the same as in URL.
 
 \vspace{1mm}\noindent\textbf{POSTMESSAGE}.
-PostMessage is used in the browser for transmitting messages between scripts. The postMessage package is defined as the formatted term $$\myangle{\mathtt{POSTMESSAGE}, target, content, origin}$$ 
+PostMessage is used in the browser for transmitting messages between scripts. The postMessage package is defined as the formatted term $$\myangle{\mathtt{POSTMESSAGE}, target, content, origin}$$
 \begin{itemize}
 \item \myss{\mathtt{POSTMESSAGE}} is the type.
 \item The \myss{target} is the constant nonce which stands for the receiver.
@@ -194,10 +206,10 @@ PostMessage is used in the browser for transmitting messages between scripts. Th
 
 \vspace{1mm}\noindent\textbf{XMLHTTPREQUEST}.
 XMLHTTPRequest is the HTTP message processed  by scripts in the browser. That is, the XMLHTTPRequest  package can as the following formatted term can be converted into HTTP request message by the browser.
-$$\myangle{\mathtt{XMLHTTPREQUEST}, URL, methods, body, nonce}$$ 
+$$\myangle{\mathtt{XMLHTTPREQUEST}, URL, methods, body, nonce}$$
 
 The XMLHTTPRequest  package as the following formatted term is converted from HTTP response message.
-$$\myangle{\mathtt{XMLHTTPREQUEST}, body, nonce}$$  
+$$\myangle{\mathtt{XMLHTTPREQUEST}, body, nonce}$$
 The $\mathtt{XMLHTTPREQUEST}$ is the type. Other attributes are defined similarly as them in HTTP message.
 
 \subsubsection{The Atomic Processes of IdP and RP}
@@ -208,17 +220,17 @@ An atomic process is a tuple $p=$ $(I^p, Z^p, R^p,z_0^p )$, containing the addre
 \vspace{1mm}\noindent\textbf{IdP Server Process}.
 The state of IdP process is described as the formatted term,
 \begin{multline*}
-\ \ \ \ \ \ \ \ \ \langle Issuer, SK, SessionList, UserList, \\RPList, Validity,  TokenList \rangle \ \ \ \ \ \ \ \ \ 
+\langle Issuer, SK, SessionList, UserList, Validity,  TokenList \rangle
 \end{multline*}
 That is,  the state of an IdP server  at the point in time can be sketched using these attributes.
 %Other data stored at IdP but not used during SSO authentication are not mentioned here.
 \begin{itemize}
-\item \myss{Issuer} is the identifier of IdP.
+\item \myss{Issuer} is the IdP's identity.
 %\item \myss{p} is the large prime mentioned before.
 \item \myss{SK} is the private key used by IdP to generate signatures.
 \item \myss{SessionList} is the term in the form of \myss{\myangle{\myangle{cookie, session}}}, the cookie uniquely identifies the session storing the  browser uploaded messages.
 \item \myss{UserList} is the set of user's information, including  \myss{ID_U}  and other attributes.
-\item \myss{RPList} is the set of registered RP information which consists of ID of RP \myss{(PID_{RP})}, \myss{Enpt}  and \myss{Validity}.
+%\item \myss{RPList} is the set of registered RP information which consists of ID of RP \myss{(PID_{RP})}, \myss{Enpt}  and \myss{Validity}.
 \item \myss{Validity} is the validity for IdP generated signatures.
 \item \myss{TokenList} is the set of IdP generated Identity tokens.
 \end{itemize}
@@ -226,10 +238,11 @@ We also define the \myss{functions} in the relations.
 \begin{itemize}
 \item \myss{\mathtt{CredentialVerify(credential)}} returns the authentication result of a user.
 \item \myss{\mathtt{UIDOfUser(credential)}} returns the $ID_U$ of a user.
-\item \myss{\mathtt{ListOfPID()}} returns the set of $PID_{RP}$s of the registered RPs in the valid period.
-\item \myss{\mathtt{EnptOfRP(PID_{RP})}} returns the endpoint bound with this $PID_{RP}$ at IdP.
+\item \myss{\mathtt{IsValid(PID_{RP})}} returns the result whether $PID_{RP}$ is the valid point on elliptic curve.
+%\item \myss{\mathtt{ListOfPID()}} returns the set of $PID_{RP}$s of the registered RPs in the valid period.
+%\item \myss{\mathtt{EnptOfRP(PID_{RP})}} returns the endpoint bound with this $PID_{RP}$ at IdP.
 %\item \myss{\mathtt{ModPow(a, b, c)}} is the result of \myss{a^b \mod c}.
-\item \myss{\mathtt{Multiply(P, a)}} returns the result of \myss{[a]P}, where $P$ is the point on elliptic curve and $a$ is the integer.
+\item \myss{\mathtt{Multiply(P, a)}} returns the result of \myss{[a]P}, where $P$ is a point on the elliptic curve and $a$ is an integer.
 \item \myss{\mathtt{CurrentTime()}} returns the current system time.
 \end{itemize}
 
@@ -240,18 +253,18 @@ The relation of IdP process is shown as Relation~\ref{alg1} in Appendix~\ref{ape
 
 
 \vspace{1mm}\noindent\textbf{RP server process}.
-The state of RP process is the formatted term, 
+The state of RP process is the formatted term,
 \begin{multline*}
-\ \langle ID_{RP}, Enpt, IdP, Cert, SessionList, UserList \rangle \ 
+\ \langle ID_{RP}, Enpt, IdP, Cert, SessionList, UserList \rangle \
  \end{multline*}
 
 \begin{itemize}
-\item \myss{ID_{RP}} is the iRP's identifier assigned by IdP.
+\item \myss{ID_{RP}} is the  RP's identity assigned by IdP.
 \item  \myss{Enpt} is the RP's address for uploading the identity token.
-\item \myss{Cert} is the IdP-signed message containing \myss{ID_{RP}, Enpt} and other attributes.
-\item \myss{IdP} is the term of the form \myss{\langle ScriptUrl}, 
-    \myss{PK \rangle}, where \myss{ScriptUrl} is the site to download IdP script, 
-     and \myss{PK} is the public key used to verify the IdP signed messages.
+\item \myss{Cert} is the IdP-signed document containing \myss{ID_{RP}, Enpt} and other attributes.
+\item \myss{IdP} is the term of the form \myss{\langle ScriptUrl},
+    \myss{PK \rangle}, where \myss{ScriptUrl} is the site to download the IdP script,
+     and \myss{PK} is the public key used to verify signed messages.
 \item \myss{SessionList} is same as it in IdP process.
 \item \myss{UserList} is the set of users registered at this RP, each user is uniquely identified by the \myss{Acct}.
 \end{itemize}
@@ -267,7 +280,6 @@ The relation of RP process is shown as Relation~\ref{alg2} in Appendix~\ref{ape:
 
 \subsubsection{Browser}
 %In UPPRESSO, we assume that the browsers are honest and well developed, so that, we neglect  the detailed process of browser, such as constructing and parsing the HTTP package.
-In this section, we analyze how the browsers interact with other parties in UPPRESSO.
 In UPPRESSO system, the message transmitted through a browser is constructing and parsing by the script, so that we only focus on how the script process runs in the browser.
 
 In the browser, a window is the basic unit that shows the content to user.
@@ -275,21 +287,21 @@ In a window, the document %(Document Object Model, DOM)
  represents the whole page contained in this window.
 The script is one node in the document.
 We introduce the windows and documents of the browser model, which provides inputs and parses the outputs of the script process.
-The opened windows, documents and downloaded scripts are parts of the state of a browser.
+The opened windows, documents and scripts are parts of the state of a browser.
 %For a better reading experience, in this section, we only introduce the model of window and document, and the models of IdP and RP scripts are provided in next section
 
 
 
 \vspace{1mm}
-\noindent\textbf{Window}. A window is the formatted term,  
-$$\langle ID_w, documents, opener \rangle$$
-It represents the concrete browser window in the system.
+\noindent\textbf{Window}. A window is a formatted term,
+$$\langle winID, documents, opener \rangle$$
+It represents the certain browser window in the system.
 \begin{itemize}
-\item The \myss{ID_w} is the window reference to identify each windows.
+\item The $winID$ is the window reference to identify each windows.
 \item The \myss{documents} is the set of documents (defined below) including the current document and cached documents (for example, the documents can be viewed via the ``forward" and ``back" buttons in the browser).
 \item The \myss{opener} represents the document from which this window is created,
     for instance, while a user clicks the href in document \myss{d} and it creates a new window \myss{w},
-    there is \myss{w.opener \equiv d.ID_d}.
+    there is \myss{w.opener \equiv d.docID}.
 \end{itemize}
 
 
@@ -299,17 +311,17 @@ It represents the concrete browser window in the system.
 \noindent\textbf{Document}. A document is the web page content in the browser window,
     in the formatted term
 \begin{multline*}
-  \ \ \ \langle ID_d, location, referrer, script, scriptstate, \\
+  \ \ \ \langle docID, location, referer, script, scriptstate, \\
   scriptinputs, subwindows\rangle \ \ \
 \end{multline*}
 \begin{itemize}
-\item The \myss{ID_d} locates the document.
-\item \myss{Location} is the URL where the document is loaded.
-\item \myss{Referrer} is same as the Referer header defined in HTTP standard.
-\item The \myss{script} is the script process downloaded from each servers.
-\item \myss{scriptstate} is define by the script, different in each scripts.
+\item \myss{docID} locates the document.
+\item \myss{location} is the URL where the document is loaded.
+\item \myss{referer} is same as the Referer header defined in HTTP standard.
+\item \myss{script} is the script process downloaded from each servers.
+\item \myss{scriptstate} is define by the script, different in each scripts, stored and updated in the document.
 \item The \myss{scriptinputs} is the message transmitted into the script process.
-\item The \myss{subwindows} is the set of \myss{ID_w} of document-created windows.
+\item The \myss{subwindows} is the set of \myss{winID} of windows created from this document.
 \end{itemize}
 
  %\myss{active} represents whether this document is active or not.
@@ -317,22 +329,25 @@ It represents the concrete browser window in the system.
 
 
 \subsubsection{The IdP Script and the RP Script}
-The script process is the dependent process relying on the browser, which can be considered as a relation \myss{R} mapping a message input and a message output. And finally the browser will conduct the command in the output message.
-A script can be modelled as the tuple containing the input, output and relation.
+The script process is the dependent process relying on the browser,
+ which can be modelled as a relation \myss{R} mapping a message input and a message output.
+ And finally the browser will conduct the command in the output message.
+%A script can be modelled as the tuple containing the input, output and relation.
+A script does not have state,
+    the state is stored as input and updated as output.
 
 
 \vspace{1mm}
 \noindent\textbf{IdP script process.}
-At the first, we give the description of the formate of input.
 The input is the formatted term
 \begin{multline*}
-\langle tree, ID_d, scriptstate, stateinputs, cookies, ids, secret \rangle
+\langle tree, docID, scriptstate, stateinputs, cookies, ids, secret \rangle
 \end{multline*}
 \begin{itemize}
 \item The \myss{tree} is the structure of the opened windows and documents, which are visible to this script.
-\item \myss{ID_d} is the document's ID, representing the document containing this script. 
-\item \myss{Scriptinputs} is the message transmitted to script. The \myss{scriptinputs} is defined as formatted term, for example, postMessage is one of the forms of \myss{scriptinputs}.
-\item \myss{Cookies} is the set of cookies that belong to the document's origin.
+\item \myss{docID} is the document's ID, representing the document containing this script.
+\item \myss{scriptinputs} is the message transmitted to script. The \myss{scriptinputs} is defined as formatted term, for example, postMessage is one of the forms of \myss{scriptinputs}.
+\item \myss{cookies} is the set of cookies that belong to the document's origin.
 \item \myss{Ids} is the set of users while \myss{secret} is the credential of corresponding user.
 \end{itemize}
 
@@ -365,11 +380,17 @@ We have defined the postMessage and XMLHTTPRequest (for HTTP request) message wh
 The relation of IdP script process $script\_idp$ is shown as Relation~\ref{alg3}, Appendix~\ref{ape:alg}.
  The new \myss{functions} in relation are defined as follows.
 \begin{itemize}
- \item \myss{\mathtt{PARENTWINDOW}(tree,ID_d)}. The first parameter is the input relation tree defined before, and the second parameter is the ID of a document. It returns the current window's opener's $ID_w$ (null if it doesn't exist nor it is invisible to this document).
+ \item \myss{\mathtt{PARENTWINDOW}(tree,docID)}. The first parameter is the input relation tree defined before, and the second parameter is the ID of a document. It returns the current window's opener's $winID$ (null if it doesn't exist nor it is invisible to this document).
   \item \myss{\mathtt{CHOOSEINPUT}(inputs,pattern)}. The first parameter is a set of script inputs, and the second parameter is a pattern. The result returned by the function is the input in \myss{inputs} matching the \myss{pattern}.
-  \item \myss{\mathtt{RandomUrl}()} returns a newly generated host string.
+%  \item \myss{\mathtt{RandomUrl}()} returns a newly generated host string.
     \item \myss{\mathtt{CredentialofUser}(user,secret)} returns the user's credential for authentication.
 \end{itemize}
+%Among the functions, only the generation of random url is implemented dependently by the script.
+The retrieval of the parent window (the opener) is implemented by the browser, and it can be easily invoked in the script by using the browser-provided API.
+The \myss{\mathtt{CHOOSEINPUT}} function is conducted by the browser and transparent to the script developer. 
+For example, while the browser receives the HTTP response from the browser, it would decide witch callback function is invoked. 
+Moreover, the function \myss{\mathtt{CredentialofUser}} needs the participation on the user, for example, the user inputs her password in the web page. 
+
 
 
 
@@ -384,13 +405,15 @@ While the output is the formatted term
 \begin{multline*}
 \ \langle scriptstate, cookies, command \rangle \
 \end{multline*}
-The state of RP script process \myss{scriptstate} is the formatted term, 
+The state of RP script process \myss{scriptstate} is the formatted term,
 $$\langle IdPDomain, RPDomain, Parameters, phase, refXHR\rangle$$
 The \myss{RPDomain} is the host string of the corresponding RP server, and other terms are defined in the same way as in IdP script process.
 Other terms are same as them in IdP script
 
 
-The relation of RP script process $script\_rp$ is shown as Relation~\ref{alg4}, Appendix~\ref{ape:alg}. We define the function \myss{\mathtt{SUBWINDOW}(tree, ID_d)}, which takes the \myss{tree} defined above and the current document's \myss{ID_d} as the input. And it selects the \myss{ID_w} of the first window opened by this document as the output. However, if there is no opened windows, it returns  null.
+The relation of RP script process $script\_rp$ is shown as Relation~\ref{alg4}, Appendix~\ref{ape:alg}.
+
+We define the function \myss{\mathtt{SUBWINDOW}(tree, docID)}, which takes the \myss{tree} defined above and the current document's \myss{docID} as the input. And it selects the $winID$ of the first window opened by this document as the output. However, if there is no opened windows, it returns  null. The retrieval of the sub window is similar with the retrieval of the parent window, the developer can simply achieve the sub window in the script by invoke the browser-provided API.
 
 \subsection{Proofs of Security}
 A secure SSO service ensures that only the legitimate user logins to an honest RP under his account.
@@ -510,41 +533,53 @@ So we only need to prove that an attacker cannot retrieve an identity token from
 %\item
 
 The attacker cannot obtain the identity token from an honest RP server.
-We check all the messages sent by the RP server at Line 4, 7, 19, 25, 31, 36, 45, 55, 61, 66, 74, 84 in Relation~\ref{alg2}.
+We check all the messages sent by the RP server at Line 4, 7, 18, 24, 29, 36, 46 in Relation~\ref{alg2}.
 The RP server does not send any token to other processes.
 
-%\item 
+%\item
 
 The attacker cannot obtain the identity token from the RP script.
-Messages sent by the RP script are classified into two classes. 1) The messages at Line 18, 36, 56 in Relation~\ref{alg4}  are sent to the RPDomain which is set at Line 4, so that attackers cannot receive these messages. 2) The messages at Line 26,  46 only carry the contents received from the RP server,
+Messages sent by the RP script are classified into two classes. 1) The messages at Line 18, 36, 40 in Relation~\ref{alg4} are sent to the $RPDomain$, while the value of $RPDomain$ is set at Line 4, so that attackers cannot receive these messages. 2) The \verb+postMessage+ message at Line 26 only carries the content received from the RP server,
  and we have proved that the RP server does not send any token.
 Therefore, attackers cannot receive the token from the RP script.
 
-%\item 
+%\item
 
 Attacker cannot obtain the identity token from the IdP server.
-Among the messages at Line 4, 11, 15, 22, 25, 35, 43, 50, 66 in Relation~\ref{alg1}, only the message at Line 66 carries the token.
-This token is generated at Line 64, following the trace of the \myss{Content} at Line 62, the \myss{PID_U} at Line 60, the \myss{ID_U} at Line 59, the \myss{session} at Line 47, and finally the \myss{cookie} at Line 46. That is, the receiver of token must be the owner of the \myss{cookie} in which session that saves the parameter \myss{ID_U}. The \myss{ID_U} is set at Line 14 after verifying the credential and will never be modified.
+Among the messages at Line 4, 11, 15, 22, 25, 32, 37, 47 in Relation~\ref{alg1}, only the message at Line 47 carries the token.
+This token is generated at Line 45, following the trace of the \myss{Content} at Line 43, the \myss{PID_U} at Line 41, the \myss{ID_U} at Line 40, the \myss{session} at Line 29, and finally the \myss{cookie} at Line 28. That is, the receiver of token must be the owner of the \myss{cookie} in which session that saves the parameter \myss{ID_U}. The \myss{ID_U} is set at Line 14 after verifying the credential and will never be modified.
 As we assume that user credential cannot be known to attackers,
 attackers cannot obtain the identity token from the IdP server.
 
-%\item 
+%\item
 
 The attacker cannot obtain the identity token from the IdP script.
-As the proof provided above, only the IdP sends the token with the message at Line 66 in Relation~\ref{alg1},
-and the IdP script only receives the token at  Line 99 in Relation~\ref{alg3}.
-Here we are going to prove that the token issued for user $u$'s login to RP $r$ (denoted as \myss{t(u,r)}) can only be  sent to the corresponding RP server through the IdP script. The receiver of \myss{t(u,r)} is restricted by the \myss{RPOrigin} at Line 100, which is set at Line 55.
-    The host in the \myss{RPOrigin} is verified using the one included in \myss{Cert} at Line 51.
-    If the \myss{Cert} belong to \myss{r}, the attacker cannot obtain the \myss{t(u,r)}.
-    Now we give the proof that the \myss{Cert} belongs to \myss{r}. Firstly we define the negotiated \myss{PID_{RP}} in \myss{t(u,r)} as \myss{p}.
-    That is the \myss{PID_{RP}} at Line 69 in Relation~\ref{alg2}  must equal to \myss{p} and the \myss{PID_{RP}} is verified at Line 44 with the \myss{RegistrationToken}.
-This verification cannot be bypassed due to the state check at Line 60.
-At the same validity period, the IdP script needs to send the registration request with same \myss{p}  and receive the successful $PID_{RP}$-registration result.
-As the honest IdP checks the uniqueness of \myss{PID_{RP}} at  Line 31 in Relation~\ref{alg1}.
-The \myss{r} and IdP script must share the same \myss{RegistrationToken}. As the \myss{RegistrationToken} contains \myss{\mathtt{Hash}(t)},
-    the IdP script and \myss{r} must share the same \myss{ID_{RP}}.
-    Therefore, the  \myss{Cert} saved as the IdP scriptstate parameter must belong to \myss{r}.
-Thus, the identity token would only be sent to the script in the corresponding RP's origin.
+As the proof provided above, only the IdP sends the token with the message at Line 47 in Relation~\ref{alg1},
+and the IdP script only receives the token at Line 62 in Relation~\ref{alg3}.
+According to the RP designation, a $PID_{RP}$ is uniquely mapping with an RP (i.e., the $ID_{RP}$).
+And the $ID_{RP}$ is uniquely mapping with an $RPDomain$, which is guaranteed by the IdP's signature.
+The receiver of token is restricted by the \myss{RPOrigin} at Line 64, while the value of $RPDomain$ is set at Line 63 according to the $Cert$.
+Thus, an identity token can be only sent to the targeting RP, while the IdP script can verify the mapping between $PID_{RP}$ and $RPDomain$.
+
+
+%Here we are going to prove that the token issued for user $u$'s login to RP $r$ (denoted as \myss{t(u,r)}) can only be sent to the targeting RP server through the IdP script. The receiver of \myss{t(u,r)} is restricted by the \myss{RPOrigin} at Line 64, while the value of $RPDomain$ is set at Line 63 according to the $Cert$.
+%    The value of \myss{Cert} is set at 19 and the signature is verified at Line 16.
+%    If the \myss{Cert} belong to \myss{r}, the attacker cannot obtain the \myss{t(u,r)}.
+%    According to the RP designation, a $PID_{RP}$ is uniquely mapping with an RP (i.e., the $ID_{RP}$).
+	
+ %   Thus, while the 
+   % Now we give the proof that the \myss{Cert} belongs to \myss{r}. 
+    
+    %Firstly we define the negotiated \myss{PID_{RP}} in \myss{t(u,r)} as \myss{p}.
+    
+%    That is the \myss{PID_{RP}} at Line 69 in Relation~\ref{alg2}  must equal to \myss{p} and the \myss{PID_{RP}} is verified at Line 44 with the \myss{RegistrationToken}.
+%This verification cannot be bypassed due to the state check at Line 60.
+%At the same validity period, the IdP script needs to send the registration request with same \myss{p}  and receive the successful $PID_{RP}$-registration result.
+%As the honest IdP checks the uniqueness of \myss{PID_{RP}} at  Line 31 in Relation~\ref{alg1}.
+%The \myss{r} and IdP script must share the same \myss{RegistrationToken}. As the \myss{RegistrationToken} contains \myss{\mathtt{Hash}(t)},
+%    the IdP script and \myss{r} must share the same \myss{ID_{RP}}.
+%    Therefore, the  \myss{Cert} saved as the IdP scriptstate parameter must belong to \myss{r}.
+%Thus, the identity token would only be sent to the script in the corresponding RP's origin.
 
 %\end{itemize}
 Therefore, attackers cannot learn any valid identity tokens and this lemma is proved.
@@ -558,23 +593,23 @@ Therefore, attackers cannot learn any valid identity tokens and this lemma is pr
 \label{lemma:RPdesignation}
 \end{lemma}
 \begin{proof}
-An RP server finally accepts an token at Line 77 in Relation~\ref{alg2}, after the verification of $PID_U$ at Line 73.
-If such a token is accepted, the $PID_{RP}$ must be equal to the stored one retrieved at Line 69 and verified at Line 44 in Relation~\ref{alg2}.
-The stored $PID_{RP}$ is included in the registration result verified at Line 43 in Relation~\ref{alg2}, received from the IdP server indirectly.
-Thus, the $PID_{RP}$ is only valid at the RP received the corresponding registration result.
+%An RP server finally accepts an token at Line 77 in Relation~\ref{alg2}, after the verification of $PID_U$ at Line 73.
+%If such a token is accepted, the $PID_{RP}$ must be equal to the stored one retrieved at Line 69 and verified at Line 44 in Relation~\ref{alg2}.
+%The stored $PID_{RP}$ is included in the registration result verified at Line 43 in Relation~\ref{alg2}, received from the IdP server indirectly.
+%Thus, the $PID_{RP}$ is only valid at the RP received the corresponding registration result.
 
-Moreover, this registration result is generated at Line 40 in Relation~\ref{alg1}
-     and protected by the signature generated at Line 41.
-According to the verification at 31 in Relation~\ref{alg1}, the $PID_{RP}$ is unique during the validity period,
-    so that no other registration results containing this $PID_{RP}$ exists.
-Moreover, according to Line 42, 44 (the $t$ used at Line 42 is set  at  Line 15, used for generating $PID_{RP}$ at Line 13),
-    the $PID_{RP}$ must be designated for this RP, as no other RP cannot generate the same $PID_{RP}$ with this $t$.
-So only one RP is able to achieve the corresponding registration result of an $PID_{RP}$.
+%Moreover, this registration result is generated at Line 40 in Relation~\ref{alg1}
+%     and protected by the signature generated at Line 41.
+%According to the verification at 31 in Relation~\ref{alg1}, the $PID_{RP}$ is unique during the validity period,
+%    so that no other registration results containing this $PID_{RP}$ exists.
+%Moreover, according to Line 42, 44 (the $t$ used at Line 42 is set  at  Line 15, used for generating $PID_{RP}$ at Line 13),
+%    the $PID_{RP}$ must be designated for this RP, as no other RP cannot generate the same $PID_{RP}$ with this $t$.
+%So only one RP is able to achieve the corresponding registration result of an $PID_{RP}$.
 
-Based on the reasons above evidences, (1) the $PID_{RP}$ is only valid at the RP received the corresponding registration result, and (2) only one RP is able to achieve the corresponding registration result of an $PID_{RP}$.
-Thus,
-    the $PID_{RP}$ is only valid at one specific RP,
-        and this lemma is proved.
+%Based on the reasons above evidences, (1) the $PID_{RP}$ is only valid at the RP received the corresponding registration result, and (2) only one RP is able to achieve the corresponding registration result of an $PID_{RP}$.
+%Thus,
+%    the $PID_{RP}$ is only valid at one specific RP,
+%        and this lemma is proved.
 %As it has been proved at Lemma~\ref{lemma:confidentiality}, an malicious RP cannot receive the valid token issued for another RP, therefore, the adversary would not receive the token including an honest RP's $PID_{RP}$ from honest user.
 \end{proof}
 
@@ -586,22 +621,27 @@ Thus,
 \end{lemma}
 \begin{proof}
 %The IdP-issued tokens include the \myss{Cert} used in \myss{script\_idp}, the \myss{RegistrationResult} and \myss{Token} used in \myss{P^r} .
-The $Acct$ derived from the identity token by an RP, is generated based on the $t^{-1}$ according to Line 79 in Relation~\ref{alg2}.
-The integrity of $t^{-1}$ is protected by the IdP issued registration result, according to Line 41-44 in Relation~\ref{alg2}.
-The integrity of $ID_{RP}$ finally contained in the derived $Acct$ is protected by $Cert$, according to Line 15-21, Relation~\ref{alg3}.
-Thus, here we would prove the integrity of identity token, RP $Cert$ and registration result.
-We can easily find that the IdP does not send the private key to any processes so that the attackers cannot obtain the private key. Then we only need to prove that all the proofs are well verified as below.
-\begin{itemize}
-\setlength\itemsep{-2pt}
-\item \myss{Cert} is used at Line 21, 52 in Relation~\ref{alg3}. At Line 21, the \myss{Cert} has already been verified at Line 16. At Line 52, the \myss{Cert} is picked from the state parameters, and the cert parameter is set at Line 19.  At Line 19, the \myss{Cert} has already been verified at Line 16.
-At Line 16 the \myss{Cert} is verified with the public key in the scriptstate,
-    where the key is considered initially honest and the key is not modified in Relation~\ref{alg3}.
-Therefore, \myss{Cert} cannot be forged or modified.
-\item \myss{RegistrationResult} is used in Relation~\ref{alg2} from Line 35 to 55, which is verified at Line 30.
-The IdP's public key is initially set in the RP and never modified.
-Therefore, \myss{RegistrationResult} cannot be forged or modified.
-\item \myss{Token} is used in Relation~\ref{alg2} from Line 69 to 84 after Line 65 where it is verified.  As proved before, the public key is honestly set and never modified. Therefore, \myss{Token} cannot be forged or modified.
-\end{itemize}
+The $Acct$ derived from the identity token by an RP, is generated based on the $PID_U$ in identity proof and $t^{-1}$ assigned at Line 40 in Relation~\ref{alg2}.
+According to RP designation, the $t$ is uniquely mapping the targeting RP.
+%The integrity of $t^{-1}$ is protected by the IdP issued registration result, according to Line 41-44 in Relation~\ref{alg2}.
+The integrity of $PID_{U}$ is guaranteed by the signature contained in the identity token. 
+%The integrity of $ID_{RP}$ finally contained in the derived $Acct$ is protected by $Cert$, according to Line 15-21, Relation~\ref{alg3}.
+Thus, here we would prove the integrity of identity token.%, RP $Cert$ and registration result.
+We can easily find that the IdP does not send the private key to any processes so that the attackers cannot obtain the private key. Then we only need to prove that the identity token is well signed and verified.
+%all the proofs are well verified as below.
+%\begin{itemize}
+%\setlength\itemsep{-2pt}
+%\item \myss{Cert} is used at Line 21, 52 in Relation~\ref{alg3}. At Line 21, the \myss{Cert} has already been verified at Line 16. At Line 52, the \myss{Cert} is picked from the state parameters, and the cert parameter is set at Line 19.  At Line 19, the \myss{Cert} has already been verified at Line 16.
+%At Line 16 the \myss{Cert} is verified with the public key in the scriptstate,
+%    where the key is considered initially honest and the key is not modified in Relation~\ref{alg3}.
+%Therefore, \myss{Cert} cannot be forged or modified.
+%\item \myss{RegistrationResult} is used in Relation~\ref{alg2} from Line 35 to 55, which is verified at Line 30.
+%The IdP's public key is initially set in the RP and never modified.
+%Therefore, \myss{RegistrationResult} cannot be forged or modified.
+%\item 
+\myss{Token} is used in Relation~\ref{alg2} from Line 34 to 39 after Line 28 where it is verified.  As proved before, the public key is honestly set and never modified. Therefore, \myss{Token} cannot be forged or modified.
+%\end{itemize}
+Moreover, an adversary may try to control the $ID_{RP}$ to generate the malicious $PID_{RP}$ and $PID_U$ to break the integrity indirectly, however, the proof of confidentiality has proved it's impossible.
 Therefore, this lemma is proved.
 \end{proof}
 
@@ -613,11 +653,11 @@ Therefore, this lemma is proved.
 \label{lemma:userIdentification}
 \end{lemma}
 \begin{proof}
-The RP accepts the user's identity at Line 83 in Relation~\ref{alg2}.
-And the identity is generated at Line 79, based on the $PID_U$  retrieved from the token and the trapdoor $t^{-1}$.
+The RP accepts the user's identity at Line 45 in Relation~\ref{alg2}.
+And the identity is generated at Line 41, based on the $PID_U$ retrieved from the token and the trapdoor $t^{-1}$.
 The $t^{-1}$ is generated at Line 14, set at Line 17, and never changed, as the multiplicative inverse of $t$.
 According to Lemma~\ref{lemma:integrity}, only the IdP generates an acceptable identity token,
- so that the token must be issued at Line 64 in Relation~\ref{alg1}.
+ so that the token must be issued at Line 45 in Relation~\ref{alg1}.
 The IdP generates the $PID_U$ based on the $PID_{RP}$ and user's $ID_U$.
 According to Lemma~\ref{lemma:RPdesignation},
      if the $PID_{RP}$ is accepted by an RP, the $PID_{RP}$ must be the generated between the RP and the user.
@@ -628,10 +668,10 @@ Moreover, an adversary may allure the honest user to upload the adversary's toke
 While the honest user has already negotiated the $PID_{RP}$ with the RP, the opener of the IdP script must be the RP script.
     As the $t$ generated at Line 7, Relation~\ref{alg3}, and $PID_{RP}$ generated at Line 21 in Relation~\ref{alg3} and Line 13 in Relation~\ref{alg2}.
 The $t$ is only sent to the RP script at Line 8 in Relation~\ref{alg3}, and the RP server at Line 18 in Relation~\ref{alg4}.
-The $PID_{RP}$ is only sent to the IdP server at Lines 28 and 90 in Relation~\ref{alg3}.
-Moreover, the $PID_{RP}$-registration result including the $PID_{RP}$ is sent to the IdP script at Line  35 in Relation~\ref{alg1}, the RP script at Line 40 in Relation~\ref{alg3}, RP server at Line 36 in Relation~\ref{alg4}.
+The $PID_{RP}$ is only sent to the IdP server at Lines 39 and 53 in Relation~\ref{alg3}.
+%Moreover, the $PID_{RP}$-registration result including the $PID_{RP}$ is sent to the IdP script at Line  35 in Relation~\ref{alg1}, the RP script at Line 40 in Relation~\ref{alg3}, RP server at Line 36 in Relation~\ref{alg4}.
 An adversary can never know the $PID_{RP}$ negotiated between the honest user and RP.
-While the honest user has not negotiated the $PID_{RP}$ with the RP yet, the \verb+session+[$PID_{RP}$] at Line 69, Relation~\ref{alg2} and other similar attributes must be empty, as the $Cookie$ used at Line 58 belongs to the honest user and the negotiation between Line 10-20 does not conducted by the user.
+While the honest user has not negotiated the $PID_{RP}$ with the RP yet, the \verb+session+[$PID_{RP}$] at Line 32, Relation~\ref{alg2} and other similar attributes must be empty, as the $Cookie$ used at Line 21 belongs to the honest user and the negotiation between Line 10-18 does not conducted by the user.
 Therefore, an adversary cannot lead the honest RP to accept the malicious token from the honest user.
 \end{proof}
 
@@ -661,7 +701,8 @@ This section provides the detailed relations of the processes (including atomic 
 
 
 \subsection{IdP process}
-The IdP process only accepts the events, downloading scripts, accessing the login status of a cookie owner, authenticating with password, registering the $PID_{RP}$, and requiring the identity token.
+The IdP process only accepts the events, downloading scripts, accessing the login status of a cookie owner, authenticating with password, %registering the $PID_{RP}$, 
+and requiring the identity token.
 The detailed procedure of dealing with these events is shown as follows.
 
 \begin{breakablealgorithm}
@@ -693,29 +734,29 @@ The detailed procedure of dealing with these events is shown as follows.
   \mystate{\myss{session := s'.SessionList[cookie]}}
   \mystate{\myss{uid := session[uid]}}
   \myif{uid \not\equiv \mathtt{null}}
-  \mystate{\myss{m' := \myangle{\mathtt{HTTPResp},n,200,\myangle{},\mathtt{Logged}}}}
+  \mystate{\myss{m' := \myangle{\mathtt{HTTPResp},n,200,\myangle{},\mathtt{Authenticated}}}}
   \mystop{b, a,m'}
   \ENDIF
-  \mystate{\myss{m' := \myangle{\mathtt{HTTPResp},n,200,\myangle{},\mathtt{Unlogged}}}}
+  \mystate{\myss{m' := \myangle{\mathtt{HTTPResp},n,200,\myangle{},\mathtt{Unauthenticated}}}}
   \mystop{b, a,m'}
-  \myelse{path \equiv /dynamicRegistration}
-  \mystate{\myss{PID_{RP} := body[PID_{RP}]}}
- \mystate{\myss{Enpt := body[Enpt]}}
-  \mystate{\myss{Nonce := body[Nonce]}}
-  \myif{PID_{RP} \in \mathtt{ListOfPID()}}
-  \mystate{\myss{Content :=\myangle{Fail, PID_{RP}, Nonce}}}
-  \mystate{\myss{Sig := \mathtt{SigSign}(Content, s'.SK)}}
-  \mystate{\myss{RegistrationResult := \myangle{Content, Sig}}}
-  \mystate{\myss{m' := \myangle{\mathtt{HTTPResp}, n, 200, \myangle{}, RegistrationResult}}}
-  \mystop{b, a,m'}
-  \ENDIF
-  \mystate{\myss{Validity := \mathtt{CurrentTime} ()+ s'.Validity}}
- \mystate{\myss{s'.RPList := s'.RPList +  ^{\myangle{}} \myangle{PID_{RP}, Enpt, Validity}}}
-  \mystate{\myss{Content := \myangle{OK, PID_{RP}, Nonce, Validity}}}
-  \mystate{\myss{Sig := \mathtt{Sig}(Content, s'.SK)}}
-  \mystate{\myss{RegistrationResult := \myangle{Content, Sig}}}
-  \mystate{\myss{m' := \myangle{\mathtt{HTTPResp}, n, 200, \myangle{}, RegistrationResult}}}
-  \mystop{b, a,m'}
+  %\myelse{path \equiv /dynamicRegistration}
+ % \mystate{\myss{PID_{RP} := body[PID_{RP}]}}
+ %\mystate{\myss{Enpt := body[Enpt]}}
+ % \mystate{\myss{Nonce := body[Nonce]}}
+ % \myif{PID_{RP} \in \mathtt{ListOfPID()}}
+ % \mystate{\myss{Content :=\myangle{Fail, PID_{RP}, Nonce}}}
+ % \mystate{\myss{Sig := \mathtt{SigSign}(Content, s'.SK)}}
+ % \mystate{\myss{RegistrationResult := \myangle{Content, Sig}}}
+ % \mystate{\myss{m' := %\myangle{\mathtt{HTTPResp}, n, 200, \myangle{}, RegistrationResult}}}
+%  \mystop{b, a,m'}
+%  \ENDIF
+%  \mystate{\myss{Validity := \mathtt{CurrentTime} ()+ s'.Validity}}
+% \mystate{\myss{s'.RPList := s'.RPList +  ^{\myangle{}} \myangle{PID_{RP}, Enpt, Validity}}}
+%  \mystate{\myss{Content := \myangle{OK, PID_{RP}, Nonce, Validity}}}
+ % \mystate{\myss{Sig := \mathtt{Sig}(Content, s'.SK)}}
+%  \mystate{\myss{RegistrationResult := \myangle{Content, Sig}}}
+ % \mystate{\myss{m' := \myangle{\mathtt{HTTPResp}, n, 200, \myangle{}, RegistrationResult}}}
+ % \mystop{b, a,m'}
   \myelse{path \equiv /authorize}
   \mystate{\myss{cookie := headers[Cookie]}}
   \mystate{\myss{session := s'.SessionList[cookie]}}
@@ -725,8 +766,9 @@ The detailed procedure of dealing with these events is shown as follows.
   \mystop{b, a,m'}
   \ENDIF
   \mystate{\myss{PID_{RP} := parameters[PID_{RP}]}}
-  \mystate{\myss{Enpt := parameters[Enpt]}}
-  \myif{PID_{RP} \notin \mathtt{ListOfPID}() \lor Enpt \notin \mathtt{EnptOfRP}(PID_{RP})}
+ % \mystate{\myss{Enpt := parameters[Enpt]}}
+ % \myif{PID_{RP} \notin \mathtt{ListOfPID}() \lor Enpt \notin \mathtt{EnptOfRP}(PID_{RP})}
+ \myif{\mathtt{IsValid}(PID_{RP}) \equiv \mathtt{FALSE}}
   \mystate{\myss{m' := \myangle{\mathtt{HTTPResp}, n, 200, \myangle{}, \mathtt{Fail}}}}
   \mystop{b, a,m'}
   \ENDIF
@@ -746,7 +788,9 @@ The detailed procedure of dealing with these events is shown as follows.
 
 
 \subsection{RP process}
-The RP process only accepts the events, downloading scripts, redirecting to IdP server, negotiating the $PID_{RP}$, uploading the $PID_{RP}$-registration result and identity token.
+The RP process only accepts the events, downloading scripts, redirecting to IdP server, negotiating the $PID_{RP}$, 
+%uploading the $PID_{RP}$-registration result 
+and identity token.
 The detailed procedure of dealing with these events is shown as follows.
 \begin{breakablealgorithm}
   \caption{\textbf{RP\_Process\_Relation}}
@@ -769,48 +813,48 @@ The detailed procedure of dealing with these events is shown as follows.
   \mystate{\myss{t := parameters[t]}}
   \mystate{\myss{PID_{RP} := \mathtt{Multiply}(s'.ID_{RP}, t)}}
   \mystate{\myss{t^{-1}:= \mathtt{Inverse}(t)}}
-  \mystate{\myss{session[t] := t}}
+ % \mystate{\myss{session[t] := t}}
   \mystate{\myss{session[PID_{RP}] := PID_{RP}}}
   \mystate{\myss{session[t^{-1}] := t^{-1}}}
-  \mystate{\myss{session[state] := expectRegistration}}
+  \mystate{\myss{session[state] := expectToken}}
   \mystate{\myss{m' := \myangle{\mathtt{HTTPResp}, n, 200, \myangle{}, \myangle{Cert, s'.Cert}}}}
  \mystop{b, a, m'}
- \myelse{path \equiv /registrationResult}
- \mystate{\myss{cookie := headers[Cookie]}}
-  \mystate{\myss{session := s'.SessionList[cookie]}}
-  \myif{session[state] \not\equiv expectRegistration}
-  \mystate{\myss{m' := \myangle{\mathtt{HTTPResp}, n, 200, \myangle{}, \mathtt{Fail}}}}
-  \mystop{b, a, m'}
-  \ENDIF
-  \mystate{\myss{RegistrationResult := body[RegistrationResult]}}
-  \mystate{\myss{Content:=RegistrationResult.Content}}
-  \myif{\mathtt{SigVerify}(Content, RegistrationResult.Sig, s'.IdP.PK) \equiv \mathtt{FALSE}}
-  \mystate{\myss{m' := \myangle{\mathtt{HTTPResp}, n, 200, \myangle{}, \mathtt{Fail}}}}
-  \mystate{\myss{session := \mathtt{null}}}
-  \mystop{b, a, m'}
-  \ENDIF
-  \myif{Content.Result \not\equiv OK}
-  \mystate{\myss{m' := \myangle{\mathtt{HTTPResp}, n, 200, \myangle{}, \mathtt{Fail}}}}
-  \mystate{\myss{session := \mathtt{null}}}
-  \mystop{b, a, m'}
-  \ENDIF
-  \mystate{\myss{PID_{RP} := session[PID_{RP}]}}
-  \mystate{\myss{t := session[t]}}
-  \mystate{\myss{Nonce := \mathtt{Hash}( t)}}
-  \mystate{\myss{Time := \mathtt{CurrentTime}()}}
-  \myif{PID_{RP} \not\equiv Content.PID_{RP} \lor Nonce \not\equiv Content.Nonce \lor Time > Content.Validity}
-  \mystate{\myss{m' := \myangle{\mathtt{HTTPResp}, n, 200, \myangle{}, \mathtt{Fail}}}}
-  \mystate{\myss{session := \mathtt{null}}}
-  \mystop{b, a, m'}
-  \ENDIF
-  \mystate{\myss{session[PIDValidity] := Content.Validity}}
-  \mystate{\myss{Enpt \equiv s'.Enpt}}
-  \mystate{\myss{session[state] := expectToken}}
-  \mystate{\myss{Nonce' := \mathtt{Random}()}}
-  \mystate{\myss{session[Nonce] := Nonce'}}
-  \mystate{\myss{Body := \myangle{PID_{RP}, Enpt, Nonce'}}}
-  \mystate{\myss{m' := \myangle{\mathtt{HTTPResp}, n, 200, \myangle{}, Body}}}
-  \mystop{b, a, m'}
+% \myelse{path \equiv /registrationResult}
+% \mystate{\myss{cookie := headers[Cookie]}}
+%  \mystate{\myss{session := s'.SessionList[cookie]}}
+%  \myif{session[state] \not\equiv expectRegistration}
+%  \mystate{\myss{m' := \myangle{\mathtt{HTTPResp}, n, 200, \myangle{}, \mathtt{Fail}}}}
+%  \mystop{b, a, m'}
+%  \ENDIF
+%  \mystate{\myss{RegistrationResult := body[RegistrationResult]}}
+%  \mystate{\myss{Content:=RegistrationResult.Content}}
+%  \myif{\mathtt{SigVerify}(Content, RegistrationResult.Sig, s'.IdP.PK) \equiv \mathtt{FALSE}}
+%  \mystate{\myss{m' := \myangle{\mathtt{HTTPResp}, n, 200, \myangle{}, \mathtt{Fail}}}}
+%  \mystate{\myss{session := \mathtt{null}}}
+%  \mystop{b, a, m'}
+%  \ENDIF
+%  \myif{Content.Result \not\equiv OK}
+%  \mystate{\myss{m' := \myangle{\mathtt{HTTPResp}, n, 200, \myangle{}, \mathtt{Fail}}}}
+%  \mystate{\myss{session := \mathtt{null}}}
+%  \mystop{b, a, m'}
+ % \ENDIF
+ % \mystate{\myss{PID_{RP} := session[PID_{RP}]}}
+  %\mystate{\myss{t := session[t]}}
+  %\mystate{\myss{Nonce := \mathtt{Hash}( t)}}
+  %\mystate{\myss{Time := \mathtt{CurrentTime}()}}
+  %\myif{PID_{RP} \not\equiv Content.PID_{RP} \lor Nonce \not\equiv Content.Nonce \lor Time > Content.Validity}
+  %\mystate{\myss{m' := \myangle{\mathtt{HTTPResp}, n, 200, \myangle{}, \mathtt{Fail}}}}
+  %\mystate{\myss{session := \mathtt{null}}}
+  %\mystop{b, a, m'}
+  %\ENDIF
+  %\mystate{\myss{session[PIDValidity] := Content.Validity}}
+  %\mystate{\myss{Enpt \equiv s'.Enpt}}
+  %\mystate{\myss{session[state] := expectToken}}
+  %\mystate{\myss{Nonce' := \mathtt{Random}()}}
+  %\mystate{\myss{session[Nonce] := Nonce'}}
+  %\mystate{\myss{Body := \myangle{PID_{RP}, Enpt, Nonce'}}}
+  %\mystate{\myss{m' := \myangle{\mathtt{HTTPResp}, n, 200, \myangle{}, Body}}}
+  %\mystop{b, a, m'}
   \myelse{path \equiv /uploadToken}
  \mystate{\myss{cookie := headers[Cookie]}}
   \mystate{\myss{session := s'.SessionList[cookie]}}
@@ -825,9 +869,9 @@ The detailed procedure of dealing with these events is shown as follows.
   \ENDIF
   \mystate{\myss{PID_{RP} := session[PID_{RP}]}}
   \mystate{\myss{Time := \mathtt{CurrentTime}()}}
-  \mystate{\myss{PIDValidity := session[PIDValidity]}}
+ % \mystate{\myss{PIDValidity := session[PIDValidity]}}
   \mystate{\myss{Content := Token.Content}}
-  \myif{PID_{RP} \not\equiv Content.PID_{RP} \lor Time>Content.Validity \lor Time>PIDValidity}
+  \myif{PID_{RP} \not\equiv Content.PID_{RP} \lor Time>Content.Validity}
   \mystate{\myss{m' := \myangle{\mathtt{HTTPResp}, n, 200, \myangle{}, \mathtt{Fail}}}}
   \mystop{b, a, m'}
   \ENDIF
@@ -850,17 +894,19 @@ The detailed procedure of dealing with these events is shown as follows.
 The IdP script process is only invoked to process the events,
 (a) self-triggering events  for starting $PID_{RP}$ negotiation;
 (b) the postMessage from other scripts for sending the $Cert$, and request of identity token;
-(c) the HTTP response for transmitting $PID_{RP}$-registration result and identity token.
+(c) the HTTP response for transmitting 
+%$PID_{RP}$-registration result and 
+identity token.
 The detailed procedure of dealing with these events is shown as follows.
 
 \begin{breakablealgorithm}
   \caption{\textbf{IdP\_Script\_Relation}}
   \label{alg3}
   \begin{algorithmic}[1]
-  \REQUIRE \myss{\myangle{tree, ID_d, scriptstate, scriptinputs, cookies, ids, secret}}
+  \REQUIRE \myss{\myangle{tree, docID, scriptstate, scriptinputs, cookies, ids, secret}}
   \mystate{\myss{ s' := scriptstate}}
   \mystate{\myss{command := \myangle{}}}
-  \mystate{\myss{target := \mathtt{PARENTWINDOW}(tree,ID_d)}}
+  \mystate{\myss{target := \mathtt{PARENTWINDOW}(tree,docID)}}
   \mystate{\myss{IdPDomain := s'.IdPDomain}}
   \SWITCH{\myss{s'.phsae}}
     \CASE{\myss{start}}
@@ -881,41 +927,41 @@ The detailed procedure of dealing with these events is shown as follows.
       \mystate{\myss{t := s'.Parameters[t]}}
       \mystate{\myss{PID_{RP} := \mathtt{Multiply}(Cert.Content.ID_{RP}, t)}}
       \mystate{\myss{s'.Parameters[PID_{RP}] := PID_{RP}}}
-      \mystate{\myss{Enpt := \mathtt{RandomUrl}()}}
-      \mystate{\myss{s'.Parameters[Enpt] := Enpt}}
-      \mystate{\myss{Nonce := \mathtt{Hash}(t)}}
-      \mystate{\myss{Url := \myangle{\mathtt{URL}, \mathtt{S}, IdPDomain, /dynamicRegistration,\myangle{} }}}
-      \mystate{\myss{s'.refXHR :=  \mathtt{Random}()}}
-      \mystate{\myss{command : = \langle\mathtt{XMLHTTPREQUEST}, Url, \mathtt{POST},} \\\ \ \ \ \myss{ \myangle{\myangle{PID_{RP}, PID_{RP}}, \myangle{Nonce, Nonce}, \myangle{Enpt, Enpt}}, s'.refXHR\rangle}}
-      \mystate{\myss{s'.phase := expectRegistrationResult}}
-       \ENDIF
-      \ENDCASE
-      \CASE{expectRegistrationResult}
-      \mystate{\myss{pattern := \myangle{\mathtt{XMLHTTPREQUEST},Body,s'.refXHR}}}
-      \mystate{\myss{input := \mathtt{CHOOSEINPUT}(scriptinputs,pattern) }}
-      \myif{input \not\equiv \mathtt{null} \land input.Content[RegistrationResult].type \equiv OK}
-      \mystate{\myss{RegistrationResult := input.Body[RegistrationResult]}}
-      \myif{ RegistrationResult.Content.Result \not\equiv OK}
-      \mystate{\myss{s'.phase := stop}}
-      \mystate{\myss{\textbf{stop}\ \myangle{}}}
-      \ENDIF
-      \mystate{\myss{command := \myangle{\mathtt{POSTMESSAGE}, target, \myangle{\myangle{RegistrationResult, RegistrationResult}}, \mathtt{null}}}}
-      \mystate{\myss{s'.phase := expectTokenRquest}}
-      \ENDIF
-      \ENDCASE
-      \CASE{expecTokenRquest}
-      \mystate{\myss{pattern := \myangle{\mathtt{POSTMESSAGE}, *, Content, *}}}
-      \mystate{\myss{input := \mathtt{CHOOSEINPUT}(scriptinputs,pattern)}}
-      \myif{input \not\equiv \mathtt{null}}
-       \mystate{\myss{PID_{RP} := input.Content[PID_{RP}]}}
-       \mystate{\myss{Enpt_{RP} := input.Content[Enpt]}}
-       \mystate{\myss{s'.Parameters[Nonce] := input.Content[Nonce]}}
-       \mystate{\myss{Cert := s'.Parameters[Cert]}}
-      \myif{Enpt_{RP} \not\equiv Cert.Content.Enpt \lor PID_{RP} \not\equiv s'.Parameters[PID_{RP}]}
-      \mystate{\myss{s'.phase := stop}}
-      \mystate{\myss{\textbf{stop}\ \myangle{}}}
-      \ENDIF
-       \mystate{\myss{s'.Parameters[Enpt_{RP}] := Enpt_{RP}}}
+ %     \mystate{\myss{Enpt := \mathtt{RandomUrl}()}}
+ %     \mystate{\myss{s'.Parameters[Enpt] := Enpt}}
+ %     \mystate{\myss{Nonce := \mathtt{Hash}(t)}}
+ %     \mystate{\myss{Url := \myangle{\mathtt{URL}, \mathtt{S}, IdPDomain, /dynamicRegistration,\myangle{} }}}
+  %    \mystate{\myss{s'.refXHR :=  \mathtt{Random}()}}
+ %     \mystate{\myss{command : = \langle\mathtt{XMLHTTPREQUEST}, Url, \mathtt{POST},} \\\ \ \ \ \myss{ \myangle{\myangle{PID_{RP}, PID_{RP}}, \myangle{Nonce, Nonce}, \myangle{Enpt, Enpt}}, s'.refXHR\rangle}}
+ %     \mystate{\myss{s'.phase := expectRegistrationResult}}
+ %      \ENDIF
+%      \ENDCASE
+%      \CASE{expectRegistrationResult}
+ %     \mystate{\myss{pattern := \myangle{\mathtt{XMLHTTPREQUEST},Body,s'.refXHR}}}
+ %     \mystate{\myss{input := \mathtt{CHOOSEINPUT}(scriptinputs,pattern) }}
+ %     \myif{input \not\equiv \mathtt{null} \land input.Content[RegistrationResult].type \equiv OK}
+  %    \mystate{\myss{RegistrationResult := input.Body[RegistrationResult]}}
+   %   \myif{ RegistrationResult.Content.Result \not\equiv OK}
+  %    \mystate{\myss{s'.phase := stop}}
+  %    \mystate{\myss{\textbf{stop}\ \myangle{}}}
+  %    \ENDIF
+   %   \mystate{\myss{command := \myangle{\mathtt{POSTMESSAGE}, target, \myangle{\myangle{RegistrationResult, RegistrationResult}}, \mathtt{null}}}}
+  %    \mystate{\myss{s'.phase := expectTokenRquest}}
+   %   \ENDIF
+    %  \ENDCASE
+   %   \CASE{expecTokenRquest}
+   %   \mystate{\myss{pattern := \myangle{\mathtt{POSTMESSAGE}, *, Content, *}}}
+    %  \mystate{\myss{input := \mathtt{CHOOSEINPUT}(scriptinputs,pattern)}}
+    %  \myif{input \not\equiv \mathtt{null}}
+    %   \mystate{\myss{PID_{RP} := input.Content[PID_{RP}]}}
+   %    \mystate{\myss{Enpt_{RP} := input.Content[Enpt]}}
+   %    \mystate{\myss{s'.Parameters[Nonce] := input.Content[Nonce]}}
+   %    \mystate{\myss{Cert := s'.Parameters[Cert]}}
+   %   \myif{Enpt_{RP} \not\equiv Cert.Content.Enpt \lor PID_{RP} \not\equiv s'.Parameters[PID_{RP}]}
+   %   \mystate{\myss{s'.phase := stop}}
+   %   \mystate{\myss{\textbf{stop}\ \myangle{}}}
+    %  \ENDIF
+   %    \mystate{\myss{s'.Parameters[Enpt_{RP}] := Enpt_{RP}}}
       \mystate{\myss{Url := \myangle{\mathtt{URL}, \mathtt{S}, IdPDomain, /loginInfo, \myangle{}}}}
       \mystate{\myss{s'.refXHR :=  \mathtt{Random}()}}
       \mystate{\myss{command : = \myangle{\mathtt{XMLHTTPREQUEST}, Url, \mathtt{GET},\myangle{}, s'.refXHR}}}
@@ -926,17 +972,17 @@ The detailed procedure of dealing with these events is shown as follows.
       \mystate{\myss{pattern := \myangle{\mathtt{XMLHTTPREQUEST},Body,s'.refXHR}}}
       \mystate{\myss{input := \mathtt{CHOOSEINPUT}(scriptinputs,pattern) }}
       \myif{input \not\equiv \mathtt{null}}
-      \myif{input.Body \equiv \mathtt{Logged}}
+      \myif{input.Body \equiv \mathtt{Unanthenticated}}
       \mystate{\myss{user \in ids}}
       \mystate{\myss{Url := \myangle{\mathtt{URL}, \mathtt{S}, IdPDomain, /login, \myangle{}}}}
      \ mystate{\myss{s'.refXHR :=  \mathtt{Random}()}}
       \mystate{\myss{command : = \myangle{\mathtt{XMLHTTPREQUEST}, Url, \mathtt{POST}, \myangle{credential, \mathtt{CredentialofUser}(user,secret)}}, s'.refXHR}}
       \mystate{\myss{s'.phase := expectLoginResult}}
-      \myelse{input.Body \equiv \mathtt{Unlogged}}
+      \myelse{input.Body \equiv \mathtt{Authenticated}}
       \mystate{\myss{PID_{RP} := s'.Parameters[PID_{RP}]}}
-      \mystate{\myss{Enpt := s'.Parameters[Enpt]}}
-      \mystate{\myss{Nonce := s'.Parameters[Nonce]}}
-      \mystate{\myss{Url := \langle \mathtt{URL}, \mathtt{S}, IdPDomain, /authorize,}\\\ \ \ \  \myss{\myangle{\myangle{PID_{RP}, PID_{RP}}, \myangle{Enpt, Enpt}, \myangle{Nonce, Nonce}} \rangle}}
+     % \mystate{\myss{Enpt := s'.Parameters[Enpt]}}
+     % \mystate{\myss{Nonce := s'.Parameters[Nonce]}}
+      \mystate{\myss{Url := \langle \mathtt{URL}, \mathtt{S}, IdPDomain, /authorize,} \myss{\myangle{\myangle{PID_{RP}, PID_{RP}}} \rangle}}
       \mystate{\myss{s'.refXHR :=  \mathtt{Random}()}}
       \mystate{\myss{command : = \myangle{\mathtt{XMLHTTPREQUEST}, Url, \mathtt{GET},\myangle{}, s'.refXHR}}}
       \mystate{\myss{s'.phase := expectToken}}
@@ -951,9 +997,9 @@ The detailed procedure of dealing with these events is shown as follows.
       \mystate{\myss{\textbf{stop}\ \myangle{}}}
       \ENDIF
       \mystate{\myss{PID_{RP} := s'.Parameters[PID_{RP}]}}
-      \mystate{\myss{Enpt := s'.Parameters[Enpt]}}
-      \mystate{\myss{Nonce := s'.Parameters[Nonce]}}
-      \mystate{\myss{Url := \langle \mathtt{URL}, \mathtt{S}, IdPDomain, /authorize,}\\\ \ \ \  \myss{\myangle{\myangle{PID_{RP}, PID_{RP}}, \myangle{Enpt, Enpt}, \myangle{Nonce, Nonce}} \rangle}}
+    %  \mystate{\myss{Enpt := s'.Parameters[Enpt]}}
+     % \mystate{\myss{Nonce := s'.Parameters[Nonce]}}
+      \mystate{\myss{Url := \langle \mathtt{URL}, \mathtt{S}, IdPDomain, /authorize,}  \myss{\myangle{\myangle{PID_{RP}, PID_{RP}}} \rangle}}
       \mystate{\myss{s'.refXHR :=  \mathtt{Random}()}}
       \mystate{\myss{command : = \myangle{\mathtt{XMLHTTPREQUEST}, Url, \mathtt{GET},\myangle{}, s'.refXHR}}}
       \mystate{\myss{s'.phase := expectToken}}
@@ -964,7 +1010,7 @@ The detailed procedure of dealing with these events is shown as follows.
       \mystate{\myss{input := \mathtt{CHOOSEINPUT}(scriptinputs,pattern) }}
       \myif{input \not\equiv \mathtt{null}}
       \mystate{\myss{Token := input.Body[Token]}}
-      \mystate{\myss{RPOringin := \myangle{s'.Parameters[Enpt_{RP}], \mathtt{S}}}}
+      \mystate{\myss{RPOringin := \myangle{s'.Parameters[Cert].Content.Enpt, \mathtt{S}}}}
       \mystate{\myss{command := \myangle{\mathtt{POSTMESSAGE},target,\myangle{Token,Token},RPOrigin}}}
       \mystate{\myss{s .phase := stop}}
      \ENDIF
@@ -979,18 +1025,22 @@ The detailed procedure of dealing with these events is shown as follows.
 \subsection{RP script process}
 The RP script process is only invoked to process the events,
 (a) self-triggering events  for opening the new window;
-(b) the postMessage from other scripts for $PID_{RP}$ negotiation, posting $PID_{RP}$-registration result and identity token;
-(c) the HTTP response for downloading the RP $Cert$, retrieving identity token request and confirming login result.
+(b) the postMessage from other scripts for $PID_{RP}$ negotiation, 
+%posting $PID_{RP}$-registration result 
+and identity token;
+(c) the HTTP response for downloading the RP $Cert$, 
+%retrieving identity token request 
+and confirming login result.
 The detailed procedure of dealing with these events is shown as follows.
 
 \begin{breakablealgorithm}
   \caption{\textbf{RP\_Script\_Relation}}
   \label{alg4}
   \begin{algorithmic}[1]
-\REQUIRE \myss{\myangle{tree, ID_d, scriptstate, scriptinputs, cookies, ids, secret}}
+\REQUIRE \myss{\myangle{tree, docID, scriptstate, scriptinputs, cookies, ids, secret}}
 \mystate{\myss{ s' := scriptstate}}
   \mystate{\myss{command := \myangle{}}}
-  \mystate{\myss{IdPWindow := \mathtt{SUBWINDOW}(tree,docnonce).ID_w}}
+  \mystate{\myss{IdPWindow := \mathtt{SUBWINDOW}(tree,docnonce).winID}}
   \mystate{\myss{RPDomain := s'.RPDomain}}
   \mystate{\myss{IdPOringin := \myangle{s'.IdPDomian, \mathtt{S}}}}
   \SWITCH{\myss{s'.phase}}
@@ -1016,28 +1066,28 @@ The detailed procedure of dealing with these events is shown as follows.
       \myif{input \not\equiv \mathtt{null}}
       \mystate{\myss{Cert := input.Content[Cert]}}
       \mystate{\myss{command := \myangle{\mathtt{POSTMESSAGE}, IdPWindow, \myangle{\myangle{Cert, Cert}}, IdPOringin}}}
-      \mystate{\myss{s'.phase := expectRegistrationResult}}
-      \ENDIF
-      \ENDCASE
-      \CASE{\myss{expectRegistrationResult}}
-      \mystate{\myss{pattern := \myangle{\mathtt{POSTMESSAGE}, *, Content, *}}}
-      \mystate{\myss{input := \mathtt{CHOOSEINPUT}(scriptinputs,pattern)}}
-      \myif{input \not\equiv \mathtt{null}}
-      \mystate{\myss{RegistrationResult := input.Content[RegistrationResult]}}
-      \mystate{\myss{Url := \myangle{\mathtt{URL}, \mathtt{S}, RPDomain, /registrationResult, \myangle{}}}}
-      \mystate{\myss{s'.refXHR :=  \mathtt{Random}()}}
-      \mystate{\myss{command : = \myangle{\mathtt{XMLHTTPREQUEST}, Url, \mathtt{POST},\myangle{\myangle{RegistrationResult, RegistrationResult}}, s'.refXHR}}}
-      \mystate{\myss{s'.phase := expectTokenRequest}}
-      \ENDIF
-      \ENDCASE
-      \CASE{\myss{expectTokenRequest}}
-      \mystate{\myss{pattern := \myangle{\mathtt{XMLHTTPREQUEST},Body,s'.refXHR}}}
-      \mystate{\myss{input := \mathtt{CHOOSEINPUT}(scriptinputs,pattern) }}
-      \myif{input \not\equiv \mathtt{null}}
-      \mystate{\myss{PID_{RP} := input.Content.Body[PID_{RP}]}}
-      \mystate{\myss{Enpt := input.Content.Body[Enpt]}}
-      \mystate{\myss{Nonce := input.Content.Body[Nonce]}}
-      \mystate{\myss{command := \langle\mathtt{POSTMESSAGE}, IdPWindow}, \\\ \ \ \  \myss{\myangle{\myangle{PID_{RP}, PID_{RP}}, \myangle{Enpt, Enpt}, \myangle{Nonce, Nonce}},  IdPOringin\rangle}}
+    %  \mystate{\myss{s'.phase := expectRegistrationResult}}
+     % \ENDIF
+     % \ENDCASE
+     % \CASE{\myss{expectRegistrationResult}}
+     % \mystate{\myss{pattern := \myangle{\mathtt{POSTMESSAGE}, *, Content, *}}}
+     % \mystate{\myss{input := \mathtt{CHOOSEINPUT}(scriptinputs,pattern)}}
+     % \myif{input \not\equiv \mathtt{null}}
+     % \mystate{\myss{RegistrationResult := input.Content[RegistrationResult]}}
+     % \mystate{\myss{Url := \myangle{\mathtt{URL}, \mathtt{S}, RPDomain, /registrationResult, \myangle{}}}}
+     % \mystate{\myss{s'.refXHR :=  \mathtt{Random}()}}
+      %\mystate{\myss{command : = \myangle{\mathtt{XMLHTTPREQUEST}, Url, \mathtt{POST},\myangle{\myangle{RegistrationResult, RegistrationResult}}, s'.refXHR}}}
+     % \mystate{\myss{s'.phase := expectTokenRequest}}
+     % \ENDIF
+     % \ENDCASE
+     % \CASE{\myss{expectTokenRequest}}
+     % \mystate{\myss{pattern := \myangle{\mathtt{XMLHTTPREQUEST},Body,s'.refXHR}}}
+     % \mystate{\myss{input := \mathtt{CHOOSEINPUT}(scriptinputs,pattern) }}
+     % \myif{input \not\equiv \mathtt{null}}
+     % \mystate{\myss{PID_{RP} := input.Content.Body[PID_{RP}]}}
+     % \mystate{\myss{Enpt := input.Content.Body[Enpt]}}
+     % \mystate{\myss{Nonce := input.Content.Body[Nonce]}}
+     % \mystate{\myss{command := \langle\mathtt{POSTMESSAGE}, IdPWindow}, \\\ \ \ \  \myss{\myangle{\myangle{PID_{RP}, PID_{RP}}, \myangle{Enpt, Enpt}, \myangle{Nonce, Nonce}},  IdPOringin\rangle}}
       \mystate{\myss{s'.phase := expectToken}}
       \ENDIF
       \ENDCASE

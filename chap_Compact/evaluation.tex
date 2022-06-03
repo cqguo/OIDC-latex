@@ -20,10 +20,10 @@ The user agent is Chrome v75.0.3770.100.
 %The monitor demonstrates that the calculation and network processing of the IdP does not become a bottleneck (the load of CPU and network is in the moderate level).
 
 We compared UPPRESSO with MITREid Connect and SPRESSO.
-In the evaluation,
+%In the evaluation,
     MITREid Connect runs with the standard implicit login flow of OIDC,
  while the identity tokens in SPRESSO are also forwarded by a user to the RP,
-    similarly to the implicit login flow of OIDC to some extent.
+    similarly to the implicit login flow to some extent.
 In the identity tokens of SPRESSO, $PID_{RP}$ is the encrypted RP domain, while the one-time symmetric key only known by the RP and the user.
 They also configure RSA-2048 and SHA-256  in the generation of identity tokens.
 
@@ -37,13 +37,13 @@ The RPs in three schemes provide the same function, i.e.,
 
 We measured the time for a user to login to an RP
      and calculated the average of $1,000$ measurements.
-We divide a login flow into 3 parts:
-{\em Preparation and identity-token requesting} (for UPPRESSO, it includes Steps 1-3 in Figure \ref{fig:process}),
+We divide a login flow into three parts:
+{\em Preparation and identity-token requesting} (for UPPRESSO, it includes Steps 1-2 in Figure \ref{fig:process}),
  as the RP constructs an identity-token request transmitted to the IdP,
  cooperatively with the user sometimes;
-{\em Identity-token generation} (Step 4),
+{\em Identity-token generation} (Step 3 in Figure \ref{fig:process}),
     when the IdP generates an identity token (and the user authentication is not included);
-and {\em Identity-token acceptance} (Step 5 in Figure \ref{fig:process}),
+and {\em Identity-token acceptance} (Step 4 in Figure \ref{fig:process}),
     as the RP receives, verifies and parses the identity token.
 % and \textbf{Identity token verification} (Steps 5.1 and 5.2 in Figure \ref{fig:process}), the RP verifying and parsing the identity token.
 
@@ -58,11 +58,12 @@ and {\em Identity-token acceptance} (Step 5 in Figure \ref{fig:process}),
 
 The results are shown in Figure \ref{fig:evaluation}.
 The overall times of SSO login are  113 ms, 310 ms, and 308 ms for MITREid Connect, UPPRESSO, and SPRESSO, respectively.
+
 In the preparation and identity-token requesting, MITREid Connect only needs 10 ms but
     UPPRESSO requires 271 ms.
 The main overhead in UPPRESSO is to open the new browser window and download the scripts, which needs about 104 ms.
 This overhead can be mitigated by silently conducting these operations when the user visits the RP website,
-    by the implementation with browser extensions.
+    or by the implementation with browser extensions.
 SPRESSO needs 19 ms in the preparation and identity-token requesting,
     a little more than MITREid Connect,
 for an RP to obtain some information on the IdP  % 's public key %(SPRESSO allows a user to assign any IdPs before login without initial registrations)
@@ -72,7 +73,7 @@ for an RP to obtain some information on the IdP  % 's public key %(SPRESSO allow
 
 %估计能减少多少，
 In the identity-token generation,
-     UPPRESSO needs in total 34 ms.
+     UPPRESSO needs 34 ms.
 Compared with MITREid Connect,
     it needs 2 more ms to calculate  $PID_U$.
 SPRESSO requires 71 ms to generate an identity token,
@@ -89,9 +90,9 @@ It takes 71 ms for MITREid Connect to accept this identity token:
     when the token is redirected to the RP,
         it must be carried within an URL following  the fragment identifier \verb+#+ instead of \verb+?+,
          due to some security considerations \cite{de2014oauth},
-        so the identity-token response has to been sent to the RP by JavaScript functions (but not HTTP requests)
+        so the identity token has to be sent to the RP by JavaScript functions (but not HTTP requests)
             and most time is spent to download the script from the RP.
-SPRESSO needs the longest time (210 ms) due to the complicated process at the user's browser:
+SPRESSO needs the longest time (210 ms) due to the complicated process at the user browser:
         after receiving identity tokens from the IdP,
         the browser downloads the JavaScript program from a trusted forwarder,
             decrypts the RP endpoint, and finally sends identity tokens to this endpoint.

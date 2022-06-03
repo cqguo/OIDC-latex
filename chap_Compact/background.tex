@@ -3,7 +3,7 @@
 %UPPRESSO is designed to be compatible with OpenID Connect (OIDC) and provide privacy protections based on the discrete logarithm problem. Next,
 
 This section introduces OIDC \cite{OpenIDConnect},
- to explain typical SSO login flows.
+ to describe typical SSO login flows.
 Then, we discuss existing privacy-preserving SSO solutions and other related works.
 
 \subsection{OpenID Connect}
@@ -16,20 +16,20 @@ and other necessary information such as user credentials (i.e., passwords or pub
 % below can be removed
 %The IdP should maintain these attributes securely.
 
-\vspace{1mm}
-\noindent\textbf{Implicit Login Flow.}
-OIDC supports three types of user login flows: implicit flow, authorization code flow, and hybrid flow (i.e., a mix-up of the previous two).
+%\vspace{1mm}
+%\noindent\textbf{Implicit Login Flow.}
+OIDC supports three types of login flows: implicit flow, authorization code flow, and hybrid flow (i.e., a mix-up of the previous two).
 %In the implicit flow, an {\em id token} is generated as the identity token, which contains a user identifier, an RP identifier, the issuer (i.e., IdP), the validity period, and other requested attributes. The IdP signs the id token using its private key to ensure integrity, and sends it to the RP through the user.
 %In the authorization code flow, the IdP binds an authorization code with the RP, and sends it to the RP through the user; then, the RP establishes an HTTPS connection to the IdP and uses the authorization code with the RP's credential to obtain the user's identifier and other attributes.
 %UPPRESSO is compatible with all three flows.
 These flows mainly result from the different steps to request and receive identity tokens,
     but work with the common security requirements of identity tokens.
 We introduce the implicit flow and present our design and implementation based on this flow,
-    and the extensions to support the authorization code flow is discussed in Section \ref{sec:discussion}.
+    and Section \ref{sec:discussion} presents the extensions to support the authorization code flow.
 
 \begin{figure}[b]
   \centering
-  \includegraphics[width=0.9\linewidth]{fig/OIDC1.pdf}
+  \includegraphics[width=0.88\linewidth]{fig/OIDC1.pdf}
   \caption{The implicit SSO login flow of OIDC.}
   \label{fig:OpenID}
 %  \vspace{-5mm}
@@ -54,36 +54,61 @@ Before issuing the identity token,
 %The identity token is usually signed by the IdP,
 %    and transmitted through secure channels such as TLS/HTTPS.
 The user's operations including authentication, redirection, authorization, and forwarding,
-    are implemented in a software called user agent (i.e., a browser for web applications).
+    are implemented in a software called \emph{user agent} (i.e., a browser for web applications).
 
 %extracts user's identifier and returns the authentication result to the user (Step 7).
 
-As described above, a ``pure'' SSO protocol does not include any authentication step,
-    and there is no authentication step between users and an RP.
-An RP only verifies tokens issued by the IdP.
+As described above, a ``pure'' SSO protocol does not include any authentication step:
+the authentication between a user and the IdP is conducted independently of the SSO protocol.
+There is no authentication step between users and an RP,
+        and an RP only verifies tokens issued by the IdP.
 This feature of commonly-used SSO protocols \cite{OpenIDConnect,rfc6749,SAML} brings advantages as below.
-It enables the IdP to authenticate a user by any appropriate means (e.g., password, two-factor authentication, one-time password,
-        and smart card).
-Therefore, if a credential was lost or compromised,
+It enables the IdP to authenticate a user by any appropriate means (e.g., password,
+one-time password, multi-factor authentication, and smart card).
+Moreover, if a credential was lost or compromised,
     the user only needs renew it at the IdP.
-However, if a user needs to prove some secret to the RP and this secret is valid across multiple login instance
-    (i.e., some authentication steps are involved in fact),
+On the other hand, if a user needs to prove some secret to the RP and this secret is valid across multiple login instance
+    (i.e., some authentication steps are actually involved),
                 the user has to notify each RP if this secret was leaked  or lost. %(or even the user logins from another computer).
 
 
-\vspace{1mm}
-\noindent\textbf{RP Dynamic Registration.}
-In addition to the manual registrations,
-    OIDC also supports dynamic registrations
-    for an RP to register by online means \cite{DynamicRegistration}.
-The (unregistered) RP sends a registration request
-        with endpoints to receive identity tokens (and also other optional information),
-        to the IdP.
-After a successful registration,
- the IdP assigns a unique identity to this RP in the response.
-
+%\vspace{1mm}
+%\noindent\textbf{RP Dynamic Registration.}
+%In addition to manual registrations,
+%    OIDC also supports dynamic registrations
+%    for an RP to register by online means \cite{DynamicRegistration}.
+%The (unregistered) RP sends a registration request
+%        with endpoints to receive identity tokens (and other information),
+%        to the IdP.
+%After a successful registration,
+% the IdP assigns a unique RP identity in the response.
+%
 
 %UPPRESSO leverages this function and slightly modifies the dynamic registration process to implement the {\em $PID_{RP}$ registration} process (see details in Section \ref{sec:UPPRESSO}.C), which allows an RP to generate different privacy-preserving RP identifiers and register them with the IdP.
+
+
+
+
+
+\begin{table*}[tb]
+\footnotesize
+    \caption{Comparison of Existing Privacy-Preserving SSO Solutions.}
+    \centering
+    \begin{tabular}{|c|c|c|c|c|c|c|}
+  \hline
+  \multirow{3}*{\textbf{~~Solution~~}} &
+  \multicolumn{3}{c|}{\textbf{SSO Feature} - supported or not} & \multicolumn{3}{c|}{\textbf{Privacy Threat} - prevented or not} \\ \cline{2-7}
+  & Non-anonymous & Independency of & Maintenance of & IdP-based & RP-based & Collusive Attacks \\
+  & User Identity & User Authentication & User Attributes & Login Tracing & Identity Linkage & by the IdP and RPs \\\hline
+  ABC\cite{x} & X & X & X & X & X & X \\ \hline
+  UPPRESSO & X & X & X & X & X & X \\ \hline
+\end{tabular}
+    \label{tbl:comparison-protocol}
+\end{table*}
+
+
+
+
 
 \subsection{Existing Privacy-Preserving Solutions for SSO}
 \label{subsec-solutions}
@@ -100,7 +125,8 @@ PPID-based approaches cannot prevent the IdP-based login tracing,
 BrowserID \cite{BrowserID} and SPRESSO \cite{SPRESSO} are proposed to defend SSO services against the IdP-based login tracing,
     but both solutions are instead vulnerable to the threat of RP-based identity linkage.
 In BrowserID (and its prototypes known as Mozilla Persona \cite{persona} and Firefox Accounts \cite{FirefoxAccount}),
- the IdP issues a special ``token'' to bind the user identity to an ephemeral public key,
+ the IdP (called the primary identity authority in BrowserID \cite{BrowserID})
+  issues a special ``token'' to bind the user identity to an ephemeral public key,
  so that the user uses the corresponding private key to sign a ``subsidiary'' identity token
     to bind his identity with the target RP's identity and then sends both tokens to the RP.
 When a user logins to different RPs, the RPs could still extract the identical user identities
@@ -108,12 +134,67 @@ When a user logins to different RPs, the RPs could still extract the identical u
 Meanwhile,
     in SPRESSO an RP creates a one-time but verifiable pseudo-identity for itself in each login instance.
 Then, the IdP generates an identity token binding this RP pseudo-identity and the user identity. %and returns it through a trusted third-party entity called forwarder.
-Similarly, collusive RPs could link a user's multiple login instances based on his permanent user identity in these tokens.
+Similarly, collusive RPs could link a user based on his permanent user identity in these tokens.
 
 PPIDs cannot be directly integrated in either BrowserID or SPRESSO.
 PPIDs are assigned in identity tokens based on the visited RP \cite{NIST2017draft,OpenIDConnect, SAMLIdentifier},
     but the IdP receives (\emph{a}) nothing about the RP in BrowserID
      or (\emph{b}) only an ephemeral pseudo-identity of the RP in SPRESSO.
+
+
+
+
+A user of EL PASSO \cite{ZhangKSZR21}
+    keeps a secret on his device.
+After authenticating the user,
+    the IdP certifies a credential binding the secret,
+         also kept on the user's device.
+When attempting to login to any RP,
+    the user proves that he is the owner of this credential to the RP without exposing the secret;
+when such a credential is verified by multiple RPs,
+        user-maintained pseudonyms and anonymous credentials \cite{anon-credential} prevent collusive RPs from linking the login instances.
+UnlimitID \cite{IsaakidisHD16} presents similar designs,
+    also based on anonymous credentials \cite{anon-credential}.
+PseudoID \cite{PseudoID} introduces an independent token service in addition to the IdP,
+    to  blindly sign (or certify) a pseudonym credential binding a user's secret.
+Then, the user proves to the RP that he owns this secret to login.
+These RP-verified credentials protect user privacy well %and enable the visits to multiple RPs,
+        and two kinds of privacy threats are prevented  \cite{ZhangKSZR21,IsaakidisHD16,PseudoID},
+    but a user has to by himself manage pseudonyms for different RPs.
+For example,
+    the domain of an RP is used as a factor to locally generate the user's account (or pseudonym) at this RP.
+It brings some burdens to users,
+    while PPIDs are maintained by the IdP and in UPPRESSO the accounts are determined automatically.
+
+%FIDO \cite{fidouaf} allows a user to generate a key pair on his FIDO-certified device
+%    and register the public key at an RP, so that the user logins to this RP with the private key.
+%FIDO supports multiple key pairs for different RPs on one device,
+%        and the RP-based linkage is also prevented in the registration flow.
+
+Although EL PASSO
+ calls itself an SSO scheme
+    and the service signing tokens or credentials in EL PASSO, UnlimitID and PseudoID is called the IdP \cite{ZhangKSZR21,IsaakidisHD16,PseudoID},
+    there are some authentication steps between the user and RPs to verify the user secrets.
+Therefore, in these systems
+    a user needs to notify each RP if a credential was lost or compromised,
+for the user is authenticated by the RP with his credentials
+            to prove that he owns the long-term secret.
+Moreover,
+    a user has to change its account at each RP if its long-term secret was lost,
+        because the account is calculated based on this secret \cite{ZhangKSZR21,IsaakidisHD16}.
+On the contrary,
+    in the commonly-used SSO systems \cite{OpenIDConnect,rfc6749,SAML} and privacy-preserving schemes
+    such as BrowserID \cite{BrowserID}, SPRESSO \cite{SPRESSO} and also UPPRESSO,
+        a user only renews his credential at the IdP if it was compromised,
+    because (\emph{a}) authentication happens only between the user and the IdP
+    and (\emph{b}) an RP verifies only tokens generated by the IdP.
+
+
+
+
+
+
+
 
 
 \begin{comment}

@@ -6,12 +6,17 @@
 
 
 %%Scalbility
-%\vspace{1mm}\noindent{\textbf{Scalability.}} The adversary cannot exhaust $ID_{RP}$ and $PID_{RP}$.
-%For $ID_{RP}$, it is generated only in RP's initial registration.
-%For $PID_{RP}$,  in practice, we only need to ensure all $PID_{RP}$s are different among the unexpired identity token (the number denoted as $a$).
-%We assume that IdP does not perform the uniqueness check, and then calculate the probability that at least two $PID_{RP}$s are equal in these $a$ ones. The probability is $1-\prod_{i=0}^{a-1}(1-i/q)$ which increases with $a$.
-%For an IdP with throughput $2*10^8$ req/s, when the validity period of the identity token ($PID_{RP}$) is set as 5 minutes, $a$ is less than $2^{36}$, then the probability is less than $2^{-183}$ for 256-bit $q$ (the order of base point $G$ on \verb+P-256+).
-%%Moreover, as this probability is negligible, the uniqueness check of $PID_{RP}$, i.e., the $PID_{RP}$ registration, could be removed in the SSO login process, and this optimization can be adopted when this negligible probability is acceptable by the users and RPs.
+\vspace{1mm}\noindent{\textbf{Scalability.}} Adversaries cannot exhaust $ID_{RP}$ or $PID_{RP}$.
+$ID_{RP}$ is generated uniquely only in every RP's initial registration,
+    and the capacity is $n$ (i.e., the order of $G$); For example, for the NIST P256 elliptic curve, $n$ is approximately $2^{256}$.
+As for $PID_{RP}$,  we only need to ensure $PID_{RP}$ is unique among \emph{unexpired} identity tokens,
+    the number of which is denoted as $\sigma$.
+The probability that at least two $PID_{RP}$s are identical among these $\sigma$ ones,
+    is $1-\prod_{i=0}^{\sigma-1}(1-i/n)$.
+For example,
+    when the IdP serves $10^{8}$ requests per second and the validity period of identity tokens is 10 minutes,
+     $\sigma$ is less than $2^{36}$ and the probability is less than $2^{-183}$ for the NIST P256 elliptic curve.
+This probability is negligible.
 
 %%DoS
 %%Security against ID exhaustion DoS
@@ -22,7 +27,7 @@
 %%The adversary may act as a user requesting to log into an RP, and make the RP perform two modular exponentiations.
 %%The RP could previously calculated a set of $Y_{RP}$s to mitigate this attack.
 
-%\vspace{1mm}
+\vspace{1mm}
 \noindent{\textbf{Applicability.}}
 Three identity-transformation functions, i.e., $\mathcal{F}_{PID_{RP}}()$, $\mathcal{F}_{PID_U}()$, and $\mathcal{F}_{Acct}()$,
     are applicable to various SSO scenarios
@@ -34,8 +39,8 @@ Although the prototype system runs for web applications,
 Moreover,
     because the authentication steps are independent of the UPPRESSO protocol,
 the IdP can choose any appropriate mechanism to authenticate users.
-    
-    
+
+
 %In this paper, the functions are implemented based on the elliptic curve algorithm and the mechanism provided by OIDC system.
 %However, the transformation functions can also be implemented based on other mechanisms according to the protocol and environment, for example, the TPM may be used to take responsibility to transform identities.
 
@@ -49,16 +54,19 @@ In the authorization code flow of OIDC \cite{OpenIDConnect},
             an access token is forwarded to the RP,
             and then the RP uses this access token to ask for identity tokens from the IdP.
 The identity-transformation functions $\mathcal{F}_{PID_{U}}$, $\mathcal{F}_{PID_{RP}}$ and $\mathcal{F}_{Account}$
-    can be integrated into the authorization code flow to generate and verify two tokens,
- so that the privacy threats are still prevented in the generation and verification of tokens.
-Accordingly,
-    only $PID_{RP}$ but not $ID_{RP}$ is enclosed in the access tokens (as well as the identity tokens).
+    can be integrated into the authorization code flow to generate and verify two types of tokens.
+That is,
+    $PID_{RP}$ but not $ID_{RP}$ is enclosed in access tokens by the IdP,
+        and the RP accepts an access token with matching $PID_{RP}$ only.
+Then,
+    the RP uses the access token to request the identity token with $PID_U$,
+ so the privacy threats are still prevented in authorization code flow.
+
 However,
     as the RP receives the identity token directly from the IdP in this flow,
             it allows the IdP to obtain the RP's network information (e.g., IP address).
-Therefore,
-to prevent this leakage in the authorization code flow,
-    UPPRESSO needs to integrate anonymous networks (e.g., Tor) for the RP to ask for identity tokens.
+To prevent this leakage,
+    the RP needs to integrate anonymous networks (e.g., Tor) to ask for identity tokens  in the authorization code flow.
 
 %平台无关
 %Similar as SPRESSO, we can integrated for***
@@ -96,29 +104,32 @@ to prevent this leakage in the authorization code flow,
 
 %\noindent{\textbf{Malicious IdP mitigation.}} The IdP is assumed to assign a unique $ID_{RP}$ in $Cert_{RP}$ for each RP and generate the correct $PID_U$ for each login. The malicious IdP may attempt to provide the incorrect $ID_{RP}$ and $PID_U$, which could be prevented by integrating certificate transparency \cite{rfc6962} and user's identifier check \cite{SPRESSO}. With certificate transparency \cite{rfc6962}, the monitors  check the uniqueness of $ID_{RP}$ among all the certificates stored in the log server. To prevent the malicious IdP from injecting any incorrect $PID_U$, the user could provide a nickname to the RP for an extra check as in SPRESSO \cite{SPRESSO}.
 
-
+\vspace{1mm}\noindent{\textbf{Alternative Methods to Bind $ID_{RP}$ and $Enpt_{RP}$.}}
+xxxxx
 
 \vspace{1mm}\noindent{\textbf{Implementation with Browser Extensions.}}
 To improve the portability of user agents,
     the user functions of UPPRESSO are implemented by browser scripts in the prototype system.
 However,
     these functions can be implemented with browser extensions,
-    which will result in much better performance.
+    which will result in better performance.
 In this case,
     a user downloads and installs the browser extension,
     before he visits the RPs.
-After some experiments while the IdP and RPs in the prototype system are unmodified,
-    we find that at least 102 ms will be saved for each login instance (i.e., about 208 ms in total),
+%After some experiments while the IdP and RPs in the prototype system are unmodified,
+Experiments show that at least 102 ms will be saved for each login instance (i.e., about 208 ms in total),
     compared with the version implemented with browser scripts.
 
 \vspace{1mm}
 \noindent{\textbf{Collusive Attacks by the IdP and RPs.}}
-If the IdP is kept curious-but-honest and shares messages in the login flow (i.e.,
-$ID_U$, $PID_{RP}$, $PEnpt_U$, $H(t)$, and $PID_U$)
+If the IdP is kept curious-but-honest but shares messages in the login flow (i.e.,
+$ID_U$, $PID_{RP}$, and $PID_U$)
         with some collusive RPs,
 UPPRESSO still provides secure SSO services,
-    provided that the signed identity tokens are sent to the authenticated users only.
-Moreover, in this case, a user's login activities at the other RPs,
+    provided that the signed identity tokens are sent to the authenticated users only;
+however,
+    the collusive adversaries are able to trace the users' login activities to these RPs.
+Anyway, even in this case, a user's login activities at the other RPs not collusive with the IdP,
         are still protected from the IdP and these collusive RPs,
         because a triad of $t$, $PID_U$ and $PID_{RP}$ is ephemeral and independent of each other.
 
