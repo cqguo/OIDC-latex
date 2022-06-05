@@ -214,15 +214,15 @@ The origin parameter consists of
 
 Finally,
 in an UPPRESSO login instance,
-    the browser firstly downloads the RP script when visiting this RP and
-then the RP script opens a new window that will download the IdP script.
+    the browser firstly downloads the RP script when visiting this RP, and
+then this RP script opens a new window that will download the IdP script.
 We need to prevent the referer leakage when the IdP script is downloaded.
 Generally, when a browser window visits another website not belonging to its opener's origin,
- the HTTP request to this website will automatically carry the referer header which is the opener's origin.
-This HTTP referer header may leak the information of the visited RP to the IdP.
-Fortunately, in UPPRESSO the newly-opened window is redirected from the RP to the IdP instead of directly visiting the IdP (see Figure~\ref{fig:process}, Steps 1.2-1.3).
-So this leakage is prevented by setting the header \emph{referrer-policy=no-referrer} in the HTTP response from the RP.
-Then, the HTTP request to download the IdP Script carries no \emph{referer} header.
+ the HTTP request to this website will automatically carry the \verb+referer+ header which is the opener's origin.
+This HTTP \verb+referer+ header leaks the information about the visited RP to the IdP.
+Fortunately, in UPPRESSO this newly-opened window is redirected from the RP to the IdP, instead of directly visiting the IdP (see Figure~\ref{fig:process}, Steps 1.2-1.3).
+So this leakage is prevented by setting the header \verb+referrer-policy=no-referrer+ in the HTTP response from the RP.
+Then, the HTTP request to download the IdP Script carries no \verb+referer header.
 This setting is specified by W3C \cite{referer_policy}, and widely supported.
 We have checked it in Chrome and Firefox, and confirmed no referer leakage.
 
