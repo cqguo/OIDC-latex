@@ -157,9 +157,14 @@ and these designs enable UPPRESSO to provide SSO services for users with commerc
 %If a user visits the IdP and RPs through a client software,
 %        the specific designs become unnecessary and the performance will be improved.
 
-First of all, the IdP's ignorance of the RP's identity breaking the mechanism in OIDC system protecting the confidentiality of an identity proof. 
-In OIDC system, the confidentiality of an identity proof is guaranteed by the \verb+redirect\_uri+ mechanism. That is, while an RP registers itself at an IdP, it should upload its endpoint for receiving the identity proof. So, as the IdP transmit the identity proof to the RP, it would use the HTTP 302 URL redirection. It allows the IdP to set a target (the URL containing RP registered endpoint and the identity proof following) in the HTTP response, and the browser would following visit this target. 
-It would prevent any adversaries from achieving the valid identity token issued for an honest RP.
+First of all, in UPPRESSO the IdP is not aware of the visited RP,
+    while in commonly-used SSO protocols the IdP requires this information to ensure confidentiality of identity tokens.
+For example,
+    in the OIDC services, when an RP registers itself at the IdP, the \verb+redirect_uri+ parameter 
+    is set as the endpoint to receive identity tokens.
+So, as the IdP transmit the identity proof to the RP, it would use the HTTP 302 URL redirection. It allows the IdP to set a target (the URL containing RP registered endpoint and the identity proof following) in the HTTP response, and the browser would following visit this target.
+This mechanism ensures that an identity token is sent to the endpoint (i.e., URL) of which is designated in the token, and prevent any MitM attacker from achieving the identity token issued for an honest RP.
+
 In UPPRESSO the IdP is not aware of the visited RP and cannot set the endpoints,
         so \emph{RP certificates} are designed to instruct the user agents (or browsers) about
             the RP endpoint of an RP.
@@ -170,14 +175,14 @@ The user agent should take the responsibility for forwarding the identity token 
 To deal with the requirements of user-side logic in privacy-preserving system, for example, verifying the RP certificate and sending identity token to targeting RP,  there must be the specific application running on user's device. In UPPRESSO system, the browser is adopted as the user agent, therefore, the web script is used as the user-side application.
 More efficient but less portable implementations with browser extensions
  are discussed in Section \ref{sec:discussion}.
- As the IdP is considered honest and the RP may be malicious, so there should be the script downloaded from IdP server as the trust base. 
-Thus, to avoid the IdP server obtaining any evidence about the RP's identity and provide IdP's script with the RP certificate, the RP's script is also required to transmit the certificate to IdP script after it is downloaded from IdP server. 
+ As the IdP is considered honest and the RP may be malicious, so there should be the script downloaded from IdP server as the trust base.
+Thus, to avoid the IdP server obtaining any evidence about the RP's identity and provide IdP's script with the RP certificate, the RP's script is also required to transmit the certificate to IdP script after it is downloaded from IdP server.
 The RP certificate is verified by the IdP script, and
 the IdP's public key is downloaded in the IdP script to verify RP certificates.
 So the user agent does not configure anything locally,
     as it does in widely-adopted SSO systems.
-    
-In UPPRESSO system, the IdP script and RP script communicate with the IdP server and RP server respectively, according to the same origin policy. As the server and its script would only communicate with each other based on HTTPS channel, the adversary cannot steal the identity token in such ways. 
+
+In UPPRESSO system, the IdP script and RP script communicate with the IdP server and RP server respectively, according to the same origin policy. As the server and its script would only communicate with each other based on HTTPS channel, the adversary cannot steal the identity token in such ways.
     However, while the IdP sends the identity token to RP, the identity token would be transmitted from IdP script to RP script during the SSO flow, that should be well protected with the RP certificate.
     In UPPRESSO system, the IdP and RP scripts communicate with each other within the user browser through the standard \verb+postMessage+ HTML5 API.
 To avoid the honest user sending the identity token to an adversary, the receiver of an identity token is restricted by the \verb+postMessage+ \emph{targetOringin} mechanism. That is, while the IdP script sends the identity token through \verb+postMessage+, the origin of RP can be set as the parameter in the \verb+postMessage+ API (e.g., \emph{PR\_window.postMessage(identity\_token, "https://www.RPdomain.com")}), so that the identity token can be only sent to the script downloaded from this origin. The origin is consisted of the protocol part (e.g., http://), the host name (e.g., www.RPdomain.com) and the port (can be implied).
@@ -214,7 +219,7 @@ We have tested it in Chrome and Firefox, and confirmed no referer leakage.
 
 
 
-  
+
 
 %However, in such system, the scripts is used to communicate between RP and IdP servers instead of HTTP URL redirection.
 %The two scripts communicates with each other within the user browser through the standard \verb+postMessage+ HTML5 API.
