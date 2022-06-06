@@ -28,7 +28,7 @@ In this section, we prove that there would not be the $t$ and $t'$ happening to 
 
 \vspace{1mm}
 \noindent\textbf{User Identification.}
-An honest RP always derives an identical permanent account from different identity tokens binding $PID_U$ and $PID_{RP}$.
+An \emph{honest} RP always derives an identical permanent account from different identity tokens binding $PID_U$ and $PID_{RP}$.
 That is,
     in the user's any $i$-th and $i'$-th ($i \neq i'$) login instances to the RP,
  $\mathcal{F}_{Acct}(PID_{U}^i, PID_{RP}^i) = \mathcal{F}_{Acct}(PID_{U}^{i'}, PID_{RP}^{i'}) = [ID_U]ID_{RP}$.
@@ -74,10 +74,10 @@ First of all, the communications among the IdP, RPs and users,
     are protected by HTTPS,
     and the \verb+postMessage+ HTML5 API ensures the dedicated channels between two scripts within the browser,
     so that adversaries cannot eavesdrop the identity tokens.
-Meanwhile, the honest IdP sends the identity token only to the authenticated user 
+Meanwhile, the honest IdP sends the identity token only to the authenticated user
         (i.e., the IdP script in the browser).
 The IdP script forwards the token to the RP script
- only when it is downloaded from the same website as $Enpt_{RP}$,
+ only if it is downloaded from the same origin as $Enpt_{RP}$,
 and the binding of $Enpt_{RP}$ and $ID_{RP}$ is ensured by the signed RP certificate,
     which is also verified by the IdP script.
 So only the designated target RP that holds $Enpt_{RP}$ and $ID_{RP}$ in the certificate,
@@ -92,7 +92,7 @@ The identity token binds $Acct$ and $ID_{RP}$ implicitly,
     and any breaking will result in some failed check or verification in the login flow.
 The integrity is ensured by the IdP's signatures:
     the identity token binding $PID_U$ and $PID_{RP}$ is signed by the IdP.
-As the proof of RP designation,
+According to the proof of RP designation,
     there is no $t' \neq t$ but satisfying that $PID_{RP} = [t]ID_{RP_j} = [tr]G = [t'r']G = [t']ID_{RP_{j'}}$.
 That is, the identity token explicitly binding $PID_U$ and $PID_{RP}$,
     matches only one $ID_{RP}$ (and also only one $Acct = [t^{-1}]PID_{U}$).
@@ -149,7 +149,7 @@ UPPRESSO effectively prevents the attacks of IdP-based login tracing and RP-base
 \noindent\textbf{IdP-based Login Tracing.}
 The information accessible to the IdP and derived from the RP's identity,
     is only $PID_{RP}$, where $PID_{RP} = [t]ID_{RP}$ is calculated by the user.
-Because  (\emph{a}) $t$ is a number randomly chosen from $(1,n)$ by the user and kept secret to the IdP
+Because  (\emph{a}) $t$ is a number randomly chosen from $(1, n)$ by the user and kept secret to the IdP
  and (\emph{b}) $ID_{RP} = [r]G$ and $G$ is the base point (or generator) of $\mathbb{E}$,
  the IdP has to view $PID_{RP}$ as randomly and independently chosen from $\mathbb{E}$,
     and cannot distinguish $[t]ID_{RP_j} = [tr]G$ from any $[t']ID_{RP_{j'}} = [t'r']G$.
