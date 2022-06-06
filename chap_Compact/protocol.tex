@@ -196,9 +196,9 @@ The IdP's public key is set in the IdP script, so that
 %However, while the IdP sends the identity token to RP, the identity token would be transmitted from IdP script to RP script during the SSO flow, that should be well protected with the RP certificate.
 After using the extracted $ID_{RP}$ in identity transformations
     and receiving an identity token from the IdP,
-    the IdP script needs to ensure the RP script will forward this identity token to $Enpt_{RP}$,
+    the IdP script needs to ensure the RP script will forward this token to $Enpt_{RP}$,
         which is bound together with $ID_{RP}$ in the RP certificate.
-The IdP and RP scripts communicate with each other within the user browser through the standard \verb+postMessage+ HTML5 API,
+The IdP and RP scripts communicate with each other within the user browser through the \verb+postMessage+ HTML5 API,
 %To avoid the honest user sending the identity token to an adversary,
 and the receiver of an identity token (i.e., the RP script)
  is restricted by the \verb+postMessage+ targetOringin mechanism.
@@ -214,14 +214,14 @@ The origin parameter consists of
 
 Finally,
 in an UPPRESSO login instance,
-    the browser firstly downloads the RP script when visiting this RP, and
+    the browser first downloads the RP script when visiting an RP, and
 then this RP script opens a new window that will download the IdP script.
 We need to prevent the referer leakage when the IdP script is downloaded.
-Generally, when a browser window visits another website not belonging to its opener's origin,
+Generally, when a browser window visits another website not in its opener's origin,
  the HTTP request to this website will automatically carry the \verb+referer+ header which is the opener's origin.
 This HTTP \verb+referer+ header leaks the information about the visited RP to the IdP.
 Fortunately, in UPPRESSO this newly-opened window is redirected from the RP to the IdP, instead of directly visiting the IdP (see Figure~\ref{fig:process}, Steps 1.2-1.3).
-So this leakage is prevented by setting the header \verb+referrer-policy=no-referrer+ in the HTTP response from the RP.
+So this leakage is prevented by setting the header \verb+referrer-policy=no-referrer+ in the HTTP response from the RP, when it is redirected to the IdP.
 Then, the HTTP request to download the IdP Script carries no \verb+referer+ header.
 This setting is specified by W3C \cite{referer_policy}, and widely supported.
 We have checked it in Chrome and Firefox, and confirmed no referer leakage.
