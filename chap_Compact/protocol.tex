@@ -7,7 +7,7 @@
 
 We design three identity-transformation functions,
      $\mathcal{F}_{PID_{RP}}$, $\mathcal{F}_{PID_{U}}$ and $\mathcal{F}_{Acct}$,
-    over an elliptic curve $\mathbb{E}$,
+    on an elliptic curve $\mathbb{E}$,
      where $G$ is a base point (or generator) of this elliptic curve and the order of $G$ is a big prime number denoted as $n$.
 Table \ref{tbl:notations-protocol} lists the notations,
     and the subscript $j$ and/or the superscript $i$ may be omitted in the case of no ambiguity.
@@ -126,7 +126,8 @@ From Equations \ref{equ:PIDRP}, \ref{equ:PIDU} and \ref{equ:Account}, it is deri
 
 The RP derives the identical permanent account from different identity tokens in multiple login instances,
     with the help of $t$ from the user.
-Given a user, the accounts at different RPs are inherently unique.
+Given a user, the accounts at different RPs are inherently unique;
+at the same time, given an RP, the accounts of different users are also inherently unique.
 Moreover,
     (\emph{a}) due to the elliptic curve discrete logarithm problem (ECDLP),
 it is computationally infeasible for the RP to derive $ID_U$ from either $PID_U$ or $Acct$;
@@ -163,7 +164,7 @@ First of all, in UPPRESSO the IdP is not aware of the visited RP,
 On the contrary,
     in commonly-used SSO protocols the IdP needs this information to ensure confidentiality of identity tokens.
 For example,
-    in the OIDC services, as an RP registers itself at the IdP, the \verb+redirect_uri+ parameter 
+    in the OIDC services, as an RP registers itself at the IdP, the \verb+redirect_uri+ parameter
     is set as the endpoint URL to receive tokens.
 In a login instance, when the IdP wants to transmit identity tokens to an RP,
     it utilizes the HTTP 302 redirection with this endpoint as the target URL in the HTTP response,
@@ -203,10 +204,10 @@ The IdP and RP scripts communicate with each other within the user browser throu
 and the receiver of an identity token (i.e., the RP script)
  is restricted by the \verb+postMessage+ targetOringin mechanism.
 That is, when the IdP script sends identity tokens through \verb+postMessage+,
- the receiver's origin is set as the parameter in the API (e.g., \verb+window.opener.postMessage(token, "https://www.RP.com")+),
+ the receiver's origin is set as a parameter of the API (e.g., \verb+window.opener.postMessage(token, 'https://www.RP.com')+),
   so that only the script downloaded from this origin is a legal receiver.
-The origin parameter consists of 
-    the protocol (i.e., \verb+http://+),
+The origin parameter consists of
+    the protocol (i.e., \verb+https://+),
     the host name (i.e., \verb+www.RP.com+)
     and a port which may be implicit or explicit.
 %The \emph{RP certificates} deals with the problem of mapping an identity proof with its targeting RP.
@@ -217,12 +218,12 @@ in an UPPRESSO login instance,
     the browser first downloads the RP script when visiting an RP, and
 then this RP script opens a new window that will download the IdP script.
 We need to prevent the referer leakage when the IdP script is downloaded.
-Generally, when a browser window visits another website not in its opener's origin,
- the HTTP request to this website will automatically carry the \verb+referer+ header which is the opener's origin.
+Generally, when a browser window visits another website not belonging to its opener's origin,
+ the HTTP request to this website will automatically carry the \verb+referer+ header (i.e., the opener's origin).
 This HTTP \verb+referer+ header leaks the information about the visited RP to the IdP.
-Fortunately, in UPPRESSO this newly-opened window is redirected from the RP to the IdP, instead of directly visiting the IdP (see Figure~\ref{fig:process}, Steps 1.2-1.3).
+Fortunately, in UPPRESSO this newly-opened window is a redirection from the RP to the IdP, instead of directly visits the IdP (see Figure~\ref{fig:process}, Steps 1.2-1.3).
 So this leakage is prevented by setting the header \verb+referrer-policy=no-referrer+ in the HTTP response from the RP, when it is redirected to the IdP.
-Then, the HTTP request to download the IdP Script carries no \verb+referer+ header.
+Then, the HTTP request to download the IdP script carries no \verb+referer+ header.
 This setting is specified by W3C \cite{referer_policy}, and widely supported.
 We have checked it in Chrome and Firefox, and confirmed no referer leakage.
 
@@ -297,7 +298,9 @@ The IdP keeps $SK$ secret, while $PK$ is publicly known.
 Each RP initially registers itself at the IdP to obtain $ID_{RP}$
  and the corresponding RP certificate $Cert_{RP}$ as follows:
 \begin{enumerate}
-%\vspace{-\topsep}
+\setlength{\itemsep}{0pt}
+\setlength{\parsep}{0pt}
+\setlength{\parskip}{0pt}
 \item
 The RP sends a registration request to the IdP, including the endpoint to receive identity tokens,
     and other optional information.
@@ -330,7 +333,7 @@ This is similar to the ones in existing SSO systems.
 
 \vspace{1mm}
 \noindent\textbf{SSO Login.} A login instance is typically launched through a browser,
-when a user attempts to login to an RP.
+when a user attempts to visit an RP.
 It consists of four steps, namely script downloading, RP identity transformation,
 %$PID_{RP}$ registration,
 identity-token generation, and $Acct$ calculation, as shown in Figure \ref{fig:process}.
@@ -361,6 +364,9 @@ Each solid horizontal line means some messages between the user and the IdP (or 
 \noindent 1. {\em Script Downloading.}
 The browser downloads the scripts from the IdP and the visited RP.
 \begin{itemize}
+\setlength{\itemsep}{0pt}
+\setlength{\parsep}{0pt}
+\setlength{\parskip}{0pt}
 \item[1.1]
 When attempting to visit any protected resources at the RP,
     the user downloads the RP script.
@@ -372,17 +378,20 @@ The redirection to the IdP downloads the IdP script.
 
 
 
-\vspace{1mm}
+%\vspace{1mm}
 \noindent{\em 2. RP Identity Transformation.}
 The user and the RP negotiate $PID_{RP} = [t]{ID_{RP}}$.
 \begin{itemize}
-%\setlength{\itemsep}{0pt plus 1pt}
+\setlength{\itemsep}{0pt}
+\setlength{\parsep}{0pt}
+\setlength{\parskip}{0pt}
 \item[2.1] The IdP script in the browser chooses a random number $t$ ($1 < t <n$) and sends it to the RP script through \verb+postMessage+.
 Then, the RP script sends $t$ to the RP.
 \item[2.2] On receiving $t$,
 the RP verifies $1 < t < n$ and calculates $PID_{RP}$.
 %To acknowledge the negotiation of $PID_{RP}$,
-The RP replies with $Cert_{RP}$, which is then transmitted from the RP script to the IdP script.  % through \verb+postMessage+.
+The RP replies with $Cert_{RP}$, which is then transmitted from the RP script to the IdP script,
+    along with the scope of requested user attributes.  % through \verb+postMessage+.
 \item[2.3] The IdP script verifies $Cert_{RP}$, extracts $ID_{RP}$ and $Enpt_{RP}$ from $Cert_{RP}$ and calculates $PID_{RP}=[t]{ID_{RP}}$.
 %It then creates a random endpoint $PEnpt_{U}$ for this login instance,
  %   to receive identity tokens from the IdP.
@@ -435,16 +444,18 @@ This nonce prevents one $PID_{RP}$-registration result (and also the subsequent 
 \end{comment}
 
 
-\vspace{1mm}
+%\vspace{1mm}
 \noindent{\em 3. Identity-Token Generation.}
 The IdP calculates $PID_U = [ID_U]{PID_{RP}}$ and signs the identity token. % The processes are as follows.
 \begin{itemize}
-
+\setlength{\itemsep}{0pt}
+\setlength{\parsep}{0pt}
+\setlength{\parskip}{0pt}
 \item[3.1]
 %The IdP script checks that $PID_{RP}$ is the one registered in Step 3.1
 %            and $Enpt_{RP}$ matches the one in $Cert_{RP}$.
 %Then, it %replaces $Enpt_{RP}$ with $PEnpt_{U}$ in the identity-token request and
-The IdP script requests an identity token for $PID_{RP}$.
+The IdP script requests an identity token for $PID_{RP}$ and the user attributes.
  %by checking whether this user is authenticated by IdP.
 
 \item[3.2] On receiving the request,
@@ -462,12 +473,13 @@ The IdP then signs an identity token $[PID_{RP}, PID_U, Issuer, Validity, Attr]_
 
 \end{itemize}
 
-\vspace{1mm}
+%\vspace{1mm}
 \noindent{\em 4. $Acct$ Calculation.}
 The RP verifies the identity token and allows the user to login.
 \begin{itemize}
-%\setlength{\itemsep}{0pt plus 1pt}
-
+\setlength{\itemsep}{0pt}
+\setlength{\parsep}{0pt}
+\setlength{\parskip}{0pt}
 \item [4.1]
 The IdP script forwards this token to the RP script,
     which then sends it to the RP through $Enpt_{RP}$.
@@ -653,6 +665,7 @@ On the other hand, in UPPRESSO the scripts hide $Enpt_{RP}$ from the IdP,
   %      the script replaces $Enpt_{RP}$ with $PEnpt_{U}$,
     and forward the identity token to $Enpt_{RP}$ which is extracted from the RP certificate.
 %    that to protect the identity token from being sent to adversaries. 这句话与Compatibility无关
+So the IdP does not set \verb+redirect_uri+ in the HTTP response of identity tokens.
 
 In the step of RP identity transformation, most operations are conducted by the user agent,
  while the RP only receives $t$ to calculate $PID_{RP}$ and responds to the browser with  $Cert_{RP}$.
@@ -668,6 +681,12 @@ The operations of identity-token generation and $Acct$ calculation,
     because (\emph{a}) the calculation of $PID_U$ is viewed as a method to generate PPIDs by the IdP
         and (\emph{b}) the calculation of $Acct$ is viewed as a mapping from the user identity in tokens
                     to a local account at the RP.
+
+Finally,
+    this compatibility with OIDC is empirically confirmed by our prototype implementation,
+        where only about 20 lines of Java code are needed to modify MITREid Connect \cite{MITREid},
+        an open-source system of OIDC,
+    to build the IdP.
 
 
 %It follows a similar logic flow as OIDC in SSO login and only requires small modifications to perform identifier transformation.
