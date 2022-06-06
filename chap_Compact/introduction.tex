@@ -46,7 +46,7 @@ Finally, the RP verifies the identity token to decide whether the user is allowe
 As the comprehensive solution of identity management,
     SSO services usually allow the IdP to provide more user attributes in the tokens
         along with the authenticated user's identity.
-The attributes (e.g., age, gender, hobby, and nationality) are maintained at the IdP by a user,
+The attributes (e.g., age, gender, hobby, and nationality) are maintained at the trusted IdP by a user,
     and enclosed in the identity tokens only after the user's authorization \cite{OpenIDConnect,rfc6749}.
 
 %However, SSO systems have been continuously found vulnerable and insecure \cite{WangCW12,ccsSunB12,SomorovskyMSKJ12,ArmandoCCCPS13,DiscoveringJCS,dimvaLiM16,WangZLG16,MainkaMS16, MainkaMSW17,YangLCZ18}.
@@ -61,7 +61,7 @@ As a result, a curious-but-honest IdP could track all the RPs that each user has
  called the {\em IdP-based login tracing} in this paper.
 %This threat by curious IdPs is also discussed by recent researches .
 Meanwhile, the RPs learn users identities from the identity tokens.
-    So if the IdP encloses a unique user identity in the tokens for a user to visit different RPs \cite{Google, FirefoxAccount},
+If the IdP encloses a unique user identity in the tokens for a user to visit different RPs \cite{Google, FirefoxAccount},
      collusive RPs could link these login instances across the RPs, %and track the user's activities
       to learn his online profile \cite{maler2008venn}.
 We denote this privacy risk as the {\em RP-based identity linkage}.
@@ -108,7 +108,7 @@ Popular SSO protocols leak user privacy in different ways,
 
 
 Solutions have been proposed to protect user privacy in SSO \cite{maler2008venn,NIST2017draft,BrowserID,SPRESSO}.
-A privacy-preserving SSO service tries to provide comprehensive functions of identity management and authentication, 
+A privacy-preserving SSO service tries to provide comprehensive functions of identity management and authentication,
     while preventing various threats of user privacy.
 The following features of SSO are usually discussed:
 (\emph{a}) \emph{non-anonymous user identity},
@@ -116,14 +116,14 @@ The following features of SSO are usually discussed:
 (\emph{b}) \emph{independency of user authentication}, i.e.,
     different types of credentials are supported in the authentication between the IdP and users,
 and (\emph{c}) \emph{maintenance of user attributes},
-    i.e., a user maintains attributes at the IdP,
-    and the IdP provides the RP-requested attributes in addition to the user's identity 
-            when authorized by the user.
+    i.e., a user maintains his attributes at the IdP,
+    and the IdP provides the RP-requested attributes in addition to the user's identity
+            after authorized by the user.
 On the other hand,
-    the following privacy threats from different types of adversaries are prevented:
-    (\emph{a}) the IdP-based login tracing,
-    (\emph{b}) the RP-based identity linkage,
-    and (\emph{c}) the collusive attacks by the IdP and RPs.
+    the privacy threats from different types of adversaries are prevented:
+    (\emph{a}) the curious-but-honest IdP,
+    (\emph{b}) collusive RPs,
+    and (\emph{c}) the curious-but-honest IdP colluding some RPs.
 We analyze and compare the existing solutions \cite{maler2008venn,NIST2017draft,BrowserID,SPRESSO}
 in Section \ref{subsec-solutions}.
 
@@ -150,7 +150,6 @@ Finally,
     after receiving an identity token with matching $PID_{RP}$,
         the RP transforms $PID_U$ into an account.
 Given a user, this account (\emph{a}) is unique at each RP and (\emph{b}) keeps permanent across multiple login instances.
-While providing non-anonymous SSO services,
 UPPRESSO prevents the IdP from tracking a user's login activities because it receives only $PID_{RP}$ in the identity-token request,
     and collusive RPs from linking a user's identities across these RPs because every account is unique.
 %This prevents both IdP-based login tracing by hiding the RPs' identities from the IdP and RP-based identity linkage by hiding the user's identity from the RPs.
@@ -158,16 +157,16 @@ UPPRESSO prevents the IdP from tracking a user's login activities because it rec
 % Finally, we formally prove that the accounts of the same user at different RPs are independent and cannot be correlated by collusive RPs (see our proof in Section \ref{sec:privacy}).
 %UPPRESSO designs three one-way identifier-transformation functions based on elliptic curve cryptography. Using the one-way trapdoor function $\mathcal{F}_{ID_{RP} \mapsto PID_{RP}}(ID_{RP}, T)$, the RP converts its identity $ID_{RP}$ into a privacy-preserving pseudo-identity $PID_{RP}$ based on a randomly selected trapdoor $T$. Similarly, the IdP uses the one-way function  $\mathcal{F}_{ID_{U} \mapsto PID_{U}}(ID_U, PID_{RP})$ to generate a privacy-preserving pseudo-identity $PID_U$ for the user based on her identity $ID_U$ and $PID_{RP}$. Finally, using a special identifier-transformation function $\mathcal{F}_{PID_{U} \mapsto Account}(PID_U, PID_{RP}, T)$, the RP is able to map all the different privacy-preserving pseudo-identities of a user, which are created in her different login sessions to that RP, to a same $Account$ that identifies the user to the RP. The three identifier-transformation functions work cooperatively to ensure: (\emph{a}) when a user logs in to an RP multiple times, the RP can always map $PID_U$s to a unique $Account$ without knowing the user's identity $ID_U$; moreover, when a user logs in to multiple RPs, (\emph{b}) a curious IdP learns nothing about the identities of these RPs from $PID_{RP}$s, and (\emph{c}) collusive RPs cannot link $PID_U$s to a particular user %or associate them together, (\emph{d}) nor correlate $Account$s of a same user at different RPs.
 
-We protect user privacy,
-    while keeping the features of SSO as many as possible.
-The SSO user privacy is protected by the identity-transformation functions during the generation of identity tokens
-    and the calculation of accounts,
-and these identity transformations do not conflict with 
-    the login flows of widely-used SSO protocols \cite{OpenIDConnect,rfc6749,SAML,NIST2017draft}.
-Therefore, while the IdP-based login tracing and the RP-based identity linkage are prevented,
-    UPPRESSO works compatibly with non-anonymous user identity,
- independency of user authentication, and maintenance of user attributes.
-We do not solve the collusive attacks by the IdP and RPs.
+While keeping the features of SSO as many as possible,
+we protect user privacy.
+Both the IdP-based login tracing and the RP-based identity linkage are prevented,
+    by the identity-transformation functions during the generation of identity tokens
+    and the calculation of accounts.
+The identity-transformation functions do not conflict with
+    the login flows of widely-used SSO protocols \cite{OpenIDConnect,rfc6749,SAML,NIST2017draft},
+    so that UPPRESSO provides user identities and attributes for RPs in the SSO services,
+        and the IdP authenticates a user with different types of credentials.
+%We do not solve the collusive attacks by the IdP and RPs.
 
 
 We summarize our contributions as follows.
@@ -181,9 +180,9 @@ We summarize our contributions as follows.
     and
 %    and analyze the limitations of existing privacy-preserving SSO designs.
 %\item We
-then propose a comprehensive solution to protect the users' login activities against the curious IdP and collusive RPs;
+then propose a comprehensive solution to protect the users' login activities;
     that is, solve this challenge effectively by designing identity-transformation functions.
-The UPPRESSO protocol is then designed based on these identity-transformation functions.
+The UPPRESSO protocol is then designed based on the identity transformations.
 %To the best of our knowledge, UPPRESSO is the first practical SSO system against both the IdP-based login tracing and the RP-based identity linkage.
 
 %\item We formally prove the privacy of UPPRESSO based on the DDH assumption \cite{GoldwasserK16} and the security of UPPRESSO based on a formal model of the web infrastructure. Our results show that UPPRESSO provides expected and satisfying security and privacy protection to SSO.
