@@ -111,8 +111,40 @@ To prevent this leakage,
 
 %\noindent{\textbf{Malicious IdP mitigation.}} The IdP is assumed to assign a unique $ID_{RP}$ in $Cert_{RP}$ for each RP and generate the correct $PID_U$ for each login. The malicious IdP may attempt to provide the incorrect $ID_{RP}$ and $PID_U$, which could be prevented by integrating certificate transparency \cite{rfc6962} and user's identifier check \cite{SPRESSO}. With certificate transparency \cite{rfc6962}, the monitors  check the uniqueness of $ID_{RP}$ among all the certificates stored in the log server. To prevent the malicious IdP from injecting any incorrect $PID_U$, the user could provide a nickname to the RP for an extra check as in SPRESSO \cite{SPRESSO}.
 
+\vspace{1mm}\noindent{\textbf{Checking of $Enpt_{RP}$ and postMessage targetOringin.}}
+In the prototype, the IdP script checks targetOringin when invoking postMessage
+    to forward the identity token to the RP script.
+In this method the IdP script checks only the domain name of RP, not the whole endpoint.
+That is, if two RPs exists in one domain (https://www.RP.com/RP1/ and https://www.RP.com/RP2/),
+    one RP can attack another one.
+That is,
+    RP1 acts as the man-in-the-middle between the user and the RP2,
+        and RP1 presents RP2's certificate to the user.
+And finally, RP1 will intercept the id token for the user to login to RP2.
+
+This attack is out of the scope of our solution.
+Because
+Similar attacks exist in HTTPS, because an HTTPS server certificate
+only binding the domain.
+So, since they share the domain and the private key of HTTPS server certificate,
+    RP1 can always be the MitM attackers of RP2.
+RP1 exploits the vulnerability of HTTPS server certificate is fine to attack,
+    by the shared private key.
+
 \vspace{1mm}\noindent{\textbf{Alternative Methods to Bind $ID_{RP}$ and $Enpt_{RP}$.}}
-xxxxx
+In the prototype, we bind $ID_{RP}$ and $Enpt_{RP}$ by RP certificates.
+We can bind them in another way:
+    $H(Enpt_{RP})$ to $ID_{RP}$ deterministically.
+    then, RP certificates are unnecessary.
+    or, sometimes, $H(Domain_{RP})$ to $ID_{RP}$, if $Domain_{RP}$ is unique.
+Here, $H()$ is a collision-free hash function.
+
+The shortcoming: $Acct = [ID_U]ID_{RP}$ changes, once $Enpt_{RP}$ or $Domain_{RP}$ changes.
+A way to solve this shortcoming is:
+    when the domain is changes and the RP still holds two domains,
+        the accounts are migrated from old domain to new domain. (or merge)
+This migration can be done by a user and the RP cooperatively,
+    they do not need the IdP's help. no privacy leakage.
 
 \vspace{1mm}\noindent{\textbf{Implementation with Browser Extensions.}}
 To improve the portability of user agents,
