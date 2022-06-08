@@ -178,7 +178,7 @@ In UPPRESSO such functions of a user agent are implemented by supplementary web 
  are discussed in Section \ref{sec:discussion}.
 Two scripts are downloaded from the visited RP and the IdP, respectively,
     and each is responsible for the communications with the origin web server
- to follow the same-origin policy (SOP).
+ to follow the \emph{same-origin policy} (SOP).
 \emph{RP certificates} are designed to instruct the browsers about
             the verified endpoint of an RP.
 An RP certificate is a document signed by the IdP during the RP initial registration,
@@ -195,20 +195,20 @@ The IdP's public key is set in the IdP script, so that
 
 %As the server and its script would only communicate with each other based on HTTPS channel, the adversary cannot steal the identity token in such ways.
 %However, while the IdP sends the identity token to RP, the identity token would be transmitted from IdP script to RP script during the SSO flow, that should be well protected with the RP certificate.
-After using the extracted $ID_{RP}$ in identity transformations
+After using the extracted $ID_{RP}$ in identity-transformation functions
     and receiving an identity token from the IdP,
     the IdP script needs to ensure the RP script will forward this token to $Enpt_{RP}$,
         which is bound together with $ID_{RP}$ in the RP certificate.
 The IdP and RP scripts communicate with each other within the user browser through the \verb+postMessage+ HTML5 API,
 %To avoid the honest user sending the identity token to an adversary,
 and the receiver of an identity token (i.e., the RP script)
- is restricted by the \verb+postMessage+ targetOringin mechanism.
+ is restricted by the \verb+postMessage+ targetOringin mechanism \cite{postm-targeto}.
 That is, when the IdP script sends identity tokens through \verb+postMessage+,
  the receiver's origin is set as a parameter of the API (e.g., \verb+window.opener.postMessage(token, 'https://www.RP.com')+),
   so that only the script downloaded from this origin is a legal receiver.
 The origin parameter consists of
     the protocol (i.e., \verb+https://+),
-    the host name (i.e., \verb+www.RP.com+)
+    the domain name (i.e., \verb+www.RP.com+)
     and a port which may be implicit or explicit.
 %The \emph{RP certificates} deals with the problem of mapping an identity proof with its targeting RP.
 %That is, the IdP script derives the RP's $ID_{RP}$ and origin from the RP certificate, while the $PID_{RP}$ is generated with this $ID_{RP}$. Thus, the IdP script always know the targeting RP of an identity proof, therefore, the \verb+postMessage+ mechanism can guarantee that the identity proof would not be sent to the adversary.

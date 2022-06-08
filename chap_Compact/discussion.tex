@@ -5,7 +5,24 @@
 %Some related issues are discussed in this section.
 
 
-%%Scalbility
+%\vspace{1mm}
+\noindent{\textbf{Applicability of Identity Transformations.}}
+Three identity-transformation functions, i.e., $\mathcal{F}_{PID_{RP}}()$, $\mathcal{F}_{PID_U}()$, and $\mathcal{F}_{Acct}()$,
+    are applicable to various SSO scenarios
+        (e.g., web application, mobile App, and native software),
+    because these functions follow the common model of SSO protocols
+    and do not depend on any special implementation or runtime environment.
+Although the prototype system runs for web applications,
+    it is feasible to apply the identity-transformation functions to other SSO scenarios
+        to protect user privacy.
+%Moreover,
+%    because the authentication steps are independent of the UPPRESSO protocol,
+%the IdP can choose any appropriate mechanism to authenticate users.
+
+
+%In this paper, the functions are implemented based on the elliptic curve algorithm and the mechanism provided by OIDC system.
+%However, the transformation functions can also be implemented based on other mechanisms according to the protocol and environment, for example, the TPM may be used to take responsibility to transform identities.
+
 \vspace{1mm}\noindent{\textbf{Scalability.}} Adversaries cannot exhaust $ID_{RP}$ or $PID_{RP}$.
 $ID_{RP}$ is generated uniquely only in every RP's initial registration,
     and the capacity is $n$ (i.e., the order of $G$). For example, for the NIST P256 elliptic curve, $n$ is approximately $2^{256}$.
@@ -33,23 +50,6 @@ Therefore, given an RP,
 %However, as the user has already been authenticated at the IdP, the IdP could identify the malicious users based on audit, in addition to the existing DoS mitigation schemes.
 %%The adversary may act as a user requesting to log into an RP, and make the RP perform two modular exponentiations.
 %%The RP could previously calculated a set of $Y_{RP}$s to mitigate this attack.
-
-\vspace{1mm}
-\noindent{\textbf{Applicability.}}
-Three identity-transformation functions, i.e., $\mathcal{F}_{PID_{RP}}()$, $\mathcal{F}_{PID_U}()$, and $\mathcal{F}_{Acct}()$,
-    are applicable to various SSO scenarios
-        (e.g., web application, mobile App, and even native software),
-    because these designs do not depend on any special implementation or runtime environment.
-Although the prototype system runs for web applications,
-    it is feasible to apply the identity-transformation functions to other SSO scenarios
-        to protect user privacy.
-%Moreover,
-%    because the authentication steps are independent of the UPPRESSO protocol,
-%the IdP can choose any appropriate mechanism to authenticate users.
-
-
-%In this paper, the functions are implemented based on the elliptic curve algorithm and the mechanism provided by OIDC system.
-%However, the transformation functions can also be implemented based on other mechanisms according to the protocol and environment, for example, the TPM may be used to take responsibility to transform identities.
 
 
 %ÊÚÈ¨Âë
@@ -111,40 +111,18 @@ To prevent this leakage,
 
 %\noindent{\textbf{Malicious IdP mitigation.}} The IdP is assumed to assign a unique $ID_{RP}$ in $Cert_{RP}$ for each RP and generate the correct $PID_U$ for each login. The malicious IdP may attempt to provide the incorrect $ID_{RP}$ and $PID_U$, which could be prevented by integrating certificate transparency \cite{rfc6962} and user's identifier check \cite{SPRESSO}. With certificate transparency \cite{rfc6962}, the monitors  check the uniqueness of $ID_{RP}$ among all the certificates stored in the log server. To prevent the malicious IdP from injecting any incorrect $PID_U$, the user could provide a nickname to the RP for an extra check as in SPRESSO \cite{SPRESSO}.
 
-\vspace{1mm}\noindent{\textbf{Checking of $Enpt_{RP}$ and postMessage targetOringin.}}
-In the prototype, the IdP script checks targetOringin when invoking postMessage
-    to forward the identity token to the RP script.
-In this method the IdP script checks only the domain name of RP, not the whole endpoint.
-That is, if two RPs exists in one domain (https://www.RP.com/RP1/ and https://www.RP.com/RP2/),
-    one RP can attack another one.
-That is,
-    RP1 acts as the man-in-the-middle between the user and the RP2,
-        and RP1 presents RP2's certificate to the user.
-And finally, RP1 will intercept the id token for the user to login to RP2.
-
-This attack is out of the scope of our solution.
-Because
-Similar attacks exist in HTTPS, because an HTTPS server certificate
-only binding the domain.
-So, since they share the domain and the private key of HTTPS server certificate,
-    RP1 can always be the MitM attackers of RP2.
-RP1 exploits the vulnerability of HTTPS server certificate is fine to attack,
-    by the shared private key.
-
-\vspace{1mm}\noindent{\textbf{Alternative Methods to Bind $ID_{RP}$ and $Enpt_{RP}$.}}
-In the prototype, we bind $ID_{RP}$ and $Enpt_{RP}$ by RP certificates.
-We can bind them in another way:
-    $H(Enpt_{RP})$ to $ID_{RP}$ deterministically.
-    then, RP certificates are unnecessary.
-    or, sometimes, $H(Domain_{RP})$ to $ID_{RP}$, if $Domain_{RP}$ is unique.
-Here, $H()$ is a collision-free hash function.
-
-The shortcoming: $Acct = [ID_U]ID_{RP}$ changes, once $Enpt_{RP}$ or $Domain_{RP}$ changes.
-A way to solve this shortcoming is:
-    when the domain is changes and the RP still holds two domains,
-        the accounts are migrated from old domain to new domain. (or merge)
-This migration can be done by a user and the RP cooperatively,
-    they do not need the IdP's help. no privacy leakage.
+\vspace{1mm}
+\noindent{\textbf{Collusive Attacks by the IdP and RPs.}}
+If the IdP is curious-but-honest but shares messages in the login flow (i.e.,
+$ID_U$, $PID_{RP}$, and $PID_U$)
+        with some collusive RPs,
+UPPRESSO still provides secure SSO services,
+    provided that the signed identity tokens are sent to the authenticated users only;
+however,
+    the collusive adversaries are able to trace the users' login activities to these RPs.
+Anyway, even in this case, a user's login activities at the other RPs not collusive with the IdP,
+        are still protected from the IdP and these collusive RPs,
+        because a triad of $t$, $PID_U$ and $PID_{RP}$ is ephemeral and independent of each other.
 
 \vspace{1mm}\noindent{\textbf{Implementation with Browser Extensions.}}
 To improve the portability of user agents,
@@ -159,18 +137,46 @@ In this case,
 Experiments show that at least 102 ms will be saved for each login instance (i.e., about 208 ms in total),
     compared with the version implemented with portable web scripts.
 
-\vspace{1mm}
-\noindent{\textbf{Collusive Attacks by the IdP and RPs.}}
-If the IdP is curious-but-honest but shares messages in the login flow (i.e.,
-$ID_U$, $PID_{RP}$, and $PID_U$)
-        with some collusive RPs,
-UPPRESSO still provides secure SSO services,
-    provided that the signed identity tokens are sent to the authenticated users only;
-however,
-    the collusive adversaries are able to trace the users' login activities to these RPs.
-Anyway, even in this case, a user's login activities at the other RPs not collusive with the IdP,
-        are still protected from the IdP and these collusive RPs,
-        because a triad of $t$, $PID_U$ and $PID_{RP}$ is ephemeral and independent of each other.
+\vspace{1mm}\noindent{\textbf{Restriction of the RP Script's Origin.}}
+When the IdP script forwards identity tokens to the RP script within the browser,
+    the receiver is restricted by the \verb+postMessage+ targetOringin mechanism \cite{postm-targeto},
+        to ensure it will forward the tokens to $Enpt_{RP}$,
+        which is bound in the RP certificate.
+A targetOringin is specified as a protocol (e.g., \verb+https://+),
+    a domain name (e.g., \verb+www.RP.com+), and an implicit or explicit port,
+        and it requires the RP script's origin accurately matches the targetOringin.
+It implies that only one RP is assumed to run on a domain.
+If two independent RPs run on one domain but with different endpoints to receive tokens
+        (e.g., \verb+https://www.RP.com/RP1/uploadToken+ and \verb+https://www.RP.com/RP2/uploadToken+),
+         they cannot be distinguished actually.
+Anyway, these RPs are distinguished by the implementation with browser extensions.
+%
+%We do not consider two hostile RPs on a domain.
+%Similar attacks exist in HTTPS, because an HTTPS server certificate
+%only binding the domain.
+%So, since they share the domain and the private key of HTTPS server certificate,
+%    RP1 can always be the MitM attackers of RP2.
+%RP1 exploits the vulnerability of HTTPS server certificate is fine to attack,
+%    by the shared private key.
+
+\vspace{1mm}\noindent{\textbf{Alternative Ways to Bind $ID_{RP}$ and $Enpt_{RP}$.}}
+In the prototype, we bind $ID_{RP}$ and $Enpt_{RP}$ by RP certificates.
+This binding may be finished in another way:
+    $ID_{RP}$ is deterministically computed based on the RP's domain,
+        when an RP's domain is unique.
+For example,
+    $H(DN_{RP})$ \cite{xxxx}. xxx xxx xxx
+Here, $H()$ is a collision-free hash function.
+Then, RP certificates are unnecessary.
+    This improves the downloading of IdP scripts,
+        and on average xxx ms are saved.
+
+The shortcoming: $Acct = [ID_U]ID_{RP}$ changes, once $Enpt_{RP}$ or $Domain_{RP}$ changes.
+A way to solve this shortcoming is:
+    when the domain is changes and the RP still holds two domains,
+        the accounts are migrated from old domain to new domain. (or merge)
+This migration can be done by a user and the RP cooperatively,
+    they do not need the IdP's help. no privacy leakage.
 
 %\vspace{1mm}
 %\noindent{\textbf{Active Identity Linkage by Malicious RPs.}}
