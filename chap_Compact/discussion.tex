@@ -143,7 +143,7 @@ When the IdP script forwards identity tokens to the RP script within the browser
         to ensure it will forward the tokens to $Enpt_{RP}$,
         which is bound in the RP certificate.
 A targetOringin is specified as a protocol (e.g., \verb+https://+),
-    a domain name (e.g., \verb+www.RP.com+), and an implicit or explicit port,
+    a domain (e.g., \verb+www.RP.com+), and an implicit or explicit port,
         and it requires the RP script's origin accurately matches the targetOringin.
 It implies that only one RP is assumed to run on a domain.
 If two independent RPs run on one domain but with different endpoints to receive tokens
@@ -163,15 +163,17 @@ Anyway, these RPs are distinguished by the implementation with browser extension
 In the prototype, we bind $ID_{RP}$ and $Enpt_{RP}$ by RP certificates.
 This binding may be finished in another way:
     $ID_{RP}$ is deterministically computed based on the RP's domain,
-        when an RP's domain is unique.
+        when an RP's domain is unambiguous and unique.
 For example,
-    $H(DN_{RP})$ \cite{xxxx}. xxx xxx xxx
-Here, $H()$ is a collision-free hash function.
+    $H(DN_{RP})$ \cite{xxxx}. xxx xxx xxx.
+Here, $H()$ is a collision-free hash function, and $DN_{RP}$ is an RP's domain.
 Then, RP certificates are unnecessary.
-    This improves the downloading of IdP scripts,
+    This elimination of RP certificates improves the downloading of IdP scripts,
         and on average xxx ms are saved.
 
-The shortcoming: $Acct = [ID_U]ID_{RP}$ changes, once $Enpt_{RP}$ or $Domain_{RP}$ changes.
+However,
+$Acct = [ID_U]ID_{RP}$ changes,
+     once an RP changes its domain.
 A way to solve this shortcoming is:
     when the domain is changes and the RP still holds two domains,
         the accounts are migrated from old domain to new domain. (or merge)
