@@ -13,6 +13,34 @@ UPPRESSO satisfies the four security requirements of identity tokens in SSO serv
 \vspace{1mm}
 \noindent\textbf{RP Designation.}
 In this section, we prove that there would not be the $t$ and $t'$ happening to satisfy that $PID_{RP} = [t]ID_{RP_j} = [t']ID_{RP_{j'}}$, based on the Elliptic Curve Discrete Logarithm Problem (ECDLP).
+Let $\mathbb{E}$ be an elliptic curve over a finite field $\mathbb{F}_q$,
+    and $P$ be a point on $\mathbb{E}$ of order $n$.
+It is, for any probabilistic polynomial time (PPT) algorithm $\mathcal{D}$,
+it is computationally impossible for $\mathcal{D}$ to compute the $x$ while the input is ($P$, $xP$), where $x$ is the integer number randomly chosen from $(1,n)$.
+Let $Pr\{\}$ denote the probability.
+That is, for any PPT algorithm $\mathcal{D}$, there is 
+\begin{align*}
+Pr\{\mathcal{D}(P, [x]P)=x\} = \epsilon(k) 
+\end{align*}
+$\epsilon(k)$ becomes negligible with the security parameter $k$.
+
+Here we design the game $\mathcal{G}$ between an adversary and a challenger: the adversary receives the finite set of RPs' IDs from challenger, denoted as ($ID_{RP_1}$, $ID_{RP_2}$, ..., $ID_{RP_k}$), while $k$ is the amounts of existing RPs (currently less than hundreds of millions), and then it outputs the result ($a$, $b$, $t$, $t'$). While $[t]ID_{RP_a}=[t]'ID_{RP_b}$, adversary successes in this game. 
+We define the probability that the adversary successes in the game as $Pr_s$. 
+If the adversary is able to break the RP designation, it must own the non-negligible advantage in game $\mathcal{G}$, that means $Pr_s$ must be non-negligible.
+
+\begin{figure}[tb]
+  \centering
+  \includegraphics[width=\linewidth]{fig/ecdlp_algorithm.pdf}
+  \caption{The algorithm to solve the ECDL problem.}
+  \label{fig:ecdlp_algorithm}
+\end{figure}
+We are going to prove that, as long as an adversary has the non-negligible advantage in game $\mathcal{G}$, the PPT algorithm $\mathcal{D^*}$ designed based on this adversary, shown in Figure~\ref{fig:ecdlp_algorithm}, can deal with ECDLP. The input of $\mathcal{D^*}$ is in the form of ($P$, $[x]P$). On receiving the input, the challenger of $\mathcal{G}$ randomly chooses $r_1$, $r_2$, ..., and $r_k$ in ($1$, $n$), calculates $[r_1]P$, $[r_2]P$, ..., and $[r_k]P$ as $ID_{RP}$s, randomly replaces one of these parameters with $[x]P$, and sends them to adversary. Then, adversary return the result ($a$, $b$, $t$, $t'$). Finally, challenger calculates the $s = t^{-1}*t'*r_b \mod n$ and return $s$ as the output of $\mathcal{D^*}$. While $ID_{RP_a} = [x]P$, there is $s = x$. As the position of $[x]P$ in the set ($[r_1]P$, $[r_2]P$, ..., $[r_k]P$) is randomly chosen, and $[x]P$ and other parameters in this set are indistinguishable to adversary. Therefore, the probability $Pr\{ID_{RP_a}=[x]P\}=1/k$. There is 
+\begin{align*}
+Pr\{\mathcal{D^*}(P, [x]P)=x\} = Pr\{s = x\}=1/k*Pr_s
+\end{align*}
+While $Pr_s$ is non-negligible, $Pr\{\mathcal{D}(P, [x]P)=x\}$ is also non-negligible. It means $\mathcal{D^*}$ can deal with ECDLP. So $Pr_s$ must be negligible, that means adversary do not have the non-negligible advantage in game $\mathcal{G}$. Thus, adversary cannot break the RP designation in UPPRESSO system.
+
+
 %An identity token binding $PID_U$ and $PID_{RP}$,
 %    designates the target RP, and only the target RP.
 %An honest RP calculates $PID_{RP}$ by itself with the trapdoor $t$ sent from the user,
