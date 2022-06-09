@@ -6,20 +6,19 @@ In this section, we presents the analysis that UPPRESSO achieves the required pr
 \subsection{Security}
 UPPRESSO satisfies the four security requirements of identity tokens in SSO services,
      as listed in Section \ref{subsec:basicrequirements}.
-
 \begin{itemize}
-\item  \emph{\textbf{RP Designation}}~The RP (pseudo-)identity bound in the identity token
+\item  \textbf{RP Designation}~The RP (pseudo-)identity bound in the identity token
      identifies the target RP, and only this RP.
  % 仅有一个RP与之对应。
-\item \emph{\textbf{User Identification}}~The user (pseudo-)identity bound in the identity token identifies
+\item \textbf{User Identification}~The user (pseudo-)identity bound in the identity token identifies
         the user authenticated by the IdP, and only this user.
  % 能够被算出来的account，对应了the authenticated user；而且仅有这个user
-\item \emph{\textbf{Integrity}}~An honest RP accepts only identity tokens issued by the IdP,
-            and any forged or modified identity token will be rejected by the RP.
-\item \emph{\textbf{Confidentiality}}~An identity token issued by the IdP,
+\item \textbf{Confidentiality}~An identity token issued by the IdP,
     is accessible to only
                 the authenticated user and the target RP,
                     in addition to the IdP.
+\item \textbf{Integrity}~An honest RP accepts only identity tokens issued by the IdP,
+            and any forged or modified identity token will be rejected by the RP.
 \end{itemize}
 
 
@@ -35,15 +34,15 @@ Next, we prove that it is computationally impossible to find $t$ and $t'$
     where $RP_j$ and $RP_{j'}$ are any two RPs of the finite set of RPs,
     based on the ECDLP.
 Let $\mathbb{E}$ be an elliptic curve over a finite field $\mathbb{F}_q$,
-    $P$ be a point on $\mathbb{E}$ of order $n$,
-        and $Q = [x]P$ where $x$ is an integer number randomly  chosen from $(1,n)$.
-Given $P$ and $Q$,
+    $G$ be a point on $\mathbb{E}$ of order $n$,
+        and $Q = [x]G$ where $x$ is an integer number randomly  chosen from $(1,n)$.
+Given $G$ and $Q$,
     it is computationally impossible for any probabilistic polynomial time (PPT) algorithm $\mathcal{D}$,
         to compute $x$ (i.e., to solve the ECDLP).
 Let $Pr\{\}$ denote the probability.
 For any PPT algorithm $\mathcal{D}$, we define
 \begin{align*}
-Pr\{\mathcal{D}(P, [x]P)=x\} = \epsilon(k)
+Pr\{\mathcal{D}(G, [x]G)=x\} = \epsilon(k)
 \end{align*}
 So $\epsilon(k)$ becomes negligible with the security parameter $k$.
 
@@ -70,25 +69,25 @@ So, if the adversary is able to break RP designation,
 
 However, if the adversary has non-negligible advantages in $\mathcal{G}$,
     we will design a PPT algorithm $\mathcal{D^*}$ based on this game, shown in Figure~\ref{fig:ecdlp_algorithm}, to solve the ECDLP as below.
-The input of $\mathcal{D^*}$ is in the form of ($P$, $Q$).
+The input of $\mathcal{D^*}$ is in the form of ($G$, $Q$).
 On receiving the input, the challenger of $\mathcal{G}$ randomly chooses $r_1, r_2, \cdots, r_m$ from $(1,n)$,
- calculates $[r_1]P, [r_2]P, \cdots, [r_m]P$,
- and randomly replaces some $[r_j]P$ with the input $Q$.
+ calculates $[r_1]G, [r_2]G, \cdots, [r_m]G$,
+ and randomly replaces some $[r_j]G$ with the input $Q$.
 Then,
     these $m$ RP identities are sent to the adversary,
 and the adversary returns the result ($a$, $b$, $t$, $t'$).
 Finally, the challenger calculates $s = t^{-1}t'r_b \bmod n$ and returns $s$ as the output of $\mathcal{D^*}$.
 
-If $[r_a]P$ happens to be replaced with $Q$ and the adversary succeeds,
-    we find that $Q = [s]P$ and then $s=x$ because $[tr_a]P = [t]Q = [t'r_b]P$.
-As $[r_j]P$ is randomly chosen by the challenger,
+If $[r_a]G$ happens to be replaced with $Q$ and the adversary succeeds,
+    we find that $Q = [s]G$ and then $s=x$ because $[tr_a]G = [t]Q = [t'r_b]G$.
+As $[r_j]G$ is randomly chosen by the challenger,
     $Q$ and other RP identities in the input set are indistinguishable to the adversary.
 Thus,
 \begin{align*}
-Pr\{\mathcal{D^*}(P, [x]P)=x\} = Pr\{s = x\}=\frac{1}{m}Pr_s
+Pr\{\mathcal{D^*}(G, [x]G)=x\} = Pr\{s = x\}=\frac{1}{m}Pr_s
 \end{align*}
-If $Pr_s$ is non-negligible, $Pr\{\mathcal{D^*}(P, [x]P)=x\}$ is also non-negligible.
-It means $\mathcal{D^*}$ solves ECDLP.
+If $Pr_s$ is non-negligible, $Pr\{\mathcal{D^*}(G, [x]G)=x\}$ is also non-negligible.
+It means $\mathcal{D^*}$ solves the ECDLP.
 So the adversary does not have non-negligible advantages in $\mathcal{G}$,
     and it is computationally impossible to find $t$ and $t'$
     satisfying that $[t]ID_{RP_j} = [t']ID_{RP_{j'}}$ in UPPRESSO.
@@ -187,7 +186,7 @@ Thus,
 %The detailed process of proof is shown in Appendix.
 
 \vspace{1mm}
-We also formally analyze the three security properties of UPPRESSO,
+We also formally analyze the security properties of UPPRESSO,
      based on an Dolev-Yao style model of the web infrastructure \cite{SPRESSO},
  which has been used in the formal analysis of SSO protocols such as OAuth 2.0 \cite{FettKS16} and OIDC \cite{FettKS17}.
 The Dolev-Yao style model abstracts the entities in a web system,

@@ -1,6 +1,5 @@
 \section{Discussions}
 \label{sec:discussion}
-%We first discuss the scalability, security against DoS attack and OIDC authorization code flow support in UPPRESSO, and then present the extensions for UPPRESSO.
 
 %Some related issues are discussed in this section.
 
@@ -60,7 +59,7 @@ In the authorization code flow of OIDC \cite{OpenIDConnect},
         instead,
             an access token is forwarded to the RP,
             and then the RP uses this access token to ask for identity tokens from the IdP.
-The identity-transformation functions $\mathcal{F}_{PID_{U}}$, $\mathcal{F}_{PID_{RP}}$ and $\mathcal{F}_{Account}$
+The identity-transformation functions $\mathcal{F}_{PID_{U}}$, $\mathcal{F}_{PID_{RP}}$ and $\mathcal{F}_{Acct}$
     can be integrated into the authorization code flow to generate and verify two types of tokens.
 That is,
     $PID_{RP}$ but not $ID_{RP}$ is enclosed in access tokens by the IdP,
@@ -112,8 +111,8 @@ To prevent this leakage,
 %\noindent{\textbf{Malicious IdP mitigation.}} The IdP is assumed to assign a unique $ID_{RP}$ in $Cert_{RP}$ for each RP and generate the correct $PID_U$ for each login. The malicious IdP may attempt to provide the incorrect $ID_{RP}$ and $PID_U$, which could be prevented by integrating certificate transparency \cite{rfc6962} and user's identifier check \cite{SPRESSO}. With certificate transparency \cite{rfc6962}, the monitors  check the uniqueness of $ID_{RP}$ among all the certificates stored in the log server. To prevent the malicious IdP from injecting any incorrect $PID_U$, the user could provide a nickname to the RP for an extra check as in SPRESSO \cite{SPRESSO}.
 
 \vspace{1mm}
-\noindent{\textbf{Collusive Attacks by the IdP and RPs.}}
-If the IdP is curious-but-honest but shares messages in the login flow (i.e.,
+\noindent{\textbf{Collusive Attack by the IdP and RPs.}}
+When the IdP is still kept curious-but-honest but shares messages in the login flow (i.e.,
 $ID_U$, $PID_{RP}$, and $PID_U$)
         with some collusive RPs,
 UPPRESSO still provides secure SSO services,
@@ -159,7 +158,7 @@ Anyway, these RPs are distinguished by the implementation with browser extension
 %RP1 exploits the vulnerability of HTTPS server certificate is fine to attack,
 %    by the shared private key.
 
-\vspace{1mm}\noindent{\textbf{Alternative Ways to Bind $ID_{RP}$ and $Enpt_{RP}$.}}
+\vspace{1mm}\noindent{\textbf{Alternative Way to Bind $ID_{RP}$ and $Enpt_{RP}$.}}
 In the prototype, we bind $ID_{RP}$ and $Enpt_{RP}$ by RP certificates.
 This binding may be finished in another way:
     $ID_{RP}$ is deterministically computed based on the RP's domain,
