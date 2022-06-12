@@ -6,7 +6,7 @@ This section introduces OIDC \cite{OpenIDConnect},
  to describe typical SSO login flows.
 Then, we discuss existing privacy-preserving SSO solutions and other related works.
 
-\subsection{OpenID Connect}
+\subsection{OpenID Connect and SSO Features}
 \label{subsec:OIDC}
 OIDC is one of the most popular SSO protocols for web applications. %As other SSO protocols \cite{SAMLIdentifier}, OIDC
 %It involves three entities, i.e., {\em users}, the {\em identity provider (IdP)}, and {\em relying parties (RPs)}.
@@ -59,19 +59,43 @@ The user's operations including redirection, authorization, and forwarding,
 
 %extracts user's identifier and returns the authentication result to the user (Step 7).
 
-As described above, a ``pure'' SSO protocol does not include any authentication step:
-the authentication between a user and the IdP is conducted independently of the SSO protocol.
+In addition to the basic login flows enabling
+    an RP to verify that the user has been authenticated by the IdP,
+    the following features are supported by widely-used popular SSO solutions.
+
+\noindent \textbf{Non-anonymous User Identity.}
+The identity tokens facilitate the target RP to identify each user as a unique account at this RP,
+    and this account links the user's multiple login instances to this RP
+        for customized services.
+On the contrary, in Anonymous SSO systems \cite{WangWS13,HanCSTW18,HanCSTWW20}
+        the RP receives no other information to identity or distinguish the authenticated users.
+  
+\noindent \textbf{Independency of User Authentication.}
+A ``pure'' SSO protocol  \cite{OpenIDConnect,rfc6749,SAML} does not include authentication steps:
+the authentication between a user and the IdP is conducted independently.
 There is no authentication step between users and an RP,
         and an RP only verifies tokens issued by the IdP.
-This feature of commonly-used SSO protocols \cite{OpenIDConnect,rfc6749,SAML} brings advantages as below.
-It enables the IdP to authenticate a user by any appropriate means (e.g., password,
+This feature 
+    enables the IdP to authenticate users by any appropriate means (e.g., password,
 one-time password, multi-factor authentication, and smart card).
 Moreover, if a credential was lost or compromised,
-    the user only needs renew it at the IdP.
-On the other hand, if a user needs to prove some secret to the RP and this secret is valid across multiple login instance
+    the user only renews it at the IdP.
+On the other hand, if a user proves some non-ephemeral secret to the RP and this secret is valid across multiple login instances
     (i.e., some authentication steps are actually involved),
                 the user has to notify each RP if this secret was leaked  or lost. %(or even the user logins from another computer).
 
+\noindent \textbf{User Attributes Maintained at the IdP.}
+The IdP usually provides also user attributes in the tokens \cite{OpenIDConnect,rfc6749,SAML},
+    in addition to user (pseudo-)identities.
+These attributes are maintained by users at the IdP;
+    for example,
+        when Facebook provides social networking services,
+         it also runs as an IdP with identity tokens enclosing user identities and attributes.
+Before enclosing attributes in an identity token for any RP,
+    the IdP needs to obtain the user's authorization.
+Thus,
+    no distinctive attributes such as such as telephone number, Email, etc.,
+        are enclosed in tokens of privacy-preserving SSO systems.
 
 %\vspace{1mm}
 %\noindent\textbf{RP Dynamic Registration.}
@@ -91,7 +115,7 @@ On the other hand, if a user needs to prove some secret to the RP and this secre
 
 
 
-\begin{table*}[tb]
+\begin{table*}[htb]
 \footnotesize
     \caption{Comparison of Existing Privacy-Preserving SSO Solutions.}
     \centering
@@ -99,8 +123,13 @@ On the other hand, if a user needs to prove some secret to the RP and this secre
   \hline
   \multirow{3}*{\textbf{~~Solution~~}} &
   \multicolumn{3}{c|}{\textbf{SSO Feature} - supported $\CIRCLE$, or not $\Circle$ $\LEFTcircle$} & \multicolumn{3}{c|}{\textbf{Privacy Threat} - prevented $\CIRCLE$, or not $\Circle$} \\ \cline{2-7}
-  & Non-anonymous & Independency of & Maintenance of & IdP-based & RP-based & Collusive Attack \\
-  & User Identity & User Authentication & User Attributes & Login Tracing & Identity Linkage & by the IdP and RPs \\\hline
+  & Non-anonymous & Independency of & User Attributes & IdP-based & RP-based & Collusive Attack \\
+  & User Identity & User Authentication &  Maintained at the IdP & Login Tracing & Identity Linkage & by the IdP and RPs \\\hline
+  PPID-enhanced OIDC & $\CIRCLE$ & $\CIRCLE$ & $\CIRCLE$ & $\Circle$ & $\CIRCLE$ & $\Circle$ \\ \hline
+  SPRESSO \\ \hline
+  BrowserID \\ \hline
+  EL PASSO \\ \hline
+  PseudoID \\ \hline
   ABC\cite{x} & X & X & X & X & X & X \\ \hline
   UPPRESSO & $\CIRCLE$ & $\CIRCLE$ & $\CIRCLE$ & $\CIRCLE$ & $\CIRCLE$ & $\Circle$ \\ \hline
 \end{tabular}
