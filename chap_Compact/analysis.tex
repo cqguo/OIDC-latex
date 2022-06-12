@@ -39,7 +39,7 @@ Let $\mathbb{E}$ be an elliptic curve over a finite field $\mathbb{F}_q$,
         and $Q = [x]G$ where $x$ is an integer number randomly  chosen from $(1,n)$.
 Given $G$ and $Q$,
     it is computationally impossible for any probabilistic polynomial time (PPT) algorithm $\mathcal{D}$
-        to compute $x$ (i.e., to solve the ECDLP).
+        to determine $x$ (i.e., to solve the ECDLP).
 Let $Pr\{\}$ denote the probability.
 For any PPT algorithm $\mathcal{D}$, we define
 \begin{align*}
@@ -51,7 +51,7 @@ We assume a game $\mathcal{G}_c$ between an adversary and a challenger,
     to describe the attack breaking RP designation:
 the adversary receives a finite set of RP identities from the challenger,
  denoted as ($ID_{RP_1}$, $ID_{RP_2}$, ..., $ID_{RP_m}$),
- where $m$ is the amount of all RPs in the system,
+ where $m$ is the amount of RPs in the system,
   and then outputs $(a, b, t, t')$.
 If $[t]ID_{RP_a}=[t']ID_{RP_b}$, the adversary succeeds in this game.
 %If the adversary has the non-negligible probability on succeeding in this game, RP designation is broken.
@@ -75,7 +75,7 @@ However, if the adversary has non-negligible advantages in $\mathcal{G}_c$,
 The input of $\mathcal{D}^*_c$ is in the form of ($G$, $Q$).
 On receiving the input, the challenger of $\mathcal{G}_c$ randomly chooses $r_1, r_2, \cdots, r_m$ from $(1,n)$,
  calculates $[r_1]G, [r_2]G, \cdots, [r_m]G$,
- and randomly replaces an $[r_j]G$ with the input $Q$.
+ and randomly replaces some $[r_j]G$ with the input $Q$.
 Then,
     these $m$ RP identities are sent to the adversary,
 and the adversary returns the result ($a$, $b$, $t$, $t'$).
@@ -262,11 +262,11 @@ In a login instance,
     the RP holds $ID_{RP}$ and $Acct$, receives $t$, calculates $PID_{RP}$,
     and verifies $PID_{RP}$ and $PID_U$ in the identity token.
 After filtering out the redundant information (i.e., $PID_{RP}= [t]{ID_{RP}}$ and $Acct = [t^{-1}]PID_{U}$),
-    the RP actually receives $\{ID_{RP}, t, Acct\}$ in each UPPRESSO login instance, where $ID_{RP} = [r]G$ and $Acct = [ID_U]{ID_{RP}} = [ur]G$.
+    the RP actually receives $(ID_{RP}, t, Acct)$ in each UPPRESSO login instance, where $ID_{RP} = [r]G$ and $Acct = [ID_U]{ID_{RP}} = [ur]G$.
 
 The prevention against the RP-based identity linkage is proved
     by the proposition:
-when $c$ collusive RPs hold the information of login instances by $v$ users,
+when $c$ collusive RPs collect the information of login instances by $v$ users,
     they cannot determine whether a login instance to another RP belongs to one of these users or not.
 The information of login instances is expressed as $\mathfrak{L}=\left\{ \begin{matrix}
 L_{1,1}, & L_{1,2}, & \cdots, & L_{1,c}\\
@@ -292,13 +292,12 @@ after receiving $\mathfrak{L}$ and $L'$ from a challenger,
 We design a PPT algorithm $\mathcal{D}^*_r$ based on $\mathcal{G}_r$, shown in Figure~\ref{fig:dalgorithm}, to solve the ECDDH problem.
 The input of $\mathcal{D}^*_r$ is in the form of $(Q_1=[x]G$, $Q_2=[y]G$, $Q_3=[z]G)$.
 On receiving the input, the challenger of $\mathcal{G}_r$ randomly chooses
- $\{u_1, u_2, \cdots, u_v\}$, $\{r_1, r_2, \cdots, r_c\}$, $\{t_{1, 1}, t_{1, 2}, \cdots, t_{a, b}\}$, and $t'$ from $(1,n)$.
-Then the challenger constructs $\mathfrak{L}$ and $L'$ based on $Q_1$, $Q_2$ and $Q_3$ as below.
+ $\{u_1, u_2, \cdots, u_v\}$, $\{r_1, r_2, \cdots, r_c\}$, $\{t_{1, 1}, t_{1, 2}, \cdots, t_{v, c}\}$, and $t'$ from $(1,n)$.
+Then the challenger constructs $\mathfrak{L}$ and $L'$ as below.
 It first assigns $L_{i, j} = ([r_j]G, t_{i, j}, [u_ir_j]G)$, %$1\leq i \leq v$ and $1\leq j \leq c$,
     and randomly chooses $k \in [1, v]$ to
  replace $[u_k r_j]G$ with $[r_j]Q_1=[x][r_j]G$, $1\leq j \leq c$.
-That is, $x$ is actually inserted into $\mathfrak{L}$ as $u_k$,
-and $\mathfrak{L}=\left \{ \begin{matrix}
+So $\mathfrak{L}=\left \{ \begin{matrix}
 L_{1,1},&L_{1,2},&\cdots,&L_{1,c}\\
 L_{2,1},& L_{2,2},&\cdots,&L_{2,c}\\
 \cdots,&\cdots,&\cdots,&\cdots\\
@@ -313,7 +312,8 @@ Finally,
     the challenger sends $\mathfrak{L}$ and $L'$ to the adversary,
         and then the output $s$ of $\mathcal{G}_r$ is output by the challenger.
 According to the construction of $\mathfrak{L}$ and $L'$,
-    $z/y$ is actually assigned to $u'$.
+    $x$ is actually inserted into $\mathfrak{L}$ as $u_k$,
+    and $z/y$ is assigned to $u'$.
 So, if $z = xy$, $ID_{U'}$ is in the set \{$ID_{U_1}, ID_{U_2}, \cdots, ID_{U_v}$\}.
 Thus,
 \begin{align*}
@@ -321,7 +321,7 @@ Thus,
 &Pr_2=Pr\{\mathcal{D'^*}([x]G, [y]G, [z]G)=1\}\\ =&Pr'_2 =  Pr\{\mathcal{G}_r(\mathfrak{L}, L'|ID_{U'} \in (1, n))=1\}
 \end{align*}
 
-The ECDDH problem implies that in $\mathcal{G}_r$ the adversary 
+The ECDDH problem implies that in $\mathcal{G}_r$ the adversary
     cannot distinguish a user $U'$ chosen from \{${U_1}, {U_2}, \cdots, {U_v}$\}
         or randomly from the user set of UPPRESSO.
 %    (indistinguishability of users to collusive RPs).
