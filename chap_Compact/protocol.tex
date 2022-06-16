@@ -177,8 +177,15 @@ In UPPRESSO such functions of a user agent are implemented by supplementary web 
     and more efficient but less portable implementations with browser extensions
  are discussed in Section \ref{sec:discussion}.
 Two scripts are downloaded from the visited RP and the IdP, respectively,
-    and each is responsible for the communications with the origin web server
- to follow the \emph{same-origin policy} (SOP) \cite{sop}. 
+    and each is responsible for the communications with the origin web server.
+% to follow the \emph{same-origin policy} (SOP) \cite{sop}. 
+The RP script is downloaded, when the user visits the RP,
+    and it launches the IdP script and prepare RP certificates ($ID_{ID}$ and $Enpt_{RP}$) to the IdP script.
+Note that only the RP script is not enough;
+    otherwise, the RP script will leaks its origin to the IdP web server.
+The IdP script downloaded honest IdP
+to ensure confidentiality of identity tokens (a token is sent to the endpoint),
+to act with the user for user-attribute authorization.
 \emph{RP certificates} are designed to instruct the browsers about
             the verified endpoint of an RP.
 An RP certificate is a document signed by the IdP during the RP initial registration,
