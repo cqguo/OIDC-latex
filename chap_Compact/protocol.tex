@@ -180,7 +180,7 @@ Two scripts are downloaded from the visited RP and the IdP, respectively,
     and each is responsible for the communications with the origin web server.
 % to follow the \emph{same-origin policy} (SOP) \cite{sop}.
 The RP script is downloaded, when the user visits the RP,
-    and it launches the IdP script and prepare RP certificates ($ID_{ID}$ and $Enpt_{RP}$) to the IdP script.
+    and it launches the IdP script and prepare $ID_{RP}$ and $Enpt_{RP}$ to the IdP script.
 Note that only the RP script is not enough to implement the user agent of UPPRESSO;
     otherwise, the RP script will leaks its origin to the IdP web server
     (e.g., if it requests the identity token,
@@ -188,12 +188,12 @@ Note that only the RP script is not enough to implement the user agent of UPPRES
 automatically carry an HTTP \verb+Referer+ header, which discloses the RP domain).
 Moreover, a script downloaded the honest IdP,
 to ensure confidentiality of identity tokens (i.e., an identity token is sent to only the RP designated in this token),
-and to interact with the user for the authorization of user attributes.
+and to interact with the user for the authorization of user attributes,
+    while the visited RP might be malicious.
 
-\emph{RP certificates} are designed to instruct browsers about
-            the verified endpoint of an RP.
+\emph{RP certificates} are designed for browsers to verify the endpoint of an RP.
 An RP certificate is a document signed by the IdP during the RP initial registration,
-     binding the RP's identity and its endpoint.
+     binding the RP's identity and its endpoint (i.e., $ID_{RP}$ and $Enpt_{RP}$).
 In a login instance,
     the RP will provide its certificate through the RP script.
 The IdP script from the honest IdP,
@@ -695,7 +695,7 @@ The operations of identity-token generation and $Acct$ calculation,
 
 Finally,
     this compatibility with OIDC is experimentally confirmed by our prototype implementation,
-        where only about 20 lines of Java code are needed to modify MITREid Connect \cite{MITREid},
+        \textcolor[rgb]{1,0,0}{where only about 20 lines of Java code are needed to modify} MITREid Connect \cite{MITREid},
         an open-source system of OIDC,
     to build the IdP.
 
