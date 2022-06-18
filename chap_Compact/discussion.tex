@@ -144,11 +144,14 @@ When the IdP script forwards identity tokens to the RP script within the browser
 A targetOringin is specified as
     a domain (e.g., \verb+www.RP.com+) and the parts of protocol and port (if not presented, implied 80 for \verb+http+ protocol, and implied 443 for \verb+https+ protocol),
         and it requires the RP script's origin accurately matches the targetOringin.
-        However, the path of the endpoint, such as \verb+/path/to/myfile.html+, is not checked by the targetOringin mechanism.
-So only one RP is assumed to run on a domain.
-If two independent RPs run on one domain but with different endpoints to receive tokens
+        Although the path of the endpoint, such as \verb+/path/to/myfile.html+, is not checked by the targetOringin mechanism, which means only one RP is assumed to run on a domain, it would resulted in no additional risk.
+For example, if two independent RPs run on one domain but with different endpoints to receive tokens
         (e.g., \verb+https://www.RP.com/RP1/uploadToken+ and \verb+https://www.RP.com/RP2/uploadToken+),
          they cannot be distinguished actually by web scripts and \verb+postMessage+.
+         However, for a browser, due to the same-origin policy~\cite{sop}, the origin is also the essential parameter, that prevents the documents and scripts on one origin from accessing the resources on other origins.
+         For example, while two services are deployed on the same origin and one of them is controlled by an adversary, the adversary's document and script in a user's browser can upload this user's cookie for the other service. 
+        Although the honest service can restrict that only the request to specific path carries its cookie, however, the adversary's script can open the new window loading the honest service's path, and retrieve the cookie using the API \verb+w=window.open("http://www.example.com/honest")+
+    and \verb+w.document.cookie+.
 Anyway, such RPs are distinguished by the implementation with browser extensions.
 %
 %We do not consider two hostile RPs on a domain.
