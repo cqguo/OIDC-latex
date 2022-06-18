@@ -142,8 +142,9 @@ When the IdP script forwards identity tokens to the RP script within the browser
         to ensure it will forward the tokens to $Enpt_{RP}$,
         which is bound in the RP certificate.
 A targetOringin is specified as
-    a domain (e.g., \verb+www.RP.com+) and the parts of protocol and port,
+    a domain (e.g., \verb+www.RP.com+) and the parts of protocol and port (if not presented, implied 80 for \verb+http+ protocol, and implied 443 for \verb+https+ protocol),
         and it requires the RP script's origin accurately matches the targetOringin.
+        However, the path of the endpoint, such as \verb+/path/to/myfile.html+, is not checked by the targetOringin mechanism.
 So only one RP is assumed to run on a domain.
 If two independent RPs run on one domain but with different endpoints to receive tokens
         (e.g., \verb+https://www.RP.com/RP1/uploadToken+ and \verb+https://www.RP.com/RP2/uploadToken+),
@@ -165,8 +166,8 @@ This binding may be finished in another way:
     \verb+https://www.RP.com/+),
         when it is unambiguous and unique.
 For example,
-    $H(DN_{RP})$ \cite{xxxx}. xxx xxx xxx.
-Here, $H()$ is a collision-free hash function, and $DN_{RP}$ is an RP's domain (i.e., the RP script's origin).
+    $H(DN_{RP})$ \cite{irtf-cfrg-hash-to-curve-16} encodes an arbitrary input to a point on an elliptic curve. 
+Here, $H()$ is a collision-free hash function and does not reveal the discrete logarithm of the output point. $DN_{RP}$ is an RP's domain (i.e., the RP script's origin).
 The RP script will send its origin to the IdP script in Step 2.2,
  and then RP certificates are unnecessary.
     This elimination of RP certificates improves the downloading of IdP scripts,
@@ -180,6 +181,7 @@ When such an event happens,
 Note that this migration of accounts requires extra cooperations explicitly by each user;
     otherwise,
         two collusive RPs could actually link a user's accounts across these RPs.
+        Moreover, $Cert_{RP}$ ensures that the target has already registered itself at the IdP, which prevent the unauthorized RP joining in the UPPRESSO system.
 
 
 %\vspace{1mm}
