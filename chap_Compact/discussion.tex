@@ -137,23 +137,33 @@ Experiments show that at least 102 ms will be saved for each login instance (i.e
     compared with the version implemented with portable web scripts.
 
 \vspace{1mm}\noindent{\textbf{Restriction of the RP Script's Origin.}}
-When the IdP script forwards identity tokens to the RP script within the browser,
-    the receiver is restricted by the \verb+postMessage+ targetOringin mechanism \cite{postm-targeto},
+When the IdP script forwards identity tokens to the RP script within the user browser,
+    the receiver is restricted by the \verb+postMessage+ targetOrigin mechanism \cite{postm-targeto},
         to ensure it will forward the tokens to $Enpt_{RP}$,
         which is bound in the RP certificate.
-A targetOringin is specified as
-    a domain (e.g., \verb+www.RP.com+) and the parts of protocol and port (if not presented, implied 80 for \verb+http+ protocol, and implied 443 for \verb+https+ protocol),
-        and it requires the RP script's origin accurately matches the targetOringin.
-        Although the path of the endpoint, such as \verb+/path/to/myfile.html+, is not checked by the targetOringin mechanism, which means only one RP is assumed to run on a domain, it would resulted in no additional risk.
-For example, if two independent RPs run on one domain but with different endpoints to receive tokens
-        (e.g., \verb+https://www.RP.com/RP1/uploadToken+ and \verb+https://www.RP.com/RP2/uploadToken+),
-         they cannot be distinguished actually by web scripts and \verb+postMessage+.
-         However, for a browser, due to the same-origin policy~\cite{sop}, the origin is also the essential parameter, that prevents the documents and scripts on one origin from accessing the resources on other origins.
-         For example, while two services are deployed on the same origin and one of them is controlled by an adversary, the adversary's document and script in a user's browser can upload this user's cookie for the other service. 
-        Although the honest service can restrict that only the request to specific path carries its cookie, however, the adversary's script can open the new window loading the honest service's path, and retrieve the cookie using the API \verb+w=window.open("http://www.example.com/honest")+
-    and \verb+w.document.cookie+.
-Anyway, such RPs are distinguished by the implementation with browser extensions.
-%
+A targetOrigin is specified as
+    a domain (e.g., \verb+www.RP.com+) and the parts of protocol and port (if not presented, implicitly 80 for \verb+http+ and 443 for \verb+https+),
+        and it requires the RP script's origin accurately matches the targetOrigin.
+
+Although the path part of $Enpt_{RP}$, e.g., \verb+/SSO/uploadTkn+,
+ is not checked by the targetOrigin mechanism,
+  which means that only one RP is assumed to run on a domain,
+   it brings no extra risk.
+For example, if two independent RPs run on one domain but with different endpoints to receive identity tokens
+        (e.g., \verb+https://www.RP.com/honest/uploadTkn+ and \verb+https://www.RP.com/attack/uploadTkn+),
+         they cannot be distinguished by web scripts and \verb+postMessage+.
+On the other hand, browsers enforce
+ the same-origin policy \cite{sop} in the access control of web resources,
+    and the control granularity is also origins only.
+Therefore,
+    a malicious RP could always access the other's resources within a user's browser,
+        e.g., steal the cookie
+        by web scripts such as 
+        \verb+vw = window.open('http://www.RP.com/honest')+
+    and \verb+vw.document.cookie+,
+    even when the honest RP restricts that only HTTP requests to specific paths carry its cookie.
+%Anyway, such RPs are distinguished by the implementation with browser extensions.
+
 %We do not consider two hostile RPs on a domain.
 %Similar attacks exist in HTTPS, because an HTTPS server certificate
 %only binding the domain.
@@ -164,30 +174,30 @@ Anyway, such RPs are distinguished by the implementation with browser extensions
 
 \vspace{1mm}\noindent{\textbf{Alternative Way to Bind $ID_{RP}$ and $Enpt_{RP}$.}}
 In the prototype, we bind $ID_{RP}$ and $Enpt_{RP}$ by RP certificates.
+The RP certificates ensures that the target RP has already registered itself at the IdP,
+ which prevent the unauthorized RPs from accessing the IdP's services.
+
+
 This binding may be finished in another way:
-    $ID_{RP}$ is deterministically calculated based on the RP's website domain (e.g.,
-    \verb+https://www.RP.com/+),
-        when it is unambiguous and unique.
+    $ID_{RP}$ is deterministically calculated based on the RP's unambiguous domain (e.g.,
+    \verb+https://www.RP.com/+).
 For example,
-    $H(DN_{RP})$ \cite{irtf-cfrg-hash-to-curve-16} encodes an arbitrary input to a point on an elliptic curve. 
-Here, $H()$ is a collision-free hash function and does not reveal the discrete logarithm of the output point. $DN_{RP}$ is an RP's domain (i.e., the RP script's origin).
-The RP script will send its origin to the IdP script in Step 2.2,
- and then RP certificates are unnecessary.
-    This elimination of RP certificates improves the downloading of IdP scripts,
-        and on average xxx ms are saved.
-
-Anyway, it still needs some methods to obtain $Enpt_{RP}$;
-    for example, an implicit URL (\verb+https://www.RP.com/uploadToken+).
-
-On the other hand, once the RP updates its website domain, for instance, from \verb+https://www.theRPdomain.com/+ to \verb+https://www.RPdomain.com/+,
-$Acct = [ID_U]ID_{RP}$ will change inevitably,
+    $H(DN_{RP})$ \cite{irtf-cfrg-hash-to-curve-16} encodes an arbitrary input to a point on an elliptic curve $\mathbb{E}$ as $ID_{RP}$,
+where $DN_{RP}$ is an RP's domain (i.e., the RP script's origin),
+    and $H()$ is a collision-free hash function.
+It does not reveal the discrete logarithm of the output point (i.e., $ID_{RP} = [r]G$ but $r$ is unknown).
+Then, the RP script will send the endpoint to the IdP script in Step 2.2,
+ and $ID_{RP}$ is calculated by the IdP script.
+This elimination of RP certificates improves the downloading of IdP scripts,
+        and on average \textcolor[rgb]{1,0,0}{xxx} ms are saved.
+However, once the RP updates its domain, for instance, from \verb+https://www.theRPdomain.com/+ to \verb+https://www.RPdomain.com/+,
+$Acct = [ID_U]ID_{RP}$ will change inevitably.
 When such an event happens,
     the RP needs special operations by each user to migrate an account
             to the updated RP system.
 Note that this migration of accounts requires extra cooperations explicitly by each user;
     otherwise,
         two collusive RPs could actually link a user's accounts across these RPs.
-        Moreover, $Cert_{RP}$ ensures that the target has already registered itself at the IdP, which prevent the unauthorized RP joining in the UPPRESSO system.
 
 
 %\vspace{1mm}

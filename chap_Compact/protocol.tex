@@ -166,7 +166,7 @@ On the contrary,
 For example,
     in the OIDC services, as an RP registers itself at the IdP, the \verb+redirect_uri+ parameter
     is set as the endpoint URL to receive tokens.
-In a login instance, when the IdP wants to transmit identity tokens to an RP,
+Then, in an OIDC login instance, when the IdP wants to transmit identity tokens to an RP,
     it utilizes the HTTP 302 redirection with this endpoint as the target URL in the HTTP response,
      and then the user browser will forward it to the RP.
 This verified \verb+redirect_uri+  ensures that an identity token is sent to the target RP,
@@ -178,21 +178,25 @@ In UPPRESSO such functions of a user agent are implemented by supplementary web 
  are discussed in Section \ref{sec:discussion}.
 Two scripts are downloaded from the visited RP and the IdP, respectively,
     and each is responsible for the communications with the origin web server.
-% to follow the \emph{same-origin policy} (SOP) \cite{sop}. 
+% to follow the \emph{same-origin policy} (SOP) \cite{sop}.
 The RP script is downloaded, when the user visits the RP,
     and it launches the IdP script and prepare RP certificates ($ID_{ID}$ and $Enpt_{RP}$) to the IdP script.
-Note that only the RP script is not enough;
-    otherwise, the RP script will leaks its origin to the IdP web server.
-The IdP script downloaded honest IdP
-to ensure confidentiality of identity tokens (a token is sent to the endpoint),
-to act with the user for user-attribute authorization.
-\emph{RP certificates} are designed to instruct the browsers about
+Note that only the RP script is not enough to implement the user agent of UPPRESSO;
+    otherwise, the RP script will leaks its origin to the IdP web server
+    (e.g., if it requests the identity token,
+    an HTTP request launched by the RP script will
+automatically carry an HTTP \verb+Referer+ header, which discloses the RP domain).
+Moreover, a script downloaded the honest IdP,
+to ensure confidentiality of identity tokens (i.e., an identity token is sent to only the RP designated in this token),
+and to interact with the user for the authorization of user attributes.
+
+\emph{RP certificates} are designed to instruct browsers about
             the verified endpoint of an RP.
 An RP certificate is a document signed by the IdP during the RP initial registration,
      binding the RP's identity and its endpoint.
 In a login instance,
     the RP will provide its certificate through the RP script.
-The IdP script downloaded from the honest IdP,
+The IdP script from the honest IdP,
     verifies the RP certificate to extract $ID_{RP}$ and $Enpt_{RP}$.
 The IdP's public key is set in the IdP script, so that
  the user agent does not configure anything locally,
@@ -209,9 +213,9 @@ After using the extracted $ID_{RP}$ in identity-transformation functions
 The IdP and RP scripts communicate with each other within the user browser through the \verb+postMessage+ HTML5 API,
 %To avoid the honest user sending the identity token to an adversary,
 and the receiver of an identity token (i.e., the RP script)
- is restricted by the \verb+postMessage+ targetOringin mechanism \cite{postm-targeto}.
+ is restricted by the \verb+postMessage+ targetOrigin mechanism \cite{postm-targeto}.
 That is, when the IdP script sends identity tokens through \verb+postMessage+,
- the receiver's origin is set as a parameter of the API (e.g., \verb+window.opener.postMessage(tkn, 'https://www.RP.com')+),
+ the receiver's origin is set as a parameter, e.g., \verb+window.opener.postMessage(tkn, 'https://www.RP.com')+,
   so that only the script downloaded from this origin is a legal receiver.
 The origin parameter consists of
     the protocol (i.e., \verb+https://+),
@@ -228,7 +232,7 @@ We need to prevent the referer leakage when the IdP script is downloaded.
 Generally, when a browser window visits another website not belonging to its opener's origin,
  the HTTP request to this website will automatically carry the \verb+referer+ header (i.e., the opener's origin).
 This HTTP \verb+referer+ header leaks the information about the visited RP to the IdP.
-Fortunately, in UPPRESSO this newly-opened window is a redirection from the RP to the IdP, instead of directly visits the IdP (see Figure~\ref{fig:process}, Steps 1.2-1.3).
+Fortunately, in UPPRESSO this newly-opened window is a redirection from the RP to the IdP, instead of directly visits the IdP from the user (see Figure~\ref{fig:process}, Steps 1.2-1.3).
 So this leakage is prevented by setting the header \verb+referrer-policy=no-referrer+ in the HTTP response from the RP, when it is redirected to the IdP.
 Then, the HTTP request to download the IdP script carries no \verb+referer+ header.
 This setting is specified by W3C \cite{referer_policy}, and widely supported.
