@@ -53,37 +53,32 @@ Therefore, given an RP,
 
 %授权码
 %兼容:目前只提供隐式模式,对其他模式与协议的兼容方法
-\vspace{1mm}\noindent{\textbf{Compatibility with the Authorization Code and Access Token.}}
+\vspace{1mm}\noindent{\textbf{Compatibility with the Authorization Code Flow.}}
 In the authorization code flow of OIDC \cite{OpenIDConnect},
     the IdP does not directly issue the identity token;
         instead,
-            an authorization code is forwarded to the RP,
-            and then the RP uses this code to ask for identity token from the IdP.         
+            an authorization code is sent to the RP,
+            and then the RP uses this code to ask for identity tokens.
 The identity-transformation functions $\mathcal{F}_{PID_{U}}$, $\mathcal{F}_{PID_{RP}}$ and $\mathcal{F}_{Acct}$
-    can be integrated into the authorization code flow, similar with the login flow introduced in section~\ref{implementations}, by replacing the identity token with the authorization code.
-    The implementation of authorization code is not clearly defined by OIDC specification~\cite{OpenIDConnect}, while usually it should be the character string used as the index into IdP database storing the data, such as generated identity tokens.
-    Thus, the authorization would not expose user's information to RP. 
-    However, after receiving the authorization code, RP server would use the authorization code and a secret (issued by IdP while registering at IdP) to retrieve the identity token from IdP directly. 
-    To avoid the IdP recognizing the RP's identity, the RPs should use the same secret, or use the secrets to generate indistinguishable proofs, such as group signatures~\cite{chaum1991group}.
-    It allows the IdP to obtain the RP's network information (e.g., IP address).
-To prevent this leakage,
-    the RP needs to integrate anonymous networks (e.g., Tor) to ask for identity tokens in the authorization code flow.
-    
-    Moreover, IdP can also issue the access token to RP beside of identity token, while the specifications\cite{rfc6749, rfc6750} define mechanisms to obtain and use access tokens to access resources but do not define standard methods to provide identity information. 
-    That is, the access token is not required to carry any RP and user's information explicitly, therefore, it would not expose any user's information to RP.
-    % to generate and verify two types of tokens.
-%That is,
- %   $PID_{RP}$ but not $ID_{RP}$ is enclosed in access tokens by the IdP,
-  %      and the RP accepts an access token with matching $PID_{RP}$ only.
-%Then,
- %   the RP uses the access token to request the identity token with $PID_U$,
-% so the privacy threats are still prevented in authorization code flow.
+    can be integrated into the authorization code flow, similar with the login flow introduced in Section~\ref{implementations},
+            while an authorization code is forwarded to the RP script by the IdP script
+                and this code is used to ask for an identity token binding $PID_U$ and $PID_{RP}$.
+An authorization code is usually the index to retrieve the identity token from the IdP,
+        and does not disclose any information about the authenticated user.
 
-%However,
- %   as the RP receives the identity token directly from the IdP in this flow,
- %           it allows the IdP to obtain the RP's network information (e.g., IP address).
-%To prevent this leakage,
- %   the RP needs to integrate anonymous networks (e.g., Tor) to ask for identity tokens  in the authorization code flow.
+
+After receiving the authorization code, the RP uses it and another secret
+         which is issued by the IdP during the initial registration,
+     to retrieve the identity token from the IdP by itself \cite{OpenIDConnect}.
+Therefore,
+    in order to protect RP identities from the IdP,
+        privacy-preserving credentials (e.g., ring and group signatures \cite{ring-sig,chaum1991group}) 
+        and anonymous networks (e.g., Tor \cite{tor}) need to be adopted for RPs in the retrieval of identity tokens.
+
+
+%Moreover, IdP can also issue the access token to RP beside of identity token, while the specifications\cite{rfc6749, rfc6750} define mechanisms to obtain and use access tokens to access resources but do not define standard methods to provide identity information.
+%    That is, the access token is not required to carry any RP and user's information explicitly, therefore, it would not expose any user's information to RP.
+
 
 %平台无关
 %Similar as SPRESSO, we can integrated for***
@@ -94,15 +89,6 @@ To prevent this leakage,
 %Moreover, the implementation could  be further extended to remove the Chrome extension, whose JavaScript program is then fetched from the honest IdP. The processing is similar as SPRESSO. That is, 1) the RP's window (window A)  opens a new iframe (window B) to visit the RP's web page, while the RP's web page redirects window B to the IdP; 2) window B downloads the JavaScript  program from the IdP and performs the processing in Steps 1.3, 1.5, 2.1, 3.2 and 3.5; 3) then postMessages are adopted to exchange messages between window A and B for Steps 1.2, 1.3, 1.4, 2.3, 3.1 and 3.5.
 %The opener handle of window B is preserved (i.e., window A) for the postMessage, as window A  opens window B with a web page from the RP;
  %and window B is redirected to the IdP with \emph{noreferrer} attribute set, to prevent the browser from sending RP's URL in the Referrer header to the IdP.
-
-
-
-%malicious IdP
-%标题，collusive RPs-->PSI PSI实现的前提条件被破坏。 PSI使得RP在不侵犯用户隐私的前提下，进行idenity linkage。
-%RP designation --> RP specification / binding
-%The primary goal of SSO services is to implement secure user authentication [6], ---> 6多加几个参考文献
-%User privacy leaks in all existing SSO protocols and implementations. -->加几个参考文献
-
 
 
 
@@ -169,7 +155,7 @@ On the other hand, browsers enforce
 Therefore,
     a malicious RP could always access the other's resources within a user's browser,
         e.g., steal the cookie
-        by web scripts such as 
+        by web scripts such as
         \verb+vw = window.open('http://www.RP.com/honest')+
     and \verb+vw.document.cookie+,
     even when the honest RP restricts that only HTTP requests to specific paths carry its cookie.
@@ -203,7 +189,7 @@ to the IdP script in Step 2.2,
  and $ID_{RP}$ is calculated by the IdP script.
 %This elimination of RP certificates improves the downloading of scripts,
 %        and on average \textcolor[rgb]{1,0,0}{xxx} ms are saved.
-However, once the RP updates its domain, for instance, from \verb+https://www.theRP.com/+ to \verb+https://www.RP.com/+, 
+However, once the RP updates its domain, for instance, from \verb+https://www.theRP.com/+ to \verb+https://www.RP.com/+,
 $Acct = [ID_U]ID_{RP}$ will change inevitably.
 When such an event happens,
     the RP needs special operations by each user to migrate an account
