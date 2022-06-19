@@ -53,26 +53,37 @@ Therefore, given an RP,
 
 %授权码
 %兼容:目前只提供隐式模式,对其他模式与协议的兼容方法
-\vspace{1mm}\noindent{\textbf{Compatibility with the Authorization Code Flow.}}
+\vspace{1mm}\noindent{\textbf{Compatibility with the Authorization Code and Access Token.}}
 In the authorization code flow of OIDC \cite{OpenIDConnect},
     the IdP does not directly issue the identity token;
         instead,
-            an access token is forwarded to the RP,
-            and then the RP uses this access token to ask for identity tokens from the IdP.
+            an authorization code is forwarded to the RP,
+            and then the RP uses this code to ask for identity token from the IdP.         
 The identity-transformation functions $\mathcal{F}_{PID_{U}}$, $\mathcal{F}_{PID_{RP}}$ and $\mathcal{F}_{Acct}$
-    can be integrated into the authorization code flow to generate and verify two types of tokens.
-That is,
-    $PID_{RP}$ but not $ID_{RP}$ is enclosed in access tokens by the IdP,
-        and the RP accepts an access token with matching $PID_{RP}$ only.
-Then,
-    the RP uses the access token to request the identity token with $PID_U$,
- so the privacy threats are still prevented in authorization code flow.
-
-However,
-    as the RP receives the identity token directly from the IdP in this flow,
-            it allows the IdP to obtain the RP's network information (e.g., IP address).
+    can be integrated into the authorization code flow, similar with the login flow introduced in section~\ref{implementations}, by replacing the identity token with the authorization code.
+    The implementation of authorization code is not clearly defined by OIDC specification~\cite{OpenIDConnect}, while usually it should be the character string used as the index into IdP database storing the data, such as generated identity tokens.
+    Thus, the authorization would not expose user's information to RP. 
+    However, after receiving the authorization code, RP server would use the authorization code and a secret (issued by IdP while registering at IdP) to retrieve the identity token from IdP directly. 
+    To avoid the IdP recognizing the RP's identity, the RPs should use the same secret, or use the secrets to generate indistinguishable proofs, such as group signatures~\cite{chaum1991group}.
+    It allows the IdP to obtain the RP's network information (e.g., IP address).
 To prevent this leakage,
-    the RP needs to integrate anonymous networks (e.g., Tor) to ask for identity tokens  in the authorization code flow.
+    the RP needs to integrate anonymous networks (e.g., Tor) to ask for identity tokens in the authorization code flow.
+    
+    Moreover, IdP can also issue the access token to RP beside of identity token, while the specifications\cite{rfc6749, rfc6750} define mechanisms to obtain and use access tokens to access resources but do not define standard methods to provide identity information. 
+    That is, the access token is not required to carry any RP and user's information explicitly, therefore, it would not expose any user's information to RP.
+    % to generate and verify two types of tokens.
+%That is,
+ %   $PID_{RP}$ but not $ID_{RP}$ is enclosed in access tokens by the IdP,
+  %      and the RP accepts an access token with matching $PID_{RP}$ only.
+%Then,
+ %   the RP uses the access token to request the identity token with $PID_U$,
+% so the privacy threats are still prevented in authorization code flow.
+
+%However,
+ %   as the RP receives the identity token directly from the IdP in this flow,
+ %           it allows the IdP to obtain the RP's network information (e.g., IP address).
+%To prevent this leakage,
+ %   the RP needs to integrate anonymous networks (e.g., Tor) to ask for identity tokens  in the authorization code flow.
 
 %平台无关
 %Similar as SPRESSO, we can integrated for***
