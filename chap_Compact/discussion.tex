@@ -173,7 +173,8 @@ Therefore,
 %    by the shared private key.
 
 \vspace{1mm}\noindent{\textbf{Alternative Way to Bind $ID_{RP}$ and $Enpt_{RP}$.}}
-In the prototype, we bind $ID_{RP}$ and $Enpt_{RP}$ by RP certificates.
+In the prototype, we bind $ID_{RP}$ and $Enpt_{RP}$ by RP certificates,
+    verified by the honest IdP script.
 The RP certificates ensure that the target RP has already registered itself at the IdP,
  which prevents unauthorized RPs from accessing the IdP's SSO services.
 
@@ -182,22 +183,23 @@ This binding may be finished in another way:
     $ID_{RP}$ is deterministically calculated based on the RP's unambiguous domain (e.g.,
     \verb+https://www.RP.com/+).
 For example,
-    $Hs(DN_{RP})$ encodes an RP's domain (or the RP script's origin) to a point on an elliptic curve $\mathbb{E}$ as $ID_{RP}$,
+    $Hs()$ encodes an RP's domain (or the RP script's origin) to a point on an elliptic curve $\mathbb{E}$ as $ID_{RP}$,
 where
     hashing to elliptic curves $Hs()$ \cite{irtf-cfrg-hash-to-curve-16} provides collision resistance and does not reveal the discrete logarithm of the output
     (i.e., $ID_{RP} = [r]G$ but $r$ is unknown).
-Then, the RP script will send the endpoint to the IdP script in Step 2.2,
+Then, the RP script will send the endpoint but not its RP certificate,
+to the IdP script in Step 2.2,
  and $ID_{RP}$ is calculated by the IdP script.
 %This elimination of RP certificates improves the downloading of scripts,
 %        and on average \textcolor[rgb]{1,0,0}{xxx} ms are saved.
-However, once the RP updates its domain, for instance, from \verb+https://www.theRPdomain.com/+ to \verb+https://www.RPdomain.com/+,
+However, once the RP updates its domain, for instance, from \verb+https://www.theRP.com/+ to \verb+https://www.RP.com/+, 
 $Acct = [ID_U]ID_{RP}$ will change inevitably.
 When such an event happens,
     the RP needs special operations by each user to migrate an account
             to the updated RP system.
 Note that this migration of accounts requires extra cooperations explicitly by each user;
     otherwise,
-        two collusive RPs could actually link a user's accounts across these RPs.
+        two collusive RPs could actually link a user's accounts across RPs.
 
 
 %\vspace{1mm}
