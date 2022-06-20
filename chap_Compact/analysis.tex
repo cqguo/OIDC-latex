@@ -30,22 +30,25 @@ The identity token binds $PID_{RP}$ identifying the target RP,
     because $t$ is sent the target RP with $ID_{RP}$ and $PID_{RP} = [t]ID_{RP}$.
 
 
-Next, we prove that it is computationally impossible to find $t$ and $t'$
+Next, we prove that it is computationally impossible 
+    for adversaries
+    to find $t$ and $t'$
     satisfying that $[t]ID_{RP_j} = [t']ID_{RP_{j'}}$ (i.e., the token identifies only the target RP),
     where $RP_j$ and $RP_{j'}$ are any two RPs of the finite set of RPs,
     based on the ECDLP.
+Note that $ID_{RP_j} = [r_j]G$ and $ID_{RP_{j'}} = [r_{j'}]G$, while $r_j$ and $r_{j'}$ are kept secret to the adversaries. 
 Let $\mathbb{E}$ be an elliptic curve over a finite field $\mathbb{F}_q$,
     $G$ be a point on $\mathbb{E}$ of order $n$,
         and $Q = [x]G$ where $x$ is an integer number randomly  chosen from $(1,n)$.
 Given $G$ and $Q$,
     it is computationally impossible for any probabilistic polynomial time (PPT) algorithm $\mathcal{D}$
-        to determine $x$ (i.e., to solve the ECDLP).
+        to calculate $x$ (i.e., to solve the ECDLP).
 Let $Pr\{\}$ denote the probability.
 For any PPT algorithm $\mathcal{D}$, we define
 \begin{align*}
-Pr\{\mathcal{D}(G, [x]G)=x\} = \epsilon(k)
+Pr\{\mathcal{D}(G, [x]G)=x\} = \epsilon_{ECDLP}(k)
 \end{align*}
-So $\epsilon(k)$ becomes negligible with the security parameter $k$.
+So $\epsilon_{ECDLP}(k)$ becomes negligible with the security parameter $k$.
 
 We assume a game $\mathcal{G}_c$ between an adversary and a challenger,
     to describe the attack breaking RP designation:
