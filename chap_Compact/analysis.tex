@@ -30,25 +30,22 @@ The identity token binds $PID_{RP}$ identifying the target RP,
     because $t$ is sent the target RP with $ID_{RP}$ and $PID_{RP} = [t]ID_{RP}$.
 
 
-Next, we prove that it is computationally impossible 
-    for adversaries
-    to find $t$ and $t'$
-    satisfying that $[t]ID_{RP_j} = [t']ID_{RP_{j'}}$ (i.e., the token identifies only the target RP),
+Next, we prove that the adversaries' probability of finding $t$ and $t'$
+    satisfying that $[t]ID_{RP_j} = [t']ID_{RP_{j'}}$ (i.e., the token identifies only the target RP) is negligible,
     where $RP_j$ and $RP_{j'}$ are any two RPs of the finite set of RPs,
     based on the ECDLP.
 Note that $ID_{RP_j} = [r_j]G$ and $ID_{RP_{j'}} = [r_{j'}]G$, while $r_j$ and $r_{j'}$ are kept secret to the adversaries. 
 Let $\mathbb{E}$ be an elliptic curve over a finite field $\mathbb{F}_q$,
     $G$ be a point on $\mathbb{E}$ of order $n$,
-        and $Q = [x]G$ where $x$ is an integer number randomly  chosen from $(1,n)$.
+        and $Q = [x]G$ where $x$ is an integer number randomly  chosen from $Z^+_n$.
 Given $G$ and $Q$,
-    it is computationally impossible for any probabilistic polynomial time (PPT) algorithm $\mathcal{D}$
-        to calculate $x$ (i.e., to solve the ECDLP).
-Let $Pr\{\}$ denote the probability.
+    the probability of a probabilistic polynomial time (PPT) algorithm $\mathcal{D}$ calculating $x$ (i.e., to solve the ECDLP) is negligible.
+Let ${\rm Pr}\{\}$ denote the probability.
 For any PPT algorithm $\mathcal{D}$, we define
 \begin{align*}
-Pr\{\mathcal{D}(G, [x]G)=x\} = \epsilon_{ECDLP}(k)
+{\rm Pr}\{\mathcal{D}(G, [x]G)=x\} = \epsilon_{ECDLP}(k)
 \end{align*}
-So $\epsilon_{ECDLP}(k)$ becomes negligible with the security parameter $k$.
+So $\epsilon_{ECDLP}(k)$ is negligible with the security parameter $k$.
 
 We assume a game $\mathcal{G}_c$ between an adversary and a challenger,
     to describe the attack breaking RP designation:
@@ -60,11 +57,14 @@ If $[t]ID_{RP_a}=[t']ID_{RP_b}$, the adversary succeeds in this game.
 %If the adversary has the non-negligible probability on succeeding in this game, RP designation is broken.
 Note that $m$ is a finite integer number, but $m << 2^k$.
 
-We define the probability that the adversary succeeds in this game as $Pr_s$.
+We define the probability that the adversary succeeds in this game as ${\rm Pr}_s$.
 So, if the adversary is able to find $t$ and $t'$
     satisfying that $[t]ID_{RP_j} = [t']ID_{RP_{j'}}$,
     the adversary will have non-negligible advantages in $\mathcal{G}_c$
-        and $Pr_s$ is non-negligible.
+        and ${\rm Pr}_s$ is non-negligible. That is,  
+\begin{align*}
+{\rm Pr}_s > \epsilon_{ECDLP}(k)
+\end{align*}
 
 \begin{figure}[tb]
   \centering
@@ -76,7 +76,7 @@ So, if the adversary is able to find $t$ and $t'$
 However, if the adversary has non-negligible advantages in $\mathcal{G}_c$,
     we will design a PPT algorithm $\mathcal{D}^*_c$ based on this game, shown in Figure~\ref{fig:ecdlp_algorithm}, to solve the ECDLP as below.
 The input of $\mathcal{D}^*_c$ is in the form of ($G$, $Q$).
-On receiving the input, the challenger of $\mathcal{G}_c$ randomly chooses $r_1, r_2, \cdots, r_m$ from $(1,n)$,
+On receiving the input, the challenger of $\mathcal{G}_c$ randomly chooses $r_1, r_2, \cdots, r_m \in Z^+_n$,
  calculates $[r_1]G, [r_2]G, \cdots, [r_m]G$,
  and randomly replaces some $[r_j]G$ with the input $Q$.
 Then,
@@ -90,14 +90,21 @@ As $[r_j]G$ is randomly replaced by the challenger,
     $Q$ and other RP identities in the input set are indistinguishable to the adversary.
 Thus,
 \begin{align*}
-Pr\{\mathcal{D}^*_c(G, [x]G)=x\} = Pr\{s = x\}=\frac{1}{m}Pr_s
+&{\rm Pr}\{\mathcal{D}^*_c(G, [x]G)=x\} = {\rm Pr}\{s = x\}={\rm Pr}\{a=j\}{\rm Pr}_s=\frac{1}{m}{\rm Pr}_s
+\end{align*}
+As there is $m << 2^k$, therefore, 
+\begin{align*}
+{\rm Pr}_s = m\cdot {\rm Pr}\{\mathcal{D}^*_c(G, [x]G)=x\}=\epsilon_{ECDLP}(k)
 \end{align*}
 
-If $Pr_s$ is non-negligible with the security parameter $k$, $Pr\{\mathcal{D}^*_c(G, [x]G)=x\} =\frac{1}{m}Pr_s$ is also non-negligible because $m << 2^k$,
-which means that $\mathcal{D}^*_c$ solves the ECDLP.
-So the adversary does not have non-negligible advantages in $\mathcal{G}_c$,
-    and it is computationally impossible to find $t$ and $t'$
-    satisfying that $[t]ID_{RP_j} = [t']ID_{RP_{j'}}$ in UPPRESSO.
+Thus, ${\rm Pr}_s$ is negligible with the security parameter $k$, which means the adversary does not have non-negligible advantages in $\mathcal{G}_c$. So, the probability of finding $t$ and $t'$ satisfying that $[t]ID_{RP_j} = [t']ID_{RP_{j'}}$ in UPPRESSO is negligible. 
+
+
+%If ${\rm Pr}_s$ is non-negligible with the security parameter $k$, ${\rm Pr}\{\mathcal{D}^*_c(G, [x]G)=x\} =\frac{1}{m}{\rm Pr}_s$ is also non-negligible because $m << 2^k$,
+%which means that $\mathcal{D}^*_c$ solves the ECDLP.
+%So the adversary does not have non-negligible advantages in $\mathcal{G}_c$,
+%    and the probability of finding $t$ and $t'$
+%    satisfying that $[t]ID_{RP_j} = [t']ID_{RP_{j'}}$ in UPPRESSO is negligible. 
 
 
 %An identity token binding $PID_U$ and $PID_{RP}$,
@@ -233,7 +240,7 @@ UPPRESSO effectively prevents the attacks of IdP-based login tracing and RP-base
 \noindent\textbf{IdP-based Login Tracing.}
 The information accessible to the IdP and derived from the RP's identity,
     is only $PID_{RP}$, where $PID_{RP} = [t]ID_{RP}$ is calculated by the user.
-Because  (\emph{a}) $t$ is a number randomly chosen from $(1, n)$ by the user and kept secret to the IdP
+Because  (\emph{a}) $t$ is a number randomly chosen from $Z^+_n$ by the user and kept secret to the IdP
  and (\emph{b}) $ID_{RP} = [r]G$ and $G$ is the base point (or generator) of $\mathbb{E}$,
  the IdP has to view $PID_{RP}$ as randomly and independently chosen from $\mathbb{E}$,
     and cannot distinguish $[t]ID_{RP_j} = [tr]G$ from any $[t']ID_{RP_{j'}} = [t'r']G$.
@@ -248,18 +255,18 @@ We prove that UPPRESSO prevents the RP-based identity linkage,
 %
 Let $\mathbb{E}$ be an elliptic curve over a finite field $\mathbb{F}_q$,
     and $G$ be a point on $\mathbb{E}$ of order $n$.
-For any PPT algorithm $\mathcal{D}$,
+For any PPT algorithm $\mathcal{D}$, the probability of distinguishing
  $([x]G$, $[y]G$, $[xy]G)$ and $([x]G$, $[y]G$, $[z]G)$
-are computationally indistinguishable,
- where $x$, $y$ and $z$ are integer numbers randomly and independently chosen from $(1,n)$.
-Let  $Pr\{\}$ denote the probability and
+is negligible,
+ where $x$, $y$ and $z$ are integer numbers randomly and independently chosen from $Z^+_n$.
+Let  ${\rm Pr}\{\}$ denote the probability and
  we define
 \begin{align*}
-Pr_1 = & Pr\{\mathcal{D}([x]G, [y]G, [xy]G)=1\} \\
-Pr_2 = & Pr\{\mathcal{D}([x]G, [y]G, [z]G)=1\} \\
-\epsilon(k) = & Pr_1 - Pr_2
+&{\rm Pr}_1 =  {\rm Pr}\{\mathcal{D}(G, [x]G, [y]G, [xy]G)=1\} \\
+&{\rm Pr}_2 =  {\rm Pr}\{\mathcal{D}(G, [x]G, [y]G, [z]G)=1\} \\
+& \epsilon_{ECDDHP}(k) = |{\rm Pr}_1 - {\rm Pr}_2|
 \end{align*}
-Then, $\epsilon(k)$ becomes negligible with the security parameter $k$.
+Then, $\epsilon_{ECDDHP}(k)$ is negligible with the security parameter $k$.
 
 
 In a login instance,
@@ -281,8 +288,18 @@ L_{v,1}, & L_{v,2}, & \cdots, & L_{v,c}
 Given a login instance to another RP $L'=(ID_{RP_{c+1}}, t', [ID_{U'}]ID_{RP_{c+1}}) = ([r_{c+1}]G, t', [u'r_{c+1}]G)$,
 we define the game $\mathcal{G}_r$  as follows:
 after receiving $\mathfrak{L}$ and $L'$ from a challenger,
-    an adversary outputs the result $s = 1$ if it determines that $u'$ is in the set $\{u_1, u_2, \cdots, u_v\}$,
+    an adversary outputs the result $s = 1$ if it determines that $u' \in \{u_1, u_2, \cdots, u_v\}$,
         or $s = 0$ otherwise.
+        
+        We define the probability that the adversary's advantage in this game as ${\rm Pr}_a$.
+So, if the adversary is able to distinguish whether $u' \in \{u_1, u_2, \cdots, u_v\}$,
+    the adversary will have non-negligible advantages in $\mathcal{G}_r$
+        and ${\rm Pr}_a$ is non-negligible. That is,  
+\begin{align*}
+&{\rm Pr}'_1={\rm Pr}\{\mathcal{G}_r(\mathfrak{L}, L'|ID_{U'} \in \{ID_{U_1}, ID_{U_2}, \cdots, ID_{U_v}\})=1\} \\
+&{\rm Pr}'_2={\rm Pr}\{\mathcal{G}_r(\mathfrak{L}, L'|ID_{U'} \in Z^+_n)=1\}\\
+&{\rm Pr}_a=|{\rm Pr}'_1-{\rm Pr}'_2|>\epsilon_{ECDDHP}(k)
+\end{align*}
 
 %In UPPRESSO system, the $ID_U$, $ID_{RP}$ and $t$ are not generated by RP, or generated based on any data provided RP, therefore, as long as UPPRESSO is proved IND-COA (Indistinguishability under Ciphertext-Only Attack) security, the requirement is satisfied and the RP-based identity linkage is impossible in UPPRESSO system.
 
@@ -294,9 +311,9 @@ after receiving $\mathfrak{L}$ and $L'$ from a challenger,
 \end{figure}
 
 We design a PPT algorithm $\mathcal{D}^*_r$ based on $\mathcal{G}_r$, shown in Figure~\ref{fig:dalgorithm}, to solve the ECDDH problem.
-The input of $\mathcal{D}^*_r$ is in the form of $(Q_1=[x]G$, $Q_2=[y]G$, $Q_3=[z]G)$.
+The input of $\mathcal{D}^*_r$ is in the form of $(G$, $Q_1=[x]G$, $Q_2=[y]G$, $Q_3=[z]G)$.
 On receiving the input, the challenger of $\mathcal{G}_r$ randomly chooses
- $\{u_1, u_2, \cdots, u_v\}$, $\{r_1, r_2, \cdots, r_c\}$, $\{t_{1, 1}, t_{1, 2}, \cdots, t_{v, c}\}$, and $t'$ from $(1,n)$.
+ $\{u_1, u_2, \cdots, u_v\}$, $\{r_1, r_2, \cdots, r_c\}$, $\{t_{1, 1}, t_{1, 2}, \cdots, t_{v, c}\}$, and $t'$ from $Z^+_n$.
 Then the challenger constructs $\mathfrak{L}$ and $L'$ as below.
 It first assigns $L_{i, j} = ([r_j]G, t_{i, j}, [u_ir_j]G)$, %$1\leq i \leq v$ and $1\leq j \leq c$,
     and randomly chooses $k \in [1, v]$ to
@@ -318,18 +335,19 @@ Finally,
 According to the construction of $\mathfrak{L}$ and $L'$,
     $x$ is actually inserted into $\mathfrak{L}$ as $u_k$,
     and $z/y$ is assigned to $u'$.
-So, if $z = xy$, $ID_{U'}$ is in the set \{$ID_{U_1}, ID_{U_2}, \cdots, ID_{U_v}$\}.
+So, if $z = xy$, $ID_{U'}\in$\{$ID_{U_1}, ID_{U_2}, \cdots, ID_{U_v}$\}.
 Thus,
 \begin{align*}
-&Pr_1=Pr\{\mathcal{D}^*_r([x]G, [y]G, [xy]G)=1\}\\=&Pr'_1 =  Pr\{\mathcal{G}_r(\mathfrak{L}, L'|ID_{U'} \in \{ID_{U_1}, ID_{U_2}, \cdots, ID_{U_v}\})=1\} \\
-&Pr_2=Pr\{\mathcal{D'^*}([x]G, [y]G, [z]G)=1\}\\ =&Pr'_2 =  Pr\{\mathcal{G}_r(\mathfrak{L}, L'|ID_{U'} \in (1, n))=1\}
+&{\rm Pr}_1={\rm Pr}\{\mathcal{D}^*_r(G, [x]G, [y]G, [xy]G)=1\}\\=&{\rm Pr}'_1 =  {\rm Pr}\{\mathcal{G}_r(\mathfrak{L}, L'|ID_{U'} \in \{ID_{U_1}, ID_{U_2}, \cdots, ID_{U_v}\})=1\} \\
+&{\rm Pr}_2={\rm Pr}\{\mathcal{D'^*}(G, [x]G, [y]G, [z]G)=1\}\\ =&{\rm Pr}'_2 =  {\rm Pr}\{\mathcal{G}_r(\mathfrak{L}, L'|ID_{U'} \in Z^+_n)=1\}\\
+&{\rm Pr}_a=|{\rm Pr}'_1-{\rm Pr}'_2|=|{\rm Pr}_1-{\rm Pr}_2|=\epsilon_{ECDDHP}(k)
 \end{align*}
 
 The ECDDH problem implies that in $\mathcal{G}_r$ the adversary
     cannot distinguish a user $U'$ chosen from \{${U_1}, {U_2}, \cdots, {U_v}$\}
         or randomly from the user set of UPPRESSO.
 %    (indistinguishability of users to collusive RPs).
-So the RP-based identity linkage is computationally impossible.
+So the RP-based identity linkage is impossible.
 
 %    the adversary will have non-negligible advantages in $\mathcal{G}$
 %        and $Pr_s$ is non-negligible.
