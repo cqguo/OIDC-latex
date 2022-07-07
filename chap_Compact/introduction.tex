@@ -46,7 +46,7 @@ Finally, the RP verifies the identity token to decide whether the user is allowe
 As the comprehensive solution of identity management,
     SSO services usually allow the IdP to provide more user attributes in the tokens
         along with the authenticated user's identity.
-The attributes (e.g., age, gender, hobby, and nationality) are maintained at the trusted IdP by a user,
+The attributes (e.g., age, hobby, education, and nationality) are maintained at the trusted IdP by a user,
     and enclosed in the identity tokens only after the user's authorization \cite{OpenIDConnect,rfc6749}.
 
 %However, SSO systems have been continuously found vulnerable and insecure \cite{WangCW12,ccsSunB12,SomorovskyMSKJ12,ArmandoCCCPS13,DiscoveringJCS,dimvaLiM16,WangZLG16,MainkaMS16, MainkaMSW17,YangLCZ18}.
@@ -110,13 +110,15 @@ Popular SSO protocols leak user privacy in different ways,
 Privacy-preserving SSO solutions try to provide comprehensive functions of identity management and authentication,
     while protecting user privacy \cite{maler2008venn,NIST2017draft,BrowserID,SPRESSO}.
 The following features of SSO are usually supported:
-(\emph{a}) \emph{non-anonymous user identity},
-    i.e., an identity token enables the RP to uniquely identify a user,
-(\emph{b}) \emph{independency of user authentication}, i.e.,
-    different types of credentials are supported in the authentication between the IdP and users,
-and (\emph{c}) \emph{Provision of user attributes},
-    i.e., a user maintains his attributes at the IdP,
-    and the IdP provides the RP-requested attributes in addition to the user's identity
+(\emph{a}) \emph{User identity at an RP},
+    i.e., an identity token enables an RP to uniquely identify every user,
+(\emph{b}) \emph{Only user authentication to the IdP}, i.e.,
+    the steps of user authentication between a user and the RP are eliminated,
+    and a user only needs to hold the credential to authenticate himself to the IdP,
+%    different types of credentials are supported in the authentication between the IdP and users,
+and (\emph{c}) \emph{Provision of user-authorized attributes},
+    i.e., a user maintains his attributes at the IdP,\footnote{These attributes can be confirmed by the trusted IdP, such as age, hobby, education, and nationality.}
+    and RP-requested attributes are provided in addition to the user's identity
             after authorized by the user.
 Meanwhile,
     the privacy threats from different types of adversaries are prevented:
