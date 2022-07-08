@@ -84,9 +84,9 @@ Thus, if a user's computer or device was compromised or lost,
     the user only renews the credential at the IdP.
 On the other hand, if a user proves some non-ephemeral secret to the RP and this secret is valid across multiple login instances
     (i.e., some authentication steps are actually involved),
-                the user has to notify each RP if this secret was leaked  or lost. %(or even the user logins from another computer).
+                the user has to notify each RP if this secret was leaked  or lost during its validity period. %(or even the user logins from another computer).
 
-\noindent \textbf{User-Authorized Attribute Provision.}
+\noindent \textbf{IdP-Confirmed Selective Attribute Provision.}
 The IdP usually provides also user attributes in the tokens \cite{OpenIDConnect,rfc6749,SAML},
     in addition to user (pseudo-)identities.
 These attributes are maintained by users at the IdP;
@@ -120,23 +120,24 @@ Thus,
 
 \begin{table*}[htb]
 \footnotesize
-    \caption{Comparison of Existing Privacy-Preserving SSO Solution and Federated Identity Management.}
+    \caption{Comparison of Existing Privacy-Preserving Solutions of SSO and Federated Identity Management.}
     \centering
     \begin{tabular}{|c|c|c|c|c|c|c|}
   \hline
   \multirow{3}*{\textbf{~~Solution~~}} &
-  \multicolumn{3}{c|}{\textbf{SSO Feature} - supported $\CIRCLE$, or not $\Circle$ $\LEFTcircle$} & \multicolumn{3}{c|}{\textbf{Privacy Threat} - prevented $\CIRCLE$, or not $\Circle$} \\ \cline{2-7}
-  & User Identity & User Authentication & User-Authorized  & IdP-based & RP-based & Collusive Attack \\
+  \multicolumn{3}{c|}{\textbf{SSO Feature} - supported $\CIRCLE$, not $\Circle$, or partially $\LEFTcircle$} & \multicolumn{3}{c|}{\textbf{Privacy Threat} - prevented $\CIRCLE$, or not $\Circle$} \\ \cline{2-7}
+  & User Identity & User Authentication & IdP-Confirmed Selective  & IdP-based & RP-based & Collusive Attack \\
   & at an RP & Only to the IdP &  Attribute Provision & Login Tracing & Identity Linkage & by the IdP and RPs \\\hline
   PPID-enhanced OIDC & $\CIRCLE$ & $\CIRCLE$ & $\CIRCLE$ & $\Circle$ & $\CIRCLE$ & - \\ \hline
-  BrowserID & $\CIRCLE$ & $\CIRCLE$ & $\CIRCLE$? & $\CIRCLE$ & $\Circle$ & - \\ \hline
+  BrowserID & $\CIRCLE$ & $\LEFTcircle$ & $\Circle$ & $\CIRCLE$ & $\Circle$ & - \\ \hline
   PRIMA & $\CIRCLE$ & $\Circle$ & $\CIRCLE$ & $\CIRCLE$ & $\Circle$ & - \\ \hline
-  SPRESSO & $\CIRCLE$ & $\CIRCLE$ & $\CIRCLE$ & $\CIRCLE$ & $\Circle$ & - \\ \hline
-  PseudoID & $\CIRCLE$ & $\Circle$ & $\CIRCLE$ & $\CIRCLE$ & $\CIRCLE$ & $\CIRCLE$ \\ \hline
+  SPRESSO & $\CIRCLE$ & $\CIRCLE$ & $\CIRCLE$* & $\CIRCLE$ & $\Circle$ & - \\ \hline
+  PseudoID & $\CIRCLE$ & $\Circle$ & $\CIRCLE$* & $\CIRCLE$ & $\CIRCLE$ & $\CIRCLE$ \\ \hline
   EL PASSO & $\CIRCLE$ & $\Circle$ & $\CIRCLE$ & $\CIRCLE$ & $\CIRCLE$ & $\CIRCLE$ \\ \hline
-  Opaak & $\CIRCLE$ & $\Circle$ & $\Circle$ & $\CIRCLE$ & $\CIRCLE$ & $\CIRCLE$ \\ \hline
-  Idemix & $\CIRCLE$ & $\Circle$ & $\CIRCLE$ & $\CIRCLE$ & $\CIRCLE$ & $\CIRCLE$ \\ \hline
-  U-Prove & $\CIRCLE$ & $\Circle$ & $\CIRCLE$ & $\CIRCLE$ & $\CIRCLE$ & $\CIRCLE$ \\ \hline
+  UnlimitID & $\CIRCLE$ & $\Circle$ & $\CIRCLE$ & $\CIRCLE$ & $\CIRCLE$ & $\CIRCLE$ \\ \hline
+  Opaak & $\CIRCLE$* & $\Circle$ & $\Circle$ & $\CIRCLE$ & $\CIRCLE$ & $\CIRCLE$ \\ \hline
+  Idemix? & $\CIRCLE$ & $\Circle$ & $\CIRCLE$ & $\CIRCLE$ & $\CIRCLE$ & $\CIRCLE$ \\ \hline
+  U-Prove & $\CIRCLE$ & $\Circle$ & $\LEFTcircle$ & $\CIRCLE$ & $\CIRCLE$ & $\CIRCLE$ \\ \hline
   UPPRESSO & $\CIRCLE$ & $\CIRCLE$ & $\CIRCLE$ & $\CIRCLE$ & $\CIRCLE$ & $\Circle$ \\ \hline
 \end{tabular}
     \label{tbl:comparison-protocol}
@@ -146,7 +147,7 @@ Thus,
 
 
 
-\subsection{Existing Privacy-Preserving SSO Solution and Federated Identity Management}
+\subsection{Privacy-Preserving Solutions of SSO and Federated Identity Management}
 \label{subsec-solutions}
 Pairwise pseudonymous identifiers (PPIDs) are recommended by NIST \cite{NIST2017draft}
  and specified in several SSO protocols \cite{OpenIDConnect, SAMLIdentifier} to protect user privacy against curious RPs.
@@ -237,8 +238,11 @@ Opaak \cite{opaak}
 
 
 
-Table \ref{tbl:comparison-protocol} summaries these privacy-preserving SSO solutions.
-
+Table \ref{tbl:comparison-protocol} summaries these privacy-preserving solutions of SSO and federated identity management.
+Some identity federation solutions \cite{ZhangKSZR21,IsaakidisHD16,} protect user privacy against collusive attacks by the IdP and RPs,
+    while a user has to hold long-term secret in addition to the credentials (or tokens).
+Some privacy-preserving SSO schemes and UPPRESSO try to keep the user convenience lightweight,
+    .
 
 
 \begin{comment}
