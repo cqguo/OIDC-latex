@@ -116,16 +116,16 @@ The following features of SSO are usually supported:
     the steps of user authentication between a user and the RP are eliminated,
     and a user only needs to hold the credential to authenticate himself to the IdP,
 %    different types of credentials are supported in the authentication between the IdP and users,
-and (\emph{c}) \emph{Provision of user-authorized attributes},
-    i.e., a user maintains his attributes at the IdP,\footnote{These attributes can be confirmed by the trusted IdP, such as age, hobby, education, and nationality.}
-    and RP-requested attributes are provided in addition to the user's identity
+and (\emph{c}) \emph{Provision of IdP-confirmed user attributes},
+    i.e., a user maintains his attributes at the IdP,
+    and RP-requested attributes are provided with the user's identity
             after authorized by the user.
 Meanwhile,
-    the privacy threats from different types of adversaries are prevented:
+    the privacy threats from different types of adversaries are considered:
     (\emph{a}) \emph{the curious-but-honest IdP},
     (\emph{b}) \emph{collusive RPs},
-    and even (\emph{c}) \emph{the curious-but-honest IdP colluding some RPs}.
-We analyze and compare the existing solutions \cite{maler2008venn,NIST2017draft,BrowserID,SPRESSO}
+    and (\emph{c}) \emph{the curious-but-honest IdP colluding some RPs}.
+We analyze and compare existing privacy-preserving solutions of SSO and also federated identity management
 in Section \ref{subsec-solutions}.
 
 
@@ -159,14 +159,14 @@ UPPRESSO prevents the IdP from tracking a user's login activities because it rec
 %UPPRESSO designs three one-way identifier-transformation functions based on elliptic curve cryptography. Using the one-way trapdoor function $\mathcal{F}_{ID_{RP} \mapsto PID_{RP}}(ID_{RP}, T)$, the RP converts its identity $ID_{RP}$ into a privacy-preserving pseudo-identity $PID_{RP}$ based on a randomly selected trapdoor $T$. Similarly, the IdP uses the one-way function  $\mathcal{F}_{ID_{U} \mapsto PID_{U}}(ID_U, PID_{RP})$ to generate a privacy-preserving pseudo-identity $PID_U$ for the user based on her identity $ID_U$ and $PID_{RP}$. Finally, using a special identifier-transformation function $\mathcal{F}_{PID_{U} \mapsto Account}(PID_U, PID_{RP}, T)$, the RP is able to map all the different privacy-preserving pseudo-identities of a user, which are created in her different login sessions to that RP, to a same $Account$ that identifies the user to the RP. The three identifier-transformation functions work cooperatively to ensure: (\emph{a}) when a user logs in to an RP multiple times, the RP can always map $PID_U$s to a unique $Account$ without knowing the user's identity $ID_U$; moreover, when a user logs in to multiple RPs, (\emph{b}) a curious IdP learns nothing about the identities of these RPs from $PID_{RP}$s, and (\emph{c}) collusive RPs cannot link $PID_U$s to a particular user %or associate them together, (\emph{d}) nor correlate $Account$s of a same user at different RPs.
 
 While keeping the features of SSO,
-we protect user privacy.
+we protect user privacy greatly.
 Both the IdP-based login tracing and the RP-based identity linkage are prevented,
     by the identity-transformation functions during the generation of identity tokens
     and the calculation of accounts.
-The identity-transformation functions do not conflict with
+The transformation functions work compatibly with
     the login flows of widely-used SSO protocols \cite{OpenIDConnect,rfc6749,SAML,NIST2017draft},
-    so that UPPRESSO provides user identities and attributes for RPs in the SSO services,
-        and the IdP authenticates a user with different types of credentials.
+    so the benefits of SSO protocols are kept in UPPRESSO
+        and it is very easy to implement UPPRESSO on top of OIDC systems.
 %We do not solve the collusive attacks by the IdP and RPs.
 
 
@@ -184,7 +184,7 @@ We summarize our contributions as follows.
 then propose a comprehensive solution to protect the users' login activities;
     that is, solve this challenge effectively by designing identity-transformation functions.
 \item
-The UPPRESSO protocol is then designed based on the identity transformations,
+The UPPRESSO protocol is then presented based on the identity transformations,
     with several designs specific for web applications.
 We prove that UPPRESSO satisfies the security and privacy requirements of SSO services.
 

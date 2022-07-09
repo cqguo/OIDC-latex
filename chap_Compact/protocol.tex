@@ -181,7 +181,7 @@ Two scripts are downloaded from the visited RP and the IdP, respectively,
 % to follow the \emph{same-origin policy} (SOP) \cite{sop}.
 The RP script is downloaded, when the user visits the RP,
     and it launches the IdP script and prepare $ID_{RP}$ and $Enpt_{RP}$ to the IdP script.
-Note that only the RP script is not enough to implement the user agent of UPPRESSO;
+Only the RP script is not enough to implement the user agent of UPPRESSO;
     otherwise, the RP script will leaks its origin to the IdP web server
     (e.g., if it requests the identity token,
     an HTTP request launched by the RP script will
@@ -189,7 +189,7 @@ automatically carry an HTTP \verb+Referer+ header, which discloses the RP domain
 Moreover, a script downloaded the honest IdP,
 to ensure confidentiality of identity tokens (i.e., an identity token is sent to only the RP designated in this token),
 and to interact with the user for the authorization of user attributes,
-    while the visited RP might be malicious.
+    for the visited RP might be malicious.
 
 \emph{RP certificates} are designed for browsers to verify the endpoint of an RP.
 An RP certificate is a document signed by the IdP during the RP initial registration,
@@ -225,10 +225,10 @@ The origin parameter consists of
 %That is, the IdP script derives the RP's $ID_{RP}$ and origin from the RP certificate, while the $PID_{RP}$ is generated with this $ID_{RP}$. Thus, the IdP script always know the targeting RP of an identity proof, therefore, the \verb+postMessage+ mechanism can guarantee that the identity proof would not be sent to the adversary.
 
 Finally,
-in an UPPRESSO login instance,
+in a login instance,
     the browser first downloads the RP script when visiting an RP, and
 then this RP script opens a new window that will download the IdP script.
-We need to prevent the referer leakage when the IdP script is downloaded.
+We shall prevent the referer leakage when the IdP script is downloaded.
 Generally, when a browser window visits another website not belonging to its opener's origin,
  the HTTP request to this website will automatically carry the \verb+referer+ header (i.e., the opener's origin).
 This HTTP \verb+referer+ header leaks the information about the visited RP to the IdP.
@@ -307,7 +307,7 @@ The IdP keeps $SK$ secret, while $PK$ is publicly known.
 \noindent\textbf{RP Initial Registration.}
 %Each RP launches an initial registration operation to finish configurations.
 Each RP initially registers itself at the IdP to obtain $ID_{RP}$
- and the corresponding RP certificate $Cert_{RP}$ as follows:
+ and its RP certificate $Cert_{RP}$ as follows:
 \begin{enumerate}
 \setlength{\itemsep}{0pt}
 \setlength{\parsep}{0pt}

@@ -108,9 +108,9 @@ Table \ref{tbl:notations-dilemma} lists the notations used in the following expl
 A valid identity token contains the (pseudo-)identities of the authenticated user and the target RP. %which is to tell the RP that this user has been authenticated by the IdP.
 % Let us denote the long-term unique identifiers of the user and the RP as $ID_U$ and $ID_{RP}$, respectively.
 Since the IdP authenticates users and always knows the user's identity (i.e., $ID_U$),
-    in order to prevent the IdP-based login tracing,
+    to prevent the IdP-based login tracing,
     we shall not reveal the target RP's permanent identity (i.e., $ID_{RP}$) to the IdP in the login flow.
-So an \emph{ephemeral} pseudo-identity for the RP (i.e., $PID_{RP}$) shall be used in the identity-token request to the IdP:
+So an \emph{ephemeral} pseudo-identity for the RP (i.e., $PID_{RP}$) shall be used in the identity-token request:
 (\emph{a}) to ensure RP designation,
      $PID_{RP}$ shall be uniquely associated with the target RP;
     and (\emph{b}) the IdP cannot derive any information about $ID_{RP}$ from any $PID_{RP}^i$,
@@ -119,8 +119,8 @@ So an \emph{ephemeral} pseudo-identity for the RP (i.e., $PID_{RP}$) shall be us
             the IdP shall not link multiple login instances which attempt to visit this RP.}
    % the IdP-based login tracing is still effective, to correlate a user's multiple login instances.
 
-Next, in order to prevent the RP-based identity linkage,
- the IdP shall not directly enclose $ID_U$ in identity tokens.
+To prevent the RP-based identity linkage,
+ the IdP shall not enclose $ID_U$ in identity tokens.
 A user pseudo-identity (i.e., $PID_U$) shall be bound instead:
     (\emph{a}) the RP cannot derive any information about $ID_U$ from any $PID_{U,j}$,
     which implies $PID_{U,j}$ for different RPs shall be independent of each other;
@@ -128,7 +128,7 @@ A user pseudo-identity (i.e., $PID_U$) shall be bound instead:
         to prevent the IdP-based login tracing;\footnote{If $PID_U^i$ is not completely independent of each other,
          it implies the IdP could link multiple login instances which attempt to visit this RP.}
     and (\emph{c}) to ensure user identification,
-    an \emph{ephemeral} $PID_{U}^i$ in each login instance shall facilitate the RP to correlate it
+    an \emph{ephemeral} $PID_{U}^i$ in each login instance shall enable the RP to correlate it
      with the \emph{permanent} account  (i.e., $Acct$) at this RP.
 
 
@@ -138,9 +138,9 @@ Give a user,
     and (\emph{b}) these two \emph{ephemeral} pseudo-identities enable the target RP to derive a \emph{permanent} account, i.e., $Acct_j$.
 
 
-\begin{figure}[htb]
+\begin{figure}[tb]
   \centering
-  \includegraphics[width=0.95\linewidth]{fig/IDCorrelation.pdf}
+  \includegraphics[width=0.96\linewidth]{fig/IDCorrelation.pdf}
   \caption{Identity transformations in privacy-preserving SSO.}
   \label{fig:IDCorrelation}
 \end{figure}
@@ -156,7 +156,7 @@ Given an authenticated user and an unknown RP (i.e., permanent $ID_U$ and epheme
      while knowing nothing about the RP's identity or the user's account at this RP (i.e., $ID_{RP}$ or $Acct$).
 \end{quote}
 
-We explicitly distinguish a user's identity at the RP, i.e., the account,
+In this description, we explicitly distinguish a user's identity at the RP, i.e., the account,
      from (\emph{a}) the user's identity at the IdP and (\emph{b}) the user's pseudo-identity in identity tokens.
 This conceptualization %is proposed for the first time, to the best of our knowledge,
    % and it
