@@ -26,7 +26,7 @@ Single sign-on (SSO) protocols such as OpenID Connect (OIDC) \cite{OpenIDConnect
    known as the \emph{identity provider} (IdP).
 An RP delegates user identification and authentication to the IdP,
     which issues an \emph{identity token} (e.g., id token in OIDC or identity assertion in SAML) for a user to visit the RP after authenticating this user.
-Thus, the user keeps only one credential for the IdP, instead of maintaining several credentials for different RPs.
+So a user keeps only one credential for the IdP, instead of several credentials for different RPs.
 %Moreover, SSO shifts the burden of user authentication from RPs to IdPs and reduces security risks and costs at RPs.
 %Besides,
 %    the user only manages his attributes at the IdP,
@@ -158,7 +158,7 @@ UPPRESSO prevents the IdP from tracking a user's login activities because it rec
 % Finally, we formally prove that the accounts of the same user at different RPs are independent and cannot be correlated by collusive RPs (see our proof in Section \ref{sec:privacy}).
 %UPPRESSO designs three one-way identifier-transformation functions based on elliptic curve cryptography. Using the one-way trapdoor function $\mathcal{F}_{ID_{RP} \mapsto PID_{RP}}(ID_{RP}, T)$, the RP converts its identity $ID_{RP}$ into a privacy-preserving pseudo-identity $PID_{RP}$ based on a randomly selected trapdoor $T$. Similarly, the IdP uses the one-way function  $\mathcal{F}_{ID_{U} \mapsto PID_{U}}(ID_U, PID_{RP})$ to generate a privacy-preserving pseudo-identity $PID_U$ for the user based on her identity $ID_U$ and $PID_{RP}$. Finally, using a special identifier-transformation function $\mathcal{F}_{PID_{U} \mapsto Account}(PID_U, PID_{RP}, T)$, the RP is able to map all the different privacy-preserving pseudo-identities of a user, which are created in her different login sessions to that RP, to a same $Account$ that identifies the user to the RP. The three identifier-transformation functions work cooperatively to ensure: (\emph{a}) when a user logs in to an RP multiple times, the RP can always map $PID_U$s to a unique $Account$ without knowing the user's identity $ID_U$; moreover, when a user logs in to multiple RPs, (\emph{b}) a curious IdP learns nothing about the identities of these RPs from $PID_{RP}$s, and (\emph{c}) collusive RPs cannot link $PID_U$s to a particular user %or associate them together, (\emph{d}) nor correlate $Account$s of a same user at different RPs.
 
-While keeping the features of SSO as many as possible,
+While keeping the features of SSO,
 we protect user privacy.
 Both the IdP-based login tracing and the RP-based identity linkage are prevented,
     by the identity-transformation functions during the generation of identity tokens
