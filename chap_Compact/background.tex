@@ -118,43 +118,6 @@ Thus,
 
 
 
-\begin{table*}[htb]
-\footnotesize
-    \caption{Privacy-Preserving Solutions of SSO and Federated Identity Management.}
-    \centering
-    \begin{tabular}{|c|c|c|c|c|c|c|}
-  \hline
-  \multirow{3}*{\textbf{~~Solution~~}} &
-  \multicolumn{3}{c|}{\textbf{SSO Feature} - supported $\CIRCLE$, unsupported $\Circle$, or partially $\LEFTcircle$} & \multicolumn{3}{c|}{\textbf{Privacy Threat} - prevented $\CIRCLE$ or not $\Circle$} \\ \cline{2-7}
-  & User Identity & User Authentication & IdP-Confirmed Selective  & IdP-based & RP-based & Collusive Attack \\
-  & at an RP & Only to the IdP &  Attribute Provision & Login Tracing & Identity Linkage & by the IdP and RPs \\\hline\hline
-  OIDC with PPID & $\CIRCLE$ & $\CIRCLE$ & $\CIRCLE$ & $\Circle$ & $\CIRCLE$ & - \\ \hline
-  BrowserID & $\CIRCLE$ & $\LEFTcircle$$^1$ & $\Circle$ & $\CIRCLE$ & $\Circle$ & - \\ \hline
-  PRIMA & $\CIRCLE$ & $\Circle$ & $\CIRCLE$ & $\CIRCLE$ & $\Circle$ & - \\ \hline
-  SPRESSO & $\CIRCLE$ & $\CIRCLE$ & $\Circle$$^2$ & $\CIRCLE$ & $\Circle$ & - \\ \hline
-  PseudoID & $\CIRCLE$ & $\Circle$ & $\Circle$$^3$ & $\CIRCLE$ & $\CIRCLE$ & $\CIRCLE$ \\ \hline
-  EL PASSO & $\CIRCLE$ & $\Circle$ & $\CIRCLE$ & $\CIRCLE$ & $\CIRCLE$ & $\CIRCLE$ \\ \hline
-  UnlimitID & $\CIRCLE$ & $\Circle$ & $\CIRCLE$ & $\CIRCLE$ & $\CIRCLE$ & $\CIRCLE$ \\ \hline
-  Opaak & $\LEFTcircle$$^4$ & $\Circle$ & $\Circle$ & $\CIRCLE$ & $\CIRCLE$ & $\CIRCLE$ \\ \hline
-  Hyperledger Idemix & $\Circle$$^5$ & $\Circle$ & $\CIRCLE$ & $\CIRCLE$ & $\CIRCLE$ & $\CIRCLE$ \\ \hline
-  U-Prove & $\CIRCLE$ & $\Circle$ & $\LEFTcircle$$^6$ & $\CIRCLE$ & $\CIRCLE$ & $\CIRCLE$ \\ \hline
-  UPPRESSO & $\CIRCLE$ & $\CIRCLE$ & $\CIRCLE$ & $\CIRCLE$ & $\CIRCLE$ & $\Circle$ \\ \hline
-\end{tabular}
-    \label{tbl:comparison-protocol}
-\flushleft
-{\footnotesize
-1. A user generates an \emph{ephemeral} private key to sign every ``subsidiary'' token,
- which is verified by the RP.\\
-2. SPRESSO can be extended to provide user attributes in then tokens, while the prototype does not support it.\\
-3. Blindly-signed user attributes can be selectively provided using zero-knowledge proofs,
-    not implemented in the preliminary version of PseudoID.\\
-4. Opaak implements two exclusive options: (\emph{a}) login with pseudonyms linkable within an RP but unlinkable across multiple RPs and (\emph{b}) pseudonyms unlinkability for any two actions.\\
-5. However, in its original version \cite{idemix}, user identity is non-anonymous at an RP.\\
-6. IdP-confirmed attribute and unconfirmed attributes are both enclosed.}
-\end{table*}
-
-
-
 
 
 \subsection{Privacy-Preserving Solutions of SSO and Federated Identity Management}
@@ -169,8 +132,45 @@ Given a user,
 PPID-based approaches cannot prevent the IdP-based login tracing,
  since in the generation of identity tokens the IdP needs to know which RP the user is visiting.
 
+
+\begin{table*}[htb]
+\footnotesize
+    \caption{Privacy-Preserving Solutions of SSO and Federated Identity Management.}
+    \centering
+    \begin{tabular}{|c|c|c|c|c|c|c|}
+  \hline
+  \multirow{3}*{\textbf{~~Solution~~}} &
+  \multicolumn{3}{c|}{\textbf{SSO Feature} - supported $\CIRCLE$, unsupported $\Circle$, or partially $\LEFTcircle$} & \multicolumn{3}{c|}{\textbf{Privacy Threat} - prevented $\CIRCLE$ or not $\Circle$} \\ \cline{2-7}
+  & User Identity & User Authentication & IdP-Confirmed Selective  & IdP-based & RP-based & Collusive Attack \\
+  & at an RP & Only to the IdP &  Attribute Provision & Login Tracing & Identity Linkage & by the IdP and RPs \\\hline\hline
+  OIDC with PPID \cite{NIST2017draft} & $\CIRCLE$ & $\CIRCLE$ & $\CIRCLE$ & $\Circle$ & $\CIRCLE$ & - \\ \hline
+  BrowserID \cite{BrowserID} & $\CIRCLE$ & $\LEFTcircle$$^1$ & $\Circle$ & $\CIRCLE$ & $\Circle$ & - \\ \hline
+  PRIMA \cite{prima} & $\CIRCLE$ & $\Circle$ & $\CIRCLE$ & $\CIRCLE$ & $\Circle$ & - \\ \hline
+  SPRESSO \cite{SPRESSO} & $\CIRCLE$ & $\CIRCLE$ & $\Circle$$^2$ & $\CIRCLE$ & $\Circle$ & - \\ \hline
+  PseudoID \cite{PseudoID} & $\CIRCLE$ & $\Circle$ & $\Circle$$^3$ & $\CIRCLE$ & $\CIRCLE$ & $\CIRCLE$ \\ \hline
+  EL PASSO \cite{ELPASSO} & $\CIRCLE$ & $\Circle$ & $\CIRCLE$ & $\CIRCLE$ & $\CIRCLE$ & $\CIRCLE$ \\ \hline
+  UnlimitID \cite{UnlimitID} & $\CIRCLE$ & $\Circle$ & $\CIRCLE$ & $\CIRCLE$ & $\CIRCLE$ & $\CIRCLE$ \\ \hline
+  Opaak \cite{Opaak} & $\LEFTcircle$$^4$ & $\Circle$ & $\Circle$ & $\CIRCLE$ & $\CIRCLE$ & $\CIRCLE$ \\ \hline
+  Fabric Idemix \cite{hyperledge-idemix} & $\Circle$$^5$ & $\Circle$ & $\CIRCLE$ & $\CIRCLE$ & $\CIRCLE$ & $\CIRCLE$ \\ \hline
+  U-Prove \cite{uprov} & $\CIRCLE$ & $\Circle$ & $\LEFTcircle$$^6$ & $\CIRCLE$ & $\CIRCLE$ & $\CIRCLE$ \\ \hline
+  UPPRESSO & $\CIRCLE$ & $\CIRCLE$ & $\CIRCLE$ & $\CIRCLE$ & $\CIRCLE$ & $\Circle$ \\ \hline
+\end{tabular}
+    \label{tbl:comparison-protocol}
+\flushleft
+{\footnotesize
+1. A user generates an \emph{ephemeral} private key to sign every ``subsidiary'' token,
+ which is verified by the RP.\\
+2. SPRESSO can be extended to provide user attributes in then tokens, while the prototype does not support it.\\
+3. Blindly-signed user attributes can be selectively provided using zero-knowledge proofs,
+    not implemented in the preliminary version of PseudoID.\\
+4. Opaak implements two pseudonym options: (\emph{a}) linkable within an RP but unlinkable across multiple RPs and (\emph{b}) unlinkability for any two actions.\\
+5. In the original design of Idemix \cite{idemix}, every user logins to an RP as a non-anonymous account.\\
+6. A U-Prove token may contain some attributes \emph{invisible} to the IdP, in addition the ones confirmed by the IdP and selectively disclosed by the user.}
+\end{table*}
+
+
 Some solutions prevent the IdP-based login tracing,
-    but vulnerable to the threat of RP-based identity linkage.
+    but vulnerable to the RP-based identity linkage.
 In BrowserID \cite{BrowserID} (and its prototypes known as Firefox Accounts \cite{FirefoxAccount} and Mozilla Persona \cite{persona}),
  the IdP %(called the primary identity authority in BrowserID)
   issues a special ``token'' to bind the user identity to an \emph{ephemeral} public key,
@@ -179,7 +179,7 @@ In BrowserID \cite{BrowserID} (and its prototypes known as Firefox Accounts \cit
 %When a user logins to different RPs, the RPs still extract the identical user identities
 %    from different pairs of tokens and link these login instances.
 In PRIMA the IdP signs an authentication credential to bind a verification key with a set of user attributes \cite{prima}, where the verification key is considered as his unique identity.
-And then the PRIMA user provides selective IdP-confirmed attributes to any RP using his signing key \cite{Oblivion}, cooperatively with the IdP.
+Then the PRIMA user provides selective IdP-confirmed attributes to any RP using his signing key \cite{Oblivion}, cooperatively with the IdP.
 In SPRESSO \cite{SPRESSO} an RP creates a one-time but verifiable pseudo-identity for itself in each login instance.
 Then, the IdP generates an identity token binding this RP pseudo-identity and the user identity.
 In these schemes,
@@ -218,18 +218,14 @@ NEXTLEAP \cite{nextleap} adopts UnlimitID for secure messaging.
 %For example,
 %    the RP domain (e.g., \verb+www.RP.com+) is used as a factor to locally generate the user's account (or pseudonym) at this RP.
 
-+++++
-
 Anonymous credentials \cite{anon-credential-2001} can be utilized in flexible ways.
-Opaak \cite{opaak} keeps IdP-signed anonymous credentials in mobile phones as pseudonym tokens,
+Opaak \cite{Opaak} keeps IdP-signed anonymous credentials in mobile phones as pseudonym tokens,
     which bind a user's secret key.
 The Idemix anonymous credential system \cite{idemix}
- is integrated in Hyperledger \cite{hyperledge-idemix} to implement completely-unlinkable pseudonyms
+ is integrated in Hyperledger Fabric \cite{hyperledge-idemix} to implement completely-unlinkable pseudonyms
         and IdP-confirmed selective attribute disclosure.
-
-
-
-U-Prove \cite{uprov}
+After a user retrieves a U-Prove token \cite{uprov,uprove-conference} from the IdP,
+    it enables the user to authenticate himself and disclose attributes to an RP,
 
 %Moreover,
 %    a user has to change its account at each RP if its long-term secret was lost,
@@ -248,23 +244,27 @@ U-Prove \cite{uprov}
 
 
 Table \ref{tbl:comparison-protocol} summaries these privacy-preserving solutions of SSO and federated identity management.
-A ``pure'' SSO protocol allows the user to authenticate himself to the IdP a \emph{single} time,
-    but need no keep any permanent secret to login to an RP.
+Commonly-used SSO protocols \cite{OpenIDConnect,rfc6749,SAML,SAMLIdentifier} allow a user to login to RPs,
+    after being authenticated by the IdP,
+        without by himself holding any permanent secret verified by RPs
+        or maintain accounts at these RPs.
+%Such designs simplify the user burdens greatly.
+Privacy-preserving SSO \cite{BrowserID,SPRESSO,NIST2017draft} and UPPRESSO
+            keep the convenience for users,
+                while some privacy threats are prevented.
+
 On the other hand,
-    identity federation enables identity to be accepted by any one more than the issuer (where registration),
-    with or without more secret.
-Some identity federation solutions \cite{prima,ELPASSO,UnlimitID,idemix,PseudoID} protect user privacy against collusive attacks by the IdP and RPs,
-    while a user has to hold long-term secret in addition to the credentials (or tokens).
-    there are some authentication steps between the user and RPs to verify the user secrets.
-Therefore, in these systems
-    a user needs to notify each RP if a credential was lost or compromised,
-for the user is authenticated by the RP with his credentials
-            to prove that he owns the long-term secret.
-Some privacy-preserving SSO schemes and UPPRESSO try to keep the user convenience lightweight,
-
-It brings some burdens to users,
-    while PPIDs are maintained by the IdP and in UPPRESSO the accounts are determined automatically.
-
+    identity federation enables a user registered at the IdP to be accepted by other parties,
+            as different identities (or accounts) sometimes,
+        while more operations by the user may be involved.
+Privacy-preserving identity federation solutions \cite{ELPASSO,UnlimitID,hyperledge-idemix,PseudoID,Opaak}
+    protect user privacy against even collusive attacks by the IdP and RPs,
+    at the expense of user burdens to (\emph{a}) hold long-term secrets
+            in addition to the authentication credentials for the IdP
+                and (\emph{b}) manage the accounts at different RPs.
+There are actually some authentication steps between the user and RPs.
+In these systems
+    a user needs to notify the RPs if the secret and credentials (or tokens) were lost or leaked.
 
 \begin{comment}
 
