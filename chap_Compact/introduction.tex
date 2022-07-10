@@ -38,7 +38,7 @@ The SSO login flow for web applications works as below.
 For example, in the widely-used OIDC systems,
      a user sends a login request to the target RP, % (Step 1),
 and the RP constructs an identity-token request with its identity (denoted as $ID_{RP}$ in this paper) and redirects the request to the IdP.
-After properly authenticating the user with some credential,
+After properly authenticating the user, 
  the IdP issues an identity token explicitly binding the identities of both the user and the RP (i.e., $ID_U$ and $ID_{RP}$),
     which is returned to the user and forwarded to the RP. %in Step 5.
 Finally, the RP verifies the identity token to decide whether the user is allowed to login or not.
@@ -114,10 +114,10 @@ The following features of SSO are usually supported:
     i.e., an identity token enables an RP to uniquely identify every user,
 (\emph{b}) \emph{Only user authentication to the IdP}, i.e.,
     the steps of user authentication between a user and the RP are eliminated,
-    and a user only needs to hold the credential to authenticate himself to the IdP,
+    and a user only needs to hold the secret credential to authenticate himself to the IdP,
 %    different types of credentials are supported in the authentication between the IdP and users,
 and (\emph{c}) \emph{Provision of IdP-confirmed user attributes},
-    i.e., a user maintains his attributes at the IdP,
+    i.e., a user maintains his attributes at the trusted IdP,
     and RP-requested attributes are provided with the user's identity
             after authorized by the user.
 Meanwhile,
@@ -150,7 +150,7 @@ Then, $PID_{RP}$ is sent to the IdP to transform $ID_U$ to ephemeral $PID_U$,
 Finally,
     after receiving an identity token with matching $PID_{RP}$,
         the RP transforms $PID_U$ into an account.
-Given a user, this account (\emph{a}) is unique at each RP and (\emph{b}) keeps permanent across multiple login instances.
+Given a user, this account is (\emph{a}) identical across multiple login instances and (\emph{b}) unique at each RP.
 UPPRESSO prevents the IdP from tracking a user's login activities because it receives only $PID_{RP}$ in the identity-token request,
     and collusive RPs from linking a user's identities across these RPs because every account is unique.
 %This prevents both IdP-based login tracing by hiding the RPs' identities from the IdP and RP-based identity linkage by hiding the user's identity from the RPs.
