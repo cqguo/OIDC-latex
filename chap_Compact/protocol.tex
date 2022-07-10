@@ -163,13 +163,13 @@ First of all, in UPPRESSO the IdP is not aware of the visited RP,
 On the contrary,
     in commonly-used SSO protocols the IdP needs this information to ensure confidentiality of identity tokens.
 For example,
-    in the OIDC services, as an RP registers itself at the IdP, the \verb+redirect_uri+ parameter
+    in the OIDC services, when an RP registers itself at the IdP, the \verb+redirect_uri+ parameter
     is set as the endpoint URL to receive tokens.
 Then, in an OIDC login instance, when the IdP wants to transmit identity tokens to an RP,
     it utilizes the HTTP 302 redirection with this endpoint as the target URL in the HTTP response,
      and then the user browser will forward it to the RP.
 This verified \verb+redirect_uri+  ensures that an identity token is sent to the target RP,
-    which is designated in the token,
+   % which is designated in the token,
 and prevents any man-in-the-middle attackers from intercepting this token.
 
 In UPPRESSO such functions of a user agent are implemented by supplementary web scripts within the browser,
@@ -185,12 +185,12 @@ Only the RP script is not enough to implement the user agent of UPPRESSO;
     (e.g., if it requests the identity token,
     an HTTP request launched by the RP script will
 automatically carry an HTTP \verb+Referer+ header, which discloses the RP domain).
-Moreover, a script downloaded the honest IdP,
-to ensure confidentiality of identity tokens (i.e., an identity token is sent to only the RP designated in this token),
+Moreover, a script downloaded from the honest IdP,
+to ensure confidentiality of identity tokens (i.e., it is sent to only the RP designated in this token)
 and to interact with the user for the authorization of user attributes,
     for the visited RP might be malicious.
 
-\emph{RP certificates} are designed for browsers to verify the endpoint of an RP.
+\emph{RP certificates} are designed to verify the endpoint of an RP.
 An RP certificate is a document signed by the IdP during the RP initial registration,
      binding the RP's identity and its endpoint (i.e., $ID_{RP}$ and $Enpt_{RP}$).
 In a login instance,
@@ -225,16 +225,17 @@ The origin parameter consists of
 
 Finally,
 in a login instance,
-    the browser first downloads the RP script when visiting an RP, and
-then this RP script opens a new window that will download the IdP script.
+    the browser downloads the RP script when visiting an RP, and
+this RP script opens a new window that will download the IdP script.
 We shall prevent the referer leakage when the IdP script is downloaded.
 Generally, when a browser window visits another website not belonging to its opener's origin,
  the HTTP request to this website will automatically carry the \verb+referer+ header (i.e., the opener's origin).
 This HTTP \verb+referer+ header leaks the information about the visited RP to the IdP.
-Fortunately, in UPPRESSO this newly-opened window is a redirection from the RP to the IdP, instead of directly visits the IdP from the user (see Figure~\ref{fig:process}, Steps 1.2-1.3).
+Fortunately, in UPPRESSO this newly-opened window is a redirection from the RP to the IdP,
+ instead of a direct visit from the user (Figure~\ref{fig:process}, Steps 1.2-1.3).
 So this leakage is prevented by setting the header \verb+referrer-policy=no-referrer+ in the HTTP response from the RP, when it is redirected to the IdP.
-Then, the HTTP request to download the IdP script carries no \verb+referer+ header.
-This setting is specified by W3C \cite{referer_policy}, and widely supported.
+Then the HTTP request to download the IdP script carries no \verb+referer+ header.
+This setting is specified by W3C \cite{referer_policy} and widely supported.
 We have checked it in Chrome and Firefox, and confirmed no referer leakage.
 
 
@@ -674,7 +675,7 @@ On the other hand, in UPPRESSO the scripts hide $Enpt_{RP}$ from the IdP,
   %      the script replaces $Enpt_{RP}$ with $PEnpt_{U}$,
     and forward the identity token to $Enpt_{RP}$ which is extracted from the RP certificate.
 %    that to protect the identity token from being sent to adversaries. 这句话与Compatibility无关
-So the IdP does not set \verb+redirect_uri+ in the HTTP response of identity tokens.
+So the IdP does not set \verb+redirect_uri+ in the HTTP response. % of identity tokens.
 
 In the step of RP identity transformation, most operations are conducted by the user agent,
  while the RP only receives $t$ to calculate $PID_{RP}$ and responds to the browser with  $Cert_{RP}$.
@@ -692,11 +693,11 @@ The operations of identity-token generation and $Acct$ calculation,
                     to a local account at the RP.
 
 Finally,
-    this compatibility with OIDC is experimentally confirmed by our prototype implementation,
+    this compatibility is experimentally confirmed by our prototype implementation,
         \textcolor[rgb]{1,0,0}{where only about 20 lines of Java code are needed to modify} MITREid Connect \cite{MITREid},
         an open-source system of OIDC,
-    to build the IdP.
-
+    to build the IdP of UPPRESSO.
+It will help the adoption and deployment of UPPRESSO.
 
 %It follows a similar logic flow as OIDC in SSO login and only requires small modifications to perform identifier transformation.
 %Here, we explain the modification in each of the five steps of its SSO login flow to show that UPPRESSO is compatible with OIDC, which indicates UPPRESSO can be easily integrated with other commonly used SSO systems.
