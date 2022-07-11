@@ -22,7 +22,7 @@ Although the prototype runs for web applications,
 %In this paper, the functions are implemented based on the elliptic curve algorithm and the mechanism provided by OIDC system.
 %However, the transformation functions can also be implemented based on other mechanisms according to the protocol and environment, for example, the TPM may be used to take responsibility to transform identities.
 
-\vspace{1mm}\noindent{\textbf{Scalability.}} Adversaries cannot exhaust $ID_{RP}$ or $PID_{RP}$.
+\vspace{1mm}\noindent{\textbf{Scalability.}} Adversaries cannot exhaust $PID_{RP}$ or $ID_{RP}$.
 $ID_{RP}$ is generated uniquely in an RP's initial registration,
     and the capacity is $n$ (i.e., the order of $G$). For example, for the NIST P256 elliptic curve, $n$ is approximately $2^{256}$.
 As for $PID_{RP}$,  we only need to ensure $PID_{RP}$ is unique among \emph{unexpired} identity tokens,
@@ -70,8 +70,7 @@ An authorization code is usually the index to retrieve the identity token from t
 After receiving the authorization code, the RP uses it and another secret
          which is issued by the IdP during the initial registration,
      to retrieve the identity token from the IdP by itself \cite{OpenIDConnect}.
-Therefore,
-    in order to protect RP identities from the IdP,
+In order to protect RP identities from the IdP,
         privacy-preserving credentials (e.g., ring or group signatures \cite{ring-sig,chaum1991group})
         and anonymous networks (e.g., Tor \cite{tor}) need to be adopted for RPs in the retrieval of identity tokens.
 
@@ -134,7 +133,7 @@ We have implemented such a browser extension while the IdP and RPs are unmodifie
     compared with the version implemented with portable web scripts.
 
 \vspace{1mm}\noindent{\textbf{Restriction of the RP Script's Origin.}}
-When the IdP script forwards identity tokens to the RP script within the user browser,
+When identity tokens are forwarded by the IdP script to the RP script within the user browser,
     the receiver is restricted by the \verb+postMessage+ targetOrigin mechanism \cite{postm-targeto},
         to ensure it will forward the tokens to $Enpt_{RP}$,
         which is bound in the RP certificate.
@@ -153,7 +152,7 @@ On the other hand, browsers enforce
  the same-origin policy \cite{sop} in the access control of web resources,
     and the control granularity is also origins only.
 Therefore,
-    a malicious RP could always access the other's resources within a user's browser,
+    a malicious RP could always access the other's resources within the user browser,
         e.g., steal the cookie
         by web scripts such as
         \verb+vw = window.open('http://www.RP.com/honest')+
@@ -179,7 +178,7 @@ This binding may be finished in another way:
     $ID_{RP}$ is deterministically calculated based on the RP's unambiguous domain (e.g.,
     \verb+https://www.RP.com/+).
 For example,
-    $Hs()$ encodes an RP's domain (or the RP script's origin) to a point on an elliptic curve $\mathbb{E}$ as $ID_{RP}$,
+    $Hs()$ encodes an RP's domain (or the RP script's origin) to a point on the elliptic curve $\mathbb{E}$ as $ID_{RP}$,
 where
     hashing to elliptic curves $Hs()$ \cite{irtf-cfrg-hash-to-curve-16} provides collision resistance and does not reveal the discrete logarithm of the output
     (i.e., $ID_{RP} = [r]G$ but $r$ is unknown).

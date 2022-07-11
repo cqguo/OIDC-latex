@@ -1,11 +1,11 @@
 \section{Implementation and Evaluation}
 \label{sec:implementation}
 We have implemented the UPPRESSO prototype system,\footnote{The prototype is open-sourced at https://github.com/uppresso/.}
- and experimentally evaluated its performance
- by comparing it with two open-source systems:
+ and experimentally evaluated it
+ by comparing it with two open-source SSO systems:
   (\emph{a}) MITREid Connect \cite{MITREid}
     which implements the PPID-enhanced OIDC protocol and prevents only the RP-based identity linkage,
-     and (\emph{b}) SPRESSO \cite{SPRESSO} which only prevents the IdP-based login tracing.
+     and (\emph{b}) SPRESSO \cite{SPRESSO} preventing only the IdP-based login tracing.
 
 
 \subsection{Prototype Implementation}
@@ -26,7 +26,7 @@ We add only 3 lines of Java code to calculate $PID_U$,
  %           (i.e., checking $PID_{RP}$ and signing the registration result).
 The calculations of $ID_{RP}$ and $PID_U$ are implemented based on built-in Java cryptographic libraries. %(e.g., BigInteger).
 
-We implemented the user-side functions by scripts downloaded from the IdP and RPs,
+We implemented the user-side functions by the IdP and RP scripts,
      containing about 200 and 150 lines of JavaScript code, respectively.
 %to provide the functions in Steps 2.1, 2.3, and 4.3.
 The cryptographic computations, e.g., $Cert_{RP}$ verification and $PID_{RP}$ negotiation, are implemented based on jsrsasign \cite{jsrsasign}, an efficient JavaScript cryptographic library.
@@ -44,8 +44,8 @@ We provide a Java SDK for RPs in UPPRESSO.
 The SDK provides two functions to encapsulate the protocol steps:
  one to request identity tokens,
     and the other to derive the accounts from identity tokens.
-The SDK is implemented based on the Spring Boot framework  with about 1,000 lines of Java code
- and cryptographic computations are implemented based on the Spring Security library.
+\textcolor[rgb]{1.00,0.00,0.00}{The SDK is implemented based on the Spring Boot framework  with about 1,000 lines of Java code
+ and cryptographic computations are implemented based on the Spring Security library.}
 An RP invokes these two functions for the integration,
     by less than 10 lines of Java code.
 

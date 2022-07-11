@@ -164,7 +164,7 @@ On the contrary,
     in commonly-used SSO protocols the IdP needs this information to ensure confidentiality of identity tokens.
 For example,
     in the OIDC services, when an RP registers itself at the IdP, the \verb+redirect_uri+ parameter
-    is set as the endpoint URL to receive tokens.
+    is set as the endpoint URL to receive tokens  \cite{OpenIDConnect}.
 Then, in an OIDC login instance, when the IdP wants to transmit identity tokens to an RP,
     it utilizes the HTTP 302 redirection with this endpoint as the target URL in the HTTP response,
      and then the user browser will forward it to the RP.
@@ -172,22 +172,22 @@ This verified \verb+redirect_uri+  ensures that an identity token is sent to the
    % which is designated in the token,
 and prevents any man-in-the-middle attackers from intercepting this token.
 
-In UPPRESSO such functions of a user agent are implemented by supplementary web scripts within the browser,
+In UPPRESSO such functions of a user agent are implemented by web scripts within the browser,
     and more efficient but less portable implementations with browser extensions
  are discussed in Section \ref{sec:discussion}.
 Two scripts are downloaded from the visited RP and the IdP, respectively,
     and each is responsible for the communications with the origin web server.
 % to follow the \emph{same-origin policy} (SOP) \cite{sop}.
 The RP script is downloaded, when the user visits the RP,
-    and it launches the IdP script and prepare $ID_{RP}$ and $Enpt_{RP}$ to the IdP script.
+    and it launches the IdP script and prepares $ID_{RP}$ and $Enpt_{RP}$ to the IdP script.
 Only the RP script is not enough to implement the user agent of UPPRESSO;
     otherwise, the RP script will leaks its origin to the IdP web server
     (e.g., if it requests the identity token,
     an HTTP request launched by the RP script will
-automatically carry an HTTP \verb+Referer+ header, which discloses the RP domain).
+automatically carry an HTTP \verb+referer+ header, which discloses the RP domain).
 Moreover, a script downloaded from the honest IdP,
 to ensure confidentiality of identity tokens (i.e., it is sent to only the RP designated in this token)
-and to interact with the user for the authorization of user attributes,
+and interact with the user for the authorization of user attributes,
     for the visited RP might be malicious.
 
 \emph{RP certificates} are designed to verify the endpoint of an RP.
@@ -232,11 +232,11 @@ Generally, when a browser window visits another website not belonging to its ope
  the HTTP request to this website will automatically carry the \verb+referer+ header (i.e., the opener's origin).
 This HTTP \verb+referer+ header leaks the information about the visited RP to the IdP.
 Fortunately, in UPPRESSO this newly-opened window is a redirection from the RP to the IdP,
- instead of a direct visit from the user (Figure~\ref{fig:process}, Steps 1.2-1.3).
+ instead of a direct visit from the user browser (Figure~\ref{fig:process}, Steps 1.2-1.3).
 So this leakage is prevented by setting the header \verb+referrer-policy=no-referrer+ in the HTTP response from the RP, when it is redirected to the IdP.
 Then the HTTP request to download the IdP script carries no \verb+referer+ header.
 This setting is specified by W3C \cite{referer_policy} and widely supported.
-We have checked it in Chrome and Firefox, and confirmed no referer leakage.
+We have tested it in Chrome and Firefox, and confirmed no referer leakage.
 
 
 
@@ -317,7 +317,7 @@ The RP sends a registration request to the IdP, including the endpoint to receiv
     and other optional information.
 %\vspace{-\topsep}
 \item
-The IdP generates a unique random number $r \in (1,n)$, calculates $ID_{RP} = [r]G$,
+The IdP generates a unique random number $r \in [1,n)$, calculates $ID_{RP} = [r]G$,
     and assigns $ID_{RP}$ to this RP.
 The IdP then signs $Cert_{RP} = [ID_{RP}, Enpt_{RP}, *]_{SK}$,
      where $[\cdot]_{SK}$ means a message signed using $SK$ and $*$ denotes supplementary information such as the RP's common name and Email,
@@ -338,7 +338,7 @@ The RP verifies $Cert_{RP}$ using $PK$,
 %\vspace{1mm}
 \noindent\textbf{User Registration.}
 Each user registers once at the IdP to set up a unique user identity $ID_U$ and the corresponding credential.
-This is similar to the ones in existing SSO systems.
+This is similar to the steps in existing SSO systems.
 %$ID_U$ can be chosen by the user or the IdP, as long as it is unique for each user.
 
 \vspace{1mm}
@@ -354,7 +354,7 @@ Two vertical lines split the user's operations into two groups (i.e., in two bro
     one of which is to communicate with the IdP,
                  and the other with the target RP.
 Each solid horizontal line means some messages between the user and the IdP (or the RP),
-            and each dotted line means a \verb+postMessage+ invocation between two scripts (or windows) within the user browser.
+            and each dotted line means a \verb+postMessage+ invocation between two scripts (or browser windows) within the user browser.
 
 %In this figure, vertical bars stand for entity in the UPPRESSO system.
 %At the user side, the vertical bars represent the browser's windows which are the containers of IdP and RP scripts.
@@ -485,13 +485,13 @@ The IdP then signs an identity token $[PID_{RP}, PID_U, Issuer, Validity, Attr]_
 
 %\vspace{1mm}
 \noindent 4. {\em $Acct$ Calculation.}
-The RP verifies the identity token and allows the user to login.
+The RP receives the identity token and allows the user to login.
 \begin{itemize}
 \setlength{\itemsep}{0pt}
 \setlength{\parsep}{0pt}
 \setlength{\parskip}{0pt}
 \item [4.1]
-The IdP script forwards this token to the RP script,
+The IdP script forwards the token to the RP script,
     which then sends it to the RP through $Enpt_{RP}$.
 \item[4.2] The RP verifies the identity token, including the IdP's signature and its validity period.
 It also verifies $PID_{RP}$ in the token is consistent with the one negotiated in Step 2.2.
@@ -665,8 +665,8 @@ The RP verifies the identity token, including the signature, validity period, an
 % 这句话前面已经说过了
 
 
-Among the four steps of the SSO login flow in UPPRESSO,
-    the script downloading prepares the user agent.
+Among the four steps of the login flow in UPPRESSO,
+    the script downloading prepares the user agent before other steps.
 The user agent of SSO is responsible for the communications between the IdP and the RP,
     which are implemented by browser redirections in OIDC.
 On the other hand, in UPPRESSO the scripts hide $Enpt_{RP}$ from the IdP,
@@ -677,17 +677,17 @@ On the other hand, in UPPRESSO the scripts hide $Enpt_{RP}$ from the IdP,
 %    that to protect the identity token from being sent to adversaries. 这句话与Compatibility无关
 So the IdP does not set \verb+redirect_uri+ in the HTTP response. % of identity tokens.
 
-In the step of RP identity transformation, most operations are conducted by the user agent,
+In the step of RP identity transformation, most operations are conducted within the user agent,
  while the RP only receives $t$ to calculate $PID_{RP}$ and responds to the browser with  $Cert_{RP}$.
-The calculation of $PID_{RP}$ can be viewed as an operation to prepare the RP's identity,
-    and the static $Cert_{RP}$ is unrelated to other steps by the RP or the IdP.
+The calculation of $PID_{RP}$ can be viewed as an operation to prepare the RP's identity in OIDC,
+    and the static $Cert_{RP}$ is only a supplementary message to the user.
 %The operations in the $PID_{RP}$ registration are almost identical to those in the RP Dynamic Registration of OIDC \cite{DynamicRegistration},
    % except that
    % in OIDC the IdP assigns the RP's identity  while in UPPRESSO this (pseudo-)identity is generated by the registered entity.
 %Besides, the $PID_{RP}$ registration has a validity period.
 
 The operations of identity-token generation and $Acct$ calculation,
-    are actually identical to those in the implicit login flow of OIDC \cite{OpenIDConnect},
+    are actually identical to those in the implicit login flow of OIDC,
     because (\emph{a}) the calculation of $PID_U$ is viewed as a method to generate PPIDs by the IdP
         and (\emph{b}) the calculation of $Acct$ is viewed as a mapping from the user identity in tokens
                     to a local account at the RP.
