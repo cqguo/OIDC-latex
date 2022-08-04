@@ -163,11 +163,11 @@ On the other hand,
             with different identities (or accounts) sometimes,
         while more operations by the user may be involved.
 Privacy-preserving identity federation \cite{ELPASSO,UnlimitID,hyperledge-idemix,PseudoID,Opaak}
-    protects user privacy against even collusive attacks by the IdP and the RPs,
+    protects privacy against even collusive attacks by the IdP and the RPs,
     but requires a user to (\emph{a}) hold long-term secrets verified by RPs,
             in addition to the authentication credentials for the IdP,
                 and (\emph{b}) manage the accounts at different RPs.
-That is, there are actually some authentication steps between the user and RPs.
+That is, there are actually some authentication steps between the user and RPs (called asynchronous authentication \cite{ELPASSO}).
 %so a user needs to notify the RPs if the secret and credentials (or tokens) were lost or leaked.
 
 %
@@ -189,12 +189,12 @@ Some solutions prevent the IdP-based login tracing,
     but vulnerable to the RP-based identity linkage.
 In BrowserID \cite{BrowserID} (and its prototypes known as Firefox Accounts \cite{FirefoxAccount} and Mozilla Persona \cite{persona}),
  the IdP %(called the primary identity authority in BrowserID)
-  issues a special token (called user certificate) to bind the user identity to an \emph{ephemeral} public key,
+  issues a special token (called user certificate) to bind a user identity to an \emph{ephemeral} public key,
  so that the user utilizes the corresponding private key to sign a ``subsidiary'' token (called identity assertion)
     to bind the target RP's identity and sends both tokens to the RP.
 %When a user logins to different RPs, the RPs still extract the identical user identities
 %    from different pairs of tokens and link these login instances.
-In PRIMA \cite{prima} the IdP signs an authentication credential binding a verification key and a set of user attributes, where the key is viewed as the user's identity.
+The PRIMA IdP signs an authentication credential binding a verification key and a set of user attributes \cite{prima}, and the key is viewed as the user's identity.
 Then the PRIMA user selectively provides IdP-confirmed attributes to some RP using his signing key \cite{Oblivion}, cooperatively with the IdP.
 In SPRESSO \cite{SPRESSO} an RP assigns a one-time but verifiable pseudo-identity to itself in each login instance.
 Then, the IdP generates an identity token binding this RP pseudo-identity and the user identity.
