@@ -203,15 +203,15 @@ Thus,
 %The detailed process of proof is shown in Appendix.
 
 \vspace{1mm}
-Finally, we also formally analyze the security properties of UPPRESSO, %especially confidentiality and integrity, 
-     based on an Dolev-Yao style model \cite{SPRESSO}.
+Finally, we also formally analyze the security properties of UPPRESSO, %especially confidentiality and integrity,
+     based on a Dolev-Yao style model \cite{SPRESSO}.
 % which has been used in the formal analysis of SSO protocols such as OAuth 2.0 \cite{FettKS16} and OIDC \cite{FettKS17}.
-The Dolev-Yao style model abstracts the entities in a web system,
+The model abstracts the entities in a web system,
     such as web servers and browsers,
-    as atomic processes.
-    , which communicate with each other through events.% such as HTTPS request and response.
+    as atomic processes. %which communicate with each other through events. % such as HTTPS request and response.
 It also defines script processes to formulate client-side scripts, i.e.,  JavaScript code.
-The script is dependently invoked by the browser to process the server-defined logic, such as verifying $Certificate_{RP}$.
+%The script is dependently invoked by the browser to process the server-defined logic.
+  %such as verifying $Certificate_{RP}$.
 
 %postmessage events;
 
@@ -219,19 +219,23 @@ The script is dependently invoked by the browser to process the server-defined l
 
 %Other events change self-trigger.
 
-The UPPRESSO system contains an IdP process,
+The UPPRESSO system contains atomic processes as follows:
+an IdP process,
     a finite set of web servers for honest RPs, a finite set of honest browsers, and a finite set of attacker processes.
-    The processes communicate with each other through events such as HTTPS request and response.
-We consider all RP processes and browser processes are honest,
- while model an RP or a browser controlled by an adversary as attacker atomic processes.
- Inside the honest browsers, the honest IdP's script, honest RPs' scripts and attackers' scripts are deployed. Although the scripts coexist in the same browser, they are strictly separated. In a browser, the scripts can communicated with each other through postMessage mechanism. To clearly indicate the action of postMessage communication, we define it as the transmitting-to-itself event of the browser (which is not defined in SPRESSO).
- 
+These processes communicate with each other through events such as HTTPS request and response.
+We consider all RP and browser processes are honest,
+ while model an RP or a browser controlled by an adversary as attacker processes.
+Within the honest browsers,
+ honest IdP scripts, honest RP scripts and also attacker scripts are invoked. 
+%Although the scripts coexist in the same browser, they are strictly separated.
+Script processes communicate with each other through \verb+postMessage+,
+    modelled as transmitted-to-itself events of the browser.
+%To clearly indicate the action of postMessage communication, we define it as the transmitting-to-itself event of the browser (which is not defined in SPRESSO).
+
 %It contains two honest script processes,
 %        downloaded from the RP process and the IdP process, respectively.
 % and {\sf script\_attacker} denotes a script downloaded by an attacker process that exists in all browser processes.
 %attacker script processes
-
-
 
 After formulating UPPRESSO by the Dolev-Yao style model,
     we trace the lifecycle of an identity token,
