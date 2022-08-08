@@ -217,13 +217,13 @@ this RP script opens a new window that will download the IdP script.
 We shall prevent the referer leakage when the IdP script is downloaded.
 Generally, when a browser window visits another website not belonging to its opener's origin,
  the HTTP request to this website will automatically carry the \verb+referer+ header (i.e., the opener's origin).
-This HTTP \verb+referer+ header leaks the information about the visited RP to the IdP.
+This HTTP \verb+referer+ header leaks the visited RP's domain to the IdP.
 Fortunately, in UPPRESSO this newly-opened window is a redirection from the RP to the IdP,
- instead of a direct visit from the user browser (Figure~\ref{fig:process}, Steps 1.2-1.3).
-So this leakage is prevented by setting the header \verb+referrer-policy=no-referrer+ in the HTTP response from the RP, when it is redirected to the IdP.
-Then the HTTP request to download the IdP script carries no \verb+referer+ header.
+ but not a direct visit from the user browser (Figure~\ref{fig:process}, Steps 1.2-1.3).
+This leakage is prevented by setting the header \verb+referrer-policy=no-referrer+ in the HTTP response from the RP, when it is redirected to the IdP.
+Then, the HTTP request to download the IdP script carries no \verb+referer+ header.
 This setting is specified by W3C \cite{referer_policy} and widely supported.
-We have tested it in the most popular browsers including Chrome, Safari, Edge, Opera and Firefox, and confirmed no referer leakage.
+We have tested it in popular browsers including Chrome, Safari, Edge, Opera and Firefox, and confirmed no referer leakage.
 
 
 
@@ -329,10 +329,9 @@ This is similar to the steps in existing SSO systems.
 %$ID_U$ can be chosen by the user or the IdP, as long as it is unique for each user.
 
 \vspace{1mm}
-\noindent\textbf{SSO Login.} A login instance is typically launched through a browser,
-when a user attempts to visit an RP.
-It consists of four steps, namely script downloading, RP identity transformation,
-%$PID_{RP}$ registration,
+\noindent\textbf{SSO Login.} A login instance %is typically launched through a browser,
+%when a user attempts to visit an RP. It 
+consists of four steps, namely script downloading, RP identity transformation,
 identity-token generation, and $Acct$ calculation, as shown in Figure \ref{fig:process}.
 In this figure,
     the operations by the IdP are linked by a vertical line,
