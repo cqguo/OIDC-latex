@@ -7,12 +7,9 @@
 This section presents the threat model and assumptions.
 Then,
     we design identity-transformation functions satisfying the requirements,
-    and present the detailed protocols for web applications.
-The compatibility with OIDC is also discussed.
+    and the detailed UPPRESSO protocols.
+%The compatibility with OIDC is also discussed.
 
-%Similar as other SSO systems (e.g., SAML and OIDC), UPPRESSO consists of an IdP and multiple RPs and users.
-%The IdP provides user authentication services for all RPs.
-%Next, we describe the threat model and some assumptions. %about these entities.
 
 \subsection{Threat Model}
 The IdP is curious-but-honest,
@@ -23,7 +20,6 @@ Malicious users and RPs behave arbitrarily and might collude with each other,
 %While, the IdP will follow the protocol correctly, and is only curious about the user's privacy.
 %The details are as follows.
 
-\vspace{1mm}
 \noindent \textbf{Curious-but-honest IdP.}
 The IdP strictly follows the protocol, while being interested in learning user privacy.  %without violating the protocol.
 For example, it might store all received messages
@@ -46,7 +42,6 @@ Note that we aim to design schemes for a user without any permeant secret verifi
 %User's goal: 向IdP发送identity token，使IdP认为自己是另一个victim
 %方式：1）已经拥有有效的identity token，希望与IdP协商出相同的PID_RP；2）通过篡改或者伪造identity token来实现攻击
 
-\vspace{1mm}
 \noindent \textbf{Malicious Users.}
 We assume the adversary could control a set of users,
  by stealing users' credentials or registering Sybil accounts in the system.
@@ -80,7 +75,6 @@ or, it might manipulate $PID_{RP}$ to affect the generation of $PID_U$,
 %to link the user's multiple logins at different RPs. %by providing correlated values (e.g., $PID_{RP}$) to the IdP.
 
 
-\vspace{1mm}
 \noindent \textbf{Collusive Users and RPs.} %In particular,
 Malicious users and RPs might collude with each other.
         %to break the security and privacy guarantees for benign users.
@@ -98,7 +92,7 @@ For example, an adversary might try to pretend to be an RP and allure victim use
 \subsection{Assumptions}
 A user never authorizes the IdP to enclose any \emph{distinctive attributes} in identity tokens,
         where distinctive attributes are identifiable information such as telephone number, Email, etc.
-         %driver license, 
+         %driver license,
 A user does not configure  distinctive attributes at any RP, either.
 Thus, the privacy leakage due to user re-identification by distinctive attributes,
     is out of the scope of our work.
