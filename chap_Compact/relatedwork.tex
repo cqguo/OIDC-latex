@@ -21,7 +21,7 @@
 
 %\vspace{1mm}
 \noindent\textbf{Anonymous SSO.}
-Anonymous SSO schemes allow authenticated users to access a service (i.e. RP) protected by the IdP,
+Anonymous SSO schemes allow authenticated users to access a service protected by the IdP,
     without revealing their identities.
 Anonymous SSO was proposed for the global system for mobile (GSM) communications \cite{ElmuftiWRR08},
     and formalized \cite{WangWS13}.
@@ -86,20 +86,21 @@ Wang et al. \cite{ExplicatingSDK} detect the vulnerable applications
 Navas et al. \cite{NavasB19} discussed the possible attack patterns of the specification and implementations of OIDC.
 
 In mobile scenarios,
-    the IdP App, IdP-provided SDKs (e.g., an encapsulated WebView) or system browsers
+the IdP App,
+    IdP-provided SDKs %(e.g., an encapsulated WebView)
+     or browsers
          are responsible for forwarding identity tokens from the IdP App to RP Apps.
-However, none of them ensures that the identity tokens are sent to the designated RP only \cite{ChenPCTKT14,WangZLLYLG15},
+However, none of them ensures the identity tokens are sent to the designated RP only \cite{ChenPCTKT14,WangZLLYLG15},
     because a WebView or the system browser cannot authenticate the RP Apps and the IdP App may be repackaged.
-The SSO protocols are modified to work for mobile Apps, but these modifications are not well understood by RP developers \cite{ChenPCTKT14,YangLS17}.
+The SSO protocols are modified to work for mobile Apps, but these modifications are not well understood by developers \cite{ChenPCTKT14,YangLS17}.
 Vulnerabilities were disclosed in lots of Android applications,
     to break confidentiality \cite{ChenPCTKT14,WangZLLYLG15,YangLS17,ShiWL19}, integrity \cite{ChenPCTKT14,YangLS17}, and RP designation \cite{ChenPCTKT14,ShiWL19} of SSO identity tokens.
 A software flaw was found in Google Apps \cite{ArmandoCCCPS13}, allowing a malicious RP to hijack a user's authentication attempt and inject a payload to steal the cookie (or identity token) for another RP.
 
-Once a user at the IdP is compromised,
-    the adversaries will control his accounts at all RPs.
-An extension to OIDC, single sign-off \cite{GhasemisharifRC18}, enables
-        the IdP to help the victim user
- to revoke all his identity tokens accepted and logout from these RPs.
+If a user is compromised,
+    the attackers will control his accounts at all RPs.
+Single sign-off \cite{GhasemisharifRC18} helps the victim 
+ to revoke all his tokens accepted and logout from the RPs.
 %The design of single sign-off can also be integrated in UPPRESSO,
 %    where the user (or user agent) needs to revoke the identity tokens at all RPs,
 %     as the IdP does not know which RPs the user visits.

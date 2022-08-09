@@ -61,14 +61,14 @@ The user's operations including redirection, authorization, and forwarding,
 
 \begin{table*}[tb]
 \footnotesize
-    \caption{Privacy-Preserving Solutions of SSO and Federated Identity Management.}
+    \caption{Privacy-Preserving Solutions of SSO and Identity Federation.}
     \centering
     \begin{tabular}{|c|c|c|c|c|c|c|}
   \hline
   \multirow{3}*{\textbf{~~Solution~~}} &
   \multicolumn{3}{c|}{\textbf{SSO Feature} - supported $\CIRCLE$, unsupported $\Circle$, or partially $\LEFTcircle$} & \multicolumn{3}{c|}{\textbf{Privacy Threat} - prevented $\CIRCLE$ or not $\Circle$} \\ \cline{2-7}
   & User Identity & User Authentication & IdP-Confirmed Selective  & IdP-based & RP-based & Collusive Attack \\
-  & at an RP & Only to the IdP &  Attribute Provision & Login Tracing & Identity Linkage & by the IdP and RPs \\\hline\hline
+  & at an RP & Only to the IdP &  Attribute Provision & Login Tracing & Identity Linkage & by the IdP and RPs \\\hline
   OIDC with PPID \cite{NIST2017draft} & $\CIRCLE$ & $\CIRCLE$ & $\CIRCLE$ & $\Circle$ & $\CIRCLE$ & - \\ \hline
   BrowserID \cite{BrowserID} & $\CIRCLE$ & $\LEFTcircle$$^1$ & $\Circle$ & $\CIRCLE$ & $\Circle$ & - \\ \hline
   SPRESSO \cite{SPRESSO} & $\CIRCLE$ & $\CIRCLE$ & $\Circle$$^2$ & $\CIRCLE$ & $\Circle$ & - \\ \hline
@@ -146,36 +146,36 @@ So no distinctive attributes such as telephone number, Email, etc.,
 %UPPRESSO leverages this function and slightly modifies the dynamic registration process to implement the {\em $PID_{RP}$ registration} process (see details in Section \ref{sec:UPPRESSO}.C), which allows an RP to generate different privacy-preserving RP identifiers and register them with the IdP.
 
 
-\subsection{Privacy-Preserving Solutions of SSO and Federated Identity Management}
+\subsection{Privacy-Preserving SSO and Identity Federation}
 \label{subsec-solutions}
-Table \ref{tbl:comparison-protocol} lists privacy-preserving solutions of SSO and also federated identity management.
-Commonly-used SSO protocols \cite{OpenIDConnect,rfc6749,SAML,SAMLIdentifier} allow a user to login to RPs,
+Table \ref{tbl:comparison-protocol} lists privacy-preserving solutions of SSO and federated identity management.
+Widely-used SSO protocols \cite{OpenIDConnect,rfc6749,SAML,SAMLIdentifier} allow a user to login to RPs,
     after being authenticated by the IdP,
         without by himself holding any permanent secret verified by RPs
-        or maintain the accounts at these RPs.
+        or maintain the accounts for these RPs.
 Existing privacy-preserving SSO \cite{BrowserID,SPRESSO,NIST2017draft} prevents the IdP-based login tracing or the RP-based identity linkage,
-    but UPPRESSO prevents both of them while keeping this user convenience.
+    and UPPRESSO prevents both of them while keeping this user convenience.
 
 Identity federation enables a user registered at the IdP to be accepted by other parties,
             with different identities (or accounts) sometimes,
-        while more user operations may be involved.
+        while more user operations are involved.
 Privacy-preserving identity federation \cite{ELPASSO,UnlimitID,hyperledge-idemix,PseudoID,Opaak}
     protects privacy against even collusive attacks by the IdP and the RPs,
     but requires a user to (\emph{a}) hold long-term secrets verified by RPs,
             in addition to the authentication credentials for the IdP,
                 and (\emph{b}) manage the accounts at different RPs.
-That is, there are actually some authentication steps between the user and RPs (called asynchronous authentication \cite{ELPASSO} sometimes).
+That is, there are actually some authentication steps between the user and RPs (or called asynchronous authentication \cite{ELPASSO}).
 
 
 Pairwise pseudonymous identifiers (PPIDs) are recommended \cite{NIST2017draft}
- and specified in popular SSO protocols \cite{OpenIDConnect, SAMLIdentifier} to protect user privacy against curious RPs.
+ and specified in SSO protocols \cite{OpenIDConnect, SAMLIdentifier} to protect user privacy against curious RPs.
 When issuing an identity token,
         the IdP encloses a user pseudo-identity (but not the user identity at the IdP).
 Given a user,
     the IdP assigns a unique PPID based on the target RP,
     so collusive RPs cannot link the user's PPIDs.
-PPID-based approaches cannot prevent the IdP-based login tracing,
- for in the generation of identity tokens the IdP needs to know which RP is visited.
+PPIDs cannot prevent the IdP-based login tracing,
+ for the IdP needs the RP identity to issue tokens.
 
 
 
@@ -202,8 +202,8 @@ The user unblinds this token,
     which allows the user to login to an RP using his secret.
 Two kinds of privacy threats are prevented, because (\emph{a}) the RP's identity is not enclosed in the access token,
     and (\emph{b}) the user encloses different pseudonyms when visiting RPs.
-Collusive privacy attacks by the IdP and RPs are also prevented,
-    because even the IdP and the token service cannot link two blindly-signed tokens.
+Collusive attacks by the IdP and RPs are also prevented,
+    for they cannot link two blindly-signed tokens.
 
 % the user must use the secret to login to RP, because no RP identity is enclosed in the token.
 
@@ -234,20 +234,4 @@ The Idemix anonymous credential system \cite{idemix}
         and IdP-confirmed selective attribute disclosure.
 After a user retrieves a U-Prove token \cite{uprov,uprove-conference} from the IdP,
     it enables the user to authenticate himself and selectively disclose attributes to an RP.
-
-%Moreover,
-%    a user has to change its account at each RP if its long-term secret was lost,
-%        because the account is calculated based on this secret \cite{ELPASSO,UnlimitID}.
-% 这一点，就不作为讨论了。因为account与RP ID相关，用域名就会是这个结果；如果类似于引入RP Cert，就不会变化。
-
-%On the contrary,
-%    in the commonly-used SSO systems \cite{OpenIDConnect,rfc6749,SAML} and privacy-preserving schemes
-%    such as BrowserID \cite{BrowserID}, SPRESSO \cite{SPRESSO} and also UPPRESSO,
-%        a user only renews his credential at the IdP if it was compromised,
-%    because (\emph{a}) authentication happens only between the user and the IdP
-%    and (\emph{b}) an RP verifies only tokens generated by the IdP.
-
-
-
-
 
