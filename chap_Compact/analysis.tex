@@ -27,9 +27,6 @@ UPPRESSO satisfies the four security requirements of identity tokens in SSO serv
 \end{itemize}
 
 
-%while the detailed process of proof is provided in the Appendix.
-% 这个版本，先不管附录。
-
 \noindent\textbf{RP Designation.}
 The identity token binds $PID_{RP}$ identifying the target RP,
     because $t$ is sent the target RP with $ID_{RP}$ and $PID_{RP} = [t]ID_{RP}$.
@@ -127,7 +124,6 @@ Thus, the probability of finding $t$ and $t'$ satisfying that $[t]ID_{RP_j} = [t
 %Because (\emph{a}) both $PID_{RP}$ and $H(t)$ in the registration result are checked by the RP and then (\emph{b}) the registration result $[PID_{RP}, H(t), Validity]_{SK}$ is acceptable to only one honest RP,
 %            the identity token designates only one RP.
 
-\vspace{1mm}
 \noindent\textbf{User Identification.}
 Given a user, an honest RP with $ID_{RP}$ always deterministically derives an identical account from different identity tokens binding $PID_U$ and $PID_{RP}$.
 That is,
@@ -169,7 +165,6 @@ Thus, the calculated account is always exactly the authenticated user's account 
 %     so it cannot construct an identity token acceptable to the RP.
 %
 
-\vspace{1mm}
 \noindent\textbf{Confidentiality.}
 No event leaks the identity tokens to any malicious entity other than the authenticated user and the designated RP.
 First of all, the communications among the IdP, RPs and users,
@@ -188,16 +183,15 @@ So only the designated target RP that holds $Enpt_{RP}$ and $ID_{RP}$,
 
 %The detailed process of proof is shown in Appendix.
 
-\vspace{1mm}
 \noindent\textbf{Integrity.}
 The identity token binds $Acct$ and $ID_{RP}$ implicitly,
-    and any breaking will result in some failed check or verification in the login flow.
-It is ensured by the IdP's signatures:
-    the identity token binding $PID_U$ and $PID_{RP}$ is signed by the IdP.
+    and any breaking results in some failed check or verification in the login flow.
+%It is ensured by the IdP's signatures:
+The identity token binding $PID_U$ and $PID_{RP}$ is signed by the IdP.
 According to the proof of RP designation,
     there is no $t' \neq t$ but satisfying that $PID_{RP} = [t]ID_{RP_j} = [tr]G = [t'r']G = [t']ID_{RP_{j'}}$.
 That is, the identity token explicitly binding $PID_U$ and $PID_{RP}$,
-    matches \emph{only} one $ID_{RP}$ and also \emph{only} one $Acct = [t^{-1}]PID_{U}$.
+    matches \emph{only} one $ID_{RP}$ and then also \emph{only} one $Acct = [t^{-1}]PID_{U}$.
 Thus,
     $Acct$ and $ID_{RP}$ are actually bound by the IdP's signatures,
         due to the one-to-one mapping between (\emph{a}) the pair of $Acct$ and $ID_{RP}$ and (\emph{b}) the triad of $PID_U$, $PID_{RP}$, and $t$.
@@ -260,7 +254,6 @@ We locate the generation of an identity token, and trace to all places
 \subsection{Privacy}
 UPPRESSO effectively prevents the attacks of IdP-based login tracing and RP-based identity linkage.
 
-\vspace{1mm}
 \noindent\textbf{IdP-based Login Tracing.}
 The information accessible to the IdP and derived from the RP's identity,
     is only $PID_{RP}$, where $PID_{RP} = [t]ID_{RP}$ is calculated by the user.
@@ -271,7 +264,6 @@ Because  (\emph{a}) $t$ is a number randomly chosen from $\mathbb{Z}_n$ and kept
 So, the IdP cannot infer the RP's identity or link any pair of $PID_{RP}^i$ and $PID_{RP}^{i'}$,
     and the IdP-based login tracing is impossible.
 
-\vspace{1mm}
 \noindent\textbf{RP-based Identity Linkage.}
 We prove UPPRESSO prevents the RP-based identity linkage,
  based on the elliptic curve decision Diffie-Hellman (ECDDH) assumption. %\cite{GoldwasserK16}.

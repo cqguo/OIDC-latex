@@ -39,7 +39,7 @@ Table \ref{tbl:notations-protocol} lists the notations,
     {$SK$, $PK$} & {The IdP's key pair, a private key and a public key, to sign and verify identity tokens and RP certificates.} \\ \hline
 %    {$T$} & {The trapdoor to derive $Account$: $T=N_U^{-1} \bmod n$.} \\ \hline
     {$Enpt_{RP_j}$} & {The $j$-th RP's endpoint, to receive the identity tokens.} \\ \hline
-    {$Cert_{RP_j}$} & {An RP certificate signed by the IdP, binding $ID_{RP_j}$ and $Enpt_{RP_j}$.} \\ \hline
+    {$Cert_{RP_j}$} & {A signed RP certificate, binding $ID_{RP_j}$ and $Enpt_{RP_j}$.} \\ \hline
 %    {$PEnpt_{U,j}^i$} & {A user-generated random "pseudo-endpoint'', in the user's $i$-th login instance to the $j$-th RP.} \\ \hline
     \end{tabular}
     \label{tbl:notations-protocol}
@@ -118,7 +118,7 @@ From Equations \ref{equ:PIDRP}, \ref{equ:PIDU} and \ref{equ:Account}, it is deri
 The RP derives the \emph{identical permanent account} from different identity tokens in multiple login instances,
     with the help of $t$ from the user.
 Given a user, the accounts at different RPs are inherently unique;
-at the same time, given an RP, the accounts of different users are also inherently unique.
+while, given an RP, the accounts of different users are also inherently unique.
 Moreover,
     due to the elliptic curve discrete logarithm problem (ECDLP),
 it is impossible for the RP to derive $ID_U$ from either $PID_U$ or $Acct$,
@@ -184,23 +184,22 @@ The IdP's public key is set in the IdP script, so
 After using the extracted $ID_{RP}$ in identity transformations
     and receiving an identity token from the IdP,
     the IdP script needs to ensure the RP script will forward this token to $Enpt_{RP}$,
-        which is bound together with $ID_{RP}$ in the RP certificate.
-The IdP and RP scripts communicate with each other within the user browser through the \verb+postMessage+ HTML5 API,
+        which is bound with $ID_{RP}$ in the RP certificate.
+The scripts communicate with each other within the browser through the \verb+postMessage+ HTML5 API,
 %To avoid the honest user sending the identity token to an adversary,
-and the receiver of an identity token (i.e., the RP script)
+and the receiver (i.e., the RP script)
  is restricted by the \verb+postMessage+ targetOrigin mechanism \cite{postm-targeto}.
-That is, when the IdP script sends identity tokens through \verb+postMessage+,
+When the IdP script sends identity tokens,
  the receiver's origin is set as a parameter, e.g., \verb+window.opener.postMessage(tkn, 'https://RP.com')+,
-  so only the script downloaded from this origin is a legal receiver.
-The origin parameter consists of
+  so only a script from this origin is a legal receiver.
+An origin parameter consists of
     the protocol (i.e., \verb+https://+),
     the domain  (i.e., \verb+RP.com+)
-    and a port which may be implicit or explicit.
+    and a port which may be implicit.
 %The \emph{RP certificates} deals with the problem of mapping an identity proof with its targeting RP.
 %That is, the IdP script derives the RP's $ID_{RP}$ and origin from the RP certificate, while the $PID_{RP}$ is generated with this $ID_{RP}$. Thus, the IdP script always know the targeting RP of an identity proof, therefore, the \verb+postMessage+ mechanism can guarantee that the identity proof would not be sent to the adversary.
 
 Finally,
-%in a login instance,
     the browser downloads the RP script when visiting an RP,
      and this RP script opens a new window that will download the IdP script.
 We shall prevent the referer leakage when the IdP script is downloaded.
@@ -254,10 +253,8 @@ We tested it in popular browsers including Chrome, Safari, Edge, Opera and Firef
 
 
 
-
 \subsection{The UPPRESSO Protocols}
 \label{implementations}
-
 
 \begin{figure*}[bt]
   \centering
@@ -265,6 +262,7 @@ We tested it in popular browsers including Chrome, Safari, Edge, Opera and Firef
   \caption{The SSO login flow of UPPRESSO.}
   \label{fig:process}
 \end{figure*}
+
 
 \noindent \textbf{System Initialization.}
 The IdP generates a key pair ($SK$, $PK$) to sign/verify identity tokens and RP certificates.
@@ -484,10 +482,10 @@ The operations of identity-token generation and $Acct$ calculation,
                     to a local account at the RP.
 
 Finally,
-    this compatibility is experimentally confirmed by our prototype implementation,
-     that is, only 20 lines of Java code in MITREid Connect \cite{MITREid},        an open-source system of OIDC,
+    this compatibility is experimentally confirmed by our prototype implementation:
+     only 20 lines of Java code in MITREid Connect \cite{MITREid}, an open-source OIDC system,
  are modified
-    to build the IdP of UPPRESSO (see Section \ref{subsec:proto-imple} for more details).
+    to build the IdP of UPPRESSO (see Section \ref{subsec:proto-imple}).
 %It will help the adoption and deployment of UPPRESSO.
 
 %It follows a similar logic flow as OIDC in SSO login and only requires small modifications to perform identifier transformation.
