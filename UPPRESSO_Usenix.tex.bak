@@ -60,20 +60,6 @@
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 % correct bad hyphenation here
 \hyphenation{op-tical net-works semi-conduc-tor}
 
@@ -85,14 +71,13 @@
 
 \maketitle
 \begin{abstract}
-Single sign-on (SSO) allows a user to maintain only the credential at the identity provider (IdP), instead of one credential for each relying party (RP),
+Single sign-on (SSO) allows a user to maintain only the credential at the identity provider (IdP),
+ %instead of one credential for each relying party (RP),
     to login to numerous RPs.
-However, SSO introduces extra privacy leakage threats, compared with traditional authentication mechanisms,
+However, SSO introduces extra privacy threats, compared with traditional authentication mechanisms,
  as (\emph{a}) the IdP could track all RPs which a user is visiting,
  and (\emph{b}) collusive RPs could learn a user's online profile by linking his identities across these RPs.
-%Several privacy-preserving SSO solutions have been proposed to defend against either the curious IdP or collusive RPs,
-% but none of them well addresses both of these privacy leakage threats at the same time.
-
+%
 This paper proposes a privacy-preserving SSO system, called \emph{UPPRESSO},
  to protect a user's login activities against both the curious IdP and collusive RPs.
 We analyze the identity dilemma between the security requirements and these privacy concerns,
@@ -100,10 +85,9 @@ We analyze the identity dilemma between the security requirements and these priv
 In each login instance of UPPRESSO,
     an \emph{ephemeral pseudo-identity} (denoted as $PID_{RP}$) of the RP,
      %which the user is attempting to visit,
-        is firstly negotiated between the RP and the user.
-Then,
-    $PID_{RP}$ is sent to the IdP and designated in the identity token,
-        so that the IdP is not aware of the visited RP.
+        is negotiated between the RP and the user.
+$PID_{RP}$ is then sent to the IdP and designated in the identity token,
+        so the IdP is not aware of the visited RP.
 Meanwhile,
     $PID_{RP}$ is also used by the IdP to transform the \emph{permanent user identity} $ID_U$
         into an \emph{ephemeral user pseudo-identity} (denoted as $PID_U$)
@@ -115,15 +99,9 @@ Given a user, the account at each RP is unique and different from $ID_U$,
     so collusive RPs cannot link his identities across multiple RPs.
 %To the best of our knowledge,
 %    this is the first practical SSO solution which solves the privacy problems caused by both the curious IdP and collusive RPs.
-%These identity transformations are independent of the authentication between a user and the IdP,
-%    so UPPRESSO works compatibly with various types of user credentials (e.g., password,
-%one-time password, multi-factor authentication, and smart card)
-%as widely-used OpenID Connect (OIDC), OAuth 2.0 and SAML.
 
 We build the UPPRESSO prototype system for web applications
     on top of MITREid Connect, an open-source implementation of OIDC.
-%     the function of RP Dynamic Registration is used to support ephemeral $PID_{RP}$,
-%     while the function of Core Sign-On is slightly modified to calculate $PID_U$ and $Acct$.
 The extensive evaluation shows that UPPRESSO
         fulfills the requirements of both security and privacy
         and introduces reasonable overheads.

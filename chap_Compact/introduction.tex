@@ -37,7 +37,7 @@ So a user keeps only one credential for the IdP, instead of several credentials 
 The SSO login flow for web applications works as below.
 For example, in the widely-used OIDC systems,
      a user sends a login request to the target RP, % (Step 1),
-and the RP constructs an identity-token request with its identity (denoted as $ID_{RP}$ in this paper) and redirects the request to the IdP.
+and the RP constructs an identity-token request with its identity (denoted as $ID_{RP}$ in this paper) and redirects this request to the IdP.
 After properly authenticating the user,
  the IdP issues an identity token explicitly binding the identities of both the user and the RP (i.e., $ID_U$ and $ID_{RP}$),
     which is returned to the user and forwarded to the RP. %in Step 5.
@@ -51,8 +51,7 @@ The attributes (e.g., age, hobby, education, and nationality) are maintained at 
 
 %However, SSO systems have been continuously found vulnerable and insecure \cite{WangCW12,ccsSunB12,SomorovskyMSKJ12,ArmandoCCCPS13,DiscoveringJCS,dimvaLiM16,WangZLG16,MainkaMS16, MainkaMSW17,YangLCZ18}.
 The wide adoption of SSO raises concerns on user privacy \cite{maler2008venn,NIST2017draft,BrowserID,SPRESSO},
- because SSO facilitates curious parties to track which RPs a user visits.
-%As shown in Fig. \ref{fig:OpenID},
+ because SSO facilitates curious parties to track a user's login activities.
 In order to issue identity tokens,
 in each login instance
  the IdP is aware of when and to which RP a user attempts to login.
@@ -65,12 +64,13 @@ If the IdP encloses an identical user identity in the tokens for a user to visit
      collusive RPs could link these login instances across the RPs, %and track the user's activities
       to learn his online profile \cite{maler2008venn}.
 We denote this privacy risk as the {\em RP-based identity linkage}.
+%These privacy threats result from the designs of SSO protocols \cite{NIST2017draft},
+%     but not any specific implementations of SSO services.
+
 %This threat is usually mitigated by pairwise pseudonymous identifiers (PPIDs) in practice \cite{NIST2017draft,OpenIDConnect, SAMLIdentifier}.
 %Popular SSO protocols leak user privacy in different ways,
-It is worth noting that
-    \emph{these two kinds of privacy threats result from the designs of SSO protocols} \cite{NIST2017draft},
-     but not any specific implementations of SSO services.
 
+%
 %%As SSO becomes a popular safeguard for various privacy-sensitive web services, the privacy concern is considered more prominent and severe than it was in the past.
 %Recently, many IdPs have taken user privacy in SSO into serious consideration and offered new protection against RP-based identity linkage.
 %For example, Figure \ref{fig:wechat} shows the IdP service provided by WeChat, one of the most popular instant messaging applications in China.
@@ -112,13 +112,13 @@ Privacy-preserving SSO solutions try to provide comprehensive functions of ident
 The following features of SSO are usually supported:
 (\emph{a}) \emph{User identity at an RP},
     i.e., an identity token enables an RP to uniquely identify every user,
-(\emph{b}) \emph{Only user authentication to the IdP}, i.e.,
+(\emph{b}) \emph{User authentication only to the IdP}, i.e.,
     the steps of user authentication between a user and the RP are eliminated,
     and a user only needs to hold the secret credential to authenticate himself to the IdP,
 %    different types of credentials are supported in the authentication between the IdP and users,
 and (\emph{c}) \emph{Provision of IdP-confirmed user attributes},
     i.e., a user maintains his attributes at the trusted IdP,
-    and RP-requested attributes are provided with the user's identity
+    and RP-requested attributes are provided %with the user's identity
             after authorized by the user.
 Meanwhile,
     the privacy threats from different types of adversaries are considered:
@@ -142,7 +142,7 @@ We conceptualize the privacy requirements of SSO into
 and propose an Untraceable and Unlinkable Privacy-PREserving Single Sign-On (UPPRESSO) protocol
   to protect user privacy.
 In particular, we design three identity-transformation functions in the SSO login flow.
-In each login instance of UPPRESSO,
+In each login instance,
         $ID_{RP}$ is firstly transformed to an ephemeral $PID_{RP}$  cooperatively by the RP and the user.
 Then, $PID_{RP}$ is sent to the IdP to transform $ID_U$ to ephemeral $PID_U$,
     so that the identity token binds $PID_U$ and $PID_{RP}$, instead of permanent $ID_U$ and $ID_{RP}$.
@@ -150,8 +150,8 @@ Finally,
     after receiving an identity token with matching $PID_{RP}$,
         the RP transforms $PID_U$ into an account.
 Given a user, this account is (\emph{a}) identical across multiple login instances and (\emph{b}) unique at each RP.
-UPPRESSO prevents the IdP from tracking a user's login activities because it receives only $PID_{RP}$ in the identity-token request,
-    and collusive RPs from linking a user's identities across these RPs because every account is unique.
+UPPRESSO prevents the IdP-based login tracing because it receives only $PID_{RP}$ in the identity-token request,
+    and the RP-based identity linkage because every account is unique.
 %This prevents both IdP-based login tracing by hiding the RPs' identities from the IdP and RP-based identity linkage by hiding the user's identity from the RPs.
 %Meanwhile, an RP is still able to link multiple login sessions of the same user by converting the user's different pseudo-identities to an invariant user account using a special identifier-transformation function and the trapdoors, without knowing the user's real identity in the IdP.
 % Finally, we formally prove that the accounts of the same user at different RPs are independent and cannot be correlated by collusive RPs (see our proof in Section \ref{sec:privacy}).
@@ -163,9 +163,8 @@ UPPRESSO prevents both the IdP-based login tracing and the RP-based identity lin
     and the calculation of accounts.
 The transformation functions work compatibly with
     the login flows of widely-used SSO protocols \cite{OpenIDConnect,rfc6749,SAML,NIST2017draft},
-    so the benefits of SSO protocols are kept in UPPRESSO
-        and it is very easy to implement UPPRESSO on top of OIDC systems.
-%We do not solve the collusive attacks by the IdP and RPs.
+    so the benefits of SSO protocols are kept in UPPRESSO.
+ %       and it is very easy to implement UPPRESSO on top of OIDC systems.
 
 
 We summarize our contributions as follows.
@@ -190,11 +189,11 @@ We build the UPPRESSO prototype system for web applications,
 The experimental performance evaluations show that UPPRESSO introduces reasonable overheads.
 \end{itemize}
 
-%The remainder is organized as follows.
+The remainder is organized as follows.
 Section \ref{sec:background} presents
     the background and related works.
 The identity dilemma of privacy-preserving SSO is analyzed  in Section \ref{sec:challenge},
-    and Section \ref{sec:UPPRESSO} presents the detailed designs of UPPRESSO.
+    and Section \ref{sec:UPPRESSO} presents the designs of UPPRESSO.
 The properties of security and privacy are analyzed in Section \ref{sec:analysis}.
 We explain the prototype implementation and experimental evaluations in Section \ref{sec:implementation},
  and discuss extended issues in Section \ref{sec:discussion}.
