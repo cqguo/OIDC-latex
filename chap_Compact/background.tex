@@ -58,6 +58,43 @@ The user's operations including redirection, authorization, and forwarding,
 
 %extracts user's identifier and returns the authentication result to the user (Step 7).
 
+
+\begin{table*}[tb]
+\footnotesize
+    \caption{Privacy-Preserving Solutions of SSO and Federated Identity Management.}
+    \centering
+    \begin{tabular}{|c|c|c|c|c|c|c|}
+  \hline
+  \multirow{3}*{\textbf{~~Solution~~}} &
+  \multicolumn{3}{c|}{\textbf{SSO Feature} - supported $\CIRCLE$, unsupported $\Circle$, or partially $\LEFTcircle$} & \multicolumn{3}{c|}{\textbf{Privacy Threat} - prevented $\CIRCLE$ or not $\Circle$} \\ \cline{2-7}
+  & User Identity & User Authentication & IdP-Confirmed Selective  & IdP-based & RP-based & Collusive Attack \\
+  & at an RP & Only to the IdP &  Attribute Provision & Login Tracing & Identity Linkage & by the IdP and RPs \\\hline\hline
+  OIDC with PPID \cite{NIST2017draft} & $\CIRCLE$ & $\CIRCLE$ & $\CIRCLE$ & $\Circle$ & $\CIRCLE$ & - \\ \hline
+  BrowserID \cite{BrowserID} & $\CIRCLE$ & $\LEFTcircle$$^1$ & $\Circle$ & $\CIRCLE$ & $\Circle$ & - \\ \hline
+  SPRESSO \cite{SPRESSO} & $\CIRCLE$ & $\CIRCLE$ & $\Circle$$^2$ & $\CIRCLE$ & $\Circle$ & - \\ \hline
+  PRIMA \cite{prima} & $\CIRCLE$ & $\Circle$ & $\CIRCLE$ & $\CIRCLE$ & $\Circle$ & - \\ \hline
+  PseudoID \cite{PseudoID} & $\CIRCLE$ & $\Circle$ & $\Circle$$^3$ & $\CIRCLE$ & $\CIRCLE$ & $\CIRCLE$ \\ \hline
+  EL PASSO \cite{ELPASSO} & $\CIRCLE$ & $\Circle$ & $\CIRCLE$ & $\CIRCLE$ & $\CIRCLE$ & $\CIRCLE$ \\ \hline
+  UnlimitID \cite{UnlimitID} & $\CIRCLE$ & $\Circle$ & $\CIRCLE$ & $\CIRCLE$ & $\CIRCLE$ & $\CIRCLE$ \\ \hline
+  Opaak \cite{Opaak} & $\LEFTcircle$$^4$ & $\Circle$ & $\Circle$ & $\CIRCLE$ & $\CIRCLE$ & $\CIRCLE$ \\ \hline
+  Fabric Idemix \cite{hyperledge-idemix} & $\Circle$$^5$ & $\Circle$ & $\CIRCLE$ & $\CIRCLE$ & $\CIRCLE$ & $\CIRCLE$ \\ \hline
+  U-Prove \cite{uprov} & $\CIRCLE$ & $\Circle$ & $\LEFTcircle$$^6$ & $\CIRCLE$ & $\CIRCLE$ & $\CIRCLE$ \\ \hline
+  UPPRESSO & $\CIRCLE$ & $\CIRCLE$ & $\CIRCLE$ & $\CIRCLE$ & $\CIRCLE$ & $\Circle$ \\ \hline
+\end{tabular}
+    \label{tbl:comparison-protocol}
+\flushleft
+{\footnotesize
+1. A BrowserID user generates an \emph{ephemeral} private key to sign every ``subsidiary'' token,
+ which is verified by the RP.\\
+2. SPRESSO can be extended to provide user attributes in then tokens, while the prototype does not support it.\\
+3. Blindly-signed user attributes can be selectively provided using zero-knowledge proofs,
+    but not implemented in the prototype \cite{PseudoID}.\\
+4. Opaak supports exclusive pseudonym options: (\emph{a}) linkable within an RP but unlinkable across multiple RPs and (\emph{b}) unlinkability for any two actions.\\
+5. In the original design of Idemix \cite{idemix}, every user logins to an RP with a unique account.\\
+6. A U-Prove token may contain some attributes \emph{invisible} to the IdP, in addition the ones confirmed by the IdP.}
+\end{table*}
+
+
 The following features are supported by widely-used popular SSO solutions \cite{NIST2017draft,OpenIDConnect,rfc6749,SAML,SAMLIdentifier}.
 \\\textbf{User Identity at an RP.}
 The identity tokens facilitate the target RP to identify each user as a unique account at this RP,
@@ -107,43 +144,6 @@ So no distinctive attributes such as telephone number, Email, etc.,
 %
 
 %UPPRESSO leverages this function and slightly modifies the dynamic registration process to implement the {\em $PID_{RP}$ registration} process (see details in Section \ref{sec:UPPRESSO}.C), which allows an RP to generate different privacy-preserving RP identifiers and register them with the IdP.
-
-
-\begin{table*}[tb]
-\footnotesize
-    \caption{Privacy-Preserving Solutions of SSO and Federated Identity Management.}
-    \centering
-    \begin{tabular}{|c|c|c|c|c|c|c|}
-  \hline
-  \multirow{3}*{\textbf{~~Solution~~}} &
-  \multicolumn{3}{c|}{\textbf{SSO Feature} - supported $\CIRCLE$, unsupported $\Circle$, or partially $\LEFTcircle$} & \multicolumn{3}{c|}{\textbf{Privacy Threat} - prevented $\CIRCLE$ or not $\Circle$} \\ \cline{2-7}
-  & User Identity & User Authentication & IdP-Confirmed Selective  & IdP-based & RP-based & Collusive Attack \\
-  & at an RP & Only to the IdP &  Attribute Provision & Login Tracing & Identity Linkage & by the IdP and RPs \\\hline\hline
-  OIDC with PPID \cite{NIST2017draft} & $\CIRCLE$ & $\CIRCLE$ & $\CIRCLE$ & $\Circle$ & $\CIRCLE$ & - \\ \hline
-  BrowserID \cite{BrowserID} & $\CIRCLE$ & $\LEFTcircle$$^1$ & $\Circle$ & $\CIRCLE$ & $\Circle$ & - \\ \hline
-  SPRESSO \cite{SPRESSO} & $\CIRCLE$ & $\CIRCLE$ & $\Circle$$^2$ & $\CIRCLE$ & $\Circle$ & - \\ \hline
-  PRIMA \cite{prima} & $\CIRCLE$ & $\Circle$ & $\CIRCLE$ & $\CIRCLE$ & $\Circle$ & - \\ \hline
-  PseudoID \cite{PseudoID} & $\CIRCLE$ & $\Circle$ & $\Circle$$^3$ & $\CIRCLE$ & $\CIRCLE$ & $\CIRCLE$ \\ \hline
-  EL PASSO \cite{ELPASSO} & $\CIRCLE$ & $\Circle$ & $\CIRCLE$ & $\CIRCLE$ & $\CIRCLE$ & $\CIRCLE$ \\ \hline
-  UnlimitID \cite{UnlimitID} & $\CIRCLE$ & $\Circle$ & $\CIRCLE$ & $\CIRCLE$ & $\CIRCLE$ & $\CIRCLE$ \\ \hline
-  Opaak \cite{Opaak} & $\LEFTcircle$$^4$ & $\Circle$ & $\Circle$ & $\CIRCLE$ & $\CIRCLE$ & $\CIRCLE$ \\ \hline
-  Fabric Idemix \cite{hyperledge-idemix} & $\Circle$$^5$ & $\Circle$ & $\CIRCLE$ & $\CIRCLE$ & $\CIRCLE$ & $\CIRCLE$ \\ \hline
-  U-Prove \cite{uprov} & $\CIRCLE$ & $\Circle$ & $\LEFTcircle$$^6$ & $\CIRCLE$ & $\CIRCLE$ & $\CIRCLE$ \\ \hline
-  UPPRESSO & $\CIRCLE$ & $\CIRCLE$ & $\CIRCLE$ & $\CIRCLE$ & $\CIRCLE$ & $\Circle$ \\ \hline
-\end{tabular}
-    \label{tbl:comparison-protocol}
-\flushleft
-{\footnotesize
-1. A BrowserID user generates an \emph{ephemeral} private key to sign every ``subsidiary'' token,
- which is verified by the RP.\\
-2. SPRESSO can be extended to provide user attributes in then tokens, while the prototype does not support it.\\
-3. Blindly-signed user attributes can be selectively provided using zero-knowledge proofs,
-    but not implemented in the prototype \cite{PseudoID}.\\
-4. Opaak supports exclusive pseudonym options: (\emph{a}) linkable within an RP but unlinkable across multiple RPs and (\emph{b}) unlinkability for any two actions.\\
-5. In the original design of Idemix \cite{idemix}, every user logins to an RP with a unique account.\\
-6. A U-Prove token may contain some attributes \emph{invisible} to the IdP, in addition the ones confirmed by the IdP.}
-\end{table*}
-
 
 
 \subsection{Privacy-Preserving Solutions of SSO and Federated Identity Management}

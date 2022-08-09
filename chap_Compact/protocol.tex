@@ -133,13 +133,13 @@ Section \ref{sec:analysis} presents the detailed proofs.
 
 
 \subsection{The Designs Specific for Web Applications}
-We further propose the designs specific for web applications,
-and these designs enable UPPRESSO to provide SSO services for users with commercial-off-the-shelf (COTS) browsers.
+We propose the designs specific for web applications,
+enabling UPPRESSO to work with commercial-off-the-shelf (COTS) browsers.
 %More efficient but less portable implementations with browser extensions %and/or plug-ins
 % are discussed in Section \ref{sec:discussion}.
 %If a user visits the IdP and RPs through a client software,
 %        the specific designs become unnecessary and the performance will be improved.
-
+%
 First of all, in UPPRESSO the IdP is not aware of the visited RP,
  so the user agents (or browsers) have to deal with the forwarding of identity tokens
     to the target RP, as well as the identity transformations.
@@ -148,47 +148,46 @@ On the contrary,
 For example,
     in the OIDC services, when an RP registers itself at the IdP, the \verb+redirect_uri+ parameter
     is set as the endpoint URL to receive tokens  \cite{OpenIDConnect}.
-Then, in an OIDC login instance, when the IdP wants to transmit identity tokens to an RP,
+Then, %in an OIDC login instance,
+ when the IdP wants to transmit identity tokens to an RP,
     it utilizes the HTTP 302 redirection with this endpoint as the target URL in the HTTP response,
-     and then the user browser will forward it to the RP.
-This verified \verb+redirect_uri+  ensures that an identity token is sent to the target RP,
+     and the user browser will forward it to the RP.
+This verified \verb+redirect_uri+  ensures an identity token is sent to the target RP,
    % which is designated in the token,
-and prevents any man-in-the-middle attackers from intercepting this token.
+and prevents attackers from intercepting this token.
 
-In UPPRESSO such functions of a user agent are implemented by web scripts within the browser,
-    and more efficient but less portable implementations with browser extensions
- are discussed in Section \ref{sec:discussion}.
+In UPPRESSO such functions of a user agent are implemented by web scripts within browsers.
+Section \ref{sec:discussion} discusses more efficient but less portable implementations with browser extensions.
 Two scripts are downloaded from the visited RP and the IdP, respectively,
     and each is responsible for the communications with the origin web server.
-% to follow the \emph{same-origin policy} (SOP) \cite{sop}.
-The RP script is downloaded, when the user visits the RP,
-    and it launches the IdP script and prepares $ID_{RP}$ and $Enpt_{RP}$ to the IdP script.
+The RP script is downloaded when the user visits the RP,
+    and it launches the IdP script and prepares $ID_{RP}$ and $Enpt_{RP}$ for the IdP script.
 Only the RP script is not enough to implement the user agent of UPPRESSO;
     otherwise, the RP script will leaks its origin to the IdP web server
     (e.g., if it requests the identity token,
     an HTTP request launched by the RP script will
 automatically carry an HTTP \verb+referer+ header, which discloses the RP domain).
-Moreover, a script downloaded from the honest IdP,
-to ensure confidentiality of identity tokens (i.e., it is sent to only the RP designated in this token)
-and interact with the user for the authorization of user attributes,
-    for the visited RP might be malicious.
+Moreover, a script downloaded from the honest IdP
+ensures confidentiality of identity tokens (i.e., it is sent to only the designated RP),
+%and interacts with the user for the authorization of user attributes,
+    for the RP might be malicious.
 
 \emph{RP certificates} are designed to verify the endpoint of an RP.
-An RP certificate is a document signed by the IdP during the RP initial registration,
+An RP certificate is signed by the IdP during the RP registration,
      binding the RP's identity and its endpoint (i.e., $ID_{RP}$ and $Enpt_{RP}$).
-In a login instance,
+In a login instance
     the RP will provide its certificate through the RP script.
-The IdP script from the honest IdP,
+The IdP script %from the honest IdP,
     verifies the RP certificate to extract $ID_{RP}$ and $Enpt_{RP}$.
-The IdP's public key is set in the IdP script, so that
- the user agent does not configure anything locally,
-    as it does in widely-adopted SSO systems.
+The IdP's public key is set in the IdP script, so 
+ a user agent does not configure anything locally,
+    as it does in popular SSO systems.
 
 %Thus, to avoid the IdP server obtaining any evidence about the RP's identity and provide IdP's script with the RP certificate, the RP's script is also required to transmit the certificate to IdP script after it is downloaded from IdP server.
 
 %As the server and its script would only communicate with each other based on HTTPS channel, the adversary cannot steal the identity token in such ways.
 %However, while the IdP sends the identity token to RP, the identity token would be transmitted from IdP script to RP script during the SSO flow, that should be well protected with the RP certificate.
-After using the extracted $ID_{RP}$ in identity-transformation functions
+After using the extracted $ID_{RP}$ in identity transformations
     and receiving an identity token from the IdP,
     the IdP script needs to ensure the RP script will forward this token to $Enpt_{RP}$,
         which is bound together with $ID_{RP}$ in the RP certificate.
@@ -207,9 +206,9 @@ The origin parameter consists of
 %That is, the IdP script derives the RP's $ID_{RP}$ and origin from the RP certificate, while the $PID_{RP}$ is generated with this $ID_{RP}$. Thus, the IdP script always know the targeting RP of an identity proof, therefore, the \verb+postMessage+ mechanism can guarantee that the identity proof would not be sent to the adversary.
 
 Finally,
-in a login instance,
-    the browser downloads the RP script when visiting an RP, and
-this RP script opens a new window that will download the IdP script.
+%in a login instance,
+    the browser downloads the RP script when visiting an RP,
+     and this RP script opens a new window that will download the IdP script.
 We shall prevent the referer leakage when the IdP script is downloaded.
 Generally, when a browser window visits another website not belonging to its opener's origin,
  the HTTP request to this website will automatically carry the \verb+referer+ header (i.e., the opener's origin).
@@ -274,16 +273,8 @@ We have tested it in popular browsers including Chrome, Safari, Edge, Opera and 
 \end{figure*}
 
 \noindent \textbf{System Initialization.}
-%In particular, the IdP %chooses $L$,
-%generates a large prime $p$, and a prime factor $q$ of $p-1$
-% and a generator $g$ of order $q$
-%as the parameters of the discrete logarithm problem. % \cite{gallagher2013digital}.
 The IdP generates a key pair ($SK$, $PK$) to sign/verify identity tokens and RP certificates.
-%The lengths of %$p$, $q$ and
-%($SK$, $PK$) should satisfy the required security strength.
 The IdP keeps $SK$ secret, while $PK$ is publicly known.
-%The values of $p$, $q$, $g$ remain the same during the full lifecycle of an SSO system.
-%While, the asymmetric key pair ($SK$, $PK$) will be updated when necessary. For example, when $SK$ is leaked, IdP must update ($SK$,$PK$).
 
 
 \vspace{1mm}
@@ -292,6 +283,8 @@ The IdP keeps $SK$ secret, while $PK$ is publicly known.
 Each RP initially registers itself at the IdP to obtain $ID_{RP}$
  and its RP certificate $Cert_{RP}$ as follows:
 \begin{enumerate}
+\setlength{\topsep}{0pt}
+\setlength{\partopsep}{0pt}
 \setlength{\itemsep}{0pt}
 \setlength{\parsep}{0pt}
 \setlength{\parskip}{0pt}
@@ -356,6 +349,8 @@ Each solid horizontal line means some messages between the user and the IdP (or 
 \noindent 1. {\em Script Downloading.}
 The browser downloads the scripts from the IdP and the visited RP.
 \begin{itemize}
+\setlength{\topsep}{0pt}
+\setlength{\partopsep}{0pt}
 \setlength{\itemsep}{0pt}
 \setlength{\parsep}{0pt}
 \setlength{\parskip}{0pt}
@@ -374,6 +369,8 @@ The redirection to the IdP downloads the IdP script.
 \noindent 2. {\em RP Identity Transformation.}
 The user and the RP negotiate $PID_{RP} = [t]{ID_{RP}}$.
 \begin{itemize}
+\setlength{\topsep}{0pt}
+\setlength{\partopsep}{0pt}
 \setlength{\itemsep}{0pt}
 \setlength{\parsep}{0pt}
 \setlength{\parskip}{0pt}
@@ -396,6 +393,8 @@ The RP replies with $Cert_{RP}$, which is then transmitted from the RP script to
 \noindent 3. {\em Identity-Token Generation.}
 The IdP calculates $PID_U = [ID_U]{PID_{RP}}$ and signs the identity token. % The processes are as follows.
 \begin{itemize}
+\setlength{\topsep}{0pt}
+\setlength{\partopsep}{0pt}
 \setlength{\itemsep}{0pt}
 \setlength{\parsep}{0pt}
 \setlength{\parskip}{0pt}
@@ -425,6 +424,8 @@ The IdP then signs an identity token $[PID_{RP}, PID_U, Issuer, Validity, Attr]_
 \noindent 4. {\em $Acct$ Calculation.}
 The RP receives the identity token and allows the user to login.
 \begin{itemize}
+\setlength{\topsep}{0pt}
+\setlength{\partopsep}{0pt}
 \setlength{\itemsep}{0pt}
 \setlength{\parsep}{0pt}
 \setlength{\parskip}{0pt}
