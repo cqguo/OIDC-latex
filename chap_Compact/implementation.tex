@@ -21,7 +21,7 @@ RSA-2048 and SHA-256 are adopted as the signature algorithm and the hash functio
 
 The IdP is built on top of MITREid Connect \cite{MITREid},
     an open-source OIDC Java implementation, %certificated by the OpenID Foundation \cite{OIDF},
-    and only small modifications are needed as follows.
+    and only small modifications are needed.
 We add only 3 lines of Java code to calculate $PID_U$,
     and 20 lines to modify the way to send identity tokens.
 The calculations of $ID_{RP}$ and $PID_U$ are implemented based on built-in Java cryptographic libraries.
@@ -29,7 +29,7 @@ The calculations of $ID_{RP}$ and $PID_U$ are implemented based on built-in Java
 We implemented the user-side functions by the IdP and RP scripts,
      containing about 160 and 140 lines of JavaScript code, respectively.
 %to provide the functions in Steps 2.1, 2.3, and 4.3.
-The cryptographic computations, e.g., $Cert_{RP}$ verification and $PID_{RP}$ negotiation, are implemented based on jsrsasign \cite{jsrsasign}, an efficient JavaScript cryptographic library.
+The cryptographic computations, e.g., $Cert_{RP}$ verification and $PID_{RP}$ negotiation, are finished based on jsrsasign \cite{jsrsasign}, an efficient JavaScript cryptographic library.
 %This chrome extension requires permissions  \emph{chrome.tabs} and \emph{chrome.windows} to obtain the RP's URL from the browser's tab,  and \emph{chrome.webRequest} to intercept, block, modify requests to the IdP or RP \cite{chromeExtension}.
 
 %send HTTPS request/reply and hijack the HTTPS responses, to obtain the RP's URL and communicate with IdP and RP.
@@ -40,11 +40,11 @@ The cryptographic computations, e.g., $Cert_{RP}$ verification and $PID_{RP}$ ne
 
 %Moreover, the chrome extension needs to construct cross-origin requests to communicate with the RP and IdP, which is forbidden by the default same-origin security policy. Therefore it is required to add the HTTP header \verb+Access-Control-Allow-Origin+ in the response of IdP and RP to accept only the request from the origin \verb+chrome-extension://chrome-id+ (\verb+chrome-id+ is uniquely assigned by the Google).
 
-We provide a Java SDK for RPs in UPPRESSO.
+We provide a Java RP SDK.
 The SDK provides two functions to encapsulate the protocol steps:
  one to request identity tokens,
-    and the other to derive the accounts from identity tokens.
-The SDK is implemented based on the Spring Boot framework  with about 500 lines of Java code
- and cryptographic computations are implemented based on the Spring Security library.
-An RP invokes these two functions for the integration,
+    and the other to derive the accounts. %from identity tokens.
+It is implemented based on the Spring Boot framework  with about 500 lines of Java code
+ and cryptographic computations are finished based on the Spring Security library.
+An RP invokes these functions for the integration,
     by less than 10 lines of Java code.

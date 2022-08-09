@@ -22,7 +22,7 @@ Although the prototype runs for web applications,
 %In this paper, the functions are implemented based on the elliptic curve algorithm and the mechanism provided by OIDC system.
 %However, the transformation functions can also be implemented based on other mechanisms according to the protocol and environment, for example, the TPM may be used to take responsibility to transform identities.
 
-\vspace{1mm}\noindent{\textbf{Scalability.}} Adversaries cannot exhaust $PID_{RP}$ or $ID_{RP}$.
+\noindent{\textbf{Scalability.}} Adversaries cannot exhaust $PID_{RP}$ or $ID_{RP}$.
 $ID_{RP}$ is generated uniquely in an RP's initial registration,
     and the capacity is $n$ (i.e., the order of $G$). For example, for the NIST P256 elliptic curve, $n$ is approximately $2^{256}$.
 As for $PID_{RP}$,  we only need to ensure $PID_{RP}$ is unique among \emph{unexpired} identity tokens,
@@ -53,7 +53,7 @@ Therefore, given an RP,
 
 %授权码
 %兼容:目前只提供隐式模式,对其他模式与协议的兼容方法
-\vspace{1mm}\noindent{\textbf{Compatibility with the Authorization Code Flow.}}
+\noindent{\textbf{Compatibility with the Authorization Code Flow.}}
 In the authorization code flow of OIDC \cite{OpenIDConnect},
     the IdP does not directly issue the identity token;
         instead,
@@ -106,7 +106,6 @@ In order to protect RP identities from the IdP,
 
 %\noindent{\textbf{Malicious IdP mitigation.}} The IdP is assumed to assign a unique $ID_{RP}$ in $Cert_{RP}$ for each RP and generate the correct $PID_U$ for each login. The malicious IdP may attempt to provide the incorrect $ID_{RP}$ and $PID_U$, which could be prevented by integrating certificate transparency \cite{rfc6962} and user's identifier check \cite{SPRESSO}. With certificate transparency \cite{rfc6962}, the monitors  check the uniqueness of $ID_{RP}$ among all the certificates stored in the log server. To prevent the malicious IdP from injecting any incorrect $PID_U$, the user could provide a nickname to the RP for an extra check as in SPRESSO \cite{SPRESSO}.
 
-\vspace{1mm}
 \noindent{\textbf{Collusive Attack by the IdP and RPs.}}
 When the IdP is still kept curious-but-honest but shares messages in the login flow (i.e.,
 $ID_U$, $PID_{RP}$, and $PID_U$)
@@ -119,7 +118,7 @@ Anyway, even in this case, a user's login activities at the other RPs not collus
         are still protected from the IdP and these collusive RPs,
         because a triad of $t$, $PID_U$ and $PID_{RP}$ is ephemeral and independent of each other.
 
-\vspace{1mm}\noindent{\textbf{Implementation with Browser Extensions.}}
+\noindent{\textbf{Implementation with Browser Extensions.}}
 To improve the portability of user agents,
     the user functions of UPPRESSO are implemented by web scripts in the prototype.
 However,
@@ -132,7 +131,7 @@ We have implemented such a browser extension while the IdP and RPs are unmodifie
  \textcolor[rgb]{1,0,0}{and experiments show that at least 102 ms will be saved for each login instance (i.e., about 208 ms in total),}
     compared with the version implemented with portable web scripts.
 
-\vspace{1mm}\noindent{\textbf{Restriction of the RP Script's Origin.}}
+\noindent{\textbf{Restriction of the RP Script's Origin.}}
 When identity tokens are forwarded by the IdP script to the RP script within the user browser,
     the receiver is restricted by the \verb+postMessage+ targetOrigin mechanism \cite{postm-targeto},
         to ensure it will forward the tokens to $Enpt_{RP}$,
@@ -168,7 +167,7 @@ Therefore,
 %RP1 exploits the vulnerability of HTTPS server certificate is fine to attack,
 %    by the shared private key.
 
-\vspace{1mm}\noindent{\textbf{Alternative Way to Bind $ID_{RP}$ and $Enpt_{RP}$.}}
+\noindent{\textbf{Alternative Way to Bind $ID_{RP}$ and $Enpt_{RP}$.}}
 In the prototype, we bind $ID_{RP}$ and $Enpt_{RP}$ by RP certificates,
     verified by the honest IdP script.
 The RP certificates ensure that the target RP has already registered itself at the IdP,

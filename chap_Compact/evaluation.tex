@@ -25,7 +25,7 @@ In the identity tokens of SPRESSO, $PID_{RP}$ is the encrypted RP domain, while 
 They also configure RSA-2048 and SHA-256  in the generation of identity tokens.
 
 
-MITREid Connect provides open-source Java implementations of IdP and
+MITREid Connect provides Java implementations of the IdP and
 RP SDK,
  while SPRESSO implements all entities by JavaScript based on node.js.
 We implemented the RPs based on Spring Boot for UPPRESSO and MITREid Connect, by integrating the corresponding SDKs.
@@ -50,13 +50,13 @@ The RPs in three schemes provide the same function, i.e.,
 
 
 The IdP and RP servers are deployed on Alibaba Cloud Elastic Compute Service,
-      each of which run Window 10 with 8 vCPUs and 32 GB memory.
-The FWD server of SPRESSO runs Ubuntu 20.04.4 with 16 vCPUs and 16 GB memory,
+      each of which runs Window 10 with 8 vCPUs and 32 GB memory.
+The forwarder of SPRESSO runs Ubuntu 20.04.4 with 16 vCPUs and 16 GB memory,
     also on Alibaba Cloud.
-We evaluate the schemes in two scenarios,
+We compare the schemes in two scenarios,
     when a user browser runs locally (on a PC with Core i7-8700 CPU and 32 GB memory) to remotely visit the IdP and RP,
         and when a browser runs on another virtual machine (with 8 vCPUs and 32 GB memory) also on Alibaba Cloud.
-In the latter scenario, all entities are deployed in the same virtual private cloud and connected with each other in one vSwitch,
+In the latter scenario, all entities are deployed in the same virtual private cloud and connected to each other in one vSwitch,
     which minimizes the influence of network delays.
 Note that, in any scenario, the IdP never directly connects to the RP.
 
@@ -77,39 +77,41 @@ The overall times of an SSO login instance for MITREid Connect, UPPRESSO, and SP
  (\emph{a}) 63 ms, 174 ms, and 190 ms, respectively, when all entities are deployed as Alibaba Cloud virtual machines,
 or
  (\emph{b})
-312 ms, 421 ms, and 510 ms, respectively, when the user browser runs locally to remotely visit the IdP and RP on Alibaba Cloud.
+312 ms, 421 ms, and 510 ms, respectively, when the user browser runs locally to remotely visit the IdP and RP.
 
-In the part of identity-token requesting, the user browser loads the RP's webpage and starts the login request. The RP of MITREid Connect constructs the identity-token request immediately.
+In the part of identity-token requesting, %the user browser loads the RP's webpage and starts the login request. 
+the RP of MITREid Connect constructs the identity-token request immediately.
 %MITREid Connect only needs 10 ms but
  %   UPPRESSO requires 271 ms.
-Compared with MITREid Connect, the main overhead of UPPRESSO is to open the new browser window and download the scripts.
+Compared with MITREid Connect, the main overhead of UPPRESSO is to open a new browser window and download the scripts.
 %, which needs about 104 ms.
 This overhead may be mitigated %by silently conducting these operations when the user visits the RP website, or
     by the implementation with browser extensions.
 %SPRESSO needs 19 ms in the preparation and identity-token requesting,
  %   a little more than MITREid Connect,
-An RP in SPRESSO system needs  to obtain some information on the IdP  % 's public key %(SPRESSO allows a user to assign any IdPs before login without initial registrations)
-     and encrypt its domain using an ephemeral symmetric key, which results in the additional overhead.
+The RP in SPRESSO needs  to obtain some information on the IdP  % 's public key %(SPRESSO allows a user to assign any IdPs before login without initial registrations)
+     and encrypt its domain using an ephemeral key, resulting in the additional overhead.
 
 
 
 
 In the identity-token generation,
-UPPRESSO simply retrieves an identity token from the IdP.
-On the contrary, in MITREid Connect when a user retrieves the identity token from IdP, the token must be carried within an URL following the fragment identifier \verb+#+ instead of \verb+?+, due to some security considerations \cite{de2014oauth}.
+UPPRESSO simply retrieves a token from the IdP.
+On the contrary, in MITREid Connect when a user retrieves the identity token from the IdP,
+ the token must be carried with a URL following the fragment identifier \verb+#+ instead of \verb+?+, due to some security considerations \cite{de2014oauth}.
 So the user needs to first download the script from the RP to process this token, which takes the most time.
    %  UPPRESSO needs 34 ms.
 %Compared with MITREid Connect,
 %    it needs 2 more ms to calculate  $PID_U$.
 SPRESSO takes more time to generate an identity token,
-    as it implements the IdP based on node.js and therefore adopts a JavaScript cryptographic library,
+    as it implements the IdP based on node.js and adopts a JavaScript cryptographic library,
  while a more efficient Java library is used in the others.
 %As the processings in SPRESSO and MITREid Connect are the same, the processing time in SPRESSO may be reduced to 32 ms.
 %And, then the overall time in SPRESSO will be 269 ms, still larger than 254 ms in UPPRESSO.
 
 %transmission & extraction
 In the identity-token acceptance,
- MITREid Connect and UPPRESSO spend the comparable amounts of time for sending identity token to the RP and verifying this token by RP.
+ MITREid Connect and UPPRESSO spend the comparable amounts of time for sending identity token to the RP and verifying this token.
  %UPPRESSO only needs about 6 ms for the scripts to send an identity token to the RP,
   %  which verifies it and calculates $Acct$.
 %It takes 71 ms for MITREid Connect to accept this identity token:

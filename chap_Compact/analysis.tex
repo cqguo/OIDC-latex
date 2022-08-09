@@ -46,9 +46,9 @@ The negligible probability means the token designates \emph{only} the target RP.
 
 Let $\mathbb{E}$ be an elliptic curve over a finite field $\mathbb{F}_q$,
     $G$ be a point on $\mathbb{E}$ of order $n$,
-        and $Q = [x]G$ where $x$ is an integer number randomly  chosen from $\mathbb{Z}_n$.
+        and $Q = [x]G$ where $x$ is an integer randomly  chosen from $\mathbb{Z}_n$.
 Given $G$ and $Q$,
-    the probability that a probabilistic polynomial time (PPT) algorithm $\mathcal{D}$ calculates $x$ (i.e., to solve the ECDLP) is negligible.
+    the probability that a probabilistic polynomial time (PPT) algorithm $\mathcal{D}$ calculates $x$ (i.e., solve the ECDLP) is negligible.
 Let ${\rm Pr}\{\}$ denote the probability.
 For any PPT algorithm $\mathcal{D}$, we define
 \begin{align*}
@@ -56,15 +56,15 @@ For any PPT algorithm $\mathcal{D}$, we define
 \end{align*}
 So $\epsilon_{c}(k)$ becomes negligible with the increasing security parameter $k$.
 
-We assume a game $\mathcal{G}_c$ between an adversary and a challenger,
+Assume a game $\mathcal{G}_c$ between an adversary and a challenger,
     to describe the $PID_{RP}$ collision attack:
 the adversary receives a finite set of RP identities from the challenger,
- denoted as ($ID_{RP_1}$, $ID_{RP_2}$, ..., $ID_{RP_m}$),
+ denoted as ($ID_{RP_1}$, $ID_{RP_2}$, ..., $ID_{RP_m}$)
  where $m$ is the amount of RPs in the system,
   and then outputs $(a, b, t, t')$.
 If $[t]ID_{RP_a}=[t']ID_{RP_b}$, the adversary succeeds in this game.
 %If the adversary has the non-negligible probability on succeeding in this game, RP designation is broken.
-Note that $m$ is a finite integer number, and $m \ll 2^k$ with the increasing $k$.
+Note that $m$ is a finite integer, and $m \ll 2^k$ as $k$ increases.
 We define the probability that the adversary succeeds in this game as ${\rm Pr}_s$.
 
 
@@ -76,18 +76,18 @@ We define the probability that the adversary succeeds in this game as ${\rm Pr}_
 \end{figure}
 
 
-We then design a PPT algorithm $\mathcal{D}^*_c$ based on this game, shown in Figure~\ref{fig:ecdlp_algorithm}, to solve the ECDLP as below.
+Then, Figure~\ref{fig:ecdlp_algorithm} shows a PPT algorithm $\mathcal{D}^*_c$ based on this game, to solve the ECDLP.
 The input of $\mathcal{D}^*_c$ is in the form of ($G$, $Q$).
-On receiving the input, the challenger of $\mathcal{G}_c$ randomly chooses $r_1, r_2, \cdots, r_m \in \mathbb{Z}_n$,
+On receiving an input, the challenger of $\mathcal{G}_c$ randomly chooses $r_1, r_2, \cdots, r_m \in \mathbb{Z}_n$,
  calculates $[r_1]G, [r_2]G, \cdots, [r_m]G$,
- and randomly replaces some $[r_j]G$ with the input $Q$.
+ and randomly replaces some $[r_j]G$ with $Q$.
 Then,
     these $m$ RP identities are sent to the adversary,
 which returns the result ($a$, $b$, $t$, $t'$).
 Finally, the challenger calculates $s = t^{-1}t'r_b \bmod n$ and returns $s$ as the output of $\mathcal{D}^*_c$.
 
 If $[r_a]G$ happens to be replaced with $Q$ and the adversary succeeds,
-    we find that $Q = [s]G$ and then $s=x$ because $[tr_a]G = [t]Q = [t'r_b]G$.
+    we find $Q = [s]G$ and then $s=x$ because $[tr_a]G = [t]Q = [t'r_b]G$.
 As $[r_j]G$ is randomly replaced by the challenger,
     $Q$ and other RP identities in the input set are indistinguishable to the adversary.
 Thus,
@@ -100,12 +100,11 @@ If the adversary is able to find $t$ and $t'$
     it will have non-negligible advantages in $\mathcal{G}_c$
         and
          ${\rm Pr}_s$ becomes non-negligible with the increasing $k$.
-Then,
-as $m \ll 2^k$, ${\rm Pr}\{\mathcal{D}^*_c(G, [x]G)=x\} = \frac{1}{m}{\rm Pr}_s$ also
+Because $m \ll 2^k$, ${\rm Pr}\{\mathcal{D}^*_c(G, [x]G)=x\} = \frac{1}{m}{\rm Pr}_s$ also
 becomes non-negligible with the increasing security parameter $k$.
 This violates the ECDLP.
-Therefore, the probability of finding $t$ and $t'$ satisfying that $[t]ID_{RP_j} = [t']ID_{RP_{j'}}$ in UPPRESSO is negligible,
-    and the adversary cannot break RP Designation.
+Thus, the probability of finding $t$ and $t'$ satisfying that $[t]ID_{RP_j} = [t']ID_{RP_{j'}}$ in UPPRESSO is negligible,
+    and the adversary cannot break RP designation.
 
 
 %If ${\rm Pr}_s$ is non-negligible with the security parameter $k$, ${\rm Pr}\{\mathcal{D}^*_c(G, [x]G)=x\} =\frac{1}{m}{\rm Pr}_s$ is also non-negligible because $m << 2^k$,
@@ -176,14 +175,14 @@ No event leaks the identity tokens to any malicious entity other than the authen
 First of all, the communications among the IdP, RPs and users,
     are protected by HTTPS,
     and the \verb+postMessage+ HTML5 API ensures the dedicated channels between two scripts within the browser,
-    so that adversaries cannot eavesdrop the identity tokens.
+    so adversaries cannot eavesdrop the identity tokens.
 Meanwhile, the honest IdP sends the identity token only to the authenticated user
-        (i.e., the IdP script in the browser).
+        (i.e., the IdP script).
 The IdP script forwards the token to the RP script
  only if it is downloaded from the same origin as $Enpt_{RP}$,
 and the binding of $Enpt_{RP}$ and $ID_{RP}$ is ensured by the signed RP certificate,
-    which is also verified by the IdP script.
-So only the designated target RP that holds $Enpt_{RP}$ and $ID_{RP}$ in the certificate,
+    which is verified by the IdP script.
+So only the designated target RP that holds $Enpt_{RP}$ and $ID_{RP}$,
     receives this token.
 
 
@@ -193,12 +192,12 @@ So only the designated target RP that holds $Enpt_{RP}$ and $ID_{RP}$ in the cer
 \noindent\textbf{Integrity.}
 The identity token binds $Acct$ and $ID_{RP}$ implicitly,
     and any breaking will result in some failed check or verification in the login flow.
-The integrity is ensured by the IdP's signatures:
+It is ensured by the IdP's signatures:
     the identity token binding $PID_U$ and $PID_{RP}$ is signed by the IdP.
 According to the proof of RP designation,
     there is no $t' \neq t$ but satisfying that $PID_{RP} = [t]ID_{RP_j} = [tr]G = [t'r']G = [t']ID_{RP_{j'}}$.
 That is, the identity token explicitly binding $PID_U$ and $PID_{RP}$,
-    matches only one $ID_{RP}$ (and also only one $Acct = [t^{-1}]PID_{U}$).
+    matches \emph{only} one $ID_{RP}$ and also \emph{only} one $Acct = [t^{-1}]PID_{U}$.
 Thus,
     $Acct$ and $ID_{RP}$ are actually bound by the IdP's signatures,
         due to the one-to-one mapping between (\emph{a}) the pair of $Acct$ and $ID_{RP}$ and (\emph{b}) the triad of $PID_U$, $PID_{RP}$, and $t$.
@@ -265,45 +264,44 @@ UPPRESSO effectively prevents the attacks of IdP-based login tracing and RP-base
 \noindent\textbf{IdP-based Login Tracing.}
 The information accessible to the IdP and derived from the RP's identity,
     is only $PID_{RP}$, where $PID_{RP} = [t]ID_{RP}$ is calculated by the user.
-Because  (\emph{a}) $t$ is a number randomly chosen from $\mathbb{Z}_n$ by the user and kept secret to the IdP
+Because  (\emph{a}) $t$ is a number randomly chosen from $\mathbb{Z}_n$ and kept secret to the IdP
  and (\emph{b}) $ID_{RP} = [r]G$ and $G$ is the base point (or generator) of $\mathbb{E}$,
  the IdP has to view $PID_{RP}$ as randomly and independently chosen from $\mathbb{E}$,
     and cannot distinguish $[t]ID_{RP_j} = [tr]G$ from any $[t']ID_{RP_{j'}} = [t'r']G$.
 So, the IdP cannot infer the RP's identity or link any pair of $PID_{RP}^i$ and $PID_{RP}^{i'}$,
-    and then the IdP-based login tracing is impossible.
+    and the IdP-based login tracing is impossible.
 
 \vspace{1mm}
 \noindent\textbf{RP-based Identity Linkage.}
-We prove that UPPRESSO prevents the RP-based identity linkage,
- based on the elliptic curve decision Diffie-Hellman (ECDDH) assumption \cite{GoldwasserK16}.
+We prove UPPRESSO prevents the RP-based identity linkage,
+ based on the elliptic curve decision Diffie-Hellman (ECDDH) assumption. %\cite{GoldwasserK16}.
 %That is, while there is the login to an RP, for colluded RPs, they cannot decide whether this login and any logins to other RPs are from the same user.
 %
-Let $\mathbb{E}$ be an elliptic curve over a finite field $\mathbb{F}_q$,
+Let $\mathbb{E}$ be an elliptic curve,
     and $G$ be a point on $\mathbb{E}$ of order $n$.
 For any PPT algorithm $\mathcal{D}$, the probability of distinguishing
  $([x]G$, $[y]G$, $[xy]G)$ and $([x]G$, $[y]G$, $[z]G)$
 is negligible,
- where $x$, $y$ and $z$ are integer numbers randomly and independently chosen from $\mathbb{Z}_n$.
+ where $x$, $y$ and $z$ are integers randomly and independently chosen from $\mathbb{Z}_n$.
 Let  ${\rm Pr}\{\}$ denote the probability and
  we define
 \begin{align*}
 &{\rm Pr}_1 =  {\rm Pr}\{\mathcal{D}(G, [x]G, [y]G, [xy]G)=1\} \\
 &{\rm Pr}_2 =  {\rm Pr}\{\mathcal{D}(G, [x]G, [y]G, [z]G)=1\} \\
-& \epsilon_{r}(k) = |{\rm Pr}_1 - {\rm Pr}_2|
 \end{align*}
-Then, $\epsilon_{r}(k)$ becomes negligible as $k$ increases.
+Then, $\epsilon_{r}(k) = |{\rm Pr}_1 - {\rm Pr}_2|$ becomes negligible as $k$ increases.
 
 
 In every login instance,
     the RP holds $ID_{RP}$ and $Acct$, receives $t$, calculates $PID_{RP}$,
     and verifies $PID_{RP}$ and $PID_U$ in the identity token.
 After filtering out the redundant information (i.e., $PID_{RP}= [t]{ID_{RP}}$ and $Acct = [t^{-1}]PID_{U}$),
-    the RP actually receives $(ID_{RP}, t, Acct)$ in an UPPRESSO login instance, where $ID_{RP} = [r]G$ and $Acct = [ID_U]{ID_{RP}} = [ur]G$.
+    the RP actually receives $(ID_{RP}, t, Acct)$, where $ID_{RP} = [r]G$ and $Acct = [ID_U]{ID_{RP}} = [ur]G$.
 
 The prevention against the RP-based identity linkage is proved
     by this proposition:
 when $c$ collusive RPs collect the information of login instances by $v$ users,
-    they cannot determine whether a login instance to another RP belongs to one of these $v$ users or not.
+    they still cannot determine whether a login instance to another RP belongs to one of these $v$ users or not.
 The login instances are expressed as $\mathfrak{L}=\left\{ \begin{matrix}
 L_{1,1}, & L_{1,2}, & \cdots, & L_{1,c}\\
 L_{2,1}, & L_{2,2}, & \cdots, & L_{2,c}\\
@@ -311,9 +309,9 @@ L_{2,1}, & L_{2,2}, & \cdots, & L_{2,c}\\
 L_{v,1}, & L_{v,2}, & \cdots, & L_{v,c}
 \end{matrix}\right\}$, where $L_{i, j} = (ID_{RP_j}, t_{i, j}, [ID_{U_i}]{ID_{RP_j}}) = ([r_j]G, t_{i,j}, [u_ir_j]G)$.
 Given a login instance to another RP $L'=(ID_{RP_{c+1}}, t', [ID_{U'}]ID_{RP_{c+1}}) = ([r_{c+1}]G, t', [u'r_{c+1}]G)$,
-we define the RP-based identity linkage game $\mathcal{G}_r$  as follows:
+we define the RP-based identity linkage game $\mathcal{G}_r$:
 after receiving $\mathfrak{L}$ and $L'$ from a challenger,
-    an adversary outputs the result $s = 1$ if it determines that $u' \in \{u_1, u_2, \cdots, u_v\}$,
+    the adversary outputs the result $s = 1$ if it determines that $u' \in \{u_1, u_2, \cdots, u_v\}$,
         or $s = 0$ otherwise.
 
         We define the adversary's advantage in $\mathcal{G}_r$ as ${\rm Adv}_A$.
