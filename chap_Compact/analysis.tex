@@ -17,14 +17,14 @@ UPPRESSO satisfies the four security requirements of identity tokens in SSO serv
      identifies the target RP, and only this RP.
  % 仅有一个RP与之对应。
 \item \textbf{User Identification}~The user (pseudo-)identity bound in the identity token identifies
-        the user authenticated by the IdP, and only this user.
+        the authenticated user, and only this user.
  % 能够被算出来的account，对应了the authenticated user；而且仅有这个user
 \item \textbf{Confidentiality}~An identity token issued by the IdP,
     is accessible to only
                 the authenticated user and the target RP,
                     in addition to the IdP.
-\item \textbf{Integrity}~An honest RP accepts only identity tokens issued by the IdP,
-            and any forged or modified identity token will be rejected by the RP.
+\item \textbf{Integrity}~An honest RP accepts only identity tokens binding its (pseudo-)identity and the authenticated user's (pseudo-)identity.
+           % and any forged or modified identity token will be rejected.
 \end{itemize}
 
 
@@ -42,16 +42,16 @@ Next, based on the ECDLP
     $ID_{RP_j} = [r_j]G$ and $ID_{RP_{j'}} = [r_{j'}]G$, while $r_j$ and $r_{j'}$ are kept secret to adversaries).
 The negligible probability means the token designates \emph{only} the target RP.
 
-Let $\mathbb{E}$ be an elliptic curve over a finite field $\mathbb{F}_q$,
+Let $\mathbb{E}$ be an elliptic curve, %over a finite field $\mathbb{F}_q$,
     $G$ be a point on $\mathbb{E}$ of order $n$,
-        and $Q = [x]G$ where $x$ is an integer randomly  chosen from $\mathbb{Z}_n$.
+        and $Q = [x]G$ where $x$ is a random integer in $\mathbb{Z}_n$.
 Given $G$ and $Q$,
-    the probability that a probabilistic polynomial time (PPT) algorithm $\mathcal{D}$ calculates $x$ (i.e., solve the ECDLP) is negligible.
-Let ${\rm Pr}\{\}$ denote the probability.
+    the probability that a probabilistic polynomial time (PPT) algorithm calculates $x$ (i.e., solve the ECDLP) is negligible.
 For any PPT algorithm $\mathcal{D}$, we define
 \begin{align*}
 {\rm Pr}\{\mathcal{D}(G, [x]G)=x\} = \epsilon_{c}(k)
 \end{align*}
+Here, ${\rm Pr}\{\}$ denotes the probability.
 So $\epsilon_{c}(k)$ becomes negligible with the increasing security parameter $k$.
 
 Assume a game $\mathcal{G}_c$ between an adversary and a challenger,
@@ -68,7 +68,7 @@ We define the probability that the adversary succeeds in this game as ${\rm Pr}_
 
 \begin{figure}[tb]
   \centering
-  \includegraphics[width=0.9\linewidth]{fig/ecdlp_algorithm.pdf}
+  \includegraphics[width=0.91\linewidth]{fig/ecdlp_algorithm.pdf}
   \caption{The algorithm based on the $PID_{RP}$ collision, to solve the ECDLP.}
   \label{fig:ecdlp_algorithm}
 \end{figure}
@@ -97,12 +97,12 @@ If the adversary is able to find $t$ and $t'$
     satisfying that $[t]ID_{RP_j} = [t']ID_{RP_{j'}}$,
     it will have non-negligible advantages in $\mathcal{G}_c$
         and
-         ${\rm Pr}_s$ becomes non-negligible with the increasing $k$.
+         ${\rm Pr}_s$ becomes non-negligible as the security parameter $k$ increases.
 Because $m \ll 2^k$, ${\rm Pr}\{\mathcal{D}^*_c(G, [x]G)=x\} = \frac{1}{m}{\rm Pr}_s$ also
-becomes non-negligible with the increasing security parameter $k$.
+becomes non-negligible with the increasing $k$.
 This violates the ECDLP.
 Thus, the probability of finding $t$ and $t'$ satisfying that $[t]ID_{RP_j} = [t']ID_{RP_{j'}}$ in UPPRESSO is negligible,
-    and the adversary cannot break RP designation.
+    and then the adversary cannot break RP designation.
 
 
 %If ${\rm Pr}_s$ is non-negligible with the security parameter $k$, ${\rm Pr}\{\mathcal{D}^*_c(G, [x]G)=x\} =\frac{1}{m}{\rm Pr}_s$ is also non-negligible because $m << 2^k$,
@@ -167,18 +167,18 @@ Thus, the calculated account is always exactly the authenticated user's account 
 %
 
 \noindent\textbf{Confidentiality.}
-No event leaks the identity tokens to any malicious entity other than the authenticated user and the designated RP.
+No event leaks an identity token to any malicious entity other than the authenticated user and the designated RP.
 First of all, the communications among the IdP, RPs and users,
     are protected by HTTPS,
     and the \verb+postMessage+ HTML5 API ensures the dedicated channels between two scripts within the browser,
     so adversaries cannot eavesdrop the identity tokens.
-Meanwhile, the honest IdP sends the identity token only to the authenticated user
+Further, the IdP sends the identity token only to the authenticated user
         (i.e., the IdP script).
 The IdP script forwards the token to the RP script
  only if it is downloaded from the same origin as $Enpt_{RP}$,
-and the binding of $Enpt_{RP}$ and $ID_{RP}$ is ensured by the signed RP certificate,
-    which is verified by the IdP script.
-So only the designated target RP that holds $Enpt_{RP}$ and $ID_{RP}$,
+and the binding of $Enpt_{RP}$ and $ID_{RP}$ is ensured by the signed RP certificate.
+  %  which is verified by the IdP script.
+So only the RP that holds $Enpt_{RP}$ and $ID_{RP}$,
     receives this token.
 
 
@@ -202,7 +202,7 @@ Thus,
 %The detailed process of proof is shown in Appendix.
 
 \vspace{1mm}
-Finally, we also formally analyze the security properties of UPPRESSO, %especially confidentiality and integrity,
+Finally, we formally analyze the security properties of UPPRESSO, %especially confidentiality and integrity,
      based on a Dolev-Yao style model \cite{SPRESSO}.
 % which has been used in the formal analysis of SSO protocols such as OAuth 2.0 \cite{FettKS16} and OIDC \cite{FettKS17}.
 The model abstracts the entities in a web system,
@@ -280,7 +280,7 @@ Let  ${\rm Pr}\{\}$ denote the probability and
  we define
 \begin{align*}
 &{\rm Pr}_1 =  {\rm Pr}\{\mathcal{D}(G, [x]G, [y]G, [xy]G)=1\} \\
-&{\rm Pr}_2 =  {\rm Pr}\{\mathcal{D}(G, [x]G, [y]G, [z]G)=1\} \\
+&{\rm Pr}_2 =  {\rm Pr}\{\mathcal{D}(G, [x]G, [y]G, [z]G)=1\}
 \end{align*}
 Then, $\epsilon_{r}(k) = |{\rm Pr}_1 - {\rm Pr}_2|$ becomes negligible as $k$ increases.
 
@@ -289,7 +289,7 @@ In every login instance,
     the RP holds $ID_{RP}$ and $Acct$, receives $t$, calculates $PID_{RP}$,
     and verifies $PID_{RP}$ and $PID_U$ in the identity token.
 After filtering out the redundant information (i.e., $PID_{RP}= [t]{ID_{RP}}$ and $Acct = [t^{-1}]PID_{U}$),
-    the RP actually receives $(ID_{RP}, t, Acct)$, where $ID_{RP} = [r]G$ and $Acct = [ID_U]{ID_{RP}} = [ur]G$.
+    the RP actually receives $(ID_{RP}, t, Acct) = ([r]G, t, [ur]G)$.
 
 The prevention against the RP-based identity linkage is proved
     by this proposition:
@@ -307,7 +307,14 @@ after receiving $\mathfrak{L}$ and $L'$ from a challenger,
     the adversary outputs the result $s = 1$ if it determines that $u' \in \{u_1, u_2, \cdots, u_v\}$,
         or $s = 0$ otherwise.
 
-        We define the adversary's advantage in $\mathcal{G}_r$ as ${\rm Adv}_A$.
+\begin{figure}[tb]
+  \centering
+  \includegraphics[width=0.965\linewidth]{fig/dalgorithm.pdf}
+  \caption{The algorithm based on the RP-based identity linkage, to solve the ECDDH problem.}
+  \label{fig:dalgorithm}
+\end{figure}
+
+We define the adversary's advantage in $\mathcal{G}_r$ as ${\rm Adv}_A$.
 %If the adversary is able to distinguish whether $u' \in \{u_1, u_2, \cdots, u_v\}$ or not,
 %    the adversary will have non-negligible advantages in $\mathcal{G}_r$
 %        and ${\rm Adv}_A$ is non-negligible.
@@ -317,15 +324,8 @@ Then,
 &{\rm Pr}'_2={\rm Pr}\{\mathcal{G}_r(\mathfrak{L}, L'|ID_{U'} \in \mathbb{Z}_n)=1\}\\
 &{\rm Adv}_A=|{\rm Pr}'_1-{\rm Pr}'_2|
 \end{align*}
-
+%
 %In UPPRESSO system, the $ID_U$, $ID_{RP}$ and $t$ are not generated by RP, or generated based on any data provided RP, therefore, as long as UPPRESSO is proved IND-COA (Indistinguishability under Ciphertext-Only Attack) security, the requirement is satisfied and the RP-based identity linkage is impossible in UPPRESSO system.
-
-\begin{figure}[tb]
-  \centering
-  \includegraphics[width=0.965\linewidth]{fig/dalgorithm.pdf}
-  \caption{The algorithm based on the RP-based identity linkage, to solve the ECDDH problem.}
-  \label{fig:dalgorithm}
-\end{figure}
 
 We design a PPT algorithm $\mathcal{D}^*_r$ based on $\mathcal{G}_r$, shown in Figure~\ref{fig:dalgorithm}, to solve the ECDDH problem.
 The input is in the form of $(G$, $Q_1=[x]G$, $Q_2=[y]G$, $Q_3=[z]G)$.

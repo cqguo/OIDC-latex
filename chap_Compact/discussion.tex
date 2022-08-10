@@ -22,9 +22,9 @@ Three identity-transformation functions, i.e., $\mathcal{F}_{PID_{RP}}()$, $\mat
 \noindent{\textbf{Scalability.}} Adversaries cannot exhaust $PID_{RP}$ or $ID_{RP}$.
 $ID_{RP}$ is generated uniquely in an RP's initial registration,
     and the capacity is $n$ (i.e., the order of $G$). For example, for the NIST P256 elliptic curve, $n$ is approximately $2^{256}$.
-As for $PID_{RP}$,  we only need to ensure $PID_{RP}$ is unique among \emph{unexpired} identity tokens,
+As for $PID_{RP}$,  we only ensure $PID_{RP}$ is unique in \emph{unexpired} tokens,
     the number of which is denoted as $\sigma$.
-The probability that at least two $PID_{RP}$s are identical among these $\sigma$ ones,
+The probability that at least two $PID_{RP}$s are identical among the $\sigma$ ones,
     is $1-\prod_{i=0}^{\sigma-1}(1-i/n)$.
 For example,
     when the IdP serves $10^{8}$ requests per second and the validity period of identity tokens is 10 minutes,
@@ -140,16 +140,16 @@ Although the path part of $Enpt_{RP}$, e.g., \verb+/SSO/uploadTkn+,
    it brings no extra risk.
 If two RPs run on one domain but with different endpoints to receive identity tokens
         (e.g., \verb+https://RP.com/honest/uploadTkn+ and \verb+https://RP.com/malicious/uploadTkn+),
-         they cannot be distinguished by web scripts and \verb+postMessage+.
+         they cannot be distinguished by scripts and \verb+postMessage+.
 Meanwhile, browsers enforce
- the same-origin policy \cite{sop} in the access control of web resources.
+ the same-origin policy  in the access control of web resources \cite{sop}.
  %   and the control granularity is origins only.
-Therefore,
-    a (malicious) RP could always access the other's resources within the browser,
-        e.g., steal the cookie
-        by scripts such as
-        \verb+vw = window.open('http://RP.com/honest')+
-    and \verb+vw.document.cookie+,
+So
+    a (malicious) RP could access the other's resources in the browser,
+        e.g., steal  cookies
+        by scripts 
+        \verb+vwin = window.open('http://RP.com/honest')+
+    and \verb+vwin.document.cookie+,
     even if the honest RP restricts that only HTTP requests to specific paths carry its cookies.
 %Anyway, such RPs are distinguished by the implementation with browser extensions.
 
