@@ -6,7 +6,7 @@ We introduce %OIDC \cite{OpenIDConnect}, to describe
   typical SSO login flows,
  and discuss existing privacy-preserving solutions and other related works.
 
-\subsection{OpenID Connect and SSO Protocols}
+\subsection{OpenID Connect and SSO Services}
 \label{subsec:OIDC}
 OIDC is one of the most popular SSO protocols. % for web applications. %As other SSO protocols \cite{SAMLIdentifier}, OIDC
 %It involves three entities, i.e., {\em users}, the {\em identity provider (IdP)}, and {\em relying parties (RPs)}.
@@ -112,7 +112,7 @@ one-time password, and multi-factor authentication).
 It eliminates the authentication steps between users and an RP,
         and RPs only verify tokens issued by the IdP.
 A user holds only the credential to authenticate himself to the IdP,
-    and the burden is greatly mitigated.
+    and the burden is greatly reduced.
 If this credential was lost or leaked,
     the user only renews it at the IdP.
 However, if a user proves some non-ephemeral secret to RPs and this secret is valid across multiple login instances
@@ -128,7 +128,7 @@ These attributes are maintained by users at the IdP.
 Before enclosing attributes in a token,
     the IdP obtains the user's authorization;
     or the provided attributes are selected by the user.
-So no distinctive attributes such as telephone number, Email, etc.,
+So no distinctive attributes such as telephone number, Email address, etc.,
         are enclosed in the identity tokens of privacy-preserving SSO systems.
 
 %\vspace{1mm}
@@ -157,15 +157,15 @@ While keeping this user convenience,
  existing privacy-preserving SSO \cite{BrowserID,SPRESSO,NIST2017draft} prevents the IdP-based login tracing or the RP-based identity linkage,
     and UPPRESSO prevents both of them.
 
-Identity federation enables a user registered at the IdP to be accepted by other parties,
-            with different identities (or accounts) sometimes,
+On the contrary, identity federation enables a user registered at the IdP to be accepted by other parties,
+            with different accounts sometimes,
         while more user operations are involved.
 Privacy-preserving identity federation \cite{ELPASSO,UnlimitID,hyperledge-idemix,PseudoID,Opaak}
     protects privacy against even collusive attacks by the IdP and the RPs,
     but requires a user to (\emph{a}) hold long-term secrets verified by RPs,
             in addition to the authentication credentials for the IdP,
                 and (\emph{b}) manage the accounts at different RPs.
-That is, there are actually some authentication steps between the user and RPs (or sometimes called asynchronous authentication \cite{ELPASSO}).
+That is, there are actually some authentication steps between the user and RPs (or called asynchronous authentication \cite{ELPASSO}).
 
 
 Pairwise pseudonymous identifiers (PPIDs) are recommended \cite{NIST2017draft}
@@ -174,7 +174,7 @@ When issuing an identity token,
         the IdP encloses a user PPID (but not the identity at the IdP).
 Given a user,
     the IdP assigns a unique PPID based on the target RP,
-    so collusive RPs cannot link the user's PPIDs.
+    so collusive RPs cannot link the users.
 PPIDs cannot prevent the IdP-based login tracing,
  for the IdP needs the RP identity to issue tokens.
 
@@ -216,7 +216,7 @@ When attempting to login to an RP,
     the user proves that he is the owner of this credential without exposing the secret,
         and discloses selective attributes in the credential.
 Although one credential is proved to multiple RPs,
-        user-maintained pseudonyms and anonymous credentials prevent the RPs, even when collusive with the IdP, from linking the login instances.
+        user-maintained pseudonyms and anonymous credentials prevent the RPs, even when collusive with the IdP, from linking the users across the RPs.
 UnlimitID \cite{UnlimitID} presents similar designs based on anonymous credentials \cite{anon-credential},
         to prevent collusive attacks by the IdP and RPs.
 NEXTLEAP \cite{nextleap} adopts UnlimitID for anonymous secure messaging.

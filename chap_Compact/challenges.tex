@@ -29,7 +29,7 @@ The SSO login flow implies \emph{confidentiality} and \emph{integrity} of identi
 An identity token shall be forwarded by the authenticated user to the target RP only,
     not leaked to any other parties;
         otherwise, an adversary who presents the token, would successfully login to this honest RP.
-Integrity is also necessary,
+Integrity is also necessary
     to prevent adversaries from tampering with an identity token.
    %     without being detected by the RPs.
 So identity tokens are signed by the IdP and usually transmitted over HTTPS \cite{OpenIDConnect,rfc6749,SAML}.
@@ -37,7 +37,7 @@ So identity tokens are signed by the IdP and usually transmitted over HTTPS \cit
 These four security requirements (i.e., RP designation, user identification, confidentiality, and integrity) of SSO identity tokens
      have been discussed \cite{ArmandoCCCT08,FettKS16, FettKS17},
      and
-     vulnerabilities breaking any of these properties in SSO systems
+     vulnerabilities breaking any of these properties 
             result in effective attacks \cite{SomorovskyMSKJ12, WangCW12, ArmandoCCCPS13, ZhouE14, WangZLLYLG15, WangZLG16, YangLLZH16, MainkaMS16, MainkaMSW17, YangLCZ18, YangLS17, ShiWL19, ChenPCTKT14, ccsSunB12, DiscoveringJCS, dimvaLiM16, CaoSBKVC14, TowardsShehabM14}.
 %An adversary might attempt to login to an honest RP as a victim user (i.e., \emph{impersonation}),
 % or allure a victim user to login to an honest RP as the attacker (i.e.,  \emph{identity injection}).
@@ -77,10 +77,10 @@ We aim to design a privacy-preserving SSO system with the four security properti
     while preventing the privacy threats due to the IdP-based login tracing and the RP-based identity linkage.
 However, to satisfy the requirements of security and privacy at the same time,
      poses a dilemma in the generation of identity tokens.
-Table \ref{tbl:notations-dilemma} lists the notations used in the following explanation,
+Table \ref{tbl:notations-dilemma} lists the notations in the following explanation,
     and the subscript $j$ and/or the superscript $i$ may be omitted, when there is no ambiguity.
 
-A valid identity token contains the (pseudo-)identities of the authenticated user and the target RP. %which is to tell the RP that this user has been authenticated by the IdP.
+An identity token contains the (pseudo-)identities of the authenticated user and the target RP. %which is to tell the RP that this user has been authenticated by the IdP.
 % Let us denote the long-term unique identifiers of the user and the RP as $ID_U$ and $ID_{RP}$, respectively.
 Since the IdP authenticates users and always knows the user's identity (i.e., $ID_U$),
     to prevent the IdP-based login tracing,
@@ -91,7 +91,7 @@ So an \emph{ephemeral} pseudo-identity for the RP (i.e., $PID_{RP}$) shall be us
     and (\emph{b}) the IdP cannot derive any information about $ID_{RP}$ from any $PID_{RP}^i$,
         which implies $PID_{RP}^i$ in multiple login instances shall
          be independent of each other.\footnote{While the target RP is kept unknown to the IdP,
-            the IdP shall not link multiple login instances which attempt to visit this RP.}
+            the IdP shall not link multiple login instances to visit this RP.}
    % the IdP-based login tracing is still effective, to correlate a user's multiple login instances.
 
 To prevent the RP-based identity linkage,
@@ -99,9 +99,9 @@ To prevent the RP-based identity linkage,
 A user pseudo-identity (i.e., $PID_U$) shall be bound instead:
     (\emph{a}) the RP cannot derive any information about $ID_U$ from any $PID_{U,j}$,
     which implies $PID_{U,j}$ for different RPs shall be independent of each other;
-    (\emph{b}) in multiple login instances to the RP, $PID_U^i$ shall be independent of each other or generated ephemerally,
+    (\emph{b}) in multiple login instances to the RP, $PID_U^i$ shall be independent of each other and generated ephemerally,
         to prevent the IdP-based login tracing;\footnote{If $PID_U^i$ is not completely independent of each other,
-         it implies the IdP could link multiple login instances which attempt to visit this RP.}
+         it implies the IdP could link multiple login instances to visit this RP.}
     and (\emph{c}) to ensure user identification,
     an \emph{ephemeral} $PID_{U}^i$ in each login instance shall enable the RP to correlate it
      with the \emph{permanent} account  (i.e., $Acct$) at this RP.
@@ -156,7 +156,7 @@ The privacy protection of SSO is converted into a challenge
 \setlength{\parsep}{0pt}
 \setlength{\parskip}{0pt}
 \item
-$\mathcal{F}_{PID_{RP}}(ID_{RP}) = PID_{RP}$, calculated by the user and/or the RP.
+$\mathcal{F}_{PID_{RP}}(ID_{RP}) = PID_{RP}$, calculated by the user and the RP.
 From the IdP's view,
 $\mathcal{F}_{PID_{RP}}()$ is a one-way function and the calculated $PID_{RP}$ appears a random variable.
 \item

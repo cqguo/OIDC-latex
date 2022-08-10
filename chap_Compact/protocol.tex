@@ -5,7 +5,7 @@
 \subsection{Identity-Transformation Functions}
 \label{subsec:overview}
 
-We design three identity-transformation functions,
+We design identity-transformation functions,
      $\mathcal{F}_{PID_{RP}}$, $\mathcal{F}_{PID_{U}}$ and $\mathcal{F}_{Acct}$,
     on an elliptic curve $\mathbb{E}$.
  %    where $G$ is a base point (or generator) of this elliptic curve and the order of $G$ is a big prime number denoted as $n$.
@@ -95,8 +95,8 @@ On receiving an identity-token request with $ID_U$ and $PID_{RP}$,
 %Moreover, since $r$ is unknown to the RP, collusive RPs cannot link a user's $PID_U$s at different RPs. If $r$ is known to the RP, two collusive RPs might attempt to associate a user's $PID_U$s by checking whether the equality ${PID_{U_1}}^{r_2N_{U_2}N_{RP_2}} = {PID_{U_2}}^{r_1N_{U_1}N_{RP_1}} \bmod\ p$ holds or not, because ${PID_{U_1}} = g^{r_1N_{U_1}N_{RP_1}ID_{U_1}} \bmod p$ and ${PID_{U_2}} = g^{r_2N_{U_2}N_{RP_2}ID_{U_2}} \bmod p$.
 
 \noindent {\bf $\boldsymbol{PID_U}$-$\boldsymbol{Acct}$ Transformation.}
-The user sends the trapdoor $t$ to the target RP,
-which calculates $PID_{RP}$ to verify the RP pseudo-identity in identity tokens.
+The trapdoor $t$ is sent to the target RP,
+which calculates $PID_{RP}$ to match the RP pseudo-identity in identity tokens.
 On verifying a token binding $PID_U$ and $PID_{RP}$,
     it calculates $Acct$ as below.
 \begin{equation}
@@ -137,7 +137,7 @@ enable UPPRESSO to work with commercial-off-the-shelf (COTS) browsers.
 %
 First of all, in UPPRESSO the IdP is not aware of the visited RP,
  so the user agents (or browsers) have to deal with the forwarding of identity tokens
-    to the target RP, as well as the identity transformations.
+    to the target RP, as well as the calculation of $PID_{RP}$.
 On the contrary,
     in commonly-used SSO protocols the IdP needs this information to ensure confidentiality of identity tokens.
 In the OIDC services, when an RP registers itself at the IdP, the \verb+redirect_uri+ parameter
@@ -284,7 +284,7 @@ An RP sends a registration request, including the endpoint to receive identity t
 \item
 The IdP generates a unique random number $r \in [1,n)$, and assigns $ID_{RP} = [r]G$ to the RP.
 The IdP signs $Cert_{RP} = [ID_{RP}, Enpt_{RP}, *]_{SK}$,
-     where $[\cdot]_{SK}$ means a message signed using $SK$ and $*$ denotes supplementary information such as the RP's common name and Email,
+     where $[\cdot]_{SK}$ means a message signed using $SK$ and $*$ denotes supplementary information such as its common name and Email address.
 \item
 The RP verifies $Cert_{RP}$ using $PK$,
     and accepts $ID_{RP}$ and $Cert_{RP}$ if they are valid.
