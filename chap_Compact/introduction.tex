@@ -43,9 +43,9 @@ Finally, the RP verifies the identity token to decide whether the user is allowe
 So a user keeps only one credential for the IdP, instead of several credentials for different RPs.
 
 As the comprehensive solution of identity management and authentication,
-    SSO services allow the IdP to provide more user attributes in the tokens
+    SSO services allow the IdP to provide more attributes in the tokens
         along with the authenticated user's identity.
-The attributes (e.g., age, hobby, education, and nationality) are maintained at the trusted IdP,
+The attributes (e.g., age, hobby, education, and nationality) are maintained at the IdP,
     and enclosed in the identity tokens after the user's authorization \cite{OpenIDConnect,rfc6749}.
 
 %However, SSO systems have been continuously found vulnerable and insecure \cite{WangCW12,ccsSunB12,SomorovskyMSKJ12,ArmandoCCCPS13,DiscoveringJCS,dimvaLiM16,WangZLG16,MainkaMS16, MainkaMSW17,YangLCZ18}.
@@ -108,7 +108,7 @@ We denote this privacy risk as the {\em RP-based identity linkage}.
 
 Privacy-preserving SSO schemes try to provide comprehensive identity management and authentication,
     while protecting user privacy \cite{maler2008venn,NIST2017draft,BrowserID,SPRESSO}.
-The following features of SSO are usually supported:
+The following features of SSO are usually needed:
 (\emph{a}) \emph{User identity at an RP},
     i.e., an identity token enables an RP to uniquely identify every user,
 (\emph{b}) \emph{User authentication only to the IdP}, i.e.,
@@ -123,8 +123,8 @@ Meanwhile,
     the privacy threats from different types of adversaries are considered:
     (\emph{a}) \emph{the curious-but-honest IdP},
     (\emph{b}) \emph{collusive RPs},
-    and (\emph{c}) \emph{the curious-but-honest IdP colluding some RPs}.
-We analyze existing privacy-preserving solutions of SSO and also identity federation
+    and (\emph{c}) \emph{the curious-but-honest IdP colluding with some RPs}.
+We compare existing privacy-preserving solutions of SSO and also identity federation
 in Section \ref{subsec-solutions}.
 
 
@@ -142,24 +142,24 @@ and propose an Untraceable and Unlinkable Privacy-PREserving Single Sign-On (UPP
   to protect user privacy.
 In particular, we design three identity-transformation functions in the SSO login flow.
 In each login instance,
-        $ID_{RP}$ is transformed to an ephemeral $PID_{RP}$  cooperatively by the RP and the user.
+        $ID_{RP}$ is transformed to an ephemeral $PID_{RP}$  by the RP and the user.
 Then, $PID_{RP}$ is sent to the IdP to transform $ID_U$ to ephemeral $PID_U$,
     so that the identity token binds $PID_U$ and $PID_{RP}$, instead of permanent $ID_U$ and $ID_{RP}$.
 Finally,
     after receiving an identity token with matching $PID_{RP}$,
         the RP transforms $PID_U$ into an account.
-Given a user, this account is (\emph{a}) identical across multiple login instances and (\emph{b}) unique at each RP.
+Given a user, this account is identical across multiple login instances and unique at each RP.
 
 UPPRESSO prevents the IdP-based login tracing because it receives only $PID_{RP}$ in the identity-token request,
     and the RP-based identity linkage because every account is unique.
-On the contrary, 
+On the contrary,
      existing privacy-preserving SSO \cite{BrowserID,SPRESSO,NIST2017draft} prevents only one of these two privacy threats.
 The identity transformations work compatibly with
     the login flows of widely-used SSO protocols \cite{OpenIDConnect,rfc6749,SAML,NIST2017draft},
     so the benefits of SSO protocols are kept in UPPRESSO.
  %       and it is very easy to implement UPPRESSO on top of OIDC systems.
 %
-%   
+%
 %This prevents both IdP-based login tracing by hiding the RPs' identities from the IdP and RP-based identity linkage by hiding the user's identity from the RPs.
 %Meanwhile, an RP is still able to link multiple login sessions of the same user by converting the user's different pseudo-identities to an invariant user account using a special identifier-transformation function and the trapdoors, without knowing the user's real identity in the IdP.
 % Finally, we formally prove that the accounts of the same user at different RPs are independent and cannot be correlated by collusive RPs (see our proof in Section \ref{sec:privacy}).
@@ -182,7 +182,7 @@ Our contributions are as follows.
 propose a  solution to protect the users' login activities;
     that is, solve this challenge by designing identity-transformation functions.
 \item
-The UPPRESSO protocol is then presented based on the identity transformations,
+The UPPRESSO protocol is presented based on the identity transformations,
     with several designs specific for web applications.
 We prove that UPPRESSO satisfies the security and privacy requirements of SSO services.
 

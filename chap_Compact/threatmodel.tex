@@ -6,7 +6,7 @@
 
 This section presents the threat model and assumptions.
 Then,
-    we design identity-transformation functions satisfying the requirements,
+    we introduce identity-transformation functions satisfying the requirements,
     and the detailed UPPRESSO protocols.
 %The compatibility with OIDC is also discussed.
 
@@ -20,6 +20,7 @@ Malicious users and RPs behave arbitrarily and might collude with each other,
 %While, the IdP will follow the protocol correctly, and is only curious about the user's privacy.
 %The details are as follows.
 
+\vspace{0.4mm}
 \noindent \textbf{Curious-but-honest IdP.}
 The IdP strictly follows the protocol, while being interested in learning user privacy.  %without violating the protocol.
 For example, it might store all received messages
@@ -36,15 +37,16 @@ We do not consider the collusion of the IdP and RPs.
     If the IdP could collude with some RPs,
         a user would finish login instances completely with collusive entities
         and it is rather difficult to prevent the IdP-based login tracing across these RPs
-            while keeping the features of SSO as many as possible.
-Note that we aim to design schemes for a user without any permeant secret verified by the RPs.
+            while keeping all the features of SSO.
+Note that we aim to design schemes for a user without any non-ephemeral secret or credential verified by the RPs.
 
 %User's goal: 向IdP发送identity token，使IdP认为自己是另一个victim
 %方式：1）已经拥有有效的identity token，希望与IdP协商出相同的PID_RP；2）通过篡改或者伪造identity token来实现攻击
 
+\vspace{0.4mm}
 \noindent \textbf{Malicious Users.}
 We assume the adversary could control a set of users,
- by stealing users' credentials or registering Sybil accounts in the system.
+ by stealing users' credentials or registering Sybil users in the system.
 %These malicious users aim
 %to break the security of UPPRESSO.
 They want to impersonate a victim user at honest RPs, or allure the benign user to login to an honest RP under the adversary's account.
@@ -57,15 +59,15 @@ A malicious user might
 
 %RP's goal:1)获得目前登录用户在其他RP可用的identity token；2）collusive RP 关联用户
 
-\vspace{1mm}
+\vspace{0.4mm}
 \noindent \textbf{Malicious RPs.}
-The adversary could also control a set of RPs, by registering at the IdP as an RP
+The adversary could control a set of RPs, by registering at the IdP as an RP
      or exploiting software vulnerabilities to compromise some RPs.
-The malicious RPs might behave arbitrarily to break the security and privacy guarantees of UPPRESSO.
+The malicious RPs might behave arbitrarily to break the security and privacy guarantees.
 %they may attempt to obtain a valid identity token for another RP, to allow some user to log into this target RP:
 For example,
 a malicious RP might manipulate $PID_{RP}$ in a login instance,
-    attempting to allure honest users to return an identity token which might be accepted by an honest RP;
+    attempting to allure honest users to return an identity token which might be accepted by some honest RP;
 %when a user is logging in, to receive an identity token that will be accepted by the target RP verifying $PID_{RP}$ but not $ID_{RP}$.
 % or constructing an incorrect request to trigger the IdP issuing an identity token binding with other RP.
 %Or, the malicious RPs may collude to perform RP-based identity linkage to break user privacy.
@@ -75,6 +77,7 @@ or, it might manipulate $PID_{RP}$ to affect the generation of $PID_U$,
 %to link the user's multiple logins at different RPs. %by providing correlated values (e.g., $PID_{RP}$) to the IdP.
 
 
+\vspace{0.4mm}
 \noindent \textbf{Collusive Users and RPs.} %In particular,
 Malicious users and RPs might collude with each other.
         %to break the security and privacy guarantees for benign users.
@@ -91,7 +94,7 @@ For example, a malicious RP might collude with malicious users to allure victim 
 
 \subsection{Assumptions}
 A user never authorizes the IdP to enclose any \emph{distinctive attributes} in identity tokens,
-        where distinctive attributes are identifiable information such as telephone number, Email, etc.
+        which are identifiable information such as telephone number, Email address, etc.
          %driver license,
 A user does not configure  distinctive attributes at any RP, either.
 Thus, the privacy leakage due to user re-identification by distinctive attributes,
