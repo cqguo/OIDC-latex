@@ -145,19 +145,21 @@ Then, %in an OIDC login instance,
    % which is designated in the token,
 %and prevents attackers from intercepting it.
 
-In UPPRESSO such functions of a user agent are implemented by web scripts within browsers.
+In UPPRESSO such user-agent functions are implemented by web scripts within browsers.
 %Section \ref{sec:discussion} discusses more efficient but less portable implementations with browser extensions.
 Two scripts downloaded from the visited RP and the IdP, respectively,
     and each is responsible for the communications with the origin web server.
-Only the RP script is not enough to implement the user agent;
-    otherwise, the script will leaks its origin to the IdP web server
-    (e.g., if it requests the identity token,
-    an HTTP request launched by the RP script will
-automatically carry an HTTP \verb+referer+ header, which discloses the RP domain).
+Only the RP script is not enough to implement a user agent;
+    otherwise, the script will leak its origin to the IdP web server
+    (e.g., 
+    an identity-token request sent by the RP script will
+automatically carry an HTTP \verb+referer+ header that discloses the RP domain).
 Moreover, a script from the honest IdP
 ensures confidentiality of identity tokens (i.e., it is sent to only the designated RP)
 and interacts with the user for the authorization of user attributes,
     for the RP might be malicious.
+On receiving a request,
+    the IdP checks that it is from the IdP script.
 
 The RP script prepares $ID_{RP}$ and $Enpt_{RP}$ for the IdP script, through RP certificates.
 An RP certificate is signed by the IdP during the RP registration,
