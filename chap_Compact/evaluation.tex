@@ -33,12 +33,12 @@ The RPs in three schemes provide the same function, i.e.,
 
 \begin{figure}[tb]
   \centering
-	\subfigure[Within a virtual private cloud]{
-  		\begin{minipage}[b]{0.49\textwidth}
+	\subfigure[In a virtual private cloud]{
+  		\begin{minipage}[b]{0.47\textwidth}
 			\includegraphics[width=0.99\linewidth]{fig/evaluation-lan.pdf}
 		\end{minipage}}
 	\subfigure[With a remotely-visiting browser]{
-  		\begin{minipage}[b]{0.49\textwidth}
+  		\begin{minipage}[b]{0.47\textwidth}
 			\includegraphics[width=0.99\linewidth]{fig/evaluation-internet.pdf}
 		\end{minipage}}
   \caption{The time cost of SSO login.}
@@ -50,9 +50,9 @@ The IdP and RP servers are deployed on Alibaba Cloud Elastic Compute Service,
       each of which runs Window 10 with 8 vCPUs and 32 GB memory.
 The forwarder of SPRESSO runs Ubuntu 20.04.4 with 16 vCPUs and 16 GB memory,
     also on Alibaba Cloud.
-We compare the schemes in two scenarios,
-    (\emph{a}) when a browser runs on another virtual machine (with 8 vCPUs and 32 GB memory) also on Alibaba Cloud,
-        and (\emph{b}) when a user browser runs locally (on a PC with Core i7-8700 CPU and 32 GB memory) to remotely visit the servers.
+We compare the schemes in two scenarios:
+    (\emph{a}) a user browser, Chrome 104.0.5112.81, runs on another virtual machine with 8 vCPUs and 32 GB memory on Alibaba Cloud,
+        and (\emph{b}) the browser runs locally on a PC with Core i7-8700 CPU and 32 GB memory, to remotely visit the servers.
 In the cloud scenario, all entities are deployed in the same virtual private cloud and connected to one vSwitch,
     which minimizes the influence of network delays.
 In any scenario, the IdP never directly communicates with the RP.
@@ -84,8 +84,9 @@ Compared with MITREid Connect, the main overhead of UPPRESSO is to open a new br
     by implementing a user agent with browser extensions.
 A user installs the extension
     before visiting RPs.
-We have tested such a browser extension while the IdP and RPs are unmodified,
-and experiments show about 100 ms at least will be saved for each login.}
+We tested such a browser extension while the IdP and RPs are unmodified,
+and experiments show about 90 ms and 260 ms will be saved in a login instance,
+    in a virtual private cloud and by a remotely-visiting browser, respectively.}
 The RP in SPRESSO needs  to obtain some information on the IdP  % 's public key %(SPRESSO allows a user to assign any IdPs before login without initial registrations)
      and encrypt its domain using an ephemeral key, resulting in the additional overhead.
 
