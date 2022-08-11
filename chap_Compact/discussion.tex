@@ -34,7 +34,7 @@ This probability is negligible.
 
 The capacity of accounts at any RP is also $n$.
 $\mathbb{E}$ is a finite cyclic group,
-    so $ID_{RP} = [r]G$ is also a generator and the order of $ID_{RP}$ is $n$.
+    so $ID_{RP} = [r]G$ is also a generator of order $n$.
 Given an RP,
     a unique account is inherently assigned to every user,
         because $Acct =  [ID_U]ID_{RP} = [u]ID_{RP}$.
@@ -63,10 +63,10 @@ The identity-transformation functions $\mathcal{F}_{PID_{U}}$, $\mathcal{F}_{PID
             an authorization code is forwarded to the RP script by the IdP script
                 and this code is used to ask for an identity token binding $PID_U$ and $PID_{RP}$.
 An authorization code is usually the index to retrieve the identity token from the IdP,
-        and does not disclose any information about the authenticated user.
+        and does not disclose any information on the authenticated user.
 
 
-After receiving the authorization code, the RP uses it and another secret
+After receiving the authorization code, the RP uses it and another secret credential
          which is issued by the IdP during the initial registration,
      to retrieve the identity token from the IdP \cite{OpenIDConnect}.
 In order to protect RP identities from the IdP,
@@ -131,25 +131,25 @@ Anyway, even in this case, a user's login activities at the other RPs not collus
 \noindent{\textbf{Restriction of the RP Script's Origin.}}
 When identity tokens are forwarded by the IdP script to the RP script within the user browser,
     the receiver is restricted by the \verb+postMessage+ targetOrigin mechanism \cite{postm-targeto},
-        to ensure it will forward the tokens to $Enpt_{RP}$,
-        which is bound in the RP certificate.
+        to ensure it will forward the tokens to $Enpt_{RP}$
+        that is bound in the RP certificate.
 A targetOrigin is specified as
     a domain (e.g., \verb+RP.com+) and the parts of protocol and port (if not presented, implicitly 80 for \verb+http+ and 443 for \verb+https+),
         and it requires the RP script's origin accurately matches the targetOrigin.
 
-Although the path part of $Enpt_{RP}$, e.g., \verb+/uploadTkn+,
+Although the URL path part of $Enpt_{RP}$, e.g., \verb+/uploadTkn+,
  is not checked by the targetOrigin mechanism,
   which assumes only one RP runs on a domain,
-   it brings no extra risk.
+   it brings no \emph{extra} risk.
 If two RPs run on one domain but with different endpoints to receive identity tokens
         (e.g., \verb+https://RP.com/honest/uploadTkn+ and \verb+https://RP.com/malicious/uploadTkn+),
-         they cannot be distinguished by scripts and \verb+postMessage+.
+         they cannot be distinguished by \verb+postMessage+.
 Meanwhile, browsers enforce
  the same-origin policy  in the access control of web resources \cite{sop}.
  %   and the control granularity is origins only.
 So
-    a (malicious) RP could access the other's resources in the browser,
-        e.g., steal  cookies
+    a (malicious) RP could always access the other's resources in the browser,
+        e.g., steal the cookies
         by scripts
         \verb+vwin = window.open('http://RP.com/honest')+
     and \verb+vwin.document.cookie+,
@@ -172,10 +172,8 @@ The RP certificates ensure the target RP has already registered itself at the Id
  which prevents unauthorized RPs from accessing the IdP's SSO services.
 
 This binding may be finished in another way:
-    $ID_{RP}$ is deterministically calculated based on the RP's unambiguous domain (e.g.,
-    \verb+https://RP.com/+).
-For example,
-    $Hs()$ encodes an RP's domain (or the RP script's origin) to a point on the elliptic curve $\mathbb{E}$ as $ID_{RP}$,
+    $ID_{RP}$ is deterministically calculated based on the RP's unambiguous friendly name.
+$Hs()$ encodes an RP's domain (or the RP script's origin, \verb+https://RP.com/+) to a point on the elliptic curve $\mathbb{E}$ as $ID_{RP}$,
 where
     hashing to elliptic curves $Hs()$ \cite{irtf-cfrg-hash-to-curve-16} provides collision resistance and does not reveal the discrete logarithm of the output
     (i.e., $ID_{RP} = [r]G$ but $r$ is unknown).

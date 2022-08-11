@@ -51,30 +51,30 @@ The IdP and RP servers are deployed on Alibaba Cloud Elastic Compute Service,
 The forwarder of SPRESSO runs Ubuntu 20.04.4 with 16 vCPUs and 16 GB memory,
     also on Alibaba Cloud.
 We compare the schemes in two scenarios,
-    when a user browser runs locally (on a PC with Core i7-8700 CPU and 32 GB memory) to remotely visit the IdP and RP,
-        and when a browser runs on another virtual machine (with 8 vCPUs and 32 GB memory) also on Alibaba Cloud.
-In the latter scenario, all entities are deployed in the same virtual private cloud and connected to each other in one vSwitch,
+    (\emph{a}) when a browser runs on another virtual machine (with 8 vCPUs and 32 GB memory) also on Alibaba Cloud,
+        and (\emph{b}) when a user browser runs locally (on a PC with Core i7-8700 CPU and 32 GB memory) to remotely visit the servers.
+In the cloud scenario, all entities are deployed in the same virtual private cloud and connected to one vSwitch,
     which minimizes the influence of network delays.
-Note that, in any scenario, the IdP never directly connects to the RP.
+In any scenario, the IdP never directly communicates with the RP.
 
 We divide a login flow into three parts:
 {\em Identity-token requesting} (for UPPRESSO, it includes Steps 1-2 in Figure \ref{fig:process}),
   to construct an identity-token request transmitted to the IdP;
 {\em Identity-token generation} (Step 3 in Figure \ref{fig:process}),
-    for the IdP to generate an identity token, while the user authentication and  the authorization of user attributes are not included;
+    for the IdP to generate an identity token, while the user authentication and  the authorization of user attributes are excluded;
 and {\em Identity-token acceptance} (Step 4 in Figure \ref{fig:process}),
     as the RP receives, verifies and parses the identity token.
 
 
 
-We measured the time of a login flow
+We measured the time cost
      and calculated the average of $1,000$ measurements.
 The results are shown in Figure \ref{fig:evaluation}.
 The overall times of an SSO login instance for MITREid Connect, UPPRESSO, and SPRESSO are
  (\emph{a}) 63 ms, 174 ms, and 190 ms, respectively, when all entities are deployed as Alibaba Cloud virtual machines,
 or
  (\emph{b})
-312 ms, 421 ms, and 510 ms, respectively, when the user browser runs locally to remotely visit the IdP and RP.
+312 ms, 421 ms, and 510 ms, respectively, when the user browser runs locally to remotely visit the cloud servers.
 
 In the part of identity-token requesting, %the user browser loads the RP's webpage and starts the login request.
 the RP of MITREid Connect constructs the identity-token request immediately.
@@ -83,7 +83,7 @@ the RP of MITREid Connect constructs the identity-token request immediately.
 Compared with MITREid Connect, the main overhead of UPPRESSO is to open a new browser window and download the scripts.\footnote{This overhead may be mitigated %by silently conducting these operations when the user visits the RP website, or
     by implementing a user agent with browser extensions.
 A user installs the extension
-    before visiting the RPs.
+    before visiting RPs.
 We have tested such a browser extension while the IdP and RPs are unmodified,
 and experiments show about 100 ms at least will be saved for each login.}
 The RP in SPRESSO needs  to obtain some information on the IdP  % 's public key %(SPRESSO allows a user to assign any IdPs before login without initial registrations)
@@ -100,7 +100,7 @@ So the user needs to first download the script from the RP to process this token
    %  UPPRESSO needs 34 ms.
 %Compared with MITREid Connect,
 %    it needs 2 more ms to calculate  $PID_U$.
-SPRESSO takes more time to generate an identity token,
+SPRESSO takes a little more time to generate an identity token,
     as it implements the IdP based on node.js and adopts a JavaScript cryptographic library,
  while a more efficient Java library is used in the others.
 %As the processings in SPRESSO and MITREid Connect are the same, the processing time in SPRESSO may be reduced to 32 ms.

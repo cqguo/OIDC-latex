@@ -4,7 +4,7 @@
 
 
 \subsection{Security}
-UPPRESSO satisfies the four security requirements of identity tokens in SSO services,
+UPPRESSO satisfies the security requirements of identity tokens in SSO services,
      as discussed in Section \ref{subsec:basicrequirements}.
 \vspace{-\topsep}
 \begin{itemize}
@@ -19,7 +19,7 @@ UPPRESSO satisfies the four security requirements of identity tokens in SSO serv
 \item \textbf{User Identification}~The user (pseudo-)identity bound in the identity token identifies
         the authenticated user, and only this user.
  % 能够被算出来的account，对应了the authenticated user；而且仅有这个user
-\item \textbf{Confidentiality}~An identity token issued by the IdP,
+\item \textbf{Confidentiality}~An identity token 
     is accessible to only
                 the authenticated user and the target RP,
                     in addition to the IdP.
@@ -30,12 +30,12 @@ UPPRESSO satisfies the four security requirements of identity tokens in SSO serv
 
 \noindent\textbf{RP Designation.}
 The identity token binds $PID_{RP}$ identifying the target RP,
-    because $t$ is sent the target RP with $ID_{RP}$ and $PID_{RP} = [t]ID_{RP}$.
+    because $t$ is sent to the target RP with $ID_{RP}$ and $PID_{RP} = [t]ID_{RP}$.
 
 
 Next, based on the ECDLP
     we prove that,
-    for an adversary
+    for an adversary,
         the probability of finding $t$ and $t'$
     satisfying $[t]ID_{RP_j} = [t']ID_{RP_{j'}}$ is negligible,
     where $RP_j$ and $RP_{j'}$ are any two RPs in the finite set of RPs (i.e.,
@@ -55,7 +55,7 @@ Here, ${\rm Pr}\{\}$ denotes the probability.
 So $\epsilon_{c}(k)$ becomes negligible with the increasing security parameter $k$.
 
 Assume a game $\mathcal{G}_c$ between an adversary and a challenger,
-    to describe the $PID_{RP}$ collision attack:
+    to describe this $PID_{RP}$ collision attack:
 the adversary receives a finite set of RP identities from the challenger,
  denoted as ($ID_{RP_1}$, $ID_{RP_2}$, ..., $ID_{RP_m}$)
  where $m$ is the amount of RPs in the system,
@@ -68,7 +68,7 @@ We define the probability that the adversary succeeds in this game as ${\rm Pr}_
 
 \begin{figure}[tb]
   \centering
-  \includegraphics[width=0.95\linewidth]{fig/ecdlp_algorithm.pdf}
+  \includegraphics[width=0.96\linewidth]{fig/ecdlp_algorithm.pdf}
   \caption{The algorithm based on the $PID_{RP}$ collision, to solve the ECDLP.}
   \label{fig:ecdlp_algorithm}
 \end{figure}
@@ -97,10 +97,10 @@ If the adversary is able to find $t$ and $t'$
     satisfying that $[t]ID_{RP_j} = [t']ID_{RP_{j'}}$,
     it will have non-negligible advantages in $\mathcal{G}_c$
         and
-         ${\rm Pr}_s$ becomes non-negligible as the security parameter $k$ increases.
+         ${\rm Pr}_s$ becomes non-negligible as $k$ increases.
 Because $m \ll 2^k$, ${\rm Pr}\{\mathcal{D}^*_c(G, [x]G)=x\} = \frac{1}{m}{\rm Pr}_s$ also
 becomes non-negligible with the increasing $k$.
-This violates the ECDLP.
+This definitely violates the ECDLP.
 Thus, the probability of finding $t$ and $t'$ satisfying that $[t]ID_{RP_j} = [t']ID_{RP_{j'}}$ in UPPRESSO is negligible,
     and then the adversary cannot break RP designation.
 
@@ -192,7 +192,7 @@ The identity token binds $Acct$ and $ID_{RP}$ implicitly,
 %It is ensured by the IdP's signatures:
 The identity token binding $PID_U$ and $PID_{RP}$ is signed by the IdP.
 According to the proof of RP designation,
-    there is no $t' \neq t$ but satisfying that $PID_{RP} = [t]ID_{RP_j} = [tr]G = [t'r']G = [t']ID_{RP_{j'}}$.
+    there is no $t' \neq t$ but satisfying that $PID_{RP} = [t]ID_{RP_j} = [t']ID_{RP_{j'}}$.
 That is, the identity token explicitly binding $PID_U$ and $PID_{RP}$,
     matches \emph{only} one $ID_{RP}$ and then also \emph{only} one $Acct = [t^{-1}]PID_{U}$.
 Thus,
@@ -226,7 +226,7 @@ an IdP process,
 These processes communicate with each other through events such as HTTPS request and response.
 We consider all RP and browser processes are honest,
  while model an RP or a browser controlled by an adversary as attacker processes.
-Within the honest browsers,
+Within an honest browser,
  honest IdP scripts, honest RP scripts and also attacker scripts are invoked.
 %Although the scripts coexist in the same browser, they are strictly separated.
 Script processes communicate with each other through \verb+postMessage+,
@@ -239,7 +239,7 @@ Script processes communicate with each other through \verb+postMessage+,
 %attacker script processes
 
 After formulating UPPRESSO by the Dolev-Yao style model,
-    we trace the lifecycle of an identity token,
+    we trace the whole lifecycle of an identity token,
         starting when it is generated and ending when accepted by the RP,
  to ensure the token is not leaked to attackers or tampered with by any adversary.
 We locate the generation of an identity token, and trace to all places
@@ -313,7 +313,7 @@ after receiving $\mathfrak{L}$ and $L'$ from a challenger,
 
 \begin{figure}[tb]
   \centering
-  \includegraphics[width=0.99\linewidth]{fig/dalgorithm.pdf}
+  \includegraphics[width=0.995\linewidth]{fig/dalgorithm.pdf}
   \caption{The algorithm based on the RP-based identity linkage, to solve the ECDDH problem.}
   \label{fig:dalgorithm}
 \end{figure}
@@ -337,13 +337,13 @@ On receiving the input, the challenger of $\mathcal{G}_r$ randomly chooses
  $\{u_1, u_2, \cdots, u_v\}$, $\{r_1, r_2, \cdots, r_c\}$, $\{t_{1, 1}, t_{1, 2}, \cdots, t_{v, c}\}$, and $t'$ from $\mathbb{Z}_n$.
 Then the challenger constructs $\mathfrak{L}$ and $L'$ as below.
 It first assigns $L_{i, j} = ([r_j]G, t_{i, j}, [u_ir_j]G)$, %$1\leq i \leq v$ and $1\leq j \leq c$,
-    and randomly chooses $k \in [1, v]$ to
- replace $[u_k r_j]G$ with $[r_j]Q_1=[xr_j]G$ for $1\leq j \leq c$.
+    and randomly chooses $d \in [1, v]$ to
+ replace $[u_d r_j]G$ with $[r_j]Q_1=[xr_j]G$ for $1\leq j \leq c$.
 So $\mathfrak{L}=\left \{ \begin{matrix}
 L_{1,1},&L_{1,2},&\cdots,&L_{1,c}\\
 L_{2,1},& L_{2,2},&\cdots,&L_{2,c}\\
 \cdots,&\cdots,&\cdots,&\cdots\\
-([r_{1}]G, t_{k, 1}, [r_{1}]Q_1),&\cdots,&\cdots,&([r_{c}]G, t_{k, c}, [r_{c}]Q_1)\\
+([r_{1}]G, t_{d, 1}, [r_{1}]Q_1),&\cdots,&\cdots,&([r_{c}]G, t_{d, c}, [r_{c}]Q_1)\\
 \cdots,&\cdots,&\cdots,&\cdots\\
 L_{v,1},&L_{v,2},&\cdots,&L_{v,c}
 \end{matrix}\right\}$.
@@ -353,8 +353,8 @@ Next, it constructs $L' = (Q_2, t', Q_3) = ([y]G, t', [z/y][y]G)$.
 Finally,
     $\mathfrak{L}$ and $L'$ are sent to the adversary,
         and the output $s$ of $\mathcal{G}_r$ is output by the challenger.
-According to the construction of $\mathfrak{L}$ and $L'$,
-    $x$ is actually inserted into $\mathfrak{L}$ as $u_k$
+According to the above construction of $\mathfrak{L}$ and $L'$,
+    $x$ is actually inserted into $\mathfrak{L}$ as $u_d$
     and $z/y$ is assigned to $u'$.
 So, if $z = xy$, $z/y=x$ and $ID_{U'} \in \{ID_{U_1}, ID_{U_2}, \cdots, ID_{U_v}\}$;
     otherwise, $ID_{U'} \in \mathbb{Z}_n$.
