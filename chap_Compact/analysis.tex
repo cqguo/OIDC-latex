@@ -6,13 +6,13 @@
 \subsection{Security}
 UPPRESSO satisfies the security requirements of identity tokens in SSO services,
      as discussed in Section \ref{subsec:basicrequirements}.
-\vspace{-\topsep}
+%\vspace{-\topsep}
 \begin{itemize}
-\setlength{\topsep}{0pt}
-\setlength{\partopsep}{0pt}
-\setlength{\itemsep}{0pt}
-\setlength{\parsep}{0pt}
-\setlength{\parskip}{0pt}
+%\setlength{\topsep}{0pt}
+%\setlength{\partopsep}{0pt}
+%\setlength{\itemsep}{0pt}
+%\setlength{\parsep}{0pt}
+%\setlength{\parskip}{0pt}
 \item  \textbf{RP Designation}~The RP (pseudo-)identity bound in the identity token
      identifies the target RP, and only this RP.
  % 仅有一个RP与之对应。
@@ -90,9 +90,8 @@ As $[r_j]G$ is randomly replaced by the challenger,
     $Q$ and other RP identities in the input set are indistinguishable to the adversary.
 Thus,
 \begin{align*}
-{\rm Pr}\{\mathcal{D}^*_c(G, [x]G)=x\} = {\rm Pr}\{s = x\}={\rm Pr}\{a=j\}{\rm Pr}_s=\frac{1}{m}{\rm Pr}_s
+&{\rm Pr}\{\mathcal{D}^*_c(G, [x]G)=x\} = {\rm Pr}\{s = x\}\\=&{\rm Pr}\{a=j\}{\rm Pr}_s=\frac{1}{m}{\rm Pr}_s
 \end{align*}
-
 If the adversary is able to find $t$ and $t'$
     satisfying that $[t]ID_{RP_j} = [t']ID_{RP_{j'}}$,
     it will have non-negligible advantages in $\mathcal{G}_c$
@@ -311,12 +310,6 @@ after receiving $\mathfrak{L}$ and $L'$ from a challenger,
     the adversary outputs the result $s = 1$ if it determines that $u' \in \{u_1, u_2, \cdots, u_v\}$,
         or $s = 0$ otherwise.
 
-\begin{figure}[tb]
-  \centering
-  \includegraphics[width=0.995\linewidth]{fig/dalgorithm.pdf}
-  \caption{The algorithm based on the RP-based identity linkage, to solve the ECDDH problem.}
-  \label{fig:dalgorithm}
-\end{figure}
 
 We define the adversary's advantage in $\mathcal{G}_r$ as ${\rm Adv}_A$.
 %If the adversary is able to distinguish whether $u' \in \{u_1, u_2, \cdots, u_v\}$ or not,
@@ -360,10 +353,17 @@ So, if $z = xy$, $z/y=x$ and $ID_{U'} \in \{ID_{U_1}, ID_{U_2}, \cdots, ID_{U_v}
     otherwise, $ID_{U'} \in \mathbb{Z}_n$.
 Thus,
 \begin{align*}
-&{\rm Pr}_1={\rm Pr}\{\mathcal{D}^*_r(G, [x]G, [y]G, [xy]G)=1\}\\=&{\rm Pr}'_1 =  {\rm Pr}\{\mathcal{G}_r(\mathfrak{L}, L'|ID_{U'} \in \{ID_{U_1}, ID_{U_2}, \cdots, ID_{U_v}\})=1\} \\
-&{\rm Pr}_2={\rm Pr}\{\mathcal{D}^*_r(G, [x]G, [y]G, [z]G)=1\}\\ =&{\rm Pr}'_2 =  {\rm Pr}\{\mathcal{G}_r(\mathfrak{L}, L'|ID_{U'} \in \mathbb{Z}_n)=1\}\\
+&{\rm Pr}_1={\rm Pr}\{\mathcal{D}^*_r(G, [x]G, [y]G, [xy]G)=1\}={\rm Pr}'_1 \\=&  {\rm Pr}\{\mathcal{G}_r(\mathfrak{L}, L'|ID_{U'} \in \{ID_{U_1}, ID_{U_2}, \cdots, ID_{U_v}\})=1\} \\
+&{\rm Pr}_2={\rm Pr}\{\mathcal{D}^*_r(G, [x]G, [y]G, [z]G)=1\} ={\rm Pr}'_2 \\=&  {\rm Pr}\{\mathcal{G}_r(\mathfrak{L}, L'|ID_{U'} \in \mathbb{Z}_n)=1\}\\
 &{\rm Adv}_A=|{\rm Pr}'_1-{\rm Pr}'_2|=|{\rm Pr}_1-{\rm Pr}_2|=\epsilon_{r}(k)
 \end{align*}
+
+\begin{figure}[tb]
+  \centering
+  \includegraphics[width=0.95\linewidth]{fig/dalgorithm.pdf}
+  \caption{The algorithm based on the RP-based identity linkage, to solve the ECDDH problem.}
+  \label{fig:dalgorithm}
+\end{figure}
 
 The ECDDH assumption means that in $\mathcal{G}_r$ the adversary does not have advantages,
     i.e., cannot distinguish a user $U'$ chosen from \{${U_1}, {U_2}, \cdots, {U_v}$\}

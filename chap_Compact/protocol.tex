@@ -74,10 +74,11 @@ PID_{RP} = \mathcal{F}_{PID_{RP}}(ID_{RP}) = [t]{ID_{RP}} = [tr]G
 %Now, the identity token-request to the IdP contains a user identity $ID_U$ and a pseudo-identity of the RP $PID_{RP}$. Therefore,
 On receiving an identity-token request with $ID_U$ and $PID_{RP}$,
     the IdP calculates $PID_{U}$.
-\begin{equation}
- PID_{U} = \mathcal{F}_{PID_U}(ID_U, PID_{RP}) = [{ID_U}]{PID_{RP}} = [utr]G
+\begin{multline}
+  \ \ \ \ \ \ \ \ \ PID_{U} = \mathcal{F}_{PID_U}(ID_U, PID_{RP}) \\=
+  [{ID_U}]{PID_{RP}} = [utr]G \ \ \ \ \ \ \ \ \ \ \            
  \label{equ:PIDU}
-\end{equation}
+\end{multline}
 
 %From Equations% \ref{equ:IDRP},
 % \ref{equ:PIDRP} and \ref{equ:PIDU}, we see that $PID_U = ({N_UID_U} \bmod n) \cdot {ID_{RP}}$. So, $PID_U$ is a one-time pseudo-identity. It is only valid in one login session and one identity token.
@@ -94,10 +95,11 @@ The trapdoor $t$ is sent to the target RP,
 which calculates $PID_{RP}$ to match the RP pseudo-identity in identity tokens.
 On verifying a token binding $PID_U$ and $PID_{RP}$,
     it calculates $Acct$ as below.
-\begin{equation}
-   Acct = \mathcal{F}_{Acct}(PID_{U}, PID_{RP}) = [t^{-1} \bmod n]PID_{U}
+\begin{multline}
+  \ \ \ \ \ \ \ \ \  Acct = \mathcal{F}_{Acct}(PID_{U}, PID_{RP}) 
+   \\= [t^{-1} \bmod n]PID_{U} \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 
    \label{equ:Account}
-\end{equation}
+\end{multline}
 
 From Equations \ref{equ:PIDRP}, \ref{equ:PIDU} and \ref{equ:Account}, it is derived that
 %\begin{multline}\label{equ:AccountNotChanged}
@@ -186,7 +188,7 @@ The scripts communicate with each other within the browser through the \verb+pos
 and the receiver (i.e., the RP script)
  is restricted by the \verb+postMessage+ targetOrigin mechanism \cite{postm-targeto}.
 When the IdP script sends identity tokens,
- the receiver's origin is set as a parameter, e.g., \verb+window.opener.postMessage(tkn, 'https://RP.com')+,
+ the receiver's origin is set as a parameter, e.g., \verb+window.opener.postMessage+ \verb+(tkn, 'https://RP.com')+,
   so only a script from this targetOrigin is a legal receiver.
 The parameter consists of
     the protocol (i.e., \verb+https://+),
@@ -270,12 +272,13 @@ The IdP keeps $SK$ secret, and $PK$ is publicly known.
 %Each RP launches an initial registration operation to finish configurations.
 Each RP registers itself at the IdP to obtain $ID_{RP}$
  and its RP certificate $Cert_{RP}$ as follows:
-\vspace{-\topsep}\begin{enumerate}
-\setlength{\topsep}{0pt}
-\setlength{\partopsep}{0pt}
-\setlength{\itemsep}{0pt}
-\setlength{\parsep}{0pt}
-\setlength{\parskip}{0pt}
+%\vspace{-\topsep}
+\begin{enumerate}
+%\setlength{\topsep}{0pt}
+%\setlength{\partopsep}{0pt}
+%\setlength{\itemsep}{0pt}
+%\setlength{\parsep}{0pt}
+%\setlength{\parskip}{0pt}
 \item
 An RP sends a registration request, including the endpoint to receive identity tokens
     and other information.
@@ -332,12 +335,13 @@ Each solid horizontal line means some messages between the user and the IdP (or 
 \vspace{0.4mm}
 \noindent 1. {\em Script Downloading.}
 The browser downloads the scripts from the visited RP and the IdP.
-\vspace{-\topsep}\begin{itemize}
-\setlength{\topsep}{0pt}
-\setlength{\partopsep}{0pt}
-\setlength{\itemsep}{0pt}
-\setlength{\parsep}{0pt}
-\setlength{\parskip}{0pt}
+%\vspace{-\topsep}
+\begin{itemize}
+%\setlength{\topsep}{0pt}
+%\setlength{\partopsep}{0pt}
+%\setlength{\itemsep}{0pt}
+%\setlength{\parsep}{0pt}
+%\setlength{\parskip}{0pt}
 \item[1.1]
 When attempting to visit any protected resources at the RP,
     the user downloads the RP script.
@@ -352,12 +356,13 @@ The redirection to the IdP downloads the IdP script.
 %\vspace{1mm}
 \noindent 2. {\em RP Identity Transformation.}
 The user and the RP negotiate $PID_{RP} = [t]{ID_{RP}}$.
-\vspace{-\topsep}\begin{itemize}
-\setlength{\topsep}{0pt}
-\setlength{\partopsep}{0pt}
-\setlength{\itemsep}{0pt}
-\setlength{\parsep}{0pt}
-\setlength{\parskip}{0pt}
+%\vspace{-\topsep}
+\begin{itemize}
+%\setlength{\topsep}{0pt}
+%\setlength{\partopsep}{0pt}
+%\setlength{\itemsep}{0pt}
+%\setlength{\parsep}{0pt}
+%\setlength{\parskip}{0pt}
 \item[2.1] The IdP script chooses a random number $t$ in $\mathbb{Z}_n$ and sends it to the RP script through \verb+postMessage+.
 The RP script sends $t$ to the RP.
 \item[2.2] On receiving $t$,
@@ -376,12 +381,13 @@ The RP replies with $Cert_{RP}$, which is then transmitted from the RP script to
 %\vspace{1mm}
 \noindent 3. {\em Identity-Token Generation.}
 The IdP calculates $PID_U = [ID_U]{PID_{RP}}$ and signs the identity token. % The processes are as follows.
-\vspace{-\topsep}\begin{itemize}
-\setlength{\topsep}{0pt}
-\setlength{\partopsep}{0pt}
-\setlength{\itemsep}{0pt}
-\setlength{\parsep}{0pt}
-\setlength{\parskip}{0pt}
+%\vspace{-\topsep}
+\begin{itemize}
+%\setlength{\topsep}{0pt}
+%\setlength{\partopsep}{0pt}
+%\setlength{\itemsep}{0pt}
+%\setlength{\parsep}{0pt}
+%\setlength{\parskip}{0pt}
 \item[3.1]
 %The IdP script checks that $PID_{RP}$ is the one registered in Step 3.1
 %            and $Enpt_{RP}$ matches the one in $Cert_{RP}$.
@@ -404,12 +410,13 @@ The IdP then signs an identity token $[PID_{RP}, PID_U, Issuer, Validity, Attr]_
 %\vspace{1mm}
 \noindent 4. {\em $Acct$ Calculation.}
 The RP receives the identity token and allows the user to login.
-\vspace{-\topsep}\begin{itemize}
-\setlength{\topsep}{0pt}
-\setlength{\partopsep}{0pt}
-\setlength{\itemsep}{0pt}
-\setlength{\parsep}{0pt}
-\setlength{\parskip}{0pt}
+%\vspace{-\topsep}
+\begin{itemize}
+%\setlength{\topsep}{0pt}
+%\setlength{\partopsep}{0pt}
+%\setlength{\itemsep}{0pt}
+%\setlength{\parsep}{0pt}
+%\setlength{\parskip}{0pt}
 \item [4.1]
 The IdP script forwards the identity token to the RP script,
     which then sends it to the RP through $Enpt_{RP}$.
