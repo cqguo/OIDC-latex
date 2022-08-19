@@ -1,0 +1,525 @@
+
+%usenix 2023ģ��
+\documentclass[letterpaper,twocolumn,10pt]{article}
+\usepackage{usenix-2020-09}
+
+%SP 2023ģ��
+%\documentclass[conference,compsoc]{IEEEtran}
+
+
+\usepackage[small]{titlesec}
+% to be able to draw some self-contained figs
+%\usepackage{tikz}
+\usepackage{amsmath}
+\usepackage{bm}
+
+% inlined bib file
+\usepackage{filecontents}
+
+\usepackage{wasysym}
+
+
+\usepackage{lipsum,cuted}
+\usepackage{float}%%%%�ṩ�������[H]ѡ�����ȡ������
+\usepackage{caption}%%�ṩ\captionof����
+
+
+\pagestyle{plain}
+
+
+\usepackage{graphicx}
+\usepackage{verbatim}
+\usepackage{caption}
+%
+
+%\usepackage{algpseudocode}
+\usepackage{amsmath,amssymb,amsthm}
+
+%\usepackage{graphicx}
+%\usepackage{geometry}
+\usepackage{subfigure}
+\usepackage{url}
+\usepackage{multirow}
+\usepackage{listings}
+\usepackage{cite}
+\usepackage{array}
+\usepackage{enumerate}
+\usepackage{booktabs}
+\usepackage{color}
+\usepackage{soul}
+\usepackage{multicol}
+%\usepackage{algcompatible}
+%\usepackage[compatible]{algpseudocode}
+
+% correct bad hyphenation here
+\hyphenation{op-tical net-works semi-conduc-tor}
+
+\begin{document}
+
+\pagenumbering{arabic}
+\title{UPPRESSO: Untraceable and Unlinkable Privacy-PREserving\\Single Sign-On Services}
+
+
+\maketitle
+\begin{abstract}
+Single sign-on (SSO) allows a user to maintain only the credential at the identity provider (IdP),
+ %instead of one credential for each relying party (RP),
+    to login to numerous RPs.
+However, SSO introduces extra privacy threats, compared with traditional authentication mechanisms,
+ as (\emph{a}) the IdP could track all RPs which a user is visiting,
+ and (\emph{b}) collusive RPs could learn a user's online profile by linking his identities across these RPs.
+%
+This paper proposes a privacy-preserving SSO system, called \emph{UPPRESSO},
+ to protect a user's login activities against both the curious IdP and collusive RPs.
+We analyze the identity dilemma between the security requirements and these privacy concerns,
+    and convert the SSO privacy problems into an identity transformation challenge.
+In each login instance, % of UPPRESSO,
+    an \emph{ephemeral pseudo-identity} (denoted as $PID_{RP}$) of the RP,
+     %which the user is attempting to visit,
+        is firstly negotiated between the user and the RP.
+$PID_{RP}$ is sent to the IdP and designated in the identity token,
+        so the IdP is not aware of the visited RP.
+Meanwhile,
+    $PID_{RP}$ is used by the IdP to transform the \emph{permanent user identity} $ID_U$
+        into an \emph{ephemeral user pseudo-identity} (denoted as $PID_U$)
+        in the identity token.
+On receiving the identity token,
+    the RP transforms $PID_U$ into a \emph{permanent account} (denoted as $Acct$) of the user,
+     by an ephemeral trapdoor in the negotiation.
+Given a user, the account at each RP is unique and different from $ID_U$,
+    so collusive RPs cannot link his identities across these RPs.
+%To the best of our knowledge,
+%    this is the first practical SSO solution which solves the privacy problems caused by both the curious IdP and collusive RPs.
+%
+We build the UPPRESSO prototype %system for web applications
+    on top of MITREid Connect, an open-source implementation of OIDC.
+The extensive evaluation shows that UPPRESSO
+        fulfills the requirements of both security and privacy
+        and introduces reasonable overheads.
+\end{abstract}
+
+%\begin{IEEEkeywords}
+%Single sign-on, security, privacy. %, trace, linkage
+%\end{IEEEkeywords}
+
+\input{chap_Compact/introduction.tex}
+\input{chap_Compact/background.tex}
+\input{chap_Compact/relatedwork.tex}
+\input{chap_Compact/challenges.tex}
+\input{chap_Compact/threatmodel.tex}
+\input{chap_Compact/protocol.tex}
+%\input{chap_Compact/privacy.tex}
+%\input{chap_Compact/webmodel.tex}
+\input{chap_Compact/analysis.tex}
+\input{chap_Compact/implementation.tex}
+\input{chap_Compact/evaluation.tex}
+\input{chap_Compact/discussion.tex}
+\input{chap_Compact/conclusion.tex}
+
+
+
+
+% An example of a floating figure using the graphicx package.
+% Note that \label must occur AFTER (or within) \caption.
+% For figures, \caption should occur after the \includegraphics.
+% Note that IEEEtran v1.7 and later has special internal code that
+% is designed to preserve the operation of \label within \caption
+% even when the captionsoff option is in effect. However, because
+% of issues like this, it may be the safest practice to put all your
+% \label just after \caption rather than within \caption{}.
+%
+% Reminder: the "draftcls" or "draftclsnofoot", not "draft", class
+% option should be used if it is desired that the figures are to be
+% displayed while in draft mode.
+%
+%\begin{figure}[!t]
+%\centering
+%\includegraphics[width=2.5in]{myfigure}
+% where an .eps filename suffix will be assumed under latex,
+% and a .pdf suffix will be assumed for pdflatex; or what has been declared
+% via \DeclareGraphicsExtensions.
+%\caption{Simulation Results}
+%\label{fig_sim}
+%\end{figure}
+
+% Note that IEEE typically puts floats only at the top, even when this
+% results in a large percentage of a column being occupied by floats.
+
+
+% An example of a double column floating figure using two subfigures.
+% (The subfig.sty package must be loaded for this to work.)
+% The subfigure \label commands are set within each subfloat command, the
+% \label for the overall figure must come after \caption.
+% \hfil must be used as a separator to get equal spacing.
+% The subfigure.sty package works much the same way, except \subfigure is
+% used instead of \subfloat.
+%
+%\begin{figure*}[!t]
+%\centerline{\subfloat[Case I]\includegraphics[width=2.5in]{subfigcase1}%
+%\label{fig_first_case}}
+%\hfil
+%\subfloat[Case II]{\includegraphics[width=2.5in]{subfigcase2}%
+%\label{fig_second_case}}}
+%\caption{Simulation results}
+%\label{fig_sim}
+%\end{figure*}
+%
+% Note that often IEEE papers with subfigures do not employ subfigure
+% captions (using the optional argument to \subfloat), but instead will
+% reference/describe all of them (a), (b), etc., within the main caption.
+
+
+% An example of a floating table. Note that, for IEEE style tables, the
+% \caption command should come BEFORE the table. Table text will default to
+% \footnotesize as IEEE normally uses this smaller font for tables.
+% The \label must come after \caption as always.
+%
+%\begin{table}[!t]
+%% increase table row spacing, adjust to taste
+%\renewcommand{\arraystretch}{1.3}
+% if using array.sty, it might be a good idea to tweak the value of
+% \extrarowheight as needed to properly center the text within the cells
+%\caption{An Example of a Table}
+%\label{table_example}
+%\centering
+%% Some packages, such as MDW tools, offer better commands for making tables
+%% than the plain LaTeX2e tabular which is used here.
+%\begin{tabular}{|c||c|}
+%\hline
+%One & Two\\
+%\hline
+%Three & Four\\
+%\hline
+%\end{tabular}
+%\end{table}
+
+
+% Note that IEEE does not put floats in the very first column - or typically
+% anywhere on the first page for that matter. Also, in-text middle ("here")
+% positioning is not used. Most IEEE journals/conferences use top floats
+% exclusively. Note that, LaTeX2e, unlike IEEE journals/conferences, places
+% footnotes above bottom floats. This can be corrected via the \fnbelowfloat
+% command of the stfloats package.
+
+
+
+
+% conference papers do not normally have an appendix
+
+
+% use section* for acknowledgement
+%\section*{Acknowledgment}
+
+% trigger a \newpage just before the given reference
+% number - used to balance the columns on the last page
+% adjust value as needed - may need to be readjusted if
+% the document is modified later
+%\IEEEtriggeratref{8}
+% The "triggered" command can be changed if desired:
+%\IEEEtriggercmd{\enlargethispage{-5in}}
+
+% references section
+
+% can use a bibliography generated by BibTeX as a .bbl file
+% BibTeX documentation can be easily obtained at:
+% http://www.ctan.org/tex-archive/biblio/bibtex/contrib/doc/
+% The IEEEtran BibTeX style support page is at:
+% http://www.michaelshell.org/tex/ieeetran/bibtex/
+%\bibliographystyle{IEEEtranS}
+% argument is your BibTeX string definitions and bibliography database(s)
+%\bibliography{IEEEabrv,../bib/paper}
+%
+% <OR> manually copy in the resultant .bbl file
+% set second argument of \begin to the number of references
+% (used to reserve space for the reference number labels box)
+%\begin{thebibliography}{1}
+
+%\end{thebibliography}
+\bibliographystyle{IEEEbib}
+\bibliography{ref}
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% ��ʱɾȥ��¼��֤��
+
+%\input{chap_Compact/appendix.tex}
+
+
+% that's all folks
+\end{document}
+
+
+UPPRESSO: An Unlinkable Privacy-PREserving
+Single Sign-On System
+Abstract—As a widely adopted identity management and au-
+thentication mechanism in today’s Internet, single sign-on (SSO)
+allows a user to maintain only the credential for the identity
+provider (IdP), instead of one credential for each relying party
+(RP), which shifts the burden of user authentication from RPs to
+the IdP. However, SSO introduces new privacy leakage threats,
+since (a) a curious IdP could track all the RPs a user has visited,
+and (b) collusive RPs could learn a user’s online profile by linking
+her identifiers and activities across multiple RPs. Several privacy-
+preserving SSO solutions have been proposed to defend against
+either the curious IdP or collusive RPs, however, none of them
+can address both privacy leakage threats at the same time.
+In this paper, we propose a privacy-preserving SSO system,
+called UPPRESSO, to protect a user’s login traces against both
+the curious IdP and collusive RPs. We first formally analyze
+the privacy dilemma between SSO security requirements and
+the new privacy requirements, and convert the SSO privacy
+problem into an identifier-transformation problem. Then, we
+design a novel transformed RP designation scheme to transform
+the identifier of the RP, to which the user requests to log in,
+into a privacy-preserving pseudo-identifier (P IDRP ) through the
+cooperation between the user and the RP. Our trapdoor user
+identification scheme allows the RP to obtain a trapdoor from the
+transformation process and use it to derive a unique account of
+the user at that RP from her privacy-preserving pseudo-identifier
+(P IDU ) generated by the IdP. The login process of UPPRESSO
+follows the service pattern of OpenID Connect (OIDC), a widely
+deployed SSO system, with minimum modifications. Our analysis
+shows UPPRESSO provides a comprehensive privacy protection
+while achieving the same security guarantees of OIDC. The ex-
+periment evaluation on our UPPRESSO prototype demonstrates
+a satisfying performance of 254 ms on average for each login.
+Index Terms—Single sign-on, security, privacy.
+A. Identity-Transformation Functions
+We design identity-transformation functions, FP IDRP ,
+FP IDU and FAcct, on an elliptic curve E. Table I lists the
+notations, and the subscript j and/or the superscript i may be
+omitted in the case of no ambiguity.
+For each user, a unique integer u is assigned by the IdP
+and IDU = u. When an RP is registering, the IdP generates
+a random number r, and IDRP = [r]G, a unique point on E,
+is assigned to the RP. Here, u, r ∈ [1, n), r is unknown to the
+RP, and [r]G is the addition of G on the curve r times.
+IDRP -P IDRP Transformation. The user selects a random
+number t (1 < t < n) as the trapdoor and calculates P IDRP .
+P IDRP = FP IDRP (IDRP ) = [t]IDRP = [tr]G (1)
+IDU -P IDU Transformation. On receiving an identity-
+token request with IDU and P IDRP , the IdP calculates
+TABLE I: The notations in the UPPRESSO protocols.
+Notation Description
+E An elliptic curve over a finite field Fq .
+G, n A base point (or generator) of E, where the order of G is
+a prime number n.
+IDU IDU = u, 1 < u < n; the user’s unique identity at the
+IdP.
+IDRPj IDRP = [r]G, 1 < r < n; the j-th RP’s unique identity.
+t The user-generated random integer in a login instance,
+1 < t < n.
+P IDi
+RPj P IDRP = [t]IDRP = [tr]G; the j-th RP’s pseudo-
+identity, in the user’s i-th login instance to this RP.
+P IDi
+U,j P IDU = [IDU ]P IDRP = [utr]G; the user’s pseudo-
+identity, in the user’s i-th login instance to the j-th RP.
+Acctj Acct = [t−1 mod n]P IDU = [IDU ]IDRP = [ur]G;
+the user’s account at the j-th RP.
+SK,
+P K
+The IdP’s key pair, a private key and a public key, to sign
+and verify identity tokens and RP certificates.
+EnptRPj The j-th RP’s endpoint, to receive the identity tokens.
+CertRPj A signed RP certificate, binding IDRPj and EnptRPj .
+P IDU .
+P IDU = FP IDU (IDU , P IDRP ) = [IDU ]P IDRP = [utr]G
+(2)
+P IDU -Acct Transformation. The trapdoor t is sent to the
+target RP, which calculates P IDRP to match the RP pseudo-
+identity in identity tokens. On verifying a token binding P IDU
+and P IDRP , it calculates Acct as below.
+Acct = FAcct(P IDU , P IDRP ) = [t−1 mod n]P IDU (3)
+From Equations 1, 2 and 3, it is derived that
+Acct = [t−1utr mod n]G = [ur]G = [IDU ]IDRP
+The RP derives an identical permanent account from the
+identity tokens in different login instances, with the help of
+t. Given a user, the accounts at different RPs are inherently
+unique; while, given an RP, the accounts of different users
+are also unique. Moreover, due to the elliptic curve discrete
+logarithm problem (ECDLP), it is impossible for the RP to
+derive IDU from either P IDU or Acct, and for the IdP to
+derive IDRP from P IDRP . Section ?? presents the detailed
+proofs.
+Note that r is kept unknown to RPs; otherwise, two collusive
+RPs with IDRPj = [r]G and IDRPj′ = [r′]G could check
+whether [r′]Acctj = [r]Acctj′ or not, to link a user’s accounts.
+B. The Designs Specific for Web Applications
+The designs specific for web applications, enable UP-
+PRESSO to work with commercial-off-the-shelf (COTS)
+browsers. First of all, in UPPRESSO the IdP is not aware of
+the visited RP, so the user agents (or browsers) have to deal
+with the forwarding of identity tokens to the target RP, as well
+as the calculation of P IDRP . On the contrary, in commonly-
+used SSO protocols the IdP needs this information to ensure
+confidentiality of identity tokens. In the OIDC services, when
+an RP registers itself at the IdP, the redirect_uri param-
+eter is set as the endpoint URL to receive tokens [1]. Then,
+when the IdP wants to transmit identity tokens to an RP, it
+utilizes HTTP 302 redirection with this endpoint as the target
+URL in the HTTP response, so the user browser forwards it
+to the RP.
+In UPPRESSO such user-agent functions are implemented
+by web scripts within browsers. Two scripts downloaded from
+the visited RP and the IdP, respectively, and each is responsible
+for the communications with the origin web server. Only
+the RP script is not enough to implement a user agent;
+otherwise, the script will leak its origin to the IdP web server
+(e.g., an identity-token request sent by the RP script will
+automatically carry an HTTP referer header that discloses
+the RP domain). Moreover, a script from the honest IdP
+ensures confidentiality of identity tokens (i.e., it is sent to
+only the designated RP) and interacts with the user for the
+authorization of user attributes, for the RP might be malicious.
+On receiving a request, the IdP checks that it is from the IdP
+script.
+The RP script prepares IDRP and EnptRP for the IdP
+script, through RP certificates. An RP certificate is signed by
+the IdP during the RP registration, binding the RP’s identity
+and its endpoint. In a login instance the RP will provide its
+certificate through the RP script, to the IdP script. The IdP
+script verifies the RP certificate to extract IDRP and EnptRP .
+The IdP’s public key is set in the IdP script, so a user does not
+configure anything locally, as it does in popular SSO systems.
+After using the extracted IDRP to calculate P IDRP
+and receiving an identity token from the IdP, the IdP script
+needs to ensure the RP script will forward this token to
+EnptRP which is bound with IDRP in the RP certificate.
+The scripts communicate with each other within the browser
+through the postMessage HTML5 API, and the receiver
+(i.e., the RP script) is restricted by the postMessage
+targetOrigin mechanism [2]. When the IdP script sends
+identity tokens, the receiver’s origin is set as a parameter, e.g.,
+window.opener.postMessage(tkn, ’https://RP.com’),
+so only a script from this targetOrigin is a legal receiver.
+The parameter consists of the protocol (i.e., https://), the
+domain (i.e., RP.com) and a port which may be implicit.
+Finally, the browser downloads the RP script when visiting
+an RP, and this RP script opens a new window that downloads
+the IdP script. We shall prevent the referer leakage when
+the IdP script is downloaded. Generally, when a browser
+window visits another website not belonging to its opener’s
+origin, the HTTP request to this website automatically carries
+the referer header (i.e., the opener’s origin). This HTTP
+header leaks the visited RP’s domain to the IdP. Fortunately, in
+UPPRESSO this newly-opened window is a redirection from
+the RP to the IdP, but not a direct visit by the browser (Figure
+1, Steps 1.2-1.3). This leakage is prevented by setting the
+header referrer-policy=no-referrer in the HTTP
+response from the RP, when it is redirected to the IdP. Then the
+HTTP request to download the IdP script carries no referer
+header. This setting is specified by W3C [3] and widely
+supported. We tested it in browsers including Chrome, Safari,
+Edge, Opera and Firefox, and confirmed no referer leakage.
+C. The UPPRESSO Protocols
+System Initialization. The IdP generates a key pair (SK,
+P K) to sign/verify identity tokens and RP certificates. The
+IdP keeps SK secret, and P K is publicly known.
+RP Initial Registration. Each RP registers itself at the IdP to
+obtain IDRP and its RP certificate CertRP as follows:
+1) An RP sends a registration request, including the endpoint
+to receive identity tokens and other information.
+2) The IdP randomly generates r ∈ [1, n), until
+IDRP = [r]G is unique. It signs CertRP =
+[IDRP , EnptRP , ∗]SK , where [·]SK is a message signed
+using SK and ∗ is supplementary information such as
+the RP’s common name.
+3) The RP verifies CertRP using P K, and accepts IDRP
+and CertRP if they are valid.
+User Registration. Each user registers once at the IdP to set
+up a unique identity IDU and the corresponding credential.
+SSO Login. A login instance consists of four steps, namely
+script downloading, RP identity transformation, identity-token
+generation, and Acct calculation, as shown in Figure 1. In this
+figure, the operations by the IdP are linked by a vertical line,
+so are the RP’s. Two vertical lines split the user operations
+into two groups (i.e., in two browser windows), one of which
+is to communicate with the IdP, and the other with the target
+RP. Each solid horizontal line means some messages between
+the user and the IdP (or the RP), and each dotted line means
+a postMessage invocation between two scripts (or browser
+windows) within the user browser.
+1. Script Downloading. The browser downloads the scripts
+from the visited RP and the IdP.
+1.1 When attempting to visit any protected resources at the
+RP, the user downloads the RP script.
+1.2 The RP script opens a window in the browser to visit the
+login path at the RP, which is then redirected to the IdP.
+1.3 The redirection to the IdP downloads the IdP script.
+2. RP Identity Transformation. The user and the RP negotiate
+P IDRP = [t]IDRP .
+2.1 The IdP script chooses a random number t in Zn and
+sends it to the RP script through postMessage. The
+RP script sends t to the RP.
+2.2 On receiving t, the RP verifies 1 < t < n and calculates
+P IDRP . The RP replies with CertRP , which is then
+transmitted from the RP script to the IdP script, as well
+as the scope of requested user attributes.
+2.3 The IdP script verifies CertRP , extracts IDRP and
+EnptRP from CertRP and calculates P IDRP =
+[t]IDRP .
+IdPUser RP
+1.2 /login
+2.2 Calculate PIDRP
+2.2 CertRP, AttrScope
+2.3 Verify CertRP, extract IDRP
+and EnptRP, calculate PIDRP
+1.3 /script
+1.2 Redirection
+2.1 To opener window: t
+2.1 /startNegotiation(t)
+2.2 To IdP-script window:
+CertRP
+3.3 Check PIDRP, calculate PIDU, sign
+[PIDRP, PIDU, Issuer, Validity, Attr]SK
+4.1 /uploadToken(ID Token)
+4.2 Verify ID Token, extract
+PIDU, calculate Acct
+4.3 Login Result
+1.1 /script
+2.1 Randomly choose t
+1.1 RP script
+1.3 IdP script
+3.2 Authentication [optional]
+RP Script IdP ScriptFig. 1: The SSO login flow of UPPRESSO.
+3. Identity-Token Generation. The IdP calculates P IDU =
+[IDU ]P IDRP and signs the identity token.
+3.1 The IdP script requests an identity token for P IDRP and
+the user attributes.
+3.2 The IdP authenticates the user if he has not been authen-
+ticated yet.
+3.3 After obtaining the user’s authorization to enclose the
+requested attributes, the IdP checks whether the received
+P IDRP is valid, and calculates P IDU = [IDU ]P IDRP
+for the authenticated user. The IdP then signs an iden-
+tity token [P IDRP , P IDU , Issuer, V alidity, Attr]SK ,
+where Issuer is the IdP’s identity, V alidity indicates the
+validity period, and Attr contains the requested attributes.
+3.4 The IdP replies with the identity token.
+4. Acct Calculation. The RP receives the identity token and
+allows the user to login.
+4.1 The IdP script forwards the identity token to the RP
+script, which then sends it to the RP through EnptRP .
+4.2 The RP verifies the identity token, including the IdP’s
+signature and its validity period. It also verifies P IDRP
+in the token matches the one negotiated in Step 2.2.
+Then, the RP extracts P IDU and calculates Acct =
+[t−1]P IDU .
+4.3 The RP allows the user to login as Acct.
+If any verification or check fails, this flow will be halted
+immediately. For example, the user halts the flow on an invalid
+CertRP . The IdP rejects a request, if the received P IDRP is
+not on the elliptic curve E. Or, the RP rejects an identity token
+when P IDRP in it does not match the negotiated one.
+D. Compatibility with OIDC
+Among the four steps of the login flow in UPPRESSO,
+the script downloading prepares the user agent before other
+steps. The user agent of SSO is responsible for the com-
+munications between the IdP and the RP, which are imple-
+mented by browser redirections in OIDC. On the other hand,
+in UPPRESSO the scripts hide EnptRP from the IdP, and
+forward the identity token to EnptRP extracted from the RP
+certificate. So the IdP does not set redirect_uri in the
+HTTP response.
