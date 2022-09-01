@@ -25,20 +25,20 @@ Therefore,
         a malicious RP could replay a received identity token to the honest RP and login as the victim user.
 The RP allows the token holder to login as the user (pseudo-)identity specified in the accepted tokens.
 
-The SSO login flow implies \emph{confidentiality} and \emph{integrity} of identity tokens.
-An identity token shall be forwarded by the authenticated user to the target RP only,
+The SSO login flow requires \emph{confidentiality} and \emph{integrity} of identity tokens.
+An identity token should be forwarded by the authenticated user to the target RP only,
     not leaked to any other parties;
         otherwise, an adversary who presents the token, would successfully login to this honest RP.
-Integrity is also necessary
-    to prevent adversaries from tampering with an identity token.
+Integrity is necessary
+    to prevent adversaries from tampering with a token.
    %     without being detected by the RPs.
 So identity tokens are signed by the IdP and usually transmitted over HTTPS \cite{OpenIDConnect,rfc6749,SAML}.
 
-These four security requirements (i.e., RP designation, user identification, confidentiality, and integrity) of SSO identity tokens
+These security requirements (i.e., RP designation, user identification, confidentiality, and integrity) of SSO identity tokens
      have been discussed \cite{ArmandoCCCT08,FettKS16, FettKS17},
      and
-     vulnerabilities breaking any of these properties 
-            result in effective attacks \cite{SomorovskyMSKJ12, WangCW12, ArmandoCCCPS13, ZhouE14, WangZLLYLG15, WangZLG16, YangLLZH16, MainkaMS16, MainkaMSW17, YangLCZ18, YangLS17, ShiWL19, ChenPCTKT14, ccsSunB12, DiscoveringJCS, dimvaLiM16, CaoSBKVC14, TowardsShehabM14}.
+     vulnerabilities breaking any of the properties
+            result in attacks \cite{SomorovskyMSKJ12, WangCW12, ArmandoCCCPS13, ZhouE14, WangZLLYLG15, WangZLG16, YangLLZH16, MainkaMS16, MainkaMSW17, YangLCZ18, YangLS17, ShiWL19, ChenPCTKT14, ccsSunB12, DiscoveringJCS, dimvaLiM16, CaoSBKVC14, TowardsShehabM14}.
 %An adversary might attempt to login to an honest RP as a victim user (i.e., \emph{impersonation}),
 % or allure a victim user to login to an honest RP as the attacker (i.e.,  \emph{identity injection}).
 %Friendcaster used to accept any received identity token, which violates RP designation \cite{ChenPCTKT14},
@@ -75,10 +75,8 @@ These four security requirements (i.e., RP designation, user identification, con
 
 We aim to design a privacy-preserving SSO system with the four security properties as above,
     while preventing the privacy threats due to the IdP-based login tracing and the RP-based identity linkage.
-However, to satisfy the requirements of security and privacy at the same time,
-     poses a dilemma in the generation of identity tokens.
 Table \ref{tbl:notations-dilemma} lists the notations in the following explanation,
-    and the subscript $j$ and/or the superscript $i$ may be omitted, when there is no ambiguity.
+    and the subscript $j$ and/or the superscript $i$ may be omitted when there is no ambiguity.
 
 An identity token contains the (pseudo-)identities of the authenticated user and the target RP. %which is to tell the RP that this user has been authenticated by the IdP.
 % Let us denote the long-term unique identifiers of the user and the RP as $ID_U$ and $ID_{RP}$, respectively.
@@ -95,8 +93,8 @@ So an \emph{ephemeral} pseudo-identity for the RP (i.e., $PID_{RP}$) shall be us
    % the IdP-based login tracing is still effective, to correlate a user's multiple login instances.
 
 To prevent the RP-based identity linkage,
- the IdP shall not enclose $ID_U$ in identity tokens.
-A user pseudo-identity (i.e., $PID_U$) shall be bound instead:
+ the IdP does not enclose $ID_U$ in identity tokens.
+A user pseudo-identity (i.e., $PID_U$) is bound instead:
     (\emph{a}) the RP cannot derive any information about $ID_U$ from any $PID_{U,j}$,
     which implies $PID_{U,j}$ for different RPs shall be independent of each other;
     (\emph{b}) in multiple login instances to the RP, $PID_U^i$ shall be independent of each other and generated ephemerally,
@@ -110,7 +108,7 @@ A user pseudo-identity (i.e., $PID_U$) shall be bound instead:
 Give a user,
     (\emph{a}) any identity token contains only pseudo-identities, i.e., $PID_{U,j}^i$ and $PID_{RP_j}^i$,
         which are independent of each other for different RPs and in multiple login instances, respectively,
-    and (\emph{b}) these two \emph{ephemeral} pseudo-identities enable the target RP to derive a \emph{permanent} account, i.e., $Acct_j$.
+    and (\emph{b}) the two \emph{ephemeral} pseudo-identities enable the target RP to derive a \emph{permanent} account, i.e., $Acct_j$.
 
 
 \begin{figure}[bt]
@@ -123,7 +121,9 @@ Give a user,
 The relationships among the (pseudo-)identities in identity tokens is illustrated in Figure \ref{fig:IDCorrelation}.
 The red and green blocks represent permanent identities and ephemeral pseudo-identities, respectively.
 The arrows denote the transformations of (pseudo-)identities.
-It describes the {\em identity dilemma} of privacy-preserving SSO as below:
+%It describes the {\em identity dilemma} of privacy-preserving SSO as below:
+To satisfy the requirements of security and privacy at the same time,
+     we pose the following \emph{identity dilemma} in the generation of identity tokens.
 
 \emph{Given an authenticated user and an unknown RP (i.e., permanent $ID_U$ and ephemeral $PID_{RP}$),
     the IdP is expected to generate an ephemeral pseudo-identity (i.e., $PID_{U}$)
@@ -149,20 +149,22 @@ We explicitly distinguishes a user's identity at the RP, i.e., the account,
 % so that $PID_U$ can be correctly correlated with the $Account$. Meanwhile, such information should not provide any additional knowledge for the IdP to derive the RP's identity, or for two RPs to correlate two $Account$s belonging to the same user.
 The privacy protection of SSO is converted into a challenge
  to design \emph{identity-transformation functions} as below.
-\vspace{-\topsep}\begin{itemize}
-\setlength{\topsep}{0pt}
-\setlength{\partopsep}{0pt}
-\setlength{\itemsep}{0pt}
-\setlength{\parsep}{0pt}
-\setlength{\parskip}{0pt}
+%\vspace{-\topsep}
+\begin{itemize}
+%\setlength{\topsep}{0pt}
+%\setlength{\partopsep}{0pt}
+%\setlength{\itemsep}{0pt}
+%\setlength{\parsep}{0pt}
+%\setlength{\parskip}{0pt}
 \item
 $\mathcal{F}_{PID_{RP}}(ID_{RP}) = PID_{RP}$, calculated by the user and the RP.
 From the IdP's view,
-$\mathcal{F}_{PID_{RP}}()$ is a one-way function and the calculated $PID_{RP}$ appears a random variable.
+$\mathcal{F}_{PID_{RP}}()$ is a one-way function and $PID_{RP}$ 
+is indistinguishable from random variables.
 \item
 $\mathcal{F}_{PID_U}(ID_U, PID_{RP}) = PID_{U}$, calculated by the IdP.
 From the RP's view,
-    $\mathcal{F}_{PID_U}()$ is a one-way function and the calculated $PID_{U}$ appears a random variable.
+    $\mathcal{F}_{PID_U}()$ is a one-way function and $PID_{U}$ is indistinguishable from random variables.
 \item
 $\mathcal{F}_{Acct}(PID_{U}, PID_{RP}) = Acct$, calculated by the RP.
 Given $ID_U$ and $ID_{RP}$, $Acct$ keeps permanent and unique to other accounts at this RP;

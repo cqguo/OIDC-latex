@@ -19,9 +19,8 @@
 %%Moreover, OAuth and OIDC allow users to determine the scope of attributes exposed to the RP.
 %
 
-%\vspace{1mm}
 \noindent\textbf{Anonymous SSO.}
-Anonymous SSO schemes allow authenticated users to access a service protected by the IdP,
+Such schemes allow authenticated users to access a service protected by the IdP,
     without revealing their identities.
 Anonymous SSO was proposed for the global system for mobile (GSM) communications \cite{ElmuftiWRR08},
     and formalized \cite{WangWS13}.
@@ -41,10 +40,10 @@ ZKlaims \cite{zklaim} allow users to prove statements on the credentials issued 
 PrivacyPass \cite{privacypass} allows a user to receive a great amount of anonymous tokens.
  These tokens are used to access resources on content delivery networks,
     so  the user does not interact with challenges such as CAPTCHAs.
-Crypto-Book \cite{crypto-book} coordinates key servers to generate a ring-signature private key,
+Crypto-Book \cite{crypto-book} coordinates servers to generate a ring-signature private key,
  and a user picks up his private key through a list of Email addresses (i.e., an anonymity set).
  Then, the key pair works as an untraceable pseudonym to sign messages.
-Two-party threshold-cryptography schemes are implemented with a central server,
+Two-party threshold-cryptography is implemented with a central server,
     to improve the security of user private keys \cite{mRSA,ss-rsa}:
     to sign or decrypt a message, the user needs a token from the server.
     Tandem \cite{tandem} decouples the obtaining and using of such tokens,
@@ -70,15 +69,15 @@ SAML-based SSO is also analyzed \cite{ArmandoCCCT08},
 \vspace{0.5mm}
 \noindent\textbf{SSO Implementation Vulnerabilities.}
 Vulnerabilities were found in SSO implementations for web applications,
-    resulting in attacks of impersonation and identity injection
+    resulting in effective attacks %of impersonation and identity injection
      by breaking confidentiality \cite{WangCW12,ccsSunB12,ArmandoCCCPS13,DiscoveringJCS,dimvaLiM16}, integrity \cite{WangCW12,SomorovskyMSKJ12,WangZLG16,MainkaMS16, MainkaMSW17,dimvaLiM16} or RP designation \cite{WangZLG16,MainkaMS16,MainkaMSW17,YangLCZ18,dimvaLiM16} of identity tokens.
 %In the SSO services of Google and Facebook, %from the view of browser-relayed traffics
 %    logic flaws of the IdPs and RPs were detected \cite{WangCW12}.  % to break the confidentiality and integrity of identity tokens.
-Integrity of identity tokens was not ensured in SSO systems  \cite{SomorovskyMSKJ12,WangCW12,WangZLG16,MainkaMS16, MainkaMSW17}
-due to software flaws such as XML signature wrapping \cite{SomorovskyMSKJ12},
- incomplete verification by RPs \cite{WangCW12,WangZLG16,MainkaMSW17}, and IdP spoofing \cite{MainkaMS16,MainkaMSW17}.
+Integrity of identity tokens was violated in SSO systems  %\cite{SomorovskyMSKJ12,WangCW12,WangZLG16,MainkaMS16, MainkaMSW17}
+due to software flaws such as 
+ defective verification by RPs \cite{WangCW12,WangZLG16,MainkaMSW17}, XML signature wrapping \cite{SomorovskyMSKJ12}, and IdP spoofing \cite{MainkaMS16,MainkaMSW17}.
 RP designation is broken
-    due to incorrect binding at the IdP \cite{YangLCZ18,WangZLG16} and insufficient verification by RPs \cite{MainkaMS16,MainkaMSW17,YangLCZ18}.
+    for incorrect binding at the IdP \cite{YangLCZ18,WangZLG16} or insufficient verification by RPs \cite{MainkaMS16,MainkaMSW17,YangLCZ18}.
 
 Automatic tools such as SSOScan \cite{ZhouE14}, OAuthTester \cite{YangLLZH16} and S3KVetter \cite{YangLCZ18},
 detect the violations of confidentiality, integrity, or RP designation of SSO identity tokens.

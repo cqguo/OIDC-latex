@@ -65,18 +65,18 @@ PID_{RP} = \mathcal{F}_{PID_{RP}}(ID_{RP}) = [t]{ID_{RP}} = [tr]G
 \label{equ:PIDRP}
 \end{equation}
 %is a one-way function so that it
-
+%
 %wo nonces $N_{U}$ and $N_{RP}$ ensure that: (\emph{a}) $PID_{RP}$ is valid only for this login and for the identity token generated in this login, and (\emph{b}) $PID_{RP}$ is dynamically generated for this login and is different from other $PID_{RP}$s generated in other login session between the same user and RP. Therefore, the IdP cannot associate multiple $PID_{RP}$s of a same RP. Finally, the cooperative generation process between the user and the RP prevents a single malicious entity from manipulating the value of $PID_{RP}$.
 %For example, the malicious user fails to make a correct RP accept a $PID_{RP}$ used in another login, while the collusive RPs fail to use a same or correlated $PID_{RP}$s for different logins.
-
-
+%
+%
 \noindent {\bf $\boldsymbol{ID_U}$-$\boldsymbol{PID_U}$ Transformation.}
 %Now, the identity token-request to the IdP contains a user identity $ID_U$ and a pseudo-identity of the RP $PID_{RP}$. Therefore,
 On receiving an identity-token request with $ID_U$ and $PID_{RP}$,
     the IdP calculates $PID_{U}$.
 \begin{multline}
   \ \ \ \ \ \ \ \ \ PID_{U} = \mathcal{F}_{PID_U}(ID_U, PID_{RP}) \\=
-  [{ID_U}]{PID_{RP}} = [utr]G \ \ \ \ \ \ \ \ \ \ \            
+  [{ID_U}]{PID_{RP}} = [utr]G \ \ \ \ \ \ \ \ \ \ \
  \label{equ:PIDU}
 \end{multline}
 
@@ -95,11 +95,11 @@ The trapdoor $t$ is sent to the target RP,
 which calculates $PID_{RP}$ to match the RP pseudo-identity in identity tokens.
 On verifying a token binding $PID_U$ and $PID_{RP}$,
     it calculates $Acct$ as below.
-\begin{multline}
-  \ \ \ \ \ \ \ \ \  Acct = \mathcal{F}_{Acct}(PID_{U}, PID_{RP}) 
-   \\= [t^{-1} \bmod n]PID_{U} \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 
+\begin{equation}
+Acct = \mathcal{F}_{Acct}(PID_{U})
+   = [t^{-1} \bmod n]PID_{U}
    \label{equ:Account}
-\end{multline}
+\end{equation}
 
 From Equations \ref{equ:PIDRP}, \ref{equ:PIDU} and \ref{equ:Account}, it is derived that
 %\begin{multline}\label{equ:AccountNotChanged}
@@ -177,13 +177,11 @@ The IdP's public key is set in the IdP script, so
 
 %Thus, to avoid the IdP server obtaining any evidence about the RP's identity and provide IdP's script with the RP certificate, the RP's script is also required to transmit the certificate to IdP script after it is downloaded from IdP server.
 
-%As the server and its script would only communicate with each other based on HTTPS channel, the adversary cannot steal the identity token in such ways.
-%However, while the IdP sends the identity token to RP, the identity token would be transmitted from IdP script to RP script during the SSO flow, that should be well protected with the RP certificate.
-After using the extracted $ID_{RP}$ to calculate $PID_{RP}$
+Using the extracted $ID_{RP}$ to calculate $PID_{RP}$
     and receiving an identity token from the IdP,
     the IdP script needs to ensure the RP script will forward this token to $Enpt_{RP}$
         which is bound with $ID_{RP}$ in the RP certificate.
-The scripts communicate with each other within the browser through the \verb+postMessage+ HTML5 API,
+The scripts communicate with each other within the user browser through the \verb+postMessage+ HTML5 API,
 %To avoid the honest user sending the identity token to an adversary,
 and the receiver (i.e., the RP script)
  is restricted by the \verb+postMessage+ targetOrigin mechanism \cite{postm-targeto}.
@@ -256,7 +254,7 @@ We tested it in browsers including Chrome, Safari, Edge, Opera and Firefox, and 
 
 \begin{figure*}[bt]
   \centering
-  \includegraphics[height=0.584\textheight]{fig/process-js.pdf}
+  \includegraphics[height=0.58\textheight]{fig/process-js.pdf}
   \caption{The SSO login flow of UPPRESSO.}
   \label{fig:process}
 \end{figure*}
@@ -272,13 +270,12 @@ The IdP keeps $SK$ secret, and $PK$ is publicly known.
 %Each RP launches an initial registration operation to finish configurations.
 Each RP registers itself at the IdP to obtain $ID_{RP}$
  and its RP certificate $Cert_{RP}$ as follows:
-%\vspace{-\topsep}
 \begin{enumerate}
-%\setlength{\topsep}{0pt}
-%\setlength{\partopsep}{0pt}
-%\setlength{\itemsep}{0pt}
-%\setlength{\parsep}{0pt}
-%\setlength{\parskip}{0pt}
+\setlength{\topsep}{0pt}
+\setlength{\partopsep}{0pt}
+\setlength{\itemsep}{0pt}
+\setlength{\parsep}{0pt}
+\setlength{\parskip}{0pt}
 \item
 An RP sends a registration request, including the endpoint to receive identity tokens
     and other information.
@@ -335,13 +332,13 @@ Each solid horizontal line means some messages between the user and the IdP (or 
 \vspace{0.4mm}
 \noindent 1. {\em Script Downloading.}
 The browser downloads the scripts from the visited RP and the IdP.
-%\vspace{-\topsep}
+\vspace{-\topsep}
 \begin{itemize}
-%\setlength{\topsep}{0pt}
-%\setlength{\partopsep}{0pt}
-%\setlength{\itemsep}{0pt}
-%\setlength{\parsep}{0pt}
-%\setlength{\parskip}{0pt}
+\setlength{\topsep}{0pt}
+\setlength{\partopsep}{0pt}
+\setlength{\itemsep}{0pt}
+\setlength{\parsep}{0pt}
+\setlength{\parskip}{0pt}
 \item[1.1]
 When attempting to visit any protected resources at the RP,
     the user downloads the RP script.
@@ -356,13 +353,13 @@ The redirection to the IdP downloads the IdP script.
 %\vspace{1mm}
 \noindent 2. {\em RP Identity Transformation.}
 The user and the RP negotiate $PID_{RP} = [t]{ID_{RP}}$.
-%\vspace{-\topsep}
+\vspace{-\topsep}
 \begin{itemize}
-%\setlength{\topsep}{0pt}
-%\setlength{\partopsep}{0pt}
-%\setlength{\itemsep}{0pt}
-%\setlength{\parsep}{0pt}
-%\setlength{\parskip}{0pt}
+\setlength{\topsep}{0pt}
+\setlength{\partopsep}{0pt}
+\setlength{\itemsep}{0pt}
+\setlength{\parsep}{0pt}
+\setlength{\parskip}{0pt}
 \item[2.1] The IdP script chooses a random number $t$ in $\mathbb{Z}_n$ and sends it to the RP script through \verb+postMessage+.
 The RP script sends $t$ to the RP.
 \item[2.2] On receiving $t$,
@@ -381,17 +378,14 @@ The RP replies with $Cert_{RP}$, which is then transmitted from the RP script to
 %\vspace{1mm}
 \noindent 3. {\em Identity-Token Generation.}
 The IdP calculates $PID_U = [ID_U]{PID_{RP}}$ and signs the identity token. % The processes are as follows.
-%\vspace{-\topsep}
+\vspace{-\topsep}
 \begin{itemize}
-%\setlength{\topsep}{0pt}
-%\setlength{\partopsep}{0pt}
-%\setlength{\itemsep}{0pt}
-%\setlength{\parsep}{0pt}
-%\setlength{\parskip}{0pt}
+\setlength{\topsep}{0pt}
+\setlength{\partopsep}{0pt}
+\setlength{\itemsep}{0pt}
+\setlength{\parsep}{0pt}
+\setlength{\parskip}{0pt}
 \item[3.1]
-%The IdP script checks that $PID_{RP}$ is the one registered in Step 3.1
-%            and $Enpt_{RP}$ matches the one in $Cert_{RP}$.
-%Then, it %replaces $Enpt_{RP}$ with $PEnpt_{U}$ in the identity-token request and
 The IdP script requests an identity token for $PID_{RP}$ and the user attributes.
  %by checking whether this user is authenticated by IdP.
 
@@ -410,16 +404,16 @@ The IdP then signs an identity token $[PID_{RP}, PID_U, Issuer, Validity, Attr]_
 %\vspace{1mm}
 \noindent 4. {\em $Acct$ Calculation.}
 The RP receives the identity token and allows the user to login.
-%\vspace{-\topsep}
+\vspace{-\topsep}
 \begin{itemize}
-%\setlength{\topsep}{0pt}
-%\setlength{\partopsep}{0pt}
-%\setlength{\itemsep}{0pt}
-%\setlength{\parsep}{0pt}
-%\setlength{\parskip}{0pt}
+\setlength{\topsep}{0pt}
+\setlength{\partopsep}{0pt}
+\setlength{\itemsep}{0pt}
+\setlength{\parsep}{0pt}
+\setlength{\parskip}{0pt}
 \item [4.1]
 The IdP script forwards the identity token to the RP script,
-    which then sends it to the RP through $Enpt_{RP}$.
+    which sends it to the RP through $Enpt_{RP}$.
 \item[4.2] The RP verifies the identity token, including the IdP's signature and its validity period.
 It also verifies $PID_{RP}$ in the token matches the one negotiated in Step 2.2.
 Then, the RP extracts $PID_U$ and calculates $Acct = [t^{-1}]{PID_U}$.
@@ -441,10 +435,6 @@ Or, the RP rejects an identity token
 
 \subsection{Compatibility with OIDC}
 \label{subsec:compatible}
-%We explain the compatibility with OIDC,
-%    and this compatibility helps us to analyze, implement and deploy UPPRESSO.
-% 这句话前面已经说过了
-
 
 Among the four steps of the login flow in UPPRESSO,
     the script downloading prepares the user agent before other steps.
