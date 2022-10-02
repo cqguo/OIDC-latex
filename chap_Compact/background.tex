@@ -1,34 +1,27 @@
 \section{Background and Related Works}
 \label{sec:background}
-%UPPRESSO is designed to be compatible with OpenID Connect (OIDC) and provide privacy protections based on the discrete logarithm problem. Next,
 
 We introduce %OIDC \cite{OpenIDConnect}, to describe
 typical SSO login flows and discuss existing privacy-preserving solutions and other related works.
 
 \subsection{OpenID Connect and SSO Services}
 \label{subsec:OIDC}
-OIDC is one of the most popular SSO protocols. % for web applications. %As other SSO protocols \cite{SAMLIdentifier}, OIDC
-%It involves three entities, i.e., {\em users}, the {\em identity provider (IdP)}, and {\em relying parties (RPs)}.
-Users and RPs initially register at the IdP with their identities %($ID_U$, $ID_{RP}$ and $PID_U$ in some schemes) %(or $PID_{RP}$ in some schemes)
-and other necessary information such as user credentials %(i.e., passwords or key pairs)
+OIDC is one of the most popular SSO protocols.
+Users and RPs initially register at the IdP with their identities
+and other information such as user credentials (e.g., passwords)
 and RP endpoints (i.e., the URLs to receive tokens).
-% below can be removed
-%The IdP should maintain these attributes securely.
-%\vspace{1mm}
-%\noindent\textbf{Implicit Login Flow.}
 It supports three types of login flows, i.e. implicit flow, authorization code flow, and hybrid flow (a mix-up of the other two).
 %In the implicit flow, an {\em id token} is generated as the identity token, which contains a user identifier, an RP identifier, the issuer (i.e., IdP), the validity period, and other requested attributes. The IdP signs the id token using its private key to ensure integrity, and sends it to the RP through the user.
 %In the authorization code flow, the IdP binds an authorization code with the RP, and sends it to the RP through the user; then, the RP establishes an HTTPS connection to the IdP and uses the authorization code with the RP's credential to obtain the user's identifier and other attributes.
 %UPPRESSO is compatible with all three flows.
-They work with different steps to request/receive identity tokens, but share the common security requirements for identity tokens.
-Next, we focus on the implicit flow to present our designs. In Section \ref{sec:discussion} we discuss the support to the authorization code flow.
+They work with different steps to request/receive identity tokens, but share the common security requirements of identity tokens.
+Next, we focus on the implicit flow to present our designs. In Section \ref{sec:discussion} we discuss the supports for the authorization code flow.
 
 \begin{figure}[t]
   \centering
   \includegraphics[width=0.9\linewidth]{fig/OIDC1.pdf}
   \caption{The implicit SSO login flow of OIDC.}
   \label{fig:OpenID}
-%  \vspace{-5mm}
 \end{figure}
 
 As shown in Figure \ref{fig:OpenID}, when a user initiates a login request to an RP, the RP constructs an identity-token request with its own identity and the scope of the requested user attributes.
@@ -36,7 +29,7 @@ This request is redirected to the IdP.
 After authenticating the user, the IdP issues an identity token that will be forwarded by the user to the RP's endpoint.
 The token contains user identity (or pseudo-identity), RP identity, a validity period, the requested user attributes, etc.
 Finally, the RP verifies the received identity token and allows the user to login as the  enclosed (pseudo-)identity.
-The user's operations including redirection, authorization, and forwarding are implemented in a software called user agent (e.g., a browser).
+The user's operations including redirection, authorization, and forwarding are implemented in the user agent (e.g., a browser for web applications).
 
 %Before issuing the identity token,
 %    the IdP obtains the user's authorization to enclose the requested attributes.
@@ -59,15 +52,15 @@ The user's operations including redirection, authorization, and forwarding are i
   & User Identity & User Authentication & IdP-Confirmed Selective  & IdP-based & RP-based & Collusive Attack \\
   & at an RP & Only to the IdP &  Attribute Provision & Login Tracing & Identity Linkage & by the IdP and RPs \\\hline\hline
   OIDC with PPID \cite{NIST2017draft} & $\CIRCLE$ & $\CIRCLE$ & $\CIRCLE$ & $\Circle$ & $\CIRCLE$ & - \\ \hline
-  BrowserID \cite{BrowserID} & $\CIRCLE$ & $\LEFTcircle$$^1$ & $\Circle$ & $\CIRCLE$ & $\Circle$ & - \\ \hline
-  SPRESSO \cite{SPRESSO} & $\CIRCLE$ & $\CIRCLE$ & $\Circle$$^2$ & $\CIRCLE$ & $\Circle$ & - \\ \hline
+  BrowserID \cite{BrowserID} & $\CIRCLE$ & $\CIRCLE$$^1$ & $\Circle$ & $\CIRCLE$ & $\Circle$ & - \\ \hline
+  SPRESSO \cite{SPRESSO} & $\CIRCLE$ & $\CIRCLE$ & $\CIRCLE$$^2$ & $\CIRCLE$ & $\Circle$ & - \\ \hline  \hline
   PRIMA \cite{prima} & $\CIRCLE$ & $\Circle$ & $\CIRCLE$ & $\CIRCLE$ & $\Circle$ & - \\ \hline
   PseudoID \cite{PseudoID} & $\CIRCLE$ & $\Circle$ & $\Circle$$^3$ & $\CIRCLE$ & $\CIRCLE$ & $\CIRCLE$ \\ \hline
   EL PASSO \cite{ELPASSO} & $\CIRCLE$ & $\Circle$ & $\CIRCLE$ & $\CIRCLE$ & $\CIRCLE$ & $\CIRCLE$ \\ \hline
   UnlimitID \cite{UnlimitID} & $\CIRCLE$ & $\Circle$ & $\CIRCLE$ & $\CIRCLE$ & $\CIRCLE$ & $\CIRCLE$ \\ \hline
   Opaak \cite{Opaak} & $\LEFTcircle$$^4$ & $\Circle$ & $\Circle$ & $\CIRCLE$ & $\CIRCLE$ & $\CIRCLE$ \\ \hline
   Fabric Idemix \cite{hyperledge-idemix} & $\Circle$$^5$ & $\Circle$ & $\CIRCLE$ & $\CIRCLE$ & $\CIRCLE$ & $\CIRCLE$ \\ \hline
-  U-Prove \cite{uprov} & $\CIRCLE$ & $\Circle$ & $\LEFTcircle$$^6$ & $\CIRCLE$ & $\CIRCLE$ & $\CIRCLE$ \\ \hline
+  U-Prove \cite{uprov} & $\CIRCLE$ & $\Circle$ & $\LEFTcircle$$^6$ & $\CIRCLE$ & $\CIRCLE$ & $\CIRCLE$ \\ \hline\hline
   UPPRESSO & $\CIRCLE$ & $\CIRCLE$ & $\CIRCLE$ & $\CIRCLE$ & $\CIRCLE$ & $\Circle$ \\ \hline
 \end{tabular}
     \label{tbl:comparison-protocol}
@@ -75,20 +68,20 @@ The user's operations including redirection, authorization, and forwarding are i
 {\footnotesize
 1. A BrowserID user generates an \emph{ephemeral} private key to sign every ``subsidiary'' token,
  which is verified by the RP.\\
-2. SPRESSO can be extended to provide user attributes in then tokens, while the prototype does not support it.\\
+2. SPRESSO can be extended to provide user attributes in then tokens, while the prototype does not implement this feature.\\
 3. Blindly-signed user attributes can be selectively provided using zero-knowledge proofs,
-    but not implemented in the prototype \cite{PseudoID}.\\
+    but not implemented in the prototype.\\
 4. Opaak supports exclusive pseudonym options: (\emph{a}) linkable within an RP but unlinkable across multiple RPs and (\emph{b}) unlinkability for any two actions.\\
 5. In the original design of Idemix \cite{idemix}, every user logins to an RP with a unique account.\\
 6. A U-Prove token may contain some attributes \emph{invisible} to the IdP, in addition the ones confirmed by the IdP.}
 \end{table*}
 
-Three design features are expected in SSO services, which are supported by popular SSO systems~\cite{NIST2017draft,OpenIDConnect,rfc6749,SAML,SAMLIdentifier}.
+Three features are expected in SSO services, which are supported by popular SSO systems \cite{NIST2017draft,OpenIDConnect,rfc6749,SAML,SAMLIdentifier}.
 %The following features are supported in widely-used popular SSO solutions \cite{NIST2017draft,OpenIDConnect,rfc6749,SAML,SAMLIdentifier}.
 
 
 \noindent \textbf{User identification at an RP.}
-The RP is expected to recognize each user (by a unique identity or account) and provide customized services across multiple logins.
+The RP recognizes each user (by a unique identity or account) and then provides customized services across multiple logins.
 %The identity tokens facilitate the target RP to identify each user as a unique account at this RP and this account links the user's multiple login instances to this RP for customized services.
 
 %On the contrary, in anonymous SSO systems \cite{WangWS13,HanCSTW18,HanCSTWW20}
@@ -96,10 +89,10 @@ The RP is expected to recognize each user (by a unique identity or account) and 
 %            and receives no information to distinguish every user.
 
 \noindent\textbf{User authentication {\em only} to the IdP.}
-A ``pure'' SSO protocol  \cite{OpenIDConnect,rfc6749,SAML} does not include the authentication steps. The authentication between a user and the IdP is conducted independently,
+A ``pure'' SSO protocol \cite{OpenIDConnect,rfc6749,SAML} does not include the authentication steps. The authentication between a user and the IdP is conducted \emph{independently},
     usually not included in the designs of SSO protocols,
 and the RPs only verify the tokens issued by the IdP.
-This brings several advantages. First, the IdP can authenticate users by any appropriate means (e.g., password,
+This brings several advantages. First, the IdP authenticates users by any appropriate means (e.g., password,
 one-time password, and multi-factor authentication).
 %It eliminates the authentication steps between users and an RP,
 Meanwhile, a user only maintains his credential at the IdP. If it is lost or leaked, the user only renews it at the IdP. However, if a user proves some non-ephemeral secret to RPs, which is valid across multiple login instances (i.e., authentication steps are actually involved), he has to notify each RP when lost or leaked. %during its validity period. %(or even the user logins from another computer).
@@ -110,7 +103,7 @@ These attributes are maintained by users at the IdP.
 %    for example,
 %        when Facebook provides social networking services,
 %         it also issues identity tokens enclosing user identities and various attributes.
-Before enclosing attributes in a token, the IdP obtains the user's authorization or provide only the attributes pre-selected by the user.
+Before enclosing any attributes in a token, the IdP obtains the user's authorization or provides only the attributes pre-selected by the user.
 So no distinctive attributes such as telephone number and Email address are enclosed in the identity tokens of privacy-preserving SSO systems.
 
 %\vspace{1mm}
@@ -131,12 +124,11 @@ So no distinctive attributes such as telephone number and Email address are encl
 \subsection{Privacy-Preserving SSO and Identity Federation}
 \label{subsec-solutions}
 
-We summarize prior privacy-preserving solutions for SSO and identity federation in Table~\ref{tbl:comparison-protocol}.
-Widely-adopted SSO protocols~\cite{OpenIDConnect,rfc6749,SAML,SAMLIdentifier} allow a user to login to an RP
+We summarize prior privacy-preserving solutions for SSO and also identity federation in Table \ref{tbl:comparison-protocol}.
+Widely-adopted SSO protocols \cite{OpenIDConnect,rfc6749,SAML,SAMLIdentifier} allow a user to login to an RP
 %    after being authenticated by the IdP,
-without holding any permanent secret verified by the RP or maintaining an account at the RP.
-While preserving this feature%for user convenience
-, existing privacy-preserving SSO approaches~\cite{BrowserID,SPRESSO,NIST2017draft} prevent either the IdP-based login tracing or the RP-based identity linkage, and UPPRESSO prevents both of them.
+without holding any permanent secret verified by the RP or by himself maintaining an account at the RP.
+While preserving these features, existing privacy-preserving SSO approaches \cite{BrowserID,SPRESSO,NIST2017draft} prevent either the IdP-based login tracing or the RP-based identity linkage, and UPPRESSO prevents both of them.
 
 Identity federation enables a user registered at the IdP to be accepted by other parties,
             with different accounts sometimes,
@@ -149,8 +141,8 @@ Privacy-preserving identity federation \cite{ELPASSO,UnlimitID,hyperledge-idemix
 That is, there are actually some authentication steps between the user and RPs (or called asynchronous authentication \cite{ELPASSO}).
 
 
-Pairwise pseudonymous identifiers (PPIDs) are recommended \cite{NIST2017draft}
- and specified in SSO protocols \cite{OpenIDConnect, SAMLIdentifier} to protect user privacy against curious RPs.
+Pairwise pseudonymous identifiers (PPIDs) are specified in SSO protocols \cite{OpenIDConnect, SAMLIdentifier} and recommended \cite{NIST2017draft}
+to protect user privacy against curious RPs.
 When issuing an identity token,
         the IdP encloses a user PPID (but not the identity at the IdP).
 Given a user, the IdP assigns a unique PPID based on the target RP.
@@ -162,16 +154,16 @@ PPIDs cannot prevent the IdP-based login tracing because the IdP needs the RP's 
 Several solutions prevent the IdP-based login tracing but are vulnerable to the RP-based identity linkage.
 In BrowserID \cite{BrowserID} (formerly known as Firefox Accounts \cite{FirefoxAccount} and Mozilla Persona \cite{persona}), the IdP %(called the primary identity authority in BrowserID)
 issues a special token (called user certificate) to bind a user identity to an \emph{ephemeral} public key. With the corresponding private key, the user signs a ``subsidiary'' token (called identity assertion) to bind the target RP's identity and sends both tokens to the RP.
+In SPRESSO \cite{SPRESSO} an RP creates a verifiable one-time pseudo-identity for itself in each login instance, which is enclosed in the identity token generated by the IdP. %and the user identity.
 The PRIMA IdP signs a credential binding a verification key and user attributes \cite{prima}, where the key is considered the user identity.
-The user selectively provides IdP-confirmed attributes to an RP using his signing key \cite{Oblivion}. % cooperatively with the IdP.
-In SPRESSO~\cite{SPRESSO}, an RP creates a verifiable one-time pseudo-identity for itself in each login instance, which is enclosed in the identity token generated by the IdP. %and the user identity.
-In these schemes~\cite{BrowserID,prima,SPRESSO}, collusive RPs could link a user based on his unique identity in the tokens (or credentials).
+The user selectively provides IdP-confirmed attributes to an RP using his signing key \cite{Oblivion}.
+In these schemes \cite{BrowserID,SPRESSO,prima}, collusive RPs could link a user based on his unique identity in the tokens (or credentials).
 
 
 PseudoID \cite{PseudoID} introduces an independent token service in addition to the IdP to \emph{blindly} sign an access token binding a pseudonym and a user secret.
 The user unblinds this token and the IdP will assert it,
     which allows the user to login to an RP using his secret.
-Two kinds of privacy threats are prevented, because (\emph{a}) the RP's identity is not enclosed in the access token
+Two kinds of privacy threats are prevented, because (\emph{a}) the RP's identity is not enclosed in the token
     and (\emph{b}) the user encloses different pseudonyms when visiting RPs.
 Collusive attacks by the IdP and RPs are also prevented,
     for they cannot link two blindly-signed tokens.

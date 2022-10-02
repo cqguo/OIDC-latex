@@ -4,7 +4,7 @@
 
 
 \subsection{Security}
-UPPRESSO satisfies the security requirements of identity tokens in SSO services,
+UPPRESSO satisfies the security requirements of SSO identity tokens \cite{ArmandoCCCT08,FettKS16, FettKS17},
      as discussed in Section \ref{subsec:basicrequirements}.
 \begin{itemize}
 \setlength{\topsep}{0pt}
@@ -14,14 +14,11 @@ UPPRESSO satisfies the security requirements of identity tokens in SSO services,
 \setlength{\parskip}{0pt}
 \item  \textbf{RP Designation}~The RP (pseudo-)identity bound in the identity token
      identifies the target RP, and only this RP.
- % ����һ��RP��֮��Ӧ��
 \item \textbf{User Identification}~The user (pseudo-)identity bound in the identity token identifies
         the authenticated user, and only this user.
- % �ܹ����������account����Ӧ��the authenticated user�����ҽ������user
 \item \textbf{Confidentiality}~An identity token
     is accessible to only
-                the authenticated user and the target RP,
-                    in addition to the IdP.
+                the authenticated user, the target RP, and the IdP.
 \item \textbf{Integrity}~An honest RP accepts only identity tokens binding its (pseudo-)identity and the authenticated user's (pseudo-)identity.
            % and any forged or modified identity token will be rejected.
 \end{itemize}
@@ -39,7 +36,7 @@ Next, based on the ECDLP
     satisfying $[t]ID_{RP_j} = [t']ID_{RP_{j'}}$ is negligible,
     where $RP_j$ and $RP_{j'}$ are any two RPs in the finite set of RPs (i.e.,
     $ID_{RP_j} = [r_j]G$ and $ID_{RP_{j'}} = [r_{j'}]G$, while $r_j$ and $r_{j'}$ are kept secret to adversaries).
-The negligible probability means the token designates \emph{only} the target RP.
+This negligible probability means the token designates \emph{only} the target RP.
 
 Let $\mathbb{E}$ be an elliptic curve, %over a finite field $\mathbb{F}_q$,
     $G$ be a point on $\mathbb{E}$ of order $n$,
@@ -47,9 +44,9 @@ Let $\mathbb{E}$ be an elliptic curve, %over a finite field $\mathbb{F}_q$,
 Given $G$ and $Q$,
     the probability that a probabilistic polynomial time (PPT) algorithm calculates $x$ (i.e., solve the ECDLP) is negligible.
 For any PPT algorithm $\mathcal{D}$, we define
-\begin{align*}
+\begin{equation*}
 {\rm Pr}\{\mathcal{D}(G, [x]G)=x\} = \epsilon_{c}(k)
-\end{align*}
+\end{equation*}
 Here, ${\rm Pr}\{\}$ denotes the probability.
 So $\epsilon_{c}(k)$ becomes negligible with the increasing security parameter $k$.
 
@@ -73,7 +70,7 @@ We define the probability that the adversary succeeds in this game as ${\rm Pr}_
 \end{figure}
 
 
-Then, Figure~\ref{fig:ecdlp_algorithm} shows a PPT algorithm $\mathcal{D}^*_c$ based on this game, to solve the ECDLP.
+Figure~\ref{fig:ecdlp_algorithm} shows a PPT algorithm $\mathcal{D}^*_c$ based on this game, to solve the ECDLP.
 The input of $\mathcal{D}^*_c$ is in the form of ($G$, $Q$).
 On receiving an input, the challenger of $\mathcal{G}_c$ randomly chooses $r_1, r_2, \cdots, r_m$ in $\mathbb{Z}_n$,
  calculates $[r_1]G, [r_2]G, \cdots, [r_m]G$,
@@ -91,6 +88,7 @@ Thus,
 \begin{align*}
 &{\rm Pr}\{\mathcal{D}^*_c(G, [x]G)=x\} = {\rm Pr}\{s = x\}\\=&{\rm Pr}\{a=j\}{\rm Pr}_s=\frac{1}{m}{\rm Pr}_s
 \end{align*}
+
 If the adversary is able to find $t$ and $t'$
     satisfying that $[t]ID_{RP_j} = [t']ID_{RP_{j'}}$,
     it will have non-negligible advantages in $\mathcal{G}_c$
@@ -123,7 +121,7 @@ Thus, the probability of finding $t$ and $t'$ satisfying that $[t]ID_{RP_j} = [t
 %Because (\emph{a}) both $PID_{RP}$ and $H(t)$ in the registration result are checked by the RP and then (\emph{b}) the registration result $[PID_{RP}, H(t), Validity]_{SK}$ is acceptable to only one honest RP,
 %            the identity token designates only one RP.
 
-\vspace{0.5mm}
+\vspace{0.8mm}
 \noindent\textbf{User Identification.}
 Given a user, an honest RP with $ID_{RP}$ always deterministically derives an identical account from different identity tokens binding $PID_U$ and $PID_{RP}$.
 That is,
@@ -165,7 +163,7 @@ Thus, the calculated account is always exactly the authenticated user's account 
 %     so it cannot construct an identity token acceptable to the RP.
 %
 
-\vspace{0.5mm}
+\vspace{0.8mm}
 \noindent\textbf{Confidentiality.}
 No event leaks an identity token to any malicious entity other than the authenticated user and the designated RP.
 First of all, the communications among the IdP, RPs and users,
@@ -183,7 +181,7 @@ So only the RP that holds $Enpt_{RP}$ and $ID_{RP}$,
 
 
 %The detailed process of proof is shown in Appendix.
-\vspace{0.5mm}
+\vspace{0.8mm}
 \noindent\textbf{Integrity.}
 The identity token binds $Acct$ and $ID_{RP}$ implicitly,
     and any breaking results in some failed check or verification in the login flow.
@@ -255,7 +253,7 @@ We locate the generation of an identity token, and trace to all places
 \subsection{Privacy}
 UPPRESSO effectively prevents the threats of IdP-based login tracing and RP-based identity linkage.
 
-\vspace{0.5mm}
+\vspace{0.8mm}
 \noindent\textbf{IdP-based Login Tracing.}
 The information accessible to the IdP and derived from the RP's identity,
     is only $PID_{RP}$, where $PID_{RP} = [t]ID_{RP}$ is calculated by the user.
@@ -266,7 +264,7 @@ Because  (\emph{a}) $t$ is a random number from $\mathbb{Z}_n$ and kept secret t
 So, the IdP cannot infer the RP's identity or link any pair of $PID_{RP}^i$ and $PID_{RP}^{i'}$,
     and the IdP-based login tracing is impossible.
 
-\vspace{0.5mm}
+\vspace{0.8mm}
 \noindent\textbf{RP-based Identity Linkage.}
 We prove UPPRESSO prevents the RP-based identity linkage,
  based on the elliptic curve decision Diffie-Hellman (ECDDH) assumption. %\cite{GoldwasserK16}.

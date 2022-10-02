@@ -21,12 +21,13 @@ Malicious users and RPs behave arbitrarily and might collude with each other,
 
 \vspace{0.5mm}
 \noindent \textbf{Honest-but-curious IdP.}
-The IdP strictly follows the protocol, while being interested in learning user profiles.  %without violating the protocol.
-For example, it might store all received messages
+The IdP strictly follows the protocol, while being interested in learning user profiles.
+For example, it might store received messages
  to infer the relationship among $ID_U$, $ID_{RP}$, $PID_{U}$, and $PID_{RP}$ to track a user's login activities.
-%We assume the IdP is well-protected.
+The IdP never actively violates the protocols,
+so the script downloaded from the IdP also strictly follows the designs (see Section \ref{sec:web-design}).
 The IdP is trusted to maintain the private key for signing identity tokens and RP certificates. %(see Section \ref{implementations} for details)
-So, adversaries cannot forge such tokens or certificates.
+So adversaries cannot forge such tokens or certificates.
 %An honest IdP %follows the protocols to process the requests from users and RPs, and
 %should not collude with malicious RPs or users,
 %For example, the IdP ensures the uniqueness of $ID_{RP}$ and $ID_{U}$ when an RP or a user registers, and calculates the pseudo-identity as the UPPRESSO protocol specifies.
@@ -37,7 +38,7 @@ We do not consider the collusion of the IdP and RPs.
         a user would finish login instances completely with collusive entities
         and it is rather difficult to prevent the IdP-based login tracing across these RPs
             while keeping all the features of SSO.
-Note that we aim to design schemes for a user without any non-ephemeral secret or credential verified by the RPs.
+Note that we aim to design schemes for an SSO user without any non-ephemeral secret or credential verified by the RPs.
 
 %User's goal: 向IdP发送identity token，使IdP认为自己是另一个victim
 %方式：1）已经拥有有效的identity token，希望与IdP协商出相同的PID_RP；2）通过篡改或者伪造identity token来实现攻击
@@ -51,7 +52,7 @@ We assume the adversary could control a set of users,
 They want to impersonate a victim user at honest RPs, or allure the benign user to login to an honest RP under the adversary's account.
 %To achieve this, they could behave arbitrarily \cite{WangCW12, SomorovskyMSKJ12}.
 A malicious user might
-    modify, insert, drop or replay a message, or behave arbitrarily in any SSO login instances.
+    modify, insert, drop or replay a message, or behave arbitrarily in SSO login flows.
 
 % the forwarding messages (requests of identity token, identity token,  RP registration request and result, and etc.),
 %  and provide incorrect values for negotiating $PID_{RP}$ (detailed in Section \ref{implementations}).
@@ -61,17 +62,17 @@ A malicious user might
 \vspace{0.5mm}
 \noindent \textbf{Malicious RPs.}
 The adversary could control a set of RPs, by registering at the IdP as an RP
-     or exploiting software vulnerabilities to compromise some RPs.
+     or exploiting vulnerabilities to compromise some RPs.
 The malicious RPs might behave arbitrarily to break the security and privacy guarantees.
 %they may attempt to obtain a valid identity token for another RP, to allow some user to log into this target RP:
 For example,
 a malicious RP might manipulate $PID_{RP}$ in a login instance,
-    attempting to allure honest users to return an identity token that might be accepted by some honest RP,
+    attempting to (\emph{a}) allure honest users to return an identity token that might be accepted by some honest RP,
 %when a user is logging in, to receive an identity token that will be accepted by the target RP verifying $PID_{RP}$ but not $ID_{RP}$.
 % or constructing an incorrect request to trigger the IdP issuing an identity token binding with other RP.
 %Or, the malicious RPs may collude to perform RP-based identity linkage to break user privacy.
 %For example, the RPs
-or, attempting to affect the generation of $PID_U$ and
+or (\emph{b}) affect the generation of $PID_U$ and
     analyze the relationship between $ID_U$ and $PID_U$.
 %to link the user's multiple logins at different RPs. %by providing correlated values (e.g., $PID_{RP}$) to the IdP.
 
@@ -92,8 +93,9 @@ For example, a malicious RP might collude with malicious users to allure victim 
 % then act a malicious RP to perform the identity injection attack, by injecting this identity token to the session between the victim user and the correct RP with other web attacks (e.g., CSRF).
 
 \subsection{Assumptions}
-A user never authorizes the IdP to enclose any \emph{distinctive attributes} in identity tokens,
-        which are identifiable information such as telephone number, Email address, etc.
+UPPRESSO is designed for users who care about privacy.
+So a user never authorizes the IdP to enclose any \emph{distinctive attributes} in identity tokens,
+ such as telephone number, Email address, etc.
          %driver license,
 A user does not configure  distinctive attributes at any RP, either.
 Thus, the privacy leakage due to user re-identification by distinctive attributes,
@@ -106,7 +108,7 @@ The software stack of a honest entity is correctly implemented,
 
 We focus on the privacy threats introduced by the design of SSO protocols,
     but not network attacks such as the traffic analysis that trace a user's activities from network packets.
-Such attacks shall be prevented by other defenses.
+Such attacks shall be prevented by other existing defenses.
 
 %As we consider IdP is always honest, therefore, all the parameters provided by the IdP are assumed to be honest. All the calculations and verifications conducted by IdP are correct. Meanwhile, the collusion between RPs and IdP is not considered in this paper.
 

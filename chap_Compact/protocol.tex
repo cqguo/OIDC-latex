@@ -55,7 +55,7 @@ When an RP is registering,
 Here,
 $u, r \in [1,n)$, $r$ is \emph{unknown} to the RP, and $[r]G$ is the addition of $G$ on the curve $r$ times.
 
-\vspace{0.5mm}
+\vspace{0.8mm}
 \noindent {\bf $\boldsymbol{ID_{\boldsymbol{RP}}}$-$\boldsymbol{PID_{\boldsymbol{RP}}}$ Transformation.} The user selects a random number $t$ ($1 < t <n$) as the trapdoor
          and calculates $PID_{RP}$.
 %First, the RP chooses a random number $N_{RP}$ ($1 < N_{RP}<q $), and the user chooses another random number $N_{U}$ ($1 < N_{U}<q $).
@@ -132,6 +132,7 @@ Note that $r$ is kept unknown to RPs; otherwise, two collusive RPs with $ID_{RP_
     to link a user's accounts.
 
 \subsection{The Designs Specific for Web Applications}
+\label{sec:web-design}
 The designs specific for web applications,
 enable UPPRESSO to work with commercial-off-the-shelf (COTS) browsers.
 %More efficient but less portable implementations with browser extensions %and/or plug-ins
@@ -154,7 +155,7 @@ Then, %in an OIDC login instance,
    % which is designated in the token,
 %and prevents attackers from intercepting it.
 
-In UPPRESSO such user-agent functions are implemented by web scripts within browsers.
+In UPPRESSO such user-agent functions are implemented by web scripts within COTS browsers.
 %Section \ref{sec:discussion} discusses more efficient but less portable implementations with browser extensions.
 Two scripts downloaded from the visited RP and the IdP, respectively,
     and each is responsible for the communications with the origin web server.
@@ -163,12 +164,12 @@ Only the RP script is not enough to implement a user agent;
     (e.g.,
     an identity-token request sent by the RP script will
 automatically carry an HTTP \verb+referer+ header that discloses the RP domain).
-Moreover, a script from the honest IdP
+Moreover, a trusted script from the honest IdP
 ensures confidentiality of identity tokens (i.e., it is sent to only the designated RP)
 and interacts with the user for the authorization of user attributes,
-    for the RP might be malicious.
+    for the RP (and also the RP script) might be malicious.
 On receiving a request,
-    the IdP checks that it is from the IdP script.
+    the IdP checks that it is from the IdP script by the \verb+referer+ header.
 
 The RP script prepares $ID_{RP}$ and $Enpt_{RP}$ for the IdP script, through RP certificates.
 An RP certificate is signed by the IdP during the RP registration,
@@ -179,11 +180,11 @@ The IdP script %from the honest IdP,
     verifies the RP certificate to extract $ID_{RP}$ and $Enpt_{RP}$.
 The IdP's public key is set in the IdP script, so
  a user does not configure anything locally,
-    as it does in popular SSO systems.
+    as it does in popular SSO systems \cite{OpenIDConnect, rfc6749, SAML,SAMLIdentifier}.
 
 %Thus, to avoid the IdP server obtaining any evidence about the RP's identity and provide IdP's script with the RP certificate, the RP's script is also required to transmit the certificate to IdP script after it is downloaded from IdP server.
 
-Using the extracted $ID_{RP}$ to calculate $PID_{RP}$
+After extracting $ID_{RP}$ to calculate $PID_{RP}$
     and receiving an identity token from the IdP,
     the IdP script needs to ensure the RP script will forward this token to $Enpt_{RP}$
         which is bound with $ID_{RP}$ in the RP certificate.
@@ -191,9 +192,9 @@ The scripts communicate with each other within the user browser through the \ver
 %To avoid the honest user sending the identity token to an adversary,
 and the receiver (i.e., the RP script)
  is restricted by the \verb+postMessage+ targetOrigin mechanism \cite{postm-targeto}.
-When the IdP script sends identity tokens,
+When the IdP script sends messages,
  the receiver's origin is set as a parameter, e.g., \verb+window.opener.postMessage+ \verb+(tkn, 'https://RP.com')+,
-  so only a script from this targetOrigin is a legal receiver.
+  so only a script downloaded from this targetOrigin is a legal receiver.
 The parameter consists of
     the protocol (i.e., \verb+https://+),
     the domain  (i.e., \verb+RP.com+)
@@ -212,7 +213,7 @@ Fortunately, in UPPRESSO this newly-opened window is a redirection from the RP t
  but not a direct visit by the browser (Figure \ref{fig:process}, Steps 1.2-1.3).
 This leakage is prevented by setting the header \verb+referrer-policy=no-referrer+ in the HTTP response from the RP, when it is redirected to the IdP.
 Then the HTTP request to download the IdP script carries no \verb+referer+ header.
-This setting is specified by W3C \cite{referer_policy} and widely supported.
+This method is specified by W3C \cite{referer_policy} and widely supported.
 We tested it in browsers including Chrome, Safari, Edge, Opera and Firefox, and confirmed no referer leakage.
 
 
@@ -271,12 +272,12 @@ The IdP generates a key pair ($SK$, $PK$) to sign/verify identity tokens and RP 
 The IdP keeps $SK$ secret, and $PK$ is publicly known.
 
 
-\vspace{0.5mm}
+\vspace{0.8mm}
 \noindent\textbf{RP Initial Registration.}
 %Each RP launches an initial registration operation to finish configurations.
 Each RP registers itself at the IdP to obtain $ID_{RP}$
  and its RP certificate $Cert_{RP}$ as follows:
-\begin{enumerate}
+\vspace{-\topsep}\begin{enumerate}
 \setlength{\topsep}{0pt}
 \setlength{\partopsep}{0pt}
 \setlength{\itemsep}{0pt}
@@ -307,7 +308,7 @@ Each user registers once at the IdP to set up a unique identity $ID_U$ and the c
 %This is similar to the steps in existing SSO systems.
 
 
-\vspace{0.5mm}
+\vspace{0.8mm}
 \noindent\textbf{SSO Login.} A login instance %is typically launched through a browser,
 %when a user attempts to visit an RP. It
 consists of four steps, namely script downloading, RP identity transformation,
@@ -349,7 +350,7 @@ The browser downloads the scripts from the visited RP and the IdP.
 When attempting to visit any protected resources at the RP,
     the user downloads the RP script.
 \item[1.2]
-The RP script opens a window in the browser to visit the login path at the RP, which is then \emph{redirected} to the IdP.
+The RP script opens a window in the browser to visit the login path at the RP, which is then redirected to the IdP.
 \item[1.3]
 The redirection to the IdP downloads the IdP script.
 \end{itemize}
@@ -395,7 +396,7 @@ The IdP calculates $PID_U = [ID_U]{PID_{RP}}$ and signs the identity token. % Th
 The IdP script requests an identity token for $PID_{RP}$ and the user attributes.
  %by checking whether this user is authenticated by IdP.
 
-\item[3.2] The IdP authenticates the user if he has not been authenticated yet.
+\item[3.2] The IdP authenticates the user, if he has not been authenticated yet.
 
 \item [3.3]
 After obtaining the user's authorization to enclose the requested attributes,
@@ -404,7 +405,7 @@ the IdP checks whether the received $PID_{RP}$ is valid,
     and calculates $PID_U = [ID_U]{PID_{RP}}$ for the authenticated user.
 The IdP then signs an identity token $[PID_{RP}, PID_U, Issuer, Validity, Attr]_{SK}$,
  where $Issuer$ is the IdP's identity, $Validity$ indicates the validity period, and $Attr$ contains the requested attributes.
-\item[3.4] The IdP replies with the identity token.
+\item[3.4] The IdP replies with the identity token, to the IdP script.
 \end{itemize}
 
 %\vspace{1mm}
@@ -452,8 +453,7 @@ On the other hand, in UPPRESSO the scripts hide $Enpt_{RP}$ from the IdP,
   %      the script replaces $Enpt_{RP}$ with $PEnpt_{U}$,
     and forward the identity token to $Enpt_{RP}$ extracted from the RP certificate.
 %    that to protect the identity token from being sent to adversaries. 这句话与Compatibility无关
-So the IdP does not set \verb+redirect_uri+ in the HTTP response. % of identity tokens.
-
+Then, the IdP does not set \verb+redirect_uri+ in the HTTP response. % of identity tokens.
 Most operations of RP identity transformation are conducted within browsers,
  while the RP only receives $t$ to calculate $PID_{RP}$ and responds with  $Cert_{RP}$.
 The calculation of $PID_{RP}$ is viewed as an operation to prepare the RP identity in OIDC,
@@ -462,6 +462,8 @@ The calculation of $PID_{RP}$ is viewed as an operation to prepare the RP identi
    % except that
    % in OIDC the IdP assigns the RP's identity  while in UPPRESSO this (pseudo-)identity is generated by the registered entity.
 %Besides, the $PID_{RP}$ registration has a validity period.
+So, compared with the original OIDC protocol, in these two steps, the IdP's operations is simplified,
+    and the RP customizes its identity.
 
 The operations of identity-token generation and $Acct$ calculation,
     are actually identical to those of OIDC,
