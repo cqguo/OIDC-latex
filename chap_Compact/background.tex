@@ -2,7 +2,7 @@
 \label{sec:background}
 
 We introduce %OIDC \cite{OpenIDConnect}, to describe
-typical SSO login flows and discuss existing privacy-preserving solutions and other related works.
+typical SSO login flows, and discuss existing privacy-preserving solutions and other related works.
 
 \subsection{OpenID Connect and SSO Services}
 \label{subsec:OIDC}
@@ -76,7 +76,7 @@ The user's operations including redirection, authorization, and forwarding are i
 6. A U-Prove token may contain some attributes \emph{invisible} to the IdP, in addition the ones confirmed by the IdP.}
 \end{table*}
 
-Three features are expected in SSO services, which are supported by popular SSO systems \cite{NIST2017draft,OpenIDConnect,rfc6749,SAML,SAMLIdentifier}.
+Three features are desired in SSO services, which are supported by popular SSO systems \cite{NIST2017draft,OpenIDConnect,rfc6749,SAML,SAMLIdentifier}.
 %The following features are supported in widely-used popular SSO solutions \cite{NIST2017draft,OpenIDConnect,rfc6749,SAML,SAMLIdentifier}.
 
 
@@ -92,8 +92,8 @@ The RP recognizes each user (by a unique identity or account) and then provides 
 A ``pure'' SSO protocol \cite{OpenIDConnect,rfc6749,SAML} does not include the authentication steps. The authentication between a user and the IdP is conducted \emph{independently},
     usually not included in the designs of SSO protocols,
 and the RPs only verify the tokens issued by the IdP.
-This brings several advantages. First, the IdP authenticates users by any appropriate means (e.g., password,
-one-time password, and multi-factor authentication).
+This brings advantages. First, the IdP authenticates users by any appropriate means (e.g., password,
+one-time password, or multi-factor authentication).
 %It eliminates the authentication steps between users and an RP,
 Meanwhile, a user only maintains his credential at the IdP. If it is lost or leaked, the user only renews it at the IdP. However, if a user proves some non-ephemeral secret to RPs, which is valid across multiple login instances (i.e., authentication steps are actually involved), he has to notify each RP when lost or leaked. %during its validity period. %(or even the user logins from another computer).
 
@@ -104,7 +104,7 @@ These attributes are maintained by users at the IdP.
 %        when Facebook provides social networking services,
 %         it also issues identity tokens enclosing user identities and various attributes.
 Before enclosing any attributes in a token, the IdP obtains the user's authorization or provides only the attributes pre-selected by the user.
-So no distinctive attributes such as telephone number and Email address are enclosed in the identity tokens of privacy-preserving SSO systems.
+%So no distinctive attributes such as telephone number and Email address are enclosed in the identity tokens of privacy-preserving SSO systems.
 
 %\vspace{1mm}
 %\noindent\textbf{RP Dynamic Registration.}
@@ -124,22 +124,21 @@ So no distinctive attributes such as telephone number and Email address are encl
 \subsection{Privacy-Preserving SSO and Identity Federation}
 \label{subsec-solutions}
 
-We summarize prior privacy-preserving solutions for SSO and also identity federation in Table \ref{tbl:comparison-protocol}.
+We summarize existing privacy-preserving solutions for SSO and also identity federation in Table \ref{tbl:comparison-protocol}.
 Widely-adopted SSO protocols \cite{OpenIDConnect,rfc6749,SAML,SAMLIdentifier} allow a user to login to an RP
 %    after being authenticated by the IdP,
-without holding any permanent secret verified by the RP or by himself maintaining an account at the RP.
+\emph{without holding any permanent secret verified by the RP or by himself maintaining an account at the RP}.
 While preserving these features, existing privacy-preserving SSO approaches \cite{BrowserID,SPRESSO,NIST2017draft} prevent either the IdP-based login tracing or the RP-based identity linkage, and UPPRESSO prevents both of them.
 
 Identity federation enables a user registered at the IdP to be accepted by other parties,
             with different accounts sometimes,
         but more user operations are involved than those of SSO.
-Privacy-preserving identity federation \cite{ELPASSO,UnlimitID,hyperledge-idemix,PseudoID,Opaak,uprov}
+Privacy-preserving identity federation 
     protects privacy against even collusive attacks by the IdP and RPs,
-    but requires a user to (\emph{a}) \emph{hold long-term secrets verified by RPs},
+    but requires a user \cite{ELPASSO,UnlimitID,hyperledge-idemix,PseudoID,Opaak,uprov} to (\emph{a}) \emph{hold long-term secrets verified by RPs},
             in addition to the authentication credentials for the IdP,
                 and (\emph{b}) \emph{manage the accounts at different RPs by himself}.
-That is, there are actually some authentication steps between the user and RPs (or called asynchronous authentication \cite{ELPASSO}).
-
+That is, there are actually some authentication steps between the user and RPs (called asynchronous authentication \cite{ELPASSO}).
 
 Pairwise pseudonymous identifiers (PPIDs) are specified in SSO protocols \cite{OpenIDConnect, SAMLIdentifier} and recommended \cite{NIST2017draft}
 to protect user privacy against curious RPs.
@@ -153,14 +152,17 @@ PPIDs cannot prevent the IdP-based login tracing because the IdP needs the RP's 
 
 Several solutions prevent the IdP-based login tracing but are vulnerable to the RP-based identity linkage.
 In BrowserID \cite{BrowserID} (formerly known as Firefox Accounts \cite{FirefoxAccount} and Mozilla Persona \cite{persona}), the IdP %(called the primary identity authority in BrowserID)
-issues a special token (called user certificate) to bind a user identity to an \emph{ephemeral} public key. With the corresponding private key, the user signs a ``subsidiary'' token (called identity assertion) to bind the target RP's identity and sends both tokens to the RP.
+issues a special token (called user certificate) to bind a user identity to an ephemeral public key. With the corresponding private key, the user signs a ``subsidiary'' token (called identity assertion) to bind the target RP's identity and sends both tokens to the RP.
 In SPRESSO \cite{SPRESSO} an RP creates a verifiable one-time pseudo-identity for itself in each login instance, which is enclosed in the identity token generated by the IdP. %and the user identity.
-The PRIMA IdP signs a credential binding a verification key and user attributes \cite{prima}, where the key is considered the user identity.
+The PRIMA IdP signs a credential
+%\footnote{For the message signed by the IdP works with a user secret verified by an RP,
+%    it is usually called a credential  in identity federation instead of token.}
+ binding a verification key and user attributes \cite{prima}, where the key is considered the user identity.
 The user selectively provides IdP-confirmed attributes to an RP using his signing key \cite{Oblivion}.
 In these schemes \cite{BrowserID,SPRESSO,prima}, collusive RPs could link a user based on his unique identity in the tokens (or credentials).
 
 
-PseudoID \cite{PseudoID} introduces an independent token service in addition to the IdP to \emph{blindly} sign an access token binding a pseudonym and a user secret.
+PseudoID \cite{PseudoID} introduces an independent service in addition to the IdP to \emph{blindly} sign an access token binding a pseudonym and a user secret.
 The user unblinds this token and the IdP will assert it,
     which allows the user to login to an RP using his secret.
 Two kinds of privacy threats are prevented, because (\emph{a}) the RP's identity is not enclosed in the token
@@ -177,13 +179,13 @@ In EL PASSO \cite{ELPASSO}, after authenticating a user,
     the IdP signs an anonymous credential \cite{anon-credential} binding a secret,
          both of which are kept on the user's device.
 When attempting to login to an RP,
-    the user proves that he is the owner of this credential without exposing the secret,
+    the user proves that he is the owner of this credential using the secret,
         and discloses selective attributes in the credential.
 Although one credential is proved to multiple RPs,
-        user-maintained pseudonyms and anonymous credentials prevent the RPs, even when collusive with the IdP, from linking the users across the RPs.
+        \emph{user-maintained pseudonyms} and \emph{anonymous credentials} prevent the RPs, even when collusive with the IdP, from linking the users across the RPs.
 UnlimitID \cite{UnlimitID} presents similar designs based on anonymous credentials \cite{anon-credential},
         to prevent collusive attacks by the IdP and RPs.
-NEXTLEAP \cite{nextleap} adopts UnlimitID for anonymous secure messaging.
+NEXTLEAP \cite{nextleap} builds anonymous secure messaging on top of UnlimitID.
 
 %    but a user has to by himself manage pseudonyms for different RPs.
 %For example,

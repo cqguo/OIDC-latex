@@ -52,7 +52,7 @@ The forwarder of SPRESSO runs Ubuntu 20.04.4 with 16 vCPUs and 16 GB memory,
     also on Alibaba Cloud.
 We compare the schemes in two scenarios:
     (\emph{a}) a user browser, Chrome 104.0.5112.81, runs on another virtual machine with 8 vCPUs and 32 GB memory on Alibaba Cloud,
-        and (\emph{b}) the browser runs locally on a PC with Core i7-8700 CPU and 32 GB memory, to remotely visit the servers.
+        and (\emph{b}) a browser runs locally on a PC with Core i7-8700 CPU and 32 GB memory, to remotely visit the servers.
 In the cloud scenario, all entities are deployed in the same virtual private cloud and connected to one vSwitch,
     which minimizes the influence of network delays.
 In any scenario, the IdP never directly communicates with the RP.
@@ -69,7 +69,7 @@ and {\em Identity-token acceptance} (Step 4 in Figure \ref{fig:process}),
 Figure \ref{fig:evaluation} shows
         the average time cost of $1,000$ measurements.
 The overall times of an SSO login instance for MITREid Connect, UPPRESSO, and SPRESSO are
- (\emph{a}) 63 ms, 179 ms, and 190 ms, respectively, when all entities are deployed as Alibaba Cloud virtual machines,
+ (\emph{a}) 63 ms, 179 ms, and 190 ms, respectively, when all entities are deployed on Alibaba Cloud,
 or
  (\emph{b})
 312 ms, 471 ms, and 510 ms, respectively, when the user browser runs locally to remotely visit the servers.
@@ -95,7 +95,7 @@ In the identity-token generation,
 UPPRESSO simply retrieves a token from the IdP.
 On the contrary, in MITREid Connect when a user retrieves the identity token from the IdP,
  the token must be carried with a URL following the fragment identifier \verb+#+ instead of \verb+?+, due to some security considerations \cite{de2014oauth}.
-So the user needs to first download the script from the RP to process this token, which takes the most time.
+So the user needs to first download a script from the RP to process this token, which takes the most time.
    %  UPPRESSO needs 34 ms.
 %Compared with MITREid Connect,
 %    it needs 2 more ms to calculate  $PID_U$.
@@ -118,7 +118,7 @@ In the identity-token acceptance,
    %         and most time is spent to download the script from the RP.
 SPRESSO needs the longest time due to the complicated process at the user browser:
         after receiving identity tokens from the IdP,
-        the browser downloads the JavaScript code from a trusted forwarder,
+        the browser downloads the JavaScript code from the trusted forwarder server,
             decrypts the RP endpoint, and finally sends identity tokens to this endpoint.
 %In the evaluation, the forwarder and IdP are deployed in one machine, which doesn't introduce performance degradation based on the observation. % as  FWD and IdP work sequently for one login.
 
