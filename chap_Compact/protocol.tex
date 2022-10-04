@@ -133,8 +133,7 @@ Note that $r$ is kept unknown to RPs; otherwise, two collusive RPs with $ID_{RP_
 
 \subsection{The Designs Specific for Web Applications}
 \label{sec:web-design}
-The designs specific for web applications,
-enable UPPRESSO to work with commercial-off-the-shelf (COTS) browsers.
+UPPRESSO works with commercial-off-the-shelf (COTS) browsers by the following designs.
 %More efficient but less portable implementations with browser extensions %and/or plug-ins
 % are discussed in Section \ref{sec:discussion}.
 %If a user visits the IdP and RPs through a client software,
@@ -144,13 +143,13 @@ First of all, in UPPRESSO the IdP is not aware of the visited RP,
  so the user agents (or browsers) have to deal with the forwarding of identity tokens
     to the target RP, as well as the calculation of $PID_{RP}$.
 On the contrary,
-    in commonly-used SSO protocols the IdP needs this information to ensure confidentiality of identity tokens.
+    in commonly-used SSO protocols the IdP needs this information to ensure \emph{confidentiality} of identity tokens.
 In the OIDC services, when an RP registers itself at the IdP, the \verb+redirect_uri+ parameter
     is set as the endpoint URL to receive tokens  \cite{OpenIDConnect}.
 Then, %in an OIDC login instance,
  when the IdP wants to transmit identity tokens to an RP,
     it utilizes HTTP 302 redirection with this endpoint as the target URL in the HTTP response,
-     so the user browser forwards it to the RP.
+     so the user browser forwards it to the designated RP.
 %This verified \verb+redirect_uri+  ensures the token is sent to the target RP.
    % which is designated in the token,
 %and prevents attackers from intercepting it.
@@ -158,9 +157,9 @@ Then, %in an OIDC login instance,
 In UPPRESSO such user-agent functions are implemented by web scripts within COTS browsers,
 and the scripts downloaded from an honest entity are also honest.
 %Section \ref{sec:discussion} discusses more efficient but less portable implementations with browser extensions.
-Two scripts are from the visited RP and the IdP, respectively,
+Two scripts are from the visited RP and the IdP, %respectively,
     and each is responsible for the communications with the origin web server.
-Only the RP script is \emph{not} enough to implement a user agent;
+Only the RP script is not enough to implement a user agent;
     otherwise, the script will leak its origin to the IdP web server
     (e.g.,
     an identity-token request sent by the RP script will
@@ -169,7 +168,7 @@ Moreover, a \emph{trusted} script from the honest IdP
 ensures confidentiality of identity tokens (i.e., it is sent to only the designated RP)
 and interacts with the user for the authorization of user attributes,
     for the RP (and also the RP script) might be malicious.
-So on receiving a request with the \verb+referer+ header,
+Thus, on receiving a request with the \verb+referer+ header,
     the IdP checks that it is from the IdP script.
 
 The RP script prepares $ID_{RP}$ and $Enpt_{RP}$ for the IdP script, through RP certificates.
@@ -180,7 +179,7 @@ In a login instance
 The IdP script %from the honest IdP,
     verifies the RP certificate to extract $ID_{RP}$ and $Enpt_{RP}$.
 The IdP's public key is set in the IdP script, so
- a user does not configure anything locally,
+ a user does not configure anything \emph{locally},
     as it does in popular SSO systems \cite{OpenIDConnect, rfc6749, SAML,SAMLIdentifier}.
 
 %Thus, to avoid the IdP server obtaining any evidence about the RP's identity and provide IdP's script with the RP certificate, the RP's script is also required to transmit the certificate to IdP script after it is downloaded from IdP server.
@@ -210,11 +209,11 @@ Finally,
 We shall prevent the referer leakage when the IdP script is downloaded.
 Generally, when a browser window visits another website not belonging to its opener's origin,
  the HTTP request to this website automatically carries the \verb+referer+ header (i.e., the opener's origin).
-This HTTP header leaks the visited RP's domain to the IdP.
-Fortunately, in UPPRESSO this newly-opened window is a redirection from the RP to the IdP,
+Such an HTTP header leaks the visited RP's domain to the IdP.
+Fortunately, in UPPRESSO this newly-opened window is a \emph{redirection} from the RP to the IdP,
  but not a direct visit by the browser (Figure \ref{fig:process}, Steps 1.2-1.3).
 This leakage is prevented by setting the header \verb+referrer-policy=no-referrer+ in the HTTP response from the RP, when it is redirected to the IdP.
-Then the HTTP request to download the IdP script carries no \verb+referer+ header.
+So the HTTP request to download the IdP script carries no \verb+referer+ header.
 This method is specified by W3C \cite{referer_policy} and widely supported.
 We tested it in browsers including Chrome, Safari, Edge, Opera and Firefox, and confirmed no referer leakage.
 
