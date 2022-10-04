@@ -13,7 +13,7 @@ Then,
 %A dedicated, the bidirectional authenticated secure channel was proposed to improve the confidentiality and integrity of identity token \cite{CaoSBKVC14}.
 
 The primary goal of non-anonymous SSO services is %user authentication and identification \cite{SPRESSO},
- to ensure that a \emph{legitimate} user is able to login to an \emph{honest} RP as his permanent identity at this RP, %correlating multiple login instances,
+ to ensure that a \emph{legitimate} user is able to login to an \emph{honest} RP as his permanent account at this RP, %correlating multiple login instances,
     by presenting the \emph{identity tokens} issued by the \emph{honest} IdP.
 
 To achieve this goal,
@@ -74,10 +74,10 @@ These security requirements (i.e., RP designation, user identification, confiden
 
 We aim to design a privacy-preserving SSO system with the four security properties as above,
     while preventing the privacy threats due to both the IdP-based login tracing and the RP-based identity linkage.
-Table \ref{tbl:notations-dilemma} lists the notations in the following explanation,
+Table \ref{tbl:notations-dilemma} lists the notations in the following explanations,
     and the subscript $j$ and/or the superscript $i$ may be omitted when there is no ambiguity.
 We explicitly distinguish a user's identity (or \emph{account}) at the RP, 
-     from the user's \emph{identity} at the IdP and the user's \emph{pseudo-identity} in identity tokens.
+     from the user's \emph{identity} at the IdP and the user's \emph{pseudo-identity} enclosed in identity tokens.
 
 An identity token contains the (pseudo-)identities of the authenticated user and the target RP. %which is to tell the RP that this user has been authenticated by the IdP.
 % Let us denote the long-term unique identifiers of the user and the RP as $ID_U$ and $ID_{RP}$, respectively.
@@ -86,19 +86,19 @@ Since the IdP authenticates users and always knows the user's identity (i.e., $I
     we shall not reveal the target RP's permanent identity (i.e., $ID_{RP}$) to the IdP.
 So an \emph{ephemeral} pseudo-identity for the RP (i.e., $PID_{RP}$) shall be used in the identity-token request:
 (\emph{a}) to ensure RP designation,
-     $PID_{RP}$ shall be uniquely associated with the target RP;
+     $PID_{RP}$ shall be \emph{uniquely} associated with the target RP;
     and (\emph{b}) the IdP cannot derive any information about $ID_{RP}$ from any $PID_{RP}^i$,
         which implies $PID_{RP}^i$ in multiple login instances shall
-         be independent of each other.\footnote{While the target RP is kept unknown to the IdP,
-            the IdP shall not link multiple login instances to visit this RP.}
+         be independent of each other.\footnote{Even when the target RP is kept unknown to the IdP,
+            the IdP shall not link multiple login instances visiting this RP.}
    % the IdP-based login tracing is still effective, to correlate a user's multiple login instances.
 
 To prevent the RP-based identity linkage,
  the IdP does not enclose $ID_U$ in identity tokens.
 A user pseudo-identity (i.e., $PID_U$) is bound instead:
-    (\emph{a}) in multiple login instances to the RP, $PID_U^i$ shall be independent of each other and generated ephemerally,
+    (\emph{a}) in multiple login instances to an RP, $PID_U^i$ shall be independent of each other and generated ephemerally,
         to prevent the IdP-based login tracing;\footnote{If $PID_U^i$ is not completely independent of each other,
-         it implies the IdP could link multiple login instances to visit this RP.}
+         it implies the IdP could link multiple login instances visiting this RP.}
     (\emph{b}) the RP cannot derive any information about $ID_U$ from any $PID_{U,j}$,
     which implies $PID_{U,j}$ for different RPs shall be independent of each other;
     and (\emph{c}) to ensure user identification,
@@ -106,11 +106,11 @@ A user pseudo-identity (i.e., $PID_U$) is bound instead:
      with the \emph{permanent} account  (i.e., $Acct$) at this RP.
 
 
-Give a user,
+Given a user,
     (\emph{a}) an identity token contains only pseudo-identities, i.e., $PID_{U,j}^i$ and $PID_{RP_j}^i$,
         which are independent of each other for different RPs and in multiple login instances, respectively,
     and (\emph{b}) the two \emph{ephemeral} pseudo-identities enable the target RP to derive a \emph{permanent} account, i.e., $Acct_j$.
-The relationships among the (pseudo-)identities in identity tokens is illustrated in Figure \ref{fig:IDCorrelation}.
+The relationship among the (pseudo-)identities in identity tokens is illustrated in Figure \ref{fig:IDCorrelation}.
 The \emph{red} and \emph{green} blocks represent \emph{permanent} and \emph{ephemeral} (pseudo-)identities, respectively.
 The arrows denote the transformations of (pseudo-)identities.
 %It describes the {\em identity dilemma} of privacy-preserving SSO as below:
@@ -132,7 +132,7 @@ To satisfy the requirements of both security and privacy,
      while knowing nothing about the RP's identity or the user's account at this RP (i.e., $ID_{RP}$ or $Acct$).}
 
 Existing privacy-preserving SSO solutions (i.e., SPRESSO \cite{SPRESSO}, BrowserID \cite{BrowserID} and PPID \cite{NIST2017draft})
-  do not comprehensively consider all five (pseudo-)identities in the SSO login flow,
+  do not explicitly and comprehensively consider all five (pseudo-)identities in the SSO login flow,
     and either $ID_U$ or $ID_{RP}$ is still enclosed in identity tokens.
 
 

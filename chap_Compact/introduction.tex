@@ -34,19 +34,19 @@ An RP delegates user identification and authentication to the IdP,
 %SSO has been widely integrated into many application services. For example, 80\% of the Alexa Top-100 websites and 6.3\% of the Alexa Top-1M websites support SSO \cite{GhasemisharifRC18}. Meanwhile, many email and social network providers (such as Google, Facebook, Twitter, etc.) are serving the IdP roles.
 %
 For example, in the popular OIDC systems,
-     a user sends a login request to the target RP, % (Step 1),
+     a user sends a login request to the target RP,
 and the RP constructs an identity-token request with its identity (denoted as $ID_{RP}$) and redirects this request to the IdP.
 After authenticating the user,
  the IdP issues an identity token explicitly binding the identities of both the user and the RP (i.e., $ID_U$ and $ID_{RP}$),
-    which is returned to the user and forwarded to the RP. %in Step 5.
-Finally, the RP verifies the identity token to decide whether the user is allowed to login or not.
+    which is returned to the user and forwarded to the RP.
+Finally, the RP verifies the identity token to decide whether the token holder is allowed to login or not.
 So a user keeps only one credential for the IdP, instead of several credentials for different RPs.
 
 As the comprehensive solution of identity management and authentication,
     SSO services allow the IdP to provide more user attributes in the tokens,
         along with the authenticated user's identity.
 The attributes (e.g., age, hobby, education, and nationality) are maintained at the IdP,
-    and enclosed in the identity tokens after the user's authorization \cite{OpenIDConnect,rfc6749}.
+    and enclosed in identity tokens after the user's authorization \cite{OpenIDConnect,rfc6749}.
 
 %However, SSO systems have been continuously found vulnerable and insecure \cite{WangCW12,ccsSunB12,SomorovskyMSKJ12,ArmandoCCCPS13,DiscoveringJCS,dimvaLiM16,WangZLG16,MainkaMS16, MainkaMSW17,YangLCZ18}.
 The wide adoption of SSO raises concerns on user privacy \cite{NIST2017draft,SPRESSO,BrowserID,maler2008venn},
@@ -58,7 +58,7 @@ As a result, an honest-but-curious IdP could track all the RPs that each user ha
 % This data can be further analyzed to profile users' online activities, as in other web tracking attacks.
  called the {\em IdP-based login tracing} in this paper.
 %This threat by curious IdPs is also discussed by recent researches .
-Meanwhile, the RPs learn users identities from the identity tokens.
+Meanwhile, the RPs learn users identities from the received identity tokens.
 If the IdP encloses an identical user identity in the tokens for a user to visit different RPs \cite{maler2008venn,Google,FirefoxAccount},
      collusive RPs could link these login instances across the RPs, %and track the user's activities
       to learn his online profile \cite{maler2008venn}.
@@ -145,7 +145,8 @@ Given a user, this account is identical across multiple login instances for an R
      and unique at each RP.
 
 UPPRESSO prevents the IdP-based login tracing because only $PID_{RP}$ is in the identity-token request,
-    and the RP-based identity linkage because every user account is unique.
+    and the RP-based identity linkage because every user account is unique
+    (see Section \ref{sec:analysis} for details).
 On the contrary,
      existing privacy-preserving SSO solutions \cite{BrowserID,SPRESSO,NIST2017draft,FirefoxAccount} prevent only one of these two privacy threats.
 The identity transformations work compatibly with
@@ -174,7 +175,7 @@ Our contributions are as follows.
 \setlength{\parskip}{0pt}
 \item We formalize the SSO privacy problems as an identity-transformation challenge,
     and
-propose a  solution to protect the users' login activities;
+propose a  solution to protect the users' online profiles;
     that is, solve this challenge by designing identity-transformation functions.
 \item
 The UPPRESSO protocol is proposed based on the identity transformations,

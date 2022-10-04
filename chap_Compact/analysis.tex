@@ -92,13 +92,13 @@ Thus,
 If the adversary is able to find $t$ and $t'$
     satisfying that $[t]ID_{RP_j} = [t']ID_{RP_{j'}}$,
     it will have non-negligible advantages in $\mathcal{G}_c$
-        and
+        and then
          ${\rm Pr}_s$ becomes non-negligible as $k$ increases.
 Because $m \ll 2^k$, ${\rm Pr}\{\mathcal{D}^*_c(G, [x]G)=x\} = \frac{1}{m}{\rm Pr}_s$ also
 becomes non-negligible with the increasing $k$.
-This definitely violates the ECDLP.
+This violates the ECDLP assumption.
 Thus, the probability of finding $t$ and $t'$ satisfying that $[t]ID_{RP_j} = [t']ID_{RP_{j'}}$ in UPPRESSO is negligible,
-    and then the adversary cannot break RP designation.
+    and then adversaries cannot break RP designation.
 
 
 %If ${\rm Pr}_s$ is non-negligible with the security parameter $k$, ${\rm Pr}\{\mathcal{D}^*_c(G, [x]G)=x\} =\frac{1}{m}{\rm Pr}_s$ is also non-negligible because $m << 2^k$,
@@ -200,13 +200,13 @@ Thus,
 %The detailed process of proof is shown in Appendix.
 
 \vspace{1mm}
-Finally, we formally analyze the security properties of UPPRESSO, %especially confidentiality and integrity,
+Finally, we have formally analyzed the security properties of UPPRESSO, %especially confidentiality and integrity,
      based on a Dolev-Yao style model \cite{SPRESSO}.
 % which has been used in the formal analysis of SSO protocols such as OAuth 2.0 \cite{FettKS16} and OIDC \cite{FettKS17}.
 The model abstracts the entities in a web system,
     such as web servers and browsers,
-    as atomic processes. %which communicate with each other through events. % such as HTTPS request and response.
-It also defines script processes to formulate client-side scripts, i.e.,  JavaScript code.
+    as \emph{atomic processes}. %which communicate with each other through events. % such as HTTPS request and response.
+It defines \emph{script processes} to formulate client-side scripts.
 %The script is dependently invoked by the browser to process the server-defined logic.
   %such as verifying $Certificate_{RP}$.
 
@@ -222,11 +222,11 @@ an IdP process,
 These processes communicate with each other through events such as HTTPS request and response.
 We consider all RP and browser processes are honest,
  while model an RP or a browser controlled by an adversary as attacker processes.
-Within an honest browser,
+Within a browser,
  honest IdP scripts, honest RP scripts and also attacker scripts are invoked.
 %Although the scripts coexist in the same browser, they are strictly separated.
 Script processes communicate with each other through \verb+postMessage+,
-    modelled as transmitted-to-itself events of the browser.
+    modelled as transmitted-to-itself events of the browser process.
 %To clearly indicate the action of postMessage communication, we define it as the transmitting-to-itself event of the browser (which is not defined in SPRESSO).
 
 %It contains two honest script processes,
@@ -295,7 +295,7 @@ The prevention against the RP-based identity linkage is proved
     by this proposition:
 when $c$ collusive RPs collect the information of login instances by $v$ users,
     they still cannot determine whether a login instance to another RP belongs to one of these $v$ users or not.
-The login instances are expressed as $\mathfrak{L}=\left\{ \begin{matrix}
+The collected login instances are expressed as $\mathfrak{L}=\left\{ \begin{matrix}
 L_{1,1}, & L_{1,2}, & \cdots, & L_{1,c}\\
 L_{2,1}, & L_{2,2}, & \cdots, & L_{2,c}\\
 \cdots, & \cdots, & \cdots, & \cdots\\
@@ -344,7 +344,7 @@ Finally,
 According to the above construction of $\mathfrak{L}$ and $L'$,
     $x$ is actually inserted into $\mathfrak{L}$ as $u_d$
     and $z/y$ is assigned to $u'$.
-So, if $z = xy$, $z/y=x$ and $ID_{U'} \in \{ID_{U_1}, ID_{U_2}, \cdots, ID_{U_v}\}$;
+So, if $z = xy$, then $z/y=x$ and $ID_{U'} \in \{ID_{U_1}, ID_{U_2}, \cdots, ID_{U_v}\}$;
     otherwise, $ID_{U'} \in \mathbb{Z}_n$.
 Thus,
 \begin{align*}
