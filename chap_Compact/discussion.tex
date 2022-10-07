@@ -1,20 +1,47 @@
 \section{Discussions}
 \label{sec:discussion}
 
-%Some related issues are discussed in this section.
+\noindent{\textbf{Collusive Attack by an IdP and RPs.}}
+Privacy-preserving identity federation solutions \cite{ELPASSO,UnlimitID,hyperledge-idemix,PseudoID,Opaak,uprov}
+ prevent the collusive attacks by the IdP and RPs,
+    at the cost of (\emph{a}) a long-term secret held by a user but verified by RPs
+        and (\emph{b}) user-managed accounts \cite{PseudoID} for different RPs.
+The account may be derived from an RP domain and the secret \cite{ELPASSO,UnlimitID,Opaak,uprov,idemix},
+  but this design still brings inconveniences.
+For web applications, a user needs to install a browser extension to handle this long-term secret;
+  and if it is lost or leaked,
+       a user has to notify all RPs to update his accounts which are derived from the secret
+        (if the accounts are not protected by the user's secret, the colluding IdP and RPs can eventually link them).
+Meanwhile,
+UPPRESSO does not protect user privacy against such collusive attacks,
+    but a user is authenticated to only an IdP:
+         the identity at the IdP and the accounts at RPs
+                are unrelated to the user credential (e.g., password, one-time password, and smart card).
+
+%When the IdP is kept honest-but-curious but shares messages in the login flow (i.e.,
+%$ID_U$, $PID_{RP}$, and $PID_U$)
+%        with some colluding RPs,
+%UPPRESSO still provides secure SSO services,
+%    provided that the signed identity tokens are sent to the authenticated users only;
+%however,
+%    the colluding adversaries are able to track the users' login activities to these RPs.
+%Even in this case, a user's login activities at the other RPs not collusive with the IdP,
+%        are still kept unknown to the IdP and these colluding RPs,
+%        because a triad of $t$, $PID_U$ and $PID_{RP}$ is ephemeral and independent of each other.
 
 
-\noindent{\textbf{Scalability.}} Adversaries cannot exhaust $PID_{RP}$ or $ID_{RP}$.
+
+\vspace{0.5mm}
+\noindent{\textbf{Scalability.}} 
 $ID_{RP}$ is generated uniquely in an RP's initial registration,
-    and the capacity is $n$ (i.e., the order of $G$). For example, for the NIST P256 elliptic curve, $n$ is approximately $2^{256}$.
-As for $PID_{RP}$,  we only ensure $PID_{RP}$ is unique in \emph{unexpired} tokens,
+    and the capacity is $n$ (i.e., the order of $G$). For the NIST P256 elliptic curve, $n$ is approximately $2^{256}$.
+Adversaries cannot exhaust $PID_{RP}$, either.
+We only ensure $PID_{RP}$ is unique in \emph{unexpired} tokens,
     the number of which is denoted as $\sigma$.
 The probability that at least two $PID_{RP}$s are identical among the $\sigma$ ones,
     is $1-\prod_{i=0}^{\sigma-1}(1-i/n)$.
-For example,
-    when the IdP serves $10^{8}$ requests per second and the validity period of identity tokens is 10 minutes,
-     $\sigma$ is less than $2^{36}$ and the probability is less than $2^{-183}$ for the NIST P256 elliptic curve.
-This probability is negligible.
+If the system serves $10^{8}$ requests per second and the validity period is 10 minutes,
+     $\sigma$ is less than $2^{36}$ and the collision probability is negligible (i.e., less than $2^{-183}$) for the P256 curve.
 
 The capacity of accounts at any RP is also $n$.
 $\mathbb{E}$ is a finite cyclic group,
@@ -23,35 +50,40 @@ Thus, given any RP,
     a \emph{unique} account is assigned to every user,
         because $Acct =  [ID_U]ID_{RP} = [u]ID_{RP}$.
 
-\vspace{0.8mm}
-\noindent{\textbf{Applicability of Identity Transformations.}}
-These identity-transformation functions, i.e., $\mathcal{F}_{PID_{RP}}()$, $\mathcal{F}_{PID_U}()$, and $\mathcal{F}_{Acct}()$,
-    are applicable to various SSO scenarios
-        (e.g., web application, mobile App, and native software),
-    because these functions follow the common model of popular SSO protocols
-    and do not depend on any special implementation or runtime.
-%Although the prototype runs for web applications,
-%    it is feasible to apply the identity-transformation functions to other SSO scenarios
-%        to protect user privacy.
+Besides, stronger elliptic curves accommodate more RPs and users;
+e.g., $n$ is nearly $2^{384}$ for the NIST P384 curves.
 
 
-%In this paper, the functions are implemented based on the elliptic curve algorithm and the mechanism provided by OIDC system.
-%However, the transformation functions can also be implemented based on other mechanisms according to the protocol and environment, for example, the TPM may be used to take responsibility to transform identities.
+\vspace{0.5mm}\noindent{\textbf{Alternative Way to Generate $ID_{RP}$ and Bind $Enpt_{RP}$.}}
+In the prototype, an RP certificate binds $ID_{RP}$ and $Enpt_{RP}$,
+    verified by the honest IdP script.
+The RP certificates ensure the target RP has already registered itself at the IdP,
+ which prevents unauthorized RPs from accessing the IdP's services.
 
-%%DoS
-%%Security against ID exhaustion DoS
-%%1.用户被鉴别过的，可以事后审计的； 2. IdP， 本来对OIDC是做一次数字签名， 加了一次模幂，资源消耗 --> DoS attack
-%\vspace{1mm}\noindent{\textbf{Security against DoS attack.}}
-%The adversary may attempt to perform DoS attack on the IdP and RP. For example, the adversary may act as a user to invoke the $PID_{RP}$ registration and identity token generation at the IdP, which requires the IdP to perform two signature generations and one modular exponentiation.
-%However, as the user has already been authenticated at the IdP, the IdP could identify the malicious users based on audit, in addition to the existing DoS mitigation schemes.
-%%The adversary may act as a user requesting to log into an RP, and make the RP perform two modular exponentiations.
-%%The RP could previously calculated a set of $Y_{RP}$s to mitigate this attack.
+This binding may be finished in another way:
+    $ID_{RP}$ is \emph{deterministically} calculated based on the RP's \emph{unambiguous name}.
+For example, $Hs()$ encodes an RP's domain (or the RP script's origin, e.g., \verb+https://RP.com+) to a point on the elliptic curve $\mathbb{E}$ as $ID_{RP}$,
+where
+    hashing to elliptic curves $Hs()$ \cite{irtf-cfrg-hash-to-curve-16} provides collision resistance and does not reveal the discrete logarithm of the output
+    (i.e., $ID_{RP} = [r]G$ is unique and $r$ is unknown).
+Then,  in Step 2.2 the RP script will send the endpoint but not its RP certificate,
+  %to the IdP script,
+ and $ID_{RP}$ is calculated by the IdP script.
+%This elimination of RP certificates improves the downloading of scripts,
+%        and on average \textcolor[rgb]{1,0,0}{xxx} ms are saved.
+However, if the RP updates its domain, for instance, from \verb+https://RP.com+ to \verb+https://theRP.com+,
+$Acct = [ID_U]ID_{RP}$ will change \emph{inevitably}.
+In such cases,
+    it needs special operations by each user to migrate his account
+            to the updated RP system.
+This account migration requires extra operations \emph{explicitly by each user};
+    otherwise,
+        colluding RPs could actually link a user's accounts across RPs.
 
 
-
-\vspace{0.8mm}\noindent{\textbf{Compatibility with the Authorization Code Flow.}}
+\vspace{0.5mm}\noindent{\textbf{Support for the Authorization Code Flow.}}
 In the authorization code flow of OIDC \cite{OpenIDConnect},
-    the IdP does not directly issue the identity token;
+    an IdP does not directly issue the identity token;
         instead,
             an authorization code is sent to the RP,
             and then the RP uses this code to ask for identity tokens.
@@ -103,22 +135,6 @@ In order to protect RP identities from the IdP,
 
 %\noindent{\textbf{Malicious IdP mitigation.}} The IdP is assumed to assign a unique $ID_{RP}$ in $Cert_{RP}$ for each RP and generate the correct $PID_U$ for each login. The malicious IdP may attempt to provide the incorrect $ID_{RP}$ and $PID_U$, which could be prevented by integrating certificate transparency \cite{rfc6962} and user's identifier check \cite{SPRESSO}. With certificate transparency \cite{rfc6962}, the monitors  check the uniqueness of $ID_{RP}$ among all the certificates stored in the log server. To prevent the malicious IdP from injecting any incorrect $PID_U$, the user could provide a nickname to the RP for an extra check as in SPRESSO \cite{SPRESSO}.
 
-\vspace{0.8mm}\noindent{\textbf{Collusive Attack by the IdP and RPs.}}
-Compared with some privacy-preserving identity federation solutions \cite{ELPASSO,UnlimitID,hyperledge-idemix,PseudoID,Opaak,uprov},
-UPPRESSO does not protect user privacy against such collusive attacks
-    but a user is always authenticated to only the IdP.
-
-When the IdP is kept honest-but-curious but shares messages in the login flow (i.e.,
-$ID_U$, $PID_{RP}$, and $PID_U$)
-        with some collusive RPs,
-UPPRESSO still provides secure SSO services,
-    provided that the signed identity tokens are sent to the authenticated users only;
-however,
-    the collusive adversaries are able to track the users' login activities to these RPs.
-Even in this case, a user's login activities at the other RPs not collusive with the IdP,
-        are still kept unknown to the IdP and these collusive RPs,
-        because a triad of $t$, $PID_U$ and $PID_{RP}$ is ephemeral and independent of each other.
-%
 
 %\noindent{\textbf{Implementation with Browser Extensions.}}
 %If the user functions of UPPRESSO are implemented with browser extensions,
@@ -129,7 +145,24 @@ Even in this case, a user's login activities at the other RPs not collusive with
 % \textcolor[rgb]{1,0,0}{and experiments show that at least 102 ms will be saved for each login (i.e., about 208 ms in total),}
 %    compared with the version with portable web scripts.
 
-\vspace{0.8mm}\noindent{\textbf{Restriction of the RP Script's Origin.}}
+\vspace{0.5mm}
+\noindent{\textbf{Applicability of Identity Transformations.}}
+These identity-transformation functions, i.e., $\mathcal{F}_{PID_{RP}}()$, $\mathcal{F}_{PID_U}()$, and $\mathcal{F}_{Acct}()$,
+    are applicable to various SSO scenarios
+        (e.g., web application, mobile App, and native software),
+    because these functions follow the common model of popular SSO protocols
+    and do not depend on any special implementation or runtime.
+%Although the prototype runs for web applications,
+%    it is feasible to apply the identity-transformation functions to other SSO scenarios
+%        to protect user privacy.
+
+
+%In this paper, the functions are implemented based on the elliptic curve algorithm and the mechanism provided by OIDC system.
+%However, the transformation functions can also be implemented based on other mechanisms according to the protocol and environment, for example, the TPM may be used to take responsibility to transform identities.
+
+
+
+\vspace{0.5mm}\noindent{\textbf{Restriction of the RP Script's Origin.}}
 When identity tokens are forwarded by the IdP script to the RP script, % within the user browser,
     the receiver is restricted by the \verb+postMessage+ targetOrigin mechanism \cite{postm-targeto},
         to ensure it will forward the tokens to $Enpt_{RP}$
@@ -140,7 +173,7 @@ A targetOrigin is specified as
 
 Although the URL path part of $Enpt_{RP}$ %, e.g., \verb+/uploadTkn+,
  is not checked by the targetOrigin mechanism,
-  which assumes \emph{only one RP runs on a domain},
+  which assumes \emph{only one} RP runs on a domain,
    it brings no \emph{extra} risk as below.
 If two RPs run on one domain but with different endpoints to receive identity tokens
         (e.g., \verb+https://RP.com/honest/tkn+ and \verb+https://RP.com/malicious/tkn+),
@@ -164,46 +197,3 @@ So
 %    RP1 can always be the MitM attackers of RP2.
 %RP1 exploits the vulnerability of HTTPS server certificate is fine to attack,
 %    by the shared private key.
-
-\vspace{0.8mm}\noindent{\textbf{Alternative Way to Bind $ID_{RP}$ and $Enpt_{RP}$.}}
-In the prototype, an RP certificate binds $ID_{RP}$ and $Enpt_{RP}$,
-    verified by the honest IdP script.
-The RP certificates ensure the target RP has already registered itself at the IdP,
- which prevents unauthorized RPs from accessing the IdP's services.
-
-This binding may be finished in another way:
-    $ID_{RP}$ is \emph{deterministically} calculated based on the RP's \emph{unambiguous name}.
-For example, $Hs()$ encodes an RP's domain (or the RP script's origin, e.g., \verb+https://RP.com+) to a point on the elliptic curve $\mathbb{E}$ as $ID_{RP}$,
-where
-    hashing to elliptic curves $Hs()$ \cite{irtf-cfrg-hash-to-curve-16} provides collision resistance and does not reveal the discrete logarithm of the output
-    (i.e., $ID_{RP} = [r]G$ is unique and $r$ is unknown).
-Then,  in Step 2.2 the RP script will send the endpoint but not its RP certificate,
-  %to the IdP script,
- and $ID_{RP}$ is calculated by the IdP script.
-%This elimination of RP certificates improves the downloading of scripts,
-%        and on average \textcolor[rgb]{1,0,0}{xxx} ms are saved.
-However, if the RP updates its domain, for instance, from \verb+https://RP.com+ to \verb+https://theRP.com+,
-$Acct = [ID_U]ID_{RP}$ will change \emph{inevitably}.
-In such cases,
-    it needs special operations by each user to migrate his account
-            to the updated RP system.
-This account migration requires extra operations \emph{explicitly by each user};
-    otherwise,
-        collusive RPs could actually link a user's accounts across RPs.
-
-
-%\vspace{1mm}
-%\noindent{\textbf{Active Identity Linkage by Malicious RPs.}}
-%When a user logins to multiple RPs \emph{concurrently} on one device as different accounts,
-%        malicious RPs might actively correlate the accounts by online means.
-%For instance,
-%     when the user has logined to $RP_j$ with $Acct_j$,
-%         malicious $RP_j$ might try to redirect $Acct_j$ to another $RP_{j'}$ through a hidden iframe in the browser.
-%As long as he has logined to $RP_{j'}$,
-%     two accounts would be correlated by $RP_{j'}$.
-%This active attack appears not only in SSO systems, but also exists in all web applications.
-%Anyway,
-%    this attack can be prevented through various methods,
-% such as checking hidden iframes in the script
-%  and detecting the redirection by browser extensions.
-%

@@ -19,8 +19,33 @@
 %%Moreover, OAuth and OIDC allow users to determine the scope of attributes exposed to the RP.
 %
 
+\noindent\textbf{Privacy-Preserving Token or Credential.}
+%Such tokens (or credentials) authorize a user to conduct operations
+%        in privacy-preserving ways.
+%
+%    tokens (or credentials) authorize a user to conduct operations
+%        in privacy-preserving ways.
+In addition to sign-on, privacy enhancing technologies have been applied in different scenarios,
+  but not adopted to comprehensively transform the five (pseudo-)identities in SSO services.
+PrivacyPass and TrustToken \cite{privacypass,trusttoken} allow a user to receive a great number of \emph{anonymous} tokens.
+ These tokens are used to access resources on content delivery networks,
+    so the user does not interact with challenges such as CAPTCHAs.
+ZKlaims \cite{zklaim} allow users to prove statements on the credentials issued by a trusted party
+    using zero-knowledge proofs,
+        but the credential contents are not revealed.
+Crypto-Book \cite{crypto-book} coordinates servers to generate a ring-signature private key,
+ and a user picks up his private key through a list of Email addresses (i.e., an anonymity set).
+ Then the key pair works as an untraceable pseudonym to sign messages.
+Two-party threshold schemes are implemented with a central server,
+    to protect user private keys \cite{mRSA,ss-rsa}:
+    to sign or decrypt a message, the user needs a token from the server.
+    Tandem \cite{tandem} decouples the obtaining and using of such tokens,
+for the privacy of key usage.
+
+
+%\vspace{0.5mm}
 \noindent\textbf{Anonymous SSO.}
-Such schemes allow authenticated users to access a service protected by the IdP,
+Such schemes allow authenticated users to access a service protected by an IdP,
     without revealing their identities.
 Anonymous SSO was proposed for GSM communications \cite{ElmuftiWRR08},
     and formalized \cite{WangWS13}.
@@ -29,27 +54,7 @@ Privacy-preserving primitives, such as group signature, zero-knowledge proof, Ch
 Anonymous SSO schemes work for some applications,
     but are unapplicable to most systems that require user identification for customized services.
 
-\vspace{0.5mm}
-\noindent\textbf{Privacy-Preserving Token or Credential.}
-In addition to login,
-    tokens (or credentials) authorize a user to conduct operations
-        in privacy-preserving ways.
-ZKlaims \cite{zklaim} allow users to prove statements on the credentials issued by a trusted party
-    using zero-knowledge proofs,
-        but the credential contents are not revealed.
-PrivacyPass \cite{privacypass} allows a user to receive a great amount of anonymous tokens.
- These tokens are used to access resources on content delivery networks,
-    so  the user does not interact with challenges such as CAPTCHAs.
-Crypto-Book \cite{crypto-book} coordinates servers to generate a ring-signature private key,
- and a user picks up his private key through a list of Email addresses (i.e., an anonymity set).
- Then, the key pair works as an untraceable pseudonym to sign messages.
-Two-party threshold-cryptography is implemented with a central server,
-    to improve the security of user private keys \cite{mRSA,ss-rsa}:
-    to sign or decrypt a message, the user needs a token from the server.
-    Tandem \cite{tandem} decouples the obtaining and using of such tokens,
-to preserve the privacy of key usage.
-
-\vspace{0.5mm}
+%\vspace{0.5mm}
 \noindent\textbf{Formal Analysis on SSO Protocols.}
 %The SSO standards (e.g., SAML, OAuth, and OIDC) have been formally analyzed.
 Fett et al. \cite{FettKS16, FettKS17} formally analyzed OAuth 2.0 and OIDC using an expressive Dolev-Yao style model \cite{FettKS14},
@@ -66,7 +71,7 @@ SAML-based SSO is also analyzed \cite{ArmandoCCCT08},
 
 
 
-\vspace{0.5mm}
+%\vspace{0.5mm}
 \noindent\textbf{SSO Implementation Vulnerabilities.}
 Vulnerabilities were found in SSO implementations for web applications,
     resulting in effective attacks %of impersonation and identity injection
@@ -86,8 +91,8 @@ Wang et al. \cite{ExplicatingSDK} detect the vulnerable applications
      due to the implicit assumptions of these SDKs.
 Navas et al. \cite{NavasB19} discussed the possible attack patterns against OIDC services.
 
-In mobile systems,
-the IdP App,
+In a mobile system,
+IdP Apps,
     IdP-provided SDKs %(e.g., an encapsulated WebView)
      or browsers
          are responsible for forwarding identity tokens, %from the IdP App to RP Apps.

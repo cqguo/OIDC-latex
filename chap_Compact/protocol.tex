@@ -6,9 +6,8 @@
 \label{subsec:overview}
 
 We design identity-transformation functions,
-     $\mathcal{F}_{PID_{RP}}$, $\mathcal{F}_{PID_{U}}$ and $\mathcal{F}_{Acct}$,
+   %  $\mathcal{F}_{PID_{RP}}$, $\mathcal{F}_{PID_{U}}$ and $\mathcal{F}_{Acct}$,
     on an elliptic curve $\mathbb{E}$.
- %    where $G$ is a base point (or generator) of this elliptic curve and the order of $G$ is a big prime number denoted as $n$.
 Table \ref{tbl:notations-protocol} lists the notations,
     and the subscript $j$ and/or the superscript $i$ may be omitted in the case of no ambiguity.
 
@@ -26,13 +25,10 @@ Table \ref{tbl:notations-protocol} lists the notations,
 %    \begin{tabular}{|c|c|c|}
     \begin{tabular}{|p{1.0cm}|p{6.60cm}|} \hline
     {\textbf{Notation}} & {\textbf{Description}} \\ \hline
-    {$\mathbb{E}$} & {An elliptic curve over a finite field $\mathbb{F}_q$.} \\ \hline
-    {$G$, $n$}&{A base point (or generator) of $\mathbb{E}$, where the order of $G$ is a prime number $n$.} \\ \hline
-%    {$q$} & {A large prime, the size of the underlying field.} \\ \hline
-%    {$n$} & {the order of the base point $G$.} \\ \hline
+    {$\mathbb{E}$, $G$, $n$} & {$\mathbb{E}$ is an elliptic curve over a finite field $\mathbb{F}_q$. $G$ is a base point (or generator) of $\mathbb{E}$, and the order of $G$ is a prime number $n$.} \\ \hline
     {$ID_U$} & {$ID_U = u$, $1 \leq u < n$; the user's unique identity at the IdP.} \\ \hline
    {$ID_{RP_j}$} & {$ID_{RP} = [r]G$, $1 \leq r < n$; the $j$-th RP's unique identity.} \\ \hline
-    {$t$} & {The user-generated random integer in a login instance, $1 \leq t < n$.} \\ \hline
+    {$t$} & {A user-generated random integer in a login instance, $1 \leq t < n$.} \\ \hline
     {$PID_{RP_j}^i$} & {$PID_{RP} = [t]{ID_{RP}} = [tr]G$; the $j$-th RP's pseudo-identity, in the user's $i$-th login instance to this RP.} \\ \hline
     {$PID_{U,j}^i$} & {$PID_U = [{ID_U}]{PID_{RP}} = [utr]G$; the user's pseudo-identity, in the user's $i$-th login instance to the $j$-th RP.} \\ \hline
      {$Acct_j$} & {$Acct = [t^{-1}\bmod n]PID_{U} = [ID_U]ID_{RP} = [ur]G$; the user's account at the $j$-th RP.} \\ \hline
@@ -51,11 +47,12 @@ Table \ref{tbl:notations-protocol} lists the notations,
 For each user,
            a unique integer $u$ is assigned by the IdP and $ID_U = u$.
 When an RP is registering,
-            the IdP generates a random number $r$, and $ID_{RP} = [r]G$, a unique point on $\mathbb{E}$, is assigned to the RP.
+            the IdP generates a random number $r$, and $ID_{RP} = [r]G$, a unique point on $\mathbb{E}$, is assigned.
 Here,
-$u, r \in [1,n)$, $r$ is \emph{unknown} to the RP, and $[r]G$ is the addition of $G$ on the curve $r$ times.
+%$u, r \in [1,n)$, %$r$ is unknown to the RP, and
+ $[r]G$ is the addition of $G$ on the curve $r$ times.
 
-\vspace{0.8mm}
+\vspace{0.5mm}
 \noindent {\bf $\boldsymbol{ID_{\boldsymbol{RP}}}$-$\boldsymbol{PID_{\boldsymbol{RP}}}$ Transformation.} The user selects a random number $t$ ($1 \leq t <n$) as the trapdoor
          and calculates $PID_{RP}$.
 %First, the RP chooses a random number $N_{RP}$ ($1 < N_{RP}<q $), and the user chooses another random number $N_{U}$ ($1 < N_{U}<q $).
@@ -67,7 +64,7 @@ PID_{RP} = \mathcal{F}_{PID_{RP}}(ID_{RP}) = [t]{ID_{RP}} = [tr]G
 %is a one-way function so that it
 %
 %wo nonces $N_{U}$ and $N_{RP}$ ensure that: (\emph{a}) $PID_{RP}$ is valid only for this login and for the identity token generated in this login, and (\emph{b}) $PID_{RP}$ is dynamically generated for this login and is different from other $PID_{RP}$s generated in other login session between the same user and RP. Therefore, the IdP cannot associate multiple $PID_{RP}$s of a same RP. Finally, the cooperative generation process between the user and the RP prevents a single malicious entity from manipulating the value of $PID_{RP}$.
-%For example, the malicious user fails to make a correct RP accept a $PID_{RP}$ used in another login, while the collusive RPs fail to use a same or correlated $PID_{RP}$s for different logins.
+%For example, the malicious user fails to make a correct RP accept a $PID_{RP}$ used in another login, while the colluding RPs fail to use a same or correlated $PID_{RP}$s for different logins.
 %
 %
 \noindent {\bf $\boldsymbol{ID_U}$-$\boldsymbol{PID_U}$ Transformation.}
@@ -92,9 +89,9 @@ PID_{U} = \mathcal{F}_{PID_U}(ID_U, PID_{RP}) =
 
 %Moreover, although the IdP does not know how the RP identifies the user (i.e. the user's $Account$ at the RP), involving $PID_{RP}$ in the generation of $PID_U$ indirectly links a user's one-time pseudo-identity at the IdP ($PID_U$) to her long-term identifier at the RP ($Account$) through a trapdoor.
 
-%Moreover, $ID_{RP}$ is generated following Equation \ref{equ:IDRP} to introduce a random $r$ that is unknown to the RP, so that for a given $ID_U$, $PID_U$ is determined by $r$, $N_{U}$ and $N_{RP}$ together. Otherwise, if two collusive RPs know $r_1$ and $r_2$ respectively, they can check if ${PID_{U_1}}^{r_2N_{U_2}N_{RP_2}} = {PID_{U_2}}^{r_1N_{U_1}N_{RP_1}} \bmod\ p$ holds, which means a same user logs into them in two SSO sessions (i.e., $ID_{U_1}==ID_{U_2}$).
+%Moreover, $ID_{RP}$ is generated following Equation \ref{equ:IDRP} to introduce a random $r$ that is unknown to the RP, so that for a given $ID_U$, $PID_U$ is determined by $r$, $N_{U}$ and $N_{RP}$ together. Otherwise, if two colluding RPs know $r_1$ and $r_2$ respectively, they can check if ${PID_{U_1}}^{r_2N_{U_2}N_{RP_2}} = {PID_{U_2}}^{r_1N_{U_1}N_{RP_1}} \bmod\ p$ holds, which means a same user logs into them in two SSO sessions (i.e., $ID_{U_1}==ID_{U_2}$).
 
-%Moreover, since $r$ is unknown to the RP, collusive RPs cannot link a user's $PID_U$s at different RPs. If $r$ is known to the RP, two collusive RPs might attempt to associate a user's $PID_U$s by checking whether the equality ${PID_{U_1}}^{r_2N_{U_2}N_{RP_2}} = {PID_{U_2}}^{r_1N_{U_1}N_{RP_1}} \bmod\ p$ holds or not, because ${PID_{U_1}} = g^{r_1N_{U_1}N_{RP_1}ID_{U_1}} \bmod p$ and ${PID_{U_2}} = g^{r_2N_{U_2}N_{RP_2}ID_{U_2}} \bmod p$.
+%Moreover, since $r$ is unknown to the RP, colluding RPs cannot link a user's $PID_U$s at different RPs. If $r$ is known to the RP, two colluding RPs might attempt to associate a user's $PID_U$s by checking whether the equality ${PID_{U_1}}^{r_2N_{U_2}N_{RP_2}} = {PID_{U_2}}^{r_1N_{U_1}N_{RP_1}} \bmod\ p$ holds or not, because ${PID_{U_1}} = g^{r_1N_{U_1}N_{RP_1}ID_{U_1}} \bmod p$ and ${PID_{U_2}} = g^{r_2N_{U_2}N_{RP_2}ID_{U_2}} \bmod p$.
 
 \noindent {\bf $\boldsymbol{PID_U}$-$\boldsymbol{Acct}$ Transformation.}
 The trapdoor $t$ is sent to the target RP,
@@ -128,8 +125,7 @@ it is impossible for the RP to derive $ID_U$ from either $PID_U$ or $Acct$,
     and for the IdP to derive $ID_{RP}$ from $PID_{RP}$.
 Section \ref{sec:analysis} presents the detailed proofs.
 
-Note that $r$ is kept unknown to RPs; otherwise, two collusive RPs with $ID_{RP_j} = [r]G$ and $ID_{RP_{j'}} = [r']G$ could check whether $[r']Acct_j = [r]Acct_{j'}$ or not,
-    to link a user's accounts at these RPs.
+Note that $r$ is kept secret to RPs; otherwise, two colluding RPs with $ID_{RP_j} = [r]G$ and $ID_{RP_{j'}} = [r']G$ could link a user's accounts by checking whether $[r']Acct_j = [r]Acct_{j'}$ or not.
 
 \subsection{The Designs Specific for Web Applications}
 \label{sec:web-design}
@@ -194,19 +190,20 @@ and the receiver (i.e., the RP script)
  is restricted by the \verb+postMessage+ targetOrigin mechanism \cite{postm-targeto}.
 When the IdP script sends messages,
  the receiver's origin is set as a parameter,
-  e.g., \verb+postMessage(tkn, 'https://RP.com')+,
-  so that only the script downloaded from this targetOrigin is a legal receiver.
-The parameter consists of
+  e.g., \verb+postMessage(tkn, 'https://RP.com')+.
+It consists of
     the protocol (i.e., \verb+https://+),
     the domain  (i.e., \verb+RP.com+)
     and a port which may be implicit.
+So only the script downloaded from this targetOrigin is a legal receiver.
+
 %The \emph{RP certificates} deals with the problem of mapping an identity proof with its targeting RP.
 %That is, the IdP script derives the RP's $ID_{RP}$ and origin from the RP certificate, while the $PID_{RP}$ is generated with this $ID_{RP}$. Thus, the IdP script always know the targeting RP of an identity proof, therefore, the \verb+postMessage+ mechanism can guarantee that the identity proof would not be sent to the adversary.
 
 Finally,
     the browser downloads the RP script when visiting an RP,
      and this RP script opens a new window that downloads the IdP script.
-We shall prevent the referer leakage when the IdP script is downloaded.
+We should prevent the referer leakage when the IdP script is downloaded.
 Generally, when a browser window visits another website not belonging to its opener's origin,
  the HTTP request to this website automatically carries the \verb+referer+ header (i.e., the opener's origin).
 Such an HTTP header leaks the visited RP's domain to the IdP.
@@ -273,7 +270,7 @@ The IdP generates a key pair ($SK$, $PK$) to sign/verify identity tokens and RP 
 The IdP keeps $SK$ secret, and $PK$ is publicly known.
 
 
-\vspace{0.8mm}
+\vspace{0.5mm}
 \noindent\textbf{RP Initial Registration.}
 %Each RP launches an initial registration operation to finish configurations.
 Each RP registers itself at the IdP to obtain $ID_{RP}$
@@ -309,7 +306,7 @@ Each user registers once at the IdP to set up a unique identity $ID_U$ and the c
 %This is similar to the steps in existing SSO systems.
 
 
-\vspace{0.8mm}
+%\vspace{0.4mm}
 \noindent\textbf{SSO Login.} A login instance %is typically launched through a browser,
 %when a user attempts to visit an RP. It
 consists of four steps, namely script downloading, RP identity transformation,
@@ -397,14 +394,15 @@ The IdP calculates $PID_U = [ID_U]{PID_{RP}}$ and signs the identity token. % Th
 The IdP script requests an identity token for $PID_{RP}$ and the user attributes.
  %by checking whether this user is authenticated by IdP.
 
-\item[3.2] The IdP authenticates the user, if he has not been authenticated yet.
+\item[3.2] The IdP authenticates the user, if not authenticated yet.
 
 \item [3.3]
-After obtaining the user's authorization to enclose the requested attributes,
-the IdP checks whether the received $PID_{RP}$ is valid,
+The IdP script locally obtains the user's authorization to enclose the requested attributes,
+    and send the identity-token request.
+The IdP checks that the received $PID_{RP}$ is valid,
 %pair of $PID_{RPs}$ and $PEnpt_Us$ is in the list of unexpired $PID_{RP}$,
-    and calculates $PID_U = [ID_U]{PID_{RP}}$ for the authenticated user.
-The IdP then signs an identity token $[PID_{RP}, PID_U, Issuer, Validity, Attr]_{SK}$,
+    calculates $PID_U = [ID_U]{PID_{RP}}$ for the user,
+and signs $[PID_{RP}, PID_U, Issuer, Validity, Attr]_{SK}$,
  where $Issuer$ is the IdP's identity, $Validity$ indicates the validity period, and $Attr$ contains the requested attributes.
 \item[3.4] The IdP replies with the identity token, to the IdP script.
 \end{itemize}
@@ -443,7 +441,7 @@ Or, the RP rejects an identity token
 
 \subsection{Compatibility with OIDC}
 \label{subsec:compatible}
-
+First of all, UPPRESSO and OIDC work with COTS browsers.
 Among the four steps of the login flow in UPPRESSO,
     \emph{script downloading} prepares the user agent.
 The user agent is responsible for the communications between the IdP and the RP,
