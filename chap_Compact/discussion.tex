@@ -15,8 +15,8 @@ For web applications, a user needs to install a browser extension to handle this
 Meanwhile,
 UPPRESSO does not protect user privacy against such collusive attacks,
     but a user is authenticated to \emph{only} an IdP:
-         the identity at the IdP and the accounts at RPs
-                are transformed, unrelated to any user credential (e.g., password, one-time password or smart card).
+         the identity at the IdP 
+                are transformed to the accounts at RPs, unrelated to any user credential (e.g., password, one-time password or smart card).
 
 %When the IdP is kept honest-but-curious but shares messages in the login flow (i.e.,
 %$ID_U$, $PID_{RP}$, and $PID_U$)
@@ -32,7 +32,7 @@ UPPRESSO does not protect user privacy against such collusive attacks,
 
 
 \vspace{0.5mm}
-\noindent{\textbf{Scalability.}} 
+\noindent{\textbf{Scalability.}}
 $ID_{RP}$ is generated uniquely in an RP's initial registration,
     and the capacity is $n$ (i.e., the order of $G$). For the NIST P256 elliptic curve, $n$ is approximately $2^{256}$.
 Adversaries cannot exhaust $PID_{RP}$, either.
@@ -41,7 +41,7 @@ We only ensure $PID_{RP}$ is unique in \emph{unexpired} tokens,
 The probability that at least two $PID_{RP}$s are identical among the $\sigma$ ones,
     is $1-\prod_{i=0}^{\sigma-1}(1-i/n)$.
 If the system serves $10^{8}$ requests per second and the validity period is 10 minutes,
-     $\sigma$ is less than $2^{36}$ and the collision probability is negligible (i.e., less than $2^{-183}$) for the P256 curve.
+     $\sigma$ is less than $2^{36}$ and the $PID_{RP}$-collision probability is negligible (i.e., less than $2^{-183}$) for the P256 curve.
 
 The capacity of accounts at any RP is also $n$.
 $\mathbb{E}$ is a finite cyclic group,
@@ -80,6 +80,32 @@ This account migration requires extra operations \emph{explicitly by each user};
     otherwise,
         colluding RPs could actually link a user's accounts across RPs.
 
+\vspace{0.5mm}\noindent{\textbf{Restriction of the RP Script's Origin.}}
+When identity tokens are forwarded by the IdP script to the RP script, % within the user browser,
+    the receiver is restricted by the \verb+postMessage+ targetOrigin mechanism \cite{postm-targeto},
+        to ensure it will forward the tokens to $Enpt_{RP}$
+        that is bound in the RP certificate.
+A targetOrigin is specified as
+    a domain (e.g., \verb+RP.com+) and the parts of protocol and port (if not presented, implicitly 80 for \verb+http+ and 443 for \verb+https+),
+        and it requires the RP script's origin \emph{accurately} matches the targetOrigin.
+
+Although the URL path part of $Enpt_{RP}$ %, e.g., \verb+/uploadTkn+,
+ is not checked by the targetOrigin mechanism,
+  which assumes \emph{only one} RP runs on a domain,
+   it brings no \emph{extra} risk as below.
+If two RPs run on one domain but with different endpoints to receive identity tokens
+        (e.g., \verb+https://RP.com/honest/tkn+ and \verb+https://RP.com/malicious/tkn+),
+         they cannot be distinguished by \verb+postMessage+.
+Meanwhile, browsers enforce
+ the same-origin policy  in the access control of web resources \cite{sop}.
+So
+    a (malicious) RP could always access the other RP's resources in the browser,
+        e.g., steal cookies
+        by the scripts
+        \verb+vwin = window.open('https://RP.com/honest')+
+    and \verb+vwin.document.cookie+,
+    even if the honest RP restricts that only HTTP requests to specific paths carry its cookies.
+
 
 \vspace{0.5mm}\noindent{\textbf{Support for the Authorization Code Flow.}}
 In the authorization code flow of OIDC \cite{OpenIDConnect},
@@ -108,33 +134,6 @@ In order to protect RP identities from the IdP,
 %    That is, the access token is not required to carry any RP and user's information explicitly, therefore, it would not expose any user's information to RP.
 
 
-%平台无关
-%Similar as SPRESSO, we can integrated for***
-%SPRESSO跨平台:我们目前的方案只在browser实现
-%我们现在的实现使得一个用户不需要在机器上存任何东西，只有装那个插件。这个实现可以进一步推广到这个插件都不用安装***
-%\vspace{1mm}\noindent{\textbf{Platform independent.}}
-%Our current implementation only requires the user to install a Chrome extension and doesn't need to store any persistent data at the user's machine.
-%Moreover, the implementation could  be further extended to remove the Chrome extension, whose JavaScript program is then fetched from the honest IdP. The processing is similar as SPRESSO. That is, 1) the RP's window (window A)  opens a new iframe (window B) to visit the RP's web page, while the RP's web page redirects window B to the IdP; 2) window B downloads the JavaScript  program from the IdP and performs the processing in Steps 1.3, 1.5, 2.1, 3.2 and 3.5; 3) then postMessages are adopted to exchange messages between window A and B for Steps 1.2, 1.3, 1.4, 2.3, 3.1 and 3.5.
-%The opener handle of window B is preserved (i.e., window A) for the postMessage, as window A  opens window B with a web page from the RP;
- %and window B is redirected to the IdP with \emph{noreferrer} attribute set, to prevent the browser from sending RP's URL in the Referrer header to the IdP.
-
-
-
-
-
-%1) RP's window opens a new window to download a document from RP; 2) the document uses JavaScript to navigate this window to IdP, while the noreferrer attribute is set to clear Referer header and prevent the browser from sending RP's URL to the IdP; 3) this window downloads the  JavaScript  program from IdP and performs the processing in Steps 2.1.3, 2.2.1, 2.4 and 5.2; 4) the opener handle of this new window is preserved (i.e., RP's window) and then postMessages can be adopted to exchange messages between the two windows for Steps 2.1.4, 2.1.6, 2.2.4, 2.3 and 5.3.
-
-%the RP's web page initiates the loading of IdP's web page and sets the attribute (rel="noreferrer") to prevent the browser from sending Referer header with RP's URL to the IdP; 2) the IdP's web page contains the JavaScript program for user's processing in Steps 2.1.3, 2.2.1, 2.4 and 5.2; 3) postMessages is adopted
-%; and 4) the correct RP sets subresource integrity (SRI) to prevent the IdP from providing incorrect JavaScript programs.
-%A native web technology called subresource integrity (SRI)7 is currently under development at the W3C. SRI allows a document to create an iframe with an attribute integrity that takes a hash value. The browser now would guarantee that the document loaded into the iframe hashes to exactly the given value. So, essentially the creator of the iframe can enforce the iframe to be loaded with a aspecific document. This would enable SPRESSO to automatically check the integrity of FWDdoc without any extensions.
-
-
-
-%While USPRESS is designed for semi-honest IdP, it could be extended to prevent
-
-
-%\noindent{\textbf{Malicious IdP mitigation.}} The IdP is assumed to assign a unique $ID_{RP}$ in $Cert_{RP}$ for each RP and generate the correct $PID_U$ for each login. The malicious IdP may attempt to provide the incorrect $ID_{RP}$ and $PID_U$, which could be prevented by integrating certificate transparency \cite{rfc6962} and user's identifier check \cite{SPRESSO}. With certificate transparency \cite{rfc6962}, the monitors  check the uniqueness of $ID_{RP}$ among all the certificates stored in the log server. To prevent the malicious IdP from injecting any incorrect $PID_U$, the user could provide a nickname to the RP for an extra check as in SPRESSO \cite{SPRESSO}.
-
 
 %\noindent{\textbf{Implementation with Browser Extensions.}}
 %If the user functions of UPPRESSO are implemented with browser extensions,
@@ -157,43 +156,7 @@ These identity-transformation functions, i.e., $\mathcal{F}_{PID_{RP}}()$, $\mat
 %        to protect user privacy.
 
 
-%In this paper, the functions are implemented based on the elliptic curve algorithm and the mechanism provided by OIDC system.
-%However, the transformation functions can also be implemented based on other mechanisms according to the protocol and environment, for example, the TPM may be used to take responsibility to transform identities.
 
 
-
-\vspace{0.5mm}\noindent{\textbf{Restriction of the RP Script's Origin.}}
-When identity tokens are forwarded by the IdP script to the RP script, % within the user browser,
-    the receiver is restricted by the \verb+postMessage+ targetOrigin mechanism \cite{postm-targeto},
-        to ensure it will forward the tokens to $Enpt_{RP}$
-        that is bound in the RP certificate.
-A targetOrigin is specified as
-    a domain (e.g., \verb+RP.com+) and the parts of protocol and port (if not presented, implicitly 80 for \verb+http+ and 443 for \verb+https+),
-        and it requires the RP script's origin \emph{accurately} matches the targetOrigin.
-
-Although the URL path part of $Enpt_{RP}$ %, e.g., \verb+/uploadTkn+,
- is not checked by the targetOrigin mechanism,
-  which assumes \emph{only one} RP runs on a domain,
-   it brings no \emph{extra} risk as below.
-If two RPs run on one domain but with different endpoints to receive identity tokens
-        (e.g., \verb+https://RP.com/honest/tkn+ and \verb+https://RP.com/malicious/tkn+),
-         they cannot be distinguished by \verb+postMessage+.
-Meanwhile, browsers enforce
- the same-origin policy  in the access control of web resources \cite{sop}.
- %   and the control granularity is origins only.
-So
-    a (malicious) RP could always access the other RP's resources in the browser,
-        e.g., steal cookies
-        by the scripts
-        \verb+vwin = window.open('https://RP.com/honest')+
-    and \verb+vwin.document.cookie+,
-    even if the honest RP restricts that only HTTP requests to specific paths carry its cookies.
-%Anyway, such RPs are distinguished by the implementation with browser extensions.
-
-%We do not consider two hostile RPs on a domain.
-%Similar attacks exist in HTTPS, because an HTTPS server certificate
-%only binding the domain.
-%So, since they share the domain and the private key of HTTPS server certificate,
-%    RP1 can always be the MitM attackers of RP2.
-%RP1 exploits the vulnerability of HTTPS server certificate is fine to attack,
-%    by the shared private key.
+% 解决IdP数据泄露
+% 如果IdP的数据库泄露，用户列表u公开，则RP就可以，针对每一个u，计算[u]ID_{RP}；然后，
