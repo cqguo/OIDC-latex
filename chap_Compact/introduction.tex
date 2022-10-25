@@ -33,7 +33,7 @@ An RP delegates user identification and authentication to an IdP,
 %
 %SSO has been widely integrated into many application services. For example, 80\% of the Alexa Top-100 websites and 6.3\% of the Alexa Top-1M websites support SSO \cite{GhasemisharifRC18}. Meanwhile, many email and social network providers (such as Google, Facebook, Twitter, etc.) are serving the IdP roles.
 %
-For example, in a popular OIDC system,
+For example, in an OIDC system,
      a user sends a login request to an RP,
 and this RP constructs an identity-token request with its identity (denoted as $ID_{RP}$) and redirects this request to the IdP of this system.
 After authenticating the user,
@@ -135,17 +135,17 @@ and propose an Untraceable and Unlinkable Privacy-PREserving Single Sign-On (UPP
  % to protect user privacy.
 We design three identity-transformation functions in the SSO login flow.
 In each login instance,
-        $ID_{RP}$ is transformed to an ephemeral $PID_{RP}$  by the RP and the user.
-Then, $PID_{RP}$ is sent to the IdP to transform $ID_U$ into ephemeral $PID_U$,
-    so the identity token binds $PID_U$ and $PID_{RP}$, instead of permanent $ID_U$ and $ID_{RP}$.
+        $ID_{RP}$ is transformed to an ephemeral $PID_{RP}$  by a user and the target RP.
+$PID_{RP}$ is then sent to an IdP to transform $ID_U$ into ephemeral $PID_U$,
+    so an identity token binds $PID_U$ and $PID_{RP}$, instead of permanent $ID_U$ and $ID_{RP}$.
 Finally,
-    after receiving an identity token with matching $PID_{RP}$,
+    on receiving an identity token with matching $PID_{RP}$,
         the RP transforms $PID_U$ into an account.
 Given a user, this account is identical across multiple login instances for an RP
-     and unique at each RP.
+     but unique at each RP.
 
-UPPRESSO prevents the IdP-based login tracing because only $PID_{RP}$ is in the identity-token request,
-    and the RP-based identity linkage because every user account is unique
+UPPRESSO prevents the IdP-based login tracing for only $PID_{RP}$ is sent in identity-token requests,
+    and the RP-based identity linkage for every user account is unique
     (see Section \ref{sec:analysis} for details).
 On the contrary,
      existing privacy-preserving SSO solutions \cite{BrowserID,SPRESSO,NIST2017draft,FirefoxAccount} prevent only one of these two privacy threats.

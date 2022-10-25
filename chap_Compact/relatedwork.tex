@@ -25,11 +25,11 @@
 %
 %    tokens (or credentials) authorize a user to conduct operations
 %        in privacy-preserving ways.
-In addition to sign-on, privacy enhancing technologies have been applied in different scenarios,
+In addition to sign-on, privacy enhancing technologies have been applied in various scenarios,
   but not adopted to comprehensively transform the five (pseudo-)identities in SSO services.
 PrivacyPass and TrustToken \cite{privacypass,trusttoken} allow a user to receive a great number of \emph{anonymous} tokens.
  These tokens are used to access resources on content delivery networks,
-    so the user does not interact with challenges such as CAPTCHAs.
+    so a user does not interact with challenges such as CAPTCHAs.
 ZKlaims \cite{zklaim} allow users to prove statements on the credentials issued by a trusted party
     using zero-knowledge proofs,
         but the credential contents are not revealed.
@@ -38,7 +38,7 @@ Crypto-Book \cite{crypto-book} coordinates servers to generate a ring-signature 
  Then the key pair works as an untraceable pseudonym to sign messages.
 Two-party threshold schemes are implemented with a central server,
     to protect user private keys \cite{mRSA,ss-rsa}:
-    to sign or decrypt a message, the user needs a token from the server.
+    to sign or decrypt a message, a user needs a token from the server.
     Tandem \cite{tandem} decouples the obtaining and using of such tokens,
 for the privacy of key usage.
 
@@ -52,12 +52,12 @@ Anonymous SSO was proposed for GSM communications \cite{ElmuftiWRR08},
 Privacy-preserving primitives, such as group signature, zero-knowledge proof, Chebyshev Chaotic Maps and proxy re-verification,
      were adopted to design anonymous SSO \cite{WangWS13,HanCSTW18,Lee18,HanCSTWW20}.
 Anonymous SSO schemes work for some applications,
-    but are unapplicable to most systems that require user identification for customized services.
+    but are \emph{unapplicable} to most systems that require user identification for customized services.
 
 %\vspace{0.5mm}
 \noindent\textbf{Formal Analysis on SSO Protocols.}
 %The SSO standards (e.g., SAML, OAuth, and OIDC) have been formally analyzed.
-Fett et al. \cite{FettKS16, FettKS17} formally analyzed OAuth 2.0 and OIDC using an expressive Dolev-Yao style model \cite{FettKS14},
+Fett et al. \cite{FettKS16, FettKS17} formally analyzed OAuth 2.0 and OIDC using a Dolev-Yao style model \cite{FettKS14},
     and presented the attacks of 307 redirection and IdP mix-up.
         %When the IdP misuses an HTTP 307 status code for redirection, the sensitive information (e.g., credentials) entered at the IdP
          %   will  be leaked to the RP through  the user's browser.
@@ -67,7 +67,7 @@ Fett et al. \cite{FettKS16, FettKS17} formally analyzed OAuth 2.0 and OIDC using
 %    OAuth 2.0 and OIDC are secure except these two attacks.
 %UPPRESSO could be integrated into OIDC, which simplifies its security analysis.
 SAML-based SSO is also analyzed \cite{ArmandoCCCT08},
-    and the RP identity is found not to be correctly bound in the identity tokens of a variant designed by Google.
+    and it is found that RP identities are not correctly bound in the identity tokens of a variant designed by Google.
 
 
 
@@ -82,7 +82,7 @@ Integrity of identity tokens was violated in SSO systems  %\cite{SomorovskyMSKJ1
 due to software flaws such as
  defective verification by RPs \cite{WangCW12,WangZLG16,MainkaMSW17}, XML signature wrapping \cite{SomorovskyMSKJ12}, and IdP spoofing \cite{MainkaMS16,MainkaMSW17}.
 RP designation is broken
-    for incorrect binding by the IdP \cite{YangLCZ18,WangZLG16} or insufficient verification by RPs \cite{MainkaMS16,MainkaMSW17,YangLCZ18}.
+    for incorrect binding by an IdP \cite{YangLCZ18,WangZLG16} or insufficient verification by RPs \cite{MainkaMS16,MainkaMSW17,YangLCZ18}.
 
 Automatic tools such as SSOScan \cite{ZhouE14}, OAuthTester \cite{YangLLZH16} and S3KVetter \cite{YangLCZ18},
 detect the violations of confidentiality, integrity, or RP designation of SSO identity tokens.
@@ -95,15 +95,15 @@ In a mobile system,
 browsers, IdP Apps,
     or IdP-provided SDKs %(e.g., an encapsulated WebView)
          are responsible for forwarding identity tokens, %from the IdP App to RP Apps.
-but none of them ensures the identity tokens are sent to the designated RP only \cite{ChenPCTKT14,WangZLLYLG15}.
+but none of them ensures an identity token is sent to the designated RP only \cite{ChenPCTKT14,WangZLLYLG15}.
 %    because a WebView or the system browser cannot authenticate the RP Apps and the IdP App may be repackaged.
 %SSO protocols are modified for mobile Apps, but the modifications are not well understood by developers \cite{ChenPCTKT14,YangLS17}.
 Vulnerabilities were found in Android Apps,
     to break confidentiality \cite{ChenPCTKT14,WangZLLYLG15,YangLS17,ShiWL19}, integrity \cite{ChenPCTKT14,YangLS17}, and RP designation \cite{ChenPCTKT14,ShiWL19} of identity tokens.
-A flaw was found in Google Apps \cite{ArmandoCCCPS13}, allowing a malicious RP to hijack a user's authentication attempt and inject a payload to steal the cookie (or identity token) for another RP.
+A flaw was found in Google Apps \cite{ArmandoCCCPS13}, allowing a malicious RP to hijack a user's authentication attempt and inject a payload to steal the cookie or identity token for another RP.
 
 If a user is compromised,
-    the attackers will login to RPs on behalf of him.
+    attackers will login to RPs on behalf of him.
 Single sign-off \cite{GhasemisharifRC18} helps the victim
  to revoke all his tokens accepted and logout from the RPs.
 

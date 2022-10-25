@@ -18,7 +18,7 @@ This model is consistent with the widely-used SSO services \cite{OpenIDConnect,r
 
 %\vspace{0.4mm}
 \noindent \textbf{Honest-but-curious IdP.}
-The IdP strictly follows the protocol, while being interested in learning user profiles.
+An IdP strictly follows the protocol, while being interested in learning user profiles.
 For example, it might store all received messages
  to infer the relationship among $ID_U$, $ID_{RP}$, $PID_{U}$, and $PID_{RP}$ to track a user's login activities.
 The IdP never actively violates the protocols,
@@ -35,9 +35,9 @@ We do \emph{not} consider the collusion of the IdP and RPs.
         a user will finish login flows completely with colluding entities
         and then in principle we need a long-term user secret to protect (or transform) the permanent accounts at these RPs.
 This secret is held \emph{only} by the user;
-    otherwise, the colluding IdP and RPs can always link these accounts.
+    otherwise, the colluding IdP and RPs could always link these accounts.
 %Note that we aim to design a solution for SSO users without any non-ephemeral secret verified by the RPs.
-However, such accounts derived from this secret have to be updated,
+However, such accounts derived from this user secret have to be updated,
     when it is lost or leaked
     (see discussions in Section \ref{sec:discussion}).
 
@@ -96,16 +96,16 @@ For example, a malicious RP might collude with malicious users to allure victim 
 \subsection{Assumptions}
 HTTPS is adopted to secure the communications between honest entities,
  and the adopted cryptographic primitives are secure.
-The software stack of a honest entity is correctly implemented,
+The software stack of an honest entity is correctly implemented,
      to transmits messages to the receivers as expected.
 
 UPPRESSO is designed for users who care about privacy,
-and a user never authorizes the IdP to enclose any \emph{distinctive attributes} in identity tokens,
+so a user never authorizes the IdP to enclose any \emph{distinctive attributes} in identity tokens,
  such as telephone number, Email address, etc.
          %driver license,
 A user does not configure  distinctive attributes at any RP, either.
 So the privacy leakage due to re-identification by distinctive attributes across RPs,
-    is out of the scope.
+    is out of our scope.
 
 We focus on the privacy threats introduced by SSO services.
 The network traffic analysis that tracks a user's activities from packets,

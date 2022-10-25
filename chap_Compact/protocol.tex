@@ -53,7 +53,7 @@ Here,
  $[r]G$ is the addition of $G$ on the curve $r$ times.
 
 \vspace{0.5mm}
-\noindent {\bf $\boldsymbol{ID_{\boldsymbol{RP}}}$-$\boldsymbol{PID_{\boldsymbol{RP}}}$ Transformation.} The user selects a random number $t$ ($1 \leq t <n$) as the trapdoor
+\noindent {\bf $\boldsymbol{ID_{\boldsymbol{RP}}}$-$\boldsymbol{PID_{\boldsymbol{RP}}}$ Transformation.} A user selects a random number $t$ ($1 \leq t <n$) as the trapdoor
          and calculates $PID_{RP}$.
 %First, the RP chooses a random number $N_{RP}$ ($1 < N_{RP}<q $), and the user chooses another random number $N_{U}$ ($1 < N_{U}<q $).
 %Then, they exchange $N_{RP}$ and $N_{U}$ to calculate $PID_{RP}$ following Equation \ref{equ:PIDRP}.
@@ -129,23 +129,23 @@ Note that $r$ is kept secret to RPs; otherwise, two colluding RPs with $ID_{RP_j
 
 \subsection{The Designs Specific for Web Applications}
 \label{sec:web-design}
-UPPRESSO works with commercial-off-the-shelf (COTS) browsers as the user agent. %by the following designs.
+UPPRESSO works with commercial-off-the-shelf (COTS) browsers as the SSO user agent. %by the following designs.
 %More efficient but less portable implementations with browser extensions %and/or plug-ins
 % are discussed in Section \ref{sec:discussion}.
 %If a user visits the IdP and RPs through a client software,
 %        the specific designs become unnecessary and the performance will be improved.
 %
-First of all, in UPPRESSO the IdP is not aware of the visited RP,
+First of all, in UPPRESSO the IdP is not aware of visited RPs,
  so the user agents (or browsers) have to deal with the forwarding of identity tokens
     to the target RP, as well as the calculation of $PID_{RP}$.
 On the contrary,
     in commonly-used SSO protocols \cite{OpenIDConnect,rfc6749,SAML,SAMLIdentifier} the IdP needs this information to ensure \emph{confidentiality} of identity tokens.
-In the OIDC services, when an RP registers itself at the IdP, the \verb+redirect_uri+ parameter
+For instance, in the OIDC services, when an RP registers itself at the IdP, the \verb+redirect_uri+ parameter
     is set as the endpoint URL to receive tokens  \cite{OpenIDConnect}.
-Then, %in an OIDC login instance,
- when the IdP wants to transmit identity tokens to an RP,
+%in an OIDC login instance,
+When the IdP wants to transmit identity tokens to an RP,
     it utilizes HTTP 302 redirection with this endpoint as the target URL in the HTTP response,
-     so the user browser forwards it to the designated RP.
+     so a browser forwards it to the designated RP.
 %This verified \verb+redirect_uri+  ensures the token is sent to the target RP.
    % which is designated in the token,
 %and prevents attackers from intercepting it.
@@ -167,7 +167,7 @@ and interacts with the user for the authorization of user attributes,
 Thus, on receiving a request with the \verb+referer+ header,
     the IdP checks that it is from the IdP script.
 
-The RP script prepares $ID_{RP}$ and $Enpt_{RP}$ for the IdP script, through RP certificates.
+The RP script prepares $ID_{RP}$ and $Enpt_{RP}$ for the IdP script, through \emph{RP certificates}.
 An RP certificate is signed by the IdP during the RP registration,
      binding the RP's identity and its endpoint. % (i.e., $ID_{RP}$ and $Enpt_{RP}$).
 In a login instance

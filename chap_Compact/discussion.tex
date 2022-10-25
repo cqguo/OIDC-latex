@@ -15,7 +15,7 @@ For web applications, a user needs to install a browser extension to handle this
 Meanwhile,
 UPPRESSO does not protect user privacy against such collusive attacks,
     but a user is authenticated to \emph{only} an IdP:
-         the identity at the IdP 
+         the identity at the IdP
                 are transformed to the accounts at RPs, unrelated to any user credential (e.g., password, one-time password or smart card).
 
 %When the IdP is kept honest-but-curious but shares messages in the login flow (i.e.,
@@ -32,12 +32,12 @@ UPPRESSO does not protect user privacy against such collusive attacks,
 
 
 \vspace{0.5mm}
-\noindent{\textbf{Scalability.}}
+\noindent{\textbf{Scalability and Uniqueness.}}
 $ID_{RP}$ is generated uniquely in an RP's initial registration,
     and the capacity is $n$ (i.e., the order of $G$). For the NIST P256 elliptic curve, $n$ is approximately $2^{256}$.
 Adversaries cannot exhaust $PID_{RP}$, either.
 We only ensure $PID_{RP}$ is unique in \emph{unexpired} tokens,
-    the number of which is denoted as $\sigma$.
+    the number of which is $\sigma$.
 The probability that at least two $PID_{RP}$s are identical among the $\sigma$ ones,
     is $1-\prod_{i=0}^{\sigma-1}(1-i/n)$.
 If the system serves $10^{8}$ requests per second and the validity period is 10 minutes,
@@ -47,7 +47,7 @@ The capacity of accounts at any RP is also $n$.
 $\mathbb{E}$ is a finite cyclic group,
     so $ID_{RP} = [r]G$ is also a generator of order $n$.
 Thus, given any RP,
-    a \emph{unique} account is assigned to every user,
+    a \emph{unique} account is automatically assigned to every user,
         because $Acct =  [ID_U]ID_{RP} = [u]ID_{RP}$.
 
 Besides, stronger elliptic curves accommodate more RPs and users;
@@ -55,23 +55,23 @@ e.g., $n$ is nearly $2^{384}$ for the NIST P384 curves.
 
 
 \vspace{0.5mm}\noindent{\textbf{Alternative Way to Generate $ID_{RP}$ and Bind $Enpt_{RP}$.}}
-In the prototype, an RP certificate binds $ID_{RP}$ and $Enpt_{RP}$,
+In the prototype an RP certificate binds $ID_{RP}$ and $Enpt_{RP}$,
     verified by the honest IdP script.
-The RP certificates ensure the target RP has already registered itself at the IdP,
+RP certificates ensure the target RP has already registered itself at the IdP,
  which prevents unauthorized RPs from accessing the IdP's services.
 
 This binding may be finished in another way:
     $ID_{RP}$ is \emph{deterministically} calculated based on the RP's \emph{unambiguous name}.
-For example, $Hs()$ encodes an RP's domain (or the RP script's origin, e.g., \verb+https://RP.com+) to a point on the elliptic curve $\mathbb{E}$ as $ID_{RP}$,
+For example, $Hs()$ encodes an RP's domain (or the RP script's origin, e.g., \verb+https://RP.com+) to a point on $\mathbb{E}$ as $ID_{RP}$,
 where
     hashing to elliptic curves $Hs()$ \cite{irtf-cfrg-hash-to-curve-16} provides collision resistance and does not reveal the discrete logarithm of the output
-    (i.e., $ID_{RP} = [r]G$ is unique and $r$ is unknown).
+    (i.e., $ID_{RP} = [r]G$ is \emph{unique} and $r$ is \emph{unknown}).
 Then,  in Step 2.2 the RP script will send the endpoint but not its RP certificate,
   %to the IdP script,
  and $ID_{RP}$ is calculated by the IdP script.
 %This elimination of RP certificates improves the downloading of scripts,
 %        and on average \textcolor[rgb]{1,0,0}{xxx} ms are saved.
-However, if the RP updates its domain, for instance, from \verb+https://RP.com+ to \verb+https://theRP.com+,
+However, if an RP updates its domain, for instance, from \verb+https://RP.com+ to \verb+https://theRP.com+,
 $Acct = [ID_U]ID_{RP}$ will change \emph{inevitably}.
 In such cases,
     it needs special operations by each user to migrate his account
@@ -93,13 +93,13 @@ Although the URL path part of $Enpt_{RP}$ %, e.g., \verb+/uploadTkn+,
  is not checked by the targetOrigin mechanism,
   which assumes \emph{only one} RP runs on a domain,
    it brings no \emph{extra} risk as below.
-If two RPs run on one domain but with different endpoints to receive identity tokens
+For example, if two RPs run on one domain but with different endpoints to receive identity tokens
         (e.g., \verb+https://RP.com/honest/tkn+ and \verb+https://RP.com/malicious/tkn+),
          they cannot be distinguished by \verb+postMessage+.
 Meanwhile, browsers enforce
  the same-origin policy  in the access control of web resources \cite{sop}.
 So
-    a (malicious) RP could always access the other RP's resources in the browser,
+    a malicious RP could always access the other RP's resources in the browser,
         e.g., steal cookies
         by the scripts
         \verb+vwin = window.open('https://RP.com/honest')+
