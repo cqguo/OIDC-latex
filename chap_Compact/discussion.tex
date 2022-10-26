@@ -3,10 +3,10 @@
 
 \noindent{\textbf{Collusive Attack by an IdP and RPs.}}
 Privacy-preserving identity federation solutions \cite{ELPASSO,UnlimitID,idemix,PseudoID,Opaak,uprov}
- prevent the collusive attacks by the IdP and RPs,
+ prevent the collusive attacks by an IdP and RPs,
     at the cost of (\emph{a}) a long-term secret held by a user but verified by RPs
         and (\emph{b}) user-managed accounts \cite{PseudoID} for different RPs.
-The account may be derived from an RP domain and the secret \cite{ELPASSO,UnlimitID,Opaak,uprov,idemix},
+The accounts may be derived from an RP domain and this secret \cite{ELPASSO,UnlimitID,Opaak,uprov,idemix},
   but this design still brings inconveniences.
 For web applications, a user needs to install a browser extension to handle this long-term secret;
   and if it is lost or leaked,
@@ -15,7 +15,7 @@ For web applications, a user needs to install a browser extension to handle this
 Meanwhile,
 UPPRESSO does not protect user privacy against such collusive attacks,
     but a user is authenticated to \emph{only} an IdP:
-         the identity at the IdP
+         the user identity at the IdP
                 are transformed to the accounts at RPs, unrelated to any user credential (e.g., password, one-time password or smart card).
 
 %When the IdP is kept honest-but-curious but shares messages in the login flow (i.e.,
@@ -109,10 +109,10 @@ So
 
 \vspace{0.5mm}\noindent{\textbf{Support for the Authorization Code Flow.}}
 In the authorization code flow of OIDC \cite{OpenIDConnect},
-    an IdP does not directly issue the identity token;
+    an IdP does not directly issue identity tokens;
         instead,
             an authorization code is sent to the RP,
-            and then the RP uses this code to ask for identity tokens.
+            which uses this code to ask for identity tokens.
 The identity-transformation functions $\mathcal{F}_{PID_{U}}$, $\mathcal{F}_{PID_{RP}}$ and $\mathcal{F}_{Acct}$
     can be integrated into the authorization code flow:
     %similar with the login flow introduced in Section~\ref{implementations},
@@ -122,9 +122,9 @@ An authorization code is usually the index to retrieve the identity token from t
         and does not disclose any information on the authenticated user.
 
 
-After receiving the authorization code, the RP uses it and another secret credential
+After receiving an authorization code, an RP uses it and another secret credential
          which is issued by the IdP during the initial registration \cite{OpenIDConnect},
-     to retrieve the identity token from the IdP.
+     to retrieve identity tokens from the IdP.
 In order to protect RP identities from the IdP,
         privacy-preserving credentials (e.g., ring or group signatures \cite{ring-sig,chaum1991group})
         and anonymous networks (e.g., Tor \cite{tor}) need to be adopted for RPs in the final retrieval of identity tokens.
