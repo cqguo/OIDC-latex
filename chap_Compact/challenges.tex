@@ -22,7 +22,7 @@ To achieve this goal,
 Therefore,
     an honest RP compares the designated RP identity (or pseudo-identity) in identity tokens with its own before accepting the tokens;
      otherwise,
-        a malicious RP could replay a received identity token to the honest RP and login as the victim user.
+        a malicious RP could replay a received identity token to some honest RP and login as the victim user.
 The RP allows the token holder to login as the user (pseudo-)identity specified in the accepted tokens.
 
 The SSO login flow also requires \emph{confidentiality} and \emph{integrity} of identity tokens.
@@ -31,7 +31,7 @@ An identity token should be forwarded by the authenticated user to the target RP
         otherwise, an eavesdropper who presents the token, would successfully login to the RP.
 Integrity is necessary
     to prevent adversaries from tampering with a token.
-So identity tokens are signed by the IdP and usually transmitted over HTTPS \cite{OpenIDConnect,rfc6749,SAML}.
+So identity tokens are signed by a trusted IdP and usually transmitted over HTTPS \cite{OpenIDConnect,rfc6749,SAML}.
 
 These security requirements (i.e., RP designation, user identification, confidentiality, and integrity) of SSO identity tokens
      are well analyzed \cite{ArmandoCCCT08,FettKS16, FettKS17},
@@ -171,7 +171,7 @@ In the user's any $i$-th and $i'$-th ($i \neq i'$) login instances to the RP,
 \end{itemize}
 
 In an SSO login flow with identity transformations,
-    a user firstly negotiates an ephemeral $PID_{RP}$ with an RP.
+    a user firstly negotiates an ephemeral $PID_{RP}$ with a target RP.
 An identity-token request with $PID_{RP}$ is sent by the user to an IdP.
 After authenticating the user as $ID_U$, the IdP calculates an ephemeral $PID_U$ based on $ID_U$ and $PID_{RP}$,
     and issues an identity token binding $PID_U$ and $PID_{RP}$.
