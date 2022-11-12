@@ -24,7 +24,7 @@ Single sign-on (SSO) protocols such as OpenID Connect (OIDC) \cite{OpenIDConnect
  With the help of SSO,
   a user logins to a website, referred to as the \emph{relying party} (RP), using his account registered at a trusted web service,
    known as the \emph{identity provider} (IdP).
-An RP delegates user identification and authentication to an IdP,
+An RP delegates user identification and authentication to the IdP,
     which issues an \emph{identity token} (e.g., id token in OIDC or identity assertion in SAML) for a user to visit the RP. %after authenticating this user.
 %Moreover, SSO shifts the burden of user authentication from RPs to IdPs and reduces security risks and costs at RPs.
 %Besides,
@@ -35,7 +35,7 @@ An RP delegates user identification and authentication to an IdP,
 %
 For example, in an OIDC system,
      a user sends a login request to an RP,
-and this RP constructs an identity-token request with its identity (denoted as $ID_{RP}$) and redirects this request to the IdP of this system.
+and this RP constructs an identity-token request with its identity (denoted as $ID_{RP}$) and redirects this request to an IdP of this system.
 After authenticating the user,
  the IdP issues an identity token explicitly binding the identities of both the user and the RP (i.e., $ID_U$ and $ID_{RP}$),
     which is returned to the user and forwarded to the RP.
@@ -45,7 +45,7 @@ So a user keeps only one credential for the IdP, instead of several credentials 
 As the comprehensive solution of identity management and authentication,
     SSO services allow an IdP to provide more user attributes in identity tokens,
         along with an authenticated user's identity.
-The attributes (e.g., age, hobby, education, and nationality) are maintained at the IdP,
+Attributes (e.g., age, hobby, education, and nationality) are maintained at the IdP,
     and enclosed in identity tokens after the user's authorization \cite{OpenIDConnect,rfc6749}.
 
 %However, SSO systems have been continuously found vulnerable and insecure \cite{WangCW12,ccsSunB12,SomorovskyMSKJ12,ArmandoCCCPS13,DiscoveringJCS,dimvaLiM16,WangZLG16,MainkaMS16, MainkaMSW17,YangLCZ18}.
@@ -135,7 +135,7 @@ and propose an Untraceable and Unlinkable Privacy-PREserving Single Sign-On (UPP
  % to protect user privacy.
 We design three identity-transformation functions in the SSO login flow.
 In each login instance,
-        $ID_{RP}$ is transformed to an ephemeral $PID_{RP}$  by a user and the target RP.
+        $ID_{RP}$ is transformed to an ephemeral $PID_{RP}$  by a user and an RP.
 $PID_{RP}$ is then sent to an IdP to transform $ID_U$ into ephemeral $PID_U$,
     so an identity token binds $PID_U$ and $PID_{RP}$, instead of permanent $ID_U$ and $ID_{RP}$.
 Finally,
@@ -144,7 +144,7 @@ Finally,
 Given a user, this account is identical across multiple login instances for an RP
      but unique at each RP.
 
-UPPRESSO prevents the IdP-based login tracing for only $PID_{RP}$ is sent in identity-token requests,
+UPPRESSO prevents the IdP-based login tracing as only $PID_{RP}$ is sent in identity-token requests,
     and the RP-based identity linkage for every user account is unique
     (see Section \ref{sec:analysis} for details).
 On the contrary,
