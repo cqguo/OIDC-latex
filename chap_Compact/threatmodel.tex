@@ -6,7 +6,7 @@
 
 This section presents the threat model and assumptions of UPPRESSO.
 We then introduce identity-transformation functions satisfying the requirements
-    and then the protocols.
+    and the protocols.
 
 
 \subsection{Threat Model}
@@ -18,11 +18,12 @@ This model is consistent with the widely-used SSO services \cite{OpenIDConnect,r
 
 %\vspace{0.4mm}
 \noindent \textbf{Honest-but-curious IdP.}
-An IdP strictly follows the protocols, while being interested in learning user profiles.
+An IdP follows the protocols strictly, while being interested in learning user profiles.
 For example, it might store all received messages
- to infer the relationship among $ID_U$, $ID_{RP}$, $PID_{U}$, and $PID_{RP}$ to track a user's login activities.
+ to infer the relationship among $ID_U$, $ID_{RP}$, $PID_{U}$, and $PID_{RP}$.
+ % to track a user's login activities.
 It never actively violates the protocols,
-so a script downloaded from the IdP also strictly follows the designs (see Section \ref{sec:web-design}
+so that a script downloaded from the IdP also strictly follows the protocols (see Section \ref{sec:web-design} about specific designs 
     for web applications).
 The IdP maintains the private key well for signing identity tokens and RP certificates, %(see Section \ref{implementations} for details)
 so adversaries cannot forge such tokens or certificates.
@@ -31,27 +32,16 @@ so adversaries cannot forge such tokens or certificates.
 %For example, the IdP ensures the uniqueness of $ID_{RP}$ and $ID_{U}$ when an RP or a user registers, and calculates the pseudo-identity as the UPPRESSO protocol specifies.
 %However,
 
-We do \emph{not} consider the collusion of the IdP and RPs.
-    If the IdP could collude with some RPs,
-        a user will finish login flows completely with colluding entities
-        and then in principle we need a long-term user secret to protect (or transform) the permanent accounts at these RPs.
-This secret is held \emph{only} by the user;
-    otherwise, the colluding IdP and RPs could always link these accounts.
-%Note that we aim to design a solution for SSO users without any non-ephemeral secret verified by the RPs.
-However, such accounts derived from this user secret have to be updated,
-    when it is lost or leaked
-    (see discussions in Section \ref{sec:discussion}).
-
 %User's goal: 向IdP发送identity token，使IdP认为自己是另一个victim
 %方式：1）已经拥有有效的identity token，希望与IdP协商出相同的PID_RP；2）通过篡改或者伪造identity token来实现攻击
 
 %\vspace{0.4mm}
 \noindent \textbf{Malicious Users.}
-We assume the adversary could control a set of users,
+We assume the adversaries could control a set of users,
  by stealing users' credentials or registering Sybil users in the system.
 %These malicious users aim
 %to break the security of UPPRESSO.
-They want to impersonate a victim user at honest RPs, or allure the benign user to login to an honest RP under the adversary's account.
+They want to impersonate a victim user at honest RPs, or allure the benign user to login to an honest RP under some adversary's account.
 %To achieve this, they could behave arbitrarily \cite{WangCW12, SomorovskyMSKJ12}.
 A malicious user might
     modify, insert, drop or replay a message, or behave arbitrarily in SSO login flows.
@@ -63,7 +53,7 @@ A malicious user might
 
 %\vspace{0.4mm}
 \noindent \textbf{Malicious RPs.}
-The adversary could control a set of RPs, by registering at the IdP as an RP
+The adversaries could control a set of RPs, by registering at the IdP as an RP
      or exploiting vulnerabilities to compromise some RPs.
 The malicious RPs might behave arbitrarily to break the security and privacy guarantees.
 %they may attempt to obtain a valid identity token for another RP, to allow some user to log into this target RP:
@@ -74,7 +64,7 @@ a malicious RP might manipulate $PID_{RP}$ in a login instance,
 % or constructing an incorrect request to trigger the IdP issuing an identity token binding with other RP.
 %Or, the malicious RPs may collude to perform RP-based identity linkage to break user privacy.
 %For example, the RPs
-or (\emph{b}) affect the generation of $PID_U$ and
+or (\emph{b}) manipulate the generation of $PID_U$ and
     analyze the relationship between $ID_U$ and $PID_U$.
 %to link the user's multiple logins at different RPs. %by providing correlated values (e.g., $PID_{RP}$) to the IdP.
 
@@ -93,6 +83,17 @@ For example, a malicious RP might collude with malicious users to allure victim 
 %  then act a malicious user, and use this identity token to impersonate this victim user at another RP.
 %The adversary could also first act as a user to login a correct RP and obtain an identity token,
 % then act a malicious RP to perform the identity injection attack, by injecting this identity token to the session between the victim user and the correct RP with other web attacks (e.g., CSRF).
+
+Finally, we do \emph{not} consider the collusion of the IdP and RPs.
+    If the IdP could collude with some RPs,
+        a user will finish login flows completely with colluding entities
+        and then in principle we need a long-term user secret to protect (or transform) the permanent accounts at these RPs.
+This secret is held \emph{only} by the user;
+    otherwise, the colluding IdP and RPs could always link these accounts.
+%Note that we aim to design a solution for SSO users without any non-ephemeral secret verified by the RPs.
+However, such accounts derived from this user secret have to be updated,
+    when it is lost or leaked
+    (see discussions in Section \ref{sec:discussion}).
 
 \subsection{Assumptions}
 HTTPS is adopted to secure the communications between honest entities,
