@@ -6,8 +6,8 @@ Privacy-preserving identity federation solutions \cite{ELPASSO,UnlimitID,idemix,
  prevent the collusive attacks by an IdP and RPs,
     at the cost of (\emph{a}) a long-term secret held by a user but verified by RPs
         and (\emph{b}) user-managed accounts \cite{PseudoID} for different RPs.
-The accounts may be derived from an RP domain and this secret \cite{ELPASSO,UnlimitID,Opaak,uprov,idemix},
-  but this design still brings inconveniences.
+Such accounts may be derived from an RP domain and this secret locally \cite{ELPASSO,UnlimitID,Opaak,uprov,idemix},
+  but it still brings inconveniences.
 For web applications, a user needs to install a browser extension to handle this long-term secret;
   and if it is lost or leaked,
        a user has to notify all RPs to update his accounts which are derived from the secret
@@ -34,9 +34,9 @@ UPPRESSO does not protect user privacy against such collusive attacks,
 \vspace{0.5mm}
 \noindent{\textbf{Scalability and Uniqueness.}}
 $ID_{RP}$ is generated uniquely in an RP's initial registration,
-    and the capacity is $n$ (i.e., the order of $G$). For the NIST P256 elliptic curve, $n$ is approximately $2^{256}$.
+    and the capacity of RPs is $n$ (i.e., the order of $G$). For the NIST P256 elliptic curve, $n$ is approximately $2^{256}$.
 Adversaries cannot exhaust $PID_{RP}$, either.
-We only ensure $PID_{RP}$ is unique in \emph{unexpired} tokens,
+We ensure $PID_{RP}$ is unique in \emph{unexpired} tokens,
     the number of which is $\sigma$.
 The probability that at least two $PID_{RP}$s are identical among the $\sigma$ ones,
     is $1-\prod_{i=0}^{\sigma-1}(1-i/n)$.
@@ -61,7 +61,7 @@ RP certificates ensure the target RP has already registered itself at the IdP,
  which prevents unauthorized RPs from accessing the IdP's services.
 
 This binding may be finished in another way:
-    $ID_{RP}$ is \emph{deterministically} calculated based on the RP's \emph{unambiguous name}.
+    $ID_{RP}$ is \emph{deterministically} calculated based on the RP's \emph{unambiguous} name.
 For example, $Hs()$ encodes an RP's domain (or the RP script's origin, e.g., \verb+https://RP.com+) to a point on $\mathbb{E}$ as $ID_{RP}$,
 where
     hashing to elliptic curves $Hs()$ \cite{irtf-cfrg-hash-to-curve-16} provides collision resistance and does not reveal the discrete logarithm of the output
@@ -84,26 +84,27 @@ This account migration requires extra operations explicitly by each user;
 When identity tokens are forwarded by the IdP script to the RP script, % within the user browser,
     the receiver is restricted by the \verb+postMessage+ targetOrigin mechanism \cite{postm-targeto},
         to ensure it will forward the tokens to $Enpt_{RP}$
-        that is bound in the RP certificate.
+        that is bound in RP certificates.
 A targetOrigin is specified as
-    a domain (e.g., \verb+RP.com+) and the parts of protocol and port (if not presented, implicitly 80 for \verb+http+ and 443 for \verb+https+),
+    a domain (e.g., \verb+RP.com+) and a pair of protocol and port (if not presented, implicitly 80 for \verb+http+ and 443 for \verb+https+),
         and it requires the RP script's origin \emph{accurately} matches the targetOrigin.
 
 Although the URL path part of $Enpt_{RP}$ %, e.g., \verb+/uploadTkn+,
  is not checked by the targetOrigin mechanism,
-  which assumes \emph{only one} RP runs on a domain,
-   it brings no \emph{extra} risk as below.
+  which assumes only \emph{one} RP runs on a domain,
+   it brings no \emph{extra} risk.
 For example, if two RPs run on one domain but with different endpoints to receive identity tokens
         (e.g., \verb+https://RP.com/honest/tkn+ and \verb+https://RP.com/malicious/tkn+),
          they cannot be distinguished by \verb+postMessage+.
 Meanwhile, browsers enforce
  the same-origin policy (SOP) in the access control of web resources \cite{sop}.
 So
-    a malicious RP could always access the other RP's resources in the browser,
+    a malicious RP could always access the other RP's resources in browsers,
         e.g., steal cookies
         by the script
         \verb+window.open('https://RP.com/honest').document.cookie+,
-    even if the honest RP restricts that only HTTP requests to specific paths carry its cookies.
+    even if the honest RP restricts only HTTP requests to specific paths carry its cookies.
+This risk resuts from the SOP design.
 
 
 \vspace{0.5mm}\noindent{\textbf{Support for the Authorization Code Flow.}}
@@ -117,14 +118,14 @@ The identity-transformation functions $\mathcal{F}_{PID_{U}}$, $\mathcal{F}_{PID
     %similar with the login flow introduced in Section \ref{implementations},
             an authorization code is forwarded to the RP script by the IdP script
                 and this code is used to ask for an identity token binding $PID_U$ and $PID_{RP}$.
-An authorization code is usually the index to retrieve the identity token from the IdP,
+An authorization code is usually an index to retrieve identity tokens from the IdP,
         and does not disclose any information on the authenticated user.
 
 
 After receiving an authorization code, an RP uses it and another secret credential
          which is issued by the IdP during the initial registration \cite{OpenIDConnect},
      to retrieve identity tokens from the IdP.
-In order to protect RP identities from the IdP,
+Thus, in order to protect RP identities from the IdP,
         privacy-preserving credentials (e.g., ring or group signatures \cite{ring-sig,chaum1991group})
         and anonymous networks (e.g., Tor \cite{tor}) need to be adopted for RPs in the final retrieval of identity tokens.
 
