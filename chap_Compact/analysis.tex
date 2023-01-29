@@ -122,7 +122,7 @@ Thus, the probability of finding $t$ and $t'$ satisfying that $[t]ID_{RP_j} = [t
 %Because (\emph{a}) both $PID_{RP}$ and $H(t)$ in the registration result are checked by the RP and then (\emph{b}) the registration result $[PID_{RP}, H(t), Validity]_{SK}$ is acceptable to only one honest RP,
 %            the identity token designates only one RP.
 
-%\vspace{0.4mm}
+\vspace{0.5mm}
 \noindent\textbf{User Identification.}
 Given a user, an honest RP with $ID_{RP}$ always deterministically derives an \emph{identical} account from \emph{different} identity tokens binding $PID_U$ and $PID_{RP}$.
 That is,
@@ -164,7 +164,7 @@ Thus, the calculated account is always exactly the authenticated user's account 
 %     so it cannot construct an identity token acceptable to the RP.
 %
 
-%\vspace{0.4mm}
+\vspace{0.5mm}
 \noindent\textbf{Confidentiality.}
 No event leaks an identity token to any malicious entity other than the authenticated user and the designated RP.
 First of all, the communications among the IdP, RPs and users,
@@ -182,10 +182,10 @@ So only the RP that owns $Enpt_{RP}$ and $ID_{RP}$,
 
 
 %The detailed process of proof is shown in Appendix.
-%\vspace{0.4mm}
+\vspace{0.5mm}
 \noindent\textbf{Integrity.}
 The identity token binds $Acct$ and $ID_{RP}$ implicitly,
-    and any breaking results in some failed check or verification in the login flow.
+    and any breaking results in some failed checking or verification in the login flow.
 %It is ensured by the IdP's signatures:
 The identity token binding $PID_U$ and $PID_{RP}$ is signed by the IdP.
 According to the proof of RP designation,
@@ -200,7 +200,7 @@ Thus,
 
 %The detailed process of proof is shown in Appendix.
 
-\vspace{0.4mm}
+\vspace{0.5mm}
 Finally, we analyzed the security properties of UPPRESSO, %especially confidentiality and integrity,
      based on a Dolev-Yao style model \cite{SPRESSO}.
 % which has been used in the formal analysis of SSO protocols such as OAuth 2.0 \cite{FettKS16} and OIDC \cite{FettKS17}.
@@ -240,7 +240,7 @@ Script processes communicate with each other through \verb+postMessage+,
 After formulating the system by this model,
     we trace the lifecycle of an identity token in UPPRESSO,
         starting when it is generated and ending when accepted by the RP,
- to ensure it is not leaked to attackers or tampered with by any adversary without checks.
+ to ensure it is not leaked to attackers or tampered with by any adversary without checking.
 \emph{Confidentiality} and \emph{integrity} of SSO tokens  in the communications among processes are proved,
 as we locate the generation of a token, and trace all places
     where $PID_U$, $PID_{RP}$ and other parameters in the token are generated and transmitted,
@@ -259,7 +259,7 @@ Besides, $t$ is proved unaccessible to the IdP, which is \emph{necessary} for pr
 \label{sec-:analysis}
 UPPRESSO effectively prevents the privacy threats of IdP-based login tracing and RP-based identity linkage.
 
-\vspace{0.4mm}
+\vspace{0.5mm}
 \noindent\textbf{IdP-based Login Tracing.}
 The information accessible to the IdP and derived from the RP's identity,
     is only $PID_{RP}$, where $PID_{RP} = [t]ID_{RP}$ is calculated by the user.
@@ -272,7 +272,7 @@ is indistinguishable from a variable randomly chosen from $\mathbb{E}$,
 So, the IdP cannot infer the RP's identity or link any pair of $PID_{RP}^i$ and $PID_{RP}^{i'}$,
     and the IdP-based login tracing is impossible.
 
-\vspace{0.4mm}
+\vspace{0.5mm}
 \noindent\textbf{RP-based Identity Linkage.}
 We prove UPPRESSO prevents the RP-based identity linkage,
  based on the elliptic curve decision Diffie-Hellman (ECDDH) assumption. %\cite{GoldwasserK16}.
@@ -291,6 +291,13 @@ Let  ${\rm Pr}\{\}$ denote the probability and
 &{\rm Pr}_2 =  {\rm Pr}\{\mathcal{D}(G, [x]G, [y]G, [z]G)=1\}
 \end{align*}
 So $\epsilon_{r}(k) = |{\rm Pr}_1 - {\rm Pr}_2|$ becomes negligible as $k$ increases.
+
+\begin{figure}[tb]
+  \centering
+  \includegraphics[width=0.96\linewidth]{fig/dalgorithm.pdf}
+  \caption{The algorithm based on the RP-based identity linkage, to solve the ECDDH problem}
+  \label{fig:dalgorithm}
+\end{figure}
 
 
 In every login instance,
@@ -359,13 +366,6 @@ Thus,
 &{\rm Pr}_2={\rm Pr}\{\mathcal{D}^*_r(G, [x]G, [y]G, [z]G)=1\} ={\rm Pr}'_2 \\=&  {\rm Pr}\{\mathcal{G}_r(\mathfrak{L}, L'|ID_{U'} \in \mathbb{Z}_n)=1\}\\
 &{\mathbf{Adv}}_{A}=|{\rm Pr}'_1-{\rm Pr}'_2|=|{\rm Pr}_1-{\rm Pr}_2|=\epsilon_{r}(k)
 \end{align*}
-
-\begin{figure}[tb]
-  \centering
-  \includegraphics[width=0.96\linewidth]{fig/dalgorithm.pdf}
-  \caption{The algorithm based on the RP-based identity linkage, to solve the ECDDH problem}
-  \label{fig:dalgorithm}
-\end{figure}
 
 The ECDDH assumption means that in $\mathcal{G}_r$ the adversary does not have advantages,
     i.e., cannot distinguish a user $U'$ chosen from \{${U_1}, {U_2}, \cdots, {U_v}$\}

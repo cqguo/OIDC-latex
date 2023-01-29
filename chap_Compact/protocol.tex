@@ -40,7 +40,7 @@ Here,
 %$u, r \in [1,n)$, %$r$ is unknown to the RP, and
  $[r]G$ is the addition of $G$ on the curve $r$ times.
 
-\vspace{0.4mm}
+\vspace{0.5mm}
 \noindent {\bf $\boldsymbol{ID_{\boldsymbol{RP}}}$-$\boldsymbol{PID_{\boldsymbol{RP}}}$ Transformation.} A user selects a random number $t$ ($1 \leq t <n$) as the trapdoor
          and calculates $PID_{RP}$.
 \begin{equation}
@@ -90,11 +90,11 @@ A user generates $t$ and calculates $PID_{RP} = [t]ID_{RP}$.
 After receiving $t$ and $PID_{RP}$ from the user,
     an RP checks that $PID_{RP} = [t]ID_{RP}$,
         because the correct account is derived only when this equation holds;
-        otherwise, a malicious user $U$ might send $t' \neq t$ to login as another user's account.\footnote{In this case, the malicious user cannot precisely manipulate the calculated account $Acct' =  [t'^{-1}]PID_{U} = [t'^{-1}t][ID_U]ID_{RP}$ by $t'$,
+        otherwise, a malicious user $U$ might send $t' \neq t$ to login as another user's account.\footnote{In this case, the malicious user cannot purposefully  manipulate the calculated account $Acct' =  [t'^{-1}]PID_{U} = [t'^{-1}t][ID_U]ID_{RP}$ by $t'$,
         due to the ECDLP.}
 On the other hand,
     if $t$ is generated and $PID_{RP}$ is calculated by the RP,
-the user also needs to checks that $PID_{RP} = [t]ID_{RP}$;
+the user also needs to check that $PID_{RP} = [t]ID_{RP}$;
     otherwise, attacks happen as below.
 A malicious user $U'$ initiates a login request to an honest RP,
     and receives $PID_{RP}$.
@@ -153,13 +153,13 @@ The IdP's public key is set in the IdP script, so
 
 %Thus, to avoid the IdP server obtaining any evidence about the RP's identity and provide IdP's script with the RP certificate, the RP's script is also required to transmit the certificate to IdP script after it is downloaded from IdP server.
 
-As mentioned in Section \ref{subsec:overview},
+As mentioned above,
     a user needs to calculate (or check) $PID_{RP} = [t]ID_{RP}$,
-    and this function shall be implemented correctly by \emph{honest} scripts.
-So $t$ is generated and used in the IdP script,
-    as well as $ID_{RP}$ in $Cert_{RP}$.
+    so this function should be implemented correctly by \emph{honest} scripts.
+Thus, $t$ is generated in the IdP script,
+    and used to calculate $PID_{RP}$ with $ID_{RP}$ extracted from $Cert_{RP}$.
 Since $ID_{RP} = [t^{-1}\bmod n]PID_{RP}$,
-    this design depends on an honest IdP which does not manipulate $t$ or steal $t$ or $ID_{RP}$ through malicious scripts.
+    this design relies on an honest IdP that does not steal $t$ or $ID_{RP}$ through malicious scripts.
 This leakage risk may be mitigated %by silently conducting these operations when the user visits the RP website, or
     by implementing a user agent with browser extensions,
 but users need to install the extension before visiting RPs.
@@ -169,7 +169,7 @@ but users need to install the extension before visiting RPs.
 %    but knowing nothing about $t$ but only $PID_{RP}$.
 
 
-After extracting $ID_{RP}$ to calculate $PID_{RP}$
+After calculating $PID_{RP}$
     and receiving an identity token from the IdP,
     the IdP script needs to ensure the RP script will forward this token to $Enpt_{RP}$
         which is bound with $ID_{RP}$ in the RP certificate.
@@ -259,7 +259,7 @@ An IdP generates a key pair ($SK$, $PK$) to sign/verify identity tokens and RP c
 The IdP keeps $SK$ secret, and $PK$ is publicly known.
 
 
-\vspace{0.4mm}
+\vspace{0.5mm}
 \noindent\textbf{RP Initial Registration.}
 %Each RP launches an initial registration operation to finish configurations.
 Each RP registers itself at the IdP to obtain $ID_{RP}$
@@ -289,13 +289,13 @@ The RP verifies $Cert_{RP}$ using $PK$,
 %        or at least some information about $ID_U$).
 %%%%%%%%%% 因为E上面的点，构成循环群、当n是素数的时候。所以，不会形成攻击。
 
-%\vspace{1mm}
+%\vspace{0.5mm}
 \noindent\textbf{User Registration.}
-Each user registers once at the IdP to set up a unique random identity $ID_U$ and the corresponding credential. $ID_U$ is kept unknown to RPs.
+Each user registers once at the IdP to set up a unique random identity $ID_U = u \in [1, n)$ and the corresponding credential. $ID_U$ is kept unknown to RPs.
 %This is similar to the steps in existing SSO systems.
 
 
-%\vspace{0.4mm}
+\vspace{0.5mm}
 \noindent\textbf{SSO Login.} A login instance %is typically launched through a browser,
 %when a user attempts to visit an RP. It
 consists of four steps, namely script downloading, RP identity transformation,
@@ -354,9 +354,9 @@ The user and the RP negotiate $PID_{RP} = [t]{ID_{RP}}$.
 \setlength{\itemsep}{0pt}
 \setlength{\parsep}{0pt}
 \setlength{\parskip}{0pt}
-\item[2.1] The IdP script chooses a random number $t$ in $\mathbb{Z}_n$ for the user,
+\item[2.1] The IdP script chooses a random number $t$ in $\mathbb{Z}_n$,
  and sends it to the RP script through \verb+postMessage+.
-The RP script sends $t$ to the RP.
+The RP script forwards $t$ to the RP.
 \item[2.2] On receiving $t$,
 the RP verifies $1 \leq t < n$ and %calculates $PID_{RP}$.
 %To acknowledge the negotiation of $PID_{RP}$, The RP
@@ -418,7 +418,7 @@ and calculates $Acct = [t^{-1}]{PID_U}$.
 \end{itemize}
 
 
-If any verification or check fails,
+If any verification or checking fails,
      this login flow will be halted immediately.
 For example, the user halts it
     on an invalid $Cert_{RP}$.
@@ -443,9 +443,10 @@ On the contrary, in UPPRESSO the scripts hide $Enpt_{RP}$ from the IdP
 %    that to protect the identity token from being sent to adversaries. 这句话与Compatibility无关
 so the IdP does not set \verb+redirect_uri+ in the HTTP responses. % of identity tokens.
 Most operations of \emph{RP identity transformation} are conducted within browsers,
- while the RP only receives $t$ to calculate $PID_{RP}$ and responds with  $Cert_{RP}$.
-The calculation of $PID_{RP}$ is viewed as the operation to prepare an RP identity in OIDC,
-    and the \emph{static} $Cert_{RP}$ is a supplementary message to users.
+ while the RP only receives $t$ to prepare an RP identity
+  and responds with  $Cert_{RP}$.
+%The calculation of $PID_{RP}$ is viewed as the operation to prepare an RP identity in OIDC,
+The static $Cert_{RP}$ is viewed as a supplementary message to users.
 %The operations in the $PID_{RP}$ registration are almost identical to those in the RP Dynamic Registration of OIDC \cite{DynamicRegistration},
    % except that
    % in OIDC the IdP assigns the RP's identity  while in UPPRESSO this (pseudo-)identity is generated by the registered entity.

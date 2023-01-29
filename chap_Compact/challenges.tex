@@ -13,7 +13,7 @@ Then,
 
 The primary goal of non-anonymous SSO services \cite{OpenIDConnect,rfc6749,SAML,SAMLIdentifier,NIST2017draft} is %user authentication and identification \cite{SPRESSO},
  to ensure that a \emph{legitimate} user is able to login to an \emph{honest} RP as his permanent account at this RP, %correlating multiple login instances,
-    by presenting \emph{identity tokens} issued by an \emph{honest} IdP.
+    by presenting \emph{identity tokens} issued by a \emph{trusted} IdP.
 
 To achieve this goal,
  an identity token issued by an IdP \cite{OpenIDConnect,rfc6749,SAML,SAMLIdentifier,NIST2017draft} specifies (\emph{a}) the RP to which the user requests to login (i.e., \emph{RP designation})
@@ -65,7 +65,7 @@ We aim to design a privacy-preserving SSO system with the four security properti
     while preventing both the IdP-based login tracing and the RP-based identity linkage.
 %We explicitly distinguish a user's identity (or \emph{account}) at an RP,
 %     from the user's \emph{identity} at an IdP and the user's \emph{pseudo-identities} enclosed in identity tokens.
-In UPPRESSO these requirements are satisfied through \emph{transformed identities} in the identity tokens.
+In UPPRESSO these requirements are satisfied with \emph{transformed identities} in the identity tokens.
 Table \ref{tbl:notations-dilemma} lists the notations in the following explanations,
     and the subscript $j$ and/or the superscript $i$ may be omitted when there is no ambiguity.
 
@@ -74,9 +74,9 @@ In an SSO login flow, % with identity transformations,
 An identity-token request with $PID_{RP}$ is sent by the user to an IdP.
 After authenticating the user as $ID_U$, the IdP calculates an \emph{ephemeral} $PID_U$ based on $ID_U$ and $PID_{RP}$,
     and issues an identity token binding $PID_U$ and $PID_{RP}$.
-After matching the designated RP pseudo-identity $PID_{RP}$ in the token,
+After matching the designated $PID_{RP}$ in the token,
     the RP calculates \emph{permanent} $Acct$ and allows the token holder to login as $Acct$.
-
+%
 %Given a user,
 %    (\emph{a}) an identity token contains only pseudo-identities, i.e., $PID_{U,j}^i$ and $PID_{RP_j}^i$,
 %        which are independent of each other for different RPs and in multiple login instances, respectively,
@@ -137,8 +137,8 @@ To prevent the RP-based identity linkage,
 %    and $ID_U$ or $ID_{RP}$ is still enclosed in identity tokens.
 %So only one type of privacy threat is prevented.
 
-The following \emph{identity transformations} in a login flow 
-    are needed in UPPRESSO.
+The following identity transformations %in a login flow 
+    are needed: %in UPPRESSO.
 \vspace{-\topsep}\begin{itemize}
 \setlength{\topsep}{0pt}
 \setlength{\partopsep}{0pt}
@@ -149,15 +149,15 @@ The following \emph{identity transformations} in a login flow
 $\mathcal{F}_{PID_{RP}}(ID_{RP}) = PID_{RP}$, calculated by the user and the RP.
 From the IdP's view,
 $\mathcal{F}_{PID_{RP}}()$ is a one-way function and $PID_{RP}$
-is \emph{indistinguishable from random variables}.
+is \emph{indistinguishable} from random variables.
 \item
 $\mathcal{F}_{PID_U}(ID_U, PID_{RP}) = PID_{U}$, calculated by the IdP.
 From the target RP's view,
-    $\mathcal{F}_{PID_U}()$ is a one-way function and $PID_{U}$ is \emph{indistinguishable from random variables}.
+    $\mathcal{F}_{PID_U}()$ is a one-way function and $PID_{U}$ is \emph{indistinguishable} from random variables.
 \item
 $\mathcal{F}_{Acct}(PID_{U}, PID_{RP}) = Acct$, calculated by the RP.
 Given $ID_U$ and $ID_{RP}$, $Acct$ is \emph{permanent} and \emph{unique} to other accounts at this RP.
-In the user's any $i$-th and $i'$-th ($i \neq i'$) login instances to the RP,
+In a user's any $i$-th and $i'$-th ($i \neq i'$) login instances to the RP,
  $\mathcal{F}_{Acct}(PID_{U}^i, PID_{RP}^i) = \mathcal{F}_{Acct}(PID_{U}^{i'}, PID_{RP}^{i'})$.
 \end{itemize}
 
