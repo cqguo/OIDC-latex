@@ -1,35 +1,61 @@
-\subsection{Extended Related Works}%各个方向全都加入，例如安全分析
+\subsection{Related Works}%各个方向全都加入，例如安全分析
 \label{sec:related}
-%Various SSO services have been designed, implemented and investigated for several years.
 
-%Various SSO protocols have been proposed, such as OIDC, SAML, OAuth 2.0, Central Authentication Service \cite{aubry2004esup} and Kerberos \cite{Kerberos}.
-%These protocols are widely adopted in Google, Facebook, Shibboleth project \cite{Shibboleth}, Java applications, etc.
-%And, plenty of works have been conducted on privacy protection and security analysis for SSO systems.
-
-%\subsection{Privacy protection for SSO systems.}
-
-%\noindent\textbf{Privacy-preserving SSO systems.}
-%%在描述Privacy-preserving SSO systems的内容中，是否需要原文中的以下内容：
-%%1.BrowserID的安全问题 2.我们方案的优点
-%%Privacy problems in SSO have been widely recognized that, as suggested in NIST SP800-63C \cite{NIST2017draft}, SSO systems should prevent both RP-based identity linkage and IdP-based login tracing. However, only a few solutions were proposed to protect user privacy so far. The pairwise user identifier, a simple design of function $\mathcal{F}_{ID_{U} \mapsto PID_{U}}$, has been specified in widely adopted deployed SSO standards, such as SAML \cite{SAML} and OIDC \cite{OpenIDConnect}. However, pairwise user identifier cannot prevent the IdP-based login tracing attack, as it doesn't adopt the function $\mathcal{F}_{ID_{RP} \mapsto PID_{RP}}$, therefore exposing $ID_{RP}$ to RP directly. To best of our knowledge, so far only SPRESSO \cite{SPRESSO} and BrowserID \cite{BrowserID} are proposed to prevent RP-based identity linkage by designing the individual function $\mathcal{F}_{ID_{RP} \mapsto PID_{RP}}$. However, neither SPRESSO nor BrowserID have proposed the function $\mathcal{F}_{ID_{U} \mapsto PID_{U}}$, which makes they are vulnerable to IdP-based login tracing. Moreover, there is no simple way to combine the existing function $\mathcal{F}_{ID_{U} \mapsto PID_{U}}$ and $\mathcal{F}_{ID_{RP} \mapsto PID_{RP}}$, as the dilemma is discussed in Section \ref{**} which breaks the \textbf{user identification} in SSO system.
-%As suggested by NIST \cite{NIST2017draft}, SSO systems should prevent both  RP-based identity linkage and IdP-based login tracing.
-%The pairwise user identifier is adopted in SAML \cite{SAMLIdentifier} and OIDC \cite{OpenIDConnect}, and only prevents RP--based identity linkage; while SPRESSO \cite{SPRESSO} and BrowserID \cite{BrowserID} only prevent  IdP-based login tracing.
-%BrowserID is adopted in Persona \cite{persona} and Firefox Accounts \cite{FirefoxAccount}, however an analysis on Persona found IdP-based login tracing could still succeed \cite{FettKS14, BrowserID}.
-%UPPRESSO prevents both the RP-based identity linkage and IdP-based login tracing and could be integrated into OIDC which has been formally analyzed \cite{FettKS17}.
-%%Moreover, OAuth and OIDC allow users to determine the scope of attributes exposed to the RP.
-%
-
-\noindent\textbf{Privacy-Preserving Token or Credential.}
+\noindent\textbf{Anonymous Token.}
 %Such tokens (or credentials) authorize a user to conduct operations
 %        in privacy-preserving ways.
 %
 %    tokens (or credentials) authorize a user to conduct operations
 %        in privacy-preserving ways.
-In addition to sign-on, privacy-enhancing technologies have been applied in various scenarios,
-  but not adopted to comprehensively transform the five (pseudo-)identities in SSO services.
-PrivacyPass and TrustToken \cite{privacypass,trusttoken} allow a user to receive a great number of \emph{anonymous} tokens.
- These tokens are used to access resources on content delivery networks,
-    so a user does not interact with challenges such as CAPTCHAs.
+%Privacy-enhancing technologies have been applied in various scenarios,
+%  but not adopted to comprehensively transform the five (pseudo-)identities in SSO services.
+PrivacyPass and TrustToken \cite{privacypass,trusttoken} allow a user to receive a number of tokens, each of which is denoted as ($T, T^{k}$), where $k$ is the token server's private key.
+ These tokens are used to access resources anonymously.
+To unlink token signing and redemption,
+    a user generates a random number $e$ for each token, blinds $T$ into $T^{e}$,
+        and sends it to return ($T^e, T^{ek}$) from the server.
+The user then utilizes $e$ to obtain $T^k$ from $T^{ek}$, so only ($T, T^{k}$) is redeemed to access resources.
+Similar cryptographic skills are adopted in UPPRESSO:
+    a user transforms $ID_{RP}$ to $[t]ID_{RP}$ by a random number $t$,
+ and $[t]ID_{RP}$ is transformed again by an IdP to $[tu]ID_{RP}$.
+Then, the visited RP calculates $Acct = [u]ID_{RP}$ from $[tu]ID_{RP}$ using $t$
+ (see Table \ref{tbl:notations-protocol} for the descriptions of notations).
+
+UPPRESSO differs from PrivacyPass and TrustToken as below.
+Firstly,
+    PrivacyPass and TrustToken work as anonymous SSO to some extent, because one consistent key works for all users,
+while UPPRESSO identifies each user at the RPs.
+Secondly,
+   the arguments of similar cryptographic skills are utilized differently.
+UPPRESSO integrates identity transformations in an OIDC-compatible way:
+$u$ is known by the IdP and a user as his user identity, and 
+$t$ is shared by the user and the RP. However, 
+$k$ is held only by the PrivacyPass/TrustToken server as a signing key,
+ and $r$ is only known to a user.
+Finally,
+more privacy requirements are satisfied in UPPRESSO.
+The unlinkability between %token signing and redemption \cite{privacypass,trusttoken}, or
+ ($T, T^k$) and ($T^r, T^{rk}$),
+roughly corresponds to only the IdP-untraceability in UPPRESSO:
+ an IdP cannot link any pair of $[t_i]ID_{RP}$
+ ($i = 1, 2, \cdots$).
+UPPRESSO also supports the unlinkability across RPs:
+given multiple users, e.g., identified as $u$ and $u'$,
+    ($ID_{RP}, t, [u]ID_{RP}$) and ($ID_{RP'}, t', [u']ID_{RP'}$) are indistinguishable to
+    colluding RPs.
+PrivacyPass and TrustToken do not consider this property.
+
+\noindent\textbf{Anonymous SSO.}
+Such schemes allow authenticated users to access a service protected by an IdP,
+    without revealing their identities.
+Anonymous SSO was proposed for GSM communications \cite{ElmuftiWRR08},
+    and formalized \cite{WangWS13}.
+Privacy-preserving primitives, such as group signature, zero-knowledge proof, Chebyshev Chaotic Maps and proxy re-verification,
+     were adopted to design anonymous SSO \cite{WangWS13,HanCSTW18,Lee18,HanCSTWW20}.
+Anonymous SSO schemes work for some applications,
+    but are \emph{unapplicable} in most systems that require user identification for customized services.
+
+\noindent\textbf{Privacy-Preserving Credential.}
 ZKlaims \cite{zklaim} allow users to prove statements on the credentials issued by a trusted party
     using zero-knowledge proofs,
         but the credential contents are not revealed.
@@ -44,16 +70,6 @@ for the privacy of key usage.
 
 
 %\vspace{0.5mm}
-\noindent\textbf{Anonymous SSO.}
-Such schemes allow authenticated users to access a service protected by an IdP,
-    without revealing their identities.
-Anonymous SSO was proposed for GSM communications \cite{ElmuftiWRR08},
-    and formalized \cite{WangWS13}.
-Privacy-preserving primitives, such as group signature, zero-knowledge proof, Chebyshev Chaotic Maps and proxy re-verification,
-     were adopted to design anonymous SSO \cite{WangWS13,HanCSTW18,Lee18,HanCSTWW20}.
-Anonymous SSO schemes work for some applications,
-    but are \emph{unapplicable} in most systems that require user identification for customized services.
-
 %\vspace{0.5mm}
 \noindent\textbf{Formal Analysis on SSO Protocols.}
 %The SSO standards (e.g., SAML, OAuth, and OIDC) have been formally analyzed.
@@ -104,9 +120,10 @@ A flaw was found in Google Apps \cite{ArmandoCCCPS13}, allowing a malicious RP t
 
 If a user is compromised,
     attackers will login to RPs on behalf of him.
-Single sign-off \cite{GhasemisharifRC18} helps the victim user
- to revoke all his tokens accepted and logout from the RPs.
-
+Single sign-off helps the victim user
+ to revoke all his tokens accepted and logout from the RPs  \cite{GhasemisharifRC18}.
+FedCM \cite{FedCM} attempts to disable iframe and third-party cookies in SSO, which migth be exploited to track users.
+%UPRRSSO protects privacy in SSO through ID transformations and our prototype does NOT use either iframe or third-party cookies.
 
 %以下内容被拆分到上面三点内容了，但是注释内容有对论文的详细表述
 

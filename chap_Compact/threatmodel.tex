@@ -1,20 +1,15 @@
-%\section{Threat Model and Assumptions}
-%\label{sec:assumptionandthreatmodel}
 
 \section{The Designs of UPPRESSO}
 \label{sec:UPPRESSO}
 
 This section presents the threat model and assumptions of UPPRESSO.
-We then introduce identity-transformation functions satisfying the requirements
+We then introduce identity-transformation algorithms satisfying the requirements
     and the protocols.
 
 
 \subsection{Threat Model}
 The system consists of an honest-but-curious IdP, a number of RPs and users which could be compromised. % or even collude with each other.
 This model is consistent with the widely-used SSO services \cite{OpenIDConnect,rfc6749,SAML,SAMLIdentifier,NIST2017draft}.
-
-%While, the IdP will follow the protocol correctly, and is only curious about the user's privacy.
-%The details are as follows.
 
 %\vspace{0.4mm}
 \noindent \textbf{Honest-but-curious IdP.}
@@ -23,66 +18,39 @@ For example, it might store all received messages
  to infer the relationship among $ID_U$, $ID_{RP}$, $PID_{U}$, and $PID_{RP}$.
  % to track a user's login activities.
 It never actively violates the protocols,
-so that a script downloaded from the IdP also strictly follows the protocols (see Section \ref{sec:web-design} about specific designs 
+so that a script downloaded from the IdP also strictly follows the protocols (see Section \ref{sec:web-design} about specific designs
     for web applications).
 The IdP maintains the private key well for signing identity tokens and RP certificates, %(see Section \ref{implementations} for details)
 so adversaries cannot forge such tokens or certificates.
-%An honest IdP %follows the protocols to process the requests from users and RPs, and
-%should not collude with malicious RPs or users,
-%For example, the IdP ensures the uniqueness of $ID_{RP}$ and $ID_{U}$ when an RP or a user registers, and calculates the pseudo-identity as the UPPRESSO protocol specifies.
-%However,
-
-%User's goal: 向IdP发送identity token，使IdP认为自己是另一个victim
-%方式：1）已经拥有有效的identity token，希望与IdP协商出相同的PID_RP；2）通过篡改或者伪造identity token来实现攻击
 
 %\vspace{0.4mm}
 \noindent \textbf{Malicious Users.}
-We assume the adversaries could control a set of users,
+Adversaries could control a set of users,
  by stealing users' credentials or registering Sybil users in the system.
-%These malicious users aim
-%to break the security of UPPRESSO.
-They want to impersonate a victim user at honest RPs, or allure the benign user to login to an honest RP under some adversary's account.
+They want to impersonate a victim user at honest RPs,
+ or allure a benign user to login to an honest RP under another user's account.
 %To achieve this, they could behave arbitrarily \cite{WangCW12, SomorovskyMSKJ12}.
 A malicious user might
-    modify, insert, drop or replay a message, or behave arbitrarily in SSO login flows.
+    modify, insert, drop or replay messages, or behave arbitrarily in login flows.
 
-% the forwarding messages (requests of identity token, identity token,  RP registration request and result, and etc.),
-%  and provide incorrect values for negotiating $PID_{RP}$ (detailed in Section \ref{implementations}).
-
-%RP's goal:1)获得目前登录用户在其他RP可用的identity token；2）colluding RP 关联用户
-
-%\vspace{0.4mm}
 \noindent \textbf{Malicious RPs.}
-The adversaries could control a set of RPs, by registering at the IdP as an RP
+Adversaries could control a set of RPs, by registering at the IdP as an RP
      or exploiting vulnerabilities to compromise some RPs.
-The malicious RPs might behave arbitrarily to break the security and privacy guarantees.
+Malicious RPs might behave arbitrarily to break the security and privacy guarantees.
 %they may attempt to obtain a valid identity token for another RP, to allow some user to log into this target RP:
 For example,
 a malicious RP might manipulate $PID_{RP}$ in a login instance,
     attempting to (\emph{a}) allure honest users to return an identity token that might be accepted by some honest RP,
-%when a user is logging in, to receive an identity token that will be accepted by the target RP verifying $PID_{RP}$ but not $ID_{RP}$.
-% or constructing an incorrect request to trigger the IdP issuing an identity token binding with other RP.
-%Or, the malicious RPs may collude to perform RP-based identity linkage to break user privacy.
-%For example, the RPs
-or (\emph{b}) manipulate the generation of $PID_U$ and
+or (\emph{b}) manipulate the generation of $PID_U$ to
     analyze the relationship between $ID_U$ and $PID_U$.
-%to link the user's multiple logins at different RPs. %by providing correlated values (e.g., $PID_{RP}$) to the IdP.
 
 
 %\vspace{0.4mm}
 \noindent \textbf{Colluding Users and RPs.}
 Malicious users and RPs might collude,
  attempting to break the security and privacy guarantees for benign users.
-For example, a malicious RP might collude with malicious users to allure victim users to leak an identity token,
-    to impersonate the victim user and login to some honest RP.
-%For example, malicious users and RPs may manipulate $PID_U$ and $PID_{RP}$ in an identity token collusively to perform the impersonation or identity injection attacks.
-%Or,
-%    they collude to
-
-%the adversary may first act as a malicious RP, and make an incorrect identity token generated for the visiting user,
-%  then act a malicious user, and use this identity token to impersonate this victim user at another RP.
-%The adversary could also first act as a user to login a correct RP and obtain an identity token,
-% then act a malicious RP to perform the identity injection attack, by injecting this identity token to the session between the victim user and the correct RP with other web attacks (e.g., CSRF).
+For example, a malicious RP might collude with malicious users to steal another user's identity token,
+    to impersonate the victim user at some honest RP.
 
 Finally, we do \emph{not} consider the collusion of the IdP and RPs.
     If the IdP could collude with some RPs,
@@ -91,9 +59,9 @@ Finally, we do \emph{not} consider the collusion of the IdP and RPs.
 This secret is held \emph{only} by the user;
     otherwise, the colluding IdP and RPs could always link these accounts.
 %Note that we aim to design a solution for SSO users without any non-ephemeral secret verified by the RPs.
-However, such accounts derived from this user secret have to be updated,
-    when it is lost or leaked
-    (see discussions in Section \ref{sec:discussion}).
+However, such accounts derived from the user secret have to be updated,
+    if it is lost or leaked
+    (see discussions in Section \ref{sec:discussion} for details).
 
 \subsection{Assumptions}
 HTTPS is adopted to secure the communications between honest entities,
@@ -102,7 +70,7 @@ The software stack of an honest entity is correctly implemented,
      to transmits messages to receivers as expected.
 
 UPPRESSO is designed for users who care about privacy,
-so a user never authorizes the IdP to enclose any \emph{distinctive attributes} in identity tokens,
+so a user never authorizes the IdP to enclose any \emph{distinctive} attributes in identity tokens,
  such as telephone number, Email address, etc.
          %driver license,
 A user does not configure  distinctive attributes at any RP, either.
@@ -111,46 +79,10 @@ So the privacy leakage due to re-identification by distinctive attributes across
 
 We focus on the privacy threats introduced by SSO services.
 The traffic analysis tracking a user's activities from network packets
-    and the active account linkage through web documents,
+    and the active account linkage through web pages,
         exist in SSO scenarios but also in all web applications.
 If a user visits multiple RPs concurrently from one browser,
-        a malicious RP might actively redirect his account to another RP server by crafted web documents.
-Such attacks will be prevented by other defenses,
+        a malicious RP might actively redirect his account to another RP server by crafted web pages.
+Such attacks will be prevented by other defenses \cite{FedCM},
     not considered in our work.
 
-%\vspace{1mm}
-%\noindent{\textbf{Active Identity Linkage by Malicious RPs.}}
-%When a user logins to multiple RPs \emph{concurrently} on one device as different accounts,
-%        malicious RPs might actively correlate the accounts by online means.
-%For instance,
-%     when the user has logined to $RP_j$ with $Acct_j$,
-%         malicious $RP_j$ might try to redirect $Acct_j$ to another $RP_{j'}$ through a hidden iframe in the browser.
-%As long as he has logined to $RP_{j'}$,
-%     two accounts would be correlated by $RP_{j'}$.
-%This active linkage attack appears not only in SSO systems, but also exists in all web applications.
-%Anyway,
-%    this attack can be prevented through various methods,
-% such as checking hidden iframes in the script
-%  and detecting the redirection by browser extensions.
-
-
-
-%As we consider IdP is always honest, therefore, all the parameters provided by the IdP are assumed to be honest. All the calculations and verifications conducted by IdP are correct. Meanwhile, the collusion between RPs and IdP is not considered in this paper.
-
-
-
-
-%We also assume a secure random number generator is adopted in UPPRESSO to provide the unpredictable random numbers;
-%and the adopted cryptographic algorithms, including the RSA and SHA-256, are secure and implemented correctly.
-%Therefore,  no one without private key can forge the signature, and the adversary fails to infer the private key during the computation.
-%Moreover, we also assume the security of the discrete logarithm problem is ensured.
-
-%In UPPRESSO, we study the RP-based identity linkage caused by a same user identifier used across different RPs. In this paper, we consider the user attributes hold by IdP can be separated as distinctive and indistinctive message, which is labelled based on whether it can be only associated with specific user.
-%While the RPs may be able to re-identify a user from some distinctive user attributes, such as , we consider it out of the scope of  UPPRESSO.
-%However, other attributes, such as nickname, birthday and sex can be provided to RPs with the explicit consent form user.
-%Also, we focus on IdP-based login tracing attacks that are enabled by SSO protocols, but do not consider other network attacks such as traffic analysis that trace a user's logins at different RPs.
-
-%The colluding RPs may attempt to link a user  based on the identifying attributes, such as the telephone number and credit number.
-%Here, we assume that the users refuse to provide these attributes to the RPs, and the correct RPs never collect these attributes as required by privacy laws (e.g., GDPR \cite{wachter2017counterfactual}).
-%Moreover, the global network traffic analysis may be adopted to correlate the user's logins at different RPs.
-%  However, UPPRESSO may integrate existing defenses to prevent this attack.

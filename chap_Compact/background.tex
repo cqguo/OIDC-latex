@@ -11,15 +11,12 @@ Users and RPs initially register at an IdP with their identities
 and other information such as user credentials (e.g., passwords)
 and RP endpoints (i.e., the URLs to receive tokens).
 It supports three types of login flows, i.e., implicit flow, authorization code flow, and hybrid flow (a mix-up of the other two).
-%In the implicit flow, an {\em id token} is generated as the identity token, which contains a user identifier, an RP identifier, the issuer (i.e., IdP), the validity period, and other requested attributes. The IdP signs the id token using its private key to ensure integrity, and sends it to the RP through the user.
-%In the authorization code flow, the IdP binds an authorization code with the RP, and sends it to the RP through the user; then, the RP establishes an HTTPS connection to the IdP and uses the authorization code with the RP's credential to obtain the user's identifier and other attributes.
-%UPPRESSO is compatible with all three flows.
 They work with different steps to request/receive identity tokens, but share the common security requirements of identity tokens.
 Next, we focus on the implicit flow to present our designs. In Section \ref{sec:discussion} we discuss the supports for the authorization code flow.
 
 \begin{figure}[t]
   \centering
-  \includegraphics[width=0.9\linewidth]{fig/OIDC1.pdf}
+  \includegraphics[width=0.98\linewidth]{fig/OIDC1.pdf}
   \caption{The implicit SSO login flow of OIDC}
   \label{fig:OpenID}
 \end{figure}
@@ -31,15 +28,6 @@ The token contains the identities (or pseudo-identities) of user and RP,
         a validity period, the requested user attributes, etc.
 Finally, the RP verifies the received identity token and allows the user to login as the  enclosed (pseudo-)identity.
 The user's operations including redirection, authorization, and forwarding are implemented in user agents (e.g., a browser for web applications).
-
-%Before issuing the identity token,
-%    the IdP obtains the user's authorization to enclose the requested attributes.
- %   which are maintained at the IdP by the user.
-%The IdP is also a web service.
-%The identity token is usually signed by the IdP,
-%    and transmitted through secure channels such as TLS/HTTPS.
-
-%extracts user's identifier and returns the authentication result to the user (Step 7).
 
 
 \begin{table*}[tb]
@@ -82,11 +70,6 @@ Three features are desired in SSO, supported by popular SSO systems \cite{NIST20
 \noindent \textbf{User identification at an RP.}
 An RP recognizes each user, as an identity or account \emph{unique}  at the RP,
     to provide customized services across multiple logins.
-%The identity tokens facilitate the target RP to identify each user as a unique account at this RP and this account links the user's multiple login instances to this RP for customized services.
-
-%On the contrary, in anonymous SSO systems \cite{WangWS13,HanCSTW18,HanCSTWW20}
-%        the RP only verifies whether he is a legitimate user authenticated by the IdP
-%            and receives no information to distinguish every user.
 
 \noindent\textbf{User authentication to {\em only} an IdP.}
 %A widely-adopted SSO protocol  usually does not include authentication steps.
@@ -113,21 +96,6 @@ These attributes are maintained by users at a trusted IdP.
 Before enclosing any attributes in a token, the IdP obtains a user's authorization or provides only attributes pre-selected by the user.
 %So no distinctive attributes such as telephone number and Email address are enclosed in the identity tokens of privacy-preserving SSO systems.
 
-%\vspace{1mm}
-%\noindent\textbf{RP Dynamic Registration.}
-%In addition to manual registrations,
-%    OIDC also supports dynamic registrations
-%    for an RP to register by online means \cite{DynamicRegistration}.
-%The (unregistered) RP sends a registration request
-%        with endpoints to receive identity tokens (and other information),
-%        to the IdP.
-%After a successful registration,
-% the IdP assigns a unique RP identity in the response.
-%
-
-%UPPRESSO leverages this function and slightly modifies the dynamic registration process to implement the {\em $PID_{RP}$ registration} process (see details in Section \ref{sec:UPPRESSO}.C), which allows an RP to generate different privacy-preserving RP identifiers and register them with the IdP.
-
-
 \subsection{Privacy-Preserving SSO and Identity Federation}
 \label{subsec-solutions}
 
@@ -143,7 +111,7 @@ Identity federation enables a user registered at a trusted IdP to be accepted by
 Privacy-preserving identity federation
     protects user privacy against even collusive attacks by the IdP and RPs,
     but requires a user \cite{ELPASSO,UnlimitID,hyperledge-idemix,PseudoID,Opaak,uprov} to (\emph{a}) \emph{hold long-term secrets verified by RPs},
-            in addition to the authentication credentials for the IdP,
+            in addition to the authentication credential for the IdP,
                 and (\emph{b}) \emph{locally manage the accounts at different RPs}.
 That is, there are actually some authentication steps between a user and RPs (called asynchronous authentication \cite{ELPASSO}).
 
@@ -180,10 +148,6 @@ Two kinds of privacy threats are prevented, because (\emph{a}) the RP's identity
 Collusive attacks by the IdP and RPs are also prevented,
     for they cannot link two blindly-signed tokens.
 
-% the user must use the secret to login to RP, because no RP identity is enclosed in the token.
-
-
-%However, the user has to permanently keep the secret preimage for each account in an RP.
 
 In EL PASSO \cite{ELPASSO}, after authenticating a user,
     an IdP signs an \emph{anonymous credential} \cite{anon-credential} binding a secret,
@@ -195,11 +159,8 @@ Although one credential is proved to multiple RPs,
         \emph{user-managed pseudonyms} and \emph{anonymous credentials} prevent the RPs, even when collusive with the IdP, from linking the users across the RPs.
 UnlimitID \cite{UnlimitID} presents similar designs based on anonymous credentials \cite{anon-credential},
         to prevent collusive attacks by the IdP and RPs.
-NEXTLEAP \cite{nextleap} builds anonymous secure messaging on top of UnlimitID.
+NEXTLEAP \cite{nextleap} builds anonymous messaging on top of UnlimitID.
 
-%    but a user has to by himself manage pseudonyms for different RPs.
-%For example,
-%    the RP domain (e.g., \verb+www.RP.com+) is used as a factor to locally generate the user's account (or pseudonym) at this RP.
 
 Anonymous credentials \cite{anon-credential-2001,anon-credential} are used in flexible ways.
 Opaak \cite{Opaak} keeps IdP-signed anonymous credentials %in mobile phones
