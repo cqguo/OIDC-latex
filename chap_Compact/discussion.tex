@@ -1,6 +1,31 @@
 \section{Discussions}
 \label{sec:discussion}
 
+\noindent{\textbf{Scalability and Uniqueness.}}
+$ID_{RP}$ is generated uniquely in an RP's initial registration,
+    and the capacity of RPs is $n$ (i.e., the order of $G$). For the NIST P256 elliptic curve, $n$ is approximately $2^{256}$.
+$PID_{RP}$ cannot be exhausted, either.
+We ensure $PID_{RP}$ is unique in unexpired tokens,
+    the number of which is $\sigma$.
+The probability that at least two $PID_{RP}$s are identical among the $\sigma$ ones,
+    is $1-\prod_{i=0}^{\sigma-1}(1-i/n)$.
+If the system serves $10^{8}$ requests per second and the validity period is 10 minutes,
+     $\sigma$ is less than $2^{36}$ and the $PID_{RP}$-collision probability is negligible (i.e., less than $2^{-183}$) for the P256 curve.
+
+The capacity of accounts at any RP is also $n$,
+    the same as that of user identities at the IdP.
+$\mathbb{E}$ is a finite cyclic group,
+    so $ID_{RP} = [r]G$ is also a generator of order $n$.
+Thus, given any RP,
+because $Acct =  [ID_U]ID_{RP} = [u]ID_{RP}$,
+    a \emph{unique} account is automatically assigned to every user.
+
+Besides, stronger elliptic curves accommodate more RPs and users;
+e.g., $n$ is nearly $2^{384}$ for the NIST P384 curve.
+
+
+
+\vspace{1mm}
 \noindent{\textbf{Collusive Attack by an IdP and RPs.}}
 Privacy-preserving identity federation solutions \cite{ELPASSO,UnlimitID,idemix,PseudoID,Opaak,uprov}
  prevent the collusive attacks by an IdP and RPs,
@@ -12,7 +37,7 @@ For web applications, a user needs to install a browser extension to handle this
   and if it is lost or leaked,
        a user has to notify all RPs to update his accounts which are derived from the secret
         (if the accounts are not masked by the user's secret, the colluding IdP and RPs can eventually link them).
-Meanwhile,
+
 UPPRESSO does not protect user privacy against such collusive attacks,
     but a user is authenticated to \emph{only} an IdP:
          the user identity at the IdP
@@ -31,31 +56,7 @@ UPPRESSO does not protect user privacy against such collusive attacks,
 %        because a triad of $t$, $PID_U$ and $PID_{RP}$ is ephemeral and independent of each other.
 
 
-
-\vspace{0.5mm}
-\noindent{\textbf{Scalability and Uniqueness.}}
-$ID_{RP}$ is generated uniquely in an RP's initial registration,
-    and the capacity of RPs is $n$ (i.e., the order of $G$). For the NIST P256 elliptic curve, $n$ is approximately $2^{256}$.
-Adversaries cannot exhaust $PID_{RP}$, either.
-We ensure $PID_{RP}$ is unique in unexpired tokens,
-    the number of which is $\sigma$.
-The probability that at least two $PID_{RP}$s are identical among the $\sigma$ ones,
-    is $1-\prod_{i=0}^{\sigma-1}(1-i/n)$.
-If the system serves $10^{8}$ requests per second and the validity period is 10 minutes,
-     $\sigma$ is less than $2^{36}$ and the $PID_{RP}$-collision probability is negligible (i.e., less than $2^{-183}$) for the P256 curve.
-
-The capacity of accounts at any RP is also $n$.
-$\mathbb{E}$ is a finite cyclic group,
-    so $ID_{RP} = [r]G$ is also a generator of order $n$.
-Thus, given any RP,
-    a \emph{unique} account is automatically assigned to every user,
-        because $Acct =  [ID_U]ID_{RP} = [u]ID_{RP}$.
-
-Besides, stronger elliptic curves accommodate more RPs and users;
-e.g., $n$ is nearly $2^{384}$ for the NIST P384 curve.
-
-
-\vspace{0.5mm}\noindent{\textbf{Alternative Way to Generate $ID_{RP}$ and Bind $Enpt_{RP}$.}}
+\vspace{1mm}\noindent{\textbf{Alternative Way to Generate $ID_{RP}$ and Bind $Enpt_{RP}$.}}
 In the prototype an RP certificate binds $ID_{RP}$ and $Enpt_{RP}$,
     verified by the honest IdP script.
 RP certificates ensure the target RP has already registered itself at the IdP,
@@ -81,7 +82,7 @@ This account migration requires extra operations explicitly by each user;
     otherwise,
         colluding RPs could actually link a user's accounts across RPs.
 
-\vspace{0.5mm}
+\vspace{1mm}
 \noindent{\textbf{Restriction of the RP Script's Origin.}}
 When identity tokens are forwarded by the IdP script to the RP script, % within the user browser,
     the receiver is restricted by the \verb+postMessage+ targetOrigin mechanism \cite{postm-targeto},
@@ -109,7 +110,7 @@ So
 This risk resuts from the SOP design of browsers.
 
 
-\vspace{0.5mm}\noindent{\textbf{Support for the Authorization Code Flow.}}
+\vspace{1mm}\noindent{\textbf{Support for the Authorization Code Flow.}}
 In the authorization code flow of OIDC \cite{OpenIDConnect},
     an IdP does not directly response with identity tokens;
         instead,
@@ -146,7 +147,7 @@ To protect RP identities from the IdP,
 % \textcolor[rgb]{1,0,0}{and experiments show that at least 102 ms will be saved for each login (i.e., about 208 ms in total),}
 %    compared with the version with portable web scripts.
 
-\vspace{0.5mm}
+\vspace{1mm}
 \noindent{\textbf{Applicability of Identity Transformations.}}
 The proposed identity-transformation algorithms %i.e., $\mathcal{F}_{PID_{RP}}()$, $\mathcal{F}_{PID_U}()$, and $\mathcal{F}_{Acct}()$,
     are applicable to various SSO scenarios

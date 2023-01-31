@@ -90,24 +90,24 @@ A user generates $t$ and calculates $PID_{RP} = [t]ID_{RP}$.
 After receiving $t$ from the user and extracting $PID_{RP}$ from the token,
     an RP checks that $PID_{RP} = [t]ID_{RP}$,
         because the correct account is derived only when this equation holds;
-        otherwise, a malicious user $U$ might send $t' \neq t$ to login as another user's account.\footnote{In this case, the malicious user cannot purposefully  manipulate the calculated account $Acct' =  [t'^{-1}]PID_{U} = [t'^{-1}t][ID_U]ID_{RP}$ by $t'$,
+        otherwise, a malicious user $U$ might send $t' \neq t$ to login as another user's account.\footnote{The malicious user cannot purposefully  manipulate the calculated account $Acct' =  [t'^{-1}]PID_{U} = [t'^{-1}t][ID_U]ID_{RP}$ by $t'$,
         due to the ECDLP.}
-On the other hand,
+On the contrary,
     if $t$ is generated and $PID_{RP}$ is calculated by the RP,
-the user also needs to check that $PID_{RP} = [t]ID_{RP}$;
+a user also needs to check that $PID_{RP} = [t]ID_{RP}$;
     otherwise, attacks happen as below.
-A malicious user $U'$ initiates a login request to an honest RP,
+A malicious user $U'$ initiates a login flow to an honest RP,
     and receives $PID_{RP}$.
 Then it colludes with a malicious RP denoted as $RP'$,
-    which sends $PID_{RP}$ to an honest user.
+    which sends $PID_{RP}$ to an honest user $U$.
 Without checking $PID_{RP} = [t']ID_{RP'}$,
-    this honest user will then present a token binding $PID_U$ and $PID_{RP}$ to the malicious RP.
-This token enables $U'$ to login as the honest user's account at the honest RP.
-In another word, this checking ensures RP designation,
+    this honest user will present a token binding $PID_U$ and $PID_{RP}$ to the malicious RP.
+This token will enable $U'$ to login as the honest user's account at the honest RP.
+In other words, this checking ensures RP designation,
     because it is impossible to find $t$ and $t'$ satisfying that
     $[t]ID_{RP} = [t']ID_{RP'}$,
-        when $ID_{RP} = [r]G$, $ID_{RP'} = [r']G$, but $r$ and $r'$ are unknown.
-See Section \ref{analysis-security} for the detailed proof of RP designation.
+        when $ID_{RP} = [r]G$, $ID_{RP'} = [r']G$, but $r$ and $r'$ are unknown (See Section \ref{analysis-security} for the detailed proof).
+
 
 \subsection{The Designs Specific for Web Applications}
 \label{sec:web-design}
@@ -242,11 +242,7 @@ We tested it in browsers such as Chrome, Safari, Edge, Opera and Firefox, and co
 %    and two scripts communicates with each other within the user browser through the standard \verb+postMessage+ HTML5 API.
 
 
-
-\subsection{The UPPRESSO Protocols}
-\label{implementations}
-
-\begin{figure*}[bt]
+\begin{figure*}[htb]
   \centering
   \includegraphics[height=0.575\textheight]{fig/process-js.pdf}
   \caption{The SSO login flow of UPPRESSO}
@@ -254,12 +250,16 @@ We tested it in browsers such as Chrome, Safari, Edge, Opera and Firefox, and co
 \end{figure*}
 
 
+
+\subsection{The UPPRESSO Protocols}
+\label{implementations}
+
 \noindent \textbf{System Initialization.}
 An IdP generates a key pair ($SK$, $PK$) to sign/verify identity tokens and RP certificates.
 The IdP keeps $SK$ secret, and $PK$ is publicly known.
 
 
-\vspace{0.5mm}
+\vspace{1mm}
 \noindent\textbf{RP Initial Registration.}
 %Each RP launches an initial registration operation to finish configurations.
 Each RP registers itself at the IdP to obtain $ID_{RP}$
@@ -295,7 +295,7 @@ Each user registers once at the IdP to set up a unique random identity $ID_U = u
 %This is similar to the steps in existing SSO systems.
 
 
-\vspace{0.5mm}
+\vspace{1mm}
 \noindent\textbf{SSO Login.} A login instance %is typically launched through a browser,
 %when a user attempts to visit an RP. It
 consists of four steps, namely script downloading, RP identity transformation,
