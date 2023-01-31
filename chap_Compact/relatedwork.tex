@@ -9,16 +9,16 @@
 %        in privacy-preserving ways.
 %Privacy-enhancing technologies have been applied in various scenarios,
 %  but not adopted to comprehensively transform the five (pseudo-)identities in SSO services.
-PrivacyPass and TrustToken \cite{privacypass,trusttoken} allow a user to receive a number of tokens, each of which is denoted as ($T, T^{k}$), where $k$ is the token server's private key.
+PrivacyPass and TrustToken \cite{privacypass,trusttoken} allow a user to receive several tokens, each of which is denoted as ($T, T^{k}$), where $k$ is the token server's private key.
  These tokens are used to access resources anonymously.
 To unlink token signing and redemption,
     a user generates a random number $e$ for each token, blinds $T$ into $T^{e}$,
         and sends it to return ($T^e, T^{ek}$) from the server.
 The user then utilizes $e$ to obtain $T^k$ from $T^{ek}$, so only ($T, T^{k}$) is redeemed to access resources.
 Similar cryptographic skills are adopted in UPPRESSO:
-    a user transforms $ID_{RP}$ to $[t]ID_{RP}$ by a random number $t$,
- and $[t]ID_{RP}$ is transformed again by an IdP to $[tu]ID_{RP}$.
-The visited RP calculates $Acct = [u]ID_{RP}$ by $[tu]ID_{RP}$ and $t$
+    a user transforms $ID_{RP}$ to $PID_{RP} = [t]ID_{RP}$ by a random number $t$,
+ and $PID_{RP}$ is transformed again by an IdP to $[tu]ID_{RP}$.
+The visited RP calculates $Acct = [u]ID_{RP}$ from $[tu]ID_{RP}$ and $t$
  (see Table \ref{tbl:notations-protocol} for detailed descriptions of these notations).
 
 UPPRESSO differs from PrivacyPass and TrustToken as below.
@@ -27,18 +27,18 @@ Firstly,
 while UPPRESSO identifies each user at the RPs.
 Secondly,
    the arguments of similar cryptographic skills are utilized differently.
-UPPRESSO integrates identity transformations in an OIDC-compatible way:
-$u$ is known by the IdP and a user as his user identity, and 
-$t$ is shared by the user and the RP. However, 
-$k$ is held only by the PrivacyPass/TrustToken server as a signing key,
- and $r$ is only known to a user.
+UPPRESSO integrates identity transformations in SSO:
+scalar $u$ is known by the IdP and a user as his user identity, and
+random $t$ is shared by the user and the RP. However,
+exponent $k$ is held only by the PrivacyPass/TrustToken server as a key,
+ and random $r$ is only known to a user.
 Finally,
 more privacy requirements are satisfied in UPPRESSO.
 The unlinkability between %token signing and redemption \cite{privacypass,trusttoken}, or
  ($T, T^k$) and ($T^r, T^{rk}$),
 roughly corresponds to only the IdP-untraceability in UPPRESSO:
- an IdP cannot link any pair of $[t_i]ID_{RP}$
- ($i = 1, 2, \cdots$).
+ an IdP cannot link any pair of $[t_i]ID^i_{RP}$,
+ $i = 1, 2, \cdots$.
 UPPRESSO also supports the unlinkability across RPs:
 given multiple users, e.g., identified as $u$ and $u'$,
     ($ID_{RP}, t, [u]ID_{RP}$) and ($ID_{RP'}, t', [u']ID_{RP'}$) are indistinguishable to
@@ -56,7 +56,7 @@ Anonymous SSO schemes work for some applications,
     but are \emph{unapplicable} in most systems that require user identification for customized services.
 
 \noindent\textbf{Privacy-Preserving Credential.}
-ZKlaims \cite{zklaim} allow users to prove statements on the credentials issued by a trusted party
+ZKlaims \cite{zklaim} allows users to prove statements on the credentials issued by a trusted party
     using zero-knowledge proofs,
         but the credential contents are not revealed.
 Crypto-Book \cite{crypto-book} coordinates servers to generate a ring-signature private key,
@@ -81,7 +81,7 @@ Fett et al. \cite{FettKS16, FettKS17} formally analyzed OAuth 2.0 and OIDC using
 %According to these formal proofs \cite{FettKS16, FettKS17},
 %    OAuth 2.0 and OIDC are secure except these two attacks.
 %UPPRESSO could be integrated into OIDC, which simplifies its security analysis.
-SAML-based SSO was also analyzed \cite{ArmandoCCCT08},
+SAML-based SSO was analyzed \cite{ArmandoCCCT08},
     and it is found that RP identities were not correctly bound in the identity tokens of a variant designed by Google.
 
 

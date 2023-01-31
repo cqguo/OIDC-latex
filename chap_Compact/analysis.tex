@@ -282,7 +282,8 @@ After formulating the system by this model,
 as we locate the generation of a token, and trace all places
     where $PID_U$, $PID_{RP}$ and other parameters in the token are generated and transmitted,
      to ensure no adversary able to retrieve or manipulate them.
-Besides, $t$ is proved unaccessible to the IdP, which is necessary for user privacy (see Section \ref{sec-:analysis}).
+Finally, $t$ is proved unaccessible to the IdP by this model,
+ which is necessary for user privacy (see Section \ref{sec-:analysis} for details).
 
 
 %The details on the Dolev-Yao web model and the detailed security proofs of UPPRESSO are in the appendix.
@@ -297,7 +298,7 @@ Besides, $t$ is proved unaccessible to the IdP, which is necessary for user priv
 UPPRESSO effectively prevents the privacy threats of IdP-based login tracing and RP-based identity linkage.
 
 The information accessible to the IdP and derived from the RP's identity,
-    is only $PID_{RP}$, where $PID_{RP} = [t]ID_{RP}$ is calculated by the user.
+    is only $PID_{RP}$ in identity-token requests, where $PID_{RP} = [t]ID_{RP}$ is calculated by the user and $t$ is kept secret to the IdP.
 So the prevention against the IdP-based login tracing
     is expressed as below.
 
@@ -305,20 +306,19 @@ So the prevention against the IdP-based login tracing
 \noindent\textbf{Privacy against the IdP.}~~The IdP
  cannot infer any information about $ID_{RP}$ or link any pair of $PID_{RP}^i$ and $PID_{RP}^{i'}$
   ($i \neq i'$),
-    from an honest user's all identity token requests for $PID_{RP}^i$ ($i = 1, 2, \cdots$).
+    from an honest user's identity-token requests for $PID_{RP}^i$ ($i = 1, 2, \cdots$).
 
 \vspace{0.5mm}
 \noindent\emph{Proof.}
 Because (\emph{a}) $ID_{RP} = [r]G$ is also a generator of order $n$,
         where $G$ is a generator of finite cyclic group $\mathbb{E}$,
-    and (\emph{b}) $t$ is kept secret to the IdP,
-the IdP cannot any information about $ID_{RP}$ from $PID_{RP} = [t]ID_{RP}$ due to the ECDLP.
-Next, because $t$ is a random number from $\mathbb{Z}_n$,
-from the IdP's view,
-$PID_{RP}$
-is \emph{indistinguishable} from a variable randomly chosen from $\mathbb{E}$.
+    and (\emph{b}) $t$ is a random number from $\mathbb{Z}_n$ and unknown to the IdP,
+ from the IdP's view,
+ $PID_{RP}$
+is \emph{indistinguishable} from a random variable on $\mathbb{E}$.
 Thus, 
-    it cannot distinguish $[t]ID_{RP_j} = [tr]G$ from any other $[t']ID_{RP_{j'}} = [t'r']G$.
+    the IdP cannot infer any information about $ID_{RP}$ from $PID_{RP} = [t]ID_{RP}$,
+or distinguish $[t]ID_{RP_j} = [tr]G$ from any other $[t']ID_{RP_{j'}} = [t'r']G$.
 So the IdP-based login tracing is computationally impossible. $\square$
 
 \vspace{1mm}
@@ -331,7 +331,7 @@ So the prevention against the RP-based identity linkage in UPPRESSO is expressed
     as below.
 
 \vspace{1mm}
-\noindent\textbf{Prevention against colluding RPs.}~~After
+\noindent\textbf{Privacy against colluding RPs.}~~After
  collecting the information of login instances by $v$ users,
 $c$ colluding RPs cannot decide whether a login instance to another RP is launched by one of these $v$ users or not,
     where
@@ -355,7 +355,7 @@ Let $\mathbb{E}$ be an elliptic curve,
 For any PPT algorithm $\mathcal{D}$, the probability of distinguishing
  $([x]G$, $[y]G$, $[xy]G)$ and $([x]G$, $[y]G$, $[z]G)$
 is negligible,
- where $x$, $y$ and $z$ are integers randomly and independently chosen from $\mathbb{Z}_n$.
+ where $x$, $y$ and $z$ are integers randomly and independently chosen in $\mathbb{Z}_n$.
 Let  ${\rm Pr}\{\}$ denote the probability and
  we define
 \begin{align*}
@@ -373,7 +373,7 @@ So $\epsilon_{r}(k) = |{\rm Pr}_1 - {\rm Pr}_2|$ becomes negligible as $k$ incre
 
 We define the RP-based identity linkage game $\mathcal{G}_r$:
 after receiving $\mathfrak{L}$ and $L'$ from a challenger,
-    the adversary outputs the result $s = 1$ if it decides $u' \in \{u_1, u_2, \cdots, u_v\}$ or $s = 0$ if $u'$ is randomly chosen from $\mathbb{Z}_n$.
+    the adversary outputs the result $s = 1$ if it decides $u' \in \{u_1, u_2, \cdots, u_v\}$ or $s = 0$ if $u'$ is randomly chosen in $\mathbb{Z}_n$.
 The adversary's advantage in $\mathcal{G}_r$ is defined as $\mathbf{Adv}_{A}$.
 %If the adversary is able to distinguish whether $u' \in \{u_1, u_2, \cdots, u_v\}$ or not,
 %    the adversary will have non-negligible advantages in $\mathcal{G}_r$
@@ -388,7 +388,7 @@ Then,
 We design a PPT algorithm $\mathcal{D}^*_r$ based on $\mathcal{G}_r$, shown in Figure \ref{fig:dalgorithm}, to solve the ECDDH problem.
 The input is in the form of $(G$, $Q_1=[x]G$, $Q_2=[y]G$, $Q_3=[z]G)$.
 On receiving the input, the challenger of $\mathcal{G}_r$ randomly chooses
- $\{u_1, u_2, \cdots, u_v\}$, $\{r_1, r_2, \cdots, r_c\}$, $\{t_{1, 1}, t_{1, 2}, \cdots, t_{v, c}\}$, and $t'$ from $\mathbb{Z}_n$.
+ $\{u_1, u_2, \cdots, u_v\}$, $\{r_1, r_2, \cdots, r_c\}$, $\{t_{1, 1}, t_{1, 2}, \cdots, t_{v, c}\}$, and $t'$ in $\mathbb{Z}_n$.
 Then the challenger constructs $\mathfrak{L}$ and $L'$ as below.
 It firstly assigns $L_{i, j} = ([r_j]G, t_{i, j}, [u_ir_j]G)$, %$1\leq i \leq v$ and $1\leq j \leq c$,
     and randomly chooses $d \in [1, v]$ to

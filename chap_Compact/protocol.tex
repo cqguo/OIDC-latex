@@ -73,25 +73,25 @@ From Equations \ref{equ:PIDRP}, \ref{equ:PIDU} and \ref{equ:Account}, it is deri
    Acct =  [t^{-1}utr \bmod n]G = [ur]G = [ID_U]ID_{RP}
    \label{equ:AccountNotChanged}
 \end{equation*}
-So the RP derives an \emph{identical permanent} account from the identity tokens in different login instances,
+The RP derives an \emph{identical permanent} account from the identity tokens in different login instances,
     with the help of $t$. %from the user.
 Given a user, the accounts at different RPs are inherently unique;
 while, given an RP, the accounts of different users are also unique.
-Moreover,
-    due to the elliptic curve discrete logarithm problem (ECDLP),
-it is \emph{impossible} for the RP to derive $ID_U$ from either $PID_U$ or $Acct$,
-    and for the IdP to derive $ID_{RP}$ from $PID_{RP}$.
-Section \ref{sec:analysis} presents the detailed proofs.
-
+It is impossible for the RP to derive $ID_U$ from either $PID_U$ or $Acct$ due to the elliptic curve discrete logarithm problem (ECDLP),
+    and for the IdP to learn $ID_{RP}$ from $PID_{RP}$ because $t$ is random in $\mathbb{Z}_n$
+     and $PID_{RP}$ is indistinguishable from a random variable on $\mathbb{E}$ from the IdP's view.
 
 Note that $r$ is kept secret to the RP; otherwise, two colluding RPs with $ID_{RP_j} = [r]G$ and $ID_{RP_{j'}} = [r']G$ could link a user's accounts by checking whether $[r']Acct_j = [r]Acct_{j'}$ or not.
 
 A user generates $t$ and calculates $PID_{RP} = [t]ID_{RP}$.
-After receiving $t$ from the user and extracting $PID_{RP}$ from the token,
+After receiving $t$ from and extracting $PID_{RP}$ from the token,
     an RP checks that $PID_{RP} = [t]ID_{RP}$,
         because the correct account is derived only when this equation holds;
-        otherwise, a malicious user $U$ might send $t' \neq t$ to login as another user's account.\footnote{The malicious user cannot purposefully  manipulate the calculated account $Acct' =  [t'^{-1}]PID_{U} = [t'^{-1}t][ID_U]ID_{RP}$ by $t'$,
-        due to the ECDLP.}
+        otherwise, a user $U$ might send $t' \neq t$ to login as another user's account,
+            while the calculated account $Acct^* =  [t'^{-1}]PID_{U} = [t'^{-1}t][ID_U]ID_{RP}$ 
+                cannot be purposefully manipulated
+        due to the ECDLP.
+
 On the contrary,
     if $t$ is generated and $PID_{RP}$ is calculated by the RP,
 a user also needs to check that $PID_{RP} = [t]ID_{RP}$;
@@ -106,7 +106,9 @@ This token will enable $U'$ to login as the honest user's account at the honest 
 In other words, this checking ensures RP designation,
     because it is impossible to find $t$ and $t'$ satisfying that
     $[t]ID_{RP} = [t']ID_{RP'}$,
-        when $ID_{RP} = [r]G$, $ID_{RP'} = [r']G$, but $r$ and $r'$ are unknown (See Section \ref{analysis-security} for the detailed proof).
+        when $ID_{RP} = [r]G$, $ID_{RP'} = [r']G$, but $r$ and $r'$ are unknown.
+See Section \ref{sec:analysis} for the detailed proofs of security and privacy.
+
 
 
 \subsection{The Designs Specific for Web Applications}
@@ -135,7 +137,7 @@ Only the RP script is not enough to implement a user agent;
 automatically carry an HTTP \verb+referer+ header that discloses the RP domain).
 Moreover, a trusted script from the honest IdP
 ensures confidentiality of identity tokens (i.e., a token is sent to only the designated RP)
-and interacts with the user for the authorization of user attributes,
+and interacts with users for the authorization of user attributes,
     for the RP (and also the RP script) might be malicious.
 Thus, on receiving a request with the \verb+referer+ header,
     the IdP checks that it is sent from the IdP script.
@@ -354,7 +356,7 @@ The user and the RP negotiate $PID_{RP} = [t]{ID_{RP}}$.
 \setlength{\itemsep}{0pt}
 \setlength{\parsep}{0pt}
 \setlength{\parskip}{0pt}
-\item[2.1] The IdP script chooses a random number $t$ in $\mathbb{Z}_n$,
+\item[2.1] The IdP script locally chooses a random number $t$ in $\mathbb{Z}_n$,
  and sends it to the RP script through \verb+postMessage+.
 The RP script forwards $t$ to the RP.
 \item[2.2] On receiving $t$,
@@ -362,7 +364,7 @@ the RP verifies $1 \leq t < n$ and %calculates $PID_{RP}$.
 %To acknowledge the negotiation of $PID_{RP}$, The RP
  replies with $Cert_{RP}$, which is then transmitted from the RP script to the IdP script,
     with the scope of requested user attributes.  % through \verb+postMessage+.
-\item[2.3] The IdP script verifies $Cert_{RP}$, extracts $ID_{RP}$ and $Enpt_{RP}$ from $Cert_{RP}$, and calculates $PID_{RP}=[t]{ID_{RP}}$.
+\item[2.3] The IdP script locally verifies $Cert_{RP}$, extracts $ID_{RP}$ and $Enpt_{RP}$ from $Cert_{RP}$, and calculates $PID_{RP}=[t]{ID_{RP}}$.
 %It then creates a random endpoint $PEnpt_{U}$ for this login instance,
  %   to receive identity tokens from the IdP.
     % as the RP endpoint required by IdP.我们已经修改了协议，IdP并不require什么
@@ -381,13 +383,13 @@ The IdP calculates $PID_U = [ID_U]{PID_{RP}}$ and signs an identity token. % The
 \setlength{\parsep}{0pt}
 \setlength{\parskip}{0pt}
 \item[3.1]
-The IdP script sends an identity token request for $PID_{RP}$ on behalf of the user. %and the user attributes.
+The IdP script sends an identity-token request for $PID_{RP}$ on behalf of the user. %and the user attributes.
  %by checking whether this user is authenticated by IdP.
 
 \item[3.2] The IdP authenticates the user, if not authenticated yet.
 
 \item [3.3]
-The IdP script locally obtains the user's authorization to enclose each attribute,
+The IdP script obtains the user's authorization to enclose each attribute,
     and sends the scope of authorized attributes. % to the IdP.
 The IdP %checks that the received $PID_{RP}$ is a point on $\mathbb{E}$,
     calculates $PID_U = [ID_U]{PID_{RP}}$, % for the user,

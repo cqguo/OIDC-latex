@@ -4,7 +4,7 @@
 
 This section presents the threat model and assumptions.
 We then introduce identity-transformation algorithms satisfying the requirements
-    and the protocols.
+    and the UPPRESSO protocols.
 
 
 \subsection{Threat Model}
@@ -18,7 +18,7 @@ For example, it might store all received messages
  to infer the relationship among $ID_U$, $ID_{RP}$, $PID_{U}$, and $PID_{RP}$.
  % to track a user's login activities.
 It never actively violates the protocols,
-so that a script downloaded from the IdP also strictly follows the protocols (see Section \ref{sec:web-design} about specific designs
+so that a script downloaded from the IdP also strictly follows the protocols (see Section \ref{sec:web-design} about the specific designs
     for web applications).
 The IdP maintains the private key well for signing identity tokens and RP certificates, %(see Section \ref{implementations} for details)
 so adversaries cannot forge such tokens or certificates.
@@ -28,7 +28,7 @@ so adversaries cannot forge such tokens or certificates.
 Adversaries could control a set of users,
  by stealing users' credentials or registering Sybil users in the system.
 They want to impersonate a victim user at honest RPs,
- or allure a benign user to login to an honest RP under another user's account.
+ or allure an honest user to login to an honest RP under another user's account.
 %To achieve this, they could behave arbitrarily \cite{WangCW12, SomorovskyMSKJ12}.
 A malicious user might
     modify, insert, drop or replay messages, or behave arbitrarily in login flows.
@@ -48,7 +48,7 @@ or (\emph{b}) manipulate the generation of $PID_U$ to
 %\vspace{0.5mm}
 \noindent \textbf{Colluding Users and RPs.}
 Malicious users and RPs might collude,
- attempting to break the security and privacy guarantees for benign users.
+ attempting to break the security and privacy guarantees for honest users.
 For example, a malicious RP might collude with malicious users to steal another user's identity token,
     to impersonate the victim user at some honest RP.
 
@@ -67,7 +67,7 @@ However, such accounts derived from the user secret have to be updated,
 HTTPS is adopted to secure the communications between honest entities,
  and the adopted cryptographic primitives are secure.
 The software stack of an honest entity is correctly implemented,
-     to transmits messages to receivers as expected.
+     to transmit messages to receivers as expected.
 
 UPPRESSO is designed for users who care about privacy,
 so a user never authorizes the IdP to enclose any \emph{distinctive} attributes in identity tokens,
@@ -79,8 +79,8 @@ So the privacy leakage due to re-identification by distinctive attributes across
 
 We focus on the privacy threats introduced by SSO services.
 The traffic analysis tracking a user's activities from network packets
-    and the active account linkage through web pages,
-        exist in SSO scenarios but also in all web applications.
+    and the active account linkage through malicious web pages,
+        exist in SSO scenarios but also in other web applications.
 If a user visits multiple RPs concurrently from one browser,
         a malicious RP might actively redirect his account to another RP server by crafted web pages.
 Such attacks will be prevented by other defenses \cite{FedCM},
