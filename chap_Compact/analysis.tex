@@ -5,39 +5,44 @@
 
 \subsection{Security}
 \label{analysis-security}
-UPPRESSO satisfies the security requirements of SSO identity tokens \cite{ArmandoCCCT08,FettKS16, FettKS17},
+UPPRESSO satisfies four security requirements of SSO identity tokens \cite{ArmandoCCCT08,FettKS16, FettKS17},
      as listed in Section \ref{subsec:basicrequirements}.
-\begin{itemize}
-\setlength{\topsep}{0pt}
-\setlength{\partopsep}{0pt}
-\setlength{\itemsep}{0pt}
-\setlength{\parsep}{0pt}
-\setlength{\parskip}{0pt}
-\item  \textbf{RP Designation}~~The RP (pseudo-)identity bound in the identity token
-     identifies the target RP, and only this RP.
-\item \textbf{User Identification}~~The user (pseudo-)identity bound in the identity token identifies
-        the authenticated user, and only this user.
-\item \textbf{Confidentiality}~~An identity token
-    is accessible to only
-                the authenticated user and the target RP, in addition to the IdP signing this token.
-\item \textbf{Integrity}~~An honest RP accepts only identity tokens binding its (pseudo-)identity and the authenticated user's (pseudo-)identity.
-           % and any forged or modified identity token will be rejected.
-\end{itemize}
+%\begin{itemize}
+%\setlength{\topsep}{0pt}
+%\setlength{\partopsep}{0pt}
+%\setlength{\itemsep}{0pt}
+%\setlength{\parsep}{0pt}
+%\setlength{\parskip}{0pt}
+%\item  \textbf{RP Designation}~~
+%\item \textbf{User Identification}~~
+%\item \textbf{Integrity}~~
+%           % and any forged or modified identity token will be rejected.
+%\item \textbf{Confidentiality}~~
+%\end{itemize}
+
+\vspace{1mm}
+\noindent\textbf{RP Designation.}~~The RP pseudo-identity $PID_{RP}$ in the identity token
+     is expected by the target RP with $ID_{RP}$, and only this RP.
+%That is,
+%    $PID_{RP}$ bound in an identity token is equal to $PID_{RP}$ expected by the target RP;
+% and $PID_{RP}$ expected by an RP with $ID_{RP}$,
+%    cannot be expected by another RP.
+
+\vspace{0.5mm}
+\noindent\emph{Proof.} 
+The identity token binds $PID_{RP} = [t]ID_{RP}$ which is expected by the target RP,
+    because $t$ is also sent to this RP with $ID_{RP}$
+     and this RP checks that $PID_{RP}$ is equal to $[t]ID_{RP}$.
 
 
-\noindent\textbf{RP Designation.}
-The identity token binds $PID_{RP}$ identifying the target RP,
-    because $t$ is sent to the target RP with $ID_{RP}$ and $PID_{RP} = [t]ID_{RP}$.
-
-
-Next, based on the ECDLP
+Based on the ECDLP
     we prove that,
-    for an adversary,
+    for adversaries,
         the probability of finding $t$ and $t'$
     satisfying $[t]ID_{RP_j} = [t']ID_{RP_{j'}}$ is negligible,
     where $RP_j$ and $RP_{j'}$ are any two RPs in the finite set of RPs (i.e.,
     $ID_{RP_j} = [r_j]G$ and $ID_{RP_{j'}} = [r_{j'}]G$, while $r_j$ and $r_{j'}$ are kept secret to adversaries).
-This negligible probability means the token designates \emph{only} the target RP.
+This negligible probability means the token binding $PID_{RP_j} = [t]ID_{RP_j}$ designates \emph{only} the target RP with $ID_{RP_j}$.
 
 Let $\mathbb{E}$ be an elliptic curve, %over a finite field $\mathbb{F}_q$,
     $G$ be a point on $\mathbb{E}$ of order $n$,
@@ -122,17 +127,34 @@ Thus, the probability of finding $t$ and $t'$ satisfying that $[t]ID_{RP_j} = [t
 %Because (\emph{a}) both $PID_{RP}$ and $H(t)$ in the registration result are checked by the RP and then (\emph{b}) the registration result $[PID_{RP}, H(t), Validity]_{SK}$ is acceptable to only one honest RP,
 %            the identity token designates only one RP.
 
+\vspace{1mm}
+\noindent\textbf{User Identification.}~~The user pseudo-identity $PID_U$ in the identity token identifies
+        the authenticated user with $ID_U$,% as $Acct = [ID_U][ID_{RP}]$,
+         and only this user,  at the target RP with $ID_{RP}$.
+%That is,
+%in UPPRESSO, $Acct$ identifies the mapping $[ID_u][ID_{RP}]$.
+
 \vspace{0.5mm}
-\noindent\textbf{User Identification.}
-Given a user, an honest RP with $ID_{RP}$ always deterministically derives an \emph{identical} account from \emph{different} identity tokens binding $PID_U$ and $PID_{RP}$.
-That is,
-    in the user's any $i$-th and $i'$-th ($i \neq i'$) login instances to the RP,
+\noindent\emph{Proof.}
+$PID_U$ in identity token binds identifies the authenticated user as $Acct = [ID_U][ID_{RP}]$
+    at the RP with $ID_{RP}$ as below.
+$PID_U$ is calculated by the IdP based on the user authenticated as $ID_U = u$,
+    and $PID_U = [ID_U]PID_{RP}$.
+The  RP checks that $PID_{RP} = [t]ID_{RP}$ 
+    and then calculates $Acct = [t^{-1}]PID_U = [t^{-1}][ID_U]PID_{RP} = [t^{-1}][ID_U][t]ID_{RP} = [ID_U]ID_{RP}$.
+%$t$ and $PID_{RP}$ have been checked by the honest RP in the $PID_{RP}$-registration result,
+Thus, given a user with $ID_U$, an RP with $ID_{RP}$ always derives an \emph{identical} account from different identity tokens, % binding $PID_U$ and $PID_{RP}$.
+because in the user's any $i$-th and $i'$-th ($i \neq i'$) login instances to the RP,
  $\mathcal{F}_{Acct}(PID_{U}^i, PID_{RP}^i) = \mathcal{F}_{Acct}(PID_{U}^{i'}, PID_{RP}^{i'}) = [ID_U]ID_{RP}$.
 
-In the calculation of $Acct = [t^{-1}]PID_U = [t^{-1}][u]PID_{RP}$,
-%$t$ and $PID_{RP}$ have been checked by the honest RP in the $PID_{RP}$-registration result,
-$PID_U$ is calculated by the honest IdP based on (\emph{a}) the authenticated user, i.e., $ID_U = u$, and (\emph{b}) the received $PID_{RP}$, which it is checked by the target RP based on $ID_{RP}$ and $t$.
-Thus, the calculated account is always exactly the authenticated user's account at the RP (i.e., $[ID_U]ID_{RP}$).
+$Acct =  [ID_U]ID_{RP}$ identifies \emph{only} this user,
+    because 
+$\mathbb{E}$ is a finite cyclic group
+    and then $ID_{RP} = [r]G$ is also a generator of order $n$.
+Thus, given any RP,
+    $[u]ID_{RP}$ automatically assigns a \emph{unique} account to every user,
+        provided that $1 \leq u < n$ and $ID_U = u$ is unique.
+
 %Moreover, adversary may try to provide the
 %However, according to the proof of RP designation, there would not be the generated $t$ and $t'$ happening to satisfy that $PID_{RP} = [t]ID_{RP_j} = [tr]G = [t'r']G = [t']ID_{RP_{j'}}$.
 
@@ -164,26 +186,12 @@ Thus, the calculated account is always exactly the authenticated user's account 
 %     so it cannot construct an identity token acceptable to the RP.
 %
 
-\vspace{0.5mm}
-\noindent\textbf{Confidentiality.}
-No event leaks an identity token to any malicious entity other than the authenticated user and the designated RP.
-First of all, the communications among the IdP, RPs and users,
-    are protected by HTTPS,
-    and the \verb+postMessage+ HTML5 API ensures the dedicated channels between two scripts within the browser,
-    so no other entities can eavesdrop the identity tokens.
-Further, the IdP sends an identity token only to the authenticated user
-        (i.e., the IdP script).
-The IdP script forwards the token to the RP script
- only if it is downloaded from the same origin as $Enpt_{RP}$,
-and the binding of $Enpt_{RP}$ and $ID_{RP}$ is ensured by a signed RP certificate.
-  %  which is verified by the IdP script.
-So only the RP that owns $Enpt_{RP}$ and $ID_{RP}$,
-    receives this token.
-
-
 %The detailed process of proof is shown in Appendix.
+\vspace{1mm}
+\noindent\textbf{Integrity.}~~An honest RP accepts only identity tokens binding its pseudo-identity and the authenticated user's pseudo-identity.
+
 \vspace{0.5mm}
-\noindent\textbf{Integrity.}
+\noindent\emph{Proof.}
 The identity token binds $Acct$ and $ID_{RP}$ implicitly,
     and any breaking results in some failed checking or verification in the login flow.
 %It is ensured by the IdP's signatures:
@@ -200,8 +208,31 @@ Thus,
 
 %The detailed process of proof is shown in Appendix.
 
+\vspace{1mm}
+\noindent\textbf{Confidentiality.}~~An identity token
+    is accessible to only
+                the authenticated user and the target RP, in addition to the IdP signing this token.
+In UPPRESSO, .
+
 \vspace{0.5mm}
-Finally, we analyzed the security properties of UPPRESSO, %especially confidentiality and integrity,
+\noindent\emph{Proof.}
+No event leaks an identity token to any malicious entity other than the authenticated user and the designated RP.
+First of all, the communications among the IdP, RPs and users,
+    are protected by HTTPS,
+    and the \verb+postMessage+ HTML5 API ensures the dedicated channels between two scripts within the browser,
+    so no other entities can eavesdrop the identity tokens.
+Further, the IdP sends an identity token only to the authenticated user
+        (i.e., the IdP script).
+The IdP script forwards the token to the RP script
+ only if it is downloaded from the same origin as $Enpt_{RP}$,
+and the binding of $Enpt_{RP}$ and $ID_{RP}$ is ensured by a signed RP certificate.
+  %  which is verified by the IdP script.
+So only the RP that owns $Enpt_{RP}$ and $ID_{RP}$,
+    receives this token.
+
+
+\vspace{0.5mm}
+Finally, we also analyzed the security properties of UPPRESSO, %especially confidentiality and integrity,
      based on a Dolev-Yao style model \cite{SPRESSO}.
 % which has been used in the formal analysis of SSO protocols such as OAuth 2.0 \cite{FettKS16} and OIDC \cite{FettKS17}.
 The model abstracts the entities in a web system,
@@ -259,7 +290,7 @@ Besides, $t$ is proved unaccessible to the IdP, which is necessary for user priv
 \label{sec-:analysis}
 UPPRESSO effectively prevents the privacy threats of IdP-based login tracing and RP-based identity linkage.
 
-\vspace{0.5mm}
+\vspace{1mm}
 \noindent\textbf{IdP-based Login Tracing.}
 The information accessible to the IdP and derived from the RP's identity,
     is only $PID_{RP}$, where $PID_{RP} = [t]ID_{RP}$ is calculated by the user.
@@ -272,7 +303,7 @@ is indistinguishable from a variable randomly chosen from $\mathbb{E}$,
 So, the IdP cannot infer the RP's identity or link any pair of $PID_{RP}^i$ and $PID_{RP}^{i'}$,
     and then the IdP-based login tracing is impossible.
 
-\vspace{0.5mm}
+\vspace{1mm}
 \noindent\textbf{RP-based Identity Linkage.}
 We prove UPPRESSO prevents the RP-based identity linkage,
  based on the elliptic curve decision Diffie-Hellman (ECDDH) assumption. %\cite{GoldwasserK16}.
