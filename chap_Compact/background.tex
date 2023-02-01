@@ -10,9 +10,10 @@ OIDC is one of the most popular SSO protocols.
 Users and RPs initially register at an IdP with their identities
 and other information such as user credentials (e.g., passwords)
 and RP endpoints (i.e., the URLs to receive tokens).
-It supports three types of login flows, i.e., implicit flow, authorization code flow, and hybrid flow (a mix-up of the other two).
+It supports three types of login flows, i.e., implicit flow, authorization code flow,
+ and hybrid flow (a mix-up of the other two).
 They work with different steps to request/receive identity tokens, but share the common security requirements of identity tokens.
-Next, we focus on the implicit flow to present our designs. In Section \ref{sec:discussion} we discuss the supports for the authorization code flow.
+Next, we focus on the implicit flow to present our designs. Section \ref{sec:discussion} discusses the supports for the authorization code flow.
 
 \begin{figure}[t]
   \centering
@@ -27,7 +28,8 @@ After authenticating the user, the IdP issues an identity token that will be for
 The token contains the identities (or pseudo-identities) of user and RP,
         a validity period, the requested user attributes, etc.
 Finally, the RP verifies the received identity token and allows the user to login as the  enclosed (pseudo-)identity.
-The user's operations including redirection, authorization, and forwarding are implemented in user agents (e.g., a browser for web applications).
+The user's operations including redirection, authorization, and forwarding,
+    are implemented in user agents (e.g., a browser for web applications).
 
 
 \begin{table*}[tb]
@@ -120,7 +122,7 @@ When issuing an identity token,
         an IdP encloses a user PPID (but not the identity at the IdP).
 Given a user, the IdP assigns a unique PPID based on the target RP.
 So colluding RPs cannot link the user identities (or accounts).
-PPIDs cannot prevent the IdP-based login tracing because the IdP needs the RP's identity to issue tokens.
+PPIDs cannot prevent the IdP-based login tracing because the IdP needs the RP's identity to assign PPIDs.
 
 
 
@@ -128,7 +130,8 @@ Several solutions prevent the IdP-based login tracing but are vulnerable to the 
 In BrowserID \cite{BrowserID} (formerly known as Firefox Accounts \cite{FirefoxAccount} and Mozilla Persona \cite{persona}), an IdP %(called the primary identity authority in BrowserID)
 issues a special token (called user certificate) to bind a user identity to an ephemeral public key.
 With the corresponding private key, the user signs a ``subsidiary'' token (called identity assertion) to bind a target RP's identity and sends both tokens to the RP.
-In SPRESSO \cite{SPRESSO} an RP creates a verifiable one-time pseudo-identity for itself in each login, which is enclosed in the identity token issued by an IdP. %and the user identity.
+In SPRESSO \cite{SPRESSO} an RP creates a verifiable one-time pseudo-identity for itself in each login instance,
+ which is enclosed in the identity token issued by an IdP. %and the user identity.
 A PRIMA IdP signs a credential
 %\footnote{For the message signed by the IdP works with a user secret verified by an RP,
 %    it is usually called a credential  in identity federation instead of token.}
@@ -162,7 +165,7 @@ NEXTLEAP \cite{nextleap} builds anonymous messaging on top of UnlimitID.
 
 
 Anonymous credentials \cite{anon-credential-2001,anon-credential} are used in flexible ways.
-Opaak \cite{Opaak} keeps IdP-signed anonymous credentials %in mobile phones
+Opaak \cite{Opaak} designs IdP-signed anonymous credentials %in mobile phones
  as pseudonym tokens,
     which bind a user's secret key.
 Idemix anonymous credentials \cite{idemix}

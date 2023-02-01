@@ -29,7 +29,7 @@ UPPRESSO satisfies four security requirements of SSO identity tokens \cite{Arman
 %    cannot be expected by another RP.
 
 \vspace{0.5mm}
-\noindent\emph{Proof.} 
+\noindent\emph{Proof.}
 $PID_{RP} = [t]ID_{RP}$ in the the identity token is expected by the target RP,
     because $t$ is also sent to this RP with $ID_{RP}$
      and this RP checks that $PID_{RP}$ is equal to $[t]ID_{RP}$.
@@ -140,7 +140,7 @@ $PID_U$ in identity token identifies the authenticated user as $Acct = [ID_U][ID
     at the RP with $ID_{RP}$ as below.
 $PID_U$ is calculated by the IdP based on the user authenticated as $ID_U = u$,
     and $PID_U = [ID_U]PID_{RP}$.
-The  RP checks that $PID_{RP} = [t]ID_{RP}$ 
+The  RP checks that $PID_{RP} = [t]ID_{RP}$
     and then calculates $Acct = [t^{-1}]PID_U = [t^{-1}][ID_U]PID_{RP} = [t^{-1}][ID_U][t]ID_{RP} = [ID_U]ID_{RP}$.
 %$t$ and $PID_{RP}$ have been checked by the honest RP in the $PID_{RP}$-registration result,
 Thus, given a user with $ID_U$, an RP with $ID_{RP}$ always derives an \emph{identical} account from different identity tokens, % binding $PID_U$ and $PID_{RP}$.
@@ -298,9 +298,10 @@ Finally, $t$ is proved unaccessible to the IdP by this model,
 UPPRESSO effectively prevents the privacy threats of IdP-based login tracing and RP-based identity linkage.
 
 The information accessible to the IdP and derived from the RP's identity,
-    is only $PID_{RP}$ in identity-token requests, where $PID_{RP} = [t]ID_{RP}$ is calculated by the user and $t$ is kept secret to the IdP.
-So the prevention against the IdP-based login tracing
-    is expressed as below.
+    is only $PID_{RP}$ in identity-token requests, where $PID_{RP} = [t]ID_{RP}$ is calculated by a user.
+    % and $t$ is kept secret to the IdP.
+So the prevention against the IdP-based login tracing in UPPRESSO
+    is expressed formally as below.
 
 \vspace{1mm}
 \noindent\textbf{Privacy against the IdP.}~~The IdP
@@ -312,14 +313,14 @@ So the prevention against the IdP-based login tracing
 \noindent\emph{Proof.}
 Because (\emph{a}) $ID_{RP} = [r]G$ is also a generator of order $n$,
         where $G$ is a generator of finite cyclic group $\mathbb{E}$,
-    and (\emph{b}) $t$ is a random number from $\mathbb{Z}_n$ and unknown to the IdP,
+    and (\emph{b}) $t$ is a random number in $\mathbb{Z}_n$ and kept unknown to the IdP,
  from the IdP's view,
  $PID_{RP}$
 is \emph{indistinguishable} from a random variable on $\mathbb{E}$.
-Thus, 
+Thus,
     the IdP cannot infer any information about $ID_{RP}$ from $PID_{RP} = [t]ID_{RP}$,
 or distinguish $[t]ID_{RP_j} = [tr]G$ from any other $[t']ID_{RP_{j'}} = [t'r']G$.
-So the IdP-based login tracing is computationally impossible. $\square$
+So the IdP-based login tracing is impossible. $\square$
 
 \vspace{1mm}
 In every login instance,
@@ -328,12 +329,12 @@ In every login instance,
 After filtering out the redundant information (i.e., $PID_{RP}= [t]{ID_{RP}}$ and $Acct = [t^{-1}]PID_{U}$),
     the RP actually receives $(ID_{RP}, t, Acct) = ([r]G, t, [ur]G)$.
 So the prevention against the RP-based identity linkage in UPPRESSO is expressed
-    as below.
+    formally as below.
 
 \vspace{1mm}
 \noindent\textbf{Privacy against colluding RPs.}~~After
  collecting the information of login instances by $v$ users,
-$c$ colluding RPs cannot decide whether a login instance to another RP is launched by one of these $v$ users or not,
+$c$ colluding RPs cannot decide whether a login instance to another RP is initiated by one of these $v$ users or not,
     where
     the collected login instances are denoted as $\mathfrak{L}=\left\{ \begin{matrix}
 L_{1,1}, & L_{1,2}, & \cdots, & L_{1,c}\\
@@ -347,7 +348,7 @@ L_{v,1}, & L_{v,2}, & \cdots, & L_{v,c}
 \vspace{0.5mm}
 \noindent\emph{Proof.}
 We prove this privacy property,
- based on the elliptic curve decision Diffie-Hellman (ECDDH) assumption. %\cite{GoldwasserK16}.
+ based on the elliptic curve decisional Diffie-Hellman (ECDDH) assumption. %\cite{GoldwasserK16}.
 %That is, while there is the login to an RP, for colluded RPs, they cannot decide whether this login and any logins to other RPs are from the same user.
 %
 Let $\mathbb{E}$ be an elliptic curve,
@@ -423,7 +424,7 @@ The ECDDH assumption means that in $\mathcal{G}_r$ the adversary does not have a
     i.e., cannot distinguish a user $U'$ chosen from \{${U_1}, {U_2}, \cdots, {U_v}$\}
         or randomly from the universal user set.
 %    (indistinguishability of users to colluding RPs).
-So the RP-based identity linkage is computationally impossible. $\square$
+So the RP-based identity linkage is impossible. $\square$
 
 %    the adversary will have non-negligible advantages in $\mathcal{G}$
 %        and $Pr_s$ is non-negligible.

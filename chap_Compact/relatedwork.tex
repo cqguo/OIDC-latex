@@ -18,32 +18,32 @@ The user then utilizes $e$ to obtain $T^k$ from $T^{ek}$, so only ($T, T^{k}$) i
 Similar cryptographic skills are adopted in UPPRESSO:
     a user transforms $ID_{RP}$ to $PID_{RP} = [t]ID_{RP}$ by a random number $t$,
  and $PID_{RP}$ is transformed again by an IdP to $[tu]ID_{RP}$.
-The visited RP calculates $Acct = [u]ID_{RP}$ from $[tu]ID_{RP}$ and $t$
+The visited RP calculates $Acct = [u]ID_{RP}$ from $[tu]ID_{RP}$ by using $t$
  (see Table \ref{tbl:notations-protocol} for detailed descriptions of these notations).
 
 UPPRESSO differs from PrivacyPass and TrustToken as below.
 Firstly,
-    PrivacyPass and TrustToken work as anonymous SSO to some extent, because one consistent key works for all users,
-while UPPRESSO identifies each user at the RPs.
+    PrivacyPass and TrustToken work as anonymous SSO to some extent, where one consistent private key serves all users,
+but UPPRESSO identifies each user at an RP.
 Secondly,
-   the arguments of similar cryptographic skills are utilized differently.
-UPPRESSO integrates identity transformations in SSO:
+   the cryptographic skills are differently utilized.
+UPPRESSO integrates them to transform identities in SSO:
 scalar $u$ is known by the IdP and a user as his user identity, and
 random $t$ is shared by the user and the RP. However,
 exponent $k$ is held only by the PrivacyPass/TrustToken server as a key,
  and random $r$ is only known to a user.
-Finally,
+Lastly and most importantly,
 more privacy requirements are satisfied in UPPRESSO.
 The unlinkability between %token signing and redemption \cite{privacypass,trusttoken}, or
  ($T, T^k$) and ($T^r, T^{rk}$),
 roughly corresponds to only the IdP-untraceability in UPPRESSO:
- an IdP cannot link any pair of $[t_i]ID^i_{RP}$,
+ an IdP cannot link any pair of $[t_i]ID_{RP}$,
  $i = 1, 2, \cdots$.
-UPPRESSO also supports the unlinkability across RPs:
+We also supports the unlinkability across RPs:
 given multiple users, e.g., identified as $u$ and $u'$,
     ($ID_{RP}, t, [u]ID_{RP}$) and ($ID_{RP'}, t', [u']ID_{RP'}$) are indistinguishable to
     colluding RPs.
-PrivacyPass and TrustToken do not consider this property.
+PrivacyPass and TrustToken do not consider this property of the cryptographic skills.
 
 \noindent\textbf{Anonymous SSO.}
 Such schemes allow authenticated users to access a service protected by an IdP,
@@ -53,18 +53,18 @@ Anonymous SSO was proposed for GSM communications \cite{ElmuftiWRR08},
 Privacy-preserving primitives, such as group signature, zero-knowledge proof, Chebyshev Chaotic Maps and proxy re-verification,
      were adopted to design anonymous SSO \cite{WangWS13,HanCSTW18,Lee18,HanCSTWW20}.
 Anonymous SSO schemes work for some applications,
-    but are \emph{unapplicable} in most systems that require user identification for customized services.
+    but are unapplicable in most systems that require user identification for customized services.
 
 \noindent\textbf{Privacy-Preserving Credential.}
-ZKlaims \cite{zklaim} allows users to prove statements on the credentials issued by a trusted party
+ZKlaims \cite{zklaim} allows users to prove statements on the credentials issued by a server
     using zero-knowledge proofs,
         but the credential contents are not revealed.
 Crypto-Book \cite{crypto-book} coordinates servers to generate a ring-signature private key,
- and a user picks up his private key through a list of Email addresses (i.e., an anonymity set).
- Then the key pair works as an untraceable pseudonym to sign messages.
+ and a user picks up his key through a list of Email addresses. % (i.e., an anonymity set).
+ Then the key pair works as an untraceable pseudonym. %to sign messages.
 Two-party threshold schemes are implemented with a central server,
-    to protect user private keys \cite{mRSA,ss-rsa}:
-    to sign or decrypt a message, a user needs a token from the server.
+    to protect a user's private keys \cite{mRSA,ss-rsa}:
+    to sign/decrypt a message, a user needs a token from the server.
     Tandem \cite{tandem} decouples the obtaining and using of such tokens,
 for the privacy of key usage.
 
@@ -121,7 +121,7 @@ If a user is compromised,
     attackers will login to RPs on behalf of him.
 Single sign-off helps the victim user
  to revoke all his tokens accepted and logout from the RPs  \cite{GhasemisharifRC18}.
-FedCM \cite{FedCM} attempts to disable iframe and third-party cookies in SSO, which migth be exploited to track users.
+FedCM \cite{FedCM} attempts to disable iframe and third-party cookies in SSO, which might be exploited to track users.
 %UPRRSSO protects privacy in SSO through ID transformations and our prototype does NOT use either iframe or third-party cookies.
 
 %以下内容被拆分到上面三点内容了，但是注释内容有对论文的详细表述

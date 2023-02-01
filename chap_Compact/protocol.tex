@@ -16,9 +16,9 @@ Table \ref{tbl:notations-protocol} lists the notations,
     \begin{tabular}{|p{1.0cm}|p{6.60cm}|} \hline
     {\textbf{Notation}} & {\textbf{Description}} \\ \hline
     {$\mathbb{E}$, $G$, $n$} & {$\mathbb{E}$ is an elliptic curve over a finite field $\mathbb{F}_q$. $G$ is a base point (or generator) of $\mathbb{E}$, and the order of $G$ is a prime number $n$.} \\ \hline
-    {$ID_U$} & {$ID_U = u$, $u \in [1, n)$; the user's unique identity at the IdP.} \\ \hline
-   {$ID_{RP_j}$} & {$ID_{RP} = [r]G$, the $j$-th RP's unique identity; $r \in [1, n)$, but unknown to the RP.} \\ \hline
-    {$t$} & {A user-generated random integer in a login instance, $t \in [1, n)$.} \\ \hline
+    {$ID_U$} & {$ID_U = u$, $u \in [1, n)$; the user's unique identity at the IdP, unknown to RPs.} \\ \hline
+   {$ID_{RP_j}$} & {$ID_{RP} = [r]G$, the $j$-th RP's unique identity; $r \in [1, n)$, unknown to the RP.} \\ \hline
+    {$t$} & {A user-generated random integer in a login instance; $t \in [1, n)$, kept secret to the IdP.} \\ \hline
     {$PID_{RP_j}^i$} & {$PID_{RP} = [t]{ID_{RP}} = [tr]G$; the $j$-th RP's pseudo-identity, in the user's $i$-th login instance to this RP.} \\ \hline
     {$PID_{U,j}^i$} & {$PID_U = [{ID_U}]{PID_{RP}} = [utr]G$; the user's pseudo-identity, in the user's $i$-th login instance to the $j$-th RP.} \\ \hline
      {$Acct_j$} & {$Acct = [t^{-1}\bmod n]PID_{U} = [ID_U]ID_{RP} = [ur]G$; the user's account at the $j$-th RP.} \\ \hline
@@ -77,9 +77,11 @@ The RP derives an \emph{identical permanent} account from the identity tokens in
     with the help of $t$. %from the user.
 Given a user, the accounts at different RPs are inherently unique;
 while, given an RP, the accounts of different users are also unique.
-It is impossible for the RP to derive $ID_U$ from either $PID_U$ or $Acct$ due to the elliptic curve discrete logarithm problem (ECDLP),
-    and for the IdP to learn $ID_{RP}$ from $PID_{RP}$ because $t$ is random in $\mathbb{Z}_n$
-     and $PID_{RP}$ is indistinguishable from a random variable on $\mathbb{E}$ from the IdP's view.
+It is impossible for the RP to derive $ID_U$ from either $PID_U$ or $Acct$ due to the elliptic curve discrete logarithm problem (ECDLP).
+Because $t$ is random in $\mathbb{Z}_n$ and unknown to the IdP,
+from the IdP's view,
+    $PID_{RP}$ is indistinguishable from a random variable on $\mathbb{E}$,
+    and the IdP learns nothing about $ID_{RP}$ from $PID_{RP}$.
 
 Note that $r$ is kept secret to the RP; otherwise, two colluding RPs with $ID_{RP_j} = [r]G$ and $ID_{RP_{j'}} = [r']G$ could link a user's accounts by checking whether $[r']Acct_j = [r]Acct_{j'}$ or not.
 
@@ -87,10 +89,12 @@ A user generates $t$ and calculates $PID_{RP} = [t]ID_{RP}$.
 After receiving $t$ from and extracting $PID_{RP}$ from the token,
     an RP checks that $PID_{RP} = [t]ID_{RP}$,
         because the correct account is derived only when this equation holds;
-        otherwise, a user $U$ might send $t' \neq t$ to login as another user's account,
-            while the calculated account $Acct^* =  [t'^{-1}]PID_{U} = [t'^{-1}t][ID_U]ID_{RP}$ 
+        otherwise, a user $U$ might send $t' \neq t$ to login as another account,
+            while the calculated account $Acct^* =  [t'^{-1}]PID_{U} = [t'^{-1}t][ID_U]ID_{RP}$
                 cannot be purposefully manipulated
         due to the ECDLP.
+See Section \ref{sec:discussion} for more discussions about this checking by RPs.
+
 
 On the contrary,
     if $t$ is generated and $PID_{RP}$ is calculated by the RP,
@@ -103,11 +107,11 @@ Then it colludes with a malicious RP denoted as $RP'$,
 Without checking $PID_{RP} = [t']ID_{RP'}$,
     this honest user will present a token binding $PID_U$ and $PID_{RP}$ to the malicious RP.
 This token will enable $U'$ to login as the honest user's account at the honest RP.
-In other words, this checking ensures RP designation,
-    because it is impossible to find $t$ and $t'$ satisfying that
-    $[t]ID_{RP} = [t']ID_{RP'}$,
-        when $ID_{RP} = [r]G$, $ID_{RP'} = [r']G$, but $r$ and $r'$ are unknown.
-See Section \ref{sec:analysis} for the detailed proofs of security and privacy.
+%In other words, this checking ensures RP designation,
+%    because it is impossible to find $t$ and $t'$ satisfying that
+%    $[t]ID_{RP} = [t']ID_{RP'}$,
+%        when $ID_{RP} = [r]G$, $ID_{RP'} = [r']G$, but $r$ and $r'$ are unknown.
+%See Section \ref{sec:analysis} for the detailed proofs of security and privacy.
 
 
 
@@ -120,7 +124,7 @@ First of all, in UPPRESSO an IdP is not aware of visited RPs,
 On the contrary,
     in commonly-used SSO protocols \cite{OpenIDConnect,rfc6749,SAML,SAMLIdentifier} an IdP needs this information to ensure \emph{confidentiality} of identity tokens.
 For instance, in the OIDC services, when an RP registers itself at the IdP, the \verb+redirect_uri+ parameter
-    is set as the endpoint URL to receive tokens  \cite{OpenIDConnect}.
+    is set as its endpoint URL to receive tokens  \cite{OpenIDConnect}.
 When the IdP is transmitting identity tokens to an RP,
     it utilizes HTTP 302 redirection with this endpoint as the target URL in HTTP responses,
      so a browser forwards it to the designated RP.
@@ -131,65 +135,65 @@ and the scripts downloaded from an honest entity are also \emph{honest}.
 Two scripts are from the visited RP and the IdP, %respectively,
     and each is responsible for the communications with the origin web server.
 Only the RP script is not enough to implement a user agent;
-    otherwise, the script will leak its origin to the IdP web server
-    (e.g.,
-    an identity-token request sent by the RP script will
-automatically carry an HTTP \verb+referer+ header that discloses the RP domain).
+    otherwise, the script will leak its origin to the IdP web server,
+    because
+    an HTTP request sent by the RP script
+automatically carries an HTTP \verb+referer+ header that discloses the RP's domain.
 Moreover, a trusted script from the honest IdP
 ensures confidentiality of identity tokens (i.e., a token is sent to only the designated RP)
-and interacts with users for the authorization of user attributes,
+and interacts with users for attribute authorization,
     for the RP (and also the RP script) might be malicious.
-Thus, on receiving a request with the \verb+referer+ header,
-    the IdP checks that it is sent from the IdP script.
+Thus, on receiving an identity-token request,
+    the IdP checks the \verb+referer+ header to ensure it is sent by the IdP script.
 
 The RP script prepares $ID_{RP}$ and $Enpt_{RP}$ for the IdP script, through \emph{RP certificates}.
 An RP certificate is signed by the IdP during the RP registration,
      binding the RP's identity and its endpoint. % (i.e., $ID_{RP}$ and $Enpt_{RP}$).
 In a login instance
-    the RP will provide its certificate through the RP script, to the IdP script.
+    the RP provides its certificate through the RP script, to the IdP script.
 The IdP script %from the honest IdP,
     verifies the RP certificate to extract $ID_{RP}$ and $Enpt_{RP}$.
 The IdP's public key is set in the IdP script, so
- a user does not configure anything \emph{locally},
+ a user does not configure anything locally,
     as it does in popular SSO systems \cite{OpenIDConnect, rfc6749, SAML,SAMLIdentifier}.
 
 %Thus, to avoid the IdP server obtaining any evidence about the RP's identity and provide IdP's script with the RP certificate, the RP's script is also required to transmit the certificate to IdP script after it is downloaded from IdP server.
-
-As mentioned above,
-    a user needs to calculate (or check) $PID_{RP} = [t]ID_{RP}$,
-    so this function should be implemented correctly by \emph{honest} scripts.
-Thus, $t$ is generated in the IdP script,
-    and used to calculate $PID_{RP}$ with $ID_{RP}$ extracted from $Cert_{RP}$.
-Since $ID_{RP} = [t^{-1}\bmod n]PID_{RP}$,
-    this design relies on an honest IdP that does not steal $t$ or $ID_{RP}$ through malicious scripts.
-This leakage risk may be mitigated %by silently conducting these operations when the user visits the RP website, or
-    by implementing a user agent with browser extensions,
-but users need to install the extension before visiting RPs.
 
 %A zero-knowledge proof may be designed,
 %    the IdP script checks that the RP knows $t$ satisfying $PID_{RP} = [t]ID_{RP}$,
 %    but knowing nothing about $t$ but only $PID_{RP}$.
 
 
-After calculating $PID_{RP}$
-    and receiving an identity token from the IdP,
-    the IdP script needs to ensure the RP script will forward this token to $Enpt_{RP}$
-        which is bound with $ID_{RP}$ in the RP certificate.
+After %calculating $PID_{RP}$ and
+ receiving an identity token from the IdP,
+    the IdP script needs to ensure the RP script will forward this token to $Enpt_{RP}$,
+        which is bound along with $ID_{RP}$ in the RP certificate.
 The scripts communicate with each other within the user browser through the \verb+postMessage+ HTML5 API,
 %To avoid the honest user sending the identity token to an adversary,
 and the receiver (i.e., the RP script)
- is restricted by the \verb+postMessage+ targetOrigin mechanism \cite{postm-targeto}.
-When the IdP script sends messages,
+ is restricted by the \verb+postMessage+ targetOrigin mechanism \cite{postm-targeto}:
+when the IdP script sends messages,
  the receiver's origin is set as a parameter,
   e.g., \verb+postMessage(tkn, 'https://RP.com')+.
 It consists of
-    the protocol (i.e., \verb+https://+),
+    the protocol (i.e., \verb+https+),
     the domain  (i.e., \verb+RP.com+)
     and a port which may be implicit.
-So only the script downloaded from this targetOrigin is a legitimate receiver.
+Only the script downloaded from this targetOrigin is a legitimate receiver.
 
 %The \emph{RP certificates} deals with the problem of mapping an identity proof with its targeting RP.
 %That is, the IdP script derives the RP's $ID_{RP}$ and origin from the RP certificate, while the $PID_{RP}$ is generated with this $ID_{RP}$. Thus, the IdP script always know the targeting RP of an identity proof, therefore, the \verb+postMessage+ mechanism can guarantee that the identity proof would not be sent to the adversary.
+
+As mentioned above,
+    a user needs to calculate (or check) $PID_{RP} = [t]ID_{RP}$,
+    so this function should be implemented by \emph{honest} scripts.
+Thus, $t$ is generated in the IdP script,
+    and used to calculate $PID_{RP}$ with $ID_{RP}$ which is extracted from $Cert_{RP}$.
+Since $ID_{RP} = [t^{-1}\bmod n]PID_{RP}$,
+    this design relies on an honest IdP that does not steal $t$, $ID_{RP}$ or the RP's domain through malicious scripts.
+This leakage risk may be mitigated %by silently conducting these operations when the user visits the RP website, or
+    by implementing a user agent with browser extensions,
+but users need to install the extension before visiting RPs.
 
 Finally,
     the browser downloads the RP script when visiting an RP,
@@ -199,8 +203,9 @@ Generally, when a browser window visits another website not belonging to its ope
  the HTTP request to this website automatically carries a \verb+referer+ header (i.e., the opener's origin).
 Such an HTTP header leaks the visited RP's domain to the IdP.
 Fortunately, in UPPRESSO this newly-opened window is a \emph{redirection} from the RP to the IdP,
- but not a direct visit by the browser (Figure \ref{fig:process}, Steps 1.2-1.3).
-This leakage is prevented by setting an \verb+referrer-policy=no-referrer+ header in the HTTP response from the RP, when it is redirected to the IdP.
+ but not a direct visit by browsers (Figure \ref{fig:process}, Steps 1.2-1.3).
+This leakage is prevented by setting a \verb+referrer-policy=no-referrer+ header in the HTTP response from the RP,
+ as it is redirected to the IdP.
 So the HTTP request to download the IdP script carries no \verb+referer+ header.
 This method is specified by W3C \cite{referer_policy} and widely supported.
 We tested it in browsers such as Chrome, Safari, Edge, Opera and Firefox, and confirmed no referer leakage.
@@ -389,7 +394,7 @@ The IdP script sends an identity-token request for $PID_{RP}$ on behalf of the u
 \item[3.2] The IdP authenticates the user, if not authenticated yet.
 
 \item [3.3]
-The IdP script obtains the user's authorization to enclose each attribute,
+The IdP script obtains the user's authorization for each requested attribute,
     and sends the scope of authorized attributes. % to the IdP.
 The IdP %checks that the received $PID_{RP}$ is a point on $\mathbb{E}$,
     calculates $PID_U = [ID_U]{PID_{RP}}$, % for the user,
@@ -424,9 +429,9 @@ If any verification or checking fails,
      this login flow will be halted immediately.
 For example, the user halts it
     on an invalid $Cert_{RP}$.
-The IdP rejects an identity-token request, if the received $PID_{RP}$ is not on the elliptic curve $\mathbb{E}$.
+The IdP rejects an identity-token request, if the received $PID_{RP}$ is not a point on $\mathbb{E}$.
 Or, the RP rejects an identity token
-    when $PID_{RP}$ in it does not match the negotiated one.
+    if the signature is invalid or $PID_{RP}$ in it does not match the negotiated one.
 
 
 
@@ -445,7 +450,7 @@ On the contrary, in UPPRESSO the scripts hide $Enpt_{RP}$ from the IdP
 %    that to protect the identity token from being sent to adversaries. 这句话与Compatibility无关
 so the IdP does not set \verb+redirect_uri+ in the HTTP responses. % of identity tokens.
 Most operations of \emph{RP identity transformation} are conducted within browsers,
- while the RP only receives $t$ to prepare an RP identity
+ while the RP only receives $t$ to prepare an RP pseudo-identity
   and responds with  $Cert_{RP}$.
 %The calculation of $PID_{RP}$ is viewed as the operation to prepare an RP identity in OIDC,
 The static $Cert_{RP}$ is viewed as a supplementary message to users.
