@@ -18,7 +18,7 @@ For example, it might store all received messages
  to infer the relationship among $ID_U$, $ID_{RP}$, $PID_{U}$, and $PID_{RP}$.
  % to track a user's login activities.
 It never actively violates the protocols,
-so that a script downloaded from the IdP also strictly follows the protocols (see Section \ref{sec:web-design} about the specific designs
+so a script downloaded from the IdP also strictly follows the protocols (see Section \ref{sec:web-design} about the specific designs
     for web applications).
 The IdP maintains the private key well for signing identity tokens and RP certificates, %(see Section \ref{implementations} for details)
 so adversaries cannot forge such tokens or certificates.
@@ -54,13 +54,13 @@ For example, a malicious RP might collude with malicious users to steal another 
 Finally, we do \emph{not} consider the collusion of the IdP and RPs.
     If the IdP could collude with some RPs,
         a user will finish login flows completely with colluding entities
-        and then in principle we need a long-term user secret to protect (or transform) the permanent accounts at these RPs.
+        and then in principle we need a long-term user secret to protect (or transform) the permanent accounts across these RPs.
 This secret is held \emph{only} by the user;
     otherwise, the colluding IdP and RPs could always link these accounts.
 %Note that we aim to design a solution for SSO users without any non-ephemeral secret verified by the RPs.
 However, such accounts derived from the user secret have to be updated,
     if it is lost or leaked
-    (see discussions in Section \ref{sec:discussion} for details).
+    (see discussions in Section \ref{sec:discussion}).
 
 \subsection{Assumptions}
 HTTPS is adopted to secure the communications between honest entities,
@@ -76,12 +76,12 @@ A user does not configure  distinctive attributes at any RP, either.
 So the privacy leakage due to re-identification by distinctive attributes across RPs,
     is out of our scope.
 
-We focus on the privacy threats introduced by SSO services.
+We focus on the privacy threats introduced by SSO protocols.
 The traffic analysis tracking a user's activities from network packets
     and the active account linkage through malicious web pages,
-        exist in SSO scenarios but also in other web applications.
+        exist in SSO scenarios but also in other web systems.
 If a user visits multiple RPs concurrently from one browser,
         a malicious RP might actively redirect his account to another RP server by crafted web pages.
-Such attacks will be prevented by other defenses \cite{FedCM},
+Such attacks are prevented by other defenses \cite{FedCM},
     not considered in our work.
 
