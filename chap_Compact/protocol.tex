@@ -89,11 +89,13 @@ A user generates $t$ and calculates $PID_{RP} = [t]ID_{RP}$.
 After receiving $t$ from and extracting $PID_{RP}$ from the token,
     an RP checks that $PID_{RP} = [t]ID_{RP}$,
         because the correct account is derived only when this equation holds;
-        otherwise, a user $U$ might send $t' \neq t$ to login as another account,
-            while the calculated account $Acct^* =  [t'^{-1}]PID_{U} = [t'^{-1}t][ID_U]ID_{RP}$
-                cannot be purposefully manipulated
-        due to the ECDLP.
-See Section \ref{sec:discussion} for more discussions about this checking by RPs.
+        otherwise, attacks happen as below.
+To login as $Acct$ intentionally,
+        a malicious user with $ID_{U'} = u'$ might generate a random number $t'$,
+            and calculate $[t'u'^{-1}]Acct$ as $PID_{RP}$ to request an identity token.
+Then, the IdP calculates $PID_U = [u'][t'u'^{-1}]Acct = [t']Acct$.
+Without checking $PID_{RP} = [t']ID_{RP}$ or not,
+        the RP finally derives $[t'^{-1}]PID_U = Acct$ as the malicious user's account.
 
 
 On the contrary,
@@ -129,10 +131,10 @@ When the IdP is transmitting identity tokens to an RP,
     it utilizes HTTP 302 redirection with this endpoint as the target URL in HTTP responses,
      so a browser forwards it to the designated RP.
 
-In UPPRESSO such user-agent functions are implemented by web scripts within COTS browsers,
+In UPPRESSO such user-agent functions are implemented by web scripts in COTS browsers,
 and the scripts downloaded from an honest entity are also \emph{honest}.
 %Section \ref{sec:discussion} discusses more efficient but less portable implementations with browser extensions.
-Two scripts are from the visited RP and the IdP, %respectively,
+Two scripts are from the visited RP and the IdP respectively,
     and each is responsible for the communications with the origin web server.
 Only the RP script is not enough to implement a user agent;
     otherwise, the script will leak its origin to the IdP web server,
@@ -148,7 +150,7 @@ Thus, on receiving an identity-token request,
 
 The RP script prepares $ID_{RP}$ and $Enpt_{RP}$ for the IdP script, through \emph{RP certificates}.
 An RP certificate is signed by the IdP during the RP registration,
-     binding the RP's identity and its endpoint. % (i.e., $ID_{RP}$ and $Enpt_{RP}$).
+     binding the RP's identity and its endpoint. %(i.e., $ID_{RP}$ and $Enpt_{RP}$).
 In a login instance
     the RP provides its certificate through the RP script, to the IdP script.
 The IdP script %from the honest IdP,
@@ -190,8 +192,9 @@ As mentioned above,
 Thus, $t$ is generated in the IdP script,
     and used to calculate $PID_{RP}$ with $ID_{RP}$ which is extracted from $Cert_{RP}$.
 Since $ID_{RP} = [t^{-1}\bmod n]PID_{RP}$,
-    this design relies on an honest IdP that does not steal $t$, $ID_{RP}$ or the RP's domain through malicious scripts.
-This leakage risk may be mitigated %by silently conducting these operations when the user visits the RP website, or
+    this design relies on an honest IdP that does not steal $t$, $ID_{RP}$ or the RP's domain through malicious scripts,
+        for any of them leaks the RP identity.
+This leakage risk may be mitigated
     by implementing a user agent with browser extensions,
 but users need to install the extension before visiting RPs.
 
