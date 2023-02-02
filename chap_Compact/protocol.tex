@@ -16,9 +16,9 @@ Table \ref{tbl:notations-protocol} lists the notations,
     \begin{tabular}{|p{1.0cm}|p{6.60cm}|} \hline
     {\textbf{Notation}} & {\textbf{Description}} \\ \hline
     {$\mathbb{E}$, $G$, $n$} & {$\mathbb{E}$ is an elliptic curve over a finite field $\mathbb{F}_q$. $G$ is a base point (or generator) of $\mathbb{E}$, and the order of $G$ is a prime number $n$.} \\ \hline
-    {$ID_U$} & {$ID_U = u$, $u \in [1, n)$; the user's unique identity at the IdP, unknown to RPs.} \\ \hline
-   {$ID_{RP_j}$} & {$ID_{RP} = [r]G$, the $j$-th RP's unique identity; $r \in [1, n)$, unknown to the RP.} \\ \hline
-    {$t$} & {A user-generated random integer in a login instance; $t \in [1, n)$, kept secret to the IdP.} \\ \hline
+    {$ID_U$} & {$ID_U = u \in [1, n)$, is the user's unique identity at the IdP; \textcolor{blue}{$u$ is kept unknown to RPs.}} \\ \hline
+   {$ID_{RP_j}$} & {$ID_{RP} = [r]G$, is the $j$-th RP's unique identity; $r \in [1, n)$, \textcolor{blue}{is known to only the IdP.}} \\ \hline
+    {$t$} & {$t \in [1, n)$, is a user-generated random integer in a login instance; \textcolor{blue}{$t$ is kept secret to the IdP.}} \\ \hline
     {$PID_{RP_j}^i$} & {$PID_{RP} = [t]{ID_{RP}} = [tr]G$; the $j$-th RP's pseudo-identity, in the user's $i$-th login instance to this RP.} \\ \hline
     {$PID_{U,j}^i$} & {$PID_U = [{ID_U}]{PID_{RP}} = [utr]G$; the user's pseudo-identity, in the user's $i$-th login instance to the $j$-th RP.} \\ \hline
      {$Acct_j$} & {$Acct = [t^{-1}\bmod n]PID_{U} = [ID_U]ID_{RP} = [ur]G$; the user's account at the $j$-th RP.} \\ \hline
@@ -85,7 +85,7 @@ from the IdP's view,
 
 Note that $r$ is kept secret to the RP; otherwise, two colluding RPs with $ID_{RP_j} = [r]G$ and $ID_{RP_{j'}} = [r']G$ could link a user's accounts by checking whether $[r']Acct_j = [r]Acct_{j'}$ or not.
 
-A user generates $t$ and calculates $PID_{RP} = [t]ID_{RP}$.
+\textcolor{blue}{A user generates $t$ and calculates $PID_{RP} = [t]ID_{RP}$.
 After receiving $t$ from the user and extracting $PID_{RP}$ from an token,
     an RP checks that $PID_{RP} = [t]ID_{RP}$,
         because the correct account is derived only if this equation holds;
@@ -95,10 +95,10 @@ To login as any $Acct$,
             and calculate $[t'u'^{-1}]Acct$ as $PID_{RP}$ to request an identity token.
 Then, the IdP calculates $PID_{U'} = [u'][t'u'^{-1}]Acct = [t']Acct$.
 Without checking $PID_{RP} = [t']ID_{RP}$ or not,
-        the RP finally allows the malicious user to login as $[t'^{-1}]PID_{U'} = Acct$.
+        the RP finally allows the malicious user to login as $[t'^{-1}]PID_{U'} = Acct$.}
 
 
-On the contrary,
+\textcolor{blue}{On the contrary,
     if $t$ is generated and $PID_{RP}$ is calculated by the RP,
 a user also needs to check that $PID_{RP} = [t]ID_{RP}$;
     otherwise, attacks happen as below.
@@ -108,7 +108,7 @@ Then it colludes with a malicious RP denoted as $RP'$,
     which sends $PID_{RP}$ to an honest user $U$.
 Without checking $PID_{RP} = [t']ID_{RP'}$,
     this honest user will present a token binding $PID_U$ and $PID_{RP}$ to the malicious RP.
-This token will enable $U'$ to login as the honest user's account at the honest RP.
+This token will enable $U'$ to login as the honest user's account at the honest RP.}
 %In other words, this checking ensures RP designation,
 %    because it is impossible to find $t$ and $t'$ satisfying that
 %    $[t]ID_{RP} = [t']ID_{RP'}$,
@@ -186,7 +186,7 @@ Only the script downloaded from this targetOrigin is a legitimate receiver.
 %The \emph{RP certificates} deals with the problem of mapping an identity proof with its targeting RP.
 %That is, the IdP script derives the RP's $ID_{RP}$ and origin from the RP certificate, while the $PID_{RP}$ is generated with this $ID_{RP}$. Thus, the IdP script always know the targeting RP of an identity proof, therefore, the \verb+postMessage+ mechanism can guarantee that the identity proof would not be sent to the adversary.
 
-As mentioned above,
+\textcolor{blue}{As mentioned above,
     a user needs to calculate (or check) $PID_{RP} = [t]ID_{RP}$,
     so this function should be implemented by \emph{honest} scripts.
 Thus, $t$ is generated in the IdP script,
@@ -196,7 +196,7 @@ Since $ID_{RP} = [t^{-1}\bmod n]PID_{RP}$,
         for any of them leaks the RP identity.
 This leakage risk may be mitigated
     by implementing a user agent with browser extensions,
-but users need to install the extension before visiting RPs.
+but users need to install the extension before visiting RPs.}
 
 Finally,
     the browser downloads the RP script when visiting an RP,
@@ -399,9 +399,9 @@ The IdP script sends an identity-token request for $PID_{RP}$ on behalf of the u
 \item [3.3]
 The IdP script obtains the user's authorization for each requested attribute,
     and sends the scope of authorized attributes. % to the IdP.
-The IdP %checks that the received $PID_{RP}$ is a point on $\mathbb{E}$,
+\textcolor{blue}{Then, the IdP %checks that the received $PID_{RP}$ is a point on $\mathbb{E}$,
     calculates $PID_U = [ID_U]{PID_{RP}}$, % for the user,
-and signs $[PID_{RP}, PID_U, Issuer, Validity, Attr]_{SK}$,
+and signs $[PID_{RP}, PID_U, Issuer, Validity, Attr]_{SK}$,}
  where $Issuer$ is the IdP's identity, $Validity$ indicates the validity period, and $Attr$ contains the authorized user attributes.
 \item[3.4] The IdP replies with the identity token, to the IdP script.
 \end{itemize}
@@ -420,7 +420,7 @@ The RP receives the identity token and allows the user to login.
 The IdP script forwards the identity token to the RP script,
     which sends it to the RP through $Enpt_{RP}$.
 \item[4.2] The RP verifies the identity token, including the IdP's signature and its validity period.
-Then, the RP extracts $PID_U$, checks that it is equal to $[t]ID_{RP}$,
+Then, \textcolor{blue}{the RP extracts $PID_U$ from the token, checks that it is equal to $[t]ID_{RP}$,}
 and calculates $Acct = [t^{-1}]{PID_U}$.
 
 \item [4.3] The RP allows the user to login as $Acct$.
@@ -432,7 +432,7 @@ If any verification or checking fails,
      this login flow will be halted immediately.
 For example, the user halts it
     on an invalid $Cert_{RP}$.
-The IdP rejects an identity-token request, if the received $PID_{RP}$ is not a point on $\mathbb{E}$.
+\textcolor{blue}{The IdP rejects an identity-token request, if the received $PID_{RP}$ is not a point on $\mathbb{E}$.}
 Or, the RP rejects an identity token
     if the signature is invalid or $PID_{RP}$ in it does not match the negotiated one.
 

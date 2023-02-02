@@ -61,15 +61,15 @@ These security requirements (i.e., RP designation, user identification, confiden
 \end{table}
 
 
-We aim to design a privacy-preserving SSO system with the four security properties as above,
+\textcolor{blue}{We aim to design a privacy-preserving SSO system with the four security properties as above,
     while preventing both the IdP-based login tracing and the RP-based identity linkage.
 %We explicitly distinguish a user's identity (or \emph{account}) at an RP,
 %     from the user's \emph{identity} at an IdP and the user's \emph{pseudo-identities} enclosed in identity tokens.
 In UPPRESSO these requirements are satisfied with \emph{transformed identities} in the identity tokens.
 Table \ref{tbl:notations-dilemma} lists the notations in the following explanations,
-    and the subscript $j$ and/or the superscript $i$ may be omitted when there is no ambiguity.
+    and the subscript $j$ and/or the superscript $i$ may be omitted when there is no ambiguity.}
 
-In an SSO login flow, % with identity transformations,
+\textcolor{blue}{In an SSO login flow, % with identity transformations,
     a user firstly negotiates an \emph{ephemeral} $PID_{RP}$ with a target RP.
 An identity-token request with $PID_{RP}$ is sent by the user to an IdP.
 After authenticating the user as $ID_U$, the IdP calculates an \emph{ephemeral} $PID_U$ based on $ID_U$ and $PID_{RP}$,
@@ -83,7 +83,7 @@ After matching the designated $PID_{RP}$ in the token,
 %    and (\emph{b}) these \emph{ephemeral} pseudo-identities enable the target RP to derive a \emph{permanent} account, i.e., $Acct_j$.
 The relationship among the (pseudo-)identities is illustrated in Figure \ref{fig:IDCorrelation}.
 The \emph{red} and \emph{green} blocks represent \emph{permanent} and \emph{ephemeral} (pseudo-)identities, respectively.
-The arrows denote the transformations of (pseudo-)identities.
+The arrows denote the transformations of (pseudo-)identities.}
 %It describes the {\em identity dilemma} of privacy-preserving SSO as below:
 
 %An identity token binds the (pseudo-)identities of an authenticated user and an RP.
@@ -91,14 +91,14 @@ The arrows denote the transformations of (pseudo-)identities.
 %    to prevent the IdP-based login tracing,
 %    we should not reveal the target RP's permanent identity (i.e., $ID_{RP}$) to the IdP.
 
-To ensure RP designation,
+\textcolor{blue}{To ensure RP designation,
      $PID_{RP}$ should be \emph{uniquely} associated with the target RP.
 To ensure user identification,
-    an \emph{ephemeral} $PID_{U}^i$ in each login instance should enable the RP to recover a \emph{permanent} account  (i.e., $Acct$) at this RP.
+    an \emph{ephemeral} $PID_{U}^i$ in each login instance should enable the RP to recover a \emph{permanent} account  (i.e., $Acct$) at this RP.}
 
 
 %An \emph{ephemeral} pseudo-identity for the RP (i.e., $PID_{RP}$) is used in the identity-token request:
-To prevent the IdP-based login tracing,
+\textcolor{blue}{To prevent the IdP-based login tracing,
     the IdP does not obtain any information about $ID_{RP}$ from any $PID_{RP}^i$,
         thus, in multiple login instances to a given RP,
            (\emph{a})  $PID_{RP}^i$ should
@@ -113,7 +113,7 @@ To prevent the RP-based identity linkage,
 %a user pseudo-identity (i.e., $PID_U$) is bound instead:
 %$PID_U$ is bound in identity tokens:
     the RP does not derive any information about $ID_U$ from any $PID_{U,j}$,
-    which implies $PID_{U,j}$ for different RPs should be independent of each other.
+    which implies $PID_{U,j}$ for different RPs should be independent of each other.}
 
 
 
@@ -137,7 +137,7 @@ To prevent the RP-based identity linkage,
 %    and $ID_U$ or $ID_{RP}$ is still enclosed in identity tokens.
 %So only one type of privacy threat is prevented.
 
-The following identity transformations %in a login flow
+\textcolor{blue}{The following identity transformations %in a login flow
     are needed: %in UPPRESSO.
 \vspace{-\topsep}\begin{itemize}
 \setlength{\topsep}{0pt}
@@ -159,5 +159,5 @@ $\mathcal{F}_{Acct}(PID_{U}, PID_{RP}) = Acct$, calculated by the RP.
 Given $ID_U$ and $ID_{RP}$, $Acct$ is \emph{permanent} and \emph{unique} to other accounts at this RP.
 In a user's any $i$-th and $i'$-th ($i \neq i'$) login instances to the RP,
  $\mathcal{F}_{Acct}(PID_{U}^i, PID_{RP}^i) = \mathcal{F}_{Acct}(PID_{U}^{i'}, PID_{RP}^{i'})$.
-\end{itemize}
+\end{itemize}}
 
