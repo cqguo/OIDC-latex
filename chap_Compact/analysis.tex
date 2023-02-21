@@ -3,6 +3,61 @@
 %In this section, we presents the analysis that UPPRESSO achieves the required properties of security and privacy.
 
 
+\subsection{Adversarial Model}
+The following adversaries.
+(1) Malicious RP and colluding with malicious users. honest IdP. => Security.
+(2) honest-but-curious. => Privacy against IdP.
+(3) Malicious RP and colluding with malicious users. => Privacy against RPs.
+
+\vspace{1mm}
+We also analyzed the properties of UPPRESSO, %especially confidentiality and integrity,
+     based on a Dolev-Yao style model \cite{SPRESSO}.
+% which has been used in the formal analysis of SSO protocols such as OAuth 2.0 \cite{FettKS16} and OIDC \cite{FettKS17}.
+The model abstracts the entities in a web system,
+    such as web servers and browsers,
+    as \emph{atomic processes}. %which communicate with each other through events. % such as HTTPS request and response.
+It defines \emph{script processes} to formulate client-side scripts.
+%The script is dependently invoked by the browser to process the server-defined logic.
+  %such as verifying $Certificate_{RP}$.
+%
+%postmessage events;
+%
+%atomic process <-> script process, communication.
+%
+%Other events change self-trigger.
+%
+UPPRESSO contains atomic processes as follows:
+an IdP process,
+    a finite set of web servers for honest RPs, a finite set of honest browsers, and a finite set of attacker processes.
+These processes communicate with each other through events such as HTTPS requests and responses.
+We consider all RP and browser processes are honest,
+ while model an RP or a browser controlled by adversaries as attacker processes.
+Within a browser,
+ an honest IdP script, an honest RP script, and also attacker scripts which are downloaded from attacker processes,
+  are invoked.
+%Although the scripts coexist in the same browser, they are strictly separated.
+Script processes communicate with each other through \verb+postMessage+,
+    modelled as transmitted-to-itself events of a browser process.
+%To clearly indicate the action of postMessage communication, we define it as the transmitting-to-itself event of the browser (which is not defined in SPRESSO).
+
+%It contains two honest script processes,
+%        downloaded from the RP process and the IdP process, respectively.
+% and {\sf script\_attacker} denotes a script downloaded by an attacker process that exists in all browser processes.
+%attacker script processes
+
+
+After formulating the system by this model,
+    we trace the lifecycle of an identity token in UPPRESSO,
+        starting when it is generated and ending when accepted by the RP,
+ to ensure it is not leaked to attackers or tampered with by any adversary without checking.
+\emph{Confidentiality} and \emph{integrity} of SSO tokens  in the communications among processes are proved,
+as we locate the generation of a token, and trace all places
+    where $PID_U$, $PID_{RP}$ and other parameters in the token are generated and transmitted,
+     to ensure no adversary able to retrieve or manipulate them.
+Finally, $t$ is proved unaccessible to the IdP in this model,
+ which is \emph{necessary} for user privacy (see Section \ref{sec-:analysis} for more details).
+
+
 \subsection{Security}
 \label{analysis-security}
 UPPRESSO satisfies four security requirements of SSO identity tokens \cite{ArmandoCCCT08,FettKS16, FettKS17},
@@ -21,9 +76,9 @@ UPPRESSO satisfies four security requirements of SSO identity tokens \cite{Arman
 %\end{itemize}
 
 \vspace{1mm}
-\noindent\textcolor{blue}{\textbf{RP Designation.}~~The RP pseudo-identity $PID_{RP} = [t]ID_{RP}$ in the identity token
-     designates the target RP with $ID_{RP} = [r]G$, and only this RP,
-     when $r$ is known to only the IdP.}
+\noindent\textcolor{blue}{\textbf{RP Designation.}~~Provided that $r$ is known to only the IdP,
+the RP pseudo-identity $PID_{RP} = [t]ID_{RP}$ in the identity token
+     designates the target RP with $ID_{RP} = [r]G$, and only this RP.}
 %That is,
 %    $PID_{RP}$ bound in an identity token is equal to $PID_{RP}$ expected by the target RP;
 % and $PID_{RP}$ expected by an RP with $ID_{RP}$,
@@ -130,7 +185,7 @@ Thus, the probability of finding $t$ and $t'$ satisfying that $[t]ID_{RP_j} = [t
 %            the identity token designates only one RP.
 
 \vspace{1mm}
-\noindent\textcolor{blue}{\textbf{User Identification.}~~In the identity token 
+\noindent\textcolor{blue}{\textbf{User Identification.}~~In the identity token
     binding $PID_U$ and $PID_{RP}$,
 the user pseudo-identity $PID_U = [ID_U]PID_{RP}$ identifies
         the authenticated user with $ID_U$, % as $Acct = [ID_U][ID_{RP}]$,
@@ -243,54 +298,6 @@ and the binding of $Enpt_{RP}$ and $ID_{RP}$ is ensured by a signed RP certifica
 So only the RP that owns $Enpt_{RP}$ and $ID_{RP}$,
     receives this token. $\square$
 
-\vspace{1mm}
-We also analyzed the properties of UPPRESSO, %especially confidentiality and integrity,
-     based on a Dolev-Yao style model \cite{SPRESSO}.
-% which has been used in the formal analysis of SSO protocols such as OAuth 2.0 \cite{FettKS16} and OIDC \cite{FettKS17}.
-The model abstracts the entities in a web system,
-    such as web servers and browsers,
-    as \emph{atomic processes}. %which communicate with each other through events. % such as HTTPS request and response.
-It defines \emph{script processes} to formulate client-side scripts.
-%The script is dependently invoked by the browser to process the server-defined logic.
-  %such as verifying $Certificate_{RP}$.
-%
-%postmessage events;
-%
-%atomic process <-> script process, communication.
-%
-%Other events change self-trigger.
-%
-UPPRESSO contains atomic processes as follows:
-an IdP process,
-    a finite set of web servers for honest RPs, a finite set of honest browsers, and a finite set of attacker processes.
-These processes communicate with each other through events such as HTTPS requests and responses.
-We consider all RP and browser processes are honest,
- while model an RP or a browser controlled by adversaries as attacker processes.
-Within a browser,
- an honest IdP script, an honest RP script, and also attacker scripts which are downloaded from attacker processes,
-  are invoked.
-%Although the scripts coexist in the same browser, they are strictly separated.
-Script processes communicate with each other through \verb+postMessage+,
-    modelled as transmitted-to-itself events of a browser process.
-%To clearly indicate the action of postMessage communication, we define it as the transmitting-to-itself event of the browser (which is not defined in SPRESSO).
-
-%It contains two honest script processes,
-%        downloaded from the RP process and the IdP process, respectively.
-% and {\sf script\_attacker} denotes a script downloaded by an attacker process that exists in all browser processes.
-%attacker script processes
-
-
-After formulating the system by this model,
-    we trace the lifecycle of an identity token in UPPRESSO,
-        starting when it is generated and ending when accepted by the RP,
- to ensure it is not leaked to attackers or tampered with by any adversary without checking.
-\emph{Confidentiality} and \emph{integrity} of SSO tokens  in the communications among processes are proved,
-as we locate the generation of a token, and trace all places
-    where $PID_U$, $PID_{RP}$ and other parameters in the token are generated and transmitted,
-     to ensure no adversary able to retrieve or manipulate them.
-Finally, $t$ is proved unaccessible to the IdP in this model,
- which is \emph{necessary} for user privacy (see Section \ref{sec-:analysis} for more details).
-
 
 %The details on the Dolev-Yao web model and the detailed security proofs of UPPRESSO are in the appendix.
 
@@ -310,7 +317,7 @@ So the prevention against the IdP-based login tracing in UPPRESSO
     is expressed formally as below.}
 
 \vspace{1mm}
-\noindent\textcolor{blue}{\textbf{Privacy against the IdP.}~~When $t$ is random in $\mathbb{Z}_n$ and unknown to the IdP,
+\noindent\textcolor{blue}{\textbf{Privacy against the IdP.}~~If $t$ is random in $\mathbb{Z}_n$ and unknown to the IdP,
 the IdP
  cannot infer any information about $ID_{RP}$ or link any pair of $PID_{RP}^i$ and $PID_{RP}^{i'}$
   ($i \neq i'$),
@@ -339,7 +346,7 @@ After filtering out the redundant information (i.e., $PID_{RP}= [t]{ID_{RP}}$ an
 So the prevention against the RP-based identity linkage in UPPRESSO is as follows.}
 
 \vspace{1mm}
-\noindent\textcolor{blue}{\textbf{Privacy against colluding RPs.}~~Provided that $u$ and $r$ are kept unknown to RPs,
+\noindent\textcolor{blue}{\textbf{Privacy against Colluding RPs.}~~Provided that $u$ and $r$ are kept unknown to RPs,
 based on the collected information of login instances by $v$ users,
 $c$ colluding RPs cannot decide whether a login instance to another RP is initiated by one of these $v$ users or not,
     where

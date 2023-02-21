@@ -1,0 +1,122 @@
+Dear Prof. Shepherd,
+We are working on the revision following the plan:
+
+\textbf{1. Section 3.2 "The Identity Dilemma of Privacy-Preserving SSO"}
+
+We remove this section. In particular, we remove the description about the identity dilemma of privacy-preserving SSO, for this description is specific to our solution but not a general challenge. We also remove all the descriptions about the identity dilemma in this manuscript.
+
+Meanwhile, we keep some paragraphs in this revision, which explain the identity-transformation approach. And these paragraphs are merged with Section 3.3 "Identity Transformation" in the original version, into Section 3.2 "Identity Transformation" in the revision.
+
+\textbf{2. Analysis of Security & Privacy}
+
+We formally define four security requirements as four theorems, and define two privacy requirements as two theorems as below. In these theorems, we emphasize the arguments known (or unknown) to some components, to make the model and assumptions clearer. Then, we prove each one. These arguments known (or unknown) to the components, are also described in Table 3 "The notations in the UPPRESSO protocols", to make it clear.
+
+\textbf{Theorem 5.1} [RP Designation] Provided that $r$ is known to only the IdP, the RP pseudo-identity $PID_{RP} = [t]ID_{RP}$ in the identity token designates the target RP with $ID_{RP} = [r]G$, and only this RP.
+
+\textbf{Theorem 5.2} [User Identification] In the identity token binding $PID_U$ and $PID_{RP}$,
+the user pseudo-identity $PID_U = [ID_U]PID_{RP}$ identifies the authenticated user with $ID_U$, and only this user,  at the target RP with $ID_{RP} = [r]G$.
+
+\textbf{Theorem 5.3} [Integrity] An honest RP accepts only identity tokens binding its pseudo-identity $PID_{RP}$ and the authenticated user's pseudo-identity $PID_U$,
+ and actually binding $ID_{RP}$ and $Acct=[ID_U]ID_{RP}$, when $SK$ is held by only the IdP.
+
+\textbf{Theorem 5.4} [Confidentiality] An identity token is accessible to only the authenticated user and the target RP, in addition to the IdP signing this token.
+
+\textbf{Theorem 5.5} [Privacy against the IdP] If $t$ is random in $\mathbb{Z}_n$ and unknown to the IdP,
+the IdP cannot infer any information about $ID_{RP}$ or link any pair of $PID_{RP}^i$ and $PID_{RP}^{i'}$
+  ($i \neq i'$),
+    from an honest user's identity-token requests for $PID_{RP}^i$ ($i = 1, 2, \cdots$).
+
+\textbf{Theorem 5.6} [Privacy against colluding RPs] Provided that $u$ and $r$ are kept unknown to RPs,
+based on the collected information of login instances by $v$ users,
+$c$ colluding RPs cannot decide whether a login instance to another RP is initiated by one of these $v$ users or not,
+    where the collected login instances are denoted as $\mathfrak{L}=\left\{ \begin{matrix}
+L_{1,1}, & L_{1,2}, & \cdots, & L_{1,c}\\
+L_{2,1}, & L_{2,2}, & \cdots, & L_{2,c}\\
+\cdots, & \cdots, & \cdots, & \cdots\\
+L_{v,1}, & L_{v,2}, & \cdots, & L_{v,c}
+\end{matrix}\right\}$, $L_{i, j} = (ID_{RP_j}, t_{i, j}, [ID_{U_i}]{ID_{RP_j}}) = ([r_j]G, t_{i,j}, [u_ir_j]G)$,
+    and the login instance to $RP_{c+1}$ is $L'=(ID_{RP_{c+1}}, t', [ID_{U'}]ID_{RP_{c+1}}) = ([r_{c+1}]G, t', [u'r_{c+1}]G)$.
+
+\textbf{3. [1] $PID_{RP}$ checking in Step 3.3}
+
+We have removed the misunderstood sentences about the checking of $PID_{RP}$ by the IdP in Step 3.3, and added "The IdP rejects an identity-token request, if the received $PID_{RP}$ is not a point on $\mathbb{E}$." in Section 4.5, Page 9. 
+We look up the manuscript to avoid similar misunderstandings.
+
+\textbf{3. [2] The double computations of $PID_{RP}$}
+
+The double computations of $PID_{RP}$ has been improved as: the user generates $t$ in Step 2.1, and calculates $PID_{RP} = [t]ID_{RP}$ in Step 2.3; in Step 4.2, the RP extracts $PID_{RP}$ from the verified token and checks that it is equal to $[t]ID_{RP}$ or not. If $PID_{RP}$ enclosed in the token is not equal to $\neq [t]ID_{RP}$, the RP rejects it.
+
+Moreover, we explain this $PID_{RP}$ checking by the RP in Section 4.3 as below, after presenting the identity transformation algorithms.
+
+A user generates $t$ and calculates $PID_{RP} = [t]ID_{RP}$.
+After receiving $t$ from the user and extracting $PID_{RP}$ from a token,
+    an RP checks that $PID_{RP} = [t]ID_{RP}$, because the correct account is derived only if this equation holds;
+        otherwise, attacks happen as below.
+To login as any $Acct$, a malicious user with $ID_{U'} = u'$ might first generate a random number $t'$,
+            and calculate $[t'u'^{-1}]Acct$ as $PID_{RP}$ to request an identity token.
+Then, the IdP will calculate $PID_{U'} = [u'][t'u'^{-1}]Acct = [t']Acct$.
+Without checking $PID_{RP} = [t']ID_{RP}$ or not, the RP finally allows the malicious user to login as $[t'^{-1}]PID_{U'} = Acct$.
+
+Meanwhile,
+    if $t$ is generated and $PID_{RP}$ is calculated by the RP,
+a user needs to by himself check that $PID_{RP} = [t]ID_{RP}$;
+    otherwise, attacks happen as below.
+A malicious user $U'$ initiates a login request to an honest RP, and receives $PID_{RP}$.
+Then it colludes with a malicious RP denoted as $RP'$, which sends $PID_{RP}$ to an honest user $U$.
+Without checking $PID_{RP} = [t']ID_{RP'}$,
+    this honest user will present a token binding $PID_U$ and $PID_{RP}$ to $RP'$.
+This token enables malicious $U'$ to login as the honest user's account at the honest RP.
+
+\textbf{4. $t$-generation by the IdP script}
+
+We explain the generation of $t$ by the IdP script in Section 4.4 "The Designs Specific for Web Applications", Page 7. A new paragraph is added as below.
+
+a user needs to calculate (or check) $PID_{RP} = [t]ID_{RP}$,
+    so this function should be implemented by \emph{honest} scripts.
+Thus, $t$ is processed in the IdP script,
+    to calculate $PID_{RP}$ with $ID_{RP}$ which is extracted from $Cert_{RP}$.
+Since $ID_{RP} = [t^{-1}\bmod n]PID_{RP}$,
+    this design relies on an honest IdP that does not steal $t$, $ID_{RP}$ or the RP's domain through malicious scripts,
+        for any of them leaks the RP identity.
+This leakage risk may be mitigated
+    by implementing a user agent with trusted browser extensions,
+but users need to install the extension before visiting RPs.
+
+\textbf{5. Difference between UPPRESSO and PrivacyPass/TrustToken}
+
+We explain the difference between our work and PrivacyPass/TrustToken in Section 2.3. Two new paragraphs are added.
+
+PrivacyPass and TrustToken allow a user to receive tokens , each of which is denoted as ($T, T^{k}$), where $k$ is the token server's private key.
+ These tokens are used to access resources anonymously.
+To unlink token signing and redemption,
+    a user generates a random number $e$ for each token, blinds $T$ into $T^{e}$,
+        and sends it to return ($T^e, T^{ek}$) from the server.
+The user then utilizes $e$ to obtain $T^k$ from $T^{ek}$, and ($T, T^{k}$) is redeemed to access resources.
+These cryptographic skills proposed in [1] for OPRFs,
+ are adopted in UPPRESSO similarly:
+    a user transforms $ID_{RP}$ to $PID_{RP} = [t]ID_{RP}$ by a random number $t$,
+ and $PID_{RP}$ is transformed again by an IdP to $[tu]ID_{RP}$.
+The visited RP calculates $Acct = [u]ID_{RP}$ from $[tu]ID_{RP}$ by using $t$.
+
+UPPRESSO differs from PrivacyPass and TrustToken as below.
+Firstly, PrivacyPass and TrustToken work as anonymous SSO to some extent, where one consistent private key serves all users,
+but UPPRESSO identifies each user at an RP.
+Secondly, the cryptographic skills are differently utilized.
+UPPRESSO integrates them to transform identities in SSO:
+scalar $u$ is known by the IdP and a user as his user identity, and
+random number $t$ is shared by the user and the RP. Meanwhile,
+exponent $k$ is held only by the PrivacyPass/TrustToken server as a key,
+ and random number $e$ is only known to a user.
+Lastly and most importantly,
+more privacy requirements are satisfied in UPPRESSO.
+The unlinkability between %token signing and redemption \cite{privacypass,trusttoken}, or
+($T^e, T^{ek}$) and  ($T, T^k$),
+roughly corresponds to only the IdP-untraceability in UPPRESSO:
+ an IdP cannot link any pair among $[t_i]ID_{RP}$ and $ID_{RP}$,
+ $i = 1, 2, \cdots$.
+UPPRESSO also supports the unlinkability across RPs:
+given multiple users, e.g., identified as $u$ and $u'$,
+    ($ID_{RP}, t, [u]ID_{RP}$) and ($ID_{RP'}, t', [u']ID_{RP'}$) are indistinguishable to colluding RPs.
+This property of the cryptographic skills is not considered in either OPRFs or anonymous tokens.
+
+[1] S. Jarecki,A. Kiayias,H. Krawczyk,and J. Xu, "Highly-efficient and composable password-protected secret sharing (or: How to protect your Bitcoin wallet online)," in 1st IEEE European Symposium on Security and Privacy (EuroSP), 2016, pp. 276–291.

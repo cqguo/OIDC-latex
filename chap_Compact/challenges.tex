@@ -2,9 +2,8 @@
 %\section{The Identifier-Transformation Approach of UPPRESSO}
 \label{sec:challenge}
 
-This section investigates the security requirements of privacy-preserving SSO.
-Then,
-    we present the identity-transformation framework of UPPRESSO.
+We discuss the security requirements of privacy-preserving SSO,
+ and present the identity-transformation framework.
 
 
 \subsection{Security Requirements of SSO}
@@ -70,20 +69,20 @@ Table \ref{tbl:notations-dilemma} lists the notations in the following explanati
     and the subscript $j$ and/or the superscript $i$ may be omitted when there is no ambiguity.}
 
 \textcolor{blue}{In an SSO login flow, % with identity transformations,
-    a user firstly negotiates an \emph{ephemeral} $PID_{RP}$ with a target RP.
-An identity-token request with $PID_{RP}$ is sent by the user to an IdP.
-After authenticating the user as $ID_U$, the IdP calculates an \emph{ephemeral} $PID_U$ based on $ID_U$ and $PID_{RP}$,
+    a user firstly negotiates \emph{ephemeral} $PID_{RP}$ with a target RP,
+and sends an identity-token request enclosing $PID_{RP}$ to an IdP.
+After authenticating the user as $ID_U$, the IdP calculates \emph{ephemeral} $PID_U$ based on $ID_U$ and $PID_{RP}$,
     and issues an identity token binding $PID_U$ and $PID_{RP}$.
-After matching the designated $PID_{RP}$ in the token,
+On receiving a token with matching $PID_{RP}$,
     the RP calculates \emph{permanent} $Acct$ and allows the token holder to login as $Acct$.
 %
 %Given a user,
 %    (\emph{a}) an identity token contains only pseudo-identities, i.e., $PID_{U,j}^i$ and $PID_{RP_j}^i$,
 %        which are independent of each other for different RPs and in multiple login instances, respectively,
 %    and (\emph{b}) these \emph{ephemeral} pseudo-identities enable the target RP to derive a \emph{permanent} account, i.e., $Acct_j$.
-The relationship among the (pseudo-)identities is illustrated in Figure \ref{fig:IDCorrelation}.
+The relationship among (pseudo-)identities is illustrated in Figure \ref{fig:IDCorrelation}.
 The \emph{red} and \emph{green} blocks represent \emph{permanent} and \emph{ephemeral} (pseudo-)identities, respectively.
-The arrows denote the transformations of (pseudo-)identities.}
+The labeled arrows denote the transformations of (pseudo-)identities.}
 %It describes the {\em identity dilemma} of privacy-preserving SSO as below:
 
 %An identity token binds the (pseudo-)identities of an authenticated user and an RP.
@@ -94,7 +93,7 @@ The arrows denote the transformations of (pseudo-)identities.}
 \textcolor{blue}{To ensure RP designation,
      $PID_{RP}$ should be \emph{uniquely} associated with the target RP.
 To ensure user identification,
-    an \emph{ephemeral} $PID_{U}^i$ in each login instance should enable the RP to recover a \emph{permanent} account  (i.e., $Acct$) at this RP.}
+    an \emph{ephemeral} $PID_{U}^i$ in each login instance should enable the RP to derive a \emph{permanent} account  (i.e., $Acct$) at this RP.}
 
 
 %An \emph{ephemeral} pseudo-identity for the RP (i.e., $PID_{RP}$) is used in the identity-token request:
@@ -112,7 +111,7 @@ To prevent the RP-based identity linkage,
 % the IdP does not enclose $ID_U$ in identity tokens.
 %a user pseudo-identity (i.e., $PID_U$) is bound instead:
 %$PID_U$ is bound in identity tokens:
-    the RP does not derive any information about $ID_U$ from any $PID_{U,j}$,
+    the RP does not obtain any information about $ID_U$ from any $PID_{U,j}$,
     which implies $PID_{U,j}$ for different RPs should be independent of each other.}
 
 
