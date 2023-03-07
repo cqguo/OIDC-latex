@@ -32,7 +32,7 @@ UPPRESSO does not protect user privacy against such collusive attacks,
 
 
 
-\vspace{1mm}
+\vspace{0.75mm}
 \noindent{\textbf{Scalability and Uniqueness.}}
 $ID_{RP}$ is generated uniquely in an RP's initial registration,
     and the capacity of RPs is $n$ (i.e., the order of $G$). For the NIST P256 elliptic curve, $n$ is approximately $2^{256}$.
@@ -57,7 +57,33 @@ Besides, stronger elliptic curves accommodate more RPs and users;
 e.g., $n$ is nearly $2^{384}$ for the NIST P384 curve.
 
 
-\vspace{1mm}\noindent{\textbf{Alternative Way to Generate $ID_{RP}$ and Bind $Enpt_{RP}$.}}
+\vspace{0.75mm}
+\noindent{\textbf{Support for the Authorization Code Flow.}}
+In the authorization code flow of OIDC \cite{OpenIDConnect},
+    an IdP does not directly response with identity tokens;
+        instead,
+            an authorization code is sent to the RP,
+            which uses this code to ask for identity tokens.
+The identity-transformation algorithms $\mathcal{F}_{PID_{U}}$, $\mathcal{F}_{PID_{RP}}$ and $\mathcal{F}_{Acct}$
+    can be integrated into the authorization code flow:
+    %similar with the login flow introduced in Section \ref{implementations},
+            an authorization code is forwarded to the RP script by the IdP script
+                and this code is used to ask for an identity token binding $PID_U$ and $PID_{RP}$.
+An authorization code is usually an index to retrieve identity tokens from the IdP,
+        and does not disclose information about the authenticated user.
+
+
+After receiving an authorization code, an RP uses it and another secret credential
+         which is issued by the IdP during the initial registration \cite{OpenIDConnect},
+     to retrieve identity tokens from the IdP.
+To protect RP identities from the IdP,
+        anonymous tokens (e.g., ring or group signatures \cite{ring-sig,chaum1991group},
+         and TrustToken \cite{trusttoken})
+        and anonymous networks (e.g., Tor \cite{tor}) need to be adopted for RPs
+         in the retrieval of identity tokens.
+
+\vspace{0.75mm}
+\noindent{\textbf{Alternative Way to Generate $ID_{RP}$ and Bind $Enpt_{RP}$.}}
 In the prototype an RP certificate binds $ID_{RP}$ and $Enpt_{RP}$,
     verified by the honest IdP script.
 RP certificates ensure the target RP has already registered itself at the IdP,
@@ -86,7 +112,7 @@ This account migration requires extra operations explicitly by each user;
         colluding RPs could actually link a user's accounts across RPs.
 
 
-\vspace{1mm}
+\vspace{0.75mm}
 \noindent{\textbf{Restriction of the RP Script's Origin.}}
 When identity tokens are forwarded by the IdP script to the RP script, % within the user browser,
     the receiver is restricted by the \verb+postMessage+ targetOrigin mechanism \cite{postm-targeto},
@@ -115,30 +141,6 @@ So
 This risk actually results from the SOP design of browsers.
 
 
-\vspace{1mm}\noindent{\textbf{Support for the Authorization Code Flow.}}
-In the authorization code flow of OIDC \cite{OpenIDConnect},
-    an IdP does not directly response with identity tokens;
-        instead,
-            an authorization code is sent to the RP,
-            which uses this code to ask for identity tokens.
-The identity-transformation algorithms $\mathcal{F}_{PID_{U}}$, $\mathcal{F}_{PID_{RP}}$ and $\mathcal{F}_{Acct}$
-    can be integrated into the authorization code flow:
-    %similar with the login flow introduced in Section \ref{implementations},
-            an authorization code is forwarded to the RP script by the IdP script
-                and this code is used to ask for an identity token binding $PID_U$ and $PID_{RP}$.
-An authorization code is usually an index to retrieve identity tokens from the IdP,
-        and does not disclose information about the authenticated user.
-
-
-After receiving an authorization code, an RP uses it and another secret credential
-         which is issued by the IdP during the initial registration \cite{OpenIDConnect},
-     to retrieve identity tokens from the IdP.
-To protect RP identities from the IdP,
-        anonymous tokens (e.g., ring or group signatures \cite{ring-sig,chaum1991group},
-         and TrustToken \cite{trusttoken})
-        and anonymous networks (e.g., Tor \cite{tor}) need to be adopted for RPs
-         in the retrieval of identity tokens.
-
 
 %Moreover, IdP can also issue the access token to RP beside of identity token, while the specifications\cite{rfc6749, rfc6750} define mechanisms to obtain and use access tokens to access resources but do not define standard methods to provide identity information.
 %    That is, the access token is not required to carry any RP and user's information explicitly, therefore, it would not expose any user's information to RP.
@@ -154,7 +156,7 @@ To protect RP identities from the IdP,
 % \textcolor[rgb]{1,0,0}{and experiments show that at least 102 ms will be saved for each login (i.e., about 208 ms in total),}
 %    compared with the version with portable web scripts.
 
-\vspace{1mm}
+\vspace{0.75mm}
 \noindent{\textbf{Applicability of Identity Transformations.}}
 The proposed identity-transformation algorithms %i.e., $\mathcal{F}_{PID_{RP}}()$, $\mathcal{F}_{PID_U}()$, and $\mathcal{F}_{Acct}()$,
     are applicable to various SSO scenarios

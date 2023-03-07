@@ -85,30 +85,35 @@ from the IdP's view,
 
 Note that $r$ is kept secret to the RP; otherwise, two colluding RPs with $ID_{RP_j} = [r]G$ and $ID_{RP_{j'}} = [r']G$ could link a user's accounts by checking whether $[r']Acct_j = [r]Acct_{j'}$ or not.
 
-\textcolor{blue}{A user generates $t$ and calculates $PID_{RP} = [t]ID_{RP}$.
+\textcolor{blue}{$PID_{RP} = [t]ID_{RP}$ is negotiated between a user and an RP,
+    while $t$ is a random number known only to them.
+The user and the RP need to calculate $PID_{RP}$ independently; or, more exactly,
+ one computes $PID_{RP} = [t]ID_{RP}$, and the other checks if $PID_{RP}$ is equal to $[t]ID_{RP}$ or not.
+In the above descriptions,
+    the user generates $t$, calculates $PID_{RP} = [t]ID_{RP}$ and sends $t$ to the RP.
 After receiving $t$ from the user and extracting $PID_{RP}$ from a token,
-    an RP checks that $PID_{RP} = [t]ID_{RP}$,
-        because the correct account is derived only if this equation holds;
+    the RP checks that $PID_{RP} = [t]ID_{RP}$,
+        because the correct account $[ID_U]ID_{RP}$ is derived \emph{only if} this equation holds (i.e., $PID_{RP} = [t]ID_{RP}$);
         otherwise, attacks happen as below.
 To login as any $Acct$,
-        a malicious user with $ID_{U'} = u'$ might first generate a random number $t'$,
+        a malicious user with $ID_{U'} = u'$ might generate a random number $t'$,
             and calculate $[t'u'^{-1}]Acct$ as $PID_{RP}$ to request an identity token.
 Then, the IdP will calculate $PID_{U'} = [u'][t'u'^{-1}]Acct = [t']Acct$.
 Without checking $PID_{RP} = [t']ID_{RP}$ or not,
-        the RP finally allows the malicious user to login as $[t'^{-1}]PID_{U'} = Acct$.}
+        the RP will finally allow the malicious user to login as $[t'^{-1}]PID_{U'} = Acct$.}
 
 
 \textcolor{blue}{Meanwhile,
-    if $t$ is generated and $PID_{RP}$ is calculated by the RP,
-a user needs to by himself check that $PID_{RP} = [t]ID_{RP}$;
+    if the RP generates $t$, calculates $PID_{RP}$ and sends $t$,
+the user still needs to by himself check that $PID_{RP} = [t]ID_{RP}$;
     otherwise, attacks happen as below.
 A malicious user $U'$ initiates a login request to an honest RP,
-    and receives $PID_{RP}$.
-Then it colludes with a malicious RP denoted as $RP'$,
-    which sends $PID_{RP}$ to an honest user $U$.
-Without checking $PID_{RP} = [t']ID_{RP'}$,
+    and receives $PID_{RP}$ from this RP.
+Then $U'$ colludes with a malicious RP denoted as $RP'$,
+    which intentionally sends $PID_{RP}$ to an honest user $U$ in some login instance.
+Without checking $PID_{RP} = [t']ID_{RP'}$ or not,
     this honest user will present a token binding $PID_U$ and $PID_{RP}$ to $RP'$.
-This token enables malicious $U'$ to login as the honest user's account at the honest RP.}
+Finally, this token enables malicious $U'$ to login as the honest user's account at the honest RP.}
 %In other words, this checking ensures RP designation,
 %    because it is impossible to find $t$ and $t'$ satisfying that
 %    $[t]ID_{RP} = [t']ID_{RP'}$,
@@ -155,9 +160,9 @@ In a login instance
     the RP provides its certificate through the RP script, to the IdP script.
 The IdP script %from the honest IdP,
     verifies the RP certificate to extract $ID_{RP}$ and $Enpt_{RP}$.
-The IdP's public key is set in the IdP script, so
+The IdP's public key is set in the IdP script, so 
  a user does not configure anything locally,
-    as it does in popular SSO systems \cite{OpenIDConnect, rfc6749, SAML,SAMLIdentifier}.
+    as it does in widely-adopted SSO systems \cite{OpenIDConnect, rfc6749, SAML,SAMLIdentifier}.
 
 %Thus, to avoid the IdP server obtaining any evidence about the RP's identity and provide IdP's script with the RP certificate, the RP's script is also required to transmit the certificate to IdP script after it is downloaded from IdP server.
 
@@ -254,7 +259,7 @@ We tested it in browsers such as Chrome, Safari, Edge, Opera and Firefox, and co
 
 \begin{figure*}[htb]
   \centering
-  \includegraphics[height=0.575\textheight]{fig/process-js.pdf}
+  \includegraphics[height=0.585\textheight]{fig/process-js.pdf}
   \caption{The SSO login flow of UPPRESSO}
   \label{fig:process}
 \end{figure*}
@@ -420,7 +425,7 @@ The RP receives the identity token and allows the user to login.
 The IdP script forwards the identity token to the RP script,
     which sends it to the RP through $Enpt_{RP}$.
 \item[4.2] The RP verifies the identity token, including the IdP's signature and its validity period.
-Then, \textcolor{blue}{the RP extracts $PID_U$ from the token, checks that it is equal to $[t]ID_{RP}$,}
+Then, \textcolor{blue}{the RP extracts $PID_{RP}$ from the token, checks that it is equal to $[t]ID_{RP}$,}
 and calculates $Acct = [t^{-1}]{PID_U}$.
 
 \item [4.3] The RP allows the user to login as $Acct$.
