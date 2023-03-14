@@ -1,4 +1,4 @@
-\subsection{Related Works}%各个方向全都加入，例如安全分析
+\subsection{Related Works}
 \label{sec:related}
 
 %Such tokens (or credentials) authorize a user to conduct operations
@@ -10,12 +10,12 @@
 %  but not adopted to comprehensively transform the five (pseudo-)identities in SSO services.
 \noindent\textbf{Anonymous Token.}
 \textcolor{blue}{PrivacyPass and TrustToken allow a user to receive tokens \cite{privacypass,trusttoken}, each of which is denoted as ($T, T^{k}$), where $k$ is the token server's private key.
- These tokens are used to access resources anonymously.
+ These tokens are used to access resources anonymously in the future.
 To unlink token signing and redemption,
     a user generates a random number $e$ for each token, blinds $T$ into $T^{e}$,
-        and sends it to return ($T^e, T^{ek}$) from the token server.
+        and sends it to request ($T^e, T^{ek}$) from the token server.
 The user then utilizes $e$ to obtain $T^k$ from $T^{ek}$, and then only ($T, T^{k}$) is redeemed to access resources.
-This cryptographic skill \cite{oprf-proved} is adopted in UPPRESSO similarly:
+This cryptographic skill \cite{oprf-proved} is used in UPPRESSO similarly:
     a user transforms $ID_{RP}$ to $PID_{RP} = [t]ID_{RP}$ by a random number $t$,
  and $PID_{RP}$ is transformed again by an IdP to $[tu]ID_{RP}$.
 The visited RP calculates $Acct = [u]ID_{RP}$ from $[tu]ID_{RP}$ by using $t$
@@ -30,7 +30,7 @@ Secondly,
 UPPRESSO integrates it to transform identities in SSO:
 scalar $u$ is known by the IdP and a user as his user identity, and
 random number $t$ is shared by the user and the RP. Meanwhile,
-exponent $k$ is held only by the PrivacyPass/TrustToken server as a key,
+exponent $k$ is held only by the PrivacyPass/TrustToken server as a private key,
  and random number $e$ is only known to a user.
 Lastly and most importantly,
 more privacy requirements are satisfied in UPPRESSO.
@@ -44,7 +44,7 @@ given multiple users, e.g., identified as $u$ and $u'$,
     ($ID_{RP}, t, [u]ID_{RP}$) and ($ID_{RP'}, t', [u']ID_{RP'}$) are indistinguishable to
     colluding RPs.
 This property of the adopted cryptographic skill is not considered
-    in either anonymous tokens \cite{privacypass,trusttoken} or oblivious pseudorandom functions (OPRFs) \cite{oprf-proved}.}
+    in anonymous tokens \cite{privacypass,trusttoken} or oblivious pseudorandom functions (OPRFs) \cite{oprf-proved}.}
 
 \noindent\textbf{Anonymous SSO.}
 Such schemes allow authenticated users to access a service protected by an IdP,
@@ -63,8 +63,8 @@ ZKlaims \cite{zklaim} allows users to prove statements on the credentials issued
 Crypto-Book \cite{crypto-book} coordinates servers to generate a ring-signature private key,
  and a user picks up his key through a list of Email addresses. % (i.e., an anonymity set).
  Then the key pair works as an untraceable pseudonym. %to sign messages.
-Two-party threshold schemes are implemented with a central server,
-    to protect a user's private keys \cite{mRSA,ss-rsa}:
+Two-party threshold cryptographic schemes are implemented with a central server,
+    to protect user private keys \cite{mRSA,ss-rsa}:
     to sign/decrypt a message, a user needs a token from the server.
     Tandem \cite{tandem} decouples the obtaining and using of such tokens,
 for the privacy of key usage.
@@ -104,7 +104,7 @@ Automatic tools such as SSOScan \cite{ZhouE14}, OAuthTester \cite{YangLLZH16} an
 detect the violations of confidentiality, integrity, or RP designation of SSO identity tokens.
 Wang et al. \cite{ExplicatingSDK} detect the vulnerable applications
     built with authentication/authorization SDKs,
-     due to the implicit assumptions of these SDKs.
+     due to the implicit but unsuitable assumptions of these SDKs.
 Navas et al. \cite{NavasB19} discussed the possible attack patterns against OIDC services.
 
 In a mobile system,
@@ -125,13 +125,3 @@ Single sign-off helps the victim user
 FedCM \cite{FedCM} attempts to disable iframe and third-party cookies in SSO, which might be exploited to track users.
 %UPRRSSO protects privacy in SSO through ID transformations and our prototype does NOT use either iframe or third-party cookies.
 
-%以下内容被拆分到上面三点内容了，但是注释内容有对论文的详细表述
-
-%MohsenS16分析了在移动端使用webview实现SSO会导致恶意RP可以向WebView中插入JS代码获取用户的token （confidentiality），同时提供了对WebView的保护防止恶意RP获得token
-%WangZLLYLG15 使用自动化工具对Android应用进行分析，总结了Android应用面临的安全问题：1 Vulnerability I (V1): Improper User-agent（使用WebView实现SSO）， 2 Vulnerabili ty II (V2): Lack of Authentication（使用app间消息传递实现SSO）， 3 Vulnerability III (V3): Inadequate transmission protection （网络传输缺少保护）， 4 Vulnerabili ty IV (V4): Insecure secret Management （上面的 client-side logic）， 5 Vulnerability V (V5): Problematical server-side validation （RP server与IdP server之间的消息传递没有受到保护，用户的信息可能被泄露，用户信息可能被篡改）， 6 Vulnerabili ty VI (V6): Wrong authentication token （使用公开信息作为identity token，破坏confidentiality ）
-%YangLS17 使用工具分析Android 应用OAuth实现的问题：1 Untrusted Identity Token （使用server-to-server transmission保护，使用签名保护 integrity）， 2 Heavy Client-Side Logic（客户端逻辑）
-%ShiWL19 使用model-based的自动化工具，分析了Android应用OAuth实现的问题，包括：Access Token Replacement（替换token，破坏binding）， access token Disclosure （confidentiality）， code Disclosure （confidentiality），App Secret Disclosure （客户端逻辑，只曝露secret不会破坏安全性），Augmented Token Replacement （提供token与RP的绑定，但是可以被绕过， the attacker can extract the associated user information of victims from the IdP directly with either the stolen (i.e., network attacker) or obtained (i.e., malicious RP attacker) token, e.g., replaying Step 7 in Fig. 1. Consequently, the attacker can inject both the token and its corresponding user information in his own session），Profile Vulnerability（缺少用户明确授权，泄露用户的隐私数据）
-% In 2016 Mohsen et al. \cite{MohsenS16} proposed the security of SSO systems implemented through WebView, one of the most important Android components, also facing the threaten of untrusted identity token transmission.
-% Moreover, in 2016 Wang et al. \cite{WangZLG16} analysed the design and implementation of SSO systems for multiple platforms with the automatic testing. In 2015 Wnag et al. \cite{WangZLLYLG15}, in 2017 Yang et al. \cite{YangLS17} and in 2019 Shi et al. \cite{ShiWL19} issued the new vulnerabilities in mobile SSO systems and conducted security assessments for the top Android applications and and achieve the statistical result of these applications.
-
-%YeBWD15在facebook的webview实现中，通过第三方应用获得facebook的cookie，使攻击者能够以受害者的身份登录facebook应用。we build a dummy app using the Facebook Login and we authorize the app with public profile permission. Then we used adb tool kit with root privilege to access to storage of the mobile phone. We successfully locate the cookies c_user and xs as well as the credential access_token. The cookies are stored in an sqlite database in mobile phone’s storage at path /data/data/<Apps package name> /databases/webviewCookiesChromium.db and the access_token is stored in an xml file at path /data/data/<App’s package name> /com.facebook.AuthorizationClient. WebViewAuthHandler.TOKEN\_STORE\_KEY.xml.

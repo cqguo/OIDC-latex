@@ -74,9 +74,10 @@ An RP recognizes each user, as an identity or account \emph{unique}  at the RP,
 
 \noindent\textbf{User authentication to {\em only} an IdP.}
 %A widely-adopted SSO protocol  usually does not include authentication steps.
-The authentication between a user and an IdP is usually conducted \emph{independently}
-    in the specifications of widely-used SSO protocols \cite{OpenIDConnect,rfc6749,SAML},
-where RPs verify only the tokens issued by the IdP.
+In the widely-used SSO protocols \cite{OpenIDConnect,rfc6749,SAML},
+where RPs verify only the identity tokens issued by the IdP,
+    the authentication between a user and an IdP is usually conducted \emph{independently}
+    of the steps dealing with identity tokens.
 This brings advantages. First, the IdP authenticates users by any appropriate means (e.g., password,
 one-time password, or multi-factor authentication).
 %It eliminates the authentication steps between users and an RP,
@@ -89,12 +90,12 @@ However, if a user proves some \emph{non-ephemeral secret} to RPs, which is vali
 %. %(or even the user logins from another computer).
 
 \noindent\textbf{Selective IdP-confirmed attribute provision.}
-An IdP usually provides user attributes in tokens \cite{OpenIDConnect,rfc6749}, in addition to user (pseudo-)identities.
+An IdP usually provides user attributes in identity tokens \cite{OpenIDConnect,rfc6749}, in addition to user (pseudo-)identities.
 These attributes are maintained by users at a trusted IdP.
 %    for example,
 %        when Facebook provides social networking services,
 %         it also issues identity tokens enclosing user identities and various attributes.
-The IdP obtains a user's authorization before enclosing any attributes in a token, or provides only attributes pre-selected by the user.
+The IdP obtains a user's authorization before enclosing attributes in a token, or provides only attributes pre-selected by the user.
 %So no distinctive attributes such as telephone number and Email address are enclosed in the identity tokens of privacy-preserving SSO systems.
 
 \subsection{Privacy-Preserving SSO and Identity Federation}
@@ -114,7 +115,7 @@ Privacy-preserving identity federation
     but requires a user \cite{ELPASSO,UnlimitID,hyperledge-idemix,PseudoID,Opaak,uprov} to (\emph{a}) hold long-term secrets verified by RPs,
             in addition to the authentication credential for the IdP,
                 and (\emph{b}) locally manage the accounts at different RPs.
-That is, there are actually some authentication steps between a user and RPs (called asynchronous authentication \cite{ELPASSO}).
+That is, there are actually some authentication steps between a user and RPs (called asynchronous authentication \cite{ELPASSO} sometimes).
 
 Pairwise pseudonymous identifiers (PPIDs) are specified in SSO protocols \cite{OpenIDConnect, SAMLIdentifier} and recommended \cite{NIST2017draft}
 to protect user privacy against curious RPs.
@@ -152,25 +153,25 @@ Collusive attacks by the IdP and RPs are also prevented,
 
 
 In EL PASSO \cite{ELPASSO}, after authenticating a user,
-    an IdP signs an \emph{anonymous credential} \cite{anon-credential} binding a secret,
+    an IdP signs an anonymous credential \cite{anon-credential} binding a secret,
          both of which are securely kept on the user's device.
 When attempting to login to an RP,
     the user proves that he is the owner of this credential using the secret,
         and discloses selective attributes in the credential.
 Although one credential is proved to multiple RPs,
-        \emph{user-managed pseudonyms} and \emph{anonymous credentials} prevent the RPs, even when collusive with the IdP, from linking the users across the RPs.
+        \emph{user-managed pseudonyms} and \emph{anonymous credentials} prevent the RPs, even when collusive with the IdP, from linking a user across the RPs.
 UnlimitID \cite{UnlimitID} presents similar designs based on anonymous credentials \cite{anon-credential},
         to prevent collusive attacks by the IdP and RPs.
 NEXTLEAP \cite{nextleap} builds anonymous messaging on top of UnlimitID.
 
 
 Anonymous credentials \cite{anon-credential-2001,anon-credential} are used in flexible ways.
-Opaak \cite{Opaak} designs IdP-signed anonymous credentials %in mobile phones
- as pseudonym tokens,
-    which bind a user's secret key.
+Opaak \cite{Opaak} designs IdP-signed anonymous credentials %in mobile phones as pseudonym tokens,
+        with different pseudonym options,
+    all of which bind a user's secret key.
 Idemix anonymous credentials \cite{idemix}
  are integrated in Hyperledger Fabric \cite{hyperledge-idemix} to implement completely-unlinkable pseudonyms
         and IdP-confirmed selective attribute disclosure.
 With a U-Prove token \cite{uprov,uprove-conference} from an IdP,
-    a user is enabled to authenticate himself to an RP and selectively disclose attributes.
+    a user is enabled to authenticate himself to an RP and disclose selective attributes.
 

@@ -1,11 +1,11 @@
 \section{The Analysis of Security and Privacy}
 \label{sec:analysis}
-In this section, we present the analysis that UPPRESSO achieves the required properties of security and privacy.
+In this section, we analyze that UPPRESSO achieves the required properties of security and privacy.
 
 \subsection{Adversarial Model}
 \label{adver-model}
 \textcolor{blue}{Based on the threat model and assumptions in Section \ref{sec:UPPRESSO},
-    different adversaries are considered as below.
+    different types of adversaries are considered.
 First of all, in the proofs of security,
     malicious RPs collude with malicious users
         to break any of the four security properties of SSO identity tokens for an honest user to visit an honest RP.
@@ -15,7 +15,7 @@ Finally,
     in the privacy analysis against the RP-based identity linkage,
     a number of malicious RPs collude to link an honest user's accounts across these RPs.}
 
-We analyzed UPPRESSO %especially confidentiality and integrity,
+We first analyzed UPPRESSO %especially confidentiality and integrity,
      based on a Dolev-Yao style model \cite{SPRESSO}.
 % which has been used in the formal analysis of SSO protocols such as OAuth 2.0 \cite{FettKS16} and OIDC \cite{FettKS17}.
 The model abstracts the entities in a web system,
@@ -45,11 +45,6 @@ Script processes communicate with each other through \verb+postMessage+,
     modelled as transmitted-to-itself events of a browser process.
 %To clearly indicate the action of postMessage communication, we define it as the transmitting-to-itself event of the browser (which is not defined in SPRESSO).
 
-%It contains two honest script processes,
-%        downloaded from the RP process and the IdP process, respectively.
-% and {\sf script\_attacker} denotes a script downloaded by an attacker process that exists in all browser processes.
-%attacker script processes
-
 
 \textcolor{blue}{After formulating the system by this model,
     we analyze the following data for the proofs in Sections \ref{analysis-security} and \ref{sec-:analysis},
@@ -57,7 +52,7 @@ Script processes communicate with each other through \verb+postMessage+,
 We (\emph{a}) trace the lifecycle of an identity token for an honest user to visit an honest RP,
         starting when it is generated and ending when accepted by the RP,
     to ensure it is not leaked to adversaries,
-(\emph{b}) 
+(\emph{b})
     locate all places
         where $PID_U$, $PID_{RP}$ and other parameters enclosed in the token are processed,
      to ensure no adversary able to manipulate them,
@@ -67,53 +62,30 @@ and (\emph{c})
 These conclusions are necessary to prove security of the UPPRESSO protocols.
 %
 % to ensure it is not leaked to attackers or tampered with by any adversary without checking.
-Then,
-        we ensure $t$ is unaccessible to the honest-but-curious IdP,
- which is necessary for privacy against the IdP-based login tracing.}
-
-%\emph{Confidentiality} and \emph{integrity} of SSO tokens  in the communications among processes are proved,
-%as we locate the generation of a token, and trace all places
-%    where $PID_U$, $PID_{RP}$ and other parameters in the token are generated and transmitted,
-%     to ensure no adversary able to retrieve or manipulate them.
-
-%The details on the Dolev-Yao web model and the detailed security proofs of UPPRESSO are in the appendix.
-
-%Finally,
-%    we formally prove that,
-%\emph{user identification}, \emph{RP designation}, \emph{confidentiality}, and \emph{integrity} are fulfilled in UPPRESSO.
+Finally,
+        this model ensures that $t$ is unaccessible to the honest-but-curious IdP,
+ which is necessary to prevent the IdP-based login tracing.}
 
 
 \subsection{Security}
 \label{analysis-security}
-UPPRESSO satisfies four security requirements of SSO identity tokens \cite{ArmandoCCCT08,FettKS16, FettKS17},
-     as listed in Section \ref{subsec:basicrequirements}.
-%\begin{itemize}
-%\setlength{\topsep}{0pt}
-%\setlength{\partopsep}{0pt}
-%\setlength{\itemsep}{0pt}
-%\setlength{\parsep}{0pt}
-%\setlength{\parskip}{0pt}
-%\item  \textbf{RP Designation}~~
-%\item \textbf{User Identification}~~
-%\item \textbf{Integrity}~~
-%           % and any forged or modified identity token will be rejected.
-%\item \textbf{Confidentiality}~~
-%\end{itemize}
+UPPRESSO satisfies four sufficient conditions
+    (i.e., RP designation, user identification, integrity, and confidentiality of identity tokens) 
+        of secure SSO services \cite{ArmandoCCCT08,FettKS16, FettKS17},
+     as stated in Section \ref{subsec:basicrequirements}.
+
 
 \vspace{1mm}
 \noindent\textcolor{blue}{\textbf{RP Designation.}~~Provided that $r$ is known to only the IdP,
 the RP pseudo-identity $PID_{RP} = [t]ID_{RP}$ in the identity token
      designates the target RP with $ID_{RP} = [r]G$, and only this RP.}
-%That is,
-%    $PID_{RP}$ bound in an identity token is equal to $PID_{RP}$ expected by the target RP;
-% and $PID_{RP}$ expected by an RP with $ID_{RP}$,
-%    cannot be expected by another RP.
 
 \vspace{0.75mm}
 \noindent\textbf{Proof.}
 $PID_{RP} = [t]ID_{RP}$ in the the identity token is expected by the target RP,
     because $t$ is also sent to this RP with $ID_{RP}$
      and this RP checks that $PID_{RP}$ is equal to $[t]ID_{RP}$.
+So $PID_{RP}$ designates this RP.
 
 
 Based on the ECDLP
@@ -122,7 +94,7 @@ Based on the ECDLP
         the probability of finding $t$ and $t'$
     satisfying $[t]ID_{RP_j} = [t']ID_{RP_{j'}}$ is negligible,
     where $RP_j$ and $RP_{j'}$ are any two RPs in the finite set of RPs (i.e.,
-    $ID_{RP_j} = [r_j]G$ and $ID_{RP_{j'}} = [r_{j'}]G$, while $r_j$ and $r_{j'}$ are kept secret to adversaries).
+    $ID_{RP_j} = [r_j]G$ and $ID_{RP_{j'}} = [r_{j'}]G$, while $r_j$ and $r_{j'}$ are kept secret to the adversaries).
 This negligible probability means $PID_{RP_j} = [t]ID_{RP_j}$ designates \emph{only} the target RP with $ID_{RP_j}$.
 
 Let $\mathbb{E}$ be an elliptic curve, %over a finite field $\mathbb{F}_q$,
@@ -186,28 +158,9 @@ becomes non-negligible with the increasing $k$.
 This violates the ECDLP assumption.
 Thus, the probability of finding $t$ and $t'$ satisfying that $[t]ID_{RP_j} = [t']ID_{RP_{j'}}$ in UPPRESSO is negligible,
     so this token binding $PID_{RP}$
-     is expected by only the target RP.
+     is expected by \emph{only} the target RP.
 $\square$
 
-%If ${\rm Pr}_s$ is non-negligible with the security parameter $k$, ${\rm Pr}\{\mathcal{D}^*_c(G, [x]G)=x\} =\frac{1}{m}{\rm Pr}_s$ is also non-negligible because $m << 2^k$,
-%which means that $\mathcal{D}^*_c$ solves the ECDLP.
-%So the adversary does not have non-negligible advantages in $\mathcal{G}_c$,
-%    and the probability of finding $t$ and $t'$
-%    satisfying that $[t]ID_{RP_j} = [t']ID_{RP_{j'}}$ in UPPRESSO is negligible.
-
-
-%An identity token binding $PID_U$ and $PID_{RP}$,
-%    designates the target RP, and only the target RP.
-%An honest RP calculates $PID_{RP}$ by itself with the trapdoor $t$ sent from the user,
-%    and checks $PID_{RP}$ in the $PID_{RP}$-registration result and the identity token.
-%So the target RP will accept this token.
-
-%Meanwhile,
-%        the honest IdP guarantees that, within its validity period, the $PID_{RP}$ will be registered only once.
-% $PID_{RP}$ will be bound in some identity token.
-%An honest RP is ready to accept an identity token binding $PID_{RP}$, only after it receives the signed $PID_{RP}$-registration result.
-%Because (\emph{a}) both $PID_{RP}$ and $H(t)$ in the registration result are checked by the RP and then (\emph{b}) the registration result $[PID_{RP}, H(t), Validity]_{SK}$ is acceptable to only one honest RP,
-%            the identity token designates only one RP.
 
 \vspace{1mm}
 \noindent\textcolor{blue}{\textbf{User Identification.}~~In the identity token
@@ -220,9 +173,9 @@ the user pseudo-identity $PID_U = [ID_U]PID_{RP}$ identifies
 
 \vspace{0.75mm}
 \noindent\textbf{Proof.}
-$PID_U$ in identity token identifies the authenticated user as $Acct = [ID_U][ID_{RP}]$
+$PID_U$ in identity token identifies the authenticated user as $Acct = [ID_U]ID_{RP}$
     at the RP with $ID_{RP}$ as follows.
-$PID_U = [ID_U]PID_{RP}$ is calculated by the IdP based on the user authenticated as $ID_U = u$, 
+$PID_U = [ID_U]PID_{RP}$ is calculated by the IdP based on the user authenticated as $ID_U = u$,
     which is analyzed in the Dolev-Yao style model.
 In the meantime, the  RP checks that $PID_{RP} = [t]ID_{RP}$
     and calculates $Acct = [t^{-1}]PID_U = [t^{-1}][ID_U]PID_{RP} = [t^{-1}][ID_U][t]ID_{RP} = [ID_U]ID_{RP}$.
@@ -239,36 +192,6 @@ Thus, given any RP,
     $[u]ID_{RP}$ assigns a \emph{unique} account to the user,
         provided that $1 \leq u < n$ and $ID_U = u$ is unique. $\square$
 
-%Moreover, adversary may try to provide the
-%However, according to the proof of RP designation, there would not be the generated $t$ and $t'$ happening to satisfy that $PID_{RP} = [t]ID_{RP_j} = [tr]G = [t'r']G = [t']ID_{RP_{j'}}$.
-
-
-%Two malicious users, whose identities are $ID_U = u$ and $ID_{U'} = u'$,
-%    could attempt to login to $RP_j$ and $RP_{j'}$, respectively.
-%If the generated $t$ and $t'$ happen to satisfy that $PID_{RP} = [t]ID_{RP_j} = [tr]G = [t'r']G = [t']ID_{RP_{j'}}$,
-%    these colluding users could arbitrarily choose to register either $[PID_{RP}, PEnpt_U, H(t)]$ or $[PID_{RP}, PEnpt_{U'}, H(t')]$ at the IdP,
-%        to receive an identity token binding $PID_{RP}$ and either $PID_U = [u]PID_{RP}$ or $PID_{U'} = [u']PID_{RP}$.\footnote{Such a token designates either $RP_j$ or $RP_{j'}$,
-%    but only one honest RP because there is only one acceptable $PID_{RP}$-registration result which is signed by the IdP.
-%    So RP designation is not violated in this attack case.}
-%When such a token is signed for $RP_j$, the calculated $Acct$ is $[ur]G$ or $[u'r't't^{-1}]G = [u'r]G$;
-%    or, when it is signed for $RP_{j'}$, $[urtt'^{-1}]G = [ur']G$ or $[u'r']G$ is calculated.
-%That is,
-%        even in this collusive case,
-%    the calculated account is still the authenticated user's account at the target RP,
-%    and it does not result in any attack.
-
-
-%An adversary might try allure a user to login under the adversary's account,
-%    by injecting his identity token into the user's communications with an honest RP.
-%Such identity injection attacks are impossible in UPPRESSO as follows.
-%If the negotiation of $PID_{RP}$ is not finished yet,
-%    the RP will reject the malicious token.
-%Even when $PID_{RP}$ has been negotiated,
-%    it is kept unknown to the adversary because the communications between two scripts are controlled by a browser
-%     and the communications between the browser and the IdP (or the RP) are protected by TLS.
-%Thus, an adversary cannot obtain $PID_{RP}$ dynamically negotiated between an honest RP and the user,
-%     so it cannot construct an identity token acceptable to the RP.
-%
 
 %The detailed process of proof is shown in Appendix.
 \vspace{1mm}
@@ -283,9 +206,9 @@ A signed identity token binds $PID_{RP} = [t]ID_{RP}$ and $PID_U = [ID_U]PID_{RP
     % $Acct$ and $ID_{RP}$ implicitly,
     and any breaking results in some failed checking or verification in the login flow as below.
 %It is ensured by the IdP's signatures:
-First of all, the identity token is signed by the IdP
+First of all, the identity token is signed by the honest IdP using $SK$
         and verified by the RP using $PK$,
-        so any modification will be rejected.
+        so any modification will be rejected by the RP.
 According to the proof of RP designation,
    % there is no $t' \neq t$ but satisfying that $PID_{RP} = [t]ID_{RP_j} = [t']ID_{RP_{j'}}$.
    $PID_{RP}$ identifies only the RP with $ID_{RP}$;
@@ -293,14 +216,10 @@ According to the proof of RP designation,
     $PID_U$ identifiers only the user with $Acct = [ID_U]ID_{RP}$ at the RP.
 Therefore, the identity token explicitly binding $PID_U$ and $PID_{RP}$,
     matches \emph{only} one $ID_{RP}$ and \emph{only} one $Acct = [t^{-1}]PID_{U}$.
-Thus,
+Therefore,
     $Acct$ and $ID_{RP}$ are actually bound in the token by the IdP's signatures,
         due to the one-to-one mapping between (\emph{a}) the pair of $Acct$ and $ID_{RP}$ and (\emph{b}) the triad of $PID_U$, $PID_{RP}$, and $t$. $\square$
 
-
-%The detailed process of proof is shown in Appendix.
-
-%The detailed process of proof is shown in Appendix.
 
 \vspace{1mm}
 \noindent\textcolor{blue}{\textbf{Confidentiality.}~~An identity token
@@ -318,7 +237,8 @@ Further, the IdP sends an identity token only to the authenticated user
         (i.e., the IdP script).
 The IdP script forwards the token to the RP script
  only if it is downloaded from the same origin as $Enpt_{RP}$,
-and the binding of $Enpt_{RP}$ and $ID_{RP}$ is ensured by a verified RP certificate.
+while the binding of $Enpt_{RP}$ and $ID_{RP}$ is ensured by a verified RP certificate
+    and $PK$ is well set in the honest IdP script.
   %  which is verified by the IdP script.
 So only the RP that owns $Enpt_{RP}$ and $ID_{RP}$,
     receives this token. $\square$
@@ -338,9 +258,9 @@ So the prevention against the IdP-based login tracing in UPPRESSO
 \vspace{1mm}
 \noindent\textcolor{blue}{\textbf{Privacy against the IdP.}~~If $t$ is random in $\mathbb{Z}_n$ and unknown to the IdP,
 the IdP
- cannot infer any information about $ID_{RP}$ or link any pair of $PID_{RP}^i$ and $PID_{RP}^{i'}$
-  ($i \neq i'$),
-    from an honest user's identity-token requests for $PID_{RP}^i$ ($i = 1, 2, \cdots$).}
+ cannot infer any information about $ID_{RP_j}$ or link any pair of $PID_{RP_j}^i$ and $PID_{RP_{j'}}^{i'}$
+  ($i \neq i'$, $j = j'$),
+    from an honest user's identity-token requests for $PID_{RP_j}^i$ ($i,j = 1, 2, \cdots$).}
 
 \vspace{0.75mm}
 \noindent\textbf{Proof.}
@@ -362,7 +282,7 @@ So the IdP-based login tracing is impossible. $\square$
     and verifies $PID_{RP}$ and $PID_U$ in the identity token.
 After filtering out the redundant information (i.e., $PID_{RP}= [t]{ID_{RP}}$ and $Acct = [t^{-1}]PID_{U}$),
     the RP actually receives $(ID_{RP}, t, Acct) = ([r]G, t, [ur]G)$.
-So the prevention against the RP-based identity linkage in UPPRESSO is expressed as follows.}
+Therefore, in UPPRESSO the prevention against the RP-based identity linkage is expressed as follows.}
 
 \vspace{1mm}
 \noindent\textcolor{blue}{\textbf{Privacy against Colluding RPs.}~~Provided that $u$ and $r$ are kept unknown to RPs,
@@ -459,14 +379,3 @@ The ECDDH assumption means that in $\mathcal{G}_r$ the adversary does not have a
 %    (indistinguishability of users to colluding RPs).
 So the RP-based identity linkage is impossible. $\square$
 
-
-%    the adversary will have non-negligible advantages in $\mathcal{G}$
-%        and $Pr_s$ is non-negligible.
-
-%If $s'=1$ and $ID_U' \in$\{$ID_{U_1}$, $ID_{U_2}$, ..., $ID_{U_a}$\}, the adversary succeeds in this game.
-%If the adversary does not have the non-negligible probability on succeeding in this game, RP-based identity linkage is not impossible.
-
-%We define the probability that the adversary succeeds in this game as $Pr_s'$.
-%So, if the adversary is able to ,
-%    the adversary will have non-negligible advantages in $\mathcal{G}$
-%        and $Pr_s$ is non-negligible.

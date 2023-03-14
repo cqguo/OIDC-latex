@@ -3,7 +3,7 @@
 \label{sec:UPPRESSO}
 
 This section gives the threat model and assumptions,
-    followed by the identity-transformation algorithms 
+    followed by the identity-transformation algorithms
     and the protocols.
 
 
@@ -13,7 +13,7 @@ This model is consistent with the widely-used SSO services \cite{OpenIDConnect,r
 
 %\vspace{0.5mm}
 \noindent \textbf{Honest-but-curious IdP.}
-An IdP follows the protocols strictly, while being interested in learning user profiles.
+An IdP follows the protocols strictly, while being interested in learning user online profiles.
 For example, it might store all received messages
  to infer the relationship among $ID_U$, $ID_{RP}$, $PID_{U}$, and $PID_{RP}$.
  % to track a user's login activities.
@@ -21,7 +21,7 @@ It never actively violates the protocols,
 so a script downloaded from the IdP also strictly follows the protocols (see Section \ref{sec:web-design} about the specific designs
     for web applications).
 The IdP maintains the private key well for signing identity tokens and RP certificates, %(see Section \ref{implementations} for details)
-so adversaries cannot forge such tokens or certificates.
+so adversaries cannot forge such messages.
 
 %\vspace{0.5mm}
 \noindent \textbf{Malicious Users.}
@@ -40,16 +40,16 @@ Malicious RPs might behave arbitrarily to break the security and privacy guarant
 %they may attempt to obtain a valid identity token for another RP, to allow some user to log into this target RP:
 e.g., manipulate $PID_{RP}$ in a login instance,
     attempting to (\emph{a}) allure honest users to return an identity token that might be accepted by some honest RP,
-or (\emph{b}) influence the generation of $PID_U$ to
+or (\emph{b}) manipulate the generation of $PID_U$ to
     analyze the relationship between $ID_U$ and $PID_U$.
 
 
 %\vspace{0.5mm}
 \noindent \textbf{Colluding Users and RPs.}
 Malicious users and RPs might collude,
- attempting to break the security and privacy guarantees for honest users.
+ attempting to break the security and privacy guarantees for honest users and RPs.
 For example, a malicious RP might collude with malicious users to steal another user's identity token,
-    to impersonate the victim user at some honest RP.
+    to impersonate the victim at some honest RP.
 
 Finally, we do \emph{not} consider the collusion of the IdP and RPs.
     If the IdP could collude with some RPs,
@@ -60,7 +60,7 @@ This secret is held \emph{only} by the user;
 %Note that we aim to design a solution for SSO users without any non-ephemeral secret verified by the RPs.
 However, such accounts derived from the user secret have to be updated,
     if it is lost or leaked
-    (see discussions in Section \ref{sec:discussion}).
+    (see more discussions in Section \ref{sec:discussion}).
 
 \subsection{Assumptions}
 HTTPS is adopted to secure the communications between honest entities,

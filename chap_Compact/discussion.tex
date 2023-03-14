@@ -19,21 +19,9 @@ UPPRESSO does not protect user privacy against such collusive attacks,
                 are transformed to the accounts at RPs, unrelated to any user credential
                  (e.g., password, one-time password, smart card or FIDO device).
 
-%When the IdP is kept honest-but-curious but shares messages in the login flow (i.e.,
-%$ID_U$, $PID_{RP}$, and $PID_U$)
-%        with some colluding RPs,
-%UPPRESSO still provides secure SSO services,
-%    provided that the signed identity tokens are sent to the authenticated users only;
-%however,
-%    the colluding adversaries are able to track the users' login activities to these RPs.
-%Even in this case, a user's login activities at the other RPs not collusive with the IdP,
-%        are still kept unknown to the IdP and these colluding RPs,
-%        because a triad of $t$, $PID_U$ and $PID_{RP}$ is ephemeral and independent of each other.
-
-
 
 \vspace{0.75mm}
-\noindent{\textbf{Scalability and Uniqueness.}}
+\noindent{\textbf{Scalability.}}
 $ID_{RP}$ is generated uniquely in an RP's initial registration,
     and the capacity of RPs is $n$ (i.e., the order of $G$). For the NIST P256 elliptic curve, $n$ is approximately $2^{256}$.
 $PID_{RP}$ cannot be exhausted, either.
@@ -69,7 +57,7 @@ The identity-transformation algorithms $\mathcal{F}_{PID_{U}}$, $\mathcal{F}_{PI
     %similar with the login flow introduced in Section \ref{implementations},
             an authorization code is forwarded to the RP script by the IdP script
                 and this code is used to ask for an identity token binding $PID_U$ and $PID_{RP}$.
-An authorization code is usually an index to retrieve identity tokens from the IdP,
+An authorization code is an index to retrieve identity tokens from the IdP,
         and does not disclose information about the authenticated user.
 
 
@@ -138,23 +126,9 @@ So
         by the script
         \verb+window.open('https://RP.com/honest').document.cookie+,
     even if the honest RP restricts only HTTP requests to specific paths carry its cookies.
-This risk actually results from the SOP design of browsers.
+That is, this risk actually results from the SOP design of browsers.
 
 
-
-%Moreover, IdP can also issue the access token to RP beside of identity token, while the specifications\cite{rfc6749, rfc6750} define mechanisms to obtain and use access tokens to access resources but do not define standard methods to provide identity information.
-%    That is, the access token is not required to carry any RP and user's information explicitly, therefore, it would not expose any user's information to RP.
-
-
-
-%\noindent{\textbf{Implementation with Browser Extensions.}}
-%If the user functions of UPPRESSO are implemented with browser extensions,
-%    it results in better performance.
-%A user downloads and installs the browser extension,
-%    before he visits the RPs.
-%We have tested such a browser extension while the IdP and RPs are unmodified,
-% \textcolor[rgb]{1,0,0}{and experiments show that at least 102 ms will be saved for each login (i.e., about 208 ms in total),}
-%    compared with the version with portable web scripts.
 
 \vspace{0.75mm}
 \noindent{\textbf{Applicability of Identity Transformations.}}
@@ -163,9 +137,6 @@ The proposed identity-transformation algorithms %i.e., $\mathcal{F}_{PID_{RP}}()
         (e.g., web application, mobile App, and native software),
     because these algorithms follow the common model of popular SSO protocols
     and do not depend on any special implementation or runtime.
-%Although the prototype runs for web applications,
-%    it is feasible to apply the identity-transformation functions to other SSO scenarios
-%        to protect user privacy.
 
 
 

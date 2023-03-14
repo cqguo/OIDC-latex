@@ -20,7 +20,7 @@
 MITREid Connect runs with the implicit flow of OIDC,
  and in SPRESSO an identity token is forwarded by a user to the RP,
     similarly to the implicit flow. %to some extent.
-In SPRESSO an RP's domain is encrypted as $PID_{RP}$ in identity tokens, 
+In SPRESSO an RP's domain is encrypted as $PID_{RP}$ in identity tokens,
 while the symmetric key is known to only the RP and the user.
 They also adopt RSA-2048 and SHA-256  in the generation of tokens.
 
@@ -35,11 +35,11 @@ The RPs in three schemes provide the same function, i.e.,
 \begin{figure}[tb]
   \centering
 	\subfigure[In a virtual private cloud]{
-  		\begin{minipage}[b]{0.45\textwidth}
+  		\begin{minipage}[b]{0.455\textwidth}
 			\includegraphics[width=0.973\linewidth]{fig/evaluation-lan.pdf}
 		\end{minipage}}
 	\subfigure[With a remotely-visiting browser]{
-  		\begin{minipage}[b]{0.45\textwidth}
+  		\begin{minipage}[b]{0.455\textwidth}
 			\includegraphics[width=0.973\linewidth]{fig/evaluation-internet.pdf}
 		\end{minipage}}
   \caption{The time cost of SSO login}
@@ -96,34 +96,15 @@ UPPRESSO simply retrieves a token from the IdP.
 On the contrary, in MITREid Connect when a user retrieves the identity token from the IdP,
  the token must be carried with a URL following the fragment identifier \verb+#+ instead of \verb+?+, due to security considerations \cite{de2014oauth}.
 So the user needs to first download a script from the RP to process this token, which takes the most time.
-   %  UPPRESSO needs 34 ms.
-%Compared with MITREid Connect,
-%    it needs 2 more ms to calculate  $PID_U$.
 SPRESSO takes a little more time to generate an identity token,
     as it implements the IdP based on node.js and adopts a JavaScript cryptographic library,
  while a more efficient Java library is used in the others.
-%As the processings in SPRESSO and MITREid Connect are the same, the processing time in SPRESSO may be reduced to 32 ms.
-%And, then the overall time in SPRESSO will be 269 ms, still larger than 254 ms in UPPRESSO.
 
 %transmission & extraction
 In the identity-token acceptance,
  MITREid Connect and UPPRESSO spend the comparable amounts of time to send an identity token to the RP and verify this token.
- %UPPRESSO only needs about 6 ms for the scripts to send an identity token to the RP,
-  %  which verifies it and calculates $Acct$.
-%It takes 71 ms for MITREid Connect to accept this identity token:
- %   when the token is redirected to the RP,
-  %      it must be carried within an URL following  the fragment identifier \verb+#+ instead of \verb+?+,
-   %      due to some security considerations \cite{de2014oauth},
-   %     so the identity token has to be sent to the RP by JavaScript functions (but not HTTP requests)
-   %         and most time is spent to download the script from the RP.
 SPRESSO needs the longest time due to the complicated process at the user agent:
         after receiving identity tokens from the IdP,
         the browser downloads JavaScript code from the trusted forwarder server,
             decrypts the RP endpoint, and finally sends identity tokens to this endpoint.
-%In the evaluation, the forwarder and IdP are deployed in one machine, which doesn't introduce performance degradation based on the observation. % as  FWD and IdP work sequently for one login.
 
-%SPRESSO needs a trusted entity named FWD for transmitting the identity token. We deployed FWD and IdP on the same machine to reduce transmitting delay between them, while the computation never becomes the bottleneck according to the observation.
-
-
-%In the verification, UPPRESSO needs an extra calculation for $Account$, which then requires  58 ms,
-% compared to 14 ms in MITREid Connect and 17 ms in SPRESSO.
