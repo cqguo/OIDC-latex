@@ -4,16 +4,17 @@ In this section, we analyze that UPPRESSO achieves the required properties of se
 
 \subsection{Adversarial Model}
 \label{adver-model}
-\textcolor{blue}{Based on the threat model and assumptions in Section \ref{sec:UPPRESSO},
-    different types of adversaries are considered.
+\textcolor{blue}{Based on the threat model and assumptions proposed in Section \ref{sec:UPPRESSO},
+    different types of adversaries are considered in the analysis of security and privacy.
 First of all, in the proofs of security,
-    malicious RPs collude with malicious users
+    malicious RPs collude with malicious users,
+        attempting 
         to break any of the four security properties of SSO identity tokens for an honest user to visit an honest RP.
 Then, in the analysis of privacy against the IdP-based login tracing,
    an honest-but-curious IdP is the only adversary.
 Finally,
     in the privacy analysis against the RP-based identity linkage,
-    a number of malicious RPs collude to link an honest user's accounts across these RPs.}
+    a number of malicious RPs collude, attempting to link an honest user's accounts across these RPs.}
 
 We first analyzed UPPRESSO %especially confidentiality and integrity,
      based on a Dolev-Yao style model \cite{SPRESSO}.
@@ -59,30 +60,34 @@ We (\emph{a}) trace the lifecycle of an identity token for an honest user to vis
 and (\emph{c})
     locate the places where $PK$ is transmitted and used in the IdP script,
         to ensure no adversary tampering with it.
-These conclusions are necessary to prove security of the UPPRESSO protocols.
+These conclusions are used to prove security of the UPPRESSO protocols.}
 %
 % to ensure it is not leaked to attackers or tampered with by any adversary without checking.
-Finally,
-        this model ensures that $t$ is unaccessible to the honest-but-curious IdP,
- which is necessary to prevent the IdP-based login tracing.}
+\textcolor{blue}{In the meantime, 
+        this model ensures that (\emph{a}) $t$ is unaccessible to the honest-but-curious IdP,
+ which is necessary to prevent the IdP-based login tracing,
+ and (\emph{b}) $u$ and $r$ are not leaked to RPs in the protocols,
+    necessary to prevent the RP-based identity linkage.}
 
 
 \subsection{Security}
 \label{analysis-security}
 UPPRESSO satisfies four sufficient conditions
-    (i.e., RP designation, user identification, integrity, and confidentiality of identity tokens) 
+    (i.e., RP designation, user identification, integrity, and confidentiality of identity tokens)
         of secure SSO services \cite{ArmandoCCCT08,FettKS16, FettKS17},
      as stated in Section \ref{subsec:basicrequirements}.
 
 
 \vspace{1mm}
 \noindent\textcolor{blue}{\textbf{RP Designation.}~~Provided that $r$ is known to only the IdP,
-the RP pseudo-identity $PID_{RP} = [t]ID_{RP}$ in the identity token
+the RP pseudo-identity $PID_{RP}$ in the identity token
      designates the target RP with $ID_{RP} = [r]G$, and only this RP.}
 
 \vspace{0.75mm}
 \noindent\textbf{Proof.}
-$PID_{RP} = [t]ID_{RP}$ in the the identity token is expected by the target RP,
+\textcolor{blue}{As analyzed in the Dolev-Yao style model, $PID_{RP} = [t]ID_{RP}$
+        is set by the honest IdP and no adversaries manipulate it.}
+Then, $PID_{RP} = [t]ID_{RP}$ in the the identity token is expected by the target RP,
     because $t$ is also sent to this RP with $ID_{RP}$
      and this RP checks that $PID_{RP}$ is equal to $[t]ID_{RP}$.
 So $PID_{RP}$ designates this RP.
@@ -165,7 +170,7 @@ $\square$
 \vspace{1mm}
 \noindent\textcolor{blue}{\textbf{User Identification.}~~In the identity token
     binding $PID_U$ and $PID_{RP}$,
-the user pseudo-identity $PID_U = [ID_U]PID_{RP}$ identifies
+the user pseudo-identity $PID_U$ identifies
         the authenticated user with $ID_U$, % as $Acct = [ID_U][ID_{RP}]$,
          and only this user,  at the target RP with $ID_{RP} = [r]G$.}
 %That is,
@@ -175,8 +180,8 @@ the user pseudo-identity $PID_U = [ID_U]PID_{RP}$ identifies
 \noindent\textbf{Proof.}
 $PID_U$ in identity token identifies the authenticated user as $Acct = [ID_U]ID_{RP}$
     at the RP with $ID_{RP}$ as follows.
-$PID_U = [ID_U]PID_{RP}$ is calculated by the IdP based on the user authenticated as $ID_U = u$,
-    which is analyzed in the Dolev-Yao style model.
+\textcolor{blue}{$PID_U = [ID_U]PID_{RP}$ is calculated by the IdP based on the user authenticated as $ID_U = u$,
+    which is analyzed in the Dolev-Yao style model.}
 In the meantime, the  RP checks that $PID_{RP} = [t]ID_{RP}$
     and calculates $Acct = [t^{-1}]PID_U = [t^{-1}][ID_U]PID_{RP} = [t^{-1}][ID_U][t]ID_{RP} = [ID_U]ID_{RP}$.
 %$t$ and $PID_{RP}$ have been checked by the honest RP in the $PID_{RP}$-registration result,
@@ -190,7 +195,7 @@ $\mathbb{E}$ is a finite cyclic group,
     and then $ID_{RP} = [r]G$ is also a generator of order $n$.
 Thus, given any RP,
     $[u]ID_{RP}$ assigns a \emph{unique} account to the user,
-        provided that $1 \leq u < n$ and $ID_U = u$ is unique. $\square$
+        because $1 \leq u < n$ and $ID_U = u$ is unique. $\square$
 
 
 %The detailed process of proof is shown in Appendix.
@@ -228,7 +233,7 @@ Therefore,
 
 \vspace{0.75mm}
 \noindent\textbf{Proof.}
-As analyzed in the Dolev-Yao style model, no event leaks an identity token to any malicious entity other than the authenticated user and the designated RP.
+\textcolor{blue}{As analyzed in the Dolev-Yao style model, no event leaks an identity token to any malicious entity other than the authenticated user and the designated RP.}
 First of all, the communications among the IdP, RPs and users,
     are protected by HTTPS,
     and the \verb+postMessage+ HTML5 API ensures the dedicated channels between two scripts within the browser,
@@ -259,14 +264,14 @@ So the prevention against the IdP-based login tracing in UPPRESSO
 \noindent\textcolor{blue}{\textbf{Privacy against the IdP.}~~If $t$ is random in $\mathbb{Z}_n$ and unknown to the IdP,
 the IdP
  cannot infer any information about $ID_{RP_j}$ or link any pair of $PID_{RP_j}^i$ and $PID_{RP_{j'}}^{i'}$
-  ($i \neq i'$, $j = j'$),
-    from an honest user's identity-token requests for $PID_{RP_j}^i$ ($i,j = 1, 2, \cdots$).}
+  ($i \neq i'$ but $j = j'$),
+    from a user's identity-token requests for $PID_{RP_j}^i$ ($i,j = 1, 2, \cdots$).}
 
 \vspace{0.75mm}
 \noindent\textbf{Proof.}
 Because (\emph{a}) $ID_{RP} = [r]G$ is also a generator of order $n$,
         where $G$ is a generator of finite cyclic group $\mathbb{E}$,
-    and (\emph{b}) $t$ is a random number in $\mathbb{Z}_n$ and kept unknown to the IdP,
+    \textcolor{blue}{and (\emph{b}) $t$ is a random number in $\mathbb{Z}_n$ and kept unknown to the IdP,}
  from the IdP's view,
  $PID_{RP}$
 is \emph{indistinguishable} from a random variable on $\mathbb{E}$.
