@@ -8,43 +8,19 @@ We discuss the security requirements of privacy-preserving SSO,
 \subsection{Security Requirements of SSO}
 \label{subsec:basicrequirements}
 
-The primary goal of non-anonymous SSO services \cite{OpenIDConnect,rfc6749,SAML,SAMLIdentifier,NIST2017draft} is %user authentication and identification \cite{SPRESSO},
- to ensure that a \emph{legitimate} user is able to login to an \emph{honest} RP as his permanent account at this RP, %correlating multiple login instances,
-    by presenting \emph{identity tokens} issued by a \emph{trusted} IdP.
-
-To achieve this goal,
- an identity token issued by a trusted IdP \cite{OpenIDConnect,rfc6749,SAML,SAMLIdentifier,NIST2017draft} specifies (\emph{a}) the RP to which the user requests to login (i.e., \emph{RP designation})
-    and  (\emph{b}) the user who is authenticated by the IdP (i.e., \emph{user identification}).
-Therefore,
-    an honest RP compares the designated RP identity (or pseudo-identity) in identity tokens with its own before accepting the tokens;
-     otherwise,
-        a malicious RP could replay a received identity token to some honest RP and login as the victim user.
-The RP allows the token holder to login as the user (pseudo-)identity specified in an accepted token.
-
-The SSO login flow also requires \emph{confidentiality} and \emph{integrity} of identity tokens.
-An identity token should be forwarded by the authenticated user to the target RP only,
-    not leaked to any other parties;
-        otherwise, an eavesdropper who presents the token, would successfully login to the designated RP.
-Integrity is also necessary
-    to prevent adversaries from tampering with a token.
-So identity tokens are usually signed by a trusted IdP and transmitted over HTTPS \cite{OpenIDConnect,rfc6749,SAML}.
+Non-anonymous SSO services~\cite{OpenIDConnect,rfc6749,SAML,SAMLIdentifier,NIST2017draft} aims to ensure a \emph{legitimate} user to login to an \emph{honest} RP using his permanent account at that RP, %correlating multiple login instances,
+by presenting \emph{identity tokens} issued by a \emph{trusted} IdP. 
+To achieve this goal, a trusted IdP issues an identity token~\cite{OpenIDConnect, rfc6749, SAML, SAMLIdentifier, NIST2017draft} that specifies (\emph{a}) the RP that the user requests to log in to (i.e., \emph{RP designation}) and  (\emph{b}) the user who has been authenticated by the IdP (i.e., \emph{user identification}). Thus, an honest RP verifies the designated RP identity (or pseudo-identity) in the identity tokens against its own before accepting them and authorizes the token holder to log in as the user whose (pseudo-)identity is specified in an accepted token. This prevents a malicious RP from replaying a received identity token to an honest RP and logging in as the victim user. 
+The SSO login flow also requires \emph{confidentiality} and \emph{integrity} of identity tokens. An identity token must be forwarded only to the target RP by the authenticated user, and not disclosed to any other parties. Otherwise, an eavesdropper who possesses the token could successfully login to the designated RP. Maintaining integrity is also critical to prevent adversaries from tampering with a token. So, identity tokens are usually signed by a trusted IdP and transmitted over HTTPS \cite{OpenIDConnect,rfc6749,SAML}.
 
 
-The necessary and  sufficient conditions
-     (i.e., RP designation, user identification, integrity, and confidentiality of identity tokens) 
-    of secure SSO services
-     are well analyzed \cite{ArmandoCCCT08,FettKS16, FettKS17},
-     and
-     vulnerabilities breaking any of the properties
-            result in attacks \cite{SomorovskyMSKJ12, WangCW12, ArmandoCCCPS13, ZhouE14, WangZLLYLG15, WangZLG16, YangLLZH16, MainkaMS16, MainkaMSW17, YangLCZ18, YangLS17, ShiWL19, ChenPCTKT14, ccsSunB12, DiscoveringJCS, dimvaLiM16, CaoSBKVC14, TowardsShehabM14}.
+The sufficient and necessary conditions for secure SSO services, i.e., {\bf {\em RP designation, user identification,}} and {\bf {\em integrity and confidentiality of identity tokens}}, have been thoroughly analyzed \cite{ArmandoCCCT08, FettKS16, FettKS17}.
+Any vulnerabilities that compromise any of these properties may lead to attacks~\cite{SomorovskyMSKJ12, WangCW12, ArmandoCCCPS13, ZhouE14, WangZLLYLG15, WangZLG16, YangLLZH16, MainkaMS16, MainkaMSW17, YangLCZ18, YangLS17, ShiWL19, ChenPCTKT14, ccsSunB12, DiscoveringJCS, dimvaLiM16, CaoSBKVC14, TowardsShehabM14}.
 
-
-\subsection{Identity Transformation}
-\label{subsec:solutions}
 
 %\subsection{The Identity Dilemma of Privacy-Preserving SSO}
 %\label{subsec:challenges}
-\begin{table}[t]
+\begin{table}
 \footnotesize
     \caption{The (pseudo-)identities in privacy-preserving SSO}
     \centering
@@ -60,6 +36,8 @@ The necessary and  sufficient conditions
     \label{tbl:notations-dilemma}
 \end{table}
 
+\subsection{Identity Transformation}
+\label{subsec:solutions}
 
 \textcolor{blue}{We aim to design a privacy-preserving SSO system with the four security properties as above,
     while preventing both the IdP-based login tracing and the RP-based identity linkage.
@@ -114,8 +92,6 @@ To prevent the RP-based identity linkage,
 %$PID_U$ is bound in identity tokens:
     the RP does not obtain any information about $ID_U$ from any $PID_{U,j}$,
     which implies $PID_{U,j}$ for different RPs should be independent of each other.}
-
-
 
 \begin{figure}[bt]
   \centering
