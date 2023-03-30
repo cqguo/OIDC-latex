@@ -25,18 +25,17 @@ Therefore, the atomic processes of UPPRESSO include an {\em IdP process}, a fini
 The script processes communicate with each other through \verb+postMessage+, which are modeled as transmitted-to-itself events of a browser process.
 %To clearly indicate the action of postMessage communication, we define it as the transmitting-to-itself event of the browser (which is not defined in SPRESSO).
 
-\textcolor{blue}{With this formal model, we could (\emph{a}) trace the identity token lifecycle from its generation at the IdP to its acceptance at the RP to prove that it cannot be leaked to adversaries; (\emph{b}) locate the places where $PID_U$, $PID_{RP}$, and other elements in the identity token are processed to prove that they cannot be manipulated by any adversary; and (\emph{c}) locate the places where the IdP script uses $PK$ for verification to prove that it cannot be replaced by any adversary. Besides, we show that the IdP cannot view $t$ shared only between the user and the RP, while the RPs cannot view $u$ shared between the user and the IdP. It is trivial to prove the security of $r$, as it never leaves the IdP.
+\textcolor{blue}{With this formal model, we could (\emph{a}) trace the identity token lifecycle from its generation at the IdP to its acceptance at the RP to prove that it cannot be leaked to adversaries; (\emph{b}) locate the places where $PID_U$, $PID_{RP}$, and other elements in the identity token are processed to prove that they cannot be manipulated by any adversary; and (\emph{c}) locate the places where the IdP script uses $PK$ for verification to prove that it cannot be replaced by any adversary. Besides, we show that the IdP cannot view $t$ shared only between the user and the RP, while the RPs cannot view $u$ shared between the user and the IdP. It is trivial to prove the security of $r$, as it never leaves the IdP. Next, we present the proofs of four security properties supported by UPPRESSO.
 %These conclusions are used to prove the security of the UPPRESSO protocols.
 }
 
 \vspace{1mm}
-\noindent\textcolor{blue}{\textbf{RP Designation.}~~Provided that $r$ is known to only the IdP,
-the RP pseudo-identity $PID_{RP}$ in the identity token
-     designates the target RP with $ID_{RP} = [r]G$, and only this RP.}
+%\noindent{\textbf{RP Designation:} {\em Provided that $r$ is known only to the IdP, $PID_{RP}$ in the identity token uniquely designates the RP with $ID_{RP} = [r]G$.}}
+\noindent\textcolor{blue}{\textbf{RP Designation:} {\em $PID_{RP}$ in any identity tokens identifies one and only one RP with $ID_{RP} = [r]G$, from all the registered RPs.}
+}
 
-\vspace{0.75mm}
 \noindent\textbf{Proof.}
-\textcolor{blue}{As analyzed in the Dolev-Yao style model, $PID_{RP} = [t]ID_{RP}$
+\textcolor{blue}{Using the Dolev-Yao-style model, $PID_{RP} = [t]ID_{RP}$
         is set by the honest IdP and no adversaries manipulate it.}
 Then, $PID_{RP} = [t]ID_{RP}$ in the the identity token is expected by the target RP,
     because $t$ is also sent to this RP with $ID_{RP}$
