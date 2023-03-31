@@ -1,9 +1,10 @@
-\section{The Analysis of Security and Privacy}
+\section{Security and Privacy Analysis}
 \label{sec:analysis}
-In this section, we analyze that UPPRESSO achieves the required properties of security and privacy.
+In this section, we analyze the security and privacy guarantees provided by UPPRESSO and show that it achieves all four required security properties defined in Section~\ref{subsec:basicrequirements} and prevents both types of privacy threats against SSO services.
 
-\subsection{Adversarial Model}
+%\subsection{Extended Adversarial Models}
 \label{adver-model}
+
 \textcolor{blue}{Based on the threat model and assumptions proposed in Section \ref{sec:UPPRESSO},
     different types of adversaries are considered in the analysis of security and privacy.
 First of all, in the proofs of security,
@@ -69,62 +70,60 @@ These conclusions are used to prove security of the UPPRESSO protocols.}
  and (\emph{b}) $u$ and $r$ are not leaked to RPs in the protocols,
     necessary to prevent the RP-based identity linkage.}
 
+\textcolor{blue}{Threat model defined in Section~\ref{subsec:threatmodel} depicts potential adversaries against SSO as honest-but-curious IdPs, malicious RPs, and malicious users, where malicious RPs and users could collude. Based on their objectives, we consider three adversarial scenarios in the security analysis and present our goals in each scenario: {\bf \emph{(S1)}} malicious users colluding with each other or with malicious RPs to impersonate an honest user and log in to an honest RP, which requires satisfying {\em four SSO security properties}; {\bf \emph{(S2)}} the honest-but-curious IdP inferring the identity of the RP(s) that the user requests to access, which requires {\em privacy against the IdP}; and {\bf \emph{(S3)}} malicious RPs colluding with each other or with malicious users to deduce the user identity or link her pseudo-identities, which requires {\em privacy against colluding RPs}. Next, we prove that UPPRESSO is secure in the first adversarial scenario in Section~\ref{analysis-security} and it can prevent privacy threats in the other two adversarial scenarios in Section~\ref{sec-:analysis}.}
+
+%======move to security analysis
+%The RP cannot derive $ID_U$ from either $PID_U$ or $Acct$ due to the elliptic curve discrete logarithm problem (ECDLP). Since $t$ is random in $\mathbb{Z}_n$ and unknown to the IdP, from the IdP's view, $PID_{RP}$ is indistinguishable from a random variable on $\mathbb{E}$. So, the IdP cannot learn anything about $ID_{RP}$ from $PID_{RP}$.
+%Section \ref{sec:analysis} presents more detailed analyses.
 
 \subsection{Security}
 \label{analysis-security}
-UPPRESSO satisfies four sufficient conditions
-    (i.e., RP designation, user identification, integrity, and confidentiality of identity tokens)
-        of secure SSO services \cite{ArmandoCCCT08,FettKS16, FettKS17},
-     as stated in Section \ref{subsec:basicrequirements}.
+%UPPRESSO satisfies four sufficient conditions (i.e., RP designation, user identification, integrity, and confidentiality of identity tokens) of secure SSO services \cite{ArmandoCCCT08,FettKS16, FettKS17}, as stated in Section \ref{subsec:basicrequirements}.
 
+\textcolor{blue}{In a secure SSO service that is robust against impersonation attacks, an honest user should be able to prove her identity to the target RP with an identity token issued by the IdP. As pseudo-identities are used in UPPRESSO, it is important to allow the RP to verify that ({\em a}) $PID_{RP}$ included in the identity token is a transformation from its $ID_{RP}$ and tied to the current login instance, which requires {\em RP designation}; and ({\em b}) $PID_U$ included in the identity token maps to a unique, long-term user account, which requires {\em user identification}. Besides, the identity token for an honest RP should not be intercepted by malicious users or RPs, requiring the {\em confidentiality of identity tokens}, nor be forged or tampered with to include a fake $PID_U$ or $PID_{RP}$, requiring the {\em integrity of identity tokens}.}
+
+To prove that UPPRESSO satisfies these four properties, we first formalize its login flow using a Dolev-Yao-style model \cite{SPRESSO}, % which has been used in the formal analysis of SSO protocols such as OAuth 2.0 \cite{FettKS16} and OIDC \cite{FettKS17}.
+which abstracts the entities in a web system, such as web servers and browsers, as \emph{atomic processes} %which communicate with each other through events. % such as HTTPS request and response.
+and then defines \emph{script processes} to formulate client-side scripts.
+%The script is dependently invoked by the browser to process the server-defined logic.%such as verifying $Certificate_{RP}$. %postmessage events; %atomic process <-> script process, communication. %Other events change self-trigger.
+Therefore, the atomic processes of UPPRESSO include an {\em IdP process}, a finite set of {\em web servers} for honest RPs, a finite set of honest {\em browsers}, and a finite set of {\em attacker processes} that model malicious RPs and malicious users. The processes communicate with each other through events such as HTTPS requests and responses. A browser may have an honest IdP script and multiple RP scripts that could be honest or malicious.
+%Although the scripts coexist in the same browser, they are strictly separated.
+The script processes communicate with each other through \verb+postMessage+, which are modeled as transmitted-to-itself events of a browser process.
+%To clearly indicate the action of postMessage communication, we define it as the transmitting-to-itself event of the browser (which is not defined in SPRESSO).
+
+\textcolor{blue}{With this formal model (referred to as $D$-$Y$ model), we could (\emph{a}) trace the identity token lifecycle from its generation at the IdP to its acceptance at the RP to prove that it cannot be leaked to adversaries; (\emph{b}) locate the places where $PID_U$, $PID_{RP}$, and other elements in the identity token are processed to prove that they cannot be manipulated by any adversary; and (\emph{c}) locate the places where the IdP script uses $PK$ for verification to prove that it cannot be replaced by any adversary. Besides, we show that the IdP cannot view $t$ shared only between the user and the RP, while the RPs cannot view $u$ shared between the user and the IdP. It is trivial to prove the security of $r$, as it never leaves the IdP. Next, we present the proofs of four security properties supported by UPPRESSO.
+%These conclusions are used to prove the security of the UPPRESSO protocols.
+}
 
 \vspace{1mm}
-\noindent\textcolor{blue}{\textbf{RP Designation.}~~Provided that $r$ is known to only the IdP,
-the RP pseudo-identity $PID_{RP}$ in the identity token
-     designates the target RP with $ID_{RP} = [r]G$, and only this RP.}
+%\noindent{\textbf{RP Designation:} {\em Provided that $r$ is known only to the IdP, $PID_{RP}$ in the identity token uniquely designates the RP with $ID_{RP} = [r]G$.}}
+\noindent\textcolor{blue}{\textsc{Theorem 1. (RP Designation)} {\em Consider an arbitrary RP registered at the IdP with $ID_{RP}$ receives from the user an integer $t$ and a valid identity token $T$ in a login instance. If $PID_{RP}$ extracted from the identity token satisfies $PID_{RP} = [t]ID_{RP}$, then $PID_{RP}$ uniquely designates this RP.}
+}
 
-\vspace{0.75mm}
-\noindent\textbf{Proof.}
-\textcolor{blue}{As analyzed in the Dolev-Yao style model, $PID_{RP} = [t]ID_{RP}$
-        is set by the honest IdP and no adversaries manipulate it.}
-Then, $PID_{RP} = [t]ID_{RP}$ in the the identity token is expected by the target RP,
-    because $t$ is also sent to this RP with $ID_{RP}$
-     and this RP checks that $PID_{RP}$ is equal to $[t]ID_{RP}$.
-So $PID_{RP}$ designates this RP.
+\vspace{0.5mm}
+\noindent\textcolor{blue}{\textsc{Proof.} $PID_{RP}$ extracted from the identity token with a valid signature signed by the IdP is considered a valid pseudo-identity. By computing $[t]ID_{RP}$ and checking $PID_{RP} = [t]ID_{RP}$, the RP confirms that $PID_{RP}$ is its own pseudo-identity, which is transformed using the trapdoor $t$.}
 
+\textcolor{blue}{As shown in Figure~\ref{fig:process}, the RP receives $t$ and $T$ from the RP script of the user browser, which could be honest or malicious, according to the $D$-$Y$ model. Hence, a malicious RP script could send a valid identity token that is issued by the honest IdP for a colluding RP to the honest RP. Based on Lemma 1, the probability that any $PID_{RP}$ is a pseudo-identity of two different RPs is negligible. Therefore, once the RP verifies $PID_{RP} = [t]ID_{RP}$, $PID_{RP}$ is a pseudo-identity of this RP but not any other RPs registered in the SSO. \hfill $\square$}
 
-Based on the ECDLP
-    we prove that,
-    for adversaries,
-        the probability of finding $t$ and $t'$
-    satisfying $[t]ID_{RP_j} = [t']ID_{RP_{j'}}$ is negligible,
-    where $RP_j$ and $RP_{j'}$ are any two RPs in the finite set of RPs (i.e.,
-    $ID_{RP_j} = [r_j]G$ and $ID_{RP_{j'}} = [r_{j'}]G$, while $r_j$ and $r_{j'}$ are kept secret to the adversaries).
-This negligible probability means $PID_{RP_j} = [t]ID_{RP_j}$ designates \emph{only} the target RP with $ID_{RP_j}$.
+\vspace{0.5mm}
+\noindent\textcolor{blue}{\textsc{Lemma 1.} {\em  For any two different RPs in a finite set of RPs registered at the IdP, the probability of finding two different integers $t \in [1,n)$ and $t' \in [1,n)$ that satisfies $[t]ID_{RP_j} = [t']ID_{RP_{j'}}$ is negligible, where $ID_{RP_j}=[r]G$, $ID_{RP_{j'}}=[r']G$, and $r$ and $r'$ are two different integers.}}
 
-Let $\mathbb{E}$ be an elliptic curve, %over a finite field $\mathbb{F}_q$,
-    $G$ be a point on $\mathbb{E}$ of order $n$,
-        and $Q = [x]G$ where $x$ is a random integer in $\mathbb{Z}_n$.
-Given $G$ and $Q$,
-    the probability that a probabilistic polynomial time (PPT) algorithm calculates $x$ (i.e., solves the ECDLP) is negligible.
-For any PPT algorithm $\mathcal{D}$ to calculate $x$, we define
+%Based on the ECDLP we prove that, for adversaries, the probability of finding $t$ and $t'$ satisfying $[t]ID_{RP_j} = [t']ID_{RP_{j'}}$ is negligible, where $RP_j$ and $RP_{j'}$ are any two RPs in the finite set of RPs (i.e., $ID_{RP_j} = [r_j]G$ and $ID_{RP_{j'}} = [r_{j'}]G$, while $r_j$ and $r_{j'}$ are kept secret to the adversaries). This negligible probability means $PID_{RP_j} = [t]ID_{RP_j}$ designates \emph{only} the target RP with $ID_{RP_j}$.
+
+\vspace{0.5mm}
+\noindent\textcolor{blue}{\textsc{Proof.}} Finding $t$ and $t'$ satisfying $[t]ID_{RP_j} = [t']ID_{RP_{j'}}$ is a $PID_{RP}$-collision attack, which can be described as a game $\mathcal{G}_c$ between an adversary and a challenger: the adversary receives a finite set of RP identities from the challenger, denoted as ($ID_{RP_1}$, $ID_{RP_2}$, ..., $ID_{RP_m}$), where $m$ is the number of the RPs in the system, and outputs $(a, b, t, t')$.
+If $[t]ID_{RP_a}=[t']ID_{RP_b}$, the adversary succeeds in the game.
+%If the adversary has the non-negligible probability on succeeding in this game, RP designation is broken.
+The attack success probability is defined as ${\rm Pr}_s$.
+
+For $ID_{RP}=[r]G$, let $Q=[t]ID_{RP}=[tr]G=xG$, where $Q$ and $G$ are points on an elliptic curve $\mathbb{E}$ of order $n$, and $x$ is a random number in $\mathbb{Z}_n$. Given $Q$ on the curve, the probability of finding a number $x$ satisfying $Q = [x]G$, which is an elliptic curve discrete logarithm problem (ECDLP), using a probabilistic polynomial time (PPT) algorithm $\mathcal{D}$ is negligible. Let us define this probability as:
+%For any PPT algorithm $\mathcal{D}$ is used to calculate $x$, we define the probability of finding $x$ as: %Therefore, the probability of finding $x$ using a probabilistic polynomial time (PPT) algorithm is negligible.
 \begin{equation*}
 {\rm Pr}\{\mathcal{D}(G, [x]G)=x\} = \epsilon_{c}(k)
 \end{equation*}
-Here, ${\rm Pr}\{\}$ denotes the probability.
-So $\epsilon_{c}(k)$ becomes negligible with the increasing security parameter $k$.
-
-Assume a game $\mathcal{G}_c$ between an adversary and a challenger,
-    to describe this $PID_{RP}$-collision attack:
-the adversary receives a finite set of RP identities from the challenger,
- denoted as ($ID_{RP_1}$, $ID_{RP_2}$, ..., $ID_{RP_m}$)
- where $m$ is the amount of all RPs in the system,
-  and then outputs $(a, b, t, t')$.
-If $[t]ID_{RP_a}=[t']ID_{RP_b}$, the adversary succeeds in this game.
-%If the adversary has the non-negligible probability on succeeding in this game, RP designation is broken.
-Note that $m$ is a finite integer, and $m \ll 2^k$ as $k$ increases.
-We define the probability that the adversary succeeds in this game as ${\rm Pr}_s$.
-
+%where ${\rm Pr}\{\}$ denotes the probability.
+where $k$ denotes the security parameter. $\epsilon_{c}(k)$ becomes negligible, when $k$ is sufficiently large.
+%For any sufficiently large $k$, $m \ll 2^k$ since $m$ is a finite integer.
 
 \begin{figure}[tb]
   \centering
@@ -133,38 +132,17 @@ We define the probability that the adversary succeeds in this game as ${\rm Pr}_
   \label{fig:ecdlp_algorithm}
 \end{figure}
 
-
-Figure \ref{fig:ecdlp_algorithm} shows a PPT algorithm $\mathcal{D}^*_c$ based on this game, to solve the ECDLP.
-The input of $\mathcal{D}^*_c$ is in the form of ($G$, $Q$).
-On receiving an input, the challenger of $\mathcal{G}_c$ randomly chooses $r_1, r_2, \cdots, r_m$ in $\mathbb{Z}_n$,
- calculates $[r_1]G, [r_2]G, \cdots, [r_m]G$,
- and randomly replaces some $[r_j]G$ with $Q$.
-Then,
-    these $m$ RP identities are sent to the adversary,
-which returns the result ($a$, $b$, $t$, $t'$).
+Figure \ref{fig:ecdlp_algorithm} depicts the game for solving the ECDLP problem using a PPT algorithm $\mathcal{D}^*_c$, whose input is in the form of ($G$, $Q$).
+Upon receiving an input, the challenger of $\mathcal{G}_c$ randomly chooses $r_1, r_2, \cdots, r_m$ in $\mathbb{Z}_n$, calculates $[r_1]G, [r_2]G, \cdots, [r_m]G$, and randomly replaces some $[r_j]G$ with $Q$.
+Then, these $m$ RP identities are sent to the adversary, which returns the result ($a$, $b$, $t$, $t'$).
 Finally, the challenger of $\mathcal{G}_c$ calculates $s = t^{-1}t'r_b \bmod n$ and returns $s$ as the output of $\mathcal{D}^*_c$.
 
-If $[r_a]G$ happens to be replaced with $Q$ and the adversary of $\mathcal{G}_c$ succeeds,
-    we find $Q = [s]G$ and then $s=x$ because $[tr_a]G = [t]Q = [t'r_b]G$.
-As $[r_j]G$ is randomly replaced by the challenger,
-    $Q$ and other RP identities in the input set are indistinguishable to the adversary.
-Thus,
+If $[r_a]G$ happens to be replaced with $Q$ and the adversary of $\mathcal{G}_c$ succeeds, we find $Q = [s]G$ and then $s=x$ because $[tr_a]G = [t]Q = [t'r_b]G$. As $[r_j]G$ is randomly replaced by the challenger, $Q$ and other RP identities in the input set are indistinguishable to the adversary. Thus,
 \begin{equation*}
 {\rm Pr}\{\mathcal{D}^*_c(G, [x]G)=x\} = {\rm Pr}\{s = x\}={\rm Pr}\{a=j\}{\rm Pr}_s=\frac{1}{m}{\rm Pr}_s
 \end{equation*}
 
-If the adversary is able to find $t$ and $t'$
-    satisfying that $[t]ID_{RP_j} = [t']ID_{RP_{j'}}$,
-    it will have advantages in $\mathcal{G}_c$
-        and then
-         ${\rm Pr}_s$ becomes non-negligible as $k$ increases.
-Because $m$ is a finite integer, ${\rm Pr}\{\mathcal{D}^*_c(G, [x]G)=x\} = \frac{1}{m}{\rm Pr}_s$ also
-becomes non-negligible with the increasing $k$.
-This violates the ECDLP assumption.
-Thus, the probability of finding $t$ and $t'$ satisfying that $[t]ID_{RP_j} = [t']ID_{RP_{j'}}$ in UPPRESSO is negligible,
-    so this token binding $PID_{RP}$
-     is expected by \emph{only} the target RP.
-$\square$
+If the adversary could find $t$ and $t'$ satisfying that $[t]ID_{RP_j} = [t']ID_{RP_{j'}}$, it will have advantages in $\mathcal{G}_c$ and then ${\rm Pr}_s$ becomes non-negligible as $k$ increases. Because $m$ is a finite integer and $m \ll 2^k$ when $k$ is sufficiently large, ${\rm Pr}\{\mathcal{D}^*_c(G, [x]G)=x\} = \frac{1}{m}{\rm Pr}_s$ is non-negligible. This violates the ECDLP assumption. Therefore, the probability of finding $t$ and $t'$ satisfying that $[t]ID_{RP_j} = [t']ID_{RP_{j'}}$ in UPPRESSO is negligible, so this token binding $PID_{RP}$ is expected by \emph{only} the target RP. \hfill $\square$
 
 
 \vspace{1mm}
