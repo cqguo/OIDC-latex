@@ -31,7 +31,7 @@ Table \ref{tbl:notations-protocol} lists the notations. The subscript $j$ and/or
 
 
 The IdP assigns a unique random integer $u$ to a user (i.e., $ID_U = u$). When an RP registers, the IdP generates a random number $r$ and assigns $ID_{RP} = [r]G$, which is a unique point on $\mathbb{E}$.
-Here, 
+Here,
 %$u, r \in [1,n)$, %$r$ is unknown to the RP, and
 $[r]G$ is the addition of $G$ on the curve $r$ times.
 
@@ -63,7 +63,7 @@ From Equations \ref{equ:PIDRP}, \ref{equ:PIDU}, and \ref{equ:Account}, we derive
    \label{equ:AccountNotChanged}
 \end{equation*}
 With the help of $t$, the RP can derive an \emph{identical permanent} account from the identity tokens in different login instances. %from the user.
-The accounts at different RPs are unique for a given user, while the accounts of different users are unique for a given RP. The RP cannot derive $ID_U$ from either $PID_U$ or $Acct$ due to the elliptic curve discrete logarithm problem (ECDLP). Since $t$ is random in $\mathbb{Z}_n$ and unknown to the IdP, from the IdP's view, $PID_{RP}$ is indistinguishable from a random variable on $\mathbb{E}$. So, the IdP cannot learn anything about $ID_{RP}$ from $PID_{RP}$. 
+The accounts at different RPs are unique for a given user, while the accounts of different users are unique for a given RP. The RP cannot derive $ID_U$ from either $PID_U$ or $Acct$ due to the elliptic curve discrete logarithm problem (ECDLP). Since $t$ is random in $\mathbb{Z}_n$ and unknown to the IdP, from the IdP's view, $PID_{RP}$ is indistinguishable from a random variable on $\mathbb{E}$. So, the IdP cannot learn anything about $ID_{RP}$ from $PID_{RP}$.
 %Section \ref{sec:analysis} presents more detailed analyses.
 Note that $r$ should be kept secret to the RP; otherwise, two colluding RPs with $ID_{RP_j} = [r]G$ and $ID_{RP_{j'}} = [r']G$ could link a user's accounts by checking if $[r']Acct_j = [r]Acct_{j'}$ holds.
 
@@ -77,7 +77,7 @@ The RP should compute $[t]ID_{RP}$ by itself and verify if it equals the receive
 %         the RP will finally allow the malicious user to login as $[t'^{-1}]PID_{U'} = Acct$.
 }
 
-\textcolor{blue}{Meanwhile, if the RP selects $t$ and calculates $PID_{RP}$, the user should compute $[t]ID_{RP}$ by herself and check if $PID_{RP} = [t]ID_{RP}$ holds. Otherwise, a malicious user $ID_{U'}$ could collude with a malicious $RP'$ to impersonate the victim user at the honest $RP$. Assume $ID_{U'}$ receives $PID_{RP}=[t']ID_{RP}$ from the honest $RP$ and forwards it to the victim user through the malicious $RP'$ in another login instance. If the victim user does not check if the received $PID_{RP}$ equals to $[t']ID_{RP'}$, she would request an identity token that binds $PID_U$ and $PID_{RP}$ from the IdP and presents it to the malicious RP. This token would allow the malicious user to log in to the honest RP on behalf of the victim user.
+\textcolor{blue}{Meanwhile, if the RP selects $t$ and calculates $PID_{RP}$, the user should compute $[t]ID_{RP}$ by herself and check if $PID_{RP} = [t]ID_{RP}$ holds. Otherwise, a malicious user $ID_{U'}$ could collude with a malicious $RP'$ to impersonate the victim user at the honest $RP$. Assume $ID_{U'}$ receives $PID_{RP}=[t']ID_{RP}$ from the honest $RP$ and forwards it to the victim user through the malicious $RP'$ in another login instance. If the victim user does not check if the received $PID_{RP}$ equals to $[t']ID_{RP'}$, she would request an identity token that binds $PID_U$ and $PID_{RP}$ from the IdP and presents it to the malicious RP. This token would allow the malicious user to login to the honest RP on behalf of the victim user.
 % Then $U'$ colludes with a malicious RP denoted as $RP'$,
 %     which intentionally sends $PID_{RP}$ to an honest user $U$ in some login instance.
 % Without checking $PID_{RP} = [t']ID_{RP'}$ or not,
