@@ -1,7 +1,5 @@
-\subsection{Other Related Works of Secure SSO}
+\subsection{Extended Related Works}
 \label{sec:related}
-
-\noindent\textbf{Anonymous SSO.} Anonymous SSO systems have been formalized \cite{WangWS13} and proposed for different applications such as GSM communications \cite{ElmuftiWRR08}, distributed networks \cite{WangWS13}, and designated verifiers \cite{HanCSTW18, HanCSTWW20} using different privacy-preserving primitives such as group signature, zero-knowledge proof, and proxy re-verification. These approaches allow users to access services anonymously, preventing verifiers from linking the user's requests. However, they cannot support user identification at the RPs due to the use of anonymous credentials.
 
 %Such tokens (or credentials) authorize a user to conduct operations
 %        in privacy-preserving ways.
@@ -10,12 +8,14 @@
 %        in privacy-preserving ways.
 %Privacy-enhancing technologies have been applied in various scenarios,
 %  but not adopted to comprehensively transform the five (pseudo-)identities in SSO services.
-\noindent\textbf{Anonymous Tokens.}
-\textcolor{blue}{Anonymous tokens such as PrivacyPass and TrustToken \cite{privacypass, trusttoken} have been proposed for applications that need to grant anonymous access to authorized users. In these approaches, the server (such as the IdP) blindly binds user-selected secrets $t_i$ (such as pseudonyms) and access tokens ($T_i, T_i^{k{r_i}}$) and signs them with its secret key $k$, where $T_i=H(t_i)$ and $H$ is a hash function. The user unblinds these tokens to obtain anonymous tokens ($t_i, T_i^k$) and redeems them later on the server. As the token signing and redemption operations are separated and cannot be linked due to blind signing, they can be used to implement anonymous SSO services that are secure against IdP-based tracing and RP-based linkage.
-}
+\noindent\textbf{Privacy-preserving cryptographic technique.}
+\textcolor{blue}{PrivacyPass and TrustToken \cite{privacypass, trusttoken} adopted a cryptographic technique originally proposed for oblivious pseudorandom functions (OPRFs) \cite{oprf-proved}, which is similar to the identity transformations in UPPRESSO.
+Anonymous tokens \cite{privacypass, trusttoken} are proposed for applications that grant anonymous access to authorized users: the token server blindly binds user-selected secrets $t_i$ (such as pseudonyms) and access tokens ($T_i, T_i^{k{r_i}}$) and signs them with its secret key $k$, where $T_i=H(t_i)$ and $H$ is a hash function.
+The user unblinds them to obtain anonymous tokens ($t_i, T_i^k$) and redeems them later on the service.
+As the token signing and redemption operations are separated and cannot be linked.}
+ % they can be used to implement anonymous SSO services that are secure against IdP-based tracing and RP-based linkage.}
 
-\textcolor{blue}{PrivacyPass and TrustToken applied a similar cryptographic technique proposed for oblivious pseudorandom functions (OPRFs) \cite{oprf-proved}, which is also used in UPPRESSO. However, they provide SSO services that are fundamentally different from the ones offered by UPPRESSO. As shown in Table~\ref{tbl:comparison-protocol}, they lack support for all three SSO features. First, the anonymous tokens used by different users or by the same user in different login instances cannot be distinguished (i.e., no user identification at RPs), since they are signed blindly using the same server secret. Besides, the users are required to maintain anonymous tokens for asynchronous authentication in addition to the credentials for the IdP, similar to other privacy-preserving solutions based on anonymous credentials. Finally, PrivacyPass and TrustToken do not support selective user attribution provisioning. In contrast, UPPRESSO formalizes the privacy-preserving SSO process as two ID-transformation problems and generates unlinkable pseudoidentities and proofs to support the desired SSO features. Therefore,  UPPRESSO is  compatible with widely-adopted SSO protocols such as OIDC and SAML.
-}
+%\textcolor{blue}{They provide SSO services that are fundamentally different from the ones offered by UPPRESSO. As shown in Table~\ref{tbl:comparison-protocol}, they lack support for all three SSO features. First, the anonymous tokens used by different users or by the same user in different login instances cannot be distinguished (i.e., no user identification at RPs), since they are signed blindly using the same server secret. Besides, the users are required to maintain anonymous tokens for asynchronous authentication in addition to the credentials for the IdP, similar to other privacy-preserving solutions based on anonymous credentials. Finally, PrivacyPass and TrustToken do not support selective user attribution provisioning. In contrast, UPPRESSO formalizes the privacy-preserving SSO process as two ID-transformation problems and generates unlinkable pseudoidentities and proofs to support the desired SSO features. Therefore,  UPPRESSO is  compatible with widely-adopted SSO protocols such as OIDC and SAML.}
 
 %\textcolor{blue}{PrivacyPass and TrustToken allow a user to receive tokens \cite{privacypass,trusttoken}, each of which is denoted as ($T, T^{k}$), where $k$ is the token server's private key. These tokens are used to access resources anonymously in the future. To unlink token signing and redemption, a user generates a random number $e$ for each token, blinds $T$ into $T^{e}$, and sends it to request ($T^e, T^{ek}$) from the token server. The user then utilizes $e$ to obtain $T^k$ from $T^{ek}$, and then only ($T, T^{k}$) is redeemed to access resources. This cryptographic skill \cite{oprf-proved} is used in UPPRESSO similarly: a user transforms $ID_{RP}$ to $PID_{RP} = [t]ID_{RP}$ by a random number $t$, and $PID_{RP}$ is transformed again by an IdP to $[tu]ID_{RP}$. The visited RP calculates $Acct = [u]ID_{RP}$ from $[tu]ID_{RP}$ by using $t$ (see Table \ref{tbl:notations-protocol} for detailed descriptions of these notations).}
 
@@ -52,13 +52,13 @@
 % Anonymous SSO schemes work for some special applications,
 %     but are unapplicable in most systems that require user identification for customized services.
 
-\noindent\textbf{Privacy-preserving credential.}
-ZKlaims \cite{zklaim} allows users to prove statements on the credentials issued by a server using zero-knowledge proofs without revealing the content of the credentials.
+Using zero-knowledge proofs ,
+ZKlaims \cite{zklaim} allows users to prove statements on the credentials issued by a server without revealing the content of the credentials.
 %Crypto-Book \cite{crypto-book} coordinates servers to generate a ring-signature private key, %and a user picks up his key through a list of Email addresses. % (i.e., an anonymity set).
 %which is used by the user as an untraceable pseudonym.  %to sign messages.
 %Two-party threshold cryptographic schemes are implemented with a central server, to protect user private keys \cite{mRSA,ss-rsa}: to sign/decrypt a message, a user needs a token from the server.
 Tandem \cite{tandem} generates one-time-use key-share tokens for securing cryptographic keys used on user devices. %and decouples the obtaining and using of such tokens for the privacy of key usage.
-Similar to anonymous credentials, they do not support the desired SSO features.
+%Similar to anonymous credentials, they do not support the desired SSO features.
 
 %\vspace{0.5mm}
 % \noindent\textbf{Formal analysis for SSO protocols.}
