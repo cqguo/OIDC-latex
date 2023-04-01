@@ -9,38 +9,53 @@
 %Privacy-enhancing technologies have been applied in various scenarios,
 %  but not adopted to comprehensively transform the five (pseudo-)identities in SSO services.
 \noindent\textbf{Privacy-preserving cryptographic technique.}
-\textcolor{blue}{PrivacyPass and TrustToken \cite{privacypass, trusttoken} adopted a cryptographic technique originally proposed for oblivious pseudorandom functions (OPRFs) \cite{oprf-proved}, which is similar to the identity transformations in UPPRESSO.
-Anonymous tokens \cite{privacypass, trusttoken} are proposed for applications that grant anonymous access to authorized users: the token server blindly binds user-selected secrets $t_i$ (such as pseudonyms) and access tokens ($T_i, T_i^{k{r_i}}$) and signs them with its secret key $k$, where $T_i=H(t_i)$ and $H$ is a hash function.
-The user unblinds them to obtain anonymous tokens ($t_i, T_i^k$) and redeems them later on the service.
-As the token signing and redemption operations are separated and cannot be linked.}
+\textcolor{blue}{PrivacyPass and TrustToken \cite{privacypass,trusttoken} 
+ propose anonymous tokens for applications that grant anonymous access to authorized users.
+They adopted a cryptographic technique originally designed for oblivious pseudorandom functions (OPRFs) \cite{oprf-proved}.
+A user generates a random number $e_i$ for each unsigned token $T_i$ and blinds $T_i$ into $T_i^{e_i}$.
+After authenticating the user,
+ a token server signs ($T_i^{e_i}, T_i^{e_i k}$) using a private key $k$.
+The user then utilizes $e_i$ to obtain $T_i^k$ from $T_i^{e_i k}$, and later ($T_i, T_i^k$) is redeemed to access resources.
+%the token server blindly binds user-selected secrets $t_i$ and access tokens ($T_i, T_i^{k{r_i}}$) and signs them with its secret key $k$, where $T_i=H(t_i)$ and $H$ is a hash function.
+%The user unblinds them to obtain anonymous tokens ($t_i, T_i^k$) and redeems them later on the service.
+The random numbers (or blinding factors) prevent the token server from linking token signing and redemption.
+Anonymous tokens may be used to build anonymous SSO services,
+    where RPs cannot identifies every user.}
  % they can be used to implement anonymous SSO services that are secure against IdP-based tracing and RP-based linkage.}
 
 %\textcolor{blue}{They provide SSO services that are fundamentally different from the ones offered by UPPRESSO. As shown in Table~\ref{tbl:comparison-protocol}, they lack support for all three SSO features. First, the anonymous tokens used by different users or by the same user in different login instances cannot be distinguished (i.e., no user identification at RPs), since they are signed blindly using the same server secret. Besides, the users are required to maintain anonymous tokens for asynchronous authentication in addition to the credentials for the IdP, similar to other privacy-preserving solutions based on anonymous credentials. Finally, PrivacyPass and TrustToken do not support selective user attribution provisioning. In contrast, UPPRESSO formalizes the privacy-preserving SSO process as two ID-transformation problems and generates unlinkable pseudoidentities and proofs to support the desired SSO features. Therefore,  UPPRESSO is  compatible with widely-adopted SSO protocols such as OIDC and SAML.}
 
 %\textcolor{blue}{PrivacyPass and TrustToken allow a user to receive tokens \cite{privacypass,trusttoken}, each of which is denoted as ($T, T^{k}$), where $k$ is the token server's private key. These tokens are used to access resources anonymously in the future. To unlink token signing and redemption, a user generates a random number $e$ for each token, blinds $T$ into $T^{e}$, and sends it to request ($T^e, T^{ek}$) from the token server. The user then utilizes $e$ to obtain $T^k$ from $T^{ek}$, and then only ($T, T^{k}$) is redeemed to access resources. This cryptographic skill \cite{oprf-proved} is used in UPPRESSO similarly: a user transforms $ID_{RP}$ to $PID_{RP} = [t]ID_{RP}$ by a random number $t$, and $PID_{RP}$ is transformed again by an IdP to $[tu]ID_{RP}$. The visited RP calculates $Acct = [u]ID_{RP}$ from $[tu]ID_{RP}$ by using $t$ (see Table \ref{tbl:notations-protocol} for detailed descriptions of these notations).}
 
+\textcolor{blue}{This cryptographic technique is similar to the identity transformations in UPPRESSO,
+    but we utilize it in different ways and explore more privacy properties of this technique.
+In UPPRESSO, a user transforms $ID_{RP}$ to $PID_{RP} = [t]ID_{RP}$ by a random number $t$,
+ and $PID_{RP}$ is transformed again by an IdP to $[tu]ID_{RP}$.
+The visited RP calculates $Acct = [u]ID_{RP}$ from $[tu]ID_{RP}$ by using $t$.
+ %(see Table \ref{tbl:notations-protocol} for detailed descriptions of these notations).
 % \textcolor{blue}{UPPRESSO differs from PrivacyPass and TrustToken as below.
 % Firstly, PrivacyPass and TrustToken work as anonymous SSO to some extent, where one consistent private key serves all users, but UPPRESSO identifies each user at an RP.
 % Secondly,
 %    the above cryptographic skill \cite{oprf-proved} is differently utilized.
-% UPPRESSO integrates it to transform identities in SSO:
-% scalar $u$ is known by the IdP and a user as his user identity, and
-% random number $t$ is shared by the user and the RP. Meanwhile,
-% exponent $k$ is held only by the PrivacyPass/TrustToken server as a private key,
-%  and random number $e$ is only known to a user.
-% Lastly and most importantly,
-% more privacy requirements are satisfied in UPPRESSO.
-% The unlinkability between token signing and redemption \cite{privacypass,trusttoken}, or
-% ($T^e, T^{ek}$) and  ($T, T^k$),
-% roughly corresponds to only the IdP-untraceability in UPPRESSO:
-%  an IdP cannot link any pair among $[t_i]ID_{RP}$ and $ID_{RP}$,
-%  $i = 1, 2, \cdots$. % which fundamentally depends on the ECDLP assumption.
-% UPPRESSO also supports the unlinkability across RPs:
-% given multiple users, e.g., identified as $u$ and $u'$,
-%     ($ID_{RP}, t, [u]ID_{RP}$) and ($ID_{RP'}, t', [u']ID_{RP'}$) are indistinguishable to
-%     colluding RPs.
-% This property of the adopted cryptographic skill is not considered
-%     in anonymous tokens \cite{privacypass,trusttoken} or oblivious pseudorandom functions (OPRFs) \cite{oprf-proved}.}
+%UPPRESSO integrates it to transform identities in SSO:
+So this technique is differently utilized:
+scalar $u$ is known by the IdP and a user as his user identity, and
+random number $t$ is shared by the user and the RP; on the other hand,
+exponent $k$ is held only by the PrivacyPass/TrustToken server as a private key,
+ and random number $e$ is only known to a user.
+%Lastly and most importantly,
+Furthermore, more privacy properties are analyzed in UPPRESSO.
+The unlinkability between token signing and redemption, or
+($T_i^{e_i}, T_i^{e_ik}$) and  ($T_i, T_i^k$),
+roughly corresponds to only the IdP-untraceability in UPPRESSO:
+ an IdP cannot link any pair of $[t_i]ID_{RP}$ and $ID_{RP}$.
+ % $i = 1, 2, \cdots$. % which fundamentally depends on the ECDLP assumption.
+UPPRESSO also supports the unlinkability across RPs:
+given multiple users, e.g., identified as $u$ and $u'$,
+    ($ID_{RP}, t, [u]ID_{RP}$) and ($ID_{RP'}, t', [u']ID_{RP'}$) are indistinguishable to
+    colluding RPs.
+The second property of the adopted cryptographic technique is not considered
+     in either anonymous tokens \cite{privacypass,trusttoken} or OPRFs \cite{oprf-proved}.}
 
 % \noindent\textbf{Anonymous SSO.}
 % Such schemes allow authenticated users to access a service protected by an IdP,
@@ -52,48 +67,49 @@ As the token signing and redemption operations are separated and cannot be linke
 % Anonymous SSO schemes work for some special applications,
 %     but are unapplicable in most systems that require user identification for customized services.
 
-Using zero-knowledge proofs ,
-ZKlaims \cite{zklaim} allows users to prove statements on the credentials issued by a server without revealing the content of the credentials.
-%Crypto-Book \cite{crypto-book} coordinates servers to generate a ring-signature private key, %and a user picks up his key through a list of Email addresses. % (i.e., an anonymity set).
-%which is used by the user as an untraceable pseudonym.  %to sign messages.
-%Two-party threshold cryptographic schemes are implemented with a central server, to protect user private keys \cite{mRSA,ss-rsa}: to sign/decrypt a message, a user needs a token from the server.
-Tandem \cite{tandem} generates one-time-use key-share tokens for securing cryptographic keys used on user devices. %and decouples the obtaining and using of such tokens for the privacy of key usage.
-%Similar to anonymous credentials, they do not support the desired SSO features.
+Various cryptographic primitives are used to protect user privacy.
+Using zero-knowledge proofs,
+ZKlaims \cite{zklaim} allows users to prove statements on the credentials issued by a trusted server without revealing the content of the credentials.
+Crypto-Book \cite{crypto-book} adopts distributed key generation to generate linkable-ring-signature private keys for users,
+    and each key pair is used as an untraceable pseudonym.
+Tandem \cite{tandem} generates one-time-use key-share tokens,
+    with a two-party threshold cryptographic scheme implemented with a central server,
+to preserve the users' privacy of key-usage patterns.
+
+
+%two-party threshold cryptographic scheme implemented with a central server, to protect user private keys \cite{mRSA,ss-rsa}: to sign/decrypt a message, a user needs a token from the server.
+%    Tandem \cite{tandem} decouples the obtaining and using of such tokens, for the privacy of key usage.
 
 %\vspace{0.5mm}
-% \noindent\textbf{Formal analysis for SSO protocols.}
-% %The SSO standards (e.g., SAML, OAuth, and OIDC) have been formally analyzed.
-% Fett et al. \cite{FettKS16, FettKS17} formally analyzed OAuth 2.0 and OIDC using a Dolev-Yao-style model \cite{FettKS14} and reported the 307 redirection and IdP mix-up attacks.
-% %When the IdP misuses an HTTP 307 status code for redirection, the sensitive information (e.g., credentials) entered at the IdP
-%          %   will  be leaked to the RP through  the user's browser.
-%         %The IdP mix-up attack confuses the RP about which IdP is used and the victim RP sends the token to a malicious IdP,
-%         % which breaks the confidentiality of identity tokens.
-% %According to these formal proofs \cite{FettKS16, FettKS17},
-% %    OAuth 2.0 and OIDC are secure except these two attacks.
-% %UPPRESSO could be integrated into OIDC, which simplifies its security analysis.
-% An analysis on SAML-based SSOs \cite{ArmandoCCCT08} found that a Google-implemented variant does not bind the RP identities in the identity tokens correctly.
+\noindent\textbf{Formal analysis for SSO protocols.}
+A formal analysis on SAML-based SSO \cite{ArmandoCCCT08} found that a Google-implemented variant does not bind RP identities in the identity tokens correctly.
+Later, Fett et al. \cite{FettKS16, FettKS17} formally analyzed OAuth 2.0 and OIDC using a Dolev-Yao-style model \cite{FettKS14} and reported the 307 redirection and IdP mix-up attacks.
+In this paper, we also develop a Dolev-Yao-style model to prove the security and privacy of UPPRESSO (see Section~\ref{adver-model} for details).
 
 
 %\vspace{0.5mm}
-\noindent\textbf{Implementation vulnerabilities in SSO and formal analysis.}
-Vulnerabilities have been found in SSO implementations for web applications, resulting in various attacks %of impersonation and identity injection
+\noindent\textbf{Implementation vulnerabilities in SSO.}
+Various vulnerabilities have been found in several SSO systems for web applications, resulting in attacks %of impersonation and identity injection
 that break the confidentiality \cite{WangCW12,ccsSunB12,ArmandoCCCPS13,DiscoveringJCS,dimvaLiM16}, integrity \cite{WangCW12,SomorovskyMSKJ12,WangZLG16,MainkaMS16, MainkaMSW17,dimvaLiM16} or RP designation \cite{WangZLG16,MainkaMS16,MainkaMSW17,YangLCZ18,dimvaLiM16} of identity tokens.
 %In the SSO services of Google and Facebook, %from the view of browser-relayed traffics
 %    logic flaws of the IdPs and RPs were detected \cite{WangCW12}.  % to break the confidentiality and integrity of identity tokens.
 The integrity of identity tokens was violated %\cite{SomorovskyMSKJ12,WangCW12,WangZLG16,MainkaMS16, MainkaMSW17}
-due to software flaws such as defective verification by RPs \cite{WangCW12,WangZLG16,MainkaMSW17}, XML signature wrapping \cite{SomorovskyMSKJ12}, and IdP spoofing \cite{MainkaMS16,MainkaMSW17}. Meanwhile, the RP designation was broken because of incorrect binding by an IdP \cite{YangLCZ18,WangZLG16} or insufficient verification by RPs \cite{MainkaMS16,MainkaMSW17,YangLCZ18}. Similarly, vulnerabilities have been found in Android Apps that break the confidentiality \cite{ChenPCTKT14,WangZLLYLG15,YangLS17,ShiWL19}, integrity \cite{ChenPCTKT14,YangLS17}, and RP designation \cite{ChenPCTKT14,ShiWL19} of identity tokens. Furthermore, if a user is compromised, the     attacker can login to RPs on his behalf. So, we consider malicious users, malicious RPs, and colluding users and RPs in our threat model (see Section~\ref{subsec:threatmodel}).
+due to software flaws such as defective verification by RPs \cite{WangCW12,WangZLG16,MainkaMSW17}, XML signature wrapping \cite{SomorovskyMSKJ12}, and IdP spoofing \cite{MainkaMS16,MainkaMSW17}.
+Meanwhile, the RP designation was broken because of incorrect binding by an IdP \cite{YangLCZ18,WangZLG16} or insufficient verification by RPs \cite{MainkaMS16,MainkaMSW17,YangLCZ18}. Similarly, vulnerabilities have been found in Android Apps that break the confidentiality \cite{ChenPCTKT14,WangZLLYLG15,YangLS17,ShiWL19}, integrity \cite{ChenPCTKT14,YangLS17}, and RP designation \cite{ChenPCTKT14,ShiWL19,WangZLLYLG15} of SSO identity tokens.
 
-An analysis on SAML-based SSO \cite{ArmandoCCCT08} found that a Google-implemented variant does not bind the RP identities in the identity tokens correctly. Later, Fett et al. \cite{FettKS16, FettKS17} formally analyzed OAuth 2.0 and OIDC using a Dolev-Yao-style model \cite{FettKS14} and reported the 307 redirection and IdP mix-up attacks.
-In this paper, we also develop a Dolev-Yao-style model to formally prove the security and privacy of UPPRESSO (see Section~\ref{adver-model}).
+Automatic tools such as SSOScan \cite{ZhouE14}, OAuthTester \cite{YangLLZH16} and S3KVetter \cite{YangLCZ18},
+ detect the violations of confidentiality, integrity, or RP designation of SSO identity tokens.
+ Wang et al. \cite{ExplicatingSDK} detect the vulnerable applications
+     built with authentication/authorization SDKs,
+      due to the implicit but unsuitable assumptions of these SDKs.
+ Navas et al. \cite{NavasB19} discussed the possible attack patterns against OIDC services.
+FedCM \cite{FedCM} attempts to disable iframe and third-party cookies in SSO, which might be exploited to track users.
+
+%Furthermore, if a user is compromised, the attacker can login to RPs on his behalf. So, we consider malicious users, malicious RPs, and colluding users and RPs in our threat model (see Section~\ref{subsec:threatmodel}).
 
 
 
-% Automatic tools such as SSOScan \cite{ZhouE14}, OAuthTester \cite{YangLLZH16} and S3KVetter \cite{YangLCZ18},
-% detect the violations of confidentiality, integrity, or RP designation of SSO identity tokens.
-% Wang et al. \cite{ExplicatingSDK} detect the vulnerable applications
-%     built with authentication/authorization SDKs,
-%      due to the implicit but unsuitable assumptions of these SDKs.
-% Navas et al. \cite{NavasB19} discussed the possible attack patterns against OIDC services.
+
 
 % In a mobile system,
 % browsers, IdP Apps,
