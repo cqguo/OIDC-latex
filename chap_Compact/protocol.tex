@@ -24,7 +24,7 @@ PID_{RP} = \mathcal{F}_{PID_{RP}}(ID_{RP}) = [t]{ID_{RP}} = [tr]G
 \textcolor{blue}{In each login instance, the user selects a random number $t$ and shares it with the RP to negotiate $PID_{RP}$. It makes little difference if the RP selects a $t$ randomly and sends it to the user, as long as both of them calculate $PID_{RP}$ independently by themselves and check if the received $PID_{RP}$ is correct.}
 
 \noindent {\bf $\boldsymbol{ID_U}$-$\boldsymbol{PID_U}$ Transformation.}
-Upon receiving an identity-token request with $ID_U$ and $PID_{RP}$, the IdP calculates $PID_{U}$.
+On receiving an identity-token request with $ID_U$ and $PID_{RP}$, the IdP calculates $PID_{U}$.
 \begin{equation}
 PID_{U} = \mathcal{F}_{PID_U}(ID_U, PID_{RP}) =
   [{ID_U}]{PID_{RP}} = [utr]G
@@ -83,7 +83,7 @@ With the help of $t$, for a given user, the RP can derive an \emph{identical} ac
 
 \textcolor{blue}{Similarly, if the RP selects $t$ and computes $PID_{RP}$, the user needs to check if the received $PID_{RP}$ equals $[t]ID_{RP}$. Otherwise, a malicious user could impersonate the victim user at an honest RP by colluding with a malicious $RP'$. That is, when receiving $PID_{RP}=[t']ID_{RP}$ from the RP, the malicious user forwards it to $RP'$, which sends it to the victim user in another login instance. If the victim user does not check the received $PID_{RP}$, she would request from the IdP an identity token that binds $PID_U$ and the wrong $PID_{RP}$ and presents the token to the malicious RP. This token would allow the malicious user to login to the honest RP under the victim user's account.}
 
-The IdP never shares $r$ with the RP. Otherwise, two colluding RPs with $ID_{RP_j} = [r]G$ and $ID_{RP_{j'}} = [r']G$ could link a user's accounts by checking if $[r']Acct_j = [r]Acct_{j'}$ holds.
+The IdP never discloses $r$ to RPs. Otherwise, two colluding RPs with $ID_{RP_j} = [r]G$ and $ID_{RP_{j'}} = [r']G$ could link a user's accounts by checking if $[r']Acct_j = [r]Acct_{j'}$ holds.
 
 %======move to security analysis
 %The RP cannot derive $ID_U$ from either $PID_U$ or $Acct$ due to the elliptic curve discrete logarithm problem (ECDLP). Since $t$ is random in $\mathbb{Z}_n$ and unknown to the IdP, from the IdP's view, $PID_{RP}$ is indistinguishable from a random variable on $\mathbb{E}$. So, the IdP cannot learn anything about $ID_{RP}$ from $PID_{RP}$.
@@ -102,7 +102,7 @@ The IdP never shares $r$ with the RP. Otherwise, two colluding RPs with $ID_{RP_
     {$ID_U$} & {$ID_U = u \in [1, n)$ is the user's unique identity at the IdP, \textcolor{blue}{which is known only to the user and the IdP. %$u$ is kept unknown to RPs.
     }} \\ \hline
    {$ID_{RP_j}$} & {$ID_{RP} = [r]G$ is the $j$-th RP's unique identity that is publicly known; $r \in [1, n)$ \textcolor{blue}{is known only to the IdP.}} \\ \hline
-    {$t$} & {$t \in [1, n)$ is a user-selected random integer, unique in each login instance; \textcolor{blue}{$t$ is shared with the RP. %$t$ is kept secret to the IdP.
+    {$t$} & {$t \in [1, n)$ is a user-selected random integer, unique in each login instance; \textcolor{blue}{$t$ is shared with the target RP. %$t$ is kept secret to the IdP.
     }} \\ \hline
     {$PID_{RP_j}^i$} & {$PID_{RP} = [t]{ID_{RP}} = [tr]G$ is the $j$-th RP's pseudo-identity, in the user's $i$-th login instance to this RP.} \\ \hline
     {$PID_{U,j}^i$} & {$PID_U = [{ID_U}]{PID_{RP}} = [utr]G$ is the user's pseudo-identity, in the user's $i$-th login instance to the $j$-th RP.} \\ \hline
