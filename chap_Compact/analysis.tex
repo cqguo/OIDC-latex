@@ -70,7 +70,7 @@ In this section, we analyze the security and privacy guarantees provided by UPPR
 %  and (\emph{b}) $u$ and $r$ are not leaked to RPs in the protocols,
 %     necessary to prevent the RP-based identity linkage.}
 
-\textcolor{blue}{Threat model defined in Section~\ref{subsec:threatmodel} depicts potential adversaries against SSO as honest-but-curious IdPs, malicious RPs, and malicious users, where malicious RPs and users could collude. Based on their objectives, we consider three adversarial scenarios in the security analysis and present our goals in each scenario: {\bf \emph{(S1)}} malicious users colluding with each other or with malicious RPs to impersonate an honest user and log in to an honest RP, which requires satisfying {\em four SSO security properties}; {\bf \emph{(S2)}} the honest-but-curious IdP inferring the identity of the RP(s) that the user requests to access, which requires {\em privacy against the IdP}; and {\bf \emph{(S3)}} malicious RPs colluding with each other or with malicious users to deduce the user identity or link her pseudo-identities, which requires {\em privacy against colluding RPs}. Next, we prove that UPPRESSO is secure in the first adversarial scenario in Section~\ref{analysis-security} and it can prevent privacy threats in the other two adversarial scenarios in Section~\ref{sec-:analysis}.}
+\textcolor{blue}{Threat model defined in Section~\ref{subsec:threatmodel} depicts potential adversaries against SSO as honest-but-curious IdPs, malicious RPs, and malicious users, where malicious RPs and users could collude. Based on their objectives, we consider three adversarial scenarios in the security analysis and present our goals in each scenario: {\bf \emph{(S1)}} Malicious users colluding with each other or with malicious RPs aim to impersonate an honest user and log in to an honest RP. The SSO should provide all {\em four security properties} to prevent such attacks. {\bf \emph{(S2)}} The honest-but-curious IdP aims to infer the identity of the RP(s) that a user requests to access. The SSO should support {\em privacy against the IdP}. And {\bf \emph{(S3)}} Malicious RPs colluding with each other or with malicious users aim to deduce a user's identity or link her pseudo-identities. The SSO is expected to provide {\em privacy against colluding RPs}. Next, we prove that UPPRESSO is secure in the first adversarial scenario in Section~\ref{analysis-security} and it can prevent privacy threats in the other two adversarial scenarios in Section~\ref{sec-:analysis}.}
 
 %======move to security analysis
 %The RP cannot derive $ID_U$ from either $PID_U$ or $Acct$ due to the elliptic curve discrete logarithm problem (ECDLP). Since $t$ is random in $\mathbb{Z}_n$ and unknown to the IdP, from the IdP's view, $PID_{RP}$ is indistinguishable from a random variable on $\mathbb{E}$. So, the IdP cannot learn anything about $ID_{RP}$ from $PID_{RP}$.
@@ -80,7 +80,7 @@ In this section, we analyze the security and privacy guarantees provided by UPPR
 \label{analysis-security}
 %UPPRESSO satisfies four sufficient conditions (i.e., RP designation, user identification, integrity, and confidentiality of identity tokens) of secure SSO services \cite{ArmandoCCCT08,FettKS16, FettKS17}, as stated in Section \ref{subsec:basicrequirements}.
 
-\textcolor{blue}{In a secure SSO service that is robust against impersonation attacks, an honest user should be able to prove her identity to the target RP with an identity token issued by the IdP. As pseudo-identities are used in UPPRESSO, it is important for the RP to verify that ({\em a}) $PID_{RP}$ included in the identity token is a transformation from its $ID_{RP}$ and tied to the current login instance, which requires {\em RP designation}; and ({\em b}) $PID_U$ included in the identity token maps to a unique, long-term user account, which requires {\em user identification}. Besides, the identity token for an honest RP should not be intercepted by malicious users or RPs, requiring the {\em confidentiality of identity tokens}, nor be forged or tampered with to include a fake $PID_U$ or $PID_{RP}$, requiring the {\em integrity of identity tokens}.}
+\textcolor{blue}{In a secure SSO service that is robust against impersonation attacks, an honest user should be able to prove her identity to the target RP with an identity token issued by the IdP. As pseudo-identities are used in UPPRESSO, an RP needs to verify that ({\em a}) $PID_{RP}$ in the received identity token is a transformation from its own $ID_{RP}$ and tied to the current login instance, which requires {\em RP designation}; and ({\em b}) $PID_U$ in the identity token can be associated with a unique, long-term user account it maintains, which requires {\em user identification}. Besides, identity tokens for an honest RP should not be intercepted by malicious users or RPs, requiring a guarantee for the {\em confidentiality of identity tokens}, nor be forged or manipulated to insert a forged $PID_U$ or $PID_{RP}$, requiring a guarantee for the {\em integrity of identity tokens}.}
 
 To prove that UPPRESSO satisfies these four properties, we first formalize its login flow using a Dolev-Yao-style model \cite{SPRESSO}, % which has been used in the formal analysis of SSO protocols such as OAuth 2.0 \cite{FettKS16} and OIDC \cite{FettKS17}.
 which abstracts the entities in a web system, such as web servers and browsers, as \emph{atomic processes} %which communicate with each other through events. % such as HTTPS request and response.
@@ -91,23 +91,30 @@ Therefore, the atomic processes of UPPRESSO include an {\em IdP process}, a fini
 The script processes communicate with each other through \verb+postMessage+, which are modeled as transmitted-to-itself events of a browser process.
 %To clearly indicate the action of postMessage communication, we define it as the transmitting-to-itself event of the browser (which is not defined in SPRESSO).
 
-\textcolor{blue}{With this formal model (referred to as $D$-$Y$ model), we could (\emph{a}) trace the identity token lifecycle from its generation at the IdP to its acceptance at the RP to prove that it cannot be leaked to adversaries; (\emph{b}) locate the places where $PID_U$, $PID_{RP}$, and other elements in the identity token are processed to prove that they cannot be manipulated by any adversary; and (\emph{c}) locate the places where the IdP script uses $PK$ for verification to prove that it cannot be replaced by any adversary. Besides, we show that the IdP cannot view $t$ shared only between the user and the RP, while the RPs cannot view $u$ shared between the user and the IdP. It is trivial to prove the security of $r$, as it never leaves the IdP. Next, we present the proofs of four security properties supported by UPPRESSO.
-%These conclusions are used to prove the security of the UPPRESSO protocols.
-}
+\textcolor{blue}{With this formal model (referred to as $D$-$Y$ model), we could (\emph{a}) trace the identity token lifecycle from its generation at the IdP to its acceptance at the RP to prove that it cannot be leaked to adversaries; (\emph{b}) locate the places where $PID_U$, $PID_{RP}$, and other elements in the identity token are processed to prove that they cannot be manipulated by any adversary; and (\emph{c}) locate the places where the IdP script uses $PK$ for verification to prove that it cannot be replaced by any adversary. Besides, we show that the IdP cannot view $t$ shared only between the user and the RP, while the RPs cannot view $u$ shared between the user and the IdP. It is trivial to prove the security of $r$, as it never leaves the IdP.}
 
+\textcolor{blue}{Next, we present the proofs of UPPRESSO supporting four SSO security properties. We consider an arbitrary login instance in which an arbitrary RP with $ID_{RP}$ receives an integer $t$ and an identity token $T$, binding a $PID_U$ and a $PID_{RP}$, from the RP script in a user browser.}
+
+%Upon receiving $T$, the RP verifies that it is
 
 %\noindent{\textbf{RP Designation:} {\em Provided that $r$ is known only to the IdP, $PID_{RP}$ in the identity token uniquely designates the RP with $ID_{RP} = [r]G$.}}
 \vspace{2mm}
-\noindent\textcolor{blue}{\textsc{Theorem 1. (RP Designation)} {\em Consider a login instance in which an arbitrary RP registered at the IdP with $ID_{RP}$ receives an integer $t$ and a valid identity token $T$ from the user. If $PID_{RP}$ extracted from the identity token satisfies $PID_{RP} = [t]ID_{RP}$, then $PID_{RP}$ uniquely designates this RP.}
+\noindent\textcolor{blue}{\textsc{Theorem 1. (RP Designation)} {\em $PID_{RP}$ uniquely designates the RP, if $T$ is a valid identity token and $PID_{RP} = [t]ID_{RP}$ is satisfied.}
 }
 
+\vspace{0.75mm}
+\noindent\textcolor{blue}{\textsc{Proof.} $PID_{RP}$ in a valid $T$ is considered a valid pseudo-identity based on Lemma 1. By computing $[t]ID_{RP}$ and checking $PID_{RP} = [t]ID_{RP}$, the RP confirms that $PID_{RP}$ is its own pseudo-identity, which is transformed using the trapdoor $t$.}
+
+\textcolor{blue}{As shown in Figure~\ref{fig:process}, the RP receives $t$ and $T$ from the RP script of the user browser, which could be honest or malicious, according to the $D$-$Y$ model. Hence, a malicious RP script could send a valid identity token issued by the IdP for a colluding RP to an honest RP. However, based on Lemma 2, the probability that any $PID_{RP}$ is a pseudo-identity of two different RPs is negligible. Therefore, by verifying $PID_{RP} = [t]ID_{RP}$, the RP can confirm that $PID_{RP}$ cannot be the pseudo-identity of any other RPs registered in the SSO. \hfill $\square$}
+
 \vspace{1mm}
-\noindent\textcolor{blue}{\textsc{Proof.} The extracted $PID_{RP}$ is considered a valid pseudo-identity if the signature of the identity token can be verified. By computing $[t]ID_{RP}$ and checking $PID_{RP} = [t]ID_{RP}$, the RP confirms that $PID_{RP}$ is its own pseudo-identity, which is transformed using the trapdoor $t$.}
+\noindent\textcolor{blue}{\textsc{Lemma 1.} {\em A valid identity token cannot be forged by any adversaries.}}
 
-\textcolor{blue}{As shown in Figure~\ref{fig:process}, the RP receives $t$ and $T$ from the RP script of the user browser, which could be honest or malicious, according to the $D$-$Y$ model. Hence, a malicious RP script could send a valid identity token that is issued by the honest IdP for a colluding RP to an honest RP. However, based on Lemma 1, the probability that any $PID_{RP}$ is a pseudo-identity of two different RPs is negligible. Therefore, by verifying $PID_{RP} = [t]ID_{RP}$, the RP could confirm that $PID_{RP}$ cannot be the pseudo-identity of any other RPs registered in the SSO. \hfill $\square$}
+\vspace{0.75mm}
+\noindent\textcolor{blue}{\textsc{Proof.} We define an identity token $T$ issued by the IdP as valid if its signature can be verified using the IdP's public key $PK$. According to the $D$-$Y$ model, the RP obtains $PK$ directly from the IdP server over HTTPS. Hence, $PK$ and the token $T$ (and its content) cannot be manipulated by adversaries. \hfill $\square$}
 
-\vspace{2mm}
-\noindent\textcolor{blue}{\textsc{Lemma 1.} {\em  For any two different RPs in a finite set of registered RPs, the probability of finding two different random numbers $t \in [1,n)$ and $t' \in [1,n)$ that satisfy $[t]ID_{RP_j} = [t']ID_{RP_{j'}}$ is negligible, where $ID_{RP_j}=[r]G$, $ID_{RP_{j'}}=[r']G$, $r$ and $r'$ are two different integers, and $G$ is a point on an elliptic curve $\mathbb{E}$.}}
+\vspace{1mm}
+\noindent\textcolor{blue}{\textsc{Lemma 2.} {\em  For any two different RPs in a finite set of registered RPs, the probability of finding two different random numbers $t \in [1,n)$ and $t' \in [1,n)$ that satisfy $[t]ID_{RP_j} = [t']ID_{RP_{j'}}$ is negligible, where $ID_{RP_j}=[r]G$, $ID_{RP_{j'}}=[r']G$, $r$ and $r'$ are two different integers, and $G$ is a point on an elliptic curve $\mathbb{E}$.}}
 
 %Based on the ECDLP we prove that, for adversaries, the probability of finding $t$ and $t'$ satisfying $[t]ID_{RP_j} = [t']ID_{RP_{j'}}$ is negligible, where $RP_j$ and $RP_{j'}$ are any two RPs in the finite set of RPs (i.e., $ID_{RP_j} = [r_j]G$ and $ID_{RP_{j'}} = [r_{j'}]G$, while $r_j$ and $r_{j'}$ are kept secret to the adversaries). This negligible probability means $PID_{RP_j} = [t]ID_{RP_j}$ designates \emph{only} the target RP with $ID_{RP_j}$.
 
@@ -147,8 +154,9 @@ If $[r_a]G$ happens to be $Q$, the adversary of the game $\mathcal{G}_c$ succeed
 
 
 \vspace{2mm}
-\noindent\textcolor{blue}{\textsc{Theorem 2. (User Identification)} {\em Consider a login instance in which an arbitrary RP receives an integer $t$ and an identity token $T$ that binds $PID_U$ and $PID_{RP}$. If $PID_{RP} = [t]ID_{RP}$, then $PID_U$ uniquely identifies the user at that RP.}
+\noindent\textcolor{blue}{\textsc{Theorem 2. (User Identification)} {\em Consider a login instance in which an arbitrary RP with $ID_{RP}$ receives an integer $t$ and a valid identity token $T$ that binds $PID_U$ and $PID_{RP}$. $PID_U$ uniquely identifies the user at that RP if $PID_{RP} = [t]ID_{RP}$ is satisfied.}
 }
+
 
 %\noindent\textcolor{blue}{\textbf{User Identification.}~~In the identity token binding $PID_U$ and $PID_{RP}$, the user pseudo-identity $PID_U$ identifies the authenticated user with $ID_U$, % as $Acct = [ID_U][ID_{RP}]$, 
 %and only this user,  at the target RP with $ID_{RP} = [r]G$.}
@@ -163,9 +171,9 @@ Next, we prove that $Acct$ identifies one and only one user in the system. Since
 
 %The detailed process of proof is shown in Appendix.
 \vspace{2mm}
-\noindent\textcolor{blue}{\textsc{Theorem 3. (Identity Token Integrity)}} {\em Consider an identity token $T$ that binds $PID_U$ and $PID_{RP}$ and issued by the IdP, where $PID_U$ and $PID_{RP}$ are pseudo-identities of $ID_U$ and $ID_{RP}$, respectively.  }
+\noindent\textcolor{blue}{\textsc{Theorem 3. (Identity Token Integrity)} {\em Consider a login instance in which an arbitrary RP with $ID_{RP}$ receives an integer $t$ and a valid identity token $T$ that binds $PID_U$ and $PID_{RP}$. $T$ is an identity proof for a user account $Acct$ at that RP if $PID_{RP} = [t]ID_{RP}$ is satisfied, and it cannot be forged or manipulated by any adversary.}}
 
-An honest RP accepts only identity tokens binding its pseudo-identity $PID_{RP}$ and the authenticated user's pseudo-identity $PID_U$, and actually binding $ID_{RP}$ and $Acct=[ID_U]ID_{RP}$, when $SK$ is held by only the IdP.
+%An honest RP accepts only identity tokens binding its pseudo-identity $PID_{RP}$ and the authenticated user's pseudo-identity $PID_U$, and actually binding $ID_{RP}$ and $Acct=[ID_U]ID_{RP}$, when $SK$ is held by only the IdP.
 
 \vspace{2mm}
 \noindent\textcolor{blue}{\textsc{Proof.}}
@@ -189,12 +197,11 @@ Therefore,
 
 
 \vspace{1mm}
-\noindent\textcolor{blue}{\textbf{Confidentiality.}~~An identity token
-    is accessible to only
-                the authenticated user and the target RP, in addition to the IdP signing this token.}
+\noindent\textcolor{blue}{\textsc{Theorem 4. (Identity Token Confidentiality)}}
+An identity token is accessible to only the authenticated user and the target RP, in addition to the IdP signing this token.
 
-\vspace{0.75mm}
-\noindent\textbf{Proof.}
+\vspace{1mm}
+\noindent\textcolor{blue}{\textsc{Proof.}}
 \textcolor{blue}{As analyzed in the Dolev-Yao-style model, no event leaks an identity token to any malicious entity other than the authenticated user and the designated RP.}
 First of all, the communications among the IdP, RPs and users,
     are protected by HTTPS,
