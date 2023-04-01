@@ -38,7 +38,7 @@ The user's operations, including request redirection, authorization, and token f
   & at each RP & to only the IdP &  Attribute Provision & Login Tracing & Identity Linkage & Collusion \\\hline\hline
   OIDC w/ PPID \cite{NIST2017draft} & $\CIRCLE$ & $\CIRCLE$ & $\CIRCLE$ & $\Circle$ & $\CIRCLE$ & - \\ \hline
   BrowserID \cite{BrowserID} & $\CIRCLE$ & $\CIRCLE$$^1$ & $\Circle$ & $\CIRCLE$ & $\Circle$ & - \\ \hline
-  SPRESSO \cite{SPRESSO} & $\CIRCLE$ & $\CIRCLE$ & $\LEFTcircle$$^2$ & $\CIRCLE$ & $\Circle$ & - \\ \hline
+  SPRESSO \cite{SPRESSO} & $\CIRCLE$ & $\CIRCLE$ & $\LEFTcircle$$^2$ & $\CIRCLE$ & $\Circle$ & - \\ \hline \hline
   PRIMA \cite{prima} & $\CIRCLE$ & $\Circle$ & $\CIRCLE$ & $\CIRCLE$ & $\Circle$ & - \\ \hline
   PseudoID \cite{PseudoID} & $\CIRCLE$ & $\Circle$ & $\LEFTcircle$$^3$ & $\CIRCLE$ & $\CIRCLE$ & $\CIRCLE$ \\ \hline
   Opaak \cite{Opaak} & $\LEFTcircle$$^4$ & $\Circle$ & $\Circle$ & $\CIRCLE$ & $\CIRCLE$ & $\CIRCLE$ \\ \hline
@@ -88,11 +88,17 @@ which obtains the user's authorization before including attributes or provides o
 \subsection{Privacy-Preserving SSO and Identity Federation}
 \label{subsec-solutions}
 
-A privacy-preserving SSO is expected to offer the desired features as above,
-    while addressing different types of privacy threats. However, as shown in
-Table \ref{tbl:comparison-protocol}, none of the existing solutions satisfies the requirements.
+SSO protocols \cite{OpenIDConnect,rfc6749, SAML, SAMLIdentifier} allow users to login to an RP \emph{without maintaining an account at the RP or holding a permanent secret to be verified by the RP}.
+Privacy-preserving SSO is expected to offer the desired features as above,
+    while addressing different types of privacy threats.
+On the other hand,
+  identity federation enables a user registered with a trusted IdP to be accepted by other parties, potentially with different accounts, but more user operations are involved than those in SSO.
+As shown in
+    Table \ref{tbl:comparison-protocol}, none of the existing solutions satisfies all the requirements.
 
-\noindent\textbf{Privacy-preserving SSO.} SSO protocols \cite{OpenIDConnect,rfc6749, SAML, SAMLIdentifier} allow users to login to an RP \emph{without maintaining an account at the RP or holding a permanent secret to be verified by the RP}. While supporting these features, existing privacy-preserving SSO approaches \cite{BrowserID, SPRESSO, NIST2017draft} prevent either IdP-based login tracing or RP-based identity linkage, but not both. %and UPPRESSO prevents both of them.
+
+
+\noindent\textbf{Privacy-preserving SSO.} While supporting these features, existing privacy-preserving SSO approaches \cite{BrowserID, SPRESSO, NIST2017draft} prevent either IdP-based login tracing or RP-based identity linkage, but not both. %and UPPRESSO prevents both of them.
 
 Pairwise pseudonymous identifiers (PPIDs) are specified \cite{OpenIDConnect, SAMLIdentifier} and recommended \cite{NIST2017draft}
 for protecting user privacy against curious RPs.
@@ -106,7 +112,7 @@ issues a ``user certificate'' token that binds a user identity to an ephemeral p
 In SPRESSO \cite{SPRESSO}, the RP creates a one-time pseudo-identity in each login instance, which is included in the identity token issued by the IdP. %and the user identity.
 %However, colluding RPs can link a user using the unique identity in the tokens or credentials.
 
-\noindent\textbf{Privacy-preserving identity federation.} Identity federation allows a user registered with a trusted IdP to be authenticated by other parties, potentially with different accounts. For instance, in PRIMA \cite{prima} the IdP signs a credential
+\noindent\textbf{Privacy-preserving identity federation.} In PRIMA \cite{prima} the IdP signs a credential
 %\footnote{For the message signed by the IdP works with a user secret verified by an RP,
 %    it is usually called a credential  in identity federation instead of token.}
 that binds user attributes and a verification key. Using the signing key, the user selectively provides attributes to the RPs \cite{Oblivion}.
