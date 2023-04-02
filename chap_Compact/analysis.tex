@@ -70,7 +70,7 @@ In this section, we analyze the security and privacy guarantees provided by UPPR
 %  and (\emph{b}) $u$ and $r$ are not leaked to RPs in the protocols,
 %     necessary to prevent the RP-based identity linkage.}
 
-\textcolor{blue}{Threat model defined in Section~\ref{subsec:threatmodel} depicts potential adversaries against SSO as honest-but-curious IdPs, malicious RPs, and malicious users, where malicious RPs and users could collude. Based on their objectives, we consider three adversarial scenarios in the security analysis and present our goals in each scenario: {\bf \emph{(S1)}} malicious users colluding with each other or with malicious RPs to impersonate an honest user and login to an honest RP, which requires satisfying {\em four SSO security properties}; {\bf \emph{(S2)}} the honest-but-curious IdP inferring the identity of the RP(s) that the user requests to access, which requires {\em privacy against the IdP}; and {\bf \emph{(S3)}} malicious RPs colluding with each other or with malicious users to deduce the user identity or link her pseudo-identities, which requires {\em privacy against colluding RPs}. Next, we prove that UPPRESSO is secure in the first adversarial scenario in Section~\ref{analysis-security} and it can prevent privacy threats in the other two adversarial scenarios in Section~\ref{sec-:analysis}.}
+\textcolor{blue}{Threat model defined in Section~\ref{subsec:threatmodel} depicts potential adversaries against SSO as honest-but-curious IdPs, malicious RPs, and malicious users, where malicious RPs and users could collude. Based on their objectives, we consider three adversarial scenarios in the security analysis and present our goals in each scenario: {\bf \emph{(S1)}} malicious users colluding with each other or with malicious RPs to impersonate an honest user and login to an honest RP, which requires satisfying {\em four SSO security properties}; {\bf \emph{(S2)}} the honest-but-curious IdP inferring the identity of the RP(s) that the user requests to access, which requires {\em privacy against the IdP}; and {\bf \emph{(S3)}} malicious RPs colluding with each other or with malicious users to deduce the user identity or link her pseudo-identities, which requires {\em privacy against colluding RPs}. Next, we prove that UPPRESSO is secure in the first adversarial scenario in Section~\ref{analysis-security} and it prevents privacy threats in the other two adversarial scenarios in Section~\ref{sec-:analysis}.}
 
 %======move to security analysis
 %The RP cannot derive $ID_U$ from either $PID_U$ or $Acct$ due to the elliptic curve discrete logarithm problem (ECDLP). Since $t$ is random in $\mathbb{Z}_n$ and unknown to the IdP, from the IdP's view, $PID_{RP}$ is indistinguishable from a random variable on $\mathbb{E}$. So, the IdP cannot learn anything about $ID_{RP}$ from $PID_{RP}$.
@@ -133,7 +133,7 @@ where $k$ denotes the security parameter. The probability, i.e. $\epsilon_{c}(k)
   \label{fig:ecdlp_algorithm}
 \end{figure}
 
-Figure \ref{fig:ecdlp_algorithm} depicts the game %for solving the ECDLP problem 
+Figure \ref{fig:ecdlp_algorithm} depicts the game %for solving the ECDLP problem
 using a PPT algorithm $\mathcal{D}^*_c$ and the input ($G$, $Q$).
 Upon receiving an input, the challenger first randomly chooses $r_1, \cdots, r_m$ in $\mathbb{Z}_n$ to calculate $[r_1]G, \cdots, [r_m]G$, randomly replaces a $[r_j]G$ with $Q$, and sends $m$ RP identities to the adversary, which then returns the result ($a$, $b$, $t$, $t'$).
 Finally, the challenger calculates $s = t^{-1}t'r_b \bmod n$ and returns $s$ as the output of $\mathcal{D}^*_c$.
@@ -150,12 +150,12 @@ If $[r_a]G$ happens to be $Q$, the adversary of the game $\mathcal{G}_c$ succeed
 \noindent\textcolor{blue}{\textsc{Theorem 2. (User Identification)} {\em Consider a login instance in which an arbitrary RP receives an integer $t$ and an identity token $T$ that binds $PID_U$ and $PID_{RP}$. If $PID_{RP} = [t]ID_{RP}$, then $PID_U$ uniquely identifies the user at that RP.}
 }
 
-%\noindent\textcolor{blue}{\textbf{User Identification.}~~In the identity token binding $PID_U$ and $PID_{RP}$, the user pseudo-identity $PID_U$ identifies the authenticated user with $ID_U$, % as $Acct = [ID_U][ID_{RP}]$, 
+%\noindent\textcolor{blue}{\textbf{User Identification.}~~In the identity token binding $PID_U$ and $PID_{RP}$, the user pseudo-identity $PID_U$ identifies the authenticated user with $ID_U$, % as $Acct = [ID_U][ID_{RP}]$,
 %and only this user,  at the target RP with $ID_{RP} = [r]G$.}
 %That is, in UPPRESSO, $Acct$ identifies the mapping $[ID_u][ID_{RP}]$.
 
 \vspace{1mm}
-\noindent\textcolor{blue}{\textsc{Proof.} 
+\noindent\textcolor{blue}{\textsc{Proof.}
 According to the $D$-$Y$ model, the RP may receive an identity token $T$ from a malicious RP script. However, if $PID_{RP} = [t]ID_{RP}$, based on Theorem 1, $PID_{RP}$ is the RP's pseudo-identity transformed from the trapdoor $t$. Then, using Eq.~\ref{equ:Account}, the RP could calculate $Acct$ from $PID_U$ included in $T$ and $t$. According to Eq.~\ref{equ:AccountNotChanged}, $Acct = [ID_U]ID_{RP}$, which is determined only by $ID_U$ and $ID_{RP}$ that are issued during registration and thus cannot be manipulated by adversaries. In addition, $Acct$ is independent of login instances, and an RP always derives an identical account for a given user from different identity tokens for multiple login instances.}
 
 Next, we prove that $Acct$ identifies one and only one user in the system. Since $\mathbb{E}$ is a finite cyclic group, $ID_{RP} = [r]G = Q$ is a generator on the curve of order $n$. Therefore, given a user with $ID_U = u$, $Acct = [ID_U]ID_{RP} = uQ$ is a unique point on the curve for $1 \leq u < n$. \hfill $\square$

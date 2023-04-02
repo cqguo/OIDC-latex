@@ -9,10 +9,9 @@ Table \ref{tbl:notations-protocol} lists the notations. The subscript $j$ and/or
 During registration, the IdP assigns a unique random integer $u$ to the user (i.e., $ID_U = u$), while selecting a random integer $r$ and assigning $ID_{RP} = [r]G$ to the RP, if it is a unique point on $\mathbb{E}$. Here, $G$ is a point on $\mathbb{E}$ of order $n$, and $[r]G$ denotes the addition of $G$ on the curve $r$ times.
 
 
-The IdP assigns a unique random integer $u$ to a user (i.e., $ID_U = u$). When an RP registers, the IdP generates a random number $r$ and assigns $ID_{RP} = [r]G$, which is a unique point on $\mathbb{E}$.
-Here,
-%$u, r \in [1,n)$, %$r$ is unknown to the RP, and
-$[r]G$ is the addition of $G$ on the curve $r$ times.
+%The IdP assigns a unique random integer $u$ to a user (i.e., $ID_U = u$). When an RP registers, the IdP generates a random number $r$ and assigns $ID_{RP} = [r]G$, which is a unique point on $\mathbb{E}$.
+%Here, %$u, r \in [1,n)$, %$r$ is unknown to the RP, and
+%$[r]G$ is the addition of $G$ on the curve $r$ times.
 
 \vspace{0.5mm}
 
@@ -130,7 +129,8 @@ The IdP script is necessary because the RP script could leak its origin to the I
 %Section \ref{sec:discussion} discusses more efficient but less portable implementations with browser extensions.
 
 The RP script is responsible for preparing $ID_{RP}$ and $Enpt_{RP}$ for the IdP script using the \emph{RP certificate} issued by the IdP during RP registration. %It binds the RP's identity and endpoint. %(i.e., $ID_{RP}$ and $Enpt_{RP}$).
-In a login instance, the RP script sends the certificate to the IdP script, which then verifies it and extracts $ID_{RP}$ and $Enpt_{RP}$. Unlike in widely-adopted SSO systems \cite{OpenIDConnect, rfc6749, SAML, SAMLIdentifier}, the user does not need to configure anything locally in UPPRESSO as the IdP's public key is already set in the IdP script.
+In a login instance, the RP script sends the certificate to the IdP script, which then verifies it and extracts $ID_{RP}$ and $Enpt_{RP}$.
+The same as in widely-adopted SSO systems \cite{OpenIDConnect, rfc6749, SAML, SAMLIdentifier}, the user does not need to configure anything locally in UPPRESSO as the IdP's public key is already set in the IdP script.
 
 After receiving an identity token from the IdP, the IdP script needs to ensure that the RP script will forward the token to $Enpt_{RP}$ %, which is bound with $ID_{RP}$
 specified in the RP certificate.
@@ -295,7 +295,7 @@ For example, the user may halt it when receiving an invalid $Cert_{RP}$.
 
 \subsection{Compatibility with OIDC}
 \label{subsec:compatible}
-Both UPPRESSO and OIDC work directly with COTS browsers. %Among the four steps of the login flow
+Both UPPRESSO and OIDC work with COTS browsers. %Among the four steps of the login flow
 In UPPRESSO, the \emph{script downloading} step prepares the user agent, which assists the communications between the IdP and RP. UPPRESSO employs the scripts to hide the RP's endpoint from the IdP, while securely forwarding the identity token to the RP using $Enpt_{RP}$ extracted from the RP certificate.
 %    that to protect the identity token from being sent to adversaries. 这句话与Compatibility无关
 Therefore, the IdP does not set \verb+redirect_uri+ in the HTTP responses, which is different from OIDC where HTTP redirections are used to implement the communications. Most operations in the \emph{RP identity transformation} step take place within browsers. The RP only receives $t$ to generate an RP pseudo-identity and responds with $Cert_{RP}$,
