@@ -7,50 +7,50 @@ SSO allows a user to login to a website,
  known as the \emph{relying party} (RP), using her account registered at a trusted web service, known as the \emph{identity provider} (IdP).
 An RP delegates user identification and authentication to the IdP, which issues an \emph{identity token} (such as an id token in OIDC or identity assertion in SAML) for a user to visit the RP. %after authenticating this user.
 For instance, in an OIDC system, the user sends a login request to an RP,
-which constructs an identity-token request with its identity (denoted as $ID_{RP}$) and redirects it to the trusted IdP of the system.
+which constructs an identity-token request with its identity (denoted as $ID_{RP}$) and redirects it to some trusted IdP of the system.
 After authenticating the user, the IdP issues an identity token that binds the identities of both the user and the RP (i.e., $ID_U$ and $ID_{RP}$), which is returned to the user and then forwarded to the RP.
 Finally, the RP verifies the identity token to determine whether the token holder is authorized to login.
 Thus, a user keeps only one credential for the IdP, instead of multiple credentials for different RPs.
 
-SSO services provide a comprehensive solution for identity management and authentication, enabling an IdP to include more user attributes in identity tokens, in addition to the authenticated user's identity.
+SSO services provide a comprehensive solution for identity management and authentication, enabling an IdP to enclose more user attributes in identity tokens, in addition to the authenticated user's identity.
 These attributes (e.g., age, hobby, education, and nationality) are maintained at the IdP
  and can be enclosed in identity tokens with user authorization \cite{OpenIDConnect,rfc6749}.
 
-The wide adoption of SSO raises concerns about user privacy \cite{NIST2017draft, SPRESSO, BrowserID, maler2008venn} because it facilitates the tracking of a user's login activities by interested parties.
+The wide adoption of SSO raises concerns about user privacy because it facilitates the tracking of a user's login activities by interested parties \cite{NIST2017draft, SPRESSO, BrowserID, maler2008venn}.
 To issue identity tokens, %in each login instance,
-an IdP is aware of the RP to which a user is attempting to login and the time of this login.
-Hence, an honest-but-curious IdP could potentially track all the RPs that each user has visited over time \cite{BrowserID,SPRESSO},
+ an IdP is aware of the RP to which a user is attempting to login and the time of this login.
+Thus, an honest-but-curious IdP could potentially track a user's login activities over time \cite{BrowserID,SPRESSO},
 % This data can be further analyzed to profile users' online activities, as in other web tracking attacks.
-which is known as {\em IdP-based login tracing}.
+which is called {\em IdP-based login tracing} in this paper.
 Another privacy risk arises from the fact that RPs learn the user's identity from the identity tokens they receive.
 If the same user identity is enclosed in tokens for the visits to different RPs \cite{maler2008venn, Google, FirefoxAccount}, colluding RPs could link these login instances across different RPs %and track the user's activities
 to learn the user's online profile \cite{maler2008venn}.
-This risk is known as {\em RP-based identity linkage}.
+This risk is called {\em RP-based identity linkage}.
 
 
 Privacy-preserving SSO schemes aim to support comprehensive identity management and authentication while protecting user privacy \cite{maler2008venn, NIST2017draft, BrowserID, SPRESSO}.
 They typically should offer the following features:
-(\emph{a}) \emph{unique user identity at an RP}, which is provided through an SSO identity token,
+(\emph{a}) \emph{unique user identity at an RP}, which is provided through SSO identity tokens,
 (\emph{b}) \emph{user authentication to only a trusted IdP}, which eliminates the need for authentication between a user and an RP and requires only the user's secret credential to authenticate herself to the IdP,
 %    different types of credentials are supported in the authentication between the IdP and users,
-and (\emph{c}) \emph{provision of IdP-confirmed user attributes},  where a user's attributes are maintained at a trusted IdP and provided to the RP upon the user's authorization.
+and (\emph{c}) \emph{provision of IdP-confirmed user attributes},  where a user's attributes are maintained at a trusted IdP and provided to the RP with the user's authorization.
 %It is also important to consider the privacy threats posed by different types of adversaries:
  Meanwhile, the privacy threats posed by different types of adversaries are considered:
 (\emph{a}) \emph{an honest-but-curious IdP},
 (\emph{b}) \emph{colluding RPs},
 and (\emph{c}) \emph{the honest-but-curious IdP colluding with some RPs}.
-In Section \ref{subsec-solutions}, we analyze existing privacy-preserving solutions for SSO and identity federation in light of these privacy threats.
+In Section \ref{subsec-solutions}, we analyze existing privacy-preserving solutions for SSO and also identity federation in light of these privacy threats.
 
 
 %We propose {\em identity transformations} for privacy-preserving SSO and then present an Untraceable and Unlinkable Privacy-PREserving Single Sign-On (UPPRESSO) protocol. We design identity-transformation algorithms in the SSO login flow. In each login instance, $ID_{RP}$ is transformed into an ephemeral $PID_{RP}$ by a user and an RP. $PID_{RP}$ is then sent to an IdP to transform $ID_U$ into ephemeral $PID_U$, so an identity token binds $PID_U$ and $PID_{RP}$, instead of permanent $ID_U$ and $ID_{RP}$. Finally, on receiving an identity token with a matching $PID_{RP}$, the RP transforms $PID_U$ into an account. Given a user, this account is identical across multiple login instances for an RP but unique at each RP.
 This paper presents UPPRESSO, an Untraceable and Unlinkable Privacy-PREserving Single Sign-On protocol for privacy-preserving SSO services. It involves {\em identity transformations} in the SSO login flow.
 In UPPRESSO, the RP and the user first transform $ID_{RP}$ into an ephemeral identity $PID_{RP}$, which is then sent to the IdP to transform $ID_U$ into an ephemeral user identity $PID_U$.
-The identity token issued by the IdP then binds only $PID_U$ and $PID_{RP}$, instead of $ID_U$ and $ID_{RP}$. When the RP receives the identity token with a matching $PID_{RP}$, it transforms $PID_U$ into an account, which is unique at each RP but identical across multiple login instances for that RP.
+The identity token issued by the IdP then binds only $PID_U$ and $PID_{RP}$, instead of $ID_U$ and $ID_{RP}$. When the RP receives the identity token with a matching $PID_{RP}$, it transforms $PID_U$ into an account which is unique at each RP but identical across multiple login instances to this RP.
 
 
 %UPPRESSO prevents the IdP-based login tracing as only $PID_{RP}$ is sent in identity-token requests, and the RP-based identity linkage for every user account is unique (see Section \ref{sec:analysis} for details). On the contrary, existing privacy-preserving SSO solutions \cite{BrowserID,SPRESSO,NIST2017draft,FirefoxAccount} prevent only one of these two privacy threats. The identity transformations work compatibly with widely-used SSO protocols \cite{OpenIDConnect,rfc6749,SAML,NIST2017draft}, so the above desirable features of SSO services are well kept in UPPRESSO, while not all these features are supported in privacy-preserving identity federation \cite{PseudoID,ELPASSO,UnlimitID,Opaak,uprov,hyperledge-idemix}.
 
-UPPRESSO addresses two privacy risks, IdP-based login tracing and RP-based identity linkage. In contrast, existing privacy-preserving SSO solutions \cite{BrowserID, SPRESSO, NIST2017draft, FirefoxAccount} only address one of these privacy risks. Privacy-preserving identity federation \cite{PseudoID, ELPASSO, UnlimitID,Opaak,uprov,hyperledge-idemix} supports some of the desirable features of SSO services, but not all of them. UPPRESSO is designed to be compatible with widely-used SSO protocols \cite{OpenIDConnect, rfc6749, SAML, NIST2017draft}, ensuring that all of these features are supported, and offers a comprehensive privacy-preserving SSO solution.
+UPPRESSO addresses two privacy risks, IdP-based login tracing and RP-based identity linkage. In contrast, existing privacy-preserving SSO solutions \cite{BrowserID, SPRESSO, NIST2017draft, FirefoxAccount} address only one of these privacy risks. Privacy-preserving identity federation \cite{PseudoID, ELPASSO, UnlimitID,Opaak,uprov,hyperledge-idemix} supports some of the desirable features of SSO services, but not all of them. UPPRESSO is designed to be compatible with widely-used SSO protocols \cite{OpenIDConnect, rfc6749, SAML, NIST2017draft}, ensuring that all of these features are supported, and offers a comprehensive privacy-preserving SSO solution.
 
 Our contributions are as follows.
 \vspace{-\topsep}\begin{itemize}
@@ -69,6 +69,6 @@ Our contributions are as follows.
 We present the background and related works in Section \ref{sec:background} and the identity-transformation approach in Section \ref{sec:challenge}, followed by the detailed designs in Section \ref{sec:UPPRESSO}.
 Security and privacy are analyzed in Section \ref{sec:analysis}.
  We explain the prototype implementation and evaluations
-  and discuss the extended issues 
+  and discuss some extended issues
     in Sections \ref{sec:implementation} and \ref{sec:discussion}, respectively.
 Section \ref{sec:conclusion} concludes this work.
