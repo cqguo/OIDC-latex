@@ -1,46 +1,57 @@
-\section{The UPPRESSO System}
+\section{The Designs of UPPRESSO}
 \label{sec:UPPRESSO}
 
-This section presents the threat model, the identity-transformation algorithms, and the UPPRESSO protocol.
+This section presents the threat model and assumptions, the identity-transformation algorithms, and finally the UPPRESSO protocol.
 %In this section, we present the threat model, the UPPRESSO system, and its designs.
 
 \subsection{The Threat Model and Assumptions}
 \label{subsec:threatmodel}
 The system consists of an honest-but-curious IdP,
  a number of RPs and users which could be compromised. % or even collude with each other.
-This threat model is in line with widely-used SSO services \cite{OpenIDConnect,rfc6749, SAML, SAMLIdentifier, NIST2017draft}.
+This threat model is in line with widely-used SSO services \cite{OpenIDConnect,rfc6749, SAML, SAMLIdentifier}.
 
 %\vspace{0.5mm}
-\noindent \textbf{Honest-but-curious IdP.} The IdP strictly follows the protocols while remaining interested in learning about user profiles.
+\noindent \textbf{Honest-but-curious IdP.} The IdP strictly follows the protocols,
+ while remaining interested in learning about user profiles.
 For example, it may store all received messages to infer the relationship between $ID_U$, $ID_{RP}$, $PID_{U}$, and $PID_{RP}$.
  % to track a user's login activities.
-It never actively violates the protocols, so any script downloaded from the IdP also strictly follows the protocols (see Section \ref{sec:web-design} for specific designs for web applications). The IdP maintains the private key for signing identity tokens and RP certificates, %(see Section \ref{implementations} for details)
+It never actively violates the protocols, so any script downloaded from the IdP also strictly follows the protocols (see Section \ref{sec:web-design} for specific designs for web applications).
+The IdP maintains the private key well for signing identity tokens and RP certificates, %(see Section \ref{implementations} for details)
 which prevents adversaries from forging such messages.
 
 %\vspace{0.5mm}
-\noindent \textbf{Malicious users.} Adversaries can control a set of users by stealing their credentials or registering Sybil users in the system. Their objective is to impersonate a victim user at honest RPs or entice an honest user to login to an honest RP under another user's account.
+\noindent \textbf{Malicious users.} Adversaries could control a set of users by stealing their credentials or registering Sybil users in the system.
+ Their objective is to (\emph{a}) impersonate a victim user at honest RPs or (\emph{b}) entice an honest user to login to an honest RP under another user's account.
 %To achieve this, they could behave arbitrarily \cite{WangCW12, SomorovskyMSKJ12}.
 A malicious user might modify, insert, drop, or replay messages or behave arbitrarily in login flows.
 
 \noindent \textbf{Malicious RPs.}
-Adversaries can control a set of RPs by registering at the IdP as an RP or exploiting vulnerabilities to compromise some RPs. Malicious RPs may behave arbitrarily to compromise security and privacy guarantees.
+Adversaries could control a set of RPs by registering at the IdP as an RP or exploiting vulnerabilities to compromise some RPs. Malicious RPs may behave arbitrarily to compromise the security or privacy guarantees of UPPRESSO.
 %they may attempt to obtain a valid identity token for another RP, to allow some user to login to this target RP:
-They may manipulate $PID_{RP}$ in a login instance, attempting to (\emph{a}) entice honest users to return an identity token that might be accepted by some honest RP or (\emph{b}) manipulate the generation of $PID_U$ to analyze the relationship between $ID_U$ and $PID_U$.
-
+For example, they might manipulate $PID_{RP}$ in a login instance, attempting to (\emph{a}) entice honest users to return an identity token that might be accepted by some honest RP or (\emph{b}) manipulate the generation of $PID_U$ to analyze the relationship between $ID_U$ and $PID_U$.
 
 %\vspace{0.5mm}
 \noindent \textbf{Colluding users and RPs.}
-Malicious users and RPs may collude to compromise the security and privacy guarantees for honest users and RPs. For example, a malicious RP may collude with malicious users to steal another user's identity token and impersonate the victim at other honest RPs.
+Malicious users and RPs might collude to compromise the security or privacy guarantees for honest users and RPs.
+For example, a malicious RP may collude with malicious users to steal another user's identity token and impersonate the victim at other honest RPs.
 
-We do \emph{not} consider the collusion of the IdP and RPs. If the IdP were to collude with some RPs, a user would complete login flows entirely with malicious entities. In theory, it would require a long-term user secret to protect (or transform) permanent accounts across these RPs. This secret should \emph{only} be held  by the user; otherwise, the colluding IdP and RPs could always link these accounts.
+We do \emph{not} consider the collusion of the IdP and RPs.
+If the IdP were to collude with some RPs, a user would complete login flows entirely with malicious entities.
+In principle it would require a long-term user secret to protect (or transform) permanent accounts across these RPs.
+This secret should be held \emph{only} by the user; otherwise, the colluding IdP and RPs could always link these accounts.
 %Note that we aim to design a solution for SSO users without any non-ephemeral secret verified by the RPs.
 However, accounts derived from the user secret would need to be updated if the secret is lost or leaked (see discussions in Section \ref{sec:discussion}).
 
-%\subsection{Assumptions}
-\noindent \textbf{Other assumptions.}
+\subsection{Assumptions}
+%\noindent \textbf{Other assumptions.}
 We assume HTTPS is used to secure communications between honest entities, and the cryptographic primitives are secure. The software stack of an honest entity is correctly implemented to transmit messages to receivers as expected.
+
 UPPRESSO is designed for users who value privacy,
-so a user never grants the IdP permission to include any \emph{distinctive} attributes, such as telephone number, Email address, etc., in identity tokens. Moreover, a user does not configure any distinctive attributes at any RP. So, privacy leakages due to re-identification by distinctive attributes across RPs are out of our scope. Finally, we do not consider the traffic analysis and HTTP redirection attacks in this work, as they can be prevented by existing defenses and our focus is on the privacy threats introduced by SSO protocols.
+so a user never authorizes the IdP to enclose any \emph{distinctive} attributes, such as telephone number, Email address, etc., in identity tokens. Moreover, a user does not configure any distinctive attributes at any RP.
+So privacy leakages due to re-identification by distinctive attributes across RPs are out of our scope.
+Finally, we do not consider the tracking of a user's network activities
+         by network traffic analysis or crafted web pages,
+as they can be prevented by existing defenses and this work focuses on the privacy threats introduced by SSO protocols.
 For example,
  FedCM \cite{FedCM} attempts to disable iframe and third-party cookies in SSO, which might be exploited to track users.
 
