@@ -1,8 +1,8 @@
 \section{Security and Privacy Analysis}
 \label{sec:analysis}
-In this section, we analyze the security and privacy guarantees provided by \usso~and show that it achieves all four required security properties listed in Section~\ref{subsec:basicrequirements} and prevents both types of privacy threats against SSO services.
+In this section, we analyze the security and privacy guarantees provided by \usso~and show that it satisfies four security requirements listed in Section~\ref{subsec:basicrequirements} and prevents both types of privacy threats against SSO services.
 
-%\subsection{Extended Adversarial Models}
+\subsection{Adversarial Models}
 \label{adver-model}
 
 % \textcolor{blue}{Based on the threat model and assumptions proposed in Section \ref{sec:UPPRESSO},
@@ -71,25 +71,33 @@ In this section, we analyze the security and privacy guarantees provided by \uss
 %     necessary to prevent the RP-based identity linkage.}
 
 \newc
-The threat model defined in Section~\ref{subsec:threatmodel} depicts potential adversaries against SSO as honest-but-curious IdPs, malicious RPs, and malicious users, where malicious RPs and users could collude. Based on their objectives, we consider three adversarial scenarios in the security analysis and present our goals in each scenario: {\bf \emph{(S1)}} a malicious user colludes with each other or with malicious RPs to impersonate an honest user to log in to an honest RP or entice an honest user to log in to an honest RP on her behalf. To prevent both types of impersonation attacks, the SSO should provide all {\em four SSO security properties}; {\bf \emph{(S2)}} the honest-but-curious IdP infers the identity of the RP(s) that the user requests to access, which requires SSO to provide {\em privacy against the IdP}; and {\bf \emph{(S3)}} malicious RPs collude with each other or with malicious users to deduce the user identity or link her pseudo-identities, which requires the SSO to provide {\em privacy against colluding RPs}.
+The threat model defined in Section \ref{subsec:threatmodel} depicts potential adversaries in UPPRESSO as an honest-but-curious IdP, malicious RPs, and malicious users, where malicious RPs and users could collude.
+Based on their objectives, we consider three types of adversaries against our design goals:
+\vspace{-\topsep}\begin{description}
+\setlength{\topsep}{0pt}
+\setlength{\partopsep}{0pt}
+\setlength{\itemsep}{0pt}
+\setlength{\parsep}{0pt}
+\setlength{\parskip}{0pt}
+\item[Security]
+Malicious users could colludes with each other or with malicious RPs to impersonate an honest user to login to an honest RP or entice an honest user to login to an honest RP under another user's account.
 
-Next, we prove that \usso~is secure in the first adversarial scenario in Section~\ref{analysis-security} and it can prevent privacy threats in the other two adversarial scenarios in Section~\ref{sec-:analysis}.
-\oldc
+\item[Privacy against the IdP]
+The honest-but-curious IdP infers the identity of the RP(s) that the user requests to access.
+
+\item[Privacy against RPs]
+Malicious RPs collude with each other or with malicious users to deduce the user identity or link her pseudo-identities.
+
+\end{description}
+
+
+%Next, we prove that \usso~is secure in the first adversarial scenario in Section~\ref{analysis-security} and it can prevent privacy threats in the other two adversarial scenarios in Section~\ref{sec-:analysis}.
 
 %======move to security analysis
 %The RP cannot derive $ID_U$ from either $PID_U$ or $Acct$ due to the elliptic curve discrete logarithm problem (ECDLP). Since $t$ is random in $\mathbb{Z}_n$ and unknown to the IdP, from the IdP's view, $PID_{RP}$ is indistinguishable from a random variable on $\mathbb{E}$. So, the IdP cannot learn anything about $ID_{RP}$ from $PID_{RP}$.
 %Section \ref{sec:analysis} presents more detailed analyses.
 
-\subsection{Security}
-\label{analysis-security}
-%UPPRESSO satisfies four sufficient conditions (i.e., RP designation, user identification, integrity, and confidentiality of identity tokens) of secure SSO services \cite{ArmandoCCCT08,FettKS16, FettKS17}, as stated in Section \ref{subsec:basicrequirements}.
-
-\newc
-In a secure SSO that is robust against impersonation attacks, an honest user should be able to prove her identity to the target RP with an identity token issued by the IdP. As pseudo-identities are used in \usso, an RP needs to verify that ({\em a}) $PID_{RP}$ in the received identity token is a transformation from its own $ID_{RP}$ and tied to the current login instance, which requires {\em RP designation}; and ({\em b}) $PID_U$ included in the identity token can be associated with a unique, long-term user account it maintains, which requires {\em user identification}. Besides, the identity token for an honest RP should not be intercepted by malicious users or RPs, requiring the {\em confidentiality of identity tokens}, nor be forged or tampered with to include a fake $PID_U$ or $PID_{RP}$, requiring the {\em integrity of identity tokens}.
-\oldc
-
-
-To prove that \usso~satisfies these four properties, we first formalize its login flow using a Dolev-Yao-style model \cite{SPRESSO}, % which has been used in the formal analysis of SSO protocols such as OAuth 2.0 \cite{FettKS16} and OIDC \cite{FettKS17}.
+We first formalize its login flow using a Dolev-Yao-style model \cite{SPRESSO}, % which has been used in the formal analysis of SSO protocols such as OAuth 2.0 \cite{FettKS16} and OIDC \cite{FettKS17}.
 which abstracts the entities in a web system, such as web servers and browsers, as \emph{atomic processes} %which communicate with each other through events. % such as HTTPS request and response.
 and then defines \emph{script processes} to formulate client-side scripts.
 %The script is dependently invoked by the browser to process the server-defined logic.%such as verifying $Certificate_{RP}$. %postmessage events; %atomic process <-> script process, communication. %Other events change self-trigger.
@@ -100,6 +108,14 @@ The script processes communicate with each other through \verb+postMessage+, whi
 
 \newc
 With this formal model (referred to as the \dy~model), we could (\emph{a}) trace the identity token lifecycle from its generation at the IdP to its acceptance at the RP to prove that it cannot be leaked to adversaries; (\emph{b}) locate the places where $PID_U$, $PID_{RP}$, and other elements in the identity token are processed to prove that they cannot be manipulated by any adversary; and (\emph{c}) locate the places where the IdP script uses $PK$ for verification to prove that it cannot be replaced by any adversary. Besides, we show that the IdP cannot view $t$ shared only between the user and the RP, while the RPs cannot view $u$ shared between the user and the IdP. It is trivial to prove the security of $r$, as it never leaves the IdP.
+
+\subsection{Security}
+\label{analysis-security}
+%UPPRESSO satisfies four sufficient conditions (i.e., RP designation, user identification, integrity, and confidentiality of identity tokens) of secure SSO services \cite{ArmandoCCCT08,FettKS16, FettKS17}, as stated in Section \ref{subsec:basicrequirements}.
+
+In a secure SSO that is robust against impersonation attacks, an honest user should be able to prove her identity to the target RP with an identity token issued by the IdP. As pseudo-identities are used in \usso, an RP needs to verify that ({\em a}) $PID_{RP}$ in the received identity token is a transformation from its own $ID_{RP}$ and tied to the current login instance, which requires {\em RP designation}; and ({\em b}) $PID_U$ included in the identity token can be associated with a unique, long-term user account it maintains, which requires {\em user identification}. Besides, the identity token for an honest RP should not be intercepted by malicious users or RPs, requiring the {\em confidentiality of identity tokens}, nor be forged or tampered with to include a fake $PID_U$ or $PID_{RP}$, requiring the {\em integrity of identity tokens}.
+\oldc
+
 
 Next, we present the proofs of four security properties supported by \usso. First, let us consider an identity token $T$ binding $PID_{RP}$ and $PID_U$, which is generated by the IdP upon a request from the user with $ID_U$.
 %These conclusions are used to prove the security of the UPPRESSO protocols.
