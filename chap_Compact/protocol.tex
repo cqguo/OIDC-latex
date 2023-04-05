@@ -330,9 +330,9 @@ For example, the user halts it when receiving an invalid $Cert_{RP}$.
 \subsection{Compatibility with OIDC}
 \label{subsec:compatible}
 Both UPPRESSO and OIDC work with COTS browsers. %Among the four steps of the login flow
-In UPPRESSO, the \emph{script downloading} step prepares the user agent, which assists the communications between the IdP and RP. UPPRESSO employs the scripts to hide the RP's endpoint from the IdP, while securely forwarding the identity token to the RP using $Enpt_{RP}$ extracted from the RP certificate.
+In UPPRESSO, the \emph{script downloading} step prepares the user agent, which assists the communications between the IdP and RP. UPPRESSO employs the web scripts to hide the RP's endpoint from the IdP, while securely forwarding identity tokens to the RP through $Enpt_{RP}$ extracted from the RP certificate.
 %    that to protect the identity token from being sent to adversaries. 这句话与Compatibility无关
-Therefore, the IdP does not set \verb+redirect_uri+ in the HTTP responses, which is different from OIDC where HTTP redirections are used to implement the communications. Most operations in the \emph{RP identity transformation} step take place within browsers. The RP only receives $t$ to generate an RP pseudo-identity and responds with $Cert_{RP}$,
+Therefore, the IdP does not set \verb+redirect_uri+ in the HTTP responses, which is different from OIDC where HTTP redirections are used to implement these communications. Most operations in the \emph{RP identity transformation} step take place within browsers. The RP only receives $t$ to generate an RP pseudo-identity and responds with $Cert_{RP}$,
 %The calculation of $PID_{RP}$ is viewed as the operation to prepare an RP identity in OIDC,
 which is viewed as a supplementary message to users.
 %The operations in the $PID_{RP}$ registration are almost identical to those in the RP Dynamic Registration of OIDC \cite{DynamicRegistration},
@@ -343,6 +343,6 @@ Consequently, compared to the original OIDC protocol, UPPRESSO simplifies the Id
 
 The operations of \emph{identity-token generation} and \emph{$Acct$ calculation} in UPPRESSO are \emph{identical} to those in OIDC because (\emph{a}) the calculation of $PID_U$ in UPPRESSO can be viewed as a method to generate PPIDs in OIDC and (\emph{b}) the calculation of $Acct$ can be viewed as a mapping from the user identity in tokens to an account at the RP.
 
-The compatibility is experimentally confirmed through our prototype implementation, which required modifying only 23 lines of Java code in MITREid Connect \cite{MITREid}, an open-source OIDC system, to build a UPPRESSO IdP (see Section \ref{subsec:proto-imple}).
+The compatibility is experimentally confirmed through our prototype implementation, which modifies only 23 lines of Java code in MITREid Connect \cite{MITREid}, an open-source OIDC system, to build an UPPRESSO IdP (see Section \ref{subsec:proto-imple}).
 %It will help the adoption and deployment of UPPRESSO.
 
