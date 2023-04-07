@@ -273,7 +273,7 @@ According to the conclusions of the DYU model,
 
 
 \vspace{1mm}
-\noindent\textsc{Theorem 5. (Security)} {UPPRESSO is a secure SSO system.}
+\noindent\textsc{Theorem 5. (Security)} {UPPRESSO is secure.}
 
 \vspace{0.75mm}
 \noindent\textsc{Proof.}
@@ -284,26 +284,18 @@ According to the formal analysis \cite{SPRESSO,FettKS14},
 %In a secure SSO that is robust against impersonation attacks, an honest user should be able to prove her identity to the target RP with an identity token issued by the IdP. As pseudo-identities are used in \usso, an RP needs to verify that ({\em a}) $PID_{RP}$ in the received identity token is a transformation from its own $ID_{RP}$ and tied to the current login instance, which requires {\em RP designation}; and ({\em b}) $PID_U$ included in the identity token can be associated with a unique, long-term user account it maintains, which requires {\em user identification}. Besides, the identity token for an honest RP should not be intercepted by malicious users or RPs, requiring the {\em confidentiality of identity tokens}, nor be forged or tampered with to include a fake $PID_U$ or $PID_{RP}$, requiring the {\em integrity of identity tokens}.
 
 When confidentiality and integrity of identity tokens is satisfied,
-    an adversary cannot presents an identity token issued by the IdP for honest users and accepted by an honest RP.
+    an adversary cannot presents an identity token issued for honest users and accepted by an honest RP.
 When RP designation and user identification are satisfied,
     an identity token issued to an adversary always derives the adversary's account at any RP.
-%
-So the adversary will (\emph{a}) forge an identity token or (\emph{b}) present an identity token issued to some malicious user or accepted by some malicious RP.
+So an adversary never presents an identity token that is accepted by an honest RP to derive an honest user's account at this RP.
 
 %Meanwhile, $PID_U$ can only be calculated by the IdP and the user, since no one else knows or could intercept $u$ according to the DYU model. \oldc
 
-When integrity of identity tokens is satisfied,
-    an adversary cannot forge an identity token for honest users and accepted by an honest RP.
-When RP designation is satisfied, an RP never accepts an identity token which is accepted by other RPs.
-When user identification is satisfied, an RP always derives the authenticated user from an accepted identity token.
-
-According the conclusion by the DYU model,
-    in an honest user's login instance to an honest RP,
-         all elements in the identity token are enclosed by honest entities,
- and the identity token cannot be replaced.
-So the honest user always presents an identity token issued for himself to an honest RP.
-Due to integrity, this identity token cannot be accepted if modified.
-According to RP designation and user identification,
+According to the conclusions of the DYU model,
+    $PID_U$ is calculated based on the user when the IdP issues an identity token for an authenticated user.
+Moreover, because confidentiality and integrity of identity tokens are satisfied,
+    an honest user never presents a token issued for other users and accepted by an honest RP.
+When user identification user is satisfied,\footnote{It is worthy noting that RP designation is a precondition of user identification in UPPRESSO. In other SSO systems, RP designation is not always a precondition of user identification.}
     this token always derives this honest user's account.
 \hfill $\square$
 
