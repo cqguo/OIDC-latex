@@ -84,7 +84,7 @@ See Section \ref{sec:analysis} for more detailed proofs.
 
 \textcolor{blue}{In this process, the RP needs to check whether $PID_{RP} = [t]ID_{RP}$ holds when receiving an identity token.
 Otherwise, a malicious user with $ID_{U'} = u'$ could impersonate a victim user by setting $PID_{RP}$ to $[t'u'^{-1}]Acct$ but sending $t'$ to an RP, where $Acct$ belongs to the victim with $ID_{U} = u$ at this RP.
-Then, the malicious user could request an identity token, 
+Then, the malicious user could request an identity token,
  and the IdP would calculate $PID_{U'} = [u'][t'u'^{-1}]Acct = [t']Acct$.
 Finally, the RP would accept the malicious user under $Acct$.} %In particular, when one party selects $t$ and computes $PID_{RP} = [t]ID_{RP}$, the other party should check if the received $t$ and $PID_{RP}$ satisfies $PID_{RP} = [t]ID_{RP}$.
 %In the above descriptions, the user generates $t$, calculates $PID_{RP} = [t]ID_{RP}$ and sends $t$ to the RP. After receiving $t$ from the user and extracting $PID_{RP}$ from a token, the RP checks that $PID_{RP} = [t]ID_{RP}$, because the correct account $[ID_U]ID_{RP}$ is derived \emph{only if} this equation holds (i.e., $PID_{RP} = [t]ID_{RP}$); otherwise, attacks happen as below.
@@ -99,7 +99,7 @@ This token would allow the malicious user to login to the honest RP under the vi
 
 The IdP never discloses $r$ to RPs; otherwise, two colluding RPs with $ID_{RP_j} = [r]G$ and $ID_{RP_{j'}} = [r']G$ could link a user's accounts by checking whether $[r']Acct_j = [r]Acct_{j'}$ holds.
 At the meantime,
-a user's identity $u$ is kept secret to RPs; otherwise, colluding RPs could enumerate the user's accounts 
+a user's identity $u$ is kept secret to RPs; otherwise, colluding RPs could enumerate the user's accounts
         by calculating $[u]ID_{RP_j}$ and then link these accounts.
 
 %======move to security analysis
@@ -115,7 +115,7 @@ a user's identity $u$ is kept secret to RPs; otherwise, colluding RPs could enum
 %    \begin{tabular}{|c|c|c|}
     \begin{tabular}{|p{1.0cm}|p{6.60cm}|} \hline
     {\textbf{Notation}} & {\textbf{Description}} \\ \hline
-    {$\mathbb{E}$, $G$, $n$} & {$\mathbb{E}$ is an elliptic curve over a finite field $\mathbb{F}_q$. $G$ is a base point (or generator) of $\mathbb{E}$, and the order of $G$ is a prime number $n$.} \\ \hline
+    {$\mathbb{E}$, $G$, $n$} & {$\mathbb{E}$ is an elliptic curve over a finite field $\mathbb{F}_q$. $G$ is a base point (or generator) on $\mathbb{E}$, and the order of $G$ is a prime number $n$.} \\ \hline
     {$ID_U$} & {$ID_U = u \in [1, n)$ is the user's unique identity at the IdP, \textcolor{blue}{which is known only to the user and the IdP. %$u$ is kept unknown to RPs.
     }} \\ \hline
    {$ID_{RP_j}$} & {$ID_{RP} = [r]G$ is the $j$-th RP's unique identity, which is publicly known; $r \in [1, n)$ \textcolor{blue}{is known only to the IdP.}} \\ \hline
@@ -139,7 +139,7 @@ a user's identity $u$ is kept secret to RPs; otherwise, colluding RPs could enum
 In commonly-used SSO protocols \cite{OpenIDConnect,rfc6749, SAML, SAMLIdentifier},
 an IdP needs to know the visited RP to ensure the \emph{confidentiality} of identity tokens.
  For instance, in OIDC services,
- an RP's endpoint to receive tokens is stored as the \verb+redirect_uri+ parameter at the IdP. 
+ an RP's endpoint to receive tokens is stored as the \verb+redirect_uri+ parameter at the IdP.
 The IdP employs HTTP 302 redirection to send identity tokens to the RP,
             by setting this parameter as the target URL in HTTP responses to a user's identity-token request \cite{OpenIDConnect},
 so the user agent forwards it to the designated RP.
@@ -263,7 +263,7 @@ The user and the RP negotiate $PID_{RP} = [t]{ID_{RP}}$.
 \item[2.1] The IdP script chooses a random number $t$ in $\mathbb{Z}_n$ and sends it to the RP script through \verb+postMessage+. The RP script then forwards $t$ to the RP.
 \item[2.2] Upon receiving $t$, the RP verifies $1 \leq t < n$ and %calculates $PID_{RP}$.
 %To acknowledge the negotiation of $PID_{RP}$, The RP
- replies with $Cert_{RP}$, 
+ replies with $Cert_{RP}$,
     with the scope of requested user attributes,
     which is then transmitted from the RP script to the IdP script.  % through \verb+postMessage+.
 \item[2.3] The IdP script verifies $Cert_{RP}$, extracts $ID_{RP}$ and $Enpt_{RP}$ from $Cert_{RP}$, and calculates $PID_{RP}=[t]{ID_{RP}}$.
