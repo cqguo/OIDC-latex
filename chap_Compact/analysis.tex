@@ -178,7 +178,7 @@ Finally, the challenger calculates $s = t^{-1}t'r_b \bmod n$, and returns $s$ as
 \begin{figure}[tb]
   \centering
   \includegraphics[width=0.97\linewidth]{fig/ecdlp_algorithm.pdf}
-  \caption{The PPT algorithm $\mathcal{D}^*_c$ based on the $PID_{RP}$ collision game, to solve the ECDLP}
+  \caption{The PPT algorithm $\mathcal{D}^*_c$ constructed based on the $PID_{RP}$ collision game to solve the ECDLP problem.}
   \label{fig:ecdlp_algorithm}
 \end{figure}
 
@@ -365,44 +365,30 @@ Now, consider an arbitrary login instance at the $(c+1)$th colluding RP, denoted
 
 
 \vspace{0.75mm}
-\noindent{\textsc{Proof.} 
-We prove this privacy property,
- based on the elliptic curve decisional Diffie-Hellman (ECDDH) assumption. %\cite{GoldwasserK16}.
-%That is, while there is the login to an RP, for colluded RPs, they cannot decide whether this login and any logins to other RPs are from the same user.
-%
-Let $\mathbb{E}$ be an elliptic curve,
-    and $G$ be a point on $\mathbb{E}$ of order $n$.
-For any PPT algorithm $\mathcal{D}$, the probability of distinguishing
- $([x]G$, $[y]G$, $[xy]G)$ and $([x]G$, $[y]G$, $[z]G)$
-is negligible,
- where $x$, $y$ and $z$ are integers randomly and independently chosen in $\mathbb{Z}_n$.
-Let  ${\rm Pr}\{\}$ denote the probability and
- we define
-\begin{align*}
-&{\rm Pr}_1 =  {\rm Pr}\{\mathcal{D}(G, [x]G, [y]G, [xy]G)=1\} \\
-&{\rm Pr}_2 =  {\rm Pr}\{\mathcal{D}(G, [x]G, [y]G, [z]G)=1\}
-\end{align*}
-So $\epsilon_{r}(k) = |{\rm Pr}_1 - {\rm Pr}_2|$ becomes negligible as $k$ increases.
-
-
-We define the RP-based identity linkage game $\mathcal{G}_r$:
-after receiving $\mathfrak{L}$ and $L'$ from a challenger,
-    the adversary outputs the result $s = 1$ if it decides $u' \in \{u_1, u_2, \cdots, u_v\}$ or $s = 0$ if $u'$ is randomly chosen in $\mathbb{Z}_n$.
-The adversary's advantage in $\mathcal{G}_r$ is defined as $\mathbf{Adv}_{A}$.
-%If the adversary is able to distinguish whether $u' \in \{u_1, u_2, \cdots, u_v\}$ or not,
-%    the adversary will have non-negligible advantages in $\mathcal{G}_r$
-%        and ${\rm Adv}_A$ is non-negligible.
-Then,
+\noindent{\textsc{Proof.} First, we define a RP-based identity linkage game $\mathcal{G}_r$ between an adversary and a challenger based on the shared knowledge $\mathfrak{L}$: the adversary receives $L'$ and $\mathfrak{L}$ from the challenger and outputs the result $s = 1$ if it decides $u' \in \{u_1, u_2, \cdots, u_v\}$ or $s = 0$ if $u'$ is randomly chosen in $\mathbb{Z}_n$. The adversary's advantage in $\mathcal{G}_r$ can be defined as $\mathbf{Adv}_{A}$: 
 \begin{align*}
 &{\rm Pr}'_1={\rm Pr}\{\mathcal{G}_r(\mathfrak{L}, L'|ID_{U'} \in \{ID_{U_1}, ID_{U_2}, \cdots, ID_{U_v}\})=1\} \\
 &{\rm Pr}'_2={\rm Pr}\{\mathcal{G}_r(\mathfrak{L}, L'|ID_{U'} \in \mathbb{Z}_n)=1\}\\
 &{\mathbf{Adv}}_{A}=|{\rm Pr}'_1-{\rm Pr}'_2|
 \end{align*}
 
-We design a PPT algorithm $\mathcal{D}^*_r$ based on $\mathcal{G}_r$, shown in Figure \ref{fig:dalgorithm}, to solve the ECDDH problem.
-The input is in the form of $(G$, $Q_1=[x]G$, $Q_2=[y]G$, $Q_3=[z]G)$.
-On receiving the input, the challenger of $\mathcal{G}_r$ randomly chooses
- $\{u_1, u_2, \cdots, u_v\}$, $\{r_1, r_2, \cdots, r_c\}$, $\{t_{1, 1}, t_{1, 2}, \cdots, t_{v, c}\}$, and $t'$ in $\mathbb{Z}_n$.
+%We define the RP-based identity linkage game $\mathcal{G}_r$: after receiving $\mathfrak{L}$ and $L'$ from a challenger, the adversary outputs the result $s = 1$ if it decides $u' \in \{u_1, u_2, \cdots, u_v\}$ or $s = 0$ if $u'$ is randomly chosen in $\mathbb{Z}_n$. The adversary's advantage in $\mathcal{G}_r$ is defined as $\mathbf{Adv}_{A}$. %If the adversary is able to distinguish whether $u' \in \{u_1, u_2, \cdots, u_v\}$ or not, the adversary will have non-negligible advantages in $\mathcal{G}_r$ and ${\rm Adv}_A$ is non-negligible.
+
+We design a PPT algorithm $\mathcal{D}^*_r$ based on the game $\mathcal{G}_r$, as shown in Figure \ref{fig:dalgorithm}, to solve the elliptic curve decisional Diffie-Hellman (ECDDH) problem: given $a=(G, [x]G$, $[y]G$, $[xy]G)$ and $b=(G, [x]G$, $[y]G$, $[z]G)$, determine if a quaternion is an elliptic curve Diffie-Hellman (ECDH) group or a non-ECDH group, where $G$ is a point on an elliptic curve $\mathbb{E}$ of order $n$, and $x$, $y$, and $z$ are integers randomly and independently chosen in $\mathbb{Z}_n$. The probability of distinguishing $a$ and $b$ using any PPT algorithm $\mathcal{D}$ can be defined as $\epsilon_{r}(k) = |{\rm Pr}_1 - {\rm Pr}_2|$, where: %Let  ${\rm Pr}\{\}$ denote the probability and we define
+\begin{align*}
+&{\rm Pr}_1 =  {\rm Pr}\{\mathcal{D}(G, [x]G, [y]G, [xy]G)=1\} \\
+&{\rm Pr}_2 =  {\rm Pr}\{\mathcal{D}(G, [x]G, [y]G, [z]G)=1\}
+\end{align*}
+$\epsilon_{r}(k)$ is negligible as the security parameter $k$ increases.
+
+%\cite{GoldwasserK16}.
+%That is, while there is the login to an RP, for colluded RPs, they cannot decide whether this login and any logins to other RPs are from the same user.
+%
+% Let $\mathbb{E}$ be an elliptic curve, and $G$ be a point on $\mathbb{E}$ of order $n$. For any PPT algorithm $\mathcal{D}$, the probability of distinguishing $([x]G$, $[y]G$, $[xy]G)$ and $([x]G$, $[y]G$, $[z]G)$
+% is negligible, where $x$, $y$ and $z$ are integers randomly and independently chosen in $\mathbb{Z}_n$. 
+
+
+The input of $\mathcal{D}^*_r$ is in the form of $(G$, $Q_1=[x]G$, $Q_2=[y]G$, $Q_3=[z]G)$. Upon receiving the input, the challenger of $\mathcal{G}_r$ randomly chooses $\{u_1, u_2, \cdots, u_v\}$, $\{r_1, r_2, \cdots, r_c\}$, $\{t_{1, 1}, t_{1, 2}, \cdots, t_{v, c}\}$, and $t'$ in $\mathbb{Z}_n$.
 Then the challenger constructs $\mathfrak{L}$ and $L'$ as below.
 It firstly assigns $L_{i, j} = ([r_j]G, t_{i, j}, [u_ir_j]G)$, %$1\leq i \leq v$ and $1\leq j \leq c$,
     and randomly chooses $d \in [1, v]$ to
@@ -433,15 +419,13 @@ Thus,
 &{\mathbf{Adv}}_{A}=|{\rm Pr}'_1-{\rm Pr}'_2|=|{\rm Pr}_1-{\rm Pr}_2|=\epsilon_{r}(k)
 \end{align*}
 
-The ECDDH assumption means that in $\mathcal{G}_r$ the adversary does not have advantages,
-    i.e., cannot distinguish a user $U'$ chosen from \{${U_1}, {U_2}, \cdots, {U_v}$\}
-        or randomly from the universal user set.
+The ECDDH assumption means that in $\mathcal{G}_r$ the adversary does not have advantages, i.e., cannot distinguish a user $U'$ chosen from \{${U_1}, {U_2}, \cdots, {U_v}$\} or randomly from the universal user set.
 %    (indistinguishability of users to colluding RPs).
-So the RP-based identity linkage is impossible. $\square$
+So, the RP-based identity linkage is impossible. \hfill $\square$
 
 \begin{figure}[tb]
   \centering
   \includegraphics[width=0.97\linewidth]{fig/dalgorithm.pdf}
-  \caption{The PPT algorithm $\mathcal{D}^*_r$ based on the RP-based identity linkage game, to solve the ECDDH problem}
+  \caption{The PPT algorithm $\mathcal{D}^*_r$ constructed based on the RP-based identity linkage game to solve the ECDDH problem.}
   \label{fig:dalgorithm}
 \end{figure}
