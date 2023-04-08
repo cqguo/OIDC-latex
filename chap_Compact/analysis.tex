@@ -97,9 +97,7 @@ Malicious RPs collude with each other or with malicious users,
 
 \subsection{The Dolev-Yao-Style Model for UPPRESSO}
 \label{dy-model}
-We develop a Dolev-Yao-style model \cite{SPRESSO},
-    referred to as the \emph{DYU model},
-to formalize the login flow of UPPRESSO. % which has been used in the formal analysis of SSO protocols such as OAuth 2.0 \cite{FettKS16} and OIDC \cite{FettKS17}.
+We develop a Dolev-Yao-style model \cite{SPRESSO} for \usso, referred to as the \dyu~model, to formalize the login flow of UPPRESSO. % which has been used in the formal analysis of SSO protocols such as OAuth 2.0 \cite{FettKS16} and OIDC \cite{FettKS17}.
 It abstracts the entities in a web system, such as web servers and browsers, as \emph{atomic processes} %which communicate with each other through events. % such as HTTPS request and response.
 and defines \emph{script processes} to formulate client-side scripts.
 %The script is dependently invoked by the browser to process the server-defined logic.%such as verifying $Certificate_{RP}$. %postmessage events; %atomic process <-> script process, communication. %Other events change self-trigger.
@@ -326,26 +324,32 @@ In each login instance, an RP receives $t$ (Step 2.1 in Section~\ref{implementat
 where $PID_{RP}$ and $PID_U$ can be deduced from $ID_{RP}$ and $Acct$ with a valid $t$, respectively. Therefore, when user $U_i$ requests to log in to $RP_j$, the RP's knowledge can be defined as $L_{i, j}=(ID_{RP_j}, t_{ij}, Acct_i)$. %According to Equation~\ref{equ:Account}, we have $L_{i, j}=([r_j]G, t_{ij}, [u_ir_j]G)$.
 
 \vspace{1mm}
-\noindent{\textsc{Theorem 7. (Privacy against Colluding RPs)}} {\em Consider $(c+1)$ RPs colluding in a system of $n$ RPs, where $1 \le c \le n-1$. Assume $w$ users have logged in to all the colluding RPs, among which $v$ users are malicious and colluding with these RPs.
-Using \usso, any colluding RP cannot distinguish the login instance of a user at itself from this user's login instances at any other colluding RPs, even if the colluding RPs have linked the login instances of $v$ colluding users and shared the knowledge with each other.}
+\noindent{\textsc{Theorem 7. (Privacy against Colluding RPs)}} {\em Consider $(c+1)$ RPs colluding in a system of $m$ RPs, where $c$ is between 1 and $m-1$. Suppose $w$ users have logged in to all the colluding RPs, with $v$ of these users being malicious and colluding with these RPs.
+Using \usso, any colluding RP cannot distinguish the login instance of any arbitrary user at itself from the user's login instances at any other colluding RPs, even if they have linked the login instances of $v$ colluding users and shared their knowledge with each other.}
 
 \vspace{0.75mm}
 \noindent{\textsc{Proof.}
-First, $v$ malicious users colluding with $c$ malicious RPs could link their login instances at these RPs. Without loss of generality, we consider the first $c$ RPs collecting information about the first $v$ malicious users and sharing the knowledge in term of $\mathfrak{L}$, which is defined as:
-\begin{equation}
-\mathfrak{L}=\left\{ \begin{matrix}
-L_{1,1}, & L_{1,2}, & \cdots, & L_{1,c}\\
-L_{2,1}, & L_{2,2}, & \cdots, & L_{2,c}\\
-\cdots, & \cdots, & \cdots, & \cdots\\
-L_{v,1}, & L_{v,2}, & \cdots, & L_{v,c}
-\end{matrix}\right\}
-\end{equation}
-where $L_{i, j}=(ID_{RP_j}, t_{ij}, Acct_i)=([r_j]G, t_{ij}, [u_ir_j]G)$ according to Equation~\ref{equ:Account}. In $\mathfrak{L}$, each row denotes the shared knowledge about one malicious user's logins at $c$ colluding RPs. Meanwhile, each colluding RP collects information about the honest users' login instances to itself, denoted as $\mathfrak{L}_j=\{L_{v+1,j},..., L_{w,j}\}$, and shares it with each other.
+Without loss of generality, we consider the first $v$ users as malicious and  colluding with $(c+1)$ malicious RPs. Each of the first $c$ RPs collects $L_{i, j}$s from its login instances, where $1 \le i \le w$ and $1 \le j \le c$, constructs a set $\mathbb{L}_j=\{L_{1,j},...,L_{v,j}, L_{v+1,j},..., L_{w,j}\}$s, where $\{L_{1,j},...,L_{v,j}\}$ are associated with $v$ malicious users and $\{L_{v+1,j},...,L_{w,j}\}$ are from unknown honest users, and shares $\mathbb{L}_j$ with each other. %With the assistance of colluding users, the RPs could link all $L_{i, j}$ of the same user $U_i$ logging in at different RPs. 
+% The  RPs share the knowledge in terms of $\mathfrak{L}$, which is defined as:
+% \begin{equation}
+% \mathfrak{L}=\left\{ \begin{matrix}
+% L_{1,1}, & L_{1,2}, & \cdots, & L_{1,c}\\
+% L_{2,1}, & L_{2,2}, & \cdots, & L_{2,c}\\
+% \cdots, & \cdots, & \cdots, & \cdots\\
+% L_{v,1}, & L_{v,2}, & \cdots, & L_{v,c}
+% \end{matrix}\right\}
+% \end{equation}
+% where $L_{i, j}=(ID_{RP_j}, t_{ij}, Acct_i)=([r_j]G, t_{ij}, [u_ir_j]G)$ according to Equation~\ref{equ:Account}. In $\mathfrak{L}$, each row denotes the shared knowledge about one malicious user's logins at $c$ colluding RPs. Meanwhile, each colluding RP collects information about the honest users' login instances to itself, denoted as $\mathfrak{L}_j=\{L_{v+1,j},..., L_{w,j}\}$, and shares it with each other.
 
-Now, consider an arbitrary login instance at the $(c+1)$th colluding RP, denoted as $L'=([r_{c+1}]G, t', [u'r_{c+1}]G)$. For $RP_{c+1}$, the user associated with $L'$, i.e., $u'$, is indistinguishable from any user associated with $\mathfrak{L}$ based on Lemma 2, and also from any user associated with $\mathfrak{L}_j$ for $1 \le j \le c$ based on Lemma 3. Therefore, $RP_{c+1}$ cannot link user logins that it observes with user logins at any other colluding RPs, even if $\mathfrak{L}$ and $\mathfrak{L}_j$ are shared among $(c+1)$ colluding RPs.
+Now, consider an arbitrary login request received by the $(c+1)${\em th} colluding RP
+
+receives the login request from an arbitrary user with $ID_{U'}=u'$ and observing $RP_{c+1}$ obtains $L'=(ID_{RP_{c+1}}, t', Acct')$. %$L'=([r_{c+1}]G, t', [u'r_{c+1}]G)$. 
+To prevent RP-based linkage among colluding RPs, we need to prove that $RP_{c+1}$ cannot distinguish if the user is one of the $w$ users in $\mathbb{L}_j$s or a newly authenticated user, i.e., $ID_{U'} \in \mathbb{Z}_n$.
+
+For $RP_{c+1}$, the user associated with $L'$, i.e., $u'$, is indistinguishable from any user associated with $\mathfrak{L}$ based on Lemma 2, and also from any user associated with $\mathfrak{L}_j$ for $1 \le j \le c$ based on Lemma 3. Therefore, $RP_{c+1}$ cannot link user logins that it observes with user logins at any other colluding RPs, even if $\mathfrak{L}$ and $\mathfrak{L}_j$ are shared among $(c+1)$ colluding RPs.
 
 \vspace{1mm}
-\noindent\textsc{Lemma 2.} {\em Given $\mathfrak{L}$ that is constructed from login instances observed by $c$ colluding RPs and $v$ colluding users, the $(c+1)$th colluding RP cannot distinguish two users $u'$ and $u_i$, who are associated with login instances $L'=([r_{c+1}]G, t', [u'r_{c+1}]G)$ and $L_{i, j}=([r_j]G, t_{ij}, [u_ir_j]G)$ for $1 \le i \le v$ and $1 \le j \le c$.}
+\noindent\textsc{Lemma 3.} {\em Given $\mathfrak{L}$ that is constructed from login instances observed by $c$ colluding RPs and $v$ colluding users, the $(c+1)$th colluding RP cannot distinguish two users $u'$ and $u_i$, who are associated with login instances $L'=([r_{c+1}]G, t', [u'r_{c+1}]G)$ and $L_{i, j}=([r_j]G, t_{ij}, [u_ir_j]G)$ for $1 \le i \le v$ and $1 \le j \le c$.}
 
 \oldc
 
