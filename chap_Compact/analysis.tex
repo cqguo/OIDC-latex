@@ -325,20 +325,25 @@ where $PID_{RP}$ and $PID_U$ can be deduced from $ID_{RP}$ and $Acct$ with a val
 
 \vspace{1mm}
 \noindent{\textsc{Theorem 7. (Privacy against Colluding RPs)}} {\em Consider $(c+1)$ RPs colluding in a system of $n$ RPs, where $1 \le c \le n-1$. Assume $w$ users have logged in to all the colluding RPs, among which $v$ users are malicious and colluding with these RPs. 
-Using \usso, any colluding RP cannot distinguish the login instance of an honest user at itself from this user's login instances at any other colluding RPs, even if the colluding RPs have linked the login instances of $v$ colluding users and shared the knowledge with each other.}
+Using \usso, any colluding RP cannot distinguish the login instance of a user at itself from this user's login instances at any other colluding RPs, even if the colluding RPs have linked the login instances of $v$ colluding users and shared the knowledge with each other.}
 
 \vspace{0.75mm}
 \noindent{\textsc{Proof.} 
-First, $v$ malicious users colluding with $c$ malicious RPs could link their login instances at these RPs. Without loss of generality, we consider the first $c$ RPs collecting information about $v$ malicious users and sharing the knowledge:
-\begin{equation*}
+First, $v$ malicious users colluding with $c$ malicious RPs could link their login instances at these RPs. Without loss of generality, we consider the first $c$ RPs collecting information about the first $v$ malicious users and sharing the knowledge in term of $\mathfrak{L}$, which is defined as:
+\begin{equation}
 \mathfrak{L}=\left\{ \begin{matrix}
 L_{1,1}, & L_{1,2}, & \cdots, & L_{1,c}\\
 L_{2,1}, & L_{2,2}, & \cdots, & L_{2,c}\\
 \cdots, & \cdots, & \cdots, & \cdots\\
 L_{v,1}, & L_{v,2}, & \cdots, & L_{v,c}
 \end{matrix}\right\}
-\end{equation*}
-where $L_{i, j}=(ID_{RP_j}, t_{ij}, Acct_i)=([r_j]G, t_{ij}, [u_ir_j]G)$ according to Equation~\ref{equ:Account}. In $\mathfrak{L}$, each row denotes the shared knowledge about one malicious user's logins at $c$ colluding RPs. Now, consider the $(c+1)$th colluding RP and one arbitrary login instance at it, denoted as $RP_{c+1}$ observes $L'=([r_{c+1}]G, t', [u'r_{c+1}]G)$. According to Lemma 2, we need to prove that 
+\end{equation}
+where $L_{i, j}=(ID_{RP_j}, t_{ij}, Acct_i)=([r_j]G, t_{ij}, [u_ir_j]G)$ according to Equation~\ref{equ:Account}. In $\mathfrak{L}$, each row denotes the shared knowledge about one malicious user's logins at $c$ colluding RPs. Meanwhile, each colluding RP collects information about the honest users' login instances to itself, denoted as $\mathfrak{L}_j=\{L_{v+1,j},..., L_{w,j}\}$, and shares it with each other.  
+
+Now, consider an arbitrary login instance at the $(c+1)$th colluding RP, denoted as $L'=([r_{c+1}]G, t', [u'r_{c+1}]G)$. For $RP_{c+1}$, the user associated with $L'$, i.e., $u'$, is indistinguishable from any user associated with $\mathfrak{L}$ based on Lemma 2, and also from any user associated with $\mathfrak{L}_j$ for $1 \le j \le c$ based on Lemma 3. Therefore, $RP_{c+1}$ cannot link user logins that it observes with user logins at any other colluding RPs, even if $\mathfrak{L}$ and $\mathfrak{L}_j$ are shared among $(c+1)$ colluding RPs.
+
+\vspace{1mm}
+\noindent\textsc{Lemma 2.} {\em Given $\mathfrak{L}$ that is constructed from login instances observed by $c$ colluding RPs and $v$ colluding users, the $(c+1)$th colluding RP cannot distinguish two users $u'$ and $u_i$, who are associated with login instances $L'=([r_{c+1}]G, t', [u'r_{c+1}]G)$ and $L_{i, j}=([r_j]G, t_{ij}, [u_ir_j]G)$ for $1 \le i \le v$ and $1 \le j \le c$.}
 
 \oldc
 
@@ -360,7 +365,7 @@ where $L_{i, j}=(ID_{RP_j}, t_{ij}, Acct_i)=([r_j]G, t_{ij}, [u_ir_j]G)$ accordi
 
 
 \vspace{0.75mm}
-\noindent\textbf{Proof.}
+\noindent{\textsc{Proof.} 
 We prove this privacy property,
  based on the elliptic curve decisional Diffie-Hellman (ECDDH) assumption. %\cite{GoldwasserK16}.
 %That is, while there is the login to an RP, for colluded RPs, they cannot decide whether this login and any logins to other RPs are from the same user.
