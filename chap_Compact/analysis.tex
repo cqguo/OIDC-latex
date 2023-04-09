@@ -359,11 +359,24 @@ Besides, when a malicious user (denoted by $u''$) logs in to $RP_c$ while not re
 %To prevent RP-based linkage among colluding RPs, we need to prove that $RP_{c+1}$ cannot distinguish if the user is one of the $w$ users in $\mathbb{L}_j$s or a newly authenticated user, i.e., $ID_{U'} \in \mathbb{Z}_n$.
 
 \vspace{1mm}
-\noindent\textsc{Lemma 2.} {\em When $u$, $r_j$, and $r_{j'}$ are randomly selected and unknown, the probability of distinguishing the association between $([r_j]G, t_{uj}, [ur_j]G)$ and $([r_{j'}]G, t_{uj'}, [ur_{j'}]G)$ and the association between $([r_j]G, t_{uj}, [ur_j]G)$ and $([r_{j'}]G, t, [z]G)$ is negligible, where $G$ is a point on an elliptic curve $\mathbb{E}$ and $t_{uj}$, $t_{uj'}$, and $z$ are random numbers.}
+\noindent\textsc{Lemma 2.} {\em When $u'$, $r_j$, and $r_{j'}$ are randomly selected and unknown, the probability of distinguishing the association between $([r_{j'}]G, t', [u'r_{j'}]G)$ and $([r_j]G, t, [u'r_j]G)$ and the association between $([r_{j'}]G, t', [u'r_{j'}]G)$ and $([r_j]G, t, [z]G)$ is negligible, where $G$ is a point on an elliptic curve $\mathbb{E}$ and $t$, $t'$, and $z$ are random numbers in $\mathbb{Z}_n$.}
 
 \vspace{0.75mm}
-\noindent{\textsc{Proof.} First, we define an RP-based identity linkage game $\mathcal{G}_r$ between an adversary and a challenger based on the shared knowledge $\mathbb{V}$: the adversary receives $L'$ and $\mathfrak{L}$ from the challenger and outputs the result $s = 1$ if it decides $u' \in \{u_1, u_2, \cdots, u_v\}$ or $s = 0$ if $u'$ is randomly chosen in $\mathbb{Z}_n$.
-define the game.
+\noindent{\textsc{Proof.} We define an RP-based identity linkage game $\mathcal{G}_r$ between an adversary and a challenger based on the shared knowledge $\mathbb{V}$: the adversary receives $\mathbb{V}$ and $L'=([r_{j'}]G, t_{u'j'}, [u'r_j']G)$ from the challenger and outputs the result $s = 1$ if it decides $u' \in \mathbb{U}_c$ or $s = 0$ if $u'$ is randomly chosen in $\mathbb{Z}_n$. The adversary succeeds in the game with an $\mathbf{Adv}_{A}$:
+\begin{align*}
+&{\rm Pr}_1={\rm Pr}\{\mathcal{G}_r(\mathbb{V}, L'| u' \in \mathbb{U}_c)=1\} \\
+&{\rm Pr}_2={\rm Pr}\{\mathcal{G}_r(\mathbb{V}, L'|u' \in \mathbb{Z}_n)=1\}\\
+&{\mathbf{Adv}}_{A}=|{\rm Pr}_1-{\rm Pr}_2|
+\end{align*}
+
+Based on $\mathcal{G}_r$, we design a PPT algorithm $\mathcal{D}^*_r$ to solve the elliptic curve decisional Diffie-Hellman (ECDDH) problem: distinguish between $(G, [x]G$, $[y]G$, $[xy]G)$ and $(G, [x]G$, $[y]G$, $[z]G)$, where $G$ is a point on an elliptic curve $\mathbb{E}$ of order $n$, and $x$, $y$, and $z$ are integers randomly and independently chosen in $\mathbb{Z}_n$. The probability using any PPT algorithm $\mathcal{D}$ can be defined as $\epsilon_{r}(k) = |{\rm Pr}'_1 - {\rm Pr}'_2|$, where: 
+\begin{align*}
+&{\rm Pr}'_1 =  {\rm Pr}\{\mathcal{D}(G, [x]G, [y]G, [xy]G)=1\} \\
+&{\rm Pr}'_2 =  {\rm Pr}\{\mathcal{D}(G, [x]G, [y]G, [z]G)=1\}
+\end{align*}
+$\epsilon_{r}(k)$ is negligible when the security parameter $k$ is large.
+
+As shown in Figure \ref{fig:}, the input of $\mathcal{D}^*_r$ is in the form of $(G$, $Q_1=[x]G$, $Q_2=[y]G$, $Q_3=[z]G)$. Upon receiving the input, the challenger randomly chooses $u_i \in \mathbb{U}_c$, $r_j \in \{r_1, r_2, \cdots, r_c\}$, $t_{ij} \in \mathbb{T}_c$, where $\mathbb{T}_c$ denotes all $t_{ij}$s in $\mathbb{V}$, and then constructs $L_{i, j} = ([r_j]G, t_{ij}, [u_ir_j]G)$, $\mathbb{V}_j=\{L_{i,j}\}$ for $1 \le i \le n_j$, and $\mathbb{V}=\bigcup_{1 \le j \le c}\mathbb{V}_j$. Then, the challenger randomly chooses $d_2 \in [1,c]$ and $d_1 \in [1,n_{d_2}]$, and replaces $L_{d_1,d_2}=([r_j]G, t, [r_j]Q_1)$. Finally, it chooses $t'$ in $\mathbb{Z}_n$ and constructs $L'=([Q_2, t', Q_3)=([y]G,t',[z/y][y]G)$. When the adversary receives $\mathbb{V}$ and $L'$, it outputs $s$. 
 
 When $u$ is unknown, $([r_j]G, t_{uj}, [ur_j]G)$ is indistinguishable from $([r_j]G, t_{uj}, [z]G)$, and $([r_{j'}]G, t_{uj'}, [ur_{j'}]G)$ is indistinguishable from $([r_{j'}]G, t_{uj'}, [z']G)$. Meanwhile, $([r_j]G, t_{uj}, [z]G)$ and $([r_{j'}]G, t_{uj'}, [z']G)$ are completely independent and indistinguishable, since $z$ and $z'$ are two random numbers. Therefore, $([r_j]G, t_{uj}, [ur_j]G)$ and $([r_{j'}]G, t_{uj'}, [ur_{j'}]G)$ are indistinguishable. \hfill $\square$
 
