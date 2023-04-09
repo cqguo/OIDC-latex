@@ -97,7 +97,7 @@ Malicious RPs collude with each other or with malicious users,
 
 \subsection{The Dolev-Yao-Style Model for UPPRESSO}
 \label{dy-model}
-We develop a Dolev-Yao-style model \cite{SPRESSO} for \usso, referred to as the \dyu~model, to formalize the login flow of UPPRESSO. % which has been used in the formal analysis of SSO protocols such as OAuth 2.0 \cite{FettKS16} and OIDC \cite{FettKS17}.
+We develop a Dolev-Yao-style model \cite{SPRESSO} for \usso, referred to as the DYU model, to formalize the login flow of UPPRESSO. % which has been used in the formal analysis of SSO protocols such as OAuth 2.0 \cite{FettKS16} and OIDC \cite{FettKS17}.
 It abstracts the entities in a web system, such as web servers and browsers, as \emph{atomic processes} %which communicate with each other through events. % such as HTTPS request and response.
 and defines \emph{script processes} to formulate client-side scripts.
 %The script is dependently invoked by the browser to process the server-defined logic.%such as verifying $Certificate_{RP}$. %postmessage events; %atomic process <-> script process, communication. %Other events change self-trigger.
@@ -302,7 +302,7 @@ In this section, we prove that \usso~ effectively prevents privacy threats intro
 \noindent{\textsc{Theorem 6. (Privacy against the IdP)}} {\em Consider $PID_{RP} = [t]ID_{RP}$, where $t$ is random in $\mathbb{Z}_n$ and unknown to the IdP. The IdP is unable to distinguish the pseudo-identities of RPs in identity-token requests made by honest users.}
 
 \vspace{0.75mm}
-\noindent{\textsc{Proof.} Consider a user's two arbitrary logins to an RP where $PID^{i}_{RP} = [t]ID_{RP}$ and $PID^{i'}_{RP} = [t']ID_{RP}$, and the same user's login to another RP where $PID^{i''}_{RP'} = [t'']ID_{RP'}$. As stated in Theorem 2, $ID_{RP} = [r]G = Q$ and $ID_{RP'} = [r']G = P$, where $P$ and $Q$ are two different points on the curve $\mathbb{E}$. According to the \dy~model, $t$, $t'$, and $t''$ are randomly selected by the IdP script and shared only with the corresponding RP through the RP script, they are unknown to the IdP. Therefore, in the IdP'view, $[t]Q$, $[t']Q$, and $[t'']P$ are three random points on $\mathbb{E}$ and they are indistinguishable from each other. \hfill $\square$
+\noindent{\textsc{Proof.} Consider a user's two arbitrary logins to an RP where $PID^{i}_{RP} = [t]ID_{RP}$ and $PID^{i'}_{RP} = [t']ID_{RP}$, and the same user's login to another RP where $PID^{i''}_{RP'} = [t'']ID_{RP'}$. As stated in Theorem 2, $ID_{RP} = [r]G = Q$ and $ID_{RP'} = [r']G = P$, where $P$ and $Q$ are two different points on the curve $\mathbb{E}$. According to the \dyu~model, $t$, $t'$, and $t''$ are randomly selected by the IdP script and shared only with the corresponding RP through the RP script, they are unknown to the IdP. Therefore, in the IdP'view, $[t]Q$, $[t']Q$, and $[t'']P$ are three random points on $\mathbb{E}$ and they are indistinguishable from each other. \hfill $\square$
 
 %as well as from a $PID_{RP}$ generated in an arbitrary login instance for an arbitrary user to log in to an
 
@@ -329,7 +329,7 @@ Using \usso, any colluding RP cannot distinguish the login instance of any arbit
 
 \vspace{0.75mm}
 \noindent{\textsc{Proof.}
-Without loss of generality, we consider the first $v$ users as malicious and  colluding with $(c+1)$ malicious RPs. Each of the first $c$ RPs collects $L_{i, j}$s from its login instances, where $1 \le i \le w$ and $1 \le j \le c$, constructs a set $\mathbb{L}_j=\{L_{1,j},...,L_{v,j}, L_{v+1,j},..., L_{w,j}\}$s, where $\{L_{1,j},...,L_{v,j}\}$ are associated with $v$ malicious users and $\{L_{v+1,j},...,L_{w,j}\}$ are from unknown honest users, and shares $\mathbb{L}_j$ with each other. %With the assistance of colluding users, the RPs could link all $L_{i, j}$ of the same user $U_i$ logging in at different RPs. 
+Without loss of generality, we consider the first $v$ users as malicious and  colluding with $(c+1)$ malicious RPs. Each of the first $c$ RPs collects $L_{i, j}$s from its login instances, where $1 \le i \le w$ and $1 \le j \le c$, constructs a set $\mathbb{L}_j=\{L_{1,j},...,L_{v,j}, L_{v+1,j},..., L_{w,j}\}$s, where $\{L_{1,j},...,L_{v,j}\}$ are associated with $v$ malicious users and $\{L_{v+1,j},...,L_{w,j}\}$ are from unknown honest users, and shares $\mathbb{L}_j$ with each other. %With the assistance of colluding users, the RPs could link all $L_{i, j}$ of the same user $U_i$ logging in at different RPs.
 % The  RPs share the knowledge in terms of $\mathfrak{L}$, which is defined as:
 % \begin{equation}
 % \mathfrak{L}=\left\{ \begin{matrix}
@@ -343,7 +343,7 @@ Without loss of generality, we consider the first $v$ users as malicious and  co
 
 Now, consider an arbitrary login request received by the $(c+1)${\em th} colluding RP
 
-receives the login request from an arbitrary user with $ID_{U'}=u'$ and observing $RP_{c+1}$ obtains $L'=(ID_{RP_{c+1}}, t', Acct')$. %$L'=([r_{c+1}]G, t', [u'r_{c+1}]G)$. 
+receives the login request from an arbitrary user with $ID_{U'}=u'$ and observing $RP_{c+1}$ obtains $L'=(ID_{RP_{c+1}}, t', Acct')$. %$L'=([r_{c+1}]G, t', [u'r_{c+1}]G)$.
 To prevent RP-based linkage among colluding RPs, we need to prove that $RP_{c+1}$ cannot distinguish if the user is one of the $w$ users in $\mathbb{L}_j$s or a newly authenticated user, i.e., $ID_{U'} \in \mathbb{Z}_n$.
 
 For $RP_{c+1}$, the user associated with $L'$, i.e., $u'$, is indistinguishable from any user associated with $\mathfrak{L}$ based on Lemma 2, and also from any user associated with $\mathfrak{L}_j$ for $1 \le j \le c$ based on Lemma 3. Therefore, $RP_{c+1}$ cannot link user logins that it observes with user logins at any other colluding RPs, even if $\mathfrak{L}$ and $\mathfrak{L}_j$ are shared among $(c+1)$ colluding RPs.
