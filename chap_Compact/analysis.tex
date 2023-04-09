@@ -337,9 +337,10 @@ In \usso, given the shared knowledge $\mathbb{V}_j$s and $\mathbb{L}_j$s from a 
 %Next, we show that the colluding RPs have limited knowledge about the users who have authenticated with them (using $PID_U$s). Even if they share this knowledge, it is insufficient to distinguish the pseudo-identities of different users nor link the ones belonging to the same user.
 
 \vspace{0.75mm}
-\noindent{\textsc{Proof.} Without loss of generality, let us consider an arbitrary login instance in which a user with $ID_{U'}=u'$ logs in to the $c$th malicious RP. The RP obtains $L'=(ID_{RP_c}, t', Acct'_c)$, where $ID_{RP_c}=[r_c]G$ and $Acct'_c=[u'r_c]G$. If this user previously logged in to at least one colluding RP (e.g., $RP_k$), she should be in $\mathbb{U}_c$, and her login information $L_{u',k}=(ID_{RP_k}, t_{u'k}, Acct'_k)=([r_k]G, t_{u'k}, [u'r_k]G)$ should be in $\mathbb{V}_k$. Hence, in RP-based linkage, $RP_c$ attempts to associate $L'$ with 
-$L_{u',k}$, which is to associate $(G, [r_c]G, t', [u'r_c]G)$ and $(G, [r_k]G, t_{u'k}, [u'r_k]G)$, where $G$ is a point on an elliptic curve $\mathbb{E}$.
+\noindent{\textsc{Proof.} Without loss of generality, let us consider an arbitrary login instance in which a user with $ID_{U'}=u'$ logs in to the $c$th malicious RP. The RP obtains $L'=(ID_{RP_c}, t', Acct'_c)$, where $ID_{RP_c}=[r_c]G$ and $Acct'_c=[u'r_c]G$. If this user previously logged in to at least one colluding RP (e.g., $RP_x$), she should be in $\mathbb{U}_c$, and her login information should be in $\mathbb{V}_x$. Since $x$ is unknown, in RP-based linkage, $RP_c$ attempts to associate $L'$ with any record $L^*$ in $\mathbb{V}_j$s, where $L^*=([r_k]G, t_{u'k}, [u'r_k]G)$ and $k \in [1,c]$. 
+However, according to Lemma 2, $([r_c]G, t', [u'r_c]G)$ is indistinguishable from $([r_k]G, t_{u'k}, [u'r_k]G)$. Therefore, $RP_c$ cannot tell if the user with $ID_{U'}$ is in the set $\mathbb{U}_c$ nor link it with any other user logins. 
 
+Besides, when a malicious user ($ID_{U''}=u''$) logs in to $RP_c$ while not revealing his identity, $RP_c$ cannot tell if he is in the malicious user group $\{u_1,...,u_v\}$, according to Lemma 3.
 
 %Consider the first $c$ RPs. Each of them collects $L_{i, j}$s from its login instances, where $1 \le i \le w$ and $1 \le j \le c$, constructs a set $\mathbb{L}_j=\{L_{1,j},...,L_{v,j}, L_{v+1,j},..., L_{w,j}\}$s, where $\{L_{1,j},...,L_{v,j}\}$ are associated with $v$ malicious users and $\{L_{v+1,j},...,L_{w,j}\}$ are from unknown honest users, and shares $\mathbb{L}_j$ with each other. %With the assistance of colluding users, the RPs could link all $L_{i, j}$ of the same user $U_i$ logging in at different RPs. 
 % The  RPs share the knowledge in terms of $\mathfrak{L}$, which is defined as:
@@ -357,12 +358,22 @@ $L_{u',k}$, which is to associate $(G, [r_c]G, t', [u'r_c]G)$ and $(G, [r_k]G, t
 
 %For $RP_{c+1}$, the user associated with $L'$, i.e., $u'$, is indistinguishable from any user associated with $\mathfrak{L}$ based on Lemma 2, and also from any user associated with $\mathfrak{L}_j$ for $1 \le j \le c$ based on Lemma 3. Therefore, $RP_{c+1}$ cannot link user logins that it observes with user logins at any other colluding RPs, even if $\mathfrak{L}$ and $\mathfrak{L}_j$ are shared among $(c+1)$ colluding RPs.
 
-\oldc
+\vspace{1mm}
+\noindent\textsc{Lemma 2.} {\em When $u$, $r_j$, and $r_{j'}$ are randomly selected and unknown, the probability of distinguishing between any two tuples $([r_j]G, t_{uj}, [ur_j]G)$ and $([r_{j'}]G, t_{uj'}, [ur_{j'}]G)$ is negligible, where $G$ is a point on an elliptic curve $\mathbb{E}$.}
 
+\vspace{0.75mm}
+\noindent{\textsc{Proof.} 
+define the game.
+
+When $u$ is unknown, $([r_j]G, t_{uj}, [ur_j]G)$ is indistinguishable from $([r_j]G, t_{uj}, [z]G)$, and $([r_{j'}]G, t_{uj'}, [ur_{j'}]G)$ is indistinguishable from $([r_{j'}]G, t_{uj'}, [z']G)$. Meanwhile, $([r_j]G, t_{uj}, [z]G)$ and $([r_{j'}]G, t_{uj'}, [z']G)$ are completely independent and indistinguishable, since $z$ and $z'$ are two random numbers. Therefore, $([r_j]G, t_{uj}, [ur_j]G)$ and $([r_{j'}]G, t_{uj'}, [ur_{j'}]G)$ are indistinguishable. \hfill $\square$
+
+
+
+\oldc
 \vspace{1mm}
 \noindent\textsc{Lemma 3.} {\em Given $\mathfrak{L}$ that is constructed from login instances observed by $c$ colluding RPs and $v$ colluding users, the $(c+1)$th colluding RP cannot distinguish two users $u'$ and $u_i$, who are associated with login instances $L'=([r_{c+1}]G, t', [u'r_{c+1}]G)$ and $L_{i, j}=([r_j]G, t_{ij}, [u_ir_j]G)$ for $1 \le i \le v$ and $1 \le j \le c$.}
 
-\oldc
+
 
 % \vspace{1mm}
 % In every login instance, without knowing $u$ and $r$, an RP holds $ID_{RP}$ and $Acct$, receives $t$, calculates $PID_{RP}$, and verifies $PID_{RP}$ and $PID_U$ in the identity token. After filtering out the redundant information (i.e., $PID_{RP}= [t]{ID_{RP}}$ and $Acct = [t^{-1}]PID_{U}$), the RP actually receives $(ID_{RP}, t, Acct) = ([r]G, t, [ur]G)$. Therefore, in \usso~the prevention against the RP-based identity linkage is expressed as follows.
