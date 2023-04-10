@@ -1,142 +1,47 @@
 \section{Discussions}
 \label{sec:discussion}
 
-\noindent{\textbf{Collusive Attack by an IdP and RPs.}}
-Privacy-preserving identity federation solutions \cite{ELPASSO,UnlimitID,idemix,PseudoID,Opaak,uprov}
- prevent the collusive attacks by an IdP and RPs,
-    at the cost of (\emph{a}) a long-term secret held by a user but verified by RPs
-        and (\emph{b}) user-managed accounts \cite{PseudoID} for different RPs.
-Such accounts may be derived from an RP's domain and this secret locally \cite{ELPASSO,UnlimitID,Opaak,uprov,idemix},
-  but it still brings inconveniences.
-For web applications, a user needs to install a browser extension to handle this long-term secret;
-  and if it is lost or leaked,
-       a user has to notify all RPs to update his accounts which are derived from the secret
-        (if the accounts are not masked by the user's secret, the colluding IdP and RPs can eventually link them).
+\noindent{\textbf{Collusive attacks by IdP and RPs.}}
+Privacy-preserving identity federation solutions~\cite{ELPASSO, UnlimitID, idemix, PseudoID, Opaak, uprov} prevent collusive attacks by IdP and RPs but require (\emph{a}) a long-term secret held by a user and verified by RPs, as well as (\emph{b}) user-managed accounts~\cite{PseudoID} for different RPs. These accounts may be derived from an RP's domain and the user's secret~\cite{ELPASSO, UnlimitID, Opaak, uprov,idemix}, but can still be inconvenient for users. For web applications, users need to install a browser extension to handle this long-term secret. If it is lost or leaked, the user must notify all RPs to update his accounts derived from the user's secret. If the accounts are not masked by the user's secret, colluding IdP and RPs can eventually link them. 
+Unlike these approaches, \usso~does not protect user privacy against collusive attacks, because the users authenticate only \emph{once} in SSO. The user's identity at the IdP is transformed into accounts at RPs, which are unrelated to any user credentials such as passwords, one-time passwords, smart cards, or FIDO devices.
 
-UPPRESSO does not protect user privacy against such collusive attacks,
-    but a user is authenticated to \emph{only} an IdP:
-         the user identity at the IdP
-                are transformed to the accounts at RPs, unrelated to any user credential
-                 (e.g., password, one-time password, smart card or FIDO device).
+%\vspace{0.75mm}
+\noindent \textbf{Scalability.} $ID_{RP}$ is generated uniquely during the initial registration of an RP, with a capacity of $n$, which is the order of $G$. For the NIST P256 elliptic curve, $n$ is approximately $2^{256}$. 
+$PID_{RP}$ is ensured to be unique in unexpired tokens. The probability of having at least two identical $PID_{RP}$s among $\sigma$ unexpired tokens is $1-\prod_{i=0}^{\sigma-1}(1-i/n)$. If the system serves $10^{8}$ requests per second and has a validity period of 10 minutes, $\sigma$ is less than $2^{36}$, and the $PID_{RP}$-collision probability is negligible, i.e., less than $2^{-183}$ for the NIST P256 curve.
+
+The capacity of accounts at any RP is the same as the capacity of user identities at the IdP, which is also $n$. Since $\mathbb{E}$ is a finite cyclic group, $ID_{RP} = [r]G$ is also a generator of order $n$. Therefore, for any RP, a unique account is automatically assigned to every user because $Acct =  [ID_U]ID_{RP} = [u]ID_{RP}$. 
+In addition, stronger elliptic curves can accommodate more RPs and users, e.g., $n$ is about $2^{384}$ for the NIST P384 curve.
 
 
-\vspace{0.75mm}
-\noindent{\textbf{Scalability.}}
-$ID_{RP}$ is generated uniquely in an RP's initial registration,
-    and the capacity of RPs is $n$ (i.e., the order of $G$). For the NIST P256 elliptic curve, $n$ is approximately $2^{256}$.
-$PID_{RP}$ cannot be exhausted, either.
-We ensure $PID_{RP}$ is unique in unexpired tokens,
-    the number of which is $\sigma$.
-The probability that at least two $PID_{RP}$s are identical among the $\sigma$ ones,
-    is $1-\prod_{i=0}^{\sigma-1}(1-i/n)$.
-If the system serves $10^{8}$ requests per second and the validity period is 10 minutes,
-     $\sigma$ is less than $2^{36}$ and the $PID_{RP}$-collision probability is negligible (i.e., less than $2^{-183}$)
-      for the NIST P256 curve.
-
-The capacity of accounts at any RP is also $n$,
-    the same as that of user identities at the IdP.
-$\mathbb{E}$ is a finite cyclic group,
-    so $ID_{RP} = [r]G$ is also a generator of order $n$.
-Thus, given any RP,
-because $Acct =  [ID_U]ID_{RP} = [u]ID_{RP}$,
-    a unique account is automatically assigned to every user.
-
-Besides, stronger elliptic curves accommodate more RPs and users;
-e.g., $n$ is nearly $2^{384}$ for the NIST P384 curve.
+%\vspace{0.75mm}
+\noindent \textbf{Support for the authorization code flow.} In OIDC's authorization code flow~\cite{OpenIDConnect}, the IdP does not directly provide identity tokens. Instead, it sends an authorization code to the RP, which can use this code to request identity tokens. The identity-transformation algorithms, such as $\mathcal{F}_{PID_{U}}$, $\mathcal{F}_{PID_{RP}}$, and $\mathcal{F}_{Acct}$, can be integrated into this flow. %similar with the login flow introduced in Section \ref{implementations},
+The IdP script can forward an authorization code to the RP script, which then uses it to obtain an identity token that binds $PID_U$ and $PID_{RP}$. An authorization code only serves as an index to retrieve identity tokens from the IdP and does not reveal any information about the authenticated user.
 
 
-\vspace{0.75mm}
-\noindent{\textbf{Support for the Authorization Code Flow.}}
-In the authorization code flow of OIDC \cite{OpenIDConnect},
-    an IdP does not directly response with identity tokens;
-        instead,
-            an authorization code is sent to the RP,
-            which uses this code to ask for identity tokens.
-The identity-transformation algorithms $\mathcal{F}_{PID_{U}}$, $\mathcal{F}_{PID_{RP}}$ and $\mathcal{F}_{Acct}$
-    can be integrated into the authorization code flow:
-    %similar with the login flow introduced in Section \ref{implementations},
-            an authorization code is forwarded to the RP script by the IdP script
-                and this code is used to ask for an identity token binding $PID_U$ and $PID_{RP}$.
-An authorization code is an index to retrieve identity tokens from the IdP,
-        and does not disclose information about the authenticated user.
+After receiving an authorization code, an RP uses it along with a secret credential issued by the IdP during the initial registration \cite{OpenIDConnect} to retrieve identity tokens from the IdP. However, to protect the identities of RPs from the IdP, anonymous tokens (e.g., ring or group signatures~\cite{ring-sig,chaum1991group} and TrustToken \cite{trusttoken}) and anonymous networks (e.g., Tor \cite{tor}) need to be adopted for RPs in the retrieval of identity tokens.
 
+%\vspace{0.75mm}
+\noindent \textbf{Alternative schemes for generating $ID_{RP}$ and binding $Enpt_{RP}$.} \usso~uses an RP certificate to bind $ID_{RP}$ and $Enpt_{RP}$, which is verified by the IdP script. This ensures that the target RP has already registered itself at the IdP and prevents unauthorized RPs from accessing the IdP's services.
 
-After receiving an authorization code, an RP uses it and another secret credential
-         which is issued by the IdP during the initial registration \cite{OpenIDConnect},
-     to retrieve identity tokens from the IdP.
-To protect RP identities from the IdP,
-        anonymous tokens (e.g., ring or group signatures \cite{ring-sig,chaum1991group},
-         and TrustToken \cite{trusttoken})
-        and anonymous networks (e.g., Tor \cite{tor}) need to be adopted for RPs
-         in the retrieval of identity tokens.
+One alternative method for binding $ID_{RP}$ and $Enpt_{RP}$ is to use \emph{deterministic} calculation of $ID_{RP}$ based on the RP's unambiguous name such as its domain or origin. This can be achieved by encoding the domain or origin using a hashing function, such as $Hs()$~\cite{irtf-cfrg-hash-to-curve-16}, to generate a point on the elliptic curve $\mathbb{E}$ as $ID_{RP}$. This provides collision resistance and does not reveal the discrete logarithm of the output, ensuring \emph{uniqueness} of $ID_{RP} = [r]G$ while keeping $r$ \emph{unknown}. %For example, using a hash function $Hs()$ to encode an RP's domain or the RP script's origin, e.g., verb+https://RP.com+) 
 
-\vspace{0.75mm}
-\noindent{\textbf{Alternative Way to Generate $ID_{RP}$ and Bind $Enpt_{RP}$.}}
-In the prototype an RP certificate binds $ID_{RP}$ and $Enpt_{RP}$,
-    verified by the honest IdP script.
-RP certificates ensure the target RP has already registered itself at the IdP,
- which prevents unauthorized RPs from accessing the IdP's services.
+In this case, the RP script would send only the endpoint but not its RP certificate in Step 2.2, and the IdP script would calculate $ID_{RP}$. %This elimination of RP certificates improves the downloading of scripts, and on average \textcolor[rgb]{1,0,0}{xxx} ms are saved.
+However, if the RP changes its domain, such as from \verb+https://RP.com+ to \verb+https://theRP.com+,
+$Acct = [ID_U]ID_{RP}$ would inevitably change. This requires users to perform special operations to migrate their accounts to the updated RP system, which requires extra operations explicitly by each user. However, failure to migrate accounts could allow colluding RPs to link a user's accounts across RPs.
 
-This binding may be finished in another way:
-    $ID_{RP}$ is \emph{deterministically} calculated based on the RP's unambiguous name.
-For example, $Hs()$ encodes an RP's domain (or the RP script's origin, e.g., \verb+https://RP.com+) to
- a point on $\mathbb{E}$ as $ID_{RP}$,
-where
-    hashing to elliptic curves $Hs()$ \cite{irtf-cfrg-hash-to-curve-16} provides collision resistance
-     and does not reveal the discrete logarithm of the output
-    (i.e., $ID_{RP} = [r]G$ is \emph{unique} and $r$ is \emph{unknown}).
-Then,  in Step 2.2 the RP script will send the endpoint but not its RP certificate,
-  %to the IdP script,
- and $ID_{RP}$ is calculated by the IdP script.
-%This elimination of RP certificates improves the downloading of scripts,
-%        and on average \textcolor[rgb]{1,0,0}{xxx} ms are saved.
-However, if an RP updates its domain, for instance, from \verb+https://RP.com+ to \verb+https://theRP.com+,
-$Acct = [ID_U]ID_{RP}$ will change inevitably.
-In such cases,
-    it needs special operations by each user to migrate his account
-            to the updated RP system.
-This account migration requires extra operations explicitly by each user;
-    otherwise,
-        colluding RPs could actually link a user's accounts across RPs.
+%\vspace{0.75mm}
+\noindent \textbf{Restriction of the RP script's origin.}
+When the IdP script forwards identity tokens to the RP script, the \verb+postMessage+ targetOrigin mechanism~\cite{postm-targeto} is used to restrict the recipient of the tokens, ensuring that the tokens will only be received by the intended recipient, $Enpt_{RP}$, as specified in the RP certificates. The targetOrigin is defined as a combination of protocol, port (if not presented, 80 for \verb+http+ and 443 for \verb+https+), and domain (e.g., \verb+RP.com+). The RP script's origin must accurately match the targetOrigin to receive the tokens. 
 
-
-\vspace{0.75mm}
-\noindent{\textbf{Restriction of the RP Script's Origin.}}
-When identity tokens are forwarded by the IdP script to the RP script, % within the user browser,
-    the receiver is restricted by the \verb+postMessage+ targetOrigin mechanism \cite{postm-targeto},
-        to ensure it will forward the tokens to $Enpt_{RP}$
-        that is bound in RP certificates.
-A targetOrigin is specified as
-a pair of protocol and port (if not presented, implicitly 80 for \verb+http+ and 443 for \verb+https+)
-    and a domain (e.g., \verb+RP.com+),
-        and it requires the RP script's origin accurately matches the targetOrigin.
-
-Although the URL path part of $Enpt_{RP}$ %, e.g., \verb+/uploadTkn+,
- is not checked by the targetOrigin mechanism,
-  which assumes only one RP runs on a domain,
-   it brings no \emph{extra} risk.
-For example, if two RPs run on one domain but with different endpoints to receive identity tokens
-        (e.g., \verb+https://RP.com/honest/tk+ and \verb+https://RP.com/malicious/tk+),
-         they cannot be distinguished by \verb+postMessage+.
-Meanwhile, browsers enforce
- the same-origin policy (SOP) in the access control of web resources \cite{sop}.
-So
-    a malicious RP could always access the other RP's resources in browsers,
-        e.g., steal cookies
-        by the script
-        \verb+window.open('https://RP.com/honest').document.cookie+,
-    even if the honest RP restricts only HTTP requests to specific paths carry its cookies.
-That is, this risk actually results from the SOP design of browsers.
+The targetOrigin mechanism does not introduce any {\em additional} risk, although it does not check the URL path in $Enpt_{RP}$ %, e.g., \verb+/uploadTkn+
+due to its one RP per domain assumption. For example, if two RPs run on the same domain using different endpoints to receive identity tokens, e.g., \verb+https://RP.com/honest/tk+ and \verb+https://RP.com/malicious/tk+, they cannot be distinguished by \verb+postMessage+. Since browsers control access to web resources using the same-origin policy (SOP)~\cite{sop}, an RP's resources in browsers could still be accessed by a malicious RP, such as stealing cookies using the script \verb+window.open('https://RP.com/honest').document.cookie+, even if it restricts cookies to specific paths. This risk arises from the SOP design of browsers and is not related to the \usso~protocol.
 
 
 
-\vspace{0.75mm}
-\noindent{\textbf{Applicability of Identity Transformations.}}
+%\vspace{0.75mm}
+\noindent \textbf{Applicability of identity transformations.} 
 The proposed identity-transformation algorithms %i.e., $\mathcal{F}_{PID_{RP}}()$, $\mathcal{F}_{PID_U}()$, and $\mathcal{F}_{Acct}()$,
-    are applicable to various SSO scenarios
-        (e.g., web application, mobile App, and native software),
-    because these algorithms follow the common model of popular SSO protocols
-    and do not depend on any special implementation or runtime.
+can be applied to a wide range of SSO scenarios, including web applications, mobile Apps, and native software. These algorithms follow the common model of popular SSO protocols and do not depend on any specific implementation or runtime, making them highly versatile and adaptable to different use cases.
 
 
 
