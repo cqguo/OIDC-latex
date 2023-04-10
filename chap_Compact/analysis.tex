@@ -162,7 +162,8 @@ Finding $t$ and $t'$ that satisfy $[t]ID_{RP_j} = [t']ID_{RP_{j'}}$, i.e., a $PI
 %The attack success probability is defined as ${\rm Pr}_s$.
 
 Figure \ref{fig:ecdlp_algorithm} depicts a probabilistic polynomial time (PPT) algorithm $\mathcal{D}^*_c$, which is constructed based on this game $\mathcal{G}_c$, to solve the elliptic curve discrete logarithm problem (ECDLP): find a number $x \in \mathbb{Z}_n$ satisfying $Q = [x]G$,
-where $Q$ is a point on $\mathbb{E}$ and $G$ is a generator on $\mathbb{E}$ of order $n$. The probability of solving the ECDLP using any PPT algorithm $\mathcal{D}$ is defined as:
+where $Q$ is a point on $\mathbb{E}$ and $G$ is a generator on $\mathbb{E}$ of order $n$.
+The probability of solving the ECDLP using any PPT algorithm $\mathcal{D}$ is defined as:
 %For any PPT algorithm $\mathcal{D}$ is used to calculate $x$, we define the probability of finding $x$ as: %Therefore, the probability of finding $x$ using a probabilistic polynomial time (PPT) algorithm is negligible.
 \begin{equation*}
 {\rm Pr}\{\mathcal{D}(G, [x]G)=x\} = \epsilon_{c}(k)
@@ -342,18 +343,18 @@ enclosing $PID_{RP}$ and $PID_U$. Meanwhile, the RP knows its own identity $ID_{
 Since $PID_{RP}$ and $PID_U$ can be deduced from $ID_{RP}$ and $Acct$ with $t$, respectively,
  an RP obtains deduplicated knowledge about a user when she logins,
   expressed as a login instance $L=(ID_{RP}, t, Acct)$.
-Note that a login instance $L$ includes the user's account.
+Note that a login instance $L$ includes the user's account at the RP.
 
 %Then, $RP_j$ has a view about all the $w_j$ authenticated users, i.e., $\mathbb{V}_j=\{L_{i,j}\}$ for $1 \le i \le w_j$ and $1 \le j \le m$.
     % n表示阶order，不再用n
 
 %According to Equation~\ref{equ:Account}, we have $L_{i, j}=([r_j]G, t_{ij}, [u_ir_j]G)$.
 
-Malicious RPs, even colluding with malicious users, attempt to link login instances
+Malicious RPs colluding with malicious users, attempt to link login instances
         of honest users across these malicious RPs.
 We prove that UPPRESSO prevents RP-based identity linkage, by showing that, 
     given a login instance $L'$ by an honest user $U'$ to one of $c+1$ malicious RP,
-    the adversaries cannot distinguish a login instance by $U'$ to other $c$ malicious RP
+    the colluding adversaries cannot distinguish a login instance by $U'$ to any of other $c$ malicious RP
         from the login instances by any honest users to the $c$ malicious RPs.
 
 The login instances to $c$ malicious RPs by $v$ colluding users
@@ -364,7 +365,7 @@ L_{2,1},& L_{2,2},&\cdots,&L_{2,c}\\
 L_{v,1},&L_{v,2},&\cdots,&L_{v,c}
 \end{matrix}\right\}$, where $L_{i,j} = (ID_{RP_j}, t_{i,j}, [ID_{U_i}]ID_{RP_j})$
     is the login instance to $RP_j$ initiated by $U_i$ ($1 \le i \le v$ and $1 \le j \le c$);
-and the login instance to the other RP is denoted as $L' = (ID_{RP'}, t', [ID_{U'}]ID_{RP'})$.
+and the login instance to the other RP by $U'$ is denoted as $L' = (ID_{RP'}, t', [ID_{U'}]ID_{RP'})$.
 
 %Consider the system with $c$ malicious RPs and $v$ malicious users. Without loss of generality, assume the first $c$ RPs are malicious and share their views about previously authenticated users (denoted as $\mathbb{U}_c$). Furthermore, assume the first $v$ users seen by each malicious RP are malicious. They provide additional information for linking their $PID_U$s and $L_{i, j}$s across colluding RPs. Then, a malicious $RP_j$ constructs a list $\mathbb{L}_j=\{L_{i,j}\}$ for $1 \le i \le v$ and $1 \le j \le c$, where $\mathbb{L}_j \subseteq \mathbb{V}_j$.
 %%Among them, assume the first $w$ users, without loss of generality, have logged in to all $c$ RPs. %$c \in [2,m]$.
@@ -375,8 +376,8 @@ and the login instance to the other RP is denoted as $L' = (ID_{RP'}, t', [ID_{U
 \vspace{1mm}
 \noindent{\textsc{Theorem 7. (Privacy against Colluding RPs)}} {\em
 In UPPRESSO with $c+1$ malicious RPs and $v$ malicious users,
-given a login instance $L'$ by an honest user $U'$ to one malicious RP,
-    the adversaries cannot distinguish a login instance by $U'$ to other $c$ malicious RP
+given a login instance $L'$ by an honest user $U'$ to a malicious RP,
+    the adversaries cannot distinguish a login instance by $U'$ to any of the other $c$ malicious RPs,
         from the login instances by any honest users to the $c$ malicious RPs.}
 
 
@@ -388,25 +389,26 @@ given a login instance $L'$ by an honest user $U'$ to one malicious RP,
 \noindent\textsc{Proof.}
 % Without loss of generality, consider an arbitrary login instance in which a user (denoted by $u'$) logs in to the $c$th malicious RP. The RP obtains $L'=(ID_{RP_c}, t', Acct'_c)$, where $ID_{RP_c}=[r_c]G$ and $Acct'_c=[u'r_c]G$. If this user has previously logged in to at least one colluding RP, she should be in $\mathbb{U}_c$, and her login information should be in the related views. Hence, in RP-based linkage, $RP_c$ attempts to associate $L'$ with any record $L^*$ in $\mathbb{V}_j$s, where $L^*=([r_k]G, t_{u'k}, [u'r_k]G)$ and $k \in [1,c]$.
 %
-Consider a login instance $L'$ by an honest user $U'$ to one malicious RPs, denoted as $RP'$, and
-    other malicious RP are denoted as $RP_j$ ($1 \leq j \leq c$).
-According to Lemma 2, a pair of $RP_j$ and $RP'$ cannot decide whether a login instance to $RP'$,
+First, consider a malicious RP denoted as $RP'$ that receives a login instance $L'$ by an honest user $U'$, 
+    the other $c$ malicious RPs denoted as $RP_j$ ($1 \leq j \leq c$), and no malicious user.
+According to Lemma 2, a pair of $RP_j$ and $RP'$ cannot decide whether a login instance initiated by $U'$ to $RP'$,
         is initiated by one of the users visiting $RP_j$ or not.
 
 After $RP'$ colludes with each $RP_j$ ($1 \leq j \leq c$), 
   we find that, given $L'$ initiated by $U'$ to $RP'$,
     the adversaries cannot distinguish a login instance by $U'$ to any $RP_j$,
-        from the login instances by some users to $RP_j$.
-That is, given a login instance $L'$ by an honest user $U'$ to one malicious RP,
-    the adversaries cannot distinguish a login instance by $U'$ to other $c$ malicious RP
-        from the login instances by any honest users to the $c$ malicious RPs.
+        from the login instances by any users to $RP_j$ ($1 \leq j \leq c$).
+Therefore, given a login instance $L'$ by $U'$ to a malicious RP,
+    the adversaries cannot distinguish a login instance by $U'$ to any of the other $c$ malicious RPs,
+        from the login instances by any users to the $c$ malicious RPs.
 
 Next, when colluding with $v$ malicious users,
     according to Lemma 3, 
     $RP_j$ ($1 \leq j \leq c$) and $RP'$ cannot decide whether a login instance by $U'$ to $RP'$,
-        is initiated by one of the users visiting $RP_j$ ($1 \leq j \leq c$) or not;
- otherwise, $U'$ is malicious and reveal his identity to the $c+1$ RPs.
-The collusion with malicious users does not bring any benefits to the adversaries in RP-based identity linkage.
+        is initiated by one of the $v$ malicious users visiting $RP_j$ ($1 \leq j \leq c$) or not,
+ unless $U'$ is malicious and reveal his identity to $RP'$.
+So the collusion with malicious users does not bring benefits for the adversaries,
+    to link an honest user's login instances across colluding RPs.
 So UPPRESSO prevents RP-based identity linkage, even when malicious RPs are colluding with malicious users.
 
 %Besides, when a malicious user (denoted by $u''$) logs in to $RP_c$ while not revealing his identity, $RP_c$ cannot tell if he is in the malicious user group $\{u_1,...,u_v\}$, according to Lemma 3.
@@ -432,7 +434,7 @@ So UPPRESSO prevents RP-based identity linkage, even when malicious RPs are coll
 
 
 
-\noindent\textsc{Lemma 2.} {\em  For two RPs, $RP'$ and $RP$,
+\noindent\textsc{Lemma 2.} {\em  For two RPs denoted as $RP'$ and $RP$,
         the login instances to $RP$ by $v$ users are denoted as $\mathbb{L} = \{{L_i}\}$, where
          $L_i = (ID_{RP}, t_i, [u_i r]G)$, and $1 \leq i \leq v$.
     The two RPs cannot collude to decide whether a login instance to $RP'$ denoted as $L' = (ID_{RP'}, t', [ID_{U'}]ID_{RP'})$,
@@ -441,18 +443,21 @@ So UPPRESSO prevents RP-based identity linkage, even when malicious RPs are coll
 
 
 \vspace{0.75mm}
-\noindent{\textsc{Proof.} We define an RP-based identity linkage game $\mathcal{G}_r$ between an adversary and a challenger: the adversary receives $\mathbb{L} = \{{L_i}\}$ and $L' = (ID_{RP'}, t', [ID_{U'}ID_{RP'}])$ from the challenger and outputs the result $s = 1$ if it decides $u' \in \{u_i\}$ or $s = 0$ if $u'$ is randomly chosen in $\mathbb{Z}_n$. The adversary succeeds in the game with an $\mathbf{Adv}_{A}$:
+\noindent{\textsc{Proof.} We define an RP-based identity linkage game $\mathcal{G}_r$ between an adversary and a challenger: the adversary receives $\mathbb{L} = \{{L_i}\}$ and $L' = (ID_{RP'}, t', [ID_{U'}]ID_{RP'})$ from the challenger and outputs the result $s = 1$ if it decides $u' \in \{u_i\}$ or $s = 0$ if $u'$ is randomly chosen in $\mathbb{Z}_n$.
+The adversary succeeds in the game with $\mathbf{Adv}_{A}$:
 \begin{align*}
 &{\rm Pr}_1={\rm Pr}\{\mathcal{G}_r(\mathbb{L}, L'| u' \in \{u_i\})=1\} \\
 &{\rm Pr}_2={\rm Pr}\{\mathcal{G}_r(\mathbb{L}, L'|u' \in \mathbb{Z}_n)=1\}\\
 &{\mathbf{Adv}}_{A}=|{\rm Pr}_1-{\rm Pr}_2|
 \end{align*}
 
-Based on $\mathcal{G}_r$, we design a PPT algorithm $\mathcal{D}^*_r$ to solve the elliptic curve decisional Diffie-Hellman (ECDDH) problem: distinguish between $(G, [x]G$, $[y]G$, $[xy]G)$ and $(G, [x]G$, $[y]G$, $[z]G)$, where $G$ is a point on an elliptic curve $\mathbb{E}$ of order $n$, and $x$, $y$, and $z$ are integers randomly and independently chosen in $\mathbb{Z}_n$.
-The probability using $\mathcal{D}^*_r$ is defined as $\epsilon_{r}(k) = |{\rm Pr}^*_1 - {\rm Pr}^*_2|$, where:
+Based on $\mathcal{G}_r$, we design a PPT algorithm $\mathcal{D}^*_r$ to solve the elliptic curve decisional Diffie-Hellman (ECDDH) problem:
+ given $(G, [x]G$, $[y]G$, $[z]G)$, decide $z = xy$ or $z$ is randomly chosen in $\mathbb{Z}_n$,
+    where $G$ is a point on an elliptic curve $\mathbb{E}$ of order $n$, and $x$ and $y$ are integers randomly and independently chosen in $\mathbb{Z}_n$.
+The probability of solving the ECDDH problem using $\mathcal{D}^*_r$ is defined as $\epsilon_{r}(k) = |{\rm Pr}^*_1 - {\rm Pr}^*_2|$, where:
 \begin{align*}
-&{\rm Pr}^*_1 =  {\rm Pr}\{\mathcal{D}(G, [x]G, [y]G, [xy]G)=1\} \\
-&{\rm Pr}^*_2 =  {\rm Pr}\{\mathcal{D}(G, [x]G, [y]G, [z]G)=1\}
+&{\rm Pr}^*_1 =  {\rm Pr}\{\mathcal{D}^*(G, [x]G, [y]G, [xy]G)=1\} \\
+&{\rm Pr}^*_2 =  {\rm Pr}\{\mathcal{D}^*(G, [x]G, [y]G, [z]G)=1\}
 \end{align*}
 Due to the ECDDH assumption,
     $\epsilon_{r}(k)$ is negligible when the security parameter $k$ is sufficiently large.
@@ -461,16 +466,17 @@ As shown in Figure \ref{fig:}, the input of $\mathcal{D}^*_r$ is in the form of 
 the challenger randomly chooses $u_i \in \mathbb{Z}_n$ ($1 \leq i \leq v$), $r \in [1, n)$, $t_i \in [1, n)$ ($1 \leq i \leq v$) and $t' \in [1, n)$, and constructs $\mathbb{L} = \{{L_i}\} = \{([r]G, t_i, [u_ir]G)\}$.
 Then, the challenger randomly select $d$, replaces $[u_dr]G$ with $[r]Q_1$ in $L_d$.
  That is, $\mathbb{L} = \{([r]G, t_d, [r]Q_1)\} \cup \{([r]G, t_i, [u_ir]G)\}$ ($1 \leq i \leq d-1, d+1 \leq i \leq v$).
-the challenger constructs $L' = (Q_2, t', Q_3)$.
+The challenger constructs $L' = (Q_2, t', Q_3)$.
 When the adversary receives $\mathbb{L}$ and $L'$, it outputs $s$.
 
 According to the above construction of $\mathbb{L}$ and $L'$,
  $x$ is actually inserted into $\mathbb{L}$ as $u_d$, and $z/y$ is assigned to $ID_{U'} = u'$.
  So, if $z = xy$, then $z/y = x$ and $ID_{U'} \in \{u_i\}$; otherwise, $ID_{U'} \in \mathbb{Z}_n$.
+Then, $\mathbf{Adv}_{A} = \epsilon_{r}(k)$ as follows.
 \begin{align*}
-&{\rm Pr}_1={\rm Pr}\{\mathcal{D}^*_r(G, [x]G, [y]G, [xy]G)=1\}={\rm Pr}^*_1 \\=&  {\rm Pr}\{\mathcal{G}_r(\mathbb{L}, L'|ID_{U'} \in \{ID_{U_1}, ID_{U_2}, \cdots, ID_{U_v}\})=1\} \\
-&{\rm Pr}_2={\rm Pr}\{\mathcal{D}^*_r(G, [x]G, [y]G, [z]G)=1\} ={\rm Pr}^*_2 \\=&  {\rm Pr}\{\mathcal{G}_r(\mathbb{L}, L'|ID_{U'} \in \mathbb{Z}_n)=1\}\\
-&{\mathbf{Adv}}_{A}=|{\rm Pr}^*_1-{\rm Pr}^*_2|=|{\rm Pr}_1-{\rm Pr}_2|=\epsilon_{r}(k)
+&{\rm Pr}_1={\rm Pr}\{\mathcal{G}_r(\mathbb{L}, L'|ID_{U'} \in \{ID_{U_1}, ID_{U_2}, \cdots, ID_{U_v}\})=1\} \\=& {\rm Pr}\{\mathcal{D}^*_r(G, [x]G, [y]G, [xy]G)=1\}={\rm Pr}^*_1  \\
+&{\rm Pr}_2= {\rm Pr}\{\mathcal{G}_r(\mathbb{L}, L'|ID_{U'} \in \mathbb{Z}_n)=1\} \\=& {\rm Pr}\{\mathcal{D}^*_r(G, [x]G, [y]G, [z]G)=1\} ={\rm Pr}^*_2 \\
+&{\mathbf{Adv}}_{A}=|{\rm Pr}_1-{\rm Pr}_2|=|{\rm Pr}^*_1-{\rm Pr}^*_2|=\epsilon_{r}(k)
 \end{align*}
 
 The ECDDH assumption means that in $\mathcal{G}_r$ the adversary does not have advantages, i.e., cannot distinguish a user $U'$ chosen from \{${U_1}, {U_2}, \cdots, {U_v}$\} or randomly from the universal user set.
