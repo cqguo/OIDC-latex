@@ -1,36 +1,17 @@
 \section{Implementation and Evaluation}
 \label{sec:implementation}
-We implemented the UPPRESSO prototype,\footnote{The prototype is open-sourced at https://github.com/uppresso/.}
- and experimentally compared it
- with two open-source SSO systems:
-  (\emph{a}) MITREid Connect \cite{MITREid}
-    which supports the PPID-enhanced OIDC protocol to prevent the RP-based identity linkage,
-     and (\emph{b}) SPRESSO \cite{SPRESSO} preventing the IdP-based login tracing.
+
+We implemented a prototype of \usso\footnote{The prototype is open-sourced at https://github.com/uppresso/.} and conducted experimental comparisons with two open-source SSO systems: (\emph{a}) MITREid Connect \cite{MITREid}, which is a PPID-enhanced OIDC protocol to prevent RP-based identity linkage, and (\emph{b}) SPRESSO \cite{SPRESSO}, which prevents IdP-based login tracing.
+
 
 \subsection{Prototype Implementation}
 \label{subsec:proto-imple}
-The identity transformations are defined on
-        the NIST P256 elliptic curve.
-RSA-2048 and SHA-256 are used as the signature algorithm and the hash function, respectively.
 
-An IdP is built on top of MITREid Connect \cite{MITREid},
-    an open-source OIDC Java implementation, %certificated by the OpenID Foundation \cite{OIDF},
-    and only a few modifications are needed.
-We add only 3 lines of Java code to calculate $PID_U$,
-    and 20 lines to modify the way to send identity tokens.
-The calculations of $ID_{RP}$ and $PID_U$ are implemented based on Java cryptographic libraries.
-
-The IdP and RP scripts include about 160 and 140 lines of JavaScript code, respectively.
-%to provide the functions in Steps 2.1, 2.3, and 4.3.
-The cryptographic computations such as $Cert_{RP}$ verification and $PID_{RP}$ negotiation, are finished based on jsrsasign \cite{jsrsasign}, an efficient JavaScript cryptographic library.
+The \usso~prototype implemented identity transformations on the NIST P256 elliptic curve, with RSA-2048 and SHA-256 serving as the signature algorithm and hash function, respectively. The IdP and RP scripts consist of approximately 160 and 140 lines of JavaScript code, respectively.  %to provide the functions in Steps 2.1, 2.3, and 4.3.
+The cryptographic computations such as $Cert_{RP}$ verification and $PID_{RP}$ negotiation are performed using jsrsasign~\cite{jsrsasign}, a high-performance JavaScript cryptographic library.
 %This chrome extension requires permissions  \emph{chrome.tabs} and \emph{chrome.windows} to obtain the RP's URL from the browser's tab,  and \emph{chrome.webRequest} to intercept, block, modify requests to the IdP or RP \cite{chromeExtension}.
 
+The IdP was developed using MITREid Connect\cite{MITREid}, a Java implementation of OIDC, %certificated by the OpenID Foundation \cite{OIDF},
+with minimal code modifications. Only three lines of code were added for calculating $PID_U$ and 20 lines were added to modify the method of sending identity tokens. The calculations for $ID_{RP}$ and $PID_U$ were performed using Java cryptographic libraries. 
 
-We finished a Java RP SDK.
-This SDK provides two functions to encapsulate the protocol steps:
- one to request identity tokens,
-    and the other to derive accounts. %from identity tokens.
-It is implemented based on the Spring Boot framework  with about 500 lines of Java code,
- and cryptographic computations are done based on the Spring Security library.
-An RP invokes these functions for the integration,
-    by less than 10 lines of Java code.
+We developed a Java-based RP SDK with about 500 lines of code on the Spring Boot framework. It includes two functions for encapsulating the \usso~protocol steps: one for requesting identity tokens and the other for deriving accounts. The cryptographic computations are executed using the Spring Security library. An RP can easily integrate with \usso~by  adding less than 10 lines of Java code to invoke the necessary functions.
