@@ -296,13 +296,28 @@ So, an honest user never presents an identity token that is accepted by an hones
 \label{sec-:analysis}
 In this section, we prove that \usso~ effectively prevents privacy threats introduced by IdP-based login tracing and RP-based identity linkage.
 
-\newc In each login instance, the IdP receives an identity-token request from the user (Step 3.1 in Section~\ref{implementations}), which reveals only the user's identity and the RP's pseudo-identity $PID_{RP}$. To prove that the IdP cannot trace one user's multiple logins to different RPs, we need to show that these $PID_{RP}$s are \emph{indistinguishable} from random variables.
+\newc In each login instance, the IdP receives an identity-token request from a user (Step 3.1 in Section~\ref{implementations}),
+ which reveals only the user's identity $ID_U$ and the RP's ephemeral pseudo-identity $PID_{RP}$.
+We prove that in UPPRESSO the IdP cannot trace a user's login activities,
+ by showing that $PID_{RP}$ is \emph{indistinguishable} from random variables to the IdP.
+Therefore,
+    the IdP cannot (\emph{a}) link multiple login instances to a given RP,
+        or (\emph{b}) distinguish a login instance to a given RP from those to other RPs.
 
 \vspace{1mm}
-\noindent{\textsc{Theorem 6. (Privacy against the IdP)}} {\em Consider $PID_{RP} = [t]ID_{RP}$, where $t$ is random in $\mathbb{Z}_n$ and unknown to the IdP. The IdP is unable to distinguish the pseudo-identities of RPs in identity-token requests made by honest users.}
+\noindent{\textsc{Theorem 6. (Privacy against the IdP)}} {\em In UPPRESSO the IdP cannot distinguish $PID_{RP} = [t]ID_{RP}$
+    from random variables, where $t$ is random in $\mathbb{Z}_n$.} %and unknown to the IdP.}
 
 \vspace{0.75mm}
-\noindent{\textsc{Proof.} Consider a user's two arbitrary logins to an RP where $PID^{i}_{RP} = [t]ID_{RP}$ and $PID^{i'}_{RP} = [t']ID_{RP}$, and her another login to another RP where $PID^{i''}_{RP'} = [t'']ID_{RP'}$. According to the \dyu~model, $t$, $t'$, and $t''$ are randomly selected by the IdP script and shared only with the corresponding RP through the RP script, so they are unknown to the IdP. As stated in Theorem 2, $ID_{RP} = [r]G = Q$ and $ID_{RP'} = [r']G = P$, where $P$ and $Q$ are two different points on the curve $\mathbb{E}$. Therefore, in the IdP's view, $[t]Q$, $[t']Q$, and $[t'']P$ are three random points on $\mathbb{E}$ when $t$, $t'$, and $t''$ are random and they are indistinguishable~\cite{oprf-proved}. \hfill $\square$
+\noindent{\textsc{Proof.} 
+Since $\mathbb{E}$ is a finite cyclic group     and the number of points on $\mathbb{E}$ is $n$,
+ $ID_{RP} = [r]G$ is also a generator on $\mathbb{E}$ of order $n$ as $G$ is a generator of order $n$.
+According to the \dyu~model, $t$ is randomly chosen in $\mathbb{Z}_n$ and kept unknown to the IdP.
+Therefor,
+    $PID_{RP} = [t]ID_{RP}$ is \emph{indistinguishable} from a point $Q$ randomly chosen on $\mathbb{E}$ \cite{oprf-proved,strong-oprf}.
+\hfill $\square$
+
+%Consider a user's two arbitrary logins to an RP where $PID^{i}_{RP} = [t]ID_{RP}$ and $PID^{i'}_{RP} = [t']ID_{RP}$, and her another login to another RP where $PID^{i''}_{RP'} = [t'']ID_{RP'}$. According to the \dyu~model, $t$, $t'$, and $t''$ are randomly selected by the IdP script and shared only with the corresponding RP through the RP script, so they are unknown to the IdP. As stated in Theorem 2, $ID_{RP} = [r]G = Q$ and $ID_{RP'} = [r']G = P$, where $P$ and $Q$ are two different points on the curve $\mathbb{E}$. Therefore, in the IdP's view, $[t]Q$, $[t']Q$, and $[t'']P$ are three random points on $\mathbb{E}$ when $t$, $t'$, and $t''$ are random and they are indistinguishable~\cite{oprf-proved}. \hfill $\square$
 
 %as well as from a $PID_{RP}$ generated in an arbitrary login instance for an arbitrary user to log in to an
 
@@ -320,50 +335,88 @@ In this section, we prove that \usso~ effectively prevents privacy threats intro
 
 \vspace{1mm}
 
-UPPRESSO also protects user privacy against RP-based linkage.
-In a \usso~system of $m$ RPs, from each login instance, an RP receives $t$ %(Step 2.1 in Section~\ref{implementations})
+In each login instance, an RP receives $t$ %(Step 2.1 in Section~\ref{implementations})
 and an identity token %(Step 4.1)
-from which it can extract $PID_{RP}$ and $PID_U$. Meanwhile, the RP knows its own $ID_{RP}$ and the accounts of its users (i.e., $Acct$s). %Since $PID_{RP}= [t]{ID_{RP}}$ and $Acct = [t^{-1}]PID_{U}$, we can deduce $PID_{RP}$ and $PID_U$ from $ID_{RP}$ and $Acct$ with a valid $t$.
-Since $PID_{RP}$ and $PID_U$ can be deduced from $ID_{RP}$ and $Acct$ with a valid $t$, respectively, any $RP_j$ gains unique knowledge about a user $U_i$ when she logs in, denoted as $L_{i, j}=(ID_{RP_j}, t_{i,j}, Acct_i)$.
+enclosing $PID_{RP}$ and $PID_U$. Meanwhile, the RP knows its own identity $ID_{RP}$ and the user's account $Acct$.
+ %Since $PID_{RP}= [t]{ID_{RP}}$ and $Acct = [t^{-1}]PID_{U}$, we can deduce $PID_{RP}$ and $PID_U$ from $ID_{RP}$ and $Acct$ with a valid $t$.
+Since $PID_{RP}$ and $PID_U$ can be deduced from $ID_{RP}$ and $Acct$ with $t$, respectively,
+ an RP gains unique knowledge about a user when she logins, denoted as $L=(ID_{RP}, t, Acct)$.
 
 %Then, $RP_j$ has a view about all the $w_j$ authenticated users, i.e., $\mathbb{V}_j=\{L_{i,j}\}$ for $1 \le i \le w_j$ and $1 \le j \le m$.
     % n表示阶order，不再用n
 
 %According to Equation~\ref{equ:Account}, we have $L_{i, j}=([r_j]G, t_{ij}, [u_ir_j]G)$.
 
+Malicious RPs, colluding with malicious users, attempt to link login instances including accounts
+        of honest users across these malicious RPs.
+We prove that UPPRESSO prevents RP-based identity linkage, by showing that 
+    given a login instance $L'$ by an honest user $U'$ to one of the $c+1$ malicious RP,
+    the adversaries cannot distinguish a login instance by $U'$ to other $c$ malicious RP,
+        from the login instances by any honest users to other $c$ malicious RPs.
 
+The login instances to $c$ malicious RPs by $v$ colluding users
+    are $\mathfrak{L}=\left \{ \begin{matrix}
+L_{1,1},&L_{1,2},&\cdots,&L_{1,c}\\
+L_{2,1},& L_{2,2},&\cdots,&L_{2,c}\\
+\cdots,&\cdots,&L_{i,j},&\cdots\\
+L_{v,1},&L_{v,2},&\cdots,&L_{v,c}
+\end{matrix}\right\}$, where $L_{i,j} = (ID_{RP_j}, t_{i,j}, [ID_{U_i}]ID_{RP_j})$
+    is the login instance to $RP_j$ initiated by $U_i$ ($1 \le i \le v$ and $1 \le j \le c$);
+and the login instance to another RP is denoted as $L' = (ID_{RP'}, t', [ID_{U'}]ID_{RP'})$.
 
-To launch RP-based identity linkage,
-    two colluding RP could attempt to link two login instances across two RPs.
-To defeat against such attacks,
-    we need to ensure that when given a set of login instances to an RP,
-        the adversaries cannot distinguish an login instance to another RP is initiated by some user in this set
-                    from the ones by some random user.
-If the adversaries can distinguish, they will link accounts across these two RPs.
-
-We need to ensure that,
-    even when more RPs are colluding with some malicious users,
-    the collusion does not bring advantages to the adversaries in the above attack:
-        when given a set of login instances to $c$ RP by $v$ users, and these login instances have been linked across these $c$ RPs with the help from these $v$ users,
-    the adversaries still cannot distinguish an login instance to another RP is initiated by some user in this set
-                    from the ones by some random user (i.e., unknown $u' \in \mathbb{Z}_n$ ).
-
-Consider the system with $c$ malicious RPs and $v$ malicious users. Without loss of generality, assume the first $c$ RPs are malicious and share their views about previously authenticated users (denoted as $\mathbb{U}_c$).
- Furthermore, assume the first $v$ users seen by each malicious RP are malicious. They provide additional information for linking their $PID_U$s and $L_{i, j}$s across colluding RPs. Then, a malicious $RP_j$ constructs a list $\mathbb{L}_j=\{L_{i,j}\}$ for $1 \le i \le v$ and $1 \le j \le c$, where $\mathbb{L}_j \subseteq \mathbb{V}_j$.
-%Among them, assume the first $w$ users, without loss of generality, have logged in to all $c$ RPs. %$c \in [2,m]$.
+%Consider the system with $c$ malicious RPs and $v$ malicious users. Without loss of generality, assume the first $c$ RPs are malicious and share their views about previously authenticated users (denoted as $\mathbb{U}_c$). Furthermore, assume the first $v$ users seen by each malicious RP are malicious. They provide additional information for linking their $PID_U$s and $L_{i, j}$s across colluding RPs. Then, a malicious $RP_j$ constructs a list $\mathbb{L}_j=\{L_{i,j}\}$ for $1 \le i \le v$ and $1 \le j \le c$, where $\mathbb{L}_j \subseteq \mathbb{V}_j$.
+%%Among them, assume the first $w$ users, without loss of generality, have logged in to all $c$ RPs. %$c \in [2,m]$.
 %and share it with other colluding RPs.
-The colluding RPs share $\mathbb{V}_j$s and $\mathbb{L}_j$s in RP-based linkage attacks, where a malicious RP aims to link an honest user logged in to itself (e.g., $PID_a$ and $L_{a,j}$) to another user authenticated to a colluding RP (e.g., $PID_b$ and $L_{b,k}$ for any $k \neq j$) by finding a relationship between $L_{a,j}$ and $L_{b,k}$.
+
+%The colluding RPs share $\mathbb{V}_j$s and $\mathbb{L}_j$s in RP-based linkage attacks, where a malicious RP aims to link an honest user logged in to itself (e.g., $PID_a$ and $L_{a,j}$) to another user authenticated to a colluding RP (e.g., $PID_b$ and $L_{b,k}$ for any $k \neq j$) by finding a relationship between $L_{a,j}$ and $L_{b,k}$.
 
 \vspace{1mm}
 \noindent{\textsc{Theorem 7. (Privacy against Colluding RPs)}} {\em
-In \usso, given the shared knowledge $\mathbb{V}=\bigcup_{1 \le j \le c}\mathbb{V}_j$ and $\mathbb{L}=\bigcup_{1 \le j \le c}\mathbb{L}_j$ from a group of $c$ colluding RPs and $v$ colluding users, any malicious RP cannot differentiate if an honest user who has logged in to itself is among the users who have logged in to any of the colluding RPs.}
+In UPPRESSO with $c+1$ malicious RPs and $v$ malicious users,
+given a login instance $L'$ by an honest user $U'$ to one of the $c+1$ malicious RP,
+    the adversaries cannot distinguish a login instance by $U'$ to other $c$ malicious RP,
+        from the login instances by any honest users to other $c$ malicious RPs.}
+
+
+%the shared knowledge $\mathbb{V}=\bigcup_{1 \le j \le c}\mathbb{V}_j$ and $\mathbb{L}=\bigcup_{1 \le j \le c}\mathbb{L}_j$ from a group of $c$ colluding RPs and $v$ colluding users, any malicious RP cannot differentiate if an honest user who has logged in to itself is among the users who have logged in to any of the colluding RPs.}
 
 %Next, we show that the colluding RPs have limited knowledge about the users who have authenticated with them (using $PID_U$s). Even if they share this knowledge, it is insufficient to distinguish the pseudo-identities of different users nor link the ones belonging to the same user.
 
 \vspace{0.75mm}
-\noindent\textsc{Proof.} Without loss of generality, consider an arbitrary login instance in which a user (denoted by $u'$) logs in to the $c$th malicious RP. The RP obtains $L'=(ID_{RP_c}, t', Acct'_c)$, where $ID_{RP_c}=[r_c]G$ and $Acct'_c=[u'r_c]G$. If this user has previously logged in to at least one colluding RP, she should be in $\mathbb{U}_c$, and her login information should be in the related views. Hence, in RP-based linkage, $RP_c$ attempts to associate $L'$ with any record $L^*$ in $\mathbb{V}_j$s, where $L^*=([r_k]G, t_{u'k}, [u'r_k]G)$ and $k \in [1,c]$.
-However, $([r_c]G, t', [u'r_c]G)$ is indistinguishable from %$([r_k]G, t_{u'k}, [u'r_k]G)$
-any record in $\mathbb{V}_j$s based on Lemma 2. So, $RP_c$ cannot tell if the user is in the set $\mathbb{U}_c$ nor link her to any recorded logins.
+\noindent\textsc{Proof.}
+% Without loss of generality, consider an arbitrary login instance in which a user (denoted by $u'$) logs in to the $c$th malicious RP. The RP obtains $L'=(ID_{RP_c}, t', Acct'_c)$, where $ID_{RP_c}=[r_c]G$ and $Acct'_c=[u'r_c]G$. If this user has previously logged in to at least one colluding RP, she should be in $\mathbb{U}_c$, and her login information should be in the related views. Hence, in RP-based linkage, $RP_c$ attempts to associate $L'$ with any record $L^*$ in $\mathbb{V}_j$s, where $L^*=([r_k]G, t_{u'k}, [u'r_k]G)$ and $k \in [1,c]$.
+%
+First,
+ consider a login instance $L'$ by an honest user $U'$ to one of the $c+1$ malicious RPs, without loss of generality, denoted as $RP_{c+1}$, and any $RP_j$ ($j \in [1,c]$) of the other $c$ malicious RPs.
+According to Lemma 2, $RP_j$ and $RP_{c+1}$ cannot decide whether a login instance to $RP_{c+1}$,
+        is initiated by some users visiting $RP_j$ or not.
+Thus,
+    for each  $RP_j$,
+    $RP_j$ and $RP_{c+1}$ cannot distinguish a login instance by an honest user $U'$ to one of the two RP,
+        from the login instances by any honest users to the other RP.
+
+Therefore, the $c+1$ malicious RPs cannot distinguish a login instance by an honest user $U'$ to $RP_{c+1}$,
+        from the login instances by any honest users to other $c$ malicious RPs.
+Therefore,  
+    $c+1$ colluding RPs cannot distinguish a login instance by an honest user $U'$ to one of the $c+1$ RP,
+        from the login instances by any honest users to the other $c$ RPs.
+
+Next, when colluding with $v$ malicious users,
+    according to Lemma 3, $RP$ and $RP'$ cannot decide whether a login instance to $RP'$ denoted as $L' = (ID_{RP'}, t', [ID_{U'}]ID_{RP'})$,
+        belong to one of the $v$ users visiting to $RP$ or not (i.e., $ID_{U'} \in \{u_i\}$ or $\mathbb{Z}_n$).
+
+Furthermore, we need to prove that,
+    even when more RPs are colluding with some malicious users,
+    the collusion does not bring any benefits to the adversaries in the RP-based identity linkage:
+given a matrix of login instances to $c$ RPs by $v$ users,
+        where these login instances are linked across the $c$ RPs with the help from the $v$ colluding users,
+    the adversaries still cannot distinguish a login instance to another RP that is initiated by some of the $v$ users
+                    from login instances by a user randomly chosen in the system.
+Therefore,
+        malicious RPs cannot collude with malicious users cannot link login instances across the RPs,
+            and RP-based identity linkage is prevented in UPPRESSO.
+
+
 
 Besides, when a malicious user (denoted by $u''$) logs in to $RP_c$ while not revealing his identity, $RP_c$ cannot tell if he is in the malicious user group $\{u_1,...,u_v\}$, according to Lemma 3. This indicates that the additional knowledge from the colluding users, i.e., $\mathbb{L}_j$s, does not facilitate RP-based linkage.
 
@@ -387,11 +440,11 @@ Besides, when a malicious user (denoted by $u''$) logs in to $RP_c$ while not re
 
 
 
-\noindent\textsc{Lemma 2.} {\em  For any two RPs, $RP'$ and $RP$,
-        The $v$ users visiting to $RP$ are denoted as $\mathbb{L} = \{{L_i}\}$,
+\noindent\textsc{Lemma 2.} {\em  For two RPs, $RP'$ and $RP$,
+        the login instances to $RP$ by $v$ users are denoted as $\mathbb{L} = \{{L_i}\}$, where
          $L_i = (ID_{RP}, t_i, [u_i r]G)$, and $1 \leq i \leq v$.
-    They cannot decide whether a login instance to $RP'$ denoted as $L' = (ID_{RP'}, t', [ID_{U'}]ID_{RP'})$,
-        belong to one of the $v$ users or not (i.e., $ID_{U'} \in \{u_i\}$ or $\mathbb{Z}_n$).}
+    The two RPs cannot collude to decide whether a login instance to $RP'$ denoted as $L' = (ID_{RP'}, t', [ID_{U'}]ID_{RP'})$,
+        is initiated by one of the $v$ users or not, i.e., $ID_{U'} \in \{u_i\}$ ($1 \leq i \leq v$) or $ID_{U'} \in \mathbb{Z}_n$.}
 
 
 
@@ -436,16 +489,18 @@ The ECDDH assumption means that in $\mathcal{G}_r$ the adversary does not have a
 
 \oldc
 \vspace{1mm}
-\noindent\textsc{Lemma 3.} {\em Given $\mathfrak{L}$ that is constructed from login instances observed by $c$ colluding RPs and initiated by $v$ colluding users,
- another colluding RP called $RP'$ cannot distinguish two users $u'$ and $u_i$, who are associated with login instances $L'=([r']G, t', [u'r']G)$ and  
+\noindent\textsc{Lemma 3.} {\em For $c+1$ RPs,
+    the login instances to $c$ RPs by $v$ users are denoted as 
  $\mathfrak{L}=\left \{ \begin{matrix}
 L_{1,1},&L_{1,2},&\cdots,&L_{1,c}\\
 L_{2,1},& L_{2,2},&\cdots,&L_{2,c}\\
 \cdots,&\cdots,&\cdots,&\cdots\\
 L_{v,1},&L_{v,2},&\cdots,&L_{v,c}
-\end{matrix}\right\}$, where  
- $L_{i, j}=([r_j]G, t_{i,j}, [u_ir_j]G)$ for $1 \le i \le v$ and $1 \le j \le c$.}
-
+\end{matrix}\right\}$, where
+ $L_{i, j}=([r_j]G, t_{i,j}, [u_ir_j]G)$ for $1 \le i \le v$ and $1 \le j \le c$.
+The $c+1$ RPs cannot collude to decide
+    whether a login instance to $RP_{c+1}$ denoted as $L' = (ID_{RP'}, t', [ID_{U'}]ID_{RP'})$,
+        is initiated by one of the $v$ users or not, i.e., $ID_{U'} \in \{u_i\}$ ($1 \leq i \leq v$) or $ID_{U'} \in \mathbb{Z}_n$.}
 
 
 % \vspace{1mm}
