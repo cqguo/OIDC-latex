@@ -34,14 +34,14 @@ $Acct = [ID_U]ID_{RP}$ would inevitably change. This requires users to perform s
 When the IdP script forwards identity tokens to the RP script, the \verb+postMessage+ targetOrigin mechanism~\cite{postm-targeto} is used to restrict the recipient of the tokens, ensuring that the tokens will only be received by the intended recipient, $Enpt_{RP}$, as specified in the RP certificates. The targetOrigin is defined as a combination of protocol, port (if not presented, 80 for \verb+http+ and 443 for \verb+https+), and domain (e.g., \verb+RP.com+). The RP script's origin must accurately match the targetOrigin to receive the tokens. 
 
 The targetOrigin mechanism does not introduce any {\em additional} risk, although it does not check the URL path in $Enpt_{RP}$ %, e.g., \verb+/uploadTkn+
-due to its one RP per domain assumption. For example, if two RPs run on the same domain using different endpoints to receive identity tokens, e.g., \verb+https://RP.com/honest/tk+ and \verb+https://RP.com/malicious/tk+, they cannot be distinguished by \verb+postMessage+. Since browsers control access to web resources using the same-origin policy (SOP)~\cite{sop}, an RP's resources in browsers could still be accessed by a malicious RP, such as stealing cookies using the script \verb+window.open('https://RP.com/honest').document.cookie+, even if it restricts cookies to specific paths. This risk arises from the SOP design of browsers and is not related to the \usso~protocol.
+due to its one RP per domain assumption. For example, if two RPs run on the same domain using different endpoints to receive identity tokens, e.g., \verb+https://RP.com/honest/tk+ and \verb+https://RP.com/malicious/tk+, they cannot be distinguished by \verb+postMessage+. Since browsers control access to web resources using the same-origin policy (SOP)~\cite{sop}, an RP's resources in browsers could still be accessed by a malicious RP, such as stealing cookies using the script \verb+window.open('https://RP.com/honest').document.cookie+, even if it restricts cookies to specific paths. This risk arises from the SOP design of browsers. %and is not related to the \usso~protocol.
 
 
 
 %\vspace{0.75mm}
 \noindent \textbf{Applicability of identity transformations.} 
 The proposed identity-transformation algorithms %i.e., $\mathcal{F}_{PID_{RP}}()$, $\mathcal{F}_{PID_U}()$, and $\mathcal{F}_{Acct}()$,
-can be applied to a wide range of SSO scenarios, including web applications, mobile Apps, and native software. These algorithms follow the common model of popular SSO protocols and do not depend on any specific implementation or runtime, making them highly versatile and adaptable to different use cases.
+can be applied to a wide range of SSO scenarios, including web applications, mobile Apps, and native software. These algorithms follow the common model of popular SSO protocols and do not depend on any specific implementation or runtime.%, making them highly versatile and adaptable to different use cases.
 
 
 
