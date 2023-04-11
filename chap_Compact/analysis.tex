@@ -1,26 +1,19 @@
 \section{Security and Privacy Analysis}
 \label{sec:analysis}
-%In this section, we analyze the security and privacy guarantees provided by \usso.
-We define different adversarial scenarios against the security and privacy guarantees provided by UPPRESSO,
-    develop a  Dolev-Yao style model to analyze the login flow,
-    and formally prove each of these guarantees in respective scenarios based on the conditions confirmed in the model.
+In this section, we define three adversarial scenarios under the threat model in Section \ref{subsec:threatmodel}, develop a Dolev-Yao-style model \cite{SPRESSO} to depict the SSO login flow, and formally prove security and privacy guarantees provided by \usso~using the conditions provided by the Dolev-Yao-style model.
 
+\newc
 \subsection{Adversarial Scenarios}
 
-Based on our design goals (i.e., the security and privacy guarantees) and the potential adversaries discussed in Section \ref{subsec:threatmodel},
-we consider three adversarial scenarios as below.
+Based on our design goals (i.e., the desired security and privacy guarantees) and the potential adversaries discussed in Section \ref{subsec:threatmodel}, we consider three adversarial scenarios as below.
 
-\noindent\textbf{Security.}
-Malicious users could colludes with each other or with malicious RPs,
-    attempting to (\emph{a}) impersonate an honest user to login to an honest RP or (\emph{b}) entice an honest user to login to an honest RP under another user's account.
+\noindent\textbf{Security.} Malicious users may collude with each other or with malicious RPs attempting to (\emph{a}) impersonate an honest user to log in to an honest RP or (\emph{b}) entice an honest user to log in to an honest RP under a malicious user's account.
 
 \noindent\textbf{Privacy against the IdP.}
-The honest-but-curious IdP tries to infer the identities of the RPs that a user requests to access.
-   %     or link multiple login instances to any RP that initiated by a user.
+The honest-but-curious IdP tries to infer the identities of the RPs that a user requests to access. %or link multiple login instances to any RP initiated by a user.
 
 \noindent\textbf{Privacy against RPs.}
-Malicious RPs collude with each other or with malicious users,
- attempting to link login instances across these RPs that initiated by a user.
+Malicious RPs may collude with each other or with malicious users attempting to link login instances across these RPs that are initiated by a user.
 
 
 % \textcolor{blue}{Based on the threat model and assumptions proposed in Section \ref{sec:UPPRESSO},
@@ -95,28 +88,22 @@ Malicious RPs collude with each other or with malicious users,
 %The RP cannot derive $ID_U$ from either $PID_U$ or $Acct$ due to the elliptic curve discrete logarithm problem (ECDLP). Since $t$ is random in $\mathbb{Z}_n$ and unknown to the IdP, from the IdP's view, $PID_{RP}$ is indistinguishable from a random variable on $\mathbb{E}$. So, the IdP cannot learn anything about $ID_{RP}$ from $PID_{RP}$.
 %Section \ref{sec:analysis} presents more detailed analyses.
 
-\subsection{The Dolev-Yao-Style Model for UPPRESSO}
+\subsection{The Dolev-Yao-Style Model for \usso}
 \label{dy-model}
-We develop a Dolev-Yao-style model \cite{SPRESSO} for \usso, referred to as the DYU model, to formalize the login flow of UPPRESSO. % which has been used in the formal analysis of SSO protocols such as OAuth 2.0 \cite{FettKS16} and OIDC \cite{FettKS17}.
-It abstracts the entities in a web system, such as web servers and browsers, as \emph{atomic processes} %which communicate with each other through events. % such as HTTPS request and response.
+
+We develop a Dolev-Yao-style model \cite{SPRESSO} for \usso, referred to as the DYU model, to formalize the login flow of \usso. % which has been used in the formal analysis of SSO protocols such as OAuth 2.0 \cite{FettKS16} and OIDC \cite{FettKS17}.
+It abstracts the entities in a web system, such as web servers and browsers, as \emph{atomic processes}, %which communicate with each other through events. % such as HTTPS requests and responses.
 and defines \emph{script processes} to formulate client-side scripts.
 %The script is dependently invoked by the browser to process the server-defined logic.%such as verifying $Certificate_{RP}$. %postmessage events; %atomic process <-> script process, communication. %Other events change self-trigger.
-Thus, the atomic processes of \usso~include an {\em IdP process}, a finite set of {\em web servers} for honest RPs, a finite set of honest {\em browsers}, and a finite set of {\em attacker processes} that model malicious RPs and malicious users. The processes communicate with each other through events such as HTTPS requests and responses.
-A browser may invoke an honest IdP script and multiple RP scripts that could be honest or malicious.
+The atomic processes of \usso~include an {\em IdP process}, a finite set of {\em web servers} for honest RPs, a finite set of honest {\em browsers}, and a finite set of {\em attacker processes} that model malicious RPs and malicious users. 
+The processes communicate with each other through events such as HTTPS requests and responses. A browser may invoke an honest IdP script and multiple RP scripts that could be honest or malicious.
 %Although the scripts coexist in the same browser, they are strictly separated.
-The script processes communicate with each other through \verb+postMessage+, which are modeled as transmitted-to-itself events of a browser process.
+The script processes communicate through \verb+postMessage+, which are modeled as transmitted-to-itself events of a browser process.
 %To clearly indicate the action of postMessage communication, we define it as the transmitting-to-itself event of the browser (which is not defined in SPRESSO).
 
-\newc
-With the DYU model, we (\emph{a}) trace the lifecycle of an identity token from its generation at the IdP to its acceptance at an RP, to prove that it cannot be leaked to adversaries;
-(\emph{b}) locate the places where $PID_U$, $PID_{RP}$, and other elements in the identity token are processed,
- to prove that they cannot be manipulated by any adversary; and (\emph{c}) locate the places
-  where $PK$ is transmitted and used in the IdP script,
-to prove that it cannot be replaced by any adversary.
+With the DYU model, we can (\emph{a}) trace the lifecycle of an identity token from its generation at the IdP to its acceptance at an RP to prove that it cannot be leaked to adversaries; (\emph{b}) locate the places where $PID_U$, $PID_{RP}$, and other elements in the identity token are processed to prove that they cannot be manipulated by any adversary; and (\emph{c}) locate the places where $PK$ is transmitted and used in the IdP script to prove that it cannot be replaced by any adversary.
 
-Meanwhile, we confirm that the IdP cannot learn anything about $t$ shared only between the user and the RP,
- while the RPs learn nothing about $u$ shared between the user and the IdP.
-It is trivial to prove the confidentiality of $r$, as it never leaves the IdP.
+Meanwhile, we confirm that the IdP cannot learn anything about $t$ shared only between the user and the RP, while the RPs cannot learn anything about $u$ shared between the user and the IdP. It is trivial to prove the confidentiality of $r$, as it never leaves the IdP.
 
 \subsection{Security}
 \label{analysis-security}
@@ -124,31 +111,26 @@ It is trivial to prove the confidentiality of $r$, as it never leaves the IdP.
 %A secure SSO system allows a \emph{legitimate} user to login to an \emph{honest} RP with her account at this RP,
 % by presenting \emph{identity tokens} issued by a \emph{trusted} IdP.
 
-We prove four properties of an identity token in UPPRESSO,
-namely, \emph{RP designation}, \emph{user identification}, \emph{confidentiality} and \emph{integrity},
-and then prove that UPPRESSO is a secure SSO system based on these properties.
-
-Let us consider an identity token $TK$ binding $PID_{RP}$ and $PID_U$, which is generated by the IdP upon a request from the authenticated user with $ID_U$.
+We prove that identity tokens in \usso~and the enclosed pseudo-identities satisfy four properties, namely, \emph{RP designation}, \emph{user identification}, \emph{token confidentiality}, and \emph{token integrity}, which together ensure the security of \usso~in the first adversarial scenario. 
+First, let us consider an identity token $TK$ binding $PID_{RP}$ and $PID_U$, which is generated by the IdP upon a request from an authenticated user with $ID_U$.
 
 %These conclusions are used to prove the security of the UPPRESSO protocols.
 %We consider an arbitrary login instance in which an arbitrary RP with $ID_{RP}$ receives an integer $t$ and an identity token $TK$ issued by the IdP, binding a $PID_U$ and a $PID_{RP}$, from the RP script in a user browser. $TK$ is considered a valid identity token if the RP could verify its signature using the IdP's public key $PK$.
 
-\vspace{1mm}
-\noindent\textsc{Theorem 1. (RP Designation of $TK$)} {\em $PID_{RP}= [t]ID_{RP}$ in $TK$ uniquely designates an RP with $ID_{RP} = [r]G$,
- where $r$ is a random number known only to the IdP and $G$ is a generator on $\mathbb{E}$ of order $n$.}
+\vspace{3mm}
+\noindent\textsc{Theorem 1. (RP Designation of $TK$)} {\em $PID_{RP}$ in $TK$ uniquely designates an RP with $ID_{RP}$, where $PID_{RP}= [t]ID_{RP}$, $ID_{RP} = [r]G$, $r$ is a random number known only to the IdP, and $G$ is a generator on $\mathbb{E}$ of order $n$.}
 %{\em Provided that $r$ is known only to the IdP, $PID_{RP}$ in the identity token uniquely designates the RP with $ID_{RP} = [r]G$.}}
 %{\em If $TK$ is a valid identity token and $PID_{RP} = [t]ID_{RP}$ is satisfied, $PID_{RP}$ uniquely designates the RP that receives $TK$.}
 
 \vspace{0.75mm}
-\noindent\textsc{Proof.} We first prove that $PID_{RP}$ always specifies an RP in the system as below.
-$PID_{RP}$ sent by a user in her identity-token request is calculated as $PID_{RP} = [t]ID_{RP}$,
- where $ID_{RP}$ is the target RP's identity and $t$ is a random number selected by the user and shared with this RP.
- Therefore, $PID_{RP}$ designates the target RP which receives $t$.
+\noindent\textsc{Proof.} In \usso, $PID_{RP}=[t]ID_{RP}$ is generated by a user based on the target RP's identity $ID_{RP}$ and a user-selected random number $t$. 
+It is computationally easy for any party who knows $ID_{RP}$ and $t$ to validate the $PID_{RP}$ in an identity token. A valid $PID_{RP}$ always specifies an RP in the system. %$PID_{RP}$ sent by a user in her identity-token request is calculated as $PID_{RP} = [t]ID_{RP}$, where $ID_{RP}$ is the target RP's identity and $t$ is a random number selected by the user and shared with this RP. 
+Therefore, $PID_{RP}$ designates the target RP that knows $t$.
 
-Next, according to Lemma 1, given $PID_{RP} = [t]ID_{RP}$, the probability that $PID_{RP}$ designates another RP is negligible. %This means that $PID_{RP}$ cannot be associated with any other RPs in the system.
+Next, according to Lemma 1, given $PID_{RP} = [t]ID_{RP}$, the probability that $PID_{RP}$ designates another RP with $ID_{RP'}$ is negligible. %This means that $PID_{RP}$ cannot be associated with any other RPs in the system.
 Therefore, $PID_{RP}$ designates only the target RP with $ID_{RP}$ in the system.  \hfill $\square$
 
-\vspace{1mm}
+\vspace{3mm}
 \noindent\textsc{Lemma 1.} {\em  For any two RPs in a finite set of RPs, the probability of finding different numbers $t$ and $t'$ in $[1,n)$ that satisfy $[t]ID_{RP_j} = [t']ID_{RP_{j'}}$ is negligible, where $ID_{RP_j}=[r]G$, $ID_{RP_{j'}}=[r']G$, $r$ and $r'$ are different numbers unknown to the RPs, and $G$ is a generator on $\mathbb{E}$ of order $n$.}
 
 %Based on the ECDLP we prove that, for adversaries, the probability of finding $t$ and $t'$ satisfying $[t]ID_{RP_j} = [t']ID_{RP_{j'}}$ is negligible, where $RP_j$ and $RP_{j'}$ are any two RPs in the finite set of RPs (i.e., $ID_{RP_j} = [r_j]G$ and $ID_{RP_{j'}} = [r_{j'}]G$, while $r_j$ and $r_{j'}$ are kept secret to the adversaries). This negligible probability means $PID_{RP_j} = [t]ID_{RP_j}$ designates \emph{only} the target RP with $ID_{RP_j}$.
@@ -156,14 +138,11 @@ Therefore, $PID_{RP}$ designates only the target RP with $ID_{RP}$ in the system
 \oldc
 \vspace{0.75mm}
 \noindent\textsc{Proof.}
-Finding $t$ and $t'$ that satisfy $[t]ID_{RP_j} = [t']ID_{RP_{j'}}$, i.e., a $PID_{RP}$ collision,
-    can be described as a game $\mathcal{G}_c$ between an adversary and a challenger: the adversary receives from the challenger a finite set of RP identities, i.e., $ID_{RP_1}$, ..., $ID_{RP_m}$, where $m$ is the number of RPs in the system, and outputs $(a, b, t, t')$ where $a \neq b$.
-    If $[t]ID_{RP_a}=[t']ID_{RP_b}$, which occurs with a probability ${\rm Pr}_s$, the adversary succeeds in this game.
+Finding $t$ and $t'$ that satisfy $[t]ID_{RP_j} = [t']ID_{RP_{j'}}$, i.e., a $PID_{RP}$ collision, can be described as a game $\mathcal{G}_c$ between an adversary and a challenger: the adversary receives from the challenger a finite set of RP identities, i.e., $ID_{RP_1}$, ..., $ID_{RP_m}$, where $m$ is the number of RPs in the system, and outputs $(a, b, t, t')$ where $a \neq b$. If $[t]ID_{RP_a}=[t']ID_{RP_b}$, which occurs with a probability ${\rm Pr}_s$, the adversary succeeds in this game.
 %The attack success probability is defined as ${\rm Pr}_s$.
 
-Figure \ref{fig:ecdlp_algorithm} depicts a probabilistic polynomial time (PPT) algorithm $\mathcal{D}^*_c$, which is constructed based on this game $\mathcal{G}_c$, to solve the elliptic curve discrete logarithm problem (ECDLP): find a number $x \in \mathbb{Z}_n$ satisfying $Q = [x]G$,
-where $Q$ is a point on $\mathbb{E}$ and $G$ is a generator on $\mathbb{E}$ of order $n$.
-The probability of solving the ECDLP using any PPT algorithm $\mathcal{D}$ is defined as:
+Figure \ref{fig:ecdlp_algorithm} depicts a probabilistic polynomial time (PPT) algorithm $\mathcal{D}^*_c$, which is constructed based on this game $\mathcal{G}_c$, to solve the elliptic curve discrete logarithm problem (ECDLP): find a number $x \in \mathbb{Z}_n$ satisfying $Q = [x]G$, where $Q$ is a point on $\mathbb{E}$ and $G$ is a generator on $\mathbb{E}$ of order $n$.
+The probability of solving ECDLP using any PPT algorithm $\mathcal{D}$ is defined as:
 %For any PPT algorithm $\mathcal{D}$ is used to calculate $x$, we define the probability of finding $x$ as: %Therefore, the probability of finding $x$ using a probabilistic polynomial time (PPT) algorithm is negligible.
 \begin{equation*}
 {\rm Pr}\{\mathcal{D}(G, [x]G)=x\} = \epsilon_{c}(k)
@@ -173,9 +152,7 @@ where $k$ denotes the security parameter and $\epsilon_{c}(k)$ becomes negligibl
 %For any sufficiently large $k$, $m \ll 2^k$ since $m$ is a finite integer.
 
 
-The input of $\mathcal{D}^*_c$ is in the form of ($G, Q$).
-Upon receiving an input ($G$, $Q$), the challenger first randomly chooses $r_1, \cdots, r_m$ in $\mathbb{Z}_n$ to calculate $[r_1]G, \cdots, [r_m]G$, randomly replaces $[r_j]G$ with $Q$, and sends $m$ RP identities to the adversary, which then returns the result ($a$, $b$, $t$, $t'$).
-Finally, the challenger calculates $s = t^{-1}t'r_b \bmod n$, and returns $s$ as the output of $\mathcal{D}^*_c$.
+The input of $\mathcal{D}^*_c$ is in the form of ($G, Q$). Upon receiving an input ($G$, $Q$), the challenger first randomly chooses $r_1, \cdots, r_m$ in $\mathbb{Z}_n$ to calculate $[r_1]G, \cdots, [r_m]G$, randomly replaces $[r_j]G$ with $Q$, and sends $m$ RP identities to the adversary, which then returns the result ($a$, $b$, $t$, $t'$). Finally, the challenger calculates $s = t^{-1}t'r_b \bmod n$ and returns $s$ as the output of $\mathcal{D}^*_c$.
 
 \begin{figure}[tb]
   \centering
@@ -200,7 +177,7 @@ This violates the ECDLP assumption. Thus, the probability of finding $t$ and $t'
 
 
 \newc
-\vspace{1mm}
+\vspace{3mm}
 \noindent\textsc{Theorem 2. (User Identification of $TK$)} {\em $PID_U= [ID_U]PID_{RP}$ in $TK$ uniquely identifies an account at the RP designated by $PID_{RP}$, and this account is uniquely mapped to a user with $ID_U$.}
 
 %In the identity token binding $PID_U$ and $PID_{RP}$, the user pseudo-identity $PID_U$ identifies the authenticated user with $ID_U$, % as $Acct = [ID_U][ID_{RP}]$,
@@ -209,14 +186,10 @@ This violates the ECDLP assumption. Thus, the probability of finding $t$ and $t'
 
 \vspace{0.75mm}
 \noindent\textsc{Proof.}
-To issue an identity token requested for $PID_{RP}$,
-    the honest IdP calculates $PID_U = [ID_U]PID_{RP}$ following Equation \ref{equ:PIDU} after authenticating the user with $ID_U$,
-and the designated RP calculates $Acct = [t^{-1}]PID_{U} = [ID_U]ID_{RP}$ following Equation \ref{equ:AccountNotChanged}.
-$Acct = [ID_U]ID_{RP}$ is a \emph{permanent} identifier determined when the RP and the user register at the IdP,
-so $PID_U$ in $TK$ always identifies $Acct$ at the RP and $Acct$ is mapped to a user with $ID_U$.
+To issue an identity token requested for accessing $PID_{RP}$, the honest IdP calculates $PID_U = [ID_U]PID_{RP}$ following Equation \ref{equ:PIDU} after authenticating the user with $ID_U$. The designated RP then calculates $Acct = [t^{-1}]PID_{U} = [ID_U]ID_{RP}$ following Equation \ref{equ:AccountNotChanged}.
+$Acct = [ID_U]ID_{RP}$ is a \emph{permanent} identifier that is determined once the RP and the user have registered at the IdP. Therefore, $PID_U$ in $TK$ always identifies an $Acct$ at the RP, and $Acct$ is mapped to a user with $ID_U$.
 
-Next, we prove that it \emph{uniquely} identifies one user in the system and one account at the RP.
-Since $\mathbb{E}$ is a finite cyclic group, $ID_{RP} = [r]G$ is also a generator on $\mathbb{E}$ of order $n$. Given a user with $ID_U$, $Acct = [ID_U]ID_{RP}$ is a unique point on $\mathbb{E}$ for $1 \leq u < n$, which is uniquely associated with $ID_U=u$. \hfill $\square$
+Next, we prove that it \emph{uniquely} identifies one user in the system and one account at the RP. Since $\mathbb{E}$ is a finite cyclic group, $ID_{RP} = [r]G$ is also a generator on $\mathbb{E}$ of order $n$. Given a user with $ID_U$, $Acct = [ID_U]ID_{RP}$ is a unique point on $\mathbb{E}$ for $1 \leq u < n$, which is uniquely associated with $ID_U=u$. \hfill $\square$
 
 %According to the \dy~model, the RP may receive a $TK$ issued for another RP from a malicious RP script. However, if $PID_{RP} = [t]ID_{RP}$ holds, the RP can verify its designation by $PID_{RP}$ based on Theorem 1 and associates both $t$ and $TK$ with the current login instance.
 %Then, the RP can calculate $Acct$ using $t$ and $PID_U$ following Eq.~\ref{equ:Account}. $Acct$ is determined only by $ID_U$ and $ID_{RP}$ based on Eq.~\ref{equ:AccountNotChanged}, which are permanent identifiers issued by the IdP during registration. Hence, $Acct$ cannot be manipulated by adversaries and is independent of login instances. Therefore, in a user's multiple login instances to the same RP, $PID_U$s are always mapped to one and only one $Acct$ at that RP.
@@ -224,7 +197,7 @@ Since $\mathbb{E}$ is a finite cyclic group, $ID_{RP} = [r]G$ is also a generato
 %The detailed process of proof is shown in Appendix.
 
 \newc
-\vspace{1mm}
+\vspace{3mm}
 \noindent\textsc{Theorem 3. (Identity Token Integrity)} {\em An identity token issued by the IdP cannot be forged or manipulated.}
 
 %{\em Consider an arbitrary identity token $TK$ binding $PID_{RP}$ and $PID_U$. An honest RP accepts $TK$ if and only if $TK$ is valid, $PID_{RP}$ designates this RP with $ID_{RP}$, and $PID_U$ uniquely identifies a user account $Acct=[ID_U]ID_{RP}$ at this RP, indicating that $TK$ binds $ID_{RP}$ and $Acct$.}
@@ -232,12 +205,10 @@ Since $\mathbb{E}$ is a finite cyclic group, $ID_{RP} = [r]G$ is also a generato
 %An honest RP accepts only identity tokens binding its pseudo-identity $PID_{RP}$ and the authenticated user's pseudo-identity $PID_U$, and actually binding $ID_{RP}$ and $Acct=[ID_U]ID_{RP}$, when $SK$ is held by only the IdP.
 
 \vspace{0.75mm}
-\noindent{\textsc{Proof.} Identity tokens are generated and signed by the honest IdP using its private key,
- which is protected well at the IdP against adversaries.
+\noindent{\textsc{Proof.} Identity tokens are generated and signed by the honest IdP using its private key, which is sufficiently protected at the IdP against adversaries.
 %Meanwhile, the IdP's public key $PK$ is sent from the IdP to the RPs.
 %and $PK$ which is pre-installed by an RP cannot be manipulated by adversaries.
-With the pre-installed public key, an RP verifies the identity tokens it receives.
-So any forged or manipulated identity token will be rejected.  \hfill $\square$
+With the pre-installed public key, an RP can verify the identity tokens it receives and reject any forged or manipulated identity tokens. \hfill $\square$
 
 %Due to the one-to-one mapping between (\emph{a}) the pair of $Acct$ and $PID_{RP}$ and (\emph{b}) the triple ($PID_U$, $PID_{RP}$, $t$), $TK$ binds $ID_{RP}$ and $Acct$ implicitly. \hfill $\square$
 
@@ -250,25 +221,18 @@ So any forged or manipulated identity token will be rejected.  \hfill $\square$
 %Therefore, $Acct$ and $ID_{RP}$ are actually bound in the token by the IdP's signatures,
 
 
-\vspace{1mm}
+\vspace{3mm}
 \noindent{\textsc{Theorem 4. (Identity Token Confidentiality)}} {\em An identity token %whose $PID_{RP}$ designates an RP with $ID_{RP}$ can
-is accessible to the designated RP, besides the requesting user and the IdP.}
+can only be accessed by its designated RP, besides the requesting user and the IdP.}
 %An identity token is accessible to only the authenticated user and the target RP, in addition to the IdP signing this token.
 
 \vspace{0.75mm}
 \noindent\textsc{Proof.}
-An identity token is generated by the IdP and then sent to the requesting user (i.e., its IdP script).
- The IdP script forwards the token to the RP script, which should be downloaded from the origin of $Enpt_{RP}$ specified in a verified RP certificate.
-Because the IdP script calculates $PID_{RP} =[t]ID_{RP}$ based on $ID_{RP}$ in this verified RP certificate,
-    this RP is designated in the identity token and will receive the token from the RP script.
-
-All the communications between the IdP, RPs, and users are protected by HTTPS
- and two scripts communicate with each other through dedicated \verb+postMessage+ HTML5 channels.
-According to the conclusions of the DYU model,
- the identity tokens are not leaked to any other entity. \hfill $\square$
+An identity token is generated by the IdP and then sent to the requesting user (i.e., its IdP script). The IdP script can verify if $ID_{RP}$ specified in the RP certificate is designated by $PID_{RP}$ in the identity token and forward the token to the correct RP script, which is downloaded from the origin of $Enpt_{RP}$ specified in a verified RP certificate. %Because the IdP script calculates $PID_{RP} =[t]ID_{RP}$ based on $ID_{RP}$ in this verified RP certificate, this RP is designated in the identity token and will receive the token from the RP script.
+As all the communications between the IdP, RPs, and users are protected by HTTPS and two scripts communicate with each other through dedicated \verb+postMessage+ HTML5 channels, according to the conclusions of the DYU model, the identity tokens should not be leaked to any other entities. \hfill $\square$
 
 
-\vspace{1mm}
+\vspace{3mm}
 \noindent\textsc{Theorem 5. (Security)} {UPPRESSO is secure.}
 
 \vspace{0.75mm}
