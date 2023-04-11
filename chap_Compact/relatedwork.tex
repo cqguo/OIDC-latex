@@ -8,55 +8,31 @@
 %        in privacy-preserving ways.
 %Privacy-enhancing technologies have been applied in various scenarios,
 %  but not adopted to comprehensively transform the five (pseudo-)identities in SSO services.
-\noindent\textbf{Privacy-preserving cryptographic technique.}
-\textcolor{blue}{PrivacyPass and TrustToken \cite{privacypass,trusttoken}
- propose anonymous tokens for applications that grant anonymous access to authorized users.
-They adopted a cryptographic technique originally designed for oblivious pseudorandom functions (OPRFs) \cite{oprf-proved,voprf-proved}.
-A user generates a random number $e_i$ for each unsigned token $T_i$ and blinds $T_i$ into $T_i^{e_i}$.
-After authenticating the user,
- a token server signs ($T_i^{e_i}, T_i^{e_i k}$) using a private key $k$.
-The user then utilizes $e_i$ to obtain $T_i^k$ from $T_i^{e_i k}$, and later ($T_i, T_i^k$) is redeemed to access resources.
+
+\newc
+\noindent\textbf{Privacy-preserving cryptographic techniques.}
+PrivacyPass and TrustToken \cite{privacypass,trusttoken} propose anonymous tokens for applications that grant anonymous access to authorized users. They used a cryptographic technique that was originally designed for oblivious pseudorandom functions (OPRFs) \cite{oprf-proved,voprf-proved}. 
+A user generates a random number $e_i$ for each unsigned token $T_i$ and blinds $T_i$ into $T_i^{e_i}$. After the user is authenticated, a token server signs ($T_i^{e_i}, T_i^{e_i k}$) with a private key $k$. Then, the user converts $T_i^{e_i k}$ to $T_i^k$ using $e_i$ and redeems the token ($T_i, T_i^k$) to access resources. 
 %the token server blindly binds user-selected secrets $t_i$ and access tokens ($T_i, T_i^{k{r_i}}$) and signs them with its secret key $k$, where $T_i=H(t_i)$ and $H$ is a hash function.
 %The user unblinds them to obtain anonymous tokens ($t_i, T_i^k$) and redeems them later on the service.
-The random numbers (or blinding factors) prevent the token server from linking token signing and redemption.
-Anonymous tokens may be used to build anonymous SSO services,
-    where an RP cannot identify every user.}
- % they can be used to implement anonymous SSO services that are secure against IdP-based tracing and RP-based linkage.}
-
+%The random numbers (or blinding factors) prevent the token server from linking token signing and redemption. 
+Anonymous tokens may be used to build anonymous SSO services, where an RP cannot identify the users. 
+% they can be used to implement anonymous SSO services that are secure against IdP-based tracing and RP-based linkage.}
 %\textcolor{blue}{They provide SSO services that are fundamentally different from the ones offered by UPPRESSO. As shown in Table~\ref{tbl:comparison-protocol}, they lack support for all three SSO features. First, the anonymous tokens used by different users or by the same user in different login instances cannot be distinguished (i.e., no user identification at RPs), since they are signed blindly using the same server secret. Besides, the users are required to maintain anonymous tokens for asynchronous authentication in addition to the credentials for the IdP, similar to other privacy-preserving solutions based on anonymous credentials. Finally, PrivacyPass and TrustToken do not support selective user attribution provisioning. In contrast, UPPRESSO formalizes the privacy-preserving SSO process as two ID-transformation problems and generates unlinkable pseudoidentities and proofs to support the desired SSO features. Therefore,  UPPRESSO is  compatible with widely-adopted SSO protocols such as OIDC and SAML.}
-
 %\textcolor{blue}{PrivacyPass and TrustToken allow a user to receive tokens \cite{privacypass,trusttoken}, each of which is denoted as ($T, T^{k}$), where $k$ is the token server's private key. These tokens are used to access resources anonymously in the future. To unlink token signing and redemption, a user generates a random number $e$ for each token, blinds $T$ into $T^{e}$, and sends it to request ($T^e, T^{ek}$) from the token server. The user then utilizes $e$ to obtain $T^k$ from $T^{ek}$, and then only ($T, T^{k}$) is redeemed to access resources. This cryptographic skill \cite{oprf-proved} is used in UPPRESSO similarly: a user transforms $ID_{RP}$ to $PID_{RP} = [t]ID_{RP}$ by a random number $t$, and $PID_{RP}$ is transformed again by an IdP to $[tu]ID_{RP}$. The visited RP calculates $Acct = [u]ID_{RP}$ from $[tu]ID_{RP}$ by using $t$ (see Table \ref{tbl:notations-protocol} for detailed descriptions of these notations).}
-
-\textcolor{blue}{The identity transformations in UPPRESSO adopts a similar cryptographic technique but in different ways,
-    and we explore more privacy properties of this technique.
-In UPPRESSO, a user transforms $ID_{RP}$ to $PID_{RP} = [t]ID_{RP}$ by a random number $t$,
- and $PID_{RP}$ is transformed again by an IdP to $[tu]ID_{RP}$.
-The visited RP finally calculates $Acct = [u]ID_{RP}$ from $[tu]ID_{RP}$ by using $t$.
+\usso's identity transformations are implemented using a similar cryptographic technique. In particular, a user first transforms $ID_{RP}$ to $PID_{RP} = [t]ID_{RP}$ using a random number $t$, and then the IdP transforms $PID_{RP}$ further to $[tu]ID_{RP}$. The visited RP finally calculates $Acct = [u]ID_{RP}$ from $[tu]ID_{RP}$ by using $t$.
  %(see Table \ref{tbl:notations-protocol} for detailed descriptions of these notations).
 % \textcolor{blue}{UPPRESSO differs from PrivacyPass and TrustToken as below.
-% Firstly, PrivacyPass and TrustToken work as anonymous SSO to some extent, where one consistent private key serves all users, but UPPRESSO identifies each user at an RP.
-% Secondly,
-%    the above cryptographic skill \cite{oprf-proved} is differently utilized.
-%UPPRESSO integrates it to transform identities in SSO:
-This technique is differently utilized:
-scalar $u$ is known by the IdP and a user as his user identity, and
-random number $t$ is shared by the user and the RP;
- on the contrary,
-exponent $k$ is held only by the PrivacyPass/TrustToken server as a private key,
- and random number $e$ is only known to a user.
-%Lastly and most importantly,
-Furthermore, more privacy properties are explored in UPPRESSO.
-The unlinkability between token signing and redemption, or
-($T_i^{e_i}, T_i^{e_ik}$) and  ($T_i, T_i^k$),
-roughly corresponds to only the IdP-untraceability in UPPRESSO:
- an IdP cannot link any pair of $[t_i]ID_{RP}$ and $ID_{RP}$.
- % $i = 1, 2, \cdots$. % which fundamentally depends on the ECDLP assumption.
-UPPRESSO also supports the unlinkability across RPs:
-given multiple users, e.g., identified as $u$ and $u'$,
-    ($ID_{RP}, t, [u]ID_{RP}$) and ($ID_{RP'}, t', [u']ID_{RP'}$) are indistinguishable to
-    colluding RPs.
-The second property of this cryptographic technique is not considered
-     in anonymous tokens \cite{privacypass,trusttoken} or OPRFs \cite{oprf-proved,voprf-proved}.}
+% Firstly, PrivacyPass and TrustToken work as anonymous SSO to some extent, where one consistent private key serves all users, but UPPRESSO identifies each user at an RP. Secondly, the above cryptographic skill \cite{oprf-proved} is differently utilized. UPPRESSO integrates it to transform identities in SSO:
+Here, \usso~supports the IdP-untraceability property that prevents the IdP from linking $ID_{RP}$ and a corresponding $[t]ID_{RP}$, leveraging the ECDLP assumption (see Section~\ref{analysis-security}). This is similar to the unlinkability between token signing and redemption in PrivacyPass/TrustToken, which prevents the server from linking ($T_i^{e_i}, T_i^{e_ik}$) and  ($T_i, T_i^k$), leveraging the DLP assumption. %The unlinkability between token signing and redemption, or ($T_i^{e_i}, T_i^{e_ik}$) and  ($T_i, T_i^k$), roughly corresponds to only the IdP-untraceability in UPPRESSO: an IdP cannot link any pair of $[t_i]ID_{RP}$ and $ID_{RP}$.  % $i = 1, 2, \cdots$. % which fundamentally depends on the ECDLP assumption.
+
+However, \usso~explores this cryptographic technique %with different designs and 
+in greater depth, resulting in additional privacy protection. The exponent $k$ in PrivacyPass/TrustToken is held only by the server as a private key, and the random number $e$ is only known to a user. In contrast, the scalar $u$ in \usso~denotes a user identity known to the user and the IdP, while the random number $t$ is an ephemeral secret shared between the user and the RP.  
+%The application of the cryptographic technique differs from PrivacyPass/TrustToken
+%This different design allows \usso~to explore and offer additional privacy properties. %Furthermore, more privacy properties are explored in UPPRESSO.
+The sharing of random numbers supports additional unlinkability across colluding RPs. Their knowledge about two different users $u$ and $u'$, i.e., ($ID_{RP}, t, [u]ID_{RP}$) and ($ID_{RP'}, t', [u']ID_{RP'}$), which is obtained from different logins, are indistinguishable. 
+%given multiple users, e.g., identified as $u$ and $u'$, ($ID_{RP}, t, [u]ID_{RP}$) and ($ID_{RP'}, t', [u']ID_{RP'}$) are indistinguishable to colluding RPs.
+This property requires designing the transformations under the ECDDH assumption (see Section~\ref{sec-:analysis}), which is not considered or supported in existing anonymous tokens \cite{privacypass,trusttoken} or OPRFs \cite{oprf-proved,voprf-proved}.
 
 % \noindent\textbf{Anonymous SSO.}
 % Such schemes allow authenticated users to access a service protected by an IdP,
@@ -68,14 +44,10 @@ The second property of this cryptographic technique is not considered
 % Anonymous SSO schemes work for some special applications,
 %     but are unapplicable in most systems that require user identification for customized services.
 
-Various cryptographic primitives are used to protect user privacy.
-Using zero-knowledge proofs,
-ZKlaims \cite{zklaim} allows users to prove statements on the credentials issued by a trusted server without revealing the credential contents.
-Crypto-Book \cite{crypto-book} adopts distributed key generation to generate linkable-ring-signature private keys for users,
-    and each key pair is used as an untraceable pseudonym.
-Tandem \cite{tandem} generates one-time-use key-share tokens,
-    for a two-party threshold cryptographic scheme implemented with a central server,
-to preserve the users' privacy of key-usage patterns.
+\oldc
+Various cryptographic primitives have been used to protect user privacy.
+Using zero-knowledge proofs, ZKlaims \cite{zklaim} allows users to prove statements on the credentials issued by a trusted server without revealing the credential contents.
+Crypto-Book \cite{crypto-book} adopts distributed key generation to generate linkable-ring-signature private keys for users, and each key pair is used as an untraceable pseudonym. Tandem \cite{tandem} generates one-time-use key-share tokens for a two-party threshold cryptographic scheme implemented with a central server to protect the privacy of key-usage patterns.
 
 
 %two-party threshold cryptographic scheme implemented with a central server, to protect user private keys \cite{mRSA,ss-rsa}: to sign/decrypt a message, a user needs a token from the server.
@@ -84,9 +56,7 @@ to preserve the users' privacy of key-usage patterns.
 %\vspace{0.5mm}
 \noindent\textbf{Formal analysis of SSO protocols.}
 A formal analysis on SAML-based SSO \cite{ArmandoCCCT08} found that a Google-implemented variant does not bind RP identities correctly in the identity tokens.
-Fett et al. \cite{FettKS16, FettKS17} formally analyzed OAuth 2.0 and OIDC using a Dolev-Yao-style model \cite{FettKS14} and reported the 307 redirection and IdP mix-up attacks.
-In this paper, we also develop a Dolev-Yao-style model for UPPRESSO,
-in the proofs of the security and privacy of UPPRESSO (see Section~\ref{dy-model}).
+Fett et al. \cite{FettKS16, FettKS17} formally analyzed OAuth 2.0 and OIDC using a Dolev-Yao-style model \cite{FettKS14} and reported the 307 redirection and IdP mix-up attacks. In this paper, we also developed a Dolev-Yao-style model for \usso~to prove its security and privacy (see Section~\ref{dy-model}).
 
 
 %\vspace{0.5mm}
