@@ -163,13 +163,13 @@ Finding $t$ and $t'$ that satisfy $[t]ID_{RP_j} = [t']ID_{RP_{j'}}$, i.e., a $PI
 
 Figure \ref{fig:ecdlp_algorithm} depicts a probabilistic polynomial time (PPT) algorithm $\mathcal{D}^*_c$, which is constructed based on this game $\mathcal{G}_c$, to solve the elliptic curve discrete logarithm problem (ECDLP): find a number $x \in \mathbb{Z}_n$ satisfying $Q = [x]G$,
 where $Q$ is a point on $\mathbb{E}$ and $G$ is a generator on $\mathbb{E}$ of order $n$.
-The probability of solving the ECDLP using any PPT algorithm $\mathcal{D}_c$ is:
+The probability of solving the ECDLP using $\mathcal{D}^*_c$ is ${\rm Pr}\{\mathcal{D}^*_c(G, [x]G)=x\}$.
 %For any PPT algorithm $\mathcal{D}$ is used to calculate $x$, we define the probability of finding $x$ as: %Therefore, the probability of finding $x$ using a probabilistic polynomial time (PPT) algorithm is negligible.
-\begin{equation*}
-{\rm Pr}\{\mathcal{D}_c(G, [x]G)=x\} = \epsilon_{c}(k)
-\end{equation*}
+Due to the ECDLP assumption,
+    ${\rm Pr}\{\mathcal{D}^*_c(G, [x]G)=x\} = \epsilon_{c}(k)$ becomes negligible when the security parameter $k$ is sufficiently large.
+
 %where ${\rm Pr}\{\}$ denotes the probability.
-where $k$ denotes the security parameter and $\epsilon_{c}(k)$ becomes negligible when $k$ is sufficiently large.
+%where $k$ denotes the security parameter and $\epsilon_{c}(k)$ becomes negligible when $k$ is sufficiently large.
 %For any sufficiently large $k$, $m \ll 2^k$ since $m$ is a finite integer.
 
 
@@ -180,7 +180,7 @@ Finally, the challenger calculates $s = t^{-1}t'r_b \bmod n$, and returns $s$ as
 \begin{figure}[tb]
   \centering
   \includegraphics[width=0.97\linewidth]{fig/ecdlp_algorithm.pdf}
-  \caption{The PPT algorithm $\mathcal{D}^*_c$ constructed based on the $PID_{RP}$ collision game to solve the ECDLP problem.}
+  \caption{The PPT algorithm $\mathcal{D}^*_c$ constructed based on the $PID_{RP}$ collision game, to solve the ECDLP problem.}
   \label{fig:ecdlp_algorithm}
 \end{figure}
 
@@ -461,13 +461,13 @@ The adversary succeeds in the game with $\mathbf{Adv}_{A}$:
 Based on $\mathcal{G}_r$, we design a PPT algorithm $\mathcal{D}^*_r$ to solve the elliptic curve decisional Diffie-Hellman (ECDDH) problem:
  given $(G, [x]G$, $[y]G$, $[z]G)$, decide $z = xy$ or $z$ is randomly chosen in $\mathbb{Z}_n$,
     where $G$ is a point on an elliptic curve $\mathbb{E}$ of order $n$, and $x$ and $y$ are integers randomly and independently chosen in $\mathbb{Z}_n$.
-The probability of solving the ECDDH problem using $\mathcal{D}^*_r$ is defined as $\epsilon_{r}(k) = |{\rm Pr}^*_1 - {\rm Pr}^*_2|$, where:
+The probability of solving the ECDDH problem using $\mathcal{D}^*_r$ is defined as $|{\rm Pr}^*_1 - {\rm Pr}^*_2|$, where:
 \begin{align*}
 &{\rm Pr}^*_1 =  {\rm Pr}\{\mathcal{D}^*(G, [x]G, [y]G, [xy]G)=1\} \\
 &{\rm Pr}^*_2 =  {\rm Pr}\{\mathcal{D}^*(G, [x]G, [y]G, [z]G)=1\}
 \end{align*}
 Due to the ECDDH assumption,
-    $\epsilon_{r}(k)$ is negligible when the security parameter $k$ is sufficiently large.
+    $|{\rm Pr}^*_1 - {\rm Pr}^*_2| = \epsilon_{r}(k)$ becomes negligible when the security parameter $k$ is sufficiently large.
 
 As shown in Figure \ref{fig:dalgorithm}, the input of $\mathcal{D}^*_r$ is in the form of $(G$, $Q_1=[x]G$, $Q_2=[y]G$, $Q_3=[z]G)$. Upon receiving the input,
 the challenger randomly chooses $u_i \in \mathbb{Z}_n$ ($1 \leq i \leq v$), $r \in [1, n)$, $t_i \in [1, n)$ ($1 \leq i \leq v$) and $t' \in [1, n)$, and constructs $\mathbb{L} = \{{L_i}\} = \{([r]G, t_i, [u_ir]G)\}$.
@@ -479,16 +479,19 @@ When the adversary receives $\mathbb{L}$ and $L'$, it outputs $s$.
 According to the above construction of $\mathbb{L}$ and $L'$,
  $x$ is actually inserted into $\mathbb{L}$ as $u_d$, and $z/y$ is assigned to $ID_{U'} = u'$.
  So, if $z = xy$, then $z/y = x$ and $ID_{U'} \in \{u_i\}$; otherwise, $ID_{U'} \in \mathbb{Z}_n$.
-Then, $\mathbf{Adv}_{A} = \epsilon_{r}(k)$ as follows.
+The probability $|{\rm Pr}^*_1 - {\rm Pr}^*_2|$ of solving the ECDDH problem using $\mathcal{D}^*_r$ is formulated as: 
 \begin{align*}
-&{\rm Pr}_1={\rm Pr}\{\mathcal{G}_r(\mathbb{L}, L'|ID_{U'} \in \{ID_{U_1}, ID_{U_2}, \cdots, ID_{U_v}\})=1\} \\=& {\rm Pr}\{\mathcal{D}^*_r(G, [x]G, [y]G, [xy]G)=1\}={\rm Pr}^*_1  \\
-&{\rm Pr}_2= {\rm Pr}\{\mathcal{G}_r(\mathbb{L}, L'|ID_{U'} \in \mathbb{Z}_n)=1\} \\=& {\rm Pr}\{\mathcal{D}^*_r(G, [x]G, [y]G, [z]G)=1\} ={\rm Pr}^*_2 \\
-&{\mathbf{Adv}}_{A}=|{\rm Pr}_1-{\rm Pr}_2|=|{\rm Pr}^*_1-{\rm Pr}^*_2|=\epsilon_{r}(k)
+&{\rm Pr}^*_1 =  {\rm Pr}\{\mathcal{D}^*_r(G, [x]G, [y]G, [xy]G)=1\} \\=&{\rm Pr}\{\mathcal{G}_r(\mathbb{L}, L'|ID_{U'} \in \{ID_{U_1}, ID_{U_2}, \cdots, ID_{U_v}\})=1\} = {\rm Pr}_1 \\
+&{\rm Pr}^*_2= {\rm Pr}\{\mathcal{D}^*_r(G, [x]G, [y]G, [z]G)=1\} \\=&  {\rm Pr}\{\mathcal{G}_r(\mathbb{L}, L'|ID_{U'} \in \mathbb{Z}_n)=1\} = {\rm Pr}_2\\
+&|{\rm Pr}^*_1-{\rm Pr}^*_2|=|{\rm Pr}_1-{\rm Pr}_2|={\mathbf{Adv}}_{A}
 \end{align*}
 
-The ECDDH assumption means that in $\mathcal{G}_r$ the adversary does not have advantages, i.e., cannot distinguish a user $U'$ chosen from \{${U_1}, {U_2}, \cdots, {U_v}$\} or randomly from the universal user set.
-%    (indistinguishability of users to colluding RPs).
+If the probability of distinguishing a user $U'$ chosen from \{${U_1}, {U_2}, \cdots, {U_v}$\} or randomly from the universal user set is non-negligible,
+    then the adversary would have advantages in $\mathcal{G}_r$ and |{\rm Pr}^*_1-{\rm Pr}^*_2|=|{\rm Pr}_1-{\rm Pr}_2| is non-negligible regardless of $k$.
+This violates the ECDDH assumption.
+Thus, If the probability of distinguishing a user $U'$ chosen from \{${U_1}, {U_2}, \cdots, {U_v}$\} or randomly from the universal user set is negligible.
 \hfill $\square$
+
 
 
 
