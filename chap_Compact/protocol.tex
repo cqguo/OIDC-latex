@@ -166,8 +166,9 @@ The same as in widely-adopted SSO systems \cite{OpenIDConnect, rfc6749, SAML, SA
 After receiving an identity token from the IdP, the IdP script needs to ensure the RP script will forward the token to $Enpt_{RP}$ %, which is bound with $ID_{RP}$
 specified in the RP certificate.
 As the communication between the scripts occurs within the browser using the \verb+postMessage+ HTML5 API, %To avoid the honest user sending the identity token to an adversary,
-we use the \verb+postMessage+ targetOrigin mechanism \cite{postm-targeto} to restrict the receiver (i.e., the RP script). When the IdP script sends messages, the receiver's origin is set as a parameter, such as \verb+postMessage(tk, 'https://RP.com')+, which includes the protocol (e.g., \verb+https+), the domain (e.g., \verb+RP.com+), and a port if applicable.
-Only the script downloaded from this targetOrigin is considered a legitimate receiver.
+we use the \verb+postMessage+ targetOrigin mechanism \cite{postm-targeto} to restrict the recipient. %(i.e., the RP script).
+ When the IdP script sends messages, the recipient's origin is set as a parameter, such as \verb+postMessage(tk, 'https://RP.com')+, which includes the protocol (e.g., \verb+https+), the domain (e.g., \verb+RP.com+), and a port if applicable.
+Only the script downloaded from this targetOrigin is considered a legitimate recipient.
 
 %The \emph{RP certificates} deals with the problem of mapping an identity proof with its targeting RP.
 %That is, the IdP script derives the RP's $ID_{RP}$ and origin from the RP certificate, while the $PID_{RP}$ is generated with this $ID_{RP}$. Thus, the IdP script always know the targeting RP of an identity proof, therefore, the \verb+postMessage+ mechanism can guarantee that the identity proof would not be sent to the adversary.
