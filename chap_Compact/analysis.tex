@@ -163,10 +163,10 @@ Finding $t$ and $t'$ that satisfy $[t]ID_{RP_j} = [t']ID_{RP_{j'}}$, i.e., a $PI
 
 Figure \ref{fig:ecdlp_algorithm} depicts a probabilistic polynomial time (PPT) algorithm $\mathcal{D}^*_c$, which is constructed based on this game $\mathcal{G}_c$, to solve the elliptic curve discrete logarithm problem (ECDLP): find a number $x \in \mathbb{Z}_n$ satisfying $Q = [x]G$,
 where $Q$ is a point on $\mathbb{E}$ and $G$ is a generator on $\mathbb{E}$ of order $n$.
-The probability of solving the ECDLP using any PPT algorithm $\mathcal{D}$ is defined as:
+The probability of solving the ECDLP using any PPT algorithm $\mathcal{D}_c$ is:
 %For any PPT algorithm $\mathcal{D}$ is used to calculate $x$, we define the probability of finding $x$ as: %Therefore, the probability of finding $x$ using a probabilistic polynomial time (PPT) algorithm is negligible.
 \begin{equation*}
-{\rm Pr}\{\mathcal{D}(G, [x]G)=x\} = \epsilon_{c}(k)
+{\rm Pr}\{\mathcal{D}_c(G, [x]G)=x\} = \epsilon_{c}(k)
 \end{equation*}
 %where ${\rm Pr}\{\}$ denotes the probability.
 where $k$ denotes the security parameter and $\epsilon_{c}(k)$ becomes negligible when $k$ is sufficiently large.
@@ -310,7 +310,7 @@ Therefore,
     from random variables on $\mathbb{E}$, where $t$ is random in $\mathbb{Z}_n$.} %and unknown to the IdP.}
 
 \vspace{0.75mm}
-\noindent{\textsc{Proof.} 
+\noindent{\textsc{Proof.}
 Since $\mathbb{E}$ is a finite cyclic group     and the number of points on $\mathbb{E}$ is $n$,
  $ID_{RP} = [r]G$ is also a generator on $\mathbb{E}$ of order $n$ as $G$ is a generator of order $n$.
 According to the \dyu~model, $t$ is randomly chosen in $\mathbb{Z}_n$ and kept unknown to the IdP.
@@ -352,7 +352,7 @@ Note that a login instance $L$ includes the user's account at the RP.
 
 Malicious RPs colluding with malicious users, attempt to link login instances
         of honest users across these malicious RPs.
-We prove that UPPRESSO prevents RP-based identity linkage, by showing that, 
+We prove that UPPRESSO prevents RP-based identity linkage, by showing that,
     given a login instance $L'$ by an honest user $U'$ to one of $c+1$ malicious RP,
     the colluding adversaries cannot distinguish a login instance by $U'$ to any of other $c$ malicious RP
         from the login instances by any honest users to the $c$ malicious RPs.
@@ -389,12 +389,12 @@ given a login instance $L'$ by an honest user $U'$ to a malicious RP,
 \noindent\textsc{Proof.}
 % Without loss of generality, consider an arbitrary login instance in which a user (denoted by $u'$) logs in to the $c$th malicious RP. The RP obtains $L'=(ID_{RP_c}, t', Acct'_c)$, where $ID_{RP_c}=[r_c]G$ and $Acct'_c=[u'r_c]G$. If this user has previously logged in to at least one colluding RP, she should be in $\mathbb{U}_c$, and her login information should be in the related views. Hence, in RP-based linkage, $RP_c$ attempts to associate $L'$ with any record $L^*$ in $\mathbb{V}_j$s, where $L^*=([r_k]G, t_{u'k}, [u'r_k]G)$ and $k \in [1,c]$.
 %
-First, consider a malicious RP denoted as $RP'$ that receives a login instance $L'$ by an honest user $U'$, 
+First, consider a malicious RP denoted as $RP'$ that receives a login instance $L'$ by an honest user $U'$,
     the other $c$ malicious RPs denoted as $RP_j$ ($1 \leq j \leq c$), and no malicious user.
 According to Lemma 2, a pair of $RP_j$ and $RP'$ cannot decide whether a login instance initiated by $U'$ to $RP'$,
         is initiated by one of the users visiting $RP_j$ or not.
 
-After $RP'$ colludes with each $RP_j$ ($1 \leq j \leq c$), 
+After $RP'$ colludes with each $RP_j$ ($1 \leq j \leq c$),
   we find that, given $L'$ initiated by $U'$ to $RP'$,
     the adversaries cannot distinguish a login instance by $U'$ to any $RP_j$,
         from the login instances by any users to $RP_j$ ($1 \leq j \leq c$).
@@ -403,7 +403,7 @@ Therefore, given a login instance $L'$ by $U'$ to a malicious RP,
         from the login instances by any users to the $c$ malicious RPs.
 
 Next, when colluding with $v$ malicious users,
-    according to Lemma 3, 
+    according to Lemma 3,
     $RP_j$ ($1 \leq j \leq c$) and $RP'$ cannot decide whether a login instance by $U'$ to $RP'$,
         is initiated by one of the $v$ malicious users visiting $RP_j$ ($1 \leq j \leq c$) or not,
  unless $U'$ is malicious and reveal his identity to $RP'$.
@@ -451,6 +451,13 @@ The adversary succeeds in the game with $\mathbf{Adv}_{A}$:
 &{\mathbf{Adv}}_{A}=|{\rm Pr}_1-{\rm Pr}_2|
 \end{align*}
 
+\begin{figure}[tb]
+  \centering
+  \includegraphics[width=0.99\linewidth]{fig/dalgorithm-lemma2.pdf}
+  \caption{The PPT algorithm $\mathcal{D}^*_r$ constructed based on the RP-based identity linkage game, to solve the ECDDH problem.}
+  \label{fig:dalgorithm}
+\end{figure}
+
 Based on $\mathcal{G}_r$, we design a PPT algorithm $\mathcal{D}^*_r$ to solve the elliptic curve decisional Diffie-Hellman (ECDDH) problem:
  given $(G, [x]G$, $[y]G$, $[z]G)$, decide $z = xy$ or $z$ is randomly chosen in $\mathbb{Z}_n$,
     where $G$ is a point on an elliptic curve $\mathbb{E}$ of order $n$, and $x$ and $y$ are integers randomly and independently chosen in $\mathbb{Z}_n$.
@@ -462,7 +469,7 @@ The probability of solving the ECDDH problem using $\mathcal{D}^*_r$ is defined 
 Due to the ECDDH assumption,
     $\epsilon_{r}(k)$ is negligible when the security parameter $k$ is sufficiently large.
 
-As shown in Figure \ref{fig:}, the input of $\mathcal{D}^*_r$ is in the form of $(G$, $Q_1=[x]G$, $Q_2=[y]G$, $Q_3=[z]G)$. Upon receiving the input,
+As shown in Figure \ref{fig:dalgorithm}, the input of $\mathcal{D}^*_r$ is in the form of $(G$, $Q_1=[x]G$, $Q_2=[y]G$, $Q_3=[z]G)$. Upon receiving the input,
 the challenger randomly chooses $u_i \in \mathbb{Z}_n$ ($1 \leq i \leq v$), $r \in [1, n)$, $t_i \in [1, n)$ ($1 \leq i \leq v$) and $t' \in [1, n)$, and constructs $\mathbb{L} = \{{L_i}\} = \{([r]G, t_i, [u_ir]G)\}$.
 Then, the challenger randomly select $d$, replaces $[u_dr]G$ with $[r]Q_1$ in $L_d$.
  That is, $\mathbb{L} = \{([r]G, t_d, [r]Q_1)\} \cup \{([r]G, t_i, [u_ir]G)\}$ ($1 \leq i \leq d-1, d+1 \leq i \leq v$).
@@ -488,7 +495,7 @@ The ECDDH assumption means that in $\mathcal{G}_r$ the adversary does not have a
 \oldc
 \vspace{1mm}
 \noindent\textsc{Lemma 3.} {\em For $c+1$ RPs,
-    the login instances to $c$ RPs by $v$ users are denoted as 
+    the login instances to $c$ RPs by $v$ users are denoted as
  $\mathfrak{L}=\left \{ \begin{matrix}
 L_{1,1},&L_{1,2},&\cdots,&L_{1,c}\\
 L_{2,1},& L_{2,2},&\cdots,&L_{2,c}\\
@@ -519,21 +526,25 @@ The $c+1$ RPs cannot collude to decide
 
 
 \vspace{0.75mm}
-\noindent{\textsc{Proof.} First, we define a RP-based identity linkage game $\mathcal{G}_r$ between an adversary and a challenger based on the shared knowledge $\mathfrak{L}$: the adversary receives $L'$ and $\mathfrak{L}$ from the challenger and outputs the result $s = 1$ if it decides $u' \in \{u_1, u_2, \cdots, u_v\}$ or $s = 0$ if $u'$ is randomly chosen in $\mathbb{Z}_n$. The adversary's advantage in $\mathcal{G}_r$ can be defined as $\mathbf{Adv}_{A}$:
+\noindent{\textsc{Proof.} We define a RP-based identity linkage game $\mathcal{G}_r$ between an adversary and a challenger:
+ the adversary receives $L'$ and $\mathfrak{L}$ from the challenger and outputs the result $s = 1$ if it decides $u' \in \{u_1, u_2, \cdots, u_v\}$ or $s = 0$ if $u'$ is randomly chosen in $\mathbb{Z}_n$.
+The adversary succeeds in the game with $\mathbf{Adv}_{A}$:
 \begin{align*}
 &{\rm Pr}_1={\rm Pr}\{\mathcal{G}_r(\mathfrak{L}, L'|ID_{U'} \in \{ID_{U_1}, ID_{U_2}, \cdots, ID_{U_v}\})=1\} \\
 &{\rm Pr}_2={\rm Pr}\{\mathcal{G}_r(\mathfrak{L}, L'|ID_{U'} \in \mathbb{Z}_n)=1\}\\
-&{\mathbf{Adv}}_{A}=|{\rm Pr}'_1-{\rm Pr}'_2|
+&{\mathbf{Adv}}_{A}=|{\rm Pr}_1-{\rm Pr}_2|
 \end{align*}
 
 %We define the RP-based identity linkage game $\mathcal{G}_r$: after receiving $\mathfrak{L}$ and $L'$ from a challenger, the adversary outputs the result $s = 1$ if it decides $u' \in \{u_1, u_2, \cdots, u_v\}$ or $s = 0$ if $u'$ is randomly chosen in $\mathbb{Z}_n$. The adversary's advantage in $\mathcal{G}_r$ is defined as $\mathbf{Adv}_{A}$. %If the adversary is able to distinguish whether $u' \in \{u_1, u_2, \cdots, u_v\}$ or not, the adversary will have non-negligible advantages in $\mathcal{G}_r$ and ${\rm Adv}_A$ is non-negligible.
 
-We design a PPT algorithm $\mathcal{D}^*_r$ based on the game $\mathcal{G}_r$, as shown in Figure \ref{fig:dalgorithm}, to solve the elliptic curve decisional Diffie-Hellman (ECDDH) problem: given $a=(G, [x]G$, $[y]G$, $[xy]G)$ and $b=(G, [x]G$, $[y]G$, $[z]G)$, distinguish between $(G, [x]G$, $[y]G$, $[xy]G)$ and $(G, [x]G$, $[y]G$, $[z]G)$,
- where $G$ is a point on an elliptic curve $\mathbb{E}$ of order $n$, and $x$, $y$, and $z$ are integers randomly and independently chosen in $\mathbb{Z}_n$.
- The probability using $\mathcal{D}^*_r$ is defined as $\epsilon_{r}(k) = |{\rm Pr}^*_1 - {\rm Pr}^*_2|$, where:
+We design a PPT algorithm $\mathcal{D}^*_r$ based on $\mathcal{G}_r$, %as shown in Figure \ref{fig:dalgorithm},
+ to solve the ECDDH problem:
+ given $(G, [x]G$, $[y]G$, $[z]G)$, decide $z = xy$ or $z$ is randomly chosen in $\mathbb{Z}_n$,
+    where $G$ is a point on an elliptic curve $\mathbb{E}$ of order $n$, and $x$ and $y$ are integers randomly and independently chosen in $\mathbb{Z}_n$.
+The probability of solving the ECDDH problem using $\mathcal{D}^*_r$ is defined as $\epsilon_{r}(k) = |{\rm Pr}^*_1 - {\rm Pr}^*_2|$, where:
 \begin{align*}
-&{\rm Pr}_1 =  {\rm Pr}\{\mathcal{D}(G, [x]G, [y]G, [xy]G)=1\} \\
-&{\rm Pr}_2 =  {\rm Pr}\{\mathcal{D}(G, [x]G, [y]G, [z]G)=1\}
+&{\rm Pr}^*_1 =  {\rm Pr}\{\mathcal{D}^*(G, [x]G, [y]G, [xy]G)=1\} \\
+&{\rm Pr}^*_2 =  {\rm Pr}\{\mathcal{D}^*(G, [x]G, [y]G, [z]G)=1\}
 \end{align*}
 Due to the ECDDH assumption,
     $\epsilon_{r}(k)$ is negligible when the security parameter $k$ is sufficiently large.
@@ -573,9 +584,3 @@ The ECDDH assumption means that in $\mathcal{G}_r$ the adversary does not have a
 %    (indistinguishability of users to colluding RPs).
 \hfill $\square$
 
-\begin{figure}[tb]
-  \centering
-  \includegraphics[width=0.97\linewidth]{fig/dalgorithm.pdf}
-  \caption{The PPT algorithm $\mathcal{D}^*_r$ constructed based on the RP-based identity linkage game to solve the ECDDH problem.}
-  \label{fig:dalgorithm}
-\end{figure}
