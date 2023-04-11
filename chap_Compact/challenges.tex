@@ -41,22 +41,21 @@ Section \ref{analysis-security}.
 \subsection{Identity Transformation}
 \label{subsec:solutions}
 
-\textcolor{blue}{We aim to develop a privacy-preserving SSO system that ensures the security properties while preventing both IdP-based login tracing and RP-based identity linkage.
+We aim to develop a privacy-preserving SSO system that ensures security properties while preventing both IdP-based login tracing and RP-based identity linkage.
 %We explicitly distinguish a user's identity (or \emph{account}) at an RP,
 %     from the user's \emph{identity} at an IdP and the user's \emph{pseudo-identities} enclosed in identity tokens.
-In UPPRESSO, these requirements are satisfied through \emph{transformed identities} in the identity tokens. Table \ref{tbl:notations-dilemma} lists the notations used in this paper.
-The subscript $j$ and/or the superscript $i$ may be ignored if it does not cause ambiguity.}
+In \usso, these requirements are satisfied through \emph{transformed identities} in the identity tokens. Table \ref{tbl:notations-dilemma} lists the notations used in this paper.
+The subscript $j$ and/or the superscript $i$ may be ignored if it does not cause ambiguity.
 
-\textcolor{blue}{In an SSO login flow,
-a user initiates the process by negotiating an \emph{ephemeral} pseudo-identity $PID_{RP}$  with the target RP and sending an identity-token request that encloses $PID_{RP}$ to the IdP.
-After successful authenticating the user as $ID_U$, the IdP calculates an \emph{ephemeral} $PID_U$ based on $ID_U$ and $PID_{RP}$ and issues an identity token that binds $PID_U$ and $PID_{RP}$. Upon receiving a token with a matching $PID_{RP}$, the RP calculates the user's \emph{permanent} $Acct$ and authorizes the token holder to login.
+\newc
+In an SSO login flow, a user initiates the process by negotiating an \emph{ephemeral} pseudo-identity $PID_{RP}$  with the target RP and sending an identity-token request that encloses $PID_{RP}$ to the IdP.
+After successfully authenticating the user as $ID_U$, the IdP calculates an \emph{ephemeral} $PID_U$ based on $ID_U$ and $PID_{RP}$ and issues an identity token that binds $PID_U$ and $PID_{RP}$. Upon receiving a token with a matching $PID_{RP}$, the RP calculates the user's \emph{permanent} $Acct$ and authorizes the token holder to log in.
 %
 %Given a user,
 %    (\emph{a}) an identity token contains only pseudo-identities, i.e., $PID_{U,j}^i$ and $PID_{RP_j}^i$,
 %        which are independent of each other for different RPs and in multiple login instances, respectively,
 %    and (\emph{b}) these \emph{ephemeral} pseudo-identities enable the target RP to derive a \emph{permanent} account, i.e., $Acct_j$.
-The relationships among the permanent and ephemeral (pseudo-)identities are depicted in Figure \ref{fig:IDCorrelation}, where the \emph{red} and \emph{green} blocks represent \emph{permanent} and \emph{ephemeral} (pseudo-)identities, respectively, and
-the labeled arrows denote the transformations of (pseudo-)identities.}
+The relationships among the permanent and ephemeral (pseudo-)identities are depicted in Figure \ref{fig:IDCorrelation}, where the \emph{red} and \emph{green} blocks represent \emph{permanent} and \emph{ephemeral} (pseudo-)identities, respectively, and the labeled arrows denote the transformations of (pseudo-)identities.
 %It describes the {\em identity dilemma} of privacy-preserving SSO as below:
 
 %An identity token binds the (pseudo-)identities of an authenticated user and an RP.
@@ -64,7 +63,7 @@ the labeled arrows denote the transformations of (pseudo-)identities.}
 %    to prevent the IdP-based login tracing,
 %    we should not reveal the target RP's permanent identity (i.e., $ID_{RP}$) to the IdP.
 
-\textcolor{blue}{To ensure RP designation, $PID_{RP}$ should be \emph{uniquely} associated with the target RP.
+To ensure RP designation, $PID_{RP}$ should be \emph{uniquely} associated with the target RP.
 For user identification, the \emph{ephemeral} $PID_{U}^i$ in each login instance should enable the RP to derive the user's \emph{permanent} account  (i.e., $Acct$) at this RP.
 To prevent IdP-based login tracing, it is essential to ensure that the IdP does not obtain any information about $ID_{RP}$ from any $PID_{RP}^i$.
 Thus, in a user's multiple login instances to the same RP, he should generate independent $PID_{RP}^i$\footnote{The IdP should not be able to link multiple login instances to a given RP, while the RP's identity is unknown to the IdP.} % the IdP-based login tracing is still effective, to correlate a user's multiple login instances.
@@ -94,9 +93,11 @@ From the target RP's view,
 $\mathcal{F}_{Acct}(PID_{U}, PID_{RP}) = Acct$, calculated by the RP.
 Given $ID_U$ and $ID_{RP}$, $Acct$ is %\emph{permanent} and
 \emph{unique} to other accounts at this RP.
-That is, in a user's any two different login instances to the RP,
+That is, in a user's two different login instances to the RP,
  $\mathcal{F}_{Acct}(PID_{U}^i, PID_{RP}^i) = \mathcal{F}_{Acct}(PID_{U}^{i'}, PID_{RP}^{i'})$.
-\end{itemize}}
+\end{itemize}
+
+\oldc
 
 \begin{figure}[bt]
   \centering
