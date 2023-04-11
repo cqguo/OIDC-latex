@@ -91,7 +91,7 @@ Malicious RPs may collude with each other or with malicious users attempting to 
 \subsection{The Dolev-Yao-Style Model for \usso}
 \label{dy-model}
 
-We develop a Dolev-Yao-style model \cite{SPRESSO} for \usso, referred to as the DYU model, to formalize the login flow of \usso. % which has been used in the formal analysis of SSO protocols such as OAuth 2.0 \cite{FettKS16} and OIDC \cite{FettKS17}.
+We develop a Dolev-Yao-style model \cite{SPRESSO} for \usso, referred to as the \dyu{ }model, to formalize the login flow of \usso. % which has been used in the formal analysis of SSO protocols such as OAuth 2.0 \cite{FettKS16} and OIDC \cite{FettKS17}.
 It abstracts the entities in a web system, such as web servers and browsers, as \emph{atomic processes}, %which communicate with each other through events. % such as HTTPS requests and responses.
 and defines \emph{script processes} to formulate client-side scripts.
 %The script is dependently invoked by the browser to process the server-defined logic.%such as verifying $Certificate_{RP}$. %postmessage events; %atomic process <-> script process, communication. %Other events change self-trigger.
@@ -187,7 +187,7 @@ This violates the ECDLP assumption. Thus, the probability of finding $t$ and $t'
 
 \vspace{0.75mm}
 \noindent\textsc{Proof.}
-To issue an identity token requested for accessing $PID_{RP}$, the honest IdP calculates $PID_U = [ID_U]PID_{RP}$ following Equation \ref{equ:PIDU} after authenticating the user with $ID_U$. The designated RP then calculates $Acct = [t^{-1}]PID_{U} = [ID_U]ID_{RP}$ following Equation \ref{equ:AccountNotChanged}.
+To issue an identity token requested for $PID_{RP}$, the honest IdP calculates $PID_U = [ID_U]PID_{RP}$ following Equation \ref{equ:PIDU} after authenticating the user with $ID_U$. The designated RP then calculates $Acct = [t^{-1}]PID_{U} = [ID_U]ID_{RP}$ following Equation \ref{equ:AccountNotChanged}.
 $Acct = [ID_U]ID_{RP}$ is a \emph{permanent} identifier that is determined once the RP and the user have registered at the IdP. Therefore, $PID_U$ in $TK$ always identifies an $Acct$ at the RP, and $Acct$ is mapped to a user with $ID_U$.
 
 Next, we prove that it \emph{uniquely} identifies one user in the system and one account at the RP. Since $\mathbb{E}$ is a finite cyclic group, $ID_{RP} = [r]G$ is also a generator on $\mathbb{E}$ of order $n$. Given a user with $ID_U$, $Acct = [ID_U]ID_{RP}$ is a unique point on $\mathbb{E}$ for $1 \leq u < n$, which is uniquely associated with $ID_U=u$. \hfill $\square$
@@ -246,7 +246,7 @@ Following the login flow of \usso, when the confidentiality and integrity of ide
 Meanwhile, if an adversary presents an identity token to an honest RP, which may be issued to the adversary for accessing another RP or to an honest user for accessing a colluding RP, RP designation and user identification ensure that from this identity token, the honest RP should not derive an account of an honest user.
 %Meanwhile, $PID_U$ can only be calculated by the IdP and the user, since no one else knows or could intercept $u$ according to the DYU model. \oldc
 
-According to the login flow and the DYU model, an honest user always obtains identity tokens issued to herself, since $PID_U$ is calculated based on her own identity, which is protected against adversaries. The confidentiality and integrity of identity tokens ensure that an honest user will not present any token issued to someone else to an honest RP. Finally, with user identification\footnote{RP designation is a precondition of user identification in \usso, but this may not always be necessary for other SSO systems.}, her own identity tokens will always point to her account at the target RP.
+According to the login flow and the \dyu~model, an honest user always obtains identity tokens issued to herself, since $PID_U$ is calculated based on her own identity, which is protected against adversaries. The confidentiality and integrity of identity tokens ensure that an honest user will not present any token issued to someone else to an honest RP. Finally, with user identification\footnote{RP designation is a precondition of user identification in \usso, but this may not always be necessary for other SSO systems.}, her own identity tokens will always point to her account at the target RP.
 %According to the conclusions of the DYU model, $PID_U$ is calculated based on the user when the IdP issues an identity token for an authenticated user.
 %Moreover, because the confidentiality and integrity of identity tokens are satisfied, an honest user never presents a valid token that is issued to other users.
 %When the user identification is satisfied, this token always derives this honest user's account.
@@ -338,13 +338,13 @@ In UPPRESSO with $c+1$ malicious RPs and $v$ malicious users, given a login inst
 \noindent\textsc{Proof.}
 % Without loss of generality, consider an arbitrary login instance in which a user (denoted by $u'$) logs in to the $c$th malicious RP. The RP obtains $L'=(ID_{RP_c}, t', Acct'_c)$, where $ID_{RP_c}=[r_c]G$ and $Acct'_c=[u'r_c]G$. If this user has previously logged in to at least one colluding RP, she should be in $\mathbb{U}_c$, and her login information should be in the related views. Hence, in RP-based linkage, $RP_c$ attempts to associate $L'$ with any record $L^*$ in $\mathbb{V}_j$s, where $L^*=([r_k]G, t_{u'k}, [u'r_k]G)$ and $k \in [1,c]$.
 %
-First, consider a malicious RP denoted as $RP'$ that receives a login instance $L'$ by an honest user $U'$, the other $c$ malicious RPs denoted as $RP_j$ ($1 \leq j \leq c$), and no malicious user.
+We first consider a malicious RP denoted as $RP'$ that receives a login instance $L'$ by an honest user $U'$, the other $c$ malicious RPs denoted as $RP_j$ ($1 \leq j \leq c$), and no malicious user.
 According to Lemma 2, a pair of $RP_j$ and $RP'$ cannot decide whether a login instance initiated by $U'$ to $RP'$ is initiated by one of the users visiting $RP_j$ or not.
 
 After $RP'$ colludes with each $RP_j$ ($1 \leq j \leq c$),  we find that, given $L'$ initiated by $U'$ to $RP'$, the adversaries cannot distinguish a login instance by $U'$ to any $RP_j$, from the login instances by any users to $RP_j$ ($1 \leq j \leq c$).
 Therefore, given a login instance $L'$ by $U'$ to a malicious RP, the adversaries cannot distinguish a login instance by $U'$ to any of the other $c$ malicious RPs, from the login instances by any users to the $c$ malicious RPs.
 
-Next, when colluding with $v$ malicious users, according to Lemma 3, $RP_j$ ($1 \leq j \leq c$) and $RP'$ cannot decide whether a login instance by $U'$ to $RP'$ is initiated by one of the $v$ malicious users visiting $RP_j$ ($1 \leq j \leq c$) or not unless $U'$ is malicious and reveal his identity to $RP'$.
+Next, when colluding with $v$ malicious users, according to Lemma 3, $RP_j$ ($1 \leq j \leq c$) and $RP'$ cannot decide whether a login instance by $U'$ to $RP'$ is initiated by one of the $v$ malicious users visiting $RP_j$ ($1 \leq j \leq c$) or not, unless $U'$ is malicious and reveal his identity to $RP'$.
 So, the collusion with malicious users does not bring benefits for the adversaries, to link an honest user's login instances across colluding RPs. So UPPRESSO prevents RP-based identity linkage, even when malicious RPs are colluding with malicious users.
 
 %Besides, when a malicious user (denoted by $u''$) logs in to $RP_c$ while not revealing his identity, $RP_c$ cannot tell if he is in the malicious user group $\{u_1,...,u_v\}$, according to Lemma 3.
@@ -371,7 +371,7 @@ So, the collusion with malicious users does not bring benefits for the adversari
 
 
 \noindent\textsc{Lemma 2.} {\em Given the login instances to $RP$ by $v$ users denoted as $\mathbb{L} = \{{L_i}\}$, where $L_i = ([r]G, t_i, [u_i r]G)$ and $1 \leq i \leq v$,
-    two RPs $RP$ and $RP'$, cannot collude to decide whether a login instance to $RP'$ denoted as $L' = (ID_{RP'}, t', [ID_{U'}]ID_{RP'})$, is initiated by one of the $v$ users or not, i.e., $ID_{U'} \in \{u_i\}$ ($1 \leq i \leq v$) or $ID_{U'} \in \mathbb{Z}_n$.}
+    two colluding RPs, $RP$ and $RP'$, cannot decide whether a login instance to $RP'$ denoted as $L' = (ID_{RP'}, t', [ID_{U'}]ID_{RP'})$, is initiated by one of the $v$ users or not, i.e., $ID_{U'} \in \{u_i\}$ ($1 \leq i \leq v$) or $ID_{U'} \in \mathbb{Z}_n$.}
 
 
 
@@ -406,21 +406,22 @@ The probability of solving the ECDDH problem using $\mathcal{D}^*_r$ is defined 
 According to the ECDDH assumption,
     $|{\rm Pr}^*_1 - {\rm Pr}^*_2| = \epsilon_{r}(k)$ becomes negligible when the security parameter $k$ is sufficiently large.
 
-As shown in Figure \ref{fig:dalgorithm}, the input of $\mathcal{D}^*_r$ is in the form of ($G, Q_1=[x]G, Q_2=[y]G, Q_3=[z]G$). Upon receiving the input, the challenger randomly chooses $u_i \in \mathbb{Z}_n$ ($1 \leq i \leq v$), $r \in [1, n)$, $t_i \in [1, n)$ ($1 \leq i \leq v$) and $t' \in [1, n)$, and constructs $\mathbb{L} = \{{L_i}\} = \{([r]G, t_i, [u_ir]G)\}$.
-Then, the challenger randomly select $d$, replaces $[u_dr]G$ with $[r]Q_1$ in $L_d$. That is, $\mathbb{L} = \{([r]G, t_d, [r]Q_1)\} \cup \{([r]G, t_i, [u_ir]G)\}$ ($1 \leq i \leq d-1, d+1 \leq i \leq v$). The challenger constructs $L' = (Q_2, t', Q_3)$. When the adversary receives $\mathbb{L}$ and $L'$, it outputs $s$.
+As shown in Figure \ref{fig:dalgorithm}, the input of $\mathcal{D}^*_r$ is in the form of ($G, Q_1=[x]G, Q_2=[y]G, Q_3=[z]G$).
+Upon receiving the input, the challenger randomly chooses $u_i$, $r$, $t_i$, and $t'$ in $\mathbb{Z}_n$ for $1 \leq i \leq v$, and assigns $\mathbb{L} = \{{L_i}\} = \{([r]G, t_i, [u_ir]G)\}$.
+Then, it randomly selects $d \in [1,v]$, replaces $[u_dr]G$ with $[r]Q_1$ in $L_d$; i.e., $\mathbb{L} = \{([r]G, t_d, [r]Q_1)\} \cup \{([r]G, t_i, [u_ir]G)\}$ ($1 \leq i \leq d-1$, $d+1 \leq i \leq v$). Finally, the challenger constructs $L' = (Q_2, t', Q_3)$. When the adversary receives $\mathbb{L}$ and $L'$, it outputs $s$.
 
 
 According to the above construction of $\mathbb{L}$ and $L'$,
- $x$ is actually inserted into $\mathbb{L}$ as $u_d$, and $z/y$ is assigned to $ID_{U'} = u'$.
- So, if $z = xy$, then $z/y = x$ and $ID_{U'} \in \{u_i\}$; otherwise, $ID_{U'} \in \mathbb{Z}_n$.
-The probability $|{\rm Pr}^*_1 - {\rm Pr}^*_2|$ of solving the ECDDH problem using $\mathcal{D}^*_r$ is formulated as:
+ $x$ is actually inserted into $\mathbb{L}$ as $u_d$, and $z/y$ is assigned to $ID_{U'}$.
+Thus, if $z = xy$, then $z/y = x$ and $ID_{U'} \in \{u_i\}$; otherwise, $ID_{U'} \in \mathbb{Z}_n$.
+The probability $|{\rm Pr}^*_1 - {\rm Pr}^*_2|$ of solving the ECDDH problem using $\mathcal{D}^*_r$ is deduced as:
 \begin{align*}
-&{\rm Pr}^*_1 =  {\rm Pr}\{\mathcal{D}^*_r(G, [x]G, [y]G, [xy]G)=1\} \\=&{\rm Pr}\{\mathcal{G}_r(\mathbb{L}, L'|ID_{U'} \in \{ID_{U_1}, ID_{U_2}, \cdots, ID_{U_v}\})=1\} = {\rm Pr}_1 \\
+&{\rm Pr}^*_1 =  {\rm Pr}\{\mathcal{D}^*_r(G, [x]G, [y]G, [xy]G)=1\} \\=&{\rm Pr}\{\mathcal{G}_r(\mathbb{L}, L'|ID_{U'} \in \{u_1, u_2, \cdots, u_v\})=1\} = {\rm Pr}_1 \\
 &{\rm Pr}^*_2= {\rm Pr}\{\mathcal{D}^*_r(G, [x]G, [y]G, [z]G)=1\} \\=&  {\rm Pr}\{\mathcal{G}_r(\mathbb{L}, L'|ID_{U'} \in \mathbb{Z}_n)=1\} = {\rm Pr}_2\\
 &|{\rm Pr}^*_1-{\rm Pr}^*_2|=|{\rm Pr}_1-{\rm Pr}_2|={\mathbf{Adv}}_{A}
 \end{align*}
 
-If the probability of distinguishing a user $U'$ chosen from \{${U_1}, {U_2}, \cdots, {U_v}$\} or randomly from the universal user set is non-negligible,
+If the probability of distinguishing a login instance initiated by a user $U'$ chosen from \{${U_1}, {U_2}, \cdots, {U_v}$\} or randomly from the universal user set is non-negligible,
     then the adversary would have advantages in $\mathcal{G}_r$ and $|{\rm Pr}^*_1-{\rm Pr}^*_2|=|{\rm Pr}_1-{\rm Pr}_2|$ is non-negligible regardless of $k$.
 This violates the ECDDH assumption.
 Thus, If the probability of distinguishing a user $U'$ chosen from \{${U_1}, {U_2}, \cdots, {U_v}$\} or from the universal user set is negligible.
@@ -514,6 +515,6 @@ The probability $\epsilon_{r}(k)$ of solving the ECDDH problem using $\mathcal{D
 \epsilon_{r}(k) = |{\rm Pr}_1-{\rm Pr}_2|={\mathbf{Adv}}_{A}
 \end{equation*}
 
-The ECDDH assumption means that in $\mathcal{G}_r$ the adversary does not have advantages, i.e., cannot distinguish a user chosen from \{$u_1, u_2, \cdots, u_v$\} or from the universal user set.
+The ECDDH assumption means that in $\mathcal{G}_r$ the adversary does not have advantages, i.e., cannot distinguish a user chosen from \{${U_1}, {U_2}, \cdots, {U_v}$\} or from the universal user set.
 %    (indistinguishability of users to colluding RPs).
 \hfill $\square$
