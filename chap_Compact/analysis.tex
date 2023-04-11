@@ -233,26 +233,24 @@ As all the communications between the IdP, RPs, and users are protected by HTTPS
 
 
 \vspace{3mm}
-\noindent\textsc{Theorem 5. (Security)} {UPPRESSO is secure.}
+\noindent\textsc{Theorem 5. (Security)} {\usso~is secure.}
 
 \vspace{0.75mm}
 \noindent\textsc{Proof.}
-According to the formal analysis \cite{SPRESSO,FettKS14},
-    an SSO system is secure, if (\emph{a}) an adversary never presents an identity token that is accepted by an honest RP to derive an honest user's account at this RP
-    and (\emph{b}) an honest user never presents an identity token that is accepted by an honest RP to derive another user's account at this RP.
+According to the formal analysis on SSO security \cite{SPRESSO,FettKS14}, an SSO system that is secure against malicious users and RPs in the first adversarial scenario should satisfy two requirements: (\emph{a}) an adversary should not be able to obtain a valid identity token of an honest user and present it to an honest RP, and (\emph{b}) an honest user should not present a valid identity token that is not issued for herself to an honest RP.
+%(\emph{a}) an adversary never presents an identity token that is accepted by an honest RP to derive an honest user's account at this RP and (\emph{b}) an honest user never presents an identity token that is accepted by an honest RP to derive another user's account at this RP.
 
 %In a secure SSO that is robust against impersonation attacks, an honest user should be able to prove her identity to the target RP with an identity token issued by the IdP. As pseudo-identities are used in \usso, an RP needs to verify that ({\em a}) $PID_{RP}$ in the received identity token is a transformation from its own $ID_{RP}$ and tied to the current login instance, which requires {\em RP designation}; and ({\em b}) $PID_U$ included in the identity token can be associated with a unique, long-term user account it maintains, which requires {\em user identification}. Besides, the identity token for an honest RP should not be intercepted by malicious users or RPs, requiring the {\em confidentiality of identity tokens}, nor be forged or tampered with to include a fake $PID_U$ or $PID_{RP}$, requiring the {\em integrity of identity tokens}.
 
-When the confidentiality and integrity of identity tokens are satisfied, an adversary cannot present a valid identity token issued for honest users and accepted by an honest RP.
-When RP designation and user identification are satisfied, an identity token issued to an adversary always derives the adversary's account at the target RP.
-So, an adversary never presents an identity token that is accepted by an honest RP to derive an honest user's account at this RP.
-
+Following the login flow of \usso, if the confidentiality and integrity of identity tokens are satisfied, no adversary could obtain a valid identity token that is issued to an honest user for accessing an honest RP. %and accepted by an honest RP.
+Meanwhile, if an adversary presents a wrong identity token to an honest RP, which may be issued to the adversary for accessing another RP or to an honest user for accessing a colluding RP, RP designation and user identification ensure that from this identity token, the honest RP should not derive an account of an honest user.
 %Meanwhile, $PID_U$ can only be calculated by the IdP and the user, since no one else knows or could intercept $u$ according to the DYU model. \oldc
 
-According to the conclusions of the DYU model, $PID_U$ is calculated based on the user when the IdP issues an identity token for an authenticated user.
-Moreover, because the confidentiality and integrity of identity tokens are satisfied, an honest user never presents a valid token that is issued to other users.
-When the user identification is satisfied,\footnote{It is worth noting that RP designation is a precondition of user identification in UPPRESSO. Meanwhile, in other SSO systems, RP designation is not always a precondition of user identification.} this token always derives this honest user's account.
-So, an honest user never presents an identity token that is accepted by an honest RP to derive another user’s account at this RP.
+According to the login flow and the DYU model, an honest user always obtains identity tokens issued to herself, since $PID_U$ is calculated based on her own identity, which is protected against adversaries. The confidentiality and integrity of identity tokens ensure that an honest user will not present any token issued to someone else to an honest RP. Finally, with user identification\footnote{RP designation is a precondition of user identification in \usso, but this may not always be necessary in other SSO systems.}, her own identity tokens will always point to her account at the target RP. 
+%According to the conclusions of the DYU model, $PID_U$ is calculated based on the user when the IdP issues an identity token for an authenticated user.
+%Moreover, because the confidentiality and integrity of identity tokens are satisfied, an honest user never presents a valid token that is issued to other users.
+%When the user identification is satisfied, this token always derives this honest user's account.
+%So, an honest user never presents an identity token that is accepted by an honest RP to derive another user’s account at this RP.
 \hfill $\square$
 
 %Finally, according to Theorems 1, 2, 3, 4 and 5, UPPRESSO is secure.
