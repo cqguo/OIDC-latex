@@ -259,25 +259,17 @@ According to the login flow and the \dyu~model, an honest user always obtains id
 
 \subsection{Privacy}
 \label{sec-:analysis}
-In this section, we prove that UPPRESSO effectively prevents privacy threats introduced by IdP-based login tracing and RP-based identity linkage.
+Next, we prove that \usso~can effectively prevent privacy threats introduced by IdP-based login tracing and RP-based identity linkage in the last two adversarial scenarios.
 
-\newc In each login instance, the IdP receives an identity-token request from a user (Step 3.1 in Section~\ref{implementations}),
- which reveals only the RP's \emph{ephemeral} pseudo-identity $PID_{RP}$ along with the user's identity $ID_U$.
-We prove that in UPPRESSO the IdP cannot trace a user's login activities,
- by showing that $PID_{RP}$ is \emph{indistinguishable} from random variables to the IdP.
-Therefore,
-    the IdP cannot (\emph{a}) link multiple login instances to a given RP,
-        or (\emph{b}) distinguish a login instance to a given RP from those to other RPs.
+\newc 
+First, we show that an honest-but-curious IdP cannot trace or link a user's login activities. In \usso, a user sends an identity-token request in each login instance to the IdP (Step 3.1 in Section~\ref{implementations}), which reveals only the RP's \emph{ephemeral} pseudo-identity $PID_{RP}$ along with the user's identity $ID_U$. The IdP cannot (\emph{a}) associate multiple login instances with different $PID_{RP}$s to a specific RP, or (\emph{b}) distinguish a login instance to one RP from other login instances to another RP based on their $PID_{RP}$s, because a $PID_{RP}$ is \emph{indistinguishable} from random variables to the IdP, as proved in Theorem 6.
 
 \vspace{1mm}
-\noindent{\textsc{Theorem 6. (Privacy against the IdP)}} {\em In UPPRESSO the IdP cannot distinguish $PID_{RP} = [t]ID_{RP}$
-    from random variables on $\mathbb{E}$, where $t$ is random in $\mathbb{Z}_n$.} %and unknown to the IdP.}
+\noindent{\textsc{Theorem 6. (Privacy against the IdP)}} {\em In \usso, the IdP cannot distinguish $PID_{RP} = [t]ID_{RP}$ from any random variable on $\mathbb{E}$, where $t$ is random in $\mathbb{Z}_n$.} %and unknown to the IdP.}
 
 \vspace{0.75mm}
 \noindent \textsc{Proof.}
-Since $\mathbb{E}$ is a finite cyclic group     and the number of points on $\mathbb{E}$ is $n$, $ID_{RP} = [r]G$ is also a generator on $\mathbb{E}$ of order $n$ as $G$ is a generator of order $n$.
-According to the \dyu~model, $t$ is randomly chosen in $\mathbb{Z}_n$ and kept unknown to the IdP.
-Therefore, $PID_{RP} = [t]ID_{RP}$ is \emph{indistinguishable} from a point $Q$ randomly chosen on $\mathbb{E}$ \cite{oprf-proved,strong-oprf}. \hfill $\square$
+Consider a finite cyclic group $\mathbb{E}$ where the number of points on $\mathbb{E}$ is $n$. Given $G$ is a generator of order $n$, $ID_{RP} = [r]G$ is also a generator on $\mathbb{E}$ of order $n$. According to the DYU model, $t$ is randomly chosen in $\mathbb{Z}_n$ and kept unknown to the IdP. Therefore, $PID_{RP} = [t]ID_{RP}$ is \emph{indistinguishable} from a point $Q$ that is randomly chosen on $\mathbb{E}$ \cite{oprf-proved,strong-oprf}. \hfill $\square$
 
 %Consider a user's two arbitrary logins to an RP where $PID^{i}_{RP} = [t]ID_{RP}$ and $PID^{i'}_{RP} = [t']ID_{RP}$, and her another login to another RP where $PID^{i''}_{RP'} = [t'']ID_{RP'}$. According to the \dyu~model, $t$, $t'$, and $t''$ are randomly selected by the IdP script and shared only with the corresponding RP through the RP script, so they are unknown to the IdP. As stated in Theorem 2, $ID_{RP} = [r]G = Q$ and $ID_{RP'} = [r']G = P$, where $P$ and $Q$ are two different points on the curve $\mathbb{E}$. Therefore, in the IdP's view, $[t]Q$, $[t']Q$, and $[t'']P$ are three random points on $\mathbb{E}$ when $t$, $t'$, and $t''$ are random and they are indistinguishable~\cite{oprf-proved}. \hfill $\square$
 
