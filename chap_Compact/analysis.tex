@@ -7,7 +7,7 @@ In this section, we define three adversarial scenarios under the threat model in
 
 Based on our design goals (i.e., the desired security and privacy guarantees) and the potential adversaries discussed in Section \ref{subsec:threatmodel}, we consider three adversarial scenarios as below.
 
-\noindent\textbf{Security.} Malicious users may collude with each other or with malicious RPs attempting to (\emph{a}) impersonate an honest user to log in to an honest RP or (\emph{b}) entice an honest user to log in to an honest RP under a malicious user's account.
+\noindent\textbf{Security.} Malicious users may collude with each other or with malicious RPs attempting to (\emph{a}) impersonate an honest user to log into an honest RP or (\emph{b}) entice an honest user to log into an honest RP under a malicious user's account.
 
 \noindent\textbf{Privacy against the IdP.}
 The honest-but-curious IdP tries to infer the identities of the RPs that a user requests to access. %or link multiple login instances to any RP initiated by a user.
@@ -261,7 +261,7 @@ According to the login flow and the \dyu~model, an honest user always obtains id
 \label{sec-:analysis}
 Next, we prove that \usso~can effectively prevent privacy threats introduced by IdP-based login tracing and RP-based identity linkage in the last two adversarial scenarios.
 
-\newc 
+\newc
 First, we show that an honest-but-curious IdP cannot trace or link a user's login activities. In \usso, a user sends an identity-token request in each login instance to the IdP (Step 3.1 in Section~\ref{implementations}), which reveals only the RP's \emph{ephemeral} pseudo-identity $PID_{RP}$ along with the user's identity $ID_U$. The IdP cannot (\emph{a}) associate multiple login instances with different $PID_{RP}$s to a specific RP, or (\emph{b}) distinguish a login instance to one RP from other login instances to another RP based on their $PID_{RP}$s, because a $PID_{RP}$ is \emph{indistinguishable} from random variables to the IdP, as proved in Theorem 6.
 
 \vspace{3mm}
@@ -291,16 +291,17 @@ Consider a finite cyclic group $\mathbb{E}$ where the number of points on $\math
 
 \vspace{2mm}
 
-Then, we consider the third adversarial scenario where $c+1$ malicious RPs collude with $v$ malicious users attempting to link login instances of honest users across these malicious RPs. That is, given an arbitrary login instance $\mathcal{L'}$ initiated by an honest user $U'$ to one of the $c+1$ malicious RPs, the colluding adversaries aim to link $\mathcal{L'}$ to $U'$'s other login instances to the remaining $c$ malicious RPs. To show that \usso~prevents such linkage, we will prove in Theorem 7 that the colluding adversaries cannot distinguish the login instances initiated by $U'$ from the ones initiated by any other honest users, requesting to log in to any of the remaining $c$ malicious RPs. As a result, given $\mathcal{L'}$, the adversaries have no clue to link it to one login instance that has been observed by a colluding RP instead of another.
+Then, we consider the third adversarial scenario where $c+1$ malicious RPs collude with $v$ malicious users attempting to link login instances of honest users across these malicious RPs.
+That is, given an arbitrary login instance $\mathcal{L'}$ initiated by an honest user $U'$ to one of the $c+1$ malicious RPs, the colluding adversaries aim to link $\mathcal{L'}$ to $U'$'s other login instances to the remaining $c$ malicious RPs. To show that \usso~prevents such linkage, we will prove in Theorem 7 that the colluding adversaries cannot distinguish the login instances initiated by $U'$ from the ones initiated by any other honest users, requesting to log into any of the remaining $c$ malicious RPs. As a result, given $\mathcal{L'}$, the adversaries have no clue to link it to one login instance that has been observed by a colluding RP instead of another.
 %Malicious RPs colluding with malicious users, attempt to link login instances of honest users across these malicious RPs. We prove that UPPRESSO prevents RP-based identity linkage, by showing that,  the colluding adversaries cannot distinguish a login instance by $U'$ to any of other $c$ malicious RP from the login instances by any honest users to the $c$ malicious RPs.
 
-Let us define the knowledge that an RP obtains from each login instance. In \usso, an RP receives a random number $t$ and an identity token enclosing $PID_{RP}$ and $PID_U$ in each login instance. Meanwhile, it knows its own identity $ID_{RP}$ and derives the user's account $Acct$. Since $PID_{RP}$ and $PID_U$ can be deduced from $ID_{RP}$ and $Acct$ with $t$, respectively, we ignore the duplicate elements and define an RP's knowledge about a login instance $\mathcal{L}$ as $L=(ID_{RP}, t, Acct)=(ID_{RP}, t, [ID_{U}]ID_{RP})$. %Note that a login instance $L$ includes the user's account at the RP.
-When $v$ malicious users collude with malicious RPs, they could notify the RPs about their own login instances. As a result, the colluding RPs could further associate their knowledge to form a shared view: %, denoted by 
+Let us define the knowledge that an RP obtains from each login instance. In \usso, an RP receives a random number $t$ and an identity token enclosing $PID_{RP}$ and $PID_U$ in each login instance. Meanwhile, it knows its own identity $ID_{RP}$ and derives the user's account $Acct$. Since $PID_{RP}$ and $PID_U$ can be deduced from $ID_{RP}$ and $Acct$ with $t$, respectively, we ignore the duplicate elements and define an RP's knowledge about a login instance as $L=(ID_{RP}, t, Acct)=(ID_{RP}, t, [ID_{U}]ID_{RP})$. %Note that a login instance $L$ includes the user's account at the RP.
+When $v$ malicious users collude with malicious RPs, they could notify the RPs about their own login instances. As a result, the colluding RPs could further associate their knowledge to form a shared view: %, denoted by
 
 {\centering $\mathfrak{L}=\left \{ \begin{matrix} L_{1,1},&L_{1,2},&\cdots,&L_{1,c} \\
 L_{2,1},& L_{2,2},&\cdots,&L_{2,c}  \\
 \cdots,&\cdots,&L_{i,j},&\cdots  \\
-L_{v,1},&L_{v,2},&\cdots,&L_{v,c} 
+L_{v,1},&L_{v,2},&\cdots,&L_{v,c}
 \end{matrix}\right\}$
 \par}
 
@@ -320,7 +321,7 @@ L_{v,1},&L_{v,2},&\cdots,&L_{v,c}
 
 \vspace{2mm}
 \noindent \textsc{Theorem 7. (Privacy against Colluding RPs)} {\em
-When $c+1$ malicious RPs and $v$ malicious users collude in \usso, given a login instance $\mathcal{L'}$ initiated by an honest user $U'$ to a malicious RP, the adversaries cannot distinguish a login instance initiated by $U'$ from the ones initiated by any other honest users to any of the remaining $c$ malicious RPs.}
+When $c+1$ malicious RPs and $v$ malicious users collude in \usso, given a login instance $\mathcal{L'}$ initiated by an honest user $U'$ to a malicious RP, the adversaries cannot distinguish a login instance by $U'$ from the ones initiated by any other honest users to any of the remaining $c$ malicious RPs.}
 
 
 %the shared knowledge $\mathbb{V}=\bigcup_{1 \le j \le c}\mathbb{V}_j$ and $\mathbb{L}=\bigcup_{1 \le j \le c}\mathbb{L}_j$ from a group of $c$ colluding RPs and $v$ colluding users, any malicious RP cannot differentiate if an honest user who has logged in to itself is among the users who have logged in to any of the colluding RPs.}
