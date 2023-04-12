@@ -1,19 +1,20 @@
 \section{Security and Privacy Analysis}
 \label{sec:analysis}
-In this section, we define three adversarial scenarios under the threat model in Section \ref{subsec:threatmodel}, develop a Dolev-Yao-style model \cite{SPRESSO} to depict the SSO login flow, and formally prove security and privacy guarantees provided by \usso~using the conditions provided by the Dolev-Yao-style model.
+We define three adversarial scenarios under the threat model in Section \ref{subsec:threatmodel}, develop a Dolev-Yao-style model \cite{SPRESSO} to depict the SSO login flow,
+ and formally prove the security and privacy guarantees provided by \usso~using the conditions analyzed in the Dolev-Yao-style model.
 
 \newc
 \subsection{Adversarial Scenarios}
 
 Based on our design goals (i.e., the desired security and privacy guarantees) and the potential adversaries discussed in Section \ref{subsec:threatmodel}, we consider three adversarial scenarios as below.
 
-\noindent\textbf{Security.} Malicious users may collude with each other or with malicious RPs attempting to (\emph{a}) impersonate an honest user to log into an honest RP or (\emph{b}) entice an honest user to log into an honest RP under a malicious user's account.
+\noindent\textbf{Security.} Malicious users might collude with each other or with malicious RPs, attempting to (\emph{a}) impersonate an honest user to log into an honest RP or (\emph{b}) entice an honest user to log into an honest RP under a malicious user's account.
 
 \noindent\textbf{Privacy against the IdP.}
 The honest-but-curious IdP tries to infer the identities of the RPs that a user requests to access. %or link multiple login instances to any RP initiated by a user.
 
 \noindent\textbf{Privacy against RPs.}
-Malicious RPs may collude with each other or with malicious users attempting to link login instances across these RPs that are initiated by a user.
+Malicious RPs might collude with each other or with malicious users, attempting to link login instances across these RPs that are initiated by a user.
 
 
 % \textcolor{blue}{Based on the threat model and assumptions proposed in Section \ref{sec:UPPRESSO},
@@ -91,9 +92,9 @@ Malicious RPs may collude with each other or with malicious users attempting to 
 \subsection{The Dolev-Yao-Style Model for \usso}
 \label{dy-model}
 
-We develop a Dolev-Yao style model \cite{SPRESSO, FettKS16, FettKS17} for \usso, referred to as the DYU model, to formalize the login flow of \usso. Dolev-Yao style models abstract cryptographic concepts into an algebra of symbolic messages to discover structural flaws using simple formal logic. % which has been used in the formal analysis of SSO protocols such as OAuth 2.0 \cite{FettKS16} and OIDC \cite{FettKS17}.
+We develop a Dolev-Yao style model \cite{SPRESSO, FettKS16, FettKS17} for \usso, referred to as the \dyu~model, to formalize the login flow of \usso. Dolev-Yao style models abstract cryptographic concepts into an algebra of symbolic messages to discover structural flaws using simple formal logic. % which has been used in the formal analysis of SSO protocols such as OAuth 2.0 \cite{FettKS16} and OIDC \cite{FettKS17}.
 
-The DYU model abstracts the entities in a web system, such as web servers and browsers, as \emph{atomic processes}, %which communicate with each other through events. % such as HTTPS requests and responses.
+The \dyu~model abstracts the entities in a web system, such as web servers and browsers, as \emph{atomic processes}, %which communicate with each other through events. % such as HTTPS requests and responses.
 and defines \emph{script processes} to formulate client-side scripts.
 %The script is dependently invoked by the browser to process the server-defined logic.%such as verifying $Certificate_{RP}$. %postmessage events; %atomic process <-> script process, communication. %Other events change self-trigger.
 The atomic processes of \usso~include an {\em IdP process}, a finite set of {\em web servers} for honest RPs, a finite set of honest {\em browsers}, and a finite set of {\em attacker processes} that model malicious RPs and malicious users.
