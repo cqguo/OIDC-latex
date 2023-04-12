@@ -264,12 +264,13 @@ Next, we prove that \usso~can effectively prevent privacy threats introduced by 
 \newc 
 First, we show that an honest-but-curious IdP cannot trace or link a user's login activities. In \usso, a user sends an identity-token request in each login instance to the IdP (Step 3.1 in Section~\ref{implementations}), which reveals only the RP's \emph{ephemeral} pseudo-identity $PID_{RP}$ along with the user's identity $ID_U$. The IdP cannot (\emph{a}) associate multiple login instances with different $PID_{RP}$s to a specific RP, or (\emph{b}) distinguish a login instance to one RP from other login instances to another RP based on their $PID_{RP}$s, because a $PID_{RP}$ is \emph{indistinguishable} from random variables to the IdP, as proved in Theorem 6.
 
-\vspace{1mm}
+\vspace{3mm}
 \noindent{\textsc{Theorem 6. (Privacy against the IdP)}} {\em In \usso, the IdP cannot distinguish $PID_{RP} = [t]ID_{RP}$ from any random variable on $\mathbb{E}$, where $t$ is random in $\mathbb{Z}_n$.} %and unknown to the IdP.}
 
 \vspace{0.75mm}
 \noindent \textsc{Proof.}
 Consider a finite cyclic group $\mathbb{E}$ where the number of points on $\mathbb{E}$ is $n$. Given $G$ is a generator of order $n$, $ID_{RP} = [r]G$ is also a generator on $\mathbb{E}$ of order $n$. According to the DYU model, $t$ is randomly chosen in $\mathbb{Z}_n$ and kept unknown to the IdP. Therefore, $PID_{RP} = [t]ID_{RP}$ is \emph{indistinguishable} from a point $Q$ that is randomly chosen on $\mathbb{E}$ \cite{oprf-proved,strong-oprf}. \hfill $\square$
+
 
 %Consider a user's two arbitrary logins to an RP where $PID^{i}_{RP} = [t]ID_{RP}$ and $PID^{i'}_{RP} = [t']ID_{RP}$, and her another login to another RP where $PID^{i''}_{RP'} = [t'']ID_{RP'}$. According to the \dyu~model, $t$, $t'$, and $t''$ are randomly selected by the IdP script and shared only with the corresponding RP through the RP script, so they are unknown to the IdP. As stated in Theorem 2, $ID_{RP} = [r]G = Q$ and $ID_{RP'} = [r']G = P$, where $P$ and $Q$ are two different points on the curve $\mathbb{E}$. Therefore, in the IdP's view, $[t]Q$, $[t']Q$, and $[t'']P$ are three random points on $\mathbb{E}$ when $t$, $t'$, and $t''$ are random and they are indistinguishable~\cite{oprf-proved}. \hfill $\square$
 
@@ -287,7 +288,12 @@ Consider a finite cyclic group $\mathbb{E}$ where the number of points on $\math
 %  $PID_{RP}$ is \emph{indistinguishable} from a random variable on $\mathbb{E}$.
 % Thus, the IdP cannot infer any information about $ID_{RP}$ from $PID_{RP} = [t]ID_{RP}$, or distinguish $[t]ID_{RP_j} = [tr]G$ from any other $[t']ID_{RP_{j'}} = [t'r']G$. So the IdP-based login tracing is impossible. $\square$
 
-\vspace{1mm}
+
+\vspace{2mm}
+
+Then, we consider the third adversarial scenario where $c+1$ malicious RPs collude with $v$ malicious users attempting to link login instances of honest users across these malicious RPs. That is, given an arbitrary login instance $L'$ initiated by an honest user $U'$ to one of the $c+1$ malicious RPs, the colluding adversaries aim to link $L'$ to $U'$'s other login instances to the remaining $c$ malicious RPs. To show that \usso~prevents such linkage, we will prove in Theorem 7 that the colluding adversaries cannot distinguish the login instances initiated by $U'$ from the ones initiated by any other honest users, requesting to log in to any of the remaining $c$ malicious RPs.
+
+%Malicious RPs colluding with malicious users, attempt to link login instances of honest users across these malicious RPs. We prove that UPPRESSO prevents RP-based identity linkage, by showing that,  the colluding adversaries cannot distinguish a login instance by $U'$ to any of other $c$ malicious RP from the login instances by any honest users to the $c$ malicious RPs.
 
 In each login instance, an RP receives $t$ %(Step 2.1 in Section~\ref{implementations})
 and an identity token %(Step 4.1)
@@ -303,8 +309,7 @@ Note that a login instance $L$ includes the user's account at the RP.
 
 %According to Equation~\ref{equ:Account}, we have $L_{i, j}=([r_j]G, t_{ij}, [u_ir_j]G)$.
 
-Malicious RPs colluding with malicious users, attempt to link login instances of honest users across these malicious RPs.
-We prove that UPPRESSO prevents RP-based identity linkage, by showing that, given a login instance $L'$ by an honest user $U'$ to one of $c+1$ malicious RP, the colluding adversaries cannot distinguish a login instance by $U'$ to any of other $c$ malicious RP from the login instances by any honest users to the $c$ malicious RPs.
+
 
 The login instances to $c$ malicious RPs by $v$ colluding users are denoted as $\mathfrak{L}=\left \{ \begin{matrix}
 L_{1,1},&L_{1,2},&\cdots,&L_{1,c}\\
