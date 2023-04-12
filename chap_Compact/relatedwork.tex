@@ -27,12 +27,13 @@ Anonymous tokens may be used to build anonymous SSO services, where an RP cannot
 Here, \usso~supports the IdP-untraceability property that prevents the IdP from linking $ID_{RP}$ and a corresponding $[t]ID_{RP}$, leveraging the ECDLP assumption (see Section~\ref{analysis-security}). This is similar to the unlinkability between token signing and redemption in PrivacyPass/TrustToken, which prevents the server from linking ($T_i^{e_i}, T_i^{e_ik}$) and  ($T_i, T_i^k$), leveraging the DLP assumption. %The unlinkability between token signing and redemption, or ($T_i^{e_i}, T_i^{e_ik}$) and  ($T_i, T_i^k$), roughly corresponds to only the IdP-untraceability in UPPRESSO: an IdP cannot link any pair of $[t_i]ID_{RP}$ and $ID_{RP}$.  % $i = 1, 2, \cdots$. % which fundamentally depends on the ECDLP assumption.
 
 However, \usso~explores this cryptographic technique %with different designs and 
-in greater depth, resulting in additional privacy protection. The exponent $k$ in PrivacyPass/TrustToken is held only by the server as a private key, and the random number $e$ is only known to a user. In contrast, the scalar $u$ in \usso~denotes a user identity known to the user and the IdP, while the random number $t$ is an ephemeral secret shared between the user and the RP.  
+in greater depth, resulting in additional privacy property that is not considered or supported in existing anonymous tokens \cite{privacypass,trusttoken}. %or OPRFs \cite{oprf-proved,voprf-proved}
+The exponent $k$ in PrivacyPass/TrustToken is held only by the server as a private key, and the random number $e$ is only known to a user. In contrast, the scalar $u$ in \usso~denotes a user identity known to the user and the IdP, while the random number $t$ is an ephemeral secret shared between the user and the RP.  
 %The application of the cryptographic technique differs from PrivacyPass/TrustToken
 %This different design allows \usso~to explore and offer additional privacy properties. %Furthermore, more privacy properties are explored in UPPRESSO.
 The sharing of random numbers supports additional unlinkability across colluding RPs. Their knowledge about two different users $u$ and $u'$, i.e., ($ID_{RP}, t, [u]ID_{RP}$) and ($ID_{RP'}, t', [u']ID_{RP'}$), which is obtained from different logins, are indistinguishable. 
 %given multiple users, e.g., identified as $u$ and $u'$, ($ID_{RP}, t, [u]ID_{RP}$) and ($ID_{RP'}, t', [u']ID_{RP'}$) are indistinguishable to colluding RPs.
-This property requires designing the transformations under the ECDDH assumption (see Section~\ref{sec-:analysis}), which is not considered or supported in existing anonymous tokens \cite{privacypass,trusttoken} or OPRFs \cite{oprf-proved,voprf-proved}.
+This property requires designing the transformations under not only ECDLP but also ECDDH assumptions (see Section~\ref{sec-:analysis}).
 
 % \noindent\textbf{Anonymous SSO.}
 % Such schemes allow authenticated users to access a service protected by an IdP,

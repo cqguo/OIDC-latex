@@ -91,8 +91,9 @@ Malicious RPs may collude with each other or with malicious users attempting to 
 \subsection{The Dolev-Yao-Style Model for \usso}
 \label{dy-model}
 
-We develop a Dolev-Yao-style model \cite{SPRESSO} for \usso, referred to as the \dyu{ }model, to formalize the login flow of \usso. % which has been used in the formal analysis of SSO protocols such as OAuth 2.0 \cite{FettKS16} and OIDC \cite{FettKS17}.
-It abstracts the entities in a web system, such as web servers and browsers, as \emph{atomic processes}, %which communicate with each other through events. % such as HTTPS requests and responses.
+We develop a Dolev-Yao style model \cite{SPRESSO, FettKS16, FettKS17} for \usso, referred to as the DYU model, to formalize the login flow of \usso. Dolev-Yao style models abstract cryptographic concepts into an algebra of symbolic messages to discover structural flaws using simple formal logic. % which has been used in the formal analysis of SSO protocols such as OAuth 2.0 \cite{FettKS16} and OIDC \cite{FettKS17}.
+
+The DYU model abstracts the entities in a web system, such as web servers and browsers, as \emph{atomic processes}, %which communicate with each other through events. % such as HTTPS requests and responses.
 and defines \emph{script processes} to formulate client-side scripts.
 %The script is dependently invoked by the browser to process the server-defined logic.%such as verifying $Certificate_{RP}$. %postmessage events; %atomic process <-> script process, communication. %Other events change self-trigger.
 The atomic processes of \usso~include an {\em IdP process}, a finite set of {\em web servers} for honest RPs, a finite set of honest {\em browsers}, and a finite set of {\em attacker processes} that model malicious RPs and malicious users.
@@ -101,9 +102,10 @@ The processes communicate with each other through events such as HTTPS requests 
 The script processes communicate through \verb+postMessage+, which are modeled as transmitted-to-itself events of a browser process.
 %To clearly indicate the action of postMessage communication, we define it as the transmitting-to-itself event of the browser (which is not defined in SPRESSO).
 
-With the DYU model, we can (\emph{a}) trace the lifecycle of an identity token from its generation at the IdP to its acceptance at an RP to prove that it cannot be leaked to adversaries; (\emph{b}) locate the places where $PID_U$, $PID_{RP}$, and other elements in the identity token are processed to prove that they cannot be manipulated by any adversary; and (\emph{c}) locate the places where $PK$ is transmitted and used in the IdP script to prove that it cannot be replaced by any adversary.
+With the DYU model, we trace the lifecycle of an identity token from its generation at the IdP to its acceptance at an RP, locate the places where $PID_U$, $PID_{RP}$, and other elements in the identity token such as $t$ and $u$ are processed, and locate the places where $PK$ is transmitted and used in the IdP script. Applying the DYU model, we confirm the following conclusions: (\emph{a}) the identity tokens cannot be leaked to any adversary; (\emph{b}) pseudo-identities and other elements in the identity tokens cannot be manipulated by any adversary; (\emph{c}) the IdP cannot learn anything about $t$ shared between the user and the RP; (\emph{d}) the RPs cannot learn anything about $u$ shared between the user and the IdP; (\emph{e}) $r$ cannot be leaked to any adversary as it never leaves the IdP; (\emph{f}) the public key of the IdP is pre-installed and cannot be replaced by any adversary.
 
-Meanwhile, we confirm that the IdP cannot learn anything about $t$ shared only between the user and the RP, while the RPs cannot learn anything about $u$ shared between the user and the IdP. It is trivial to prove the confidentiality of $r$, as it never leaves the IdP.
+%With the DYU model, we (\emph{a}) trace the lifecycle of an identity token from its generation at the IdP to its acceptance at an RP to prove that it cannot be leaked to adversaries; (\emph{b}) locate the places where $PID_U$, $PID_{RP}$, and other elements in the identity token are processed to prove that they cannot be manipulated by any adversary; and (\emph{c}) locate the places where $PK$ is transmitted and used in the IdP script to prove that it cannot be replaced by any adversary.
+
 
 \subsection{Security}
 \label{analysis-security}
