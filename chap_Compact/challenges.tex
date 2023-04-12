@@ -7,12 +7,12 @@ We discuss the security requirements of privacy-preserving SSO and present the i
 \subsection{Security Requirements for SSO Services}
 \label{subsec:basicrequirements}
 
-Non-anonymous SSO Services \cite{OpenIDConnect,rfc6749,SAML,SAMLIdentifier,NIST2017draft} are designed to allow a \emph{legitimate} user to login to an \emph{honest} RP with her account at this RP, %correlating multiple login instances,
+Non-anonymous SSO Services \cite{OpenIDConnect,rfc6749,SAML,SAMLIdentifier,NIST2017draft} are designed to allow a \emph{legitimate} user to log into an \emph{honest} RP with her account at this RP, %correlating multiple login instances,
 by presenting \emph{identity tokens} issued by a \emph{trusted} IdP.
 To achieve this goal, the trusted IdP issues an identity token that specifies the RP being accessed (i.e., \emph{RP designation}) and the authenticated user's identity or pseudo-identity (i.e., \emph{user identification}).
 An honest RP verifies the RP's (pseudo-)identity in the identity token before accepting it,
- and authorizes the token holder to login as the specified user. This prevents malicious RPs from replaying received identity tokens to gain unauthorized access to other honest RPs as some victim user.
-\emph{Confidentiality} and \emph{integrity} of identity tokens are also necessary to prevent eavesdropping and tampering. Identity tokens are forwarded to the target RPs by the authenticated user and should not be revealed to any other parties. %Otherwise, an eavesdropper who possesses the token could successfully login to the designated RP. Maintaining integrity is also critical to prevent adversaries from tampering with a token. So,
+ and authorizes the token holder to log in as the specified user. This prevents malicious RPs from replaying received identity tokens to gain unauthorized access to other honest RPs as some victim user.
+The \emph{confidentiality} and \emph{integrity} of identity tokens are also necessary to prevent eavesdropping and tampering. Identity tokens are forwarded to the target RPs by the authenticated user and should not be revealed to any other parties. %Otherwise, an eavesdropper who possesses the token could successfully login to the designated RP. Maintaining integrity is also critical to prevent adversaries from tampering with a token. So,
 So they are usually signed by the trusted IdP and transmitted over HTTPS \cite{OpenIDConnect,rfc6749,SAML}.
 
 The requirements for secure SSO services, i.e., the RP designation, user identification, integrity, and confidentiality of identity tokens, have been extensively studied in the literature \cite{ArmandoCCCT08, FettKS16, FettKS17}.
@@ -41,7 +41,8 @@ Section \ref{analysis-security}.
 \subsection{Identity Transformation}
 \label{subsec:solutions}
 
-We aim to develop a privacy-preserving SSO system that ensures security properties while preventing both IdP-based login tracing and RP-based identity linkage.
+We aim to develop a privacy-preserving SSO system that ensures security properties
+ while prevents both IdP-based login tracing and RP-based identity linkage.
 %We explicitly distinguish a user's identity (or \emph{account}) at an RP,
 %     from the user's \emph{identity} at an IdP and the user's \emph{pseudo-identities} enclosed in identity tokens.
 In \usso, these requirements are satisfied through \emph{transformed identities} in the identity tokens. Table \ref{tbl:notations-dilemma} lists the notations used in this paper.
@@ -66,8 +67,8 @@ The relationships among the permanent and ephemeral (pseudo-)identities are depi
 To ensure RP designation, $PID_{RP}$ should be \emph{uniquely} associated with the target RP.
 For user identification, the \emph{ephemeral} $PID_{U}^i$ in each login instance should enable the RP to derive the user's \emph{permanent} account  (i.e., $Acct$) at this RP.
 To prevent IdP-based login tracing, it is essential to ensure that the IdP does not obtain any information about $ID_{RP}$ from any $PID_{RP}^i$.
-Thus, in a user's multiple login instances to the same RP, he should generate independent $PID_{RP}^i$\footnote{The IdP should not be able to link multiple login instances to a given RP, while the RP's identity is unknown to the IdP.} % the IdP-based login tracing is still effective, to correlate a user's multiple login instances.
-and also independent $PID_U^i$\footnote{If $PID_U^i$ is not completely independent of each other, it implies that there is a possibility for the IdP to link multiple login instances to a given RP.}.
+Thus, in a user's multiple login instances to the same RP, she should generate independent $PID_{RP}^i$\footnote{The IdP should not be able to link multiple login instances to a given RP, while the RP's identity is unknown to the IdP.} % the IdP-based login tracing is still effective, to correlate a user's multiple login instances.
+and independent $PID_U^i$.\footnote{If $PID_U^i$ is not completely independent of each other, it implies that there is a possibility for the IdP to link multiple login instances to a given RP.}
 Finally, to prevent RP-based identity linkage,
 % the IdP does not enclose $ID_U$ in identity tokens.
 %a user pseudo-identity (i.e., $PID_U$) is bound instead:

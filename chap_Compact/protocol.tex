@@ -6,7 +6,9 @@ We design identity-transformation algorithms %  $\mathcal{F}_{PID_{RP}}$, $\math
 on an elliptic curve $\mathbb{E}$.
 Table \ref{tbl:notations-protocol} lists the notations. The subscript $j$ and/or superscript $i$ may be omitted if there is no ambiguity.
 
-The IdP assigns a unique random integer $u$ to a user (i.e., $ID_U = u$) while selecting a random integer $r$ and assigning $ID_{RP} = [r]G$ to the RP if it is a unique point on $\mathbb{E}$. Here, $G$ is a point on $\mathbb{E}$ of order $n$, and $[r]G$ denotes the addition of $G$ on the curve $r$ times.
+The IdP assigns a unique random integer $u$ to a user (i.e., $ID_U = u$),
+ while selecting a random integer $r$ and assigning $ID_{RP} = [r]G$ to the RP if it is a unique point on $\mathbb{E}$.
+Here, $G$ is a point on $\mathbb{E}$ of order $n$, and $[r]G$ denotes the addition of $G$ on the curve $r$ times.
 
 
 %The IdP assigns a unique random integer $u$ to a user (i.e., $ID_U = u$). When an RP registers, the IdP generates a random number $r$ and assigns $ID_{RP} = [r]G$, which is a unique point on $\mathbb{E}$.
@@ -76,10 +78,10 @@ From Equations \ref{equ:PIDRP}, \ref{equ:PIDU}, and \ref{equ:Account}, it is der
 %%See Section \ref{sec:analysis} for the detailed proofs of security and privacy.
 %
 
-With the help of $t$, for a given user, the RP derives an \emph{identical} account from identity tokens for different login instances. It is the user's \emph{permanent} account at this RP, which is \emph{unique} among all accounts at the same RP. Meanwhile, the user's accounts at different RPs are inherently different and unlinkable. Please see Section \ref{sec:analysis} for more detailed proofs.
+With the help of $t$, for a given user, the RP derives an \emph{identical} account from identity tokens for different login instances. It is the user's \emph{permanent} account at this RP, which is \emph{unique} among all accounts at the same RP. Meanwhile, the user's accounts at different RPs are inherently different and unlinkable; see Section \ref{sec:analysis} for more detailed proofs.
 
 \newc
-In this process, the RP needs to check whether $PID_{RP} = [t]ID_{RP}$ holds when receiving an identity token.
+In this process, the RP needs to check whether $PID_{RP} = [t]ID_{RP}$ holds when extracting $PID_{RP}$ from a received identity token.
 Otherwise, a malicious user with $ID_{U'} = u'$ could impersonate a victim user by setting $PID_{RP}$ to $[t'u'^{-1}]Acct$ but sending $t'$ to an RP, where $Acct$ belongs to the victim with $ID_{U} = u$ at this RP.
 Then, the malicious user could request an identity token,
  and the IdP would calculate $PID_{U'} = [u'][t'u'^{-1}]Acct = [t']Acct$.
@@ -89,7 +91,7 @@ Finally, the RP would accept the malicious user under $Acct$. %In particular, wh
 
 Similarly, if the RP selects $t$ and calculates $PID_{RP}$,
  the user needs to check whether the received $PID_{RP}$ equals $[t]ID_{RP}$ before requesting an identity token.
-Otherwise, malicious users could impersonate a victim user at some honest RP by colluding with a malicious $RP'$.
+Otherwise, malicious users could impersonate a victim user at some honest RP by colluding with another malicious RP.
 That is, when receiving $PID_{RP}=[t']ID_{RP}$ from the honest RP, the malicious user forwards it to $RP'$, which sends it to the victim user in another login instance.
 If the victim does not check the received $PID_{RP}$, he would request from the IdP an identity token that binds $PID_U$ and the wrong $PID_{RP}$ and presents the token to the malicious RP.
 This token would allow the malicious user to log into the honest RP under the victim user's account.
@@ -292,7 +294,7 @@ where $Issuer$ is the IdP's identity, $Validity$ indicates the validity period, 
 
 %\vspace{1mm}
 \noindent 4. {\em $Acct$ Calculation.}
-The RP receives the identity token and authorizes the user to login.
+The RP receives the identity token and authorizes the user to log in.
 \vspace{-\topsep}
 \begin{itemize}
 \setlength{\topsep}{0pt}
@@ -309,7 +311,7 @@ the RP extracts $PID_{RP}$ from the token, checks if it equals $[t]ID_{RP}$,
 \oldc
 and calculates $Acct = [t^{-1}]{PID_U}$.
 
-\item [4.3] The RP authorizes the user to login as $Acct$.
+\item [4.3] The RP authorizes the user to log in as $Acct$.
 
 \end{itemize}
 
