@@ -320,7 +320,7 @@ L_{v,1},&L_{v,2},&\cdots,&L_{v,c}
 
 %The colluding RPs share $\mathbb{V}_j$s and $\mathbb{L}_j$s in RP-based linkage attacks, where a malicious RP aims to link an honest user logged in to itself (e.g., $PID_a$ and $L_{a,j}$) to another user authenticated to a colluding RP (e.g., $PID_b$ and $L_{b,k}$ for any $k \neq j$) by finding a relationship between $L_{a,j}$ and $L_{b,k}$.
 
-\vspace{2mm}
+\vspace{3mm}
 \noindent \textsc{Theorem 7. (Privacy against Colluding RPs)} {\em
 When $c+1$ malicious RPs and $v$ malicious users collude in \usso, given a login instance $\mathcal{L'}$ initiated by an honest user $U'$ to a malicious RP, the adversaries cannot distinguish a login instance initiated by $U'$ from the ones initiated by any other honest users to any of the remaining $c$ malicious RPs.}
 
@@ -331,9 +331,14 @@ When $c+1$ malicious RPs and $v$ malicious users collude in \usso, given a login
 
 \vspace{0.75mm}
 \noindent\textsc{Proof.}
-% Without loss of generality, consider an arbitrary login in which a user (denoted by $u'$) logs in to the $c$th malicious RP. The RP obtains $L'=(ID_{RP_c}, t', Acct'_c)$, where $ID_{RP_c}=[r_c]G$ and $Acct'_c=[u'r_c]G$. If this user has previously logged in to at least one colluding RP, she should be in $\mathbb{U}_c$, and her login information should be in the related views. Hence, in RP-based linkage, $RP_c$ attempts to associate $L'$ with any record $L^*$ in $\mathbb{V}_j$s, where $L^*=([r_k]G, t_{u'k}, [u'r_k]G)$ and $k \in [1,c]$.
-%
-We first consider a malicious RP denoted as $RP'$ that receives a login $L'$ by an honest user $U'$, the other $c$ malicious RPs denoted as $RP_j$ ($1 \leq j \leq c$), and no malicious user.
+Consider an arbitrary malicious RP, denoted as $RP'$, among $c+1$ colluding RPs. When an honest user $U'$ initiates a login $\mathcal{L'}$ to $RP'$, it obtains $L' = (ID_{RP'}, t', [ID_{U'}]ID_{RP'})$. Suppose one of the remaining malicious RP, denoted as $RP_j$ colludes with $RP'$ and shares its knowledge about all the $w$ logins it has observed, denoted as $\mathbb{L} = \{{L_i}\}$, where $L_i = ([r]G, t_i, [u_i r]G)$ and $1 \leq i \leq w$. $\mathbb{L}$ is about the logins that may potentially be initiated by any honest or malicious users. 
+
+First, let us assume the malicious users have not colluded with the malicious RPs by not revealing additional information about their own $PID_U$s. Therefore, $RP'$ does not know some logins in $w$ are initiated by the same malicious users. According to Lemma 2, $RP'$ and $RP_j$ cannot distinguish if any of the logins among $w$ is initiated by $U'$ or by another honest user in the system, given $L'$ and $\mathbb{L}$.
+
+
+%Let us denote $c$ malicious RPs as $RP_j$ ($1 \leq j \leq c$) and the $(c+1)$th RP as $RP'$.  
+
+///We first consider a malicious RP denoted as $RP'$ that receives a login $L'$ by an honest user $U'$, the other $c$ malicious RPs denoted as $RP_j$ ($1 \leq j \leq c$), and no malicious user.
 According to Lemma 2, a pair of $RP_j$ and $RP'$ cannot decide whether a login initiated by $U'$ to $RP'$ is initiated by one of the users visiting $RP_j$ or not.
 
 After $RP'$ colludes with each $RP_j$ ($1 \leq j \leq c$),  we find that, given $L'$ initiated by $U'$ to $RP'$, the adversaries cannot distinguish a login by $U'$ to any $RP_j$, from the logins by any users to $RP_j$ ($1 \leq j \leq c$).
