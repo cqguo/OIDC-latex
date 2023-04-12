@@ -7,7 +7,7 @@ We discuss the security requirements of privacy-preserving SSO and present the i
 \subsection{Security Requirements for SSO Services}
 \label{subsec:basicrequirements}
 
-Non-anonymous SSO Services \cite{OpenIDConnect,rfc6749,SAML,SAMLIdentifier,NIST2017draft} are designed to allow a \emph{legitimate} user to log into an \emph{honest} RP with her account at this RP, %correlating multiple login instances,
+Non-anonymous SSO Services \cite{OpenIDConnect,rfc6749,SAML,SAMLIdentifier,NIST2017draft} are designed to allow a \emph{legitimate} user to log into an \emph{honest} RP with her account at this RP, %correlating multiple logins,
 by presenting \emph{identity tokens} issued by a \emph{trusted} IdP.
 To achieve this goal, the trusted IdP issues an identity token that specifies the RP being accessed (i.e., \emph{RP designation}) and the authenticated user's identity or pseudo-identity (i.e., \emph{user identification}).
 An honest RP verifies the RP's (pseudo-)identity in the identity token before accepting it,
@@ -31,8 +31,8 @@ Section \ref{analysis-security}.
     {\textbf{Notation}} & {\textbf{Description}} & {\textbf{Lifecycle}} \\ \hline
     {$ID_U$} & {The user's unique identity at the IdP.} & {Permanent} \\ \hline
     {$ID_{RP_j}$} & {The $j$-th RP's unique identity at the IdP.} & {Permanent} \\ \hline
-    {$PID_{U,j}^i$} & {The user's pseudo-identity in her $i$-th login instance to the $j$-th RP.} & {Ephemeral} \\ \hline
-    {$PID_{RP_j}^i$} & {The $j$-th RP's pseudo-identity in the user's $i$-th login instance to this RP.} & {Ephemeral} \\ \hline
+    {$PID_{U,j}^i$} & {The user's pseudo-identity in her $i$-th login to the $j$-th RP.} & {Ephemeral} \\ \hline
+    {$PID_{RP_j}^i$} & {The $j$-th RP's pseudo-identity in the user's $i$-th login to this RP.} & {Ephemeral} \\ \hline
     {$Acct_j$} & {The user's identity (or account) at the $j$-th RP.} & {Permanent} \\ \hline
     \end{tabular}
     \label{tbl:notations-dilemma}
@@ -54,7 +54,7 @@ After successfully authenticating the user as $ID_U$, the IdP calculates an \emp
 %
 %Given a user,
 %    (\emph{a}) an identity token contains only pseudo-identities, i.e., $PID_{U,j}^i$ and $PID_{RP_j}^i$,
-%        which are independent of each other for different RPs and in multiple login instances, respectively,
+%        which are independent of each other for different RPs and in multiple logins, respectively,
 %    and (\emph{b}) these \emph{ephemeral} pseudo-identities enable the target RP to derive a \emph{permanent} account, i.e., $Acct_j$.
 The relationships among the permanent and ephemeral (pseudo-)identities are depicted in Figure \ref{fig:IDCorrelation}, where the \emph{red} and \emph{green} blocks represent \emph{permanent} and \emph{ephemeral} (pseudo-)identities, respectively, and the labeled arrows denote the transformations of (pseudo-)identities.
 %It describes the {\em identity dilemma} of privacy-preserving SSO as below:
@@ -65,10 +65,10 @@ The relationships among the permanent and ephemeral (pseudo-)identities are depi
 %    we should not reveal the target RP's permanent identity (i.e., $ID_{RP}$) to the IdP.
 
 To ensure RP designation, $PID_{RP}$ should be \emph{uniquely} associated with the target RP.
-For user identification, the \emph{ephemeral} $PID_{U}^i$ in each login instance should enable the RP to derive the user's \emph{permanent} account  (i.e., $Acct$) at this RP.
+For user identification, the \emph{ephemeral} $PID_{U}^i$ in each login should enable the RP to derive the user's \emph{permanent} account  (i.e., $Acct$) at this RP.
 To prevent IdP-based login tracing, it is essential to ensure that the IdP does not obtain any information about $ID_{RP}$ from any $PID_{RP}^i$.
-Thus, in a user's multiple login instances to the same RP, she should generate independent $PID_{RP}^i$\footnote{The IdP should not be able to link multiple login instances to a given RP, while the RP's identity is unknown to the IdP.} % the IdP-based login tracing is still effective, to correlate a user's multiple login instances.
-and independent $PID_U^i$.\footnote{If $PID_U^i$ is not completely independent of each other, it implies that there is a possibility for the IdP to link multiple login instances to a given RP.}
+Thus, in a user's multiple logins to the same RP, she should generate independent $PID_{RP}^i$\footnote{The IdP should not be able to link multiple logins to a given RP, while the RP's identity is unknown to the IdP.} % the IdP-based login tracing is still effective, to correlate a user's multiple logins.
+and independent $PID_U^i$.\footnote{If $PID_U^i$ is not completely independent of each other, it implies that there is a possibility for the IdP to link multiple logins to a given RP.}
 Finally, to prevent RP-based identity linkage,
 % the IdP does not enclose $ID_U$ in identity tokens.
 %a user pseudo-identity (i.e., $PID_U$) is bound instead:
@@ -94,7 +94,7 @@ From the target RP's view,
 $\mathcal{F}_{Acct}(PID_{U}, PID_{RP}) = Acct$, calculated by the RP.
 Given $ID_U$ and $ID_{RP}$, $Acct$ is %\emph{permanent} and
 \emph{unique} to other accounts at this RP.
-That is, in a user's two different login instances to the RP,
+That is, in a user's two different logins to the RP,
  $\mathcal{F}_{Acct}(PID_{U}^i, PID_{RP}^i) = \mathcal{F}_{Acct}(PID_{U}^{i'}, PID_{RP}^{i'})$.
 \end{itemize}
 

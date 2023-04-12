@@ -23,7 +23,7 @@ PID_{RP} = \mathcal{F}_{PID_{RP}}(ID_{RP}) = [t]{ID_{RP}} = [tr]G
 \label{equ:PIDRP}
 \end{equation}
 \newc
-In each login instance, the user selects $t$ and shares it with the RP to negotiate $PID_{RP}$.
+In each login, the user selects $t$ and shares it with the RP to negotiate $PID_{RP}$.
 It makes no difference if the RP selects $t$ randomly and sends it to the user, as long as both of them calculate $PID_{RP}$ independently and check if the received $PID_{RP}$ is equal to the calculated one.
 
 \oldc
@@ -49,7 +49,7 @@ From Equations \ref{equ:PIDRP}, \ref{equ:PIDU}, and \ref{equ:Account}, it is der
    \label{equ:AccountNotChanged}
 \end{equation}
 %<<<<<<< HEAD
-%With the help of $t$, the RP can derive an \emph{identical permanent} account from the identity tokens in different login instances. %from the user.
+%With the help of $t$, the RP can derive an \emph{identical permanent} account from the identity tokens in different logins. %from the user.
 %The accounts at different RPs are unique for a given user, while the accounts of different users are unique for a given RP. The RP cannot derive $ID_U$ from either $PID_U$ or $Acct$ due to the elliptic curve discrete logarithm problem (ECDLP). Since $t$ is random in $\mathbb{Z}_n$ and unknown to the IdP, from the IdP's view, $PID_{RP}$ is indistinguishable from a random variable on $\mathbb{E}$. So, the IdP cannot learn anything about $ID_{RP}$ from $PID_{RP}$.
 %%Section \ref{sec:analysis} presents more detailed analyses.
 %Note that $r$ should be kept secret to the RP; otherwise, two colluding RPs with $ID_{RP_j} = [r]G$ and $ID_{RP_{j'}} = [r']G$ could link a user's accounts by checking if $[r']Acct_j = [r]Acct_{j'}$ holds.
@@ -57,16 +57,16 @@ From Equations \ref{equ:PIDRP}, \ref{equ:PIDU}, and \ref{equ:Account}, it is der
 %\textcolor{blue}{A user and an RP negotiate $PID_{RP} = [t]ID_{RP}$ by selecting a random number $t$ and keeping it secret between them. They need to calculate $PID_{RP}$ independently. In particular, when one party selects $t$ and computes $PID_{RP} = [t]ID_{RP}$, the other party should check if the received $t$ and $PID_{RP}$ satisfies $PID_{RP} = [t]ID_{RP}$. In our protocol, we ask the user to generate $t$, compute $PID_{RP}$, and send them to the RP. %In the above descriptions, the user generates $t$, calculates $PID_{RP} = [t]ID_{RP}$ and sends $t$ to the RP. After receiving $t$ from the user and extracting $PID_{RP}$ from a token, the RP checks that $PID_{RP} = [t]ID_{RP}$, because the correct account $[ID_U]ID_{RP}$ is derived \emph{only if} this equation holds (i.e., $PID_{RP} = [t]ID_{RP}$); otherwise, attacks happen as below.
 %The RP should compute $[t]ID_{RP}$ by itself and verify if it equals the received $PID_{RP}$. Otherwise, a malicious user with $ID_{U'} = u'$ could impersonate a victim user with $ID_{U} = u$ who holds $Acct$ at that RP, if he uses $[t'u'^{-1}]Acct$ as $PID_{RP}$ to request an identity token from the IdP. The IdP would calculate $PID_{U'} = [u'][t'u'^{-1}]Acct = [t']Acct$, with which the RP would authenticate the malicious user under $Acct$.
 %% To login as any $Acct$,
-%%         a malicious user with $ID_{U'} = u'$ might generate a random number $t'$,
+%%         a malicious user with $ID_{U'} = u'$ could generate a random number $t'$,
 %%             and calculate $[t'u'^{-1}]Acct$ as $PID_{RP}$ to request an identity token.
 %% Then, the IdP will calculate $PID_{U'} = [u'][t'u'^{-1}]Acct = [t']Acct$.
 %% Without checking $PID_{RP} = [t']ID_{RP}$ or not,
 %%         the RP will finally allow the malicious user to login as $[t'^{-1}]PID_{U'} = Acct$.
 %}
 %
-%\textcolor{blue}{Meanwhile, if the RP selects $t$ and calculates $PID_{RP}$, the user should compute $[t]ID_{RP}$ by herself and check if $PID_{RP} = [t]ID_{RP}$ holds. Otherwise, a malicious user $ID_{U'}$ could collude with a malicious $RP'$ to impersonate the victim user at the honest $RP$. Assume $ID_{U'}$ receives $PID_{RP}=[t']ID_{RP}$ from the honest $RP$ and forwards it to the victim user through the malicious $RP'$ in another login instance. If the victim user does not check if the received $PID_{RP}$ equals to $[t']ID_{RP'}$, she would request an identity token that binds $PID_U$ and $PID_{RP}$ from the IdP and presents it to the malicious RP. This token would allow the malicious user to log in to the honest RP on behalf of the victim user.
+%\textcolor{blue}{Meanwhile, if the RP selects $t$ and calculates $PID_{RP}$, the user should compute $[t]ID_{RP}$ by herself and check if $PID_{RP} = [t]ID_{RP}$ holds. Otherwise, a malicious user $ID_{U'}$ could collude with a malicious $RP'$ to impersonate the victim user at the honest $RP$. Assume $ID_{U'}$ receives $PID_{RP}=[t']ID_{RP}$ from the honest $RP$ and forwards it to the victim user through the malicious $RP'$ in another login. If the victim user does not check if the received $PID_{RP}$ equals to $[t']ID_{RP'}$, she would request an identity token that binds $PID_U$ and $PID_{RP}$ from the IdP and presents it to the malicious RP. This token would allow the malicious user to log in to the honest RP on behalf of the victim user.
 %% Then $U'$ colludes with a malicious RP denoted as $RP'$,
-%%     which intentionally sends $PID_{RP}$ to an honest user $U$ in some login instance.
+%%     which intentionally sends $PID_{RP}$ to an honest user $U$ in some login.
 %% Without checking $PID_{RP} = [t']ID_{RP'}$ or not,
 %%     this honest user will present a token binding $PID_U$ and $PID_{RP}$ to $RP'$.
 %% Finally, this token enables malicious $U'$ to log in as the honest user's account at the honest RP.
@@ -78,7 +78,7 @@ From Equations \ref{equ:PIDRP}, \ref{equ:PIDU}, and \ref{equ:Account}, it is der
 %%See Section \ref{sec:analysis} for the detailed proofs of security and privacy.
 %
 
-With the help of $t$, for a given user, the RP derives an \emph{identical} account from identity tokens for different login instances. It is the user's \emph{permanent} account at this RP, which is \emph{unique} among all accounts at the same RP. Meanwhile, the user's accounts at different RPs are inherently different and unlinkable; see Section \ref{sec:analysis} for more detailed proofs.
+With the help of $t$, for a given user, the RP derives an \emph{identical} account from identity tokens for different logins. It is the user's \emph{permanent} account at this RP, which is \emph{unique} among all accounts at the same RP. Meanwhile, the user's accounts at different RPs are inherently different and unlinkable; see Section \ref{sec:analysis} for more detailed proofs.
 
 \newc
 In this process, the RP needs to check whether $PID_{RP} = [t]ID_{RP}$ holds when extracting $PID_{RP}$ from a received identity token.
@@ -92,7 +92,7 @@ Finally, the RP would accept the malicious user under $Acct$. %In particular, wh
 Similarly, if the RP selects $t$ and calculates $PID_{RP}$,
  the user needs to check whether the received $PID_{RP}$ equals $[t]ID_{RP}$ before requesting an identity token.
 Otherwise, malicious users could impersonate a victim user at some honest RP by colluding with another malicious RP.
-That is, when receiving $PID_{RP}=[t']ID_{RP}$ from the honest RP, the malicious user forwards it to $RP'$, which sends it to the victim user in another login instance.
+That is, when receiving $PID_{RP}=[t']ID_{RP}$ from the honest RP, the malicious user forwards it to $RP'$, which sends it to the victim user in another login.
 If the victim does not check the received $PID_{RP}$, he would request from the IdP an identity token that binds $PID_U$ and the wrong $PID_{RP}$ and presents the token to the malicious RP.
 This token would allow the malicious user to log into the honest RP under the victim user's account.
 
@@ -117,16 +117,16 @@ In the meantime, a user's identity $u$ is kept secret to RPs; otherwise, colludi
     {$ID_U$} & {$ID_U = u \in [1, n)$ is the user's unique identity at the IdP, \newc{which is known only to the user and the IdP. %$u$ is kept unknown to RPs.
     }} \\ \hline
    {$ID_{RP_j}$} & {$ID_{RP} = [r]G$ is the $j$-th RP's unique identity, which is publicly known; $r \in [1, n)$ \newc{is known only to the IdP.}} \\ \hline
-    {$t$} & {$t \in [1, n)$ is a user-selected random integer in each login instance; \newc{$t$ is shared with the target RP and kept secret to the IdP.
+    {$t$} & {$t \in [1, n)$ is a user-selected random integer in each login; \newc{$t$ is shared with the target RP and kept secret to the IdP.
     }} \\ \hline
-    {$PID_{RP_j}^i$} & {$PID_{RP} = [t]{ID_{RP}} = [tr]G$ is the $j$-th RP's pseudo-identity, in the user's $i$-th login instance to this RP.} \\ \hline
-    {$PID_{U,j}^i$} & {$PID_U = [{ID_U}]{PID_{RP}} = [utr]G$ is the user's pseudo-identity, in the user's $i$-th login instance to the $j$-th RP.} \\ \hline
+    {$PID_{RP_j}^i$} & {$PID_{RP} = [t]{ID_{RP}} = [tr]G$ is the $j$-th RP's pseudo-identity, in the user's $i$-th login to this RP.} \\ \hline
+    {$PID_{U,j}^i$} & {$PID_U = [{ID_U}]{PID_{RP}} = [utr]G$ is the user's pseudo-identity, in the user's $i$-th login to the $j$-th RP.} \\ \hline
      {$Acct_j$} & {$Acct = [t^{-1}\bmod n]PID_{U} = [ID_U]ID_{RP} = [ur]G$ is the user's account at the $j$-th RP.} \\ \hline
     {$SK$, $PK$} & {The IdP's private key and public key, which are used to sign and verify identity tokens and RP certificates.} \\ \hline
 %    {$T$} & {The trapdoor to derive $Account$: $T=N_U^{-1} \bmod n$.} \\ \hline
     {$Enpt_{RP_j}$} & {The $j$-th RP's endpoint for receiving the identity tokens.} \\ \hline
     {$Cert_{RP_j}$} & {The IdP-signed RP certificate binding $ID_{RP_j}$ and $Enpt_{RP_j}$.} \\ \hline
-%    {$PEnpt_{U,j}^i$} & {A user-generated random "pseudo-endpoint'', in the user's $i$-th login instance to the $j$-th RP.} \\ \hline
+%    {$PEnpt_{U,j}^i$} & {A user-generated random "pseudo-endpoint'', in the user's $i$-th login to the $j$-th RP.} \\ \hline
     \end{tabular}
     \label{tbl:notations-protocol}
 \end{table}
@@ -143,12 +143,12 @@ However, in \usso, the IdP does not know about the visited RPs, requiring the us
  and downloaded from the IdP and the visited RP, respectively. It is worth noting that a script downloaded from an honest entity is considered \emph{honest}.
 
 The IdP script is necessary because the RP script could leak its origin to the IdP web server due to the automatic inclusion of an HTTP \verb+referer+ header in all HTTP requests it sends.
-Besides, the IdP script is trusted to interact with the users for attribute authorization and ensure the confidentiality of identity tokens, i.e., a token is sent to only the designated RP, while the RP (and its script) might be malicious. Thus, on receiving an identity-token request, the IdP checks the \verb+referer+ header to ensure it is sent by the IdP script.
+Besides, the IdP script is trusted to interact with the users for attribute authorization and ensure the confidentiality of identity tokens, i.e., a token is sent to only the designated RP, while the RP (and its script) could be malicious. Thus, on receiving an identity-token request, the IdP checks the \verb+referer+ header to ensure it is sent by the IdP script.
 
 %Section \ref{sec:discussion} discusses more efficient but less portable implementations with browser extensions.
 
 The RP script is responsible for preparing $ID_{RP}$ and $Enpt_{RP}$ for the IdP script through an RP certificate issued by the IdP. %It binds the RP's identity and endpoint. %(i.e., $ID_{RP}$ and $Enpt_{RP}$).
-In a login instance, the RP script sends the certificate to the IdP script, which then verifies it and extracts $ID_{RP}$ and $Enpt_{RP}$.
+In a login, the RP script sends the certificate to the IdP script, which then verifies it and extracts $ID_{RP}$ and $Enpt_{RP}$.
 The same as in widely-adopted SSO systems \cite{OpenIDConnect, rfc6749, SAML, SAMLIdentifier}, in \usso~a user does not need to configure anything locally as the IdP's public key is already set in the IdP script.
 
 After receiving an identity token from the IdP, the IdP script needs to ensure the RP script will forward the token to $Enpt_{RP}$ %, which is bound with $ID_{RP}$
@@ -217,7 +217,7 @@ Each user registers once at the IdP. She sets up a unique random identity $ID_U 
 
 
 \vspace{0.5mm}
-\noindent\textbf{SSO Login.} A login instance %is typically launched through a browser,
+\noindent\textbf{SSO Login.} A login %is typically launched through a browser,
 %when a user attempts to visit an RP. It
 involves four steps: script downloading, RP identity transformation, identity-token generation, and $Acct$ calculation. In Figure \ref{fig:process}, the IdP's and RP's operations are connected by two vertical lines, respectively. The user operations are split into two groups (i.e., two browser windows) by two vertical lines, one communicating with the IdP and the other with the RP. Solid horizontal lines indicate messages exchanged between the user and the IdP (or the RP), while dotted lines represent a \verb+postMessage+ invocation between two scripts (or browser windows) within the browser.
 
@@ -259,7 +259,7 @@ The user and the RP negotiate $PID_{RP} = [t]{ID_{RP}}$.
     with the scope of requested user attributes,
     which is then transmitted from the RP script to the IdP script.  % through \verb+postMessage+.
 \item[2.3] The IdP script verifies $Cert_{RP}$, extracts $ID_{RP}$ and $Enpt_{RP}$ from $Cert_{RP}$, and calculates $PID_{RP}=[t]{ID_{RP}}$.
-%It then creates a random endpoint $PEnpt_{U}$ for this login instance,
+%It then creates a random endpoint $PEnpt_{U}$ for this login,
  %   to receive identity tokens from the IdP.
     % as the RP endpoint required by IdP.我们已经修改了协议，IdP并不require什么
 
