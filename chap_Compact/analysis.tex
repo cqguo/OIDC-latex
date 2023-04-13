@@ -342,8 +342,8 @@ For $PID_{RP}$ and $PID_U$ can be deduced from $ID_{RP}$ and $Acct$ with $t$, re
 \vspace{0.75mm}
 \noindent\textsc{Proof.}
 When a malicious RP, denoted as $RP'$, receives and verifies an identity token from an honest user $U'$,
- it obtains $L' = (ID_{RP'}, t', [ID_{U'}]ID_{RP'})$. Suppose another malicious RP, denoted as $RP_j$, colludes with $RP'$ and shares the knowledge about all its $w$ logins, denoted as $\mathbb{L} = \{{L_{i}}\}$ and $1 \leq i \leq w$. These logins are initiated by a set of users, denoted as $\mathcal{U}$, including %a set of honest users $\mathcal{U}_H$ and 
- a subset of malicious users $\mathcal{U}_M \subseteq \mathcal{U}$.
+ it obtains $L' = (ID_{RP'}, t', [ID_{U'}]ID_{RP'})$. Suppose another malicious RP, denoted as $RP_j$, colludes with $RP'$ and shares the knowledge about all its $w$ logins, denoted as $\mathbb{L} = \{{L_{i}}\}$ and $1 \leq i \leq w$. These logins are initiated by a set of users, denoted as $\mathcal{U}_j$, including a set of honest users $\mathcal{U}_{j,H} \subseteq \mathcal{U}_{j}$ and
+ a subset of malicious users $\mathcal{U}_{j,M} \subseteq \mathcal{U}_j$.
 
 Let us first assume malicious users do not collude with malicious RPs, so they do not reveal their accounts.
 As a result, even if $RP_j$ and $RP'$ collude, they are not told if some of the logins are initiated by the same malicious user. According to Lemma 2, given $\mathbb{L}$ and $L'$, $RP_j$ and $RP'$ cannot decide if $U' \in \mathcal{U}$ or not.
@@ -352,7 +352,9 @@ Therefore, they cannot determine if a login in $\mathbb{L}$ is initiated by $U'$
  % 不需要专门谈PID_U, colluding user合作之后，就是account就连起来了、不必专门谈PID_U。
 
 
-Since $RP_j$ can be any of the $c$ malicious RPs in the system, we can easily extend this proof to include all of the $c$ malicious RPs, by defining $\mathbb{L}$ as the union of the logins to all of the $c$ colluding RPs and $\mathcal{U}$ as the set of users who initiate these logins.
+Since $RP_j$ can be any of the $c$ malicious RPs in the system, we can easily extend this proof to include all of the $c$ malicious RPs, by defining $\mathbb{L}^{\Sigma}$ as the union of the logins to all of the $c$ colluding RPs and $\mathcal{U}^{\Sigma}$ as the set of users who initiate these logins.
+That is,
+    any $\mathcal{L}$ in $\mathbb{L}^{\Sigma}$ is indistinguishable.
 
 %If we denote the set of users who initiate logins to all malicious RPs as $\mathcal{U}$ and the set of honest users in $\mathcal{U}$ as $\mathcal{U}_H$, the RP-based linkage attack is to determine if $U' \in \mathcal{U}_H$.
 
@@ -384,13 +386,22 @@ L_{v,1},&L_{v,2},&\cdots,&L_{v,c}
 \noindent where $L_{i,j} = (ID_{RP_j}, t_{i,j}, [ID_{U_i}]ID_{RP_j})$, $1 \leq i \leq v$ and $1 \leq j \leq c$.
 $\mathfrak{L}$ is an ordered subset of $\mathbb{L}$ denoting the linked logins that are initiated by all malicious users to all malicious RPs. Note that $\mathcal{U}_M=\{u_1,...,u_v\}$ is known to all colluding entities.
 
-Given $L'$, $\mathbb{L}$, and $\mathfrak{L}$, a malicious $RP'$ and the other $c$ colluding RPs cannot determine if $U' \in \mathcal{U}$ according to Lemma 2 or if $U' \in \mathcal{U}_M$ according to Lemma 3.
-This indicates the additional information provided by colluding users about their own logins does not assist the adversaries in determining the relationship between the honest users' logins.
+Given $L'$, and $\mathfrak{L}$, a malicious $RP'$ and the other $c$ colluding RPs cannot determine if $U' \in \mathcal{U}_M$ according to Lemma 3.
+Consequently, when $\mathbb{L}^{\Sigma}$ is also given and the above conclusion about $\mathbb{L}^{\Sigma}$ is provided, they cannot decide if $U' \in \mathcal{U}^{\Sigma} \setminus \mathcal{U}_M = \mathcal{U}^{\Sigma}_H$ .
+
+Therefore, 
+    any $\mathcal{L}$ in $\mathbb{L}^{\Sigma} \setminus \mathfrak{L}$ is indistinguishable.
+ \hfill $\square$
+
+
+%Given $L'$ and $\mathbb{L}$, a malicious $RP'$ and the other $c$ colluding RPs cannot determine if $U' \in \mathcal{U}$ according to Lemma 2.
+
+%This indicates the additional information provided by colluding users about their own logins does not assist the adversaries in determining the relationship between the honest users' logins.
 %an arbitrary login in $(\mathbb{L}-\mathfrak{L})$, which is not initiated by a malicious user, is initiated by the honest user $U'$ or by another honest user in the system.
-As a result, they still cannot link $L'$ to any of the logins initiated by $U'$.
+%As a result, they still cannot link $L'$ to any of the logins initiated by $U'$.
+
 % Therefore, we prove that \usso~prevents RP-based identity linkage, even when multiple malicious RPs and malicious users collude.
 % 这句话在Theorem 7之前的那一段谈过了。
- \hfill $\square$
 
 
 \vspace{3mm}
