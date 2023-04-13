@@ -92,9 +92,9 @@ Malicious RPs could collude with each other or with malicious users, attempting 
 \subsection{The Dolev-Yao-Style Model for \usso}
 \label{dy-model}
 
-We develop a Dolev-Yao style model \cite{BrowserID, SPRESSO, FettKS16, FettKS17} for \usso, referred to as the \dyu~model, to formalize the login flow of \usso. Dolev-Yao style models abstract cryptographic concepts into an algebra of symbolic messages to discover structural flaws using simple formal logic. % which has been used in the formal analysis of SSO protocols such as OAuth 2.0 \cite{FettKS16} and OIDC \cite{FettKS17}.
-
-The \dyu~model abstracts the entities in a web system, such as web servers and browsers, as \emph{atomic processes}, %which communicate with each other through events. % such as HTTPS requests and responses.
+We develop a Dolev-Yao style model \cite{BrowserID, SPRESSO, FettKS16, FettKS17} for \usso, referred to as the \dyu~model, to formalize the login flow of \usso.
+% Dolev-Yao style models abstract cryptographic concepts into an algebra of symbolic messages to discover structural flaws using simple formal logic. % which has been used in the formal analysis of SSO protocols such as OAuth 2.0 \cite{FettKS16} and OIDC \cite{FettKS17}.
+The model abstracts the entities in a web system, such as web servers and browsers, as \emph{atomic processes}, %which communicate with each other through events. % such as HTTPS requests and responses.
 and defines \emph{script processes} to formulate client-side scripts.
 %The script is dependently invoked by the browser to process the server-defined logic.%such as verifying $Certificate_{RP}$. %postmessage events; %atomic process <-> script process, communication. %Other events change self-trigger.
 The atomic processes of \usso~include an {\em IdP process}, a finite set of {\em web servers} for honest RPs, a finite set of honest {\em browsers}, and a finite set of {\em attacker processes} that model malicious RPs and malicious users.
@@ -103,14 +103,14 @@ The processes communicate with each other through events such as HTTPS requests 
 The script processes communicate through \verb+postMessage+, which are modeled as transmitted-to-itself events of a browser process.
 %To clearly indicate the action of postMessage communication, we define it as the transmitting-to-itself event of the browser (which is not defined in SPRESSO).
 
-With the DYU model, we trace the lifecycle of an identity token from its generation at the IdP to its acceptance at an RP, locate the places where $PID_U$, $PID_{RP}$, and other elements related to the identity token such as $t$ and $u$ are processed, and locate the places where $PK$ is transmitted and used in the IdP script.
-Applying the DYU model, we confirm the following conclusions:
- (\emph{a}) an identity token binding identities of honest entities, cannot be leaked to any malicious entity;
- (\emph{b}) pseudo-identities and other elements in verified identity tokens cannot be manipulated by any malicious entity;
-    (\emph{c}) the IdP's public key set in the IdP script cannot be replaced by any malicious process, for an honest browser;
- (\emph{d}) the IdP does not receive anything about $t$ shared between the user and the RP;
- (\emph{e}) the RPs does not receive anything about $u$ shared between the user and the IdP;
- and (\emph{f}) $r$ is not leaked to any adversary as it never leaves the IdP; 
+Applying the DYU model, we trace the lifecycle of an identity token from its generation at the IdP to its acceptance at an RP, locate the places where $PID_U$, $PID_{RP}$, and other elements related to the identity token such as $t$ and $u$ are processed, and locate the places where $PK$ is transmitted and used in the IdP script.
+We confirm the following conclusions in the DYU model:
+ (\emph{a}) an identity token binding pseudo-identities of honest entities, cannot be leaked to any malicious process;
+ (\emph{b}) pseudo-identities and other elements in verified identity tokens cannot be manipulated by any malicious process;
+    (\emph{c}) the IdP's public key set in the IdP script cannot be replaced or tampered with by any malicious process, within an honest browser;
+ (\emph{d}) the IdP receives nothing about $t$ shared between two honest processes;
+ (\emph{e}) $r$ is not leaked to any malicious process as it never leaves the IdP;
+and (\emph{f}) the RPs cannot receive anything about $u$ shared between two honest processes.
 
 %With the DYU model, we (\emph{a}) trace the lifecycle of an identity token from its generation at the IdP to its acceptance at an RP to prove that it cannot be leaked to adversaries; (\emph{b}) locate the places where $PID_U$, $PID_{RP}$, and other elements in the identity token are processed to prove that they cannot be manipulated by any adversary; and (\emph{c}) locate the places where $PK$ is transmitted and used in the IdP script to prove that it cannot be replaced by any adversary.
 
@@ -122,26 +122,29 @@ Applying the DYU model, we confirm the following conclusions:
 % by presenting \emph{identity tokens} issued by a \emph{trusted} IdP.
 
 We prove that identity tokens in \usso~and the enclosed pseudo-identities satisfy four properties, namely, \emph{RP designation}, \emph{user identification}, \emph{token confidentiality}, and \emph{token integrity}, which together ensure the security of \usso~in the first adversarial scenario.
-First, let us consider an identity token $TK$ binding $PID_{RP}$ and $PID_U$, which is generated by the IdP upon a request from an authenticated user with $ID_U$.
+Let us consider an identity token $TK$ binding $PID_{RP}$ and $PID_U$, which is generated by the IdP upon a request from an authenticated user with $ID_U$.
 
 %These conclusions are used to prove the security of the UPPRESSO protocols.
 %We consider an arbitrary login in which an arbitrary RP with $ID_{RP}$ receives an integer $t$ and an identity token $TK$ issued by the IdP, binding a $PID_U$ and a $PID_{RP}$, from the RP script in a user browser. $TK$ is considered a valid identity token if the RP could verify its signature using the IdP's public key $PK$.
 
 \vspace{3mm}
-\noindent\textsc{Theorem 1. (RP Designation of $TK$)} {\em $PID_{RP}$ in $TK$ uniquely designates an RP with $ID_{RP}$, where $PID_{RP}= [t]ID_{RP}$, $ID_{RP} = [r]G$, $r$ is a random number known only to the IdP, and $G$ is a generator on $\mathbb{E}$ of order $n$.}
+\noindent\textsc{Theorem 1. (RP Designation of $TK$)} {\em $PID_{RP}$ in $TK$ uniquely designates an RP with $ID_{RP}$, where $PID_{RP}= [t]ID_{RP}$, $t \in [1,n)$, $ID_{RP} = [r]G$, $r$ is a random number known only to the IdP, and $G$ is a generator on $\mathbb{E}$ of order $n$.}
 %{\em Provided that $r$ is known only to the IdP, $PID_{RP}$ in the identity token uniquely designates the RP with $ID_{RP} = [r]G$.}}
 %{\em If $TK$ is a valid identity token and $PID_{RP} = [t]ID_{RP}$ is satisfied, $PID_{RP}$ uniquely designates the RP that receives $TK$.}
 
 \vspace{0.75mm}
-\noindent\textsc{Proof.} In \usso, $PID_{RP}=[t]ID_{RP}$ is generated by a user based on the target RP's identity $ID_{RP}$ and a user-selected random number $t$.
-It is computationally easy for any party who knows $ID_{RP}$ and $t$ to validate the $PID_{RP}$ in an identity token. A valid $PID_{RP}$ always specifies an RP in the system. %$PID_{RP}$ sent by a user in her identity-token request is calculated as $PID_{RP} = [t]ID_{RP}$, where $ID_{RP}$ is the target RP's identity and $t$ is a random number selected by the user and shared with this RP.
-Therefore, $PID_{RP}$ designates the target RP that knows $t$.
+\noindent\textsc{Proof.} In \usso, $PID_{RP}=[t]ID_{RP}$ is generated by a user based on the target RP's identity $ID_{RP}$ and a user-selected random number $t \in [1,n)$.
+The target RP with $ID_{RP}$ receives $t$,
+     and it will also calculate $PID_{RP}=[t]ID_{RP}$ to match $PID_{RP}$ extracted from a token received.
+%It is computationally easy for any party who knows $ID_{RP}$ and $t$ to validate the $PID_{RP}$ in an identity token. A valid
+Thus, $PID_{RP}$ always specifies an RP, i.e., %$PID_{RP}$ sent by a user in her identity-token request is calculated as $PID_{RP} = [t]ID_{RP}$, where $ID_{RP}$ is the target RP's identity and $t$ is a random number selected by the user and shared with this RP.
+designates the target RP that knows $t$.
 
 Next, according to Lemma 1, given $PID_{RP} = [t]ID_{RP}$, the probability that $PID_{RP}$ designates another RP with $ID_{RP'}$ is negligible. %This means that $PID_{RP}$ cannot be associated with any other RPs in the system.
 Therefore, $PID_{RP}$ designates only the target RP with $ID_{RP}$ in the system.  \hfill $\square$
 
 \vspace{3mm}
-\noindent\textsc{Lemma 1.} {\em  For any two RPs in a finite set of RPs, the probability of finding different numbers $t$ and $t'$ in $[1,n)$ that satisfy $[t]ID_{RP_j} = [t']ID_{RP_{j'}}$ is negligible, where $ID_{RP_j}=[r]G$, $ID_{RP_{j'}}=[r']G$, $r$ and $r'$ are different numbers unknown to the RPs, and $G$ is a generator on $\mathbb{E}$ of order $n$.}
+\noindent\textsc{Lemma 1.} {\em  For any two RPs in a finite set of RPs, the probability of finding different numbers $t$ and $t' \in [1,n)$ that satisfy $[t]ID_{RP_j} = [t']ID_{RP_{j'}}$ is negligible, where $ID_{RP_j}=[r]G$, $ID_{RP_{j'}}=[r']G$, $r$ and $r'$ are different numbers unknown to the RPs, and $G$ is a generator on $\mathbb{E}$ of order $n$.}
 
 %Based on the ECDLP we prove that, for adversaries, the probability of finding $t$ and $t'$ satisfying $[t]ID_{RP_j} = [t']ID_{RP_{j'}}$ is negligible, where $RP_j$ and $RP_{j'}$ are any two RPs in the finite set of RPs (i.e., $ID_{RP_j} = [r_j]G$ and $ID_{RP_{j'}} = [r_{j'}]G$, while $r_j$ and $r_{j'}$ are kept secret to the adversaries). This negligible probability means $PID_{RP_j} = [t]ID_{RP_j}$ designates \emph{only} the target RP with $ID_{RP_j}$.
 
@@ -153,7 +156,7 @@ Finding $t$ and $t'$ that satisfy $[t]ID_{RP_j} = [t']ID_{RP_{j'}}$, i.e., a $PI
 
 Figure \ref{fig:ecdlp_algorithm} depicts a probabilistic polynomial time (PPT) algorithm $\mathcal{D}^*_c$, which is constructed based on this game $\mathcal{G}_c$, to solve the elliptic curve discrete logarithm problem (ECDLP): find a number $x \in \mathbb{Z}_n$ satisfying $Q = [x]G$,
 where $Q$ is a point on $\mathbb{E}$ and $G$ is a generator on $\mathbb{E}$ of order $n$.
-The probability of solving the ECDLP using $\mathcal{D}^*_c$ is ${\rm Pr}\{\mathcal{D}^*_c(G, [x]G)=x\}$.
+The probability of solving the ECDLP using $\mathcal{D}^*_c$ is denoted as ${\rm Pr}\{\mathcal{D}^*_c(G, [x]G)=x\}$.
 %For any PPT algorithm $\mathcal{D}$ is used to calculate $x$, we define the probability of finding $x$ as: %Therefore, the probability of finding $x$ using a probabilistic polynomial time (PPT) algorithm is negligible.
 Due to the ECDLP assumption,
     ${\rm Pr}\{\mathcal{D}^*_c(G, [x]G)=x\} = \epsilon_{c}(k)$ becomes negligible when the security parameter $k$ is sufficiently large.
@@ -338,12 +341,12 @@ When $c+1$ malicious RPs and $v$ malicious users collude in \usso, given a login
 
 \vspace{0.75mm}
 \noindent\textsc{Proof.}
-Consider an arbitrary malicious RP, denoted as $RP'$, among $c+1$ colluding RPs. When an honest user $U'$ initiates a login $\mathcal{L'}$ to $RP'$, it obtains $L' = (ID_{RP'}, t', [ID_{U'}]ID_{RP'})$. Suppose one of the remaining malicious RP, denoted as $RP_j$ colludes with $RP'$ and shares its knowledge about all the $w$ logins it has observed, denoted as $\mathbb{L} = \{{L_i}\}$, where $L_i = ([r]G, t_i, [u_i r]G)$ and $1 \leq i \leq w$. $\mathbb{L}$ is about the logins that may potentially be initiated by any honest or malicious users. 
+Consider an arbitrary malicious RP, denoted as $RP'$, among $c+1$ colluding RPs. When an honest user $U'$ initiates a login $\mathcal{L'}$ to $RP'$, it obtains $L' = (ID_{RP'}, t', [ID_{U'}]ID_{RP'})$. Suppose one of the remaining malicious RP, denoted as $RP_j$ colludes with $RP'$ and shares its knowledge about all the $w$ logins it has observed, denoted as $\mathbb{L} = \{{L_i}\}$, where $L_i = ([r]G, t_i, [u_i r]G)$ and $1 \leq i \leq w$. $\mathbb{L}$ is about the logins that may potentially be initiated by any honest or malicious users.
 
 First, let us assume the malicious users have not colluded with the malicious RPs by not revealing additional information about their own $PID_U$s. Therefore, $RP'$ does not know some logins in $w$ are initiated by the same malicious users. According to Lemma 2, $RP'$ and $RP_j$ cannot distinguish if any of the logins among $w$ is initiated by $U'$ or by another honest user in the system, given $L'$ and $\mathbb{L}$.
 
 
-%Let us denote $c$ malicious RPs as $RP_j$ ($1 \leq j \leq c$) and the $(c+1)$th RP as $RP'$.  
+%Let us denote $c$ malicious RPs as $RP_j$ ($1 \leq j \leq c$) and the $(c+1)$th RP as $RP'$.
 
 ///We first consider a malicious RP denoted as $RP'$ that receives a login $L'$ by an honest user $U'$, the other $c$ malicious RPs denoted as $RP_j$ ($1 \leq j \leq c$), and no malicious user.
 According to Lemma 2, a pair of $RP_j$ and $RP'$ cannot decide whether a login initiated by $U'$ to $RP'$ is initiated by one of the users visiting $RP_j$ or not.
