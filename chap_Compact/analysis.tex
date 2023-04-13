@@ -104,13 +104,13 @@ The script processes communicate through \verb+postMessage+, which are modeled a
 %To clearly indicate the action of postMessage communication, we define it as the transmitting-to-itself event of the browser (which is not defined in SPRESSO).
 
 With the DYU model, we trace the lifecycle of an identity token from its generation at the IdP to its acceptance at an RP, locate the places where $PID_U$, $PID_{RP}$, and other elements related to the identity token such as $t$ and $u$ are processed, and locate the places where $PK$ is transmitted and used in the IdP script.
-Applying the DYU model, we confirm the following conclusions:
- (\emph{a}) an identity token binding identities of honest entities, cannot be leaked to any malicious entity;
- (\emph{b}) pseudo-identities and other elements in verified identity tokens cannot be manipulated by any malicious entity;
-    (\emph{c}) the IdP's public key set in the IdP script cannot be replaced by any malicious process, for an honest browser;
- (\emph{d}) the IdP does not receive anything about $t$ shared between the user and the RP;
- (\emph{e}) the RPs does not receive anything about $u$ shared between the user and the IdP;
- and (\emph{f}) $r$ is not leaked to any adversary as it never leaves the IdP; 
+Applying the DYU model, we confirm the following conclusions: 
+(\emph{a}) an identity token binding identities of honest entities cannot be leaked to any malicious entity; 
+(\emph{b}) pseudo-identities and other elements in verified identity tokens cannot be manipulated by any malicious entity; 
+(\emph{c}) the IdP's public key set in the IdP script running in an honest browser cannot be replaced by any malicious process; 
+(\emph{d}) the IdP does not receive anything about $t$ shared between the user and the RP; 
+(\emph{e}) the RPs do not receive anything about $u$ shared between the user and the IdP; 
+and (\emph{f}) $r$ is not leaked to any adversary as it never leaves the IdP.
 
 %With the DYU model, we (\emph{a}) trace the lifecycle of an identity token from its generation at the IdP to its acceptance at an RP to prove that it cannot be leaked to adversaries; (\emph{b}) locate the places where $PID_U$, $PID_{RP}$, and other elements in the identity token are processed to prove that they cannot be manipulated by any adversary; and (\emph{c}) locate the places where $PK$ is transmitted and used in the IdP script to prove that it cannot be replaced by any adversary.
 
@@ -323,7 +323,7 @@ When $c+1$ malicious RPs and $v$ malicious users collude in \usso, given a login
 
 \vspace{0.75mm}
 \noindent\textsc{Proof.}
-Consider an arbitrary malicious RP, denoted as $RP'$, among $c+1$ colluding RPs. When an honest user $U'$ initiates a login $\mathcal{L'}$ to $RP'$, it obtains $L' = (ID_{RP'}, t', [ID_{U'}]ID_{RP'})$. Suppose one of the remaining malicious RP, denoted as $RP_j$, colludes with $RP'$ and shares its knowledge about all the $w$ logins it has observed, denoted as $\mathbb{L}_j = \{{L_{ij}}\}$, where $L_{ij} = ([r]G, t_{ij}, [u_{ij} r]G)$ and $1 \leq i \leq w$. $\mathbb{L}_j$ is about the logins to $RP_j$ that could be initiated by honest or malicious users. 
+Consider an arbitrary malicious RP, denoted as $RP'$, among $c+1$ colluding RPs. When an honest user $U'$ initiates a login $\mathcal{L'}$ to $RP'$, it obtains $L' = (ID_{RP'}, t', [ID_{U'}]ID_{RP'})$. Suppose one of the remaining malicious RP, denoted as $RP_j$, colludes with $RP'$ and shares its knowledge about all the $w$ logins it has observed, denoted as $\mathbb{L}_j = \{{L_{i,j}}\}$, where $L_{i,j} = ([r]G, t_{ij}, [u_{ij} r]G)$ and $1 \leq i \leq w$. $\mathbb{L}_j$ is about the logins to $RP_j$ that could be initiated by honest or malicious users. 
 
 First, let us assume the malicious users do not collude with the malicious RPs by not revealing additional information about their own $PID_U$s to them. Therefore, two colluding RPs do not know if some of the $w$ logins are initiated by the same malicious users. According to Lemma 2, given $L'$ and $\mathbb{L}_j$, $RP'$ and $RP_j$ cannot determine if an arbitrary login among $w$ is initiated by $U'$ or by another honest user in the system. Therefore, they cannot link $L'$ to any of the $w$ logins, which appear equally likely to be initiated by $U'$. Then, we extend this proof to include all $c$ malicious RPs since $RP_j$ could be any malicious RP in the system. 
 
@@ -350,7 +350,7 @@ L_{v,1},&L_{v,2},&\cdots,&L_{v,c}
 % \end{matrix}\right\}$
 \noindent where $L_{i,j} = (ID_{RP_j}, t_{i,j}, [ID_{U_i}]ID_{RP_j})$, $i \in [1, v]$ and $j \in [1, c]$. $\mathfrak{L}$ is an ordered subset of $\mathbb{L}$ denoting the linked logins initiated by all malicious users to all malicious RPs.
 
-According to Lemma 3, given $L'$ and $\mathfrak{L}$, $RP'$ and the other $c$ colluding RPs cannot determine if an arbitrary login in $(\mathbb{L}-\mathfrak{L})$, which is not initiated by a malicious user, is initiated by the honest user $U'$ or by another honest user in the system. As a result, they still cannot link $L'$ to any of the logins initiated by non-malicious users. Therefore, we prove that \usso~prevents RP-based identity linkage, even when multiple malicious RPs and malicious users collude.
+According to Lemma 3, given $L'$ and $\mathfrak{L}$, $RP'$ and the other $c$ colluding RPs cannot determine if an arbitrary login in $(\mathbb{L}-\mathfrak{L})$, which is not initiated by a malicious user, is initiated by the honest user $U'$ or by another honest user in the system. As a result, they still cannot link $L'$ to any of the logins initiated by non-malicious users. Therefore, we prove that \usso~prevents RP-based identity linkage, even when multiple malicious RPs and malicious users collude. \hfill $\square$
 
 %$RP_j$ ($1 \leq j \leq c$) and $RP'$ cannot decide whether a login by $U'$ to $RP'$ is initiated by one of the $v$ malicious users visiting $RP_j$ ($1 \leq j \leq c$) or not, unless $U'$ is malicious and reveal his identity to $RP'$.So, the collusion with malicious users does not bring benefits for the adversaries, to link an honest user's logins across colluding RPs. So UPPRESSO prevents RP-based identity linkage, even when malicious RPs are colluding with malicious users.
 
@@ -372,11 +372,11 @@ According to Lemma 3, given $L'$ and $\mathfrak{L}$, $RP'$ and the other $c$ col
 
 %To prevent RP-based linkage among colluding RPs, we need to prove that $RP_{c+1}$ cannot distinguish if the user is one of the $w$ users in $\mathbb{L}_j$s or a newly authenticated user, i.e., $ID_{U'} \in \mathbb{Z}_n$.
 
-\vspace{1mm}
+
 %\noindent\textsc{Lemma 2.} {\em When $u'$, $r_j$, and $r_{j'}$ are randomly selected and unknown, the probability of distinguishing the association between $([r_{j'}]G, t', [u'r_{j'}]G)$ and $([r_j]G, t, [u'r_j]G)$ and the association between $([r_{j'}]G, t', [u'r_{j'}]G)$ and $([r_j]G, t, [z]G)$ is negligible, where $G$ is a point on an elliptic curve $\mathbb{E}$ and $t$, $t'$, and $z$ are random numbers in $\mathbb{Z}_n$.}
 
 
-
+\vspace{3mm}
 \noindent\textsc{Lemma 2.} {\em Given the logins to $RP$ by $v$ users denoted as $\mathbb{L} = \{{L_i}\}$, where $L_i = ([r]G, t_i, [u_i r]G)$ and $1 \leq i \leq v$,
     two colluding RPs, $RP$ and $RP'$, cannot decide whether a login to $RP'$ denoted as $L' = (ID_{RP'}, t', [ID_{U'}]ID_{RP'})$, is initiated by one of the $v$ users or not, i.e., $ID_{U'} \in \{u_i\}$ ($1 \leq i \leq v$) or $ID_{U'} \in \mathbb{Z}_n$.}
 
