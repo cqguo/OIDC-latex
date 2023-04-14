@@ -313,12 +313,12 @@ Because $G$ is a generator of order $n$, $ID_{RP} = [r]G$ is also a generator on
 \vspace{2mm}
 
 In the third adversarial scenario, malicious RPs collude with malicious users, attempting to link the logins of honest users across these colluding RPs.
-That is, when $c+1$ malicious RPs and $v$ users collude in \usso, 
+That is, when $c+1$ malicious RPs and users collude in \usso, 
     given any login $\mathcal{L'}$ initiated by an honest user $U'$ to one of the malicious RPs,
     this RP with all the other colluding entities aims to link $\mathcal{L'}$ to the logins at other $c$ colluding RPs
      which are also initiated by $U'$.
 To show that \usso~prevents such linkage, we prove in Theorem 7 that the colluding adversaries cannot distinguish a login initiated by $U'$ to some of the $c$ malicious RPs from the ones initiated by any other honest users to the $c$ malicious RPs.
-As a result, given $\mathcal{L'}$ and a shared view of all logins to the colluding RPs, the adversaries have no clue to link $\mathcal{L'}$ to one login instead of another.
+As a result, given $\mathcal{L'}$ and a shared view of all logins to the colluding RPs, the adversaries have no clue to link $\mathcal{L'}$ to one login instead of another (or even to a |$w$| subset of logins instead of others), because any login is indistinguishable.
 %Malicious RPs colluding with malicious users, attempt to link logins of honest users across these malicious RPs. We prove that UPPRESSO prevents RP-based identity linkage, by showing that,  the colluding adversaries cannot distinguish a login by $U'$ to any of other $c$ malicious RP from the logins by any honest users to the $c$ malicious RPs.
 
 Let us investigate the knowledge that an RP obtains from each login. In \usso, an RP receives a random number $t$ and an identity token enclosing $PID_{RP}$ and $PID_U$ in each login. Meanwhile, it knows its own identity $ID_{RP}$ and derives the user's account $Acct$.
@@ -332,7 +332,7 @@ For $PID_{RP}$ and $PID_U$ can be deduced from $ID_{RP}$ and $Acct$ with $t$, re
 %The colluding RPs share $\mathbb{V}_j$s and $\mathbb{L}_j$s in RP-based linkage attacks, where a malicious RP aims to link an honest user logged in to itself (e.g., $PID_a$ and $L_{a,j}$) to another user authenticated to a colluding RP (e.g., $PID_b$ and $L_{b,k}$ for any $k \neq j$) by finding a relationship between $L_{a,j}$ and $L_{b,k}$.
 
 \vspace{3mm}
-\noindent \textsc{Theorem 7. (Privacy against Colluding RPs)} {\em When $c+1$ malicious RPs and $v$ users collude in \usso, given any login $\mathcal{L'}$ initiated by an honest user $U'$ to a malicious RP, the adversaries cannot distinguish a login initiated by $U'$ to any of the other $c$ malicious RP from the logins initiated by any honest users to the $c$ colluding RPs.}
+\noindent \textsc{Theorem 7. (Privacy against Colluding RPs)} {\em When $c+1$ malicious RPs and $v$ users collude in \usso, given any login $\mathcal{L'}$ initiated by an honest user $U'$ to a malicious RP, the adversaries cannot distinguish a login initiated by $U'$ to any of the other $c$ malicious RP from the logins initiated by any honest users to these $c$ colluding RPs.}
 
 
 %the shared knowledge $\mathbb{V}=\bigcup_{1 \le j \le c}\mathbb{V}_j$ and $\mathbb{L}=\bigcup_{1 \le j \le c}\mathbb{L}_j$ from a group of $c$ colluding RPs and $v$ colluding users, any malicious RP cannot differentiate if an honest user who has logged in to itself is among the users who have logged in to any of the colluding RPs.}
@@ -344,7 +344,7 @@ For $PID_{RP}$ and $PID_U$ can be deduced from $ID_{RP}$ and $Acct$ with $t$, re
 When a malicious RP, denoted as $RP'$, receives and verifies an identity token from an honest user $U'$,
  it obtains $L' = (ID_{RP'}, t', [ID_{U'}]ID_{RP'})$. Suppose another malicious RP, denoted as $RP_j$, colludes with $RP'$ and shares the knowledge about all its $w$ logins, denoted as $\mathbb{L} = \{{L_{i}}\}$ and $1 \leq i \leq w$. These logins are initiated by a set of users, denoted as $\mathcal{U}_j$, including a set of honest users $\mathcal{U}_{j,H} \subseteq \mathcal{U}_{j}$ and
  a subset of malicious users $\mathcal{U}_{j,M} \subseteq \mathcal{U}_j$.
-$\mathcal{U}_j = \mathcal{U}_{j,H} \cup \mathcal{U}_{j,M}$
+$\mathcal{U}_j = \mathcal{U}_{j,H} \cup \mathcal{U}_{j,M}$.
 
 Let us first assume malicious users do not collude with malicious RPs, so they do not reveal their accounts.
 As a result, even if $RP_j$ and $RP'$ collude, they are not told if some of the logins are initiated by the same malicious user. According to Lemma 2, given $L'$ and ``any subset'' of $\mathbb{L}$, $RP'$ and $RP_j$ cannot decide if $U' \in$ ``the corresponding subset'' of $\mathcal{U}$ or not.
@@ -352,8 +352,8 @@ As a result, even if $RP_j$ and $RP'$ collude, they are not told if some of the 
      %which means they cannot link the $PID_U$ of $L'$ to the $PID_U$ of any login in $\mathbb{L}$.
      % 不需要专门谈PID_U, colluding user合作之后，就是account就连起来了、不必专门谈PID_U。
 That is, given $\mathcal{L}'$,
-any $\mathcal{L}$ in $\mathbb{L}$ is \emph{indistinguishable},
- because the above conclusion is about \emph{any subset}  of $\mathbb{L}$.
+any $\mathcal{L}$ in $\mathbb{L}$ is \emph{indistinguishable} from the others in $\mathbb{L}$,
+ because the above conclusion is about \emph{any subset}  of $\mathbb{L}$ (i.e., $\mathbb{L}$ $\setminus$ some $\mathcal{L}_k$s).
 
 
 Since $RP_j$ can be any of the $c$ malicious RPs in the system, we can easily extend this proof to include all of the $c$ malicious RPs, by defining $\mathbb{L}^{\Sigma}$ as the union of the logins to all of the $c$ colluding RPs and $\mathcal{U}^{\Sigma}$ as the set of users who initiate these logins.
@@ -390,9 +390,9 @@ L_{v,1},&L_{v,2},&\cdots,&L_{v,c}
 \noindent where $L_{i,j} = (ID_{RP_j}, t_{i,j}, [ID_{U_i}]ID_{RP_j})$, $1 \leq i \leq v$ and $1 \leq j \leq c$.
 $\mathfrak{L}$ is an \emph{ordered} subset of $\mathbb{L}$ denoting the linked logins that are initiated by $v$ malicious users to the $c$ malicious RPs. Note that $\mathcal{U}_M=\{u_1,...,u_v\}$ is known to all colluding entities.
 
-Consider any subset of $\mathbb{L}^{\Sigma}$.
-     Given $L'$, and ``the corresponding subset matrix'' of $\mathfrak{L}$ that is included in the subset of $\mathbb{L}^{\Sigma}$, a malicious $RP'$ and the $c$ (or $c-\delta$) colluding RPs cannot determine if $U' \in$ ``the corresponding subset'' of $\mathcal{U}_M$ according to Lemma 3.
-     Consequently, they cannot determine if $U' \in$ \{``the corresponding subset'' of $\mathcal{U}^{\Sigma}$ $\setminus$ ``the corresponding subset'' of $\mathcal{U}_M$\}, combined with the deduction from Lemma 2.
+Consider any subset of $\mathbb{L}^{\Sigma}$:
+   \{  Given $L'$, and ``the corresponding subset matrix'' of $\mathfrak{L}$ that is included in the subset of $\mathbb{L}^{\Sigma}$, a malicious $RP'$ and the $c$ (or $c-\delta$) colluding RPs cannot determine if $U' \in$ ``the corresponding subset'' of $\mathcal{U}_M$ according to Lemma 3.
+     Consequently, they cannot determine if $U' \in$ \{``the corresponding subset'' of $\mathcal{U}^{\Sigma}$ $\setminus$ ``the corresponding subset'' of $\mathcal{U}_M$\}, combined with the deduction from Lemma 2. \}
 
 Finally, even with $v$ malicious user,
     any $\mathcal{L}$ in $\mathbb{L}^{\Sigma} \setminus \mathfrak{L}$ is \emph{indistinguishable},
