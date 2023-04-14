@@ -419,11 +419,11 @@ Finally, even with $v$ malicious user,
 \vspace{0.75mm}
 \noindent{\textsc{Proof.} We define a game $\mathcal{G}_r$ between an adversary and a challenger,
     to describe the RP-based identity linkage:
- the adversary receives $\mathbb{L} = \{{L_i}\}$ and $L' = (ID_{RP'}, t', [ID_{U'}]ID_{RP'})$ from the challenger and outputs the result $s = 1$ if it decides $u' \in \{u_i\}$ or $s = 0$ if $u'$ is randomly chosen in $\mathbb{Z}_n$.
+ the adversary receives $\mathbb{L} = \{{L_i}\}$ and $L' = (ID_{RP'}, t', [ID_{U'}]ID_{RP'})$ from the challenger, and outputs the result $s = 1$ if it decides $ID_{U'} \in \{u_1, u_2, \cdots, u_w\}$ or $s = 0$ if $ID_{U'}$ is randomly chosen in $\mathbb{Z}_n$.
 The adversary succeeds in the game with $\mathbf{Adv}_{A}$:
 \begin{align*}
-&{\rm Pr}_1={\rm Pr}\{\mathcal{G}_r(\mathbb{L}, L'| u' \in \{u_i\})=1\} \\
-&{\rm Pr}_2={\rm Pr}\{\mathcal{G}_r(\mathbb{L}, L'|u' \in \mathbb{Z}_n)=1\}\\
+&{\rm Pr}_1={\rm Pr}\{\mathcal{G}_r(\mathbb{L}, L'| ID_{U'} \in \{u_1, u_2, \cdots, u_w\})=1\} \\
+&{\rm Pr}_2={\rm Pr}\{\mathcal{G}_r(\mathbb{L}, L'|ID_{U'} \in \mathbb{Z}_n)=1\}\\
 &{\mathbf{Adv}}_{A}=|{\rm Pr}_1-{\rm Pr}_2|
 \end{align*}
 
@@ -438,16 +438,15 @@ The adversary succeeds in the game with $\mathbf{Adv}_{A}$:
 Based on $\mathcal{G}_r$, we design a PPT algorithm $\mathcal{D}^*_r$ to solve the elliptic curve decisional Diffie-Hellman (ECDDH) problem:
  given $(G, [x]G$, $[y]G$, $[z]G)$, decide whether $z$ equals to $xy$ or is randomly chosen in $\mathbb{Z}_n$,
     where $G$ is a point on an elliptic curve $\mathbb{E}$ of order $n$, and $x$ and $y$ are integers randomly and independently chosen in $\mathbb{Z}_n$.
-The probability of solving the ECDDH problem using $\mathcal{D}^*_r$ is defined as $|{\rm Pr}^*_1 - {\rm Pr}^*_2|$, where:
-\vspace{-3mm}
+%The probability of solving the ECDDH problem using $\mathcal{D}^*_r$ is defined as $|{\rm Pr}^*_1 - {\rm Pr}^*_2|$, where:
+According to the ECDDH assumption,
+    $|{\rm Pr}^*_1 - {\rm Pr}^*_2| = \epsilon_{r}(k)$ becomes negligible when the security parameter $k$ is sufficiently large,
+        where
 \begin{align*}
 &{\rm Pr}^*_1 =  {\rm Pr}\{\mathcal{D}^*(G, [x]G, [y]G, [xy]G)=1\} \\
 &{\rm Pr}^*_2 =  {\rm Pr}\{\mathcal{D}^*(G, [x]G, [y]G, [z]G)=1\}
 \end{align*}
-\vspace{-4mm}
 
-According to the ECDDH assumption,
-    $|{\rm Pr}^*_1 - {\rm Pr}^*_2| = \epsilon_{r}(k)$ becomes negligible when the security parameter $k$ is sufficiently large.
 
 As shown in Figure \ref{fig:dalgorithm}, the input of $\mathcal{D}^*_r$ is in the form of ($G, Q_1=[x]G, Q_2=[y]G, Q_3=[z]G$).
 Upon receiving the input, the challenger randomly chooses $u_i$, $r$, $t_i$, and $t'$ in $\mathbb{Z}_n$ for $1 \leq i \leq w$, and assigns $\mathbb{L} = \{{L_i}\} = \{([r]G, t_i, [u_ir]G)\}$.
@@ -456,18 +455,18 @@ Then, it randomly selects $d \in [1,w]$, replaces $[u_dr]G$ with $[r]Q_1$ in $L_
 
 According to the above construction of $\mathbb{L}$ and $L'$,
  $x$ is actually inserted into $\mathbb{L}$ as $u_d$, and $z/y$ is assigned to $ID_{U'}$.
-Thus, if $z = xy$, then $z/y = x$ and $ID_{U'} \in \{u_i\}$; otherwise, $ID_{U'} \in \mathbb{Z}_n$.
-The probability $|{\rm Pr}^*_1 - {\rm Pr}^*_2|$ of solving the ECDDH problem using $\mathcal{D}^*_r$ is deduced as:
+Thus, if $z = xy$, then $z/y = x$ and $ID_{U'} \in \{u_1, u_2, \cdots, u_w\}$; otherwise, $ID_{U'} \in \mathbb{Z}_n$.
+The advantage $|{\rm Pr}^*_1 - {\rm Pr}^*_2|$ of solving the ECDDH problem using $\mathcal{D}^*_r$ is deduced as:
 \begin{align*}
-&{\rm Pr}^*_1 =  {\rm Pr}\{\mathcal{D}^*_r(G, [x]G, [y]G, [xy]G)=1\} \\=&{\rm Pr}\{\mathcal{G}_r(\mathbb{L}, L'|ID_{U'} \in \{u_1, u_2, \cdots, u_v\})=1\} = {\rm Pr}_1 \\
+&{\rm Pr}^*_1 =  {\rm Pr}\{\mathcal{D}^*_r(G, [x]G, [y]G, [xy]G)=1\} \\=&{\rm Pr}\{\mathcal{G}_r(\mathbb{L}, L'|ID_{U'} \in \{u_1, u_2, \cdots, u_w\})=1\} = {\rm Pr}_1 \\
 &{\rm Pr}^*_2= {\rm Pr}\{\mathcal{D}^*_r(G, [x]G, [y]G, [z]G)=1\} \\=&  {\rm Pr}\{\mathcal{G}_r(\mathbb{L}, L'|ID_{U'} \in \mathbb{Z}_n)=1\} = {\rm Pr}_2\\
 &|{\rm Pr}^*_1-{\rm Pr}^*_2|=|{\rm Pr}_1-{\rm Pr}_2|={\mathbf{Adv}}_{A}
 \end{align*}
 
-If the probability of distinguishing a login initiated by a user $U'$ chosen from \{${U_1}, {U_2}, \cdots, {U_w}$\} or randomly from the universal user set is non-negligible,
-    then the adversary would have advantages in $\mathcal{G}_r$ and $|{\rm Pr}^*_1-{\rm Pr}^*_2|=|{\rm Pr}_1-{\rm Pr}_2|$ is non-negligible regardless of $k$.
+If the adversary has advantages in $\mathcal{G}_r$ to distinguish a login initiated by a user $U'$ chosen from \{${U_1}, {U_2}, \cdots, {U_w}$\} or randomly from the universal user set,
+    $|{\rm Pr}^*_1-{\rm Pr}^*_2|=|{\rm Pr}_1-{\rm Pr}_2|$ is non-negligible regardless of $k$.
 This violates the ECDDH assumption.
-Thus, If the probability of distinguishing a user $U'$ chosen from \{${U_1}, {U_2}, \cdots, {U_w}$\} or from the universal user set is negligible.
+Thus, the probability of distinguishing a user $U'$ chosen from \{${U_1}, {U_2}, \cdots, {U_w}$\} or from the universal user set is negligible.
 \hfill $\square$
 
 
