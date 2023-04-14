@@ -2,14 +2,14 @@
 \label{sec:discussion}
 
 \noindent{\textbf{IdP-RP collusive attacks.}}
-Privacy-preserving identity federation solutions~\cite{ELPASSO, UnlimitID, idemix, PseudoID, Opaak, uprov}
- prevent collusive attacks by an IdP and RPs
- but require (\emph{a}) a long-term secret held by a user and verified by RPs,
-  as well as (\emph{b}) user-managed accounts~\cite{PseudoID} for different RPs.
-These accounts may be derived from an RP's domain and the user's secret~\cite{ELPASSO, UnlimitID, Opaak, uprov,idemix},
- but can still bring inconvenience to users.
+Privacy-preserving identity federation solutions \cite{ELPASSO, UnlimitID, idemix, PseudoID, Opaak, uprov}
+ prevent collusive attacks by an IdP and RPs,
+ but require (\emph{a}) a long-term secret held by a user and verified by RPs
+  and (\emph{b}) user-managed accounts \cite{PseudoID} for different RPs.
+These accounts may be derived from an RP's domain and the user's secret \cite{ELPASSO, UnlimitID, Opaak, uprov,idemix},
+ but still bring inconvenience to users.
 For web applications, users need to install a browser extension to handle this long-term secret.
-If it is lost or leaked, the user must notify all RPs to update his accounts derived from the user secret.
+If it is lost or leaked, the user must notify all RPs to update her accounts derived from this secret.
 Note that if the accounts are not masked by the user secret, the colluding IdP and RPs can eventually link them.
 Unlike these approaches, \usso~does not protect user privacy against such collusive attacks,
  because a user is authenticated only \emph{once} in the login flow.
@@ -31,7 +31,7 @@ In addition, stronger elliptic curves accommodate more RPs and users, e.g., $n$ 
 
 
 %\vspace{0.75mm}
-\noindent \textbf{Support for the authorization code flow.} In OIDC authorization code flow~\cite{OpenIDConnect},
+\noindent \textbf{Support for the authorization code flow.} In OIDC authorization code flow \cite{OpenIDConnect},
  the IdP does not directly provide identity tokens.
  Instead, it sends an authorization code to the RP, which uses this code to request identity tokens.
  The identity-transformation algorithms, namely $\mathcal{F}_{PID_{U}}$, $\mathcal{F}_{PID_{RP}}$, and $\mathcal{F}_{Acct}$,
@@ -45,7 +45,7 @@ After receiving an authorization code,
  an RP uses it along with a secret credential issued by the IdP during the initial registration \cite{OpenIDConnect}
   to retrieve identity tokens from the IdP.
   However, to protect the RP identities from the IdP, privacy-preserving tokens
-   (e.g., ring or group signatures~\cite{ring-sig,chaum1991group} and TrustToken \cite{trusttoken})
+   (e.g., ring or group signatures \cite{ring-sig,chaum1991group} and TrustToken \cite{trusttoken})
    and anonymous networks (e.g., Tor \cite{tor}) need to be adopted for RPs in the retrieval of identity tokens.
 
 %\vspace{0.75mm}
@@ -70,7 +70,7 @@ This requires users to perform special operations to migrate their accounts to t
 
 %\vspace{0.75mm}
 \noindent \textbf{Restriction of the RP script's origin.}
-When the IdP script forwards identity tokens to the RP script, the \verb+postMessage+ targetOrigin mechanism~\cite{postm-targeto} is used to restrict the recipient of the tokens, to ensure that the tokens will be sent to the intended $Enpt_{RP}$, as specified in the RP certificate. The targetOrigin is specified as a combination of protocol, port (if not presented, 80 for \verb+http+ and 443 for \verb+https+), and domain (e.g., \verb+RP.com+).
+When the IdP script forwards identity tokens to the RP script, the \verb+postMessage+ targetOrigin mechanism \cite{postm-targeto} is used to restrict the recipient of the tokens, to ensure that the tokens will be sent to the intended $Enpt_{RP}$, as specified in the RP certificate. The targetOrigin is specified as a combination of protocol, port (if not presented, 80 for \verb+http+ and 443 for \verb+https+), and domain (e.g., \verb+RP.com+).
 The RP script's origin must accurately match the targetOrigin to receive the tokens.
 
 Although it does not check the URL path in $Enpt_{RP}$,
@@ -79,7 +79,7 @@ the targetOrigin mechanism introduces no {\em additional} risk.
 For example, if two RPs run on the same domain with different endpoints to receive tokens,
  e.g., \verb+https://RP.com/honest/tk+ and \verb+https://RP.com/malicious/tk+,
   they cannot be distinguished by \verb+postMessage+ when the IdP script is sending tokens.
-Since browsers control access to web resources with the same-origin policy (SOP)~\cite{sop},
+Since browsers control access to web resources with the same-origin policy (SOP) \cite{sop},
    an RP's resources in browsers could still be accessed maliciously by the other RP running on the same domain,
     such as stealing cookies using the script \verb+window.open('https://RP.com/honest').document.cookie+,
 even if it restricts that only HTTP requests to specific paths carry its cookies.

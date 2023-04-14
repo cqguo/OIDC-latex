@@ -252,8 +252,9 @@ As all the communications between the IdP, RPs, and users are protected by HTTPS
 \vspace{0.75mm}
 \noindent\textsc{Proof.}
 According to the formal analysis on SSO security \cite{SPRESSO, FettKS14},
- the following two conditions result in an secure SSO system against malicious users and RPs in the first adversarial scenario: (\emph{a}) an adversary never obtains a valid identity token of an honest user and presents it to an honest RP, and (\emph{b}) an honest user never presents a valid identity token that is not issued for herself to an honest RP.
+    an SSO system satisfying the following two requirements is considered security in the first adversarial scenario: (\emph{a}) an adversary never obtains a valid identity token of an honest user and presents it to an honest RP, and (\emph{b}) an honest user never presents a valid identity token that is not issued for herself to an honest RP.
 %(\emph{a}) an adversary never presents an identity token that is accepted by an honest RP to derive an honest user's account at this RP and (\emph{b}) an honest user never presents an identity token that is accepted by an honest RP to derive another user's account at this RP.
+
 
 %In a secure SSO that is robust against impersonation attacks, an honest user should be able to prove her identity to the target RP with an identity token issued by the IdP. As pseudo-identities are used in \usso, an RP needs to verify that ({\em a}) $PID_{RP}$ in the received identity token is a transformation from its own $ID_{RP}$ and tied to the current login, which requires {\em RP designation}; and ({\em b}) $PID_U$ included in the identity token can be associated with a unique, long-term user account it maintains, which requires {\em user identification}. Besides, the identity token for an honest RP should not be intercepted by malicious users or RPs, requiring the {\em confidentiality of identity tokens}, nor be forged or tampered with to include a fake $PID_U$ or $PID_{RP}$, requiring the {\em integrity of identity tokens}.
 
@@ -293,7 +294,7 @@ Consider a finite cyclic group $\mathbb{E}$ where the number of points on $\math
 Because $G$ is a generator of order $n$, $ID_{RP} = [r]G$ is also a generator on $\mathbb{E}$ of order $n$. According to the DYU model, $t$ is randomly chosen in $\mathbb{Z}_n$ and kept unknown to the IdP. Therefore, $PID_{RP} = [t]ID_{RP}$ is \emph{indistinguishable} from a point $Q$ that is randomly chosen on $\mathbb{E}$ \cite{oprf-proved,strong-oprf}. \hfill $\square$
 
 
-%Consider a user's two arbitrary logins to an RP where $PID^{i}_{RP} = [t]ID_{RP}$ and $PID^{i'}_{RP} = [t']ID_{RP}$, and her another login to another RP where $PID^{i''}_{RP'} = [t'']ID_{RP'}$. According to the \dyu~model, $t$, $t'$, and $t''$ are randomly selected by the IdP script and shared only with the corresponding RP through the RP script, so they are unknown to the IdP. As stated in Theorem 2, $ID_{RP} = [r]G = Q$ and $ID_{RP'} = [r']G = P$, where $P$ and $Q$ are two different points on the curve $\mathbb{E}$. Therefore, in the IdP's view, $[t]Q$, $[t']Q$, and $[t'']P$ are three random points on $\mathbb{E}$ when $t$, $t'$, and $t''$ are random and they are indistinguishable~\cite{oprf-proved}. \hfill $\square$
+%Consider a user's two arbitrary logins to an RP where $PID^{i}_{RP} = [t]ID_{RP}$ and $PID^{i'}_{RP} = [t']ID_{RP}$, and her another login to another RP where $PID^{i''}_{RP'} = [t'']ID_{RP'}$. According to the \dyu~model, $t$, $t'$, and $t''$ are randomly selected by the IdP script and shared only with the corresponding RP through the RP script, so they are unknown to the IdP. As stated in Theorem 2, $ID_{RP} = [r]G = Q$ and $ID_{RP'} = [r']G = P$, where $P$ and $Q$ are two different points on the curve $\mathbb{E}$. Therefore, in the IdP's view, $[t]Q$, $[t']Q$, and $[t'']P$ are three random points on $\mathbb{E}$ when $t$, $t'$, and $t''$ are random and they are indistinguishable \cite{oprf-proved}. \hfill $\square$
 
 %as well as from a $PID_{RP}$ generated in an arbitrary login for an arbitrary user to log in to an
 
@@ -313,7 +314,7 @@ Because $G$ is a generator of order $n$, $ID_{RP} = [r]G$ is also a generator on
 \vspace{2mm}
 
 In the third adversarial scenario, malicious RPs collude with malicious users, attempting to link the logins of honest users across these colluding RPs.
-That is, when $c+1$ malicious RPs and users collude in \usso, 
+That is, when $c+1$ malicious RPs and users collude in \usso,
     given any login $\mathcal{L'}$ initiated by an honest user $U'$ to one of the malicious RPs,
     this RP with all the other colluding entities aims to link $\mathcal{L'}$ to the logins at other $c$ colluding RPs
      which are also initiated by $U'$.

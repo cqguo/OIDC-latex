@@ -58,10 +58,11 @@ and encrypt its domain using an ephemeral key, resulting in additional overheads
   \label{fig:evaluation}
 \end{figure}
 
-Compared with the other two schemes, \usso~requires less time for identity token generation since it retrieves the token from the IdP without any additional processing. In contrast,
-MITREid Connect requires more time as the user is required to download a script from the RP to process the token retrieved from the IdP, which is carried with a URL following the fragment identifier \verb+#+ instead of \verb+?+ due to security considerations~\cite{de2014oauth}. SPRESSO takes slightly more time to generate an identity token as it implements the IdP using node.js and uses a JavaScript cryptographic library less efficient than the Java library used by the other two schemes.
+Compared with the two schemes, \usso~requires less time for identity token generation since it retrieves the token from the IdP without any additional processing. In contrast,
+MITREid Connect requires more time as the user is required to download a script from the RP to process the token retrieved from the IdP, which is carried with a URL following the fragment identifier \verb+#+ instead of \verb+?+ due to security considerations \cite{de2014oauth}. SPRESSO takes slightly more time to generate an identity token as it implements the IdP using node.js and uses a JavaScript cryptographic library less efficient than the Java library used by the other two schemes.
 
 %transmission & extraction
 In the identity-token acceptance phase, MITREid Connect and \usso~take similar amounts of time to send an identity token to the RP and verify it.
-In contrast, SPRESSO takes the longest time due to its complex process at the user agent. After receiving the identity tokens from the IdP, the browser needs to download JavaScript code from the trusted forwarder server, decrypt the RP endpoint, and then send the identity tokens to this endpoint.
+In contrast, SPRESSO takes the longest time due to its complex process at the user agent.
+After receiving the identity tokens from the IdP, the browser needs to download JavaScript code from the trusted forwarder server, decrypt the RP endpoint, and then send the identity tokens to this endpoint.
 
