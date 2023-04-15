@@ -98,9 +98,10 @@ The model abstracts the entities in a web system, such as web servers and browse
 and defines \emph{script processes} to formulate client-side scripts.
 %The script is dependently invoked by the browser to process the server-defined logic.%such as verifying $Certificate_{RP}$. %postmessage events; %atomic process <-> script process, communication. %Other events change self-trigger.
 The atomic processes of \usso~include an {\em IdP process}, a finite set of {\em web servers} for honest RPs, a finite set of honest {\em browsers}, and a finite set of {\em attacker processes} that model malicious RPs and malicious users.
-The processes communicate with each other through events such as HTTPS requests and responses. A browser may invoke an honest IdP script and multiple RP scripts that could be honest or malicious.
+A browser may invoke an honest IdP script and multiple RP scripts that could be honest or malicious.
+The processes communicate with each other through events such as HTTPS requests and responses,
 %Although the scripts coexist in the same browser, they are strictly separated.
-The script processes communicate through \verb+postMessage+, which are modeled as transmitted-to-itself events of a browser process.
+except that the script processes communicate with each other through \verb+postMessage+ which are modeled as transmitted-to-itself events of a browser process.
 %To clearly indicate the action of postMessage communication, we define it as the transmitting-to-itself event of the browser (which is not defined in SPRESSO).
 
 Applying the DYU model, we trace the lifecycle of an identity token from its generation at the IdP to its acceptance at an RP, locate the places where $PID_U$, $PID_{RP}$, and other elements related to the identity token such as $t$ and $u$ are processed, and locate the places where $PK$ is transmitted and used in the IdP script.
