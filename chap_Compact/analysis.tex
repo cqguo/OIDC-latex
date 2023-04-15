@@ -159,7 +159,7 @@ where $Q$ is a point on $\mathbb{E}$ and $G$ is a generator on $\mathbb{E}$ of o
 The probability of solving the ECDLP using $\mathcal{D}^*_c$ is denoted as ${\rm Pr}\{\mathcal{D}^*_c(G, [x]G)=x\}$.
 %For any PPT algorithm $\mathcal{D}$ is used to calculate $x$, we define the probability of finding $x$ as: %Therefore, the probability of finding $x$ using a probabilistic polynomial time (PPT) algorithm is negligible.
 Due to the ECDLP assumption,
-    ${\rm Pr}\{\mathcal{D}^*_c(G, [x]G)=x\} = \epsilon_{c}(k)$ becomes negligible when the security parameter $k$ is sufficiently large.
+    ${\rm Pr}\{\mathcal{D}^*_c(G, [x]G)=x\} = \epsilon_{c}(\lambda)$ becomes negligible when the security parameter $\lambda$ is sufficiently large.
 
 %where ${\rm Pr}\{\}$ denotes the probability.
 %where $k$ denotes the security parameter and $\epsilon_{c}(k)$ becomes negligible when $k$ is sufficiently large.
@@ -184,8 +184,8 @@ Hence, the probability of solving the ECDLP by $\mathcal{D}^*_c$ is formulated a
 
 \newc
 If the probability of finding $t$ and $t'$ satisfying $[t]ID_{RP_j} = [t']ID_{RP_{j'}}$ is non-negligible,
- then the adversary would have advantages in $\mathcal{G}_c$ and ${\rm Pr}_s$ is non-negligible regardless of $k$.
-Therefore, we would find that ${\rm Pr}\{\mathcal{D}^*_c(G, [x]G)=x\}$ also becomes non-negligible  when $k$ is sufficiently large, because $m$ is a finite integer and $m \ll 2^k$.
+ then the adversary would have advantages in $\mathcal{G}_c$ and ${\rm Pr}_s$ is non-negligible regardless of $\lambda$.
+Therefore, we would find that ${\rm Pr}\{\mathcal{D}^*_c(G, [x]G)=x\}$ also becomes non-negligible  when $\lambda$ is sufficiently large, because $m$ is a finite integer and $m \ll 2^\lambda$.
 \oldc
 This violates the ECDLP assumption. Thus, the probability of finding $t$ and $t'$ that satisfy $[t]ID_{RP_j} = [t']ID_{RP_{j'}}$ is negligible. \hfill $\square$
 
@@ -418,9 +418,9 @@ Finally, even with $v$ malicious user,
 
 \vspace{0.75mm}
 \noindent{\textsc{Proof.} We define a game $\mathcal{G}_r$ between an adversary and a challenger,
-    to describe the RP-based identity linkage:
+    to describe this RP-based login linkage:
  the adversary receives $\mathbb{L} = \{{L_i}\}$ and $L' = (ID_{RP'}, t', [ID_{U'}]ID_{RP'})$ from the challenger, and outputs the result $s = 1$ if it decides $ID_{U'} \in \{u_1, u_2, \cdots, u_w\}$ or $s = 0$ if $ID_{U'}$ is randomly chosen in $\mathbb{Z}_n$.
-The adversary succeeds in the game with $\mathbf{Adv}_{A}$:
+The adversary succeeds in $\mathcal{G}_r$ with an advantage $\mathbf{Adv}_{A}$:
 \begin{align*}
 &{\rm Pr}_1={\rm Pr}\{\mathcal{G}_r(\mathbb{L}, L'| ID_{U'} \in \{u_1, u_2, \cdots, u_w\})=1\} \\
 &{\rm Pr}_2={\rm Pr}\{\mathcal{G}_r(\mathbb{L}, L'|ID_{U'} \in \mathbb{Z}_n)=1\}\\
@@ -439,8 +439,8 @@ Based on $\mathcal{G}_r$, we design a PPT algorithm $\mathcal{D}^*_r$ to solve t
  given $(G, [x]G$, $[y]G$, $[z]G)$, decide whether $z$ equals to $xy$ or is randomly chosen in $\mathbb{Z}_n$,
     where $G$ is a point on an elliptic curve $\mathbb{E}$ of order $n$, and $x$ and $y$ are integers randomly and independently chosen in $\mathbb{Z}_n$.
 %The probability of solving the ECDDH problem using $\mathcal{D}^*_r$ is defined as $|{\rm Pr}^*_1 - {\rm Pr}^*_2|$, where:
-According to the ECDDH assumption,
-    $|{\rm Pr}^*_1 - {\rm Pr}^*_2| = \epsilon_{r}(k)$ becomes negligible when the security parameter $k$ is sufficiently large,
+Therefore, according to the ECDDH assumption,
+    $|{\rm Pr}^*_1 - {\rm Pr}^*_2| = \epsilon_{r}(\lambda)$ becomes negligible when the security parameter $\lambda$ is sufficiently large,
         where
 \begin{align*}
 &{\rm Pr}^*_1 =  {\rm Pr}\{\mathcal{D}^*(G, [x]G, [y]G, [xy]G)=1\} \\
@@ -450,7 +450,7 @@ According to the ECDDH assumption,
 
 As shown in Figure \ref{fig:dalgorithm}, the input of $\mathcal{D}^*_r$ is in the form of ($G, Q_1=[x]G, Q_2=[y]G, Q_3=[z]G$).
 Upon receiving the input, the challenger randomly chooses $u_i$, $r$, $t_i$, and $t'$ in $\mathbb{Z}_n$ for $1 \leq i \leq w$, and assigns $\mathbb{L} = \{{L_i}\} = \{([r]G, t_i, [u_ir]G)\}$.
-Then, it randomly selects $d \in [1,w]$, replaces $[u_dr]G$ with $[r]Q_1$ in $L_d$; i.e., $\mathbb{L} = \{([r]G, t_d, [r]Q_1)\} \cup \{([r]G, t_i, [u_ir]G)\}$ ($1 \leq i \leq d-1$, $d+1 \leq i \leq w$). Finally, the challenger constructs $L' = (Q_2, t', Q_3)$. When the adversary receives $\mathbb{L}$ and $L'$, it outputs $s$.
+Then, it randomly selects $d \in [1,w]$, replaces $[u_dr]G$ with $[r]Q_1=[xr]G$ in $L_d$; i.e., $\mathbb{L} = \{([r]G, t_d, [r]Q_1)\} \cup \{([r]G, t_i, [u_ir]G)\}$ ($1 \leq i \leq d-1$, $d+1 \leq i \leq w$). Finally, the challenger constructs $L' = (Q_2, t', Q_3)$. When the adversary receives $\mathbb{L}$ and $L'$, it outputs $s$.
 
 
 According to the above construction of $\mathbb{L}$ and $L'$,
@@ -463,17 +463,17 @@ The advantage $|{\rm Pr}^*_1 - {\rm Pr}^*_2|$ of solving the ECDDH problem using
 &|{\rm Pr}^*_1-{\rm Pr}^*_2|=|{\rm Pr}_1-{\rm Pr}_2|={\mathbf{Adv}}_{A}
 \end{align*}
 
-If the adversary has advantages in $\mathcal{G}_r$ to distinguish a login initiated by a user $U'$ chosen from \{${U_1}, {U_2}, \cdots, {U_w}$\} or randomly from the universal user set,
-    $|{\rm Pr}^*_1-{\rm Pr}^*_2|=|{\rm Pr}_1-{\rm Pr}_2|$ is non-negligible regardless of $k$.
+If the adversary has advantages in $\mathcal{G}_r$ to decide whether $L'$ is initiated by $U'$ chosen from \{${U_1}, {U_2}, \cdots, {U_w}$\} or randomly from the universal user set,
+    then $|{\rm Pr}^*_1-{\rm Pr}^*_2|=|{\rm Pr}_1-{\rm Pr}_2|$ is non-negligible regardless of $\lambda$.
 This violates the ECDDH assumption.
-Thus, the probability of distinguishing a user $U'$ chosen from \{${U_1}, {U_2}, \cdots, {U_w}$\} or from the universal user set is negligible.
+Thus, $RP$ and $RP'$ cannot decide whether $L'$ is initiated by a user in \{${U_1}, {U_2}, \cdots, {U_w}$\} or randomly from the universal user set.
 \hfill $\square$
 
 
 \oldc
 \vspace{2mm}
 \noindent\textsc{Lemma 3.} { Given
-    the logins visiting $c$ RPs by $v$ users denoted as
+    the logins visiting $c$ RPs by $v$ colluding users denoted as
  $\mathfrak{L}=\left \{ \begin{matrix}
 L_{1,1},&L_{1,2},&\cdots,&L_{1,c}\\
 L_{2,1},& L_{2,2},&\cdots,&L_{2,c}\\
@@ -503,7 +503,7 @@ the $c$ RPs and $RP'$ cannot collude to decide whether a login to $RP'$ denoted 
 
 \vspace{0.75mm}
 \noindent{\textsc{Proof.} It is proved similarly to Lemma 2.
-We define a game $\mathcal{G}_r$ between an adversary and a challenger to describe the linkage:
+We define a game $\mathcal{G}_r$ between an adversary and a challenger to describe this login linkage:
  the adversary receives $\mathfrak{L}$  and $L'$ from the challenger,
   and outputs $s = 1$ if it decides $ID_{U'} \in \{u_1, u_2, \cdots, u_v\}$ or $s = 0$ if $ID_{U'}$ is randomly chosen in $\mathbb{Z}_n$.
 The adversary succeeds in the game with $\mathbf{Adv}_{A}$:
@@ -517,13 +517,13 @@ The adversary succeeds in the game with $\mathbf{Adv}_{A}$:
 
 Based on $\mathcal{G}_r$, we design a PPT algorithm $\mathcal{D}^*_r$ %as shown in Figure \ref{fig:dalgorithm},
 to solve the ECDDH problem: given $(G, [x]G$, $[y]G$, $[z]G)$, decide whether $z$ equals to $xy$ or is randomly chosen in $\mathbb{Z}_n$.
-The advantage of solving the ECDDH problem using $\mathcal{D}^*_r$ is defined as $\epsilon_{r}(k)$, and
-% = |{\rm Pr}^*_1 - {\rm Pr}^*_2|$, where:
-%\begin{align*}
-%&{\rm Pr}^*_1 =  {\rm Pr}\{\mathcal{D}^*(G, [x]G, [y]G, [xy]G)=1\} \\
-%&{\rm Pr}^*_2 =  {\rm Pr}\{\mathcal{D}^*(G, [x]G, [y]G, [z]G)=1\}
-%\end{align*}
-$\epsilon_{r}(k)$ becomes negligible when the security parameter $k$ is sufficiently large.
+Thus, 
+    $|{\rm Pr}^*_1 - {\rm Pr}^*_2| = \epsilon_{r}(\lambda)$ becomes negligible when $\lambda$ is sufficiently large,
+        where
+\begin{align*}
+&{\rm Pr}^*_1 =  {\rm Pr}\{\mathcal{D}^*(G, [x]G, [y]G, [xy]G)=1\} \\
+&{\rm Pr}^*_2 =  {\rm Pr}\{\mathcal{D}^*(G, [x]G, [y]G, [z]G)=1\}
+\end{align*}
 
 %\cite{GoldwasserK16}.
 %That is, while there is the login to an RP, for colluded RPs, they cannot decide whether this login and any logins to other RPs are from the same user.
@@ -532,8 +532,11 @@ $\epsilon_{r}(k)$ becomes negligible when the security parameter $k$ is sufficie
 % is negligible, where $x$, $y$ and $z$ are integers randomly and independently chosen in $\mathbb{Z}_n$.
 
 
-Upon receiving ($G, Q_1=[x]G, Q_2=[y]G, Q_3=[z]G$), the challenger first chooses $\{u_1, u_2, \cdots, u_v\}$, $\{r_1, r_2, \cdots, r_c\}$, $\{t_{1, 1}, t_{1, 2}, \cdots, t_{v, c}\}$, and $t'$ randomly in $\mathbb{Z}_n$ and assigns $L_{i, j} = ([r_j]G, t_{i, j}, [u_ir_j]G)$. Then, it randomly chooses $d \in [1, v]$ to replace $[u_d r_j]G$ with $[r_j]Q_1=[xr_j]G$ for $1\leq j \leq c$,
- to form $\mathfrak{L}=\left \{ \begin{matrix}
+The input of $\mathcal{D}^*_r$ is in the form of ($G, Q_1=[x]G, Q_2=[y]G, Q_3=[z]G$).
+Upon receiving an input, the challenger first chooses $\{u_1, u_2, \cdots, u_v\}$, $\{r_1, r_2, \cdots, r_c\}$, $\{t_{1, 1}, t_{1, 2}, \cdots, t_{v, c}\}$, and $t'$ randomly in $\mathbb{Z}_n$ and assigns $L_{i, j} = ([r_j]G, t_{i, j}, [u_ir_j]G)$.
+   % for $1 \le i \le v$ and $1 \le j \le c$.
+Then, it randomly chooses $d \in [1, v]$ and replaces $[u_d r_j]G$ with $[r_j]Q_1=[xr_j]G$ for $1\leq j \leq c$,
+ to construct $\mathfrak{L}=\left \{ \begin{matrix}
 L_{1,1},&L_{1,2},&\cdots,&L_{1,c}\\
 L_{2,1},& L_{2,2},&\cdots,&L_{2,c}\\
 \cdots,&\cdots,&L_{i,j},&\cdots\\
@@ -545,16 +548,18 @@ L_{v,1},&L_{v,2},&\cdots,&L_{v,c}
 %$\mathfrak{L}$ and $L'$ as follows: it assigns $L_{i, j} = ([r_j]G, t_{i, j}, [u_ir_j]G)$, %$1\leq i \leq v$ and $1\leq j \leq c$, and then randomly chooses $d \in [1, v]$ to replace $[u_d r_j]G$ with $[r_j]Q_1=[xr_j]G$ for $1\leq j \leq c$. So,
 %$L=$\{($[r_1]G$, $t_{1, 1}$, $[[u_1][r_1]G$), ($[r_2]G$, $t_{1, 2}$, $[u_1][r_2]G$), $\cdots$, ($[r_{\beta}]G$, $t_{\alpha, \beta}$, $[r_{\beta}]Q_1$), $\cdots$, ($[r_b]G$, $t_{a, b}$, $[u_a][r_b]G$)\}
 %
-Finally, it assigns $L' = (Q_2, t', Q_3) = ([y]G, t', [z/y][y]G)$. The challenger sends $\mathfrak{L}$ and $L'$ to the adversary, which outputs $s$. According to the above construction of $\mathfrak{L}$ and $L'$,
+Finally, it assigns $L' = (Q_2, t', Q_3) = ([y]G, t', [z/y][y]G)$. The challenger sends $\mathfrak{L}$ and $L'$ to the adversary, which outputs $s$.
+
+According to the above construction of $\mathfrak{L}$ and $L'$,
     $x$ is actually inserted into $\mathfrak{L}$ as $u_d$
     and $z/y$ is assigned to $ID_{U'}$.
 Thus, if $z = xy$, then $z/y=x$ and $ID_{U'} \in \{u_1, u_2, \cdots, u_v\}$;
     otherwise, $ID_{U'} \in \mathbb{Z}_n$.
-The advantage $\epsilon_{r}(k)$ of solving the ECDDH problem using $\mathcal{D}^*_r$ is deduced as:
+The advantage $|{\rm Pr}^*_1 - {\rm Pr}^*_2|$ of solving the ECDDH problem using $\mathcal{D}^*_r$ is deduced as:
 \begin{equation*}
-\epsilon_{r}(k) = |{\rm Pr}_1-{\rm Pr}_2|={\mathbf{Adv}}_{A}
+|{\rm Pr}^*_1-{\rm Pr}^*_2|=|{\rm Pr}_1-{\rm Pr}_2|={\mathbf{Adv}}_{A}
 \end{equation*}
 
-The ECDDH assumption means that in $\mathcal{G}_r$ the adversary does not have advantages, i.e., cannot distinguish a user chosen from \{${U_1}, {U_2}, \cdots, {U_v}$\} or from the universal user set.
+The ECDDH assumption means in $\mathcal{G}_r$ the adversary does not have advantages, i.e., the colluding RPs cannot decide whether $L'$ is initiated by a user in \{${U_1}, {U_2}, \cdots, {U_v}$\} or randomly from the universal user set.
 %    (indistinguishability of users to colluding RPs).
 \hfill $\square$
