@@ -278,13 +278,14 @@ Thus, \usso~is a secure SSO system.
 
 \subsection{Privacy}
 \label{sec-:analysis}
-Next, we prove that \usso~effectively prevents privacy threats introduced by IdP-based login tracing and RP-based identity linkage in the respective adversarial scenarios.
+\usso~effectively prevents privacy threats introduced by IdP-based login tracing and RP-based identity linkage in the second and third adversarial scenarios, respectively.
 
 \newc
-We show that an honest-but-curious IdP cannot trace a user's login activities. In \usso, a user sends an identity-token request in each login to the IdP (Step 3.1 in Section~\ref{implementations}), which reveals only the target RP's \emph{ephemeral} pseudo-identity $PID_{RP}$ along with the user's identity $ID_U$.
+First, we show that an honest-but-curious IdP cannot trace a user's login activities. In \usso, a user sends an identity-token request in each login to the IdP, %(Step 3.1 in Section~\ref{implementations})
+which reveals only the target RP's \emph{ephemeral} pseudo-identity $PID_{RP}$ along with the user's identity $ID_U$.
 The IdP cannot (\emph{a}) associate multiple logins with different $PID_{RP}$s to a given RP,
  or (\emph{b}) distinguish a login to one RP from other logins to another RP based on their $PID_{RP}$s,
- because $PID_{RP}$ is \emph{indistinguishable} from random variables to the IdP, as proved in Theorem 6.
+ because to the IdP, $PID_{RP}$ is \emph{indistinguishable} from random variables. We prove this in Theorem 6.
 
 \vspace{2mm}
 \noindent{\textsc{Theorem 6. (Privacy against the IdP)}} { In \usso, the IdP cannot distinguish $PID_{RP} = [t]ID_{RP}$ from a random variable on $\mathbb{E}$, where $t$ is random in $\mathbb{Z}_n$.} %and unknown to the IdP.}
@@ -292,8 +293,7 @@ The IdP cannot (\emph{a}) associate multiple logins with different $PID_{RP}$s t
 \vspace{0.75mm}
 \noindent \textsc{Proof.}
 Consider a finite cyclic group $\mathbb{E}$ where the number of points on $\mathbb{E}$ is $n$.
-Because $G$ is a generator of order $n$, $ID_{RP} = [r]G$ is also a generator on $\mathbb{E}$ of order $n$. According to the DYU model, $t$ is randomly chosen in $\mathbb{Z}_n$ and kept unknown to the IdP. Therefore, $PID_{RP} = [t]ID_{RP}$ is \emph{indistinguishable} from a point $Q$ that is randomly chosen on $\mathbb{E}$ \cite{oprf-proved,strong-oprf,voprf-proved}.\footnote{This property has been actually proved in OPRFs \cite{oprf-proved,strong-oprf,voprf-proved},
-    where the OPRF server works similarly to the IdP and learns \emph{nothing}.} \hfill $\square$
+Because $G$ is a generator of order $n$, $ID_{RP} = [r]G$ is also a generator on $\mathbb{E}$ of order $n$. According to the DYU model, $t$ is randomly chosen in $\mathbb{Z}_n$ and kept unknown to the IdP. Therefore, $PID_{RP} = [t]ID_{RP}$ is \emph{indistinguishable} from a point $Q$ that is randomly chosen on $\mathbb{E}$ \cite{oprf-proved,strong-oprf,voprf-proved}.\footnote{This property has been actually proved in OPRFs \cite{oprf-proved,strong-oprf,voprf-proved}, where the OPRF server works similarly to the IdP and learns \emph{nothing}.} \hfill $\square$
 
 %In order to receive $[k]Q$ for any given $Q$ on $\mathbb{E}$, 
 %    an OPRF client first generates a random number $e$, converts $Q$ to $[e]Q$,
@@ -320,13 +320,14 @@ Because $G$ is a generator of order $n$, $ID_{RP} = [r]G$ is also a generator on
 
 \vspace{2mm}
 
-In the third adversarial scenario, malicious RPs collude with malicious users, attempting to link the logins of honest users across these colluding RPs.
-That is, when $c+1$ malicious RPs and users collude in \usso,
-    given any login $\mathcal{L'}$ initiated by an honest user $U'$ to one of the malicious RPs,
-    this RP with all the other colluding entities aims to link $\mathcal{L'}$ to the logins at other $c$ colluding RPs
-     which are also initiated by $U'$.
-To show that \usso~prevents such linkage, we prove in Theorem 7 that the colluding adversaries cannot distinguish a login initiated by $U'$ to some of the $c$ malicious RPs from the ones initiated by any other honest users to the $c$ malicious RPs.
-As a result, given $\mathcal{L'}$ and a shared view of all logins to the colluding RPs, the adversaries have no clue to link $\mathcal{L'}$ to one login instead of another (or even to a |$w$| subset of logins instead of others), because any login is indistinguishable.
+In the third adversarial scenario, $c+1$ malicious RPs collude with malicious users. They attempt to link the logins of honest users across these colluding RPs. Let us consider an honest user $U'$ who initiates a login $\mathcal{L'}$ to  one malicious RP. All the colluding entities, including this RP, aim to associate $\mathcal{L'}$ with any other logins from this user $U'$ to any of the $c$ colluding RPs. 
+%That is, %when $c+1$ malicious RPs and users collude in \usso, 
+%given any login $\mathcal{L'}$ initiated by an honest user $U'$ to one of the malicious RPs, this RP, along with all the other colluding entities, aims to link $\mathcal{L'}$ to other logins from $U'$ to the other $c$ colluding RPs.
+To show that \usso~prevents such linkage, we prove in Theorem 7 that the colluding adversaries cannot {\em distinguish} logins initiated by $U'$ to one of the $c$ colluding RPs from the ones initiated by any other honest users to these colluding RPs. %a login initiated by $U'$ to some of the $c$ malicious RPs from the ones initiated by any other honest users to the $c$ malicious RPs.
+As the logins are indistinguishable from each other, given $\mathcal{L'}$ and a shared view of all the logins to the colluding RPs, the adversaries have no clue to link $\mathcal{L'}$ to one login instead of another. They even cannot link $\mathcal{L'}$ to one %|$w$| 
+subset of the shared logins instead of another subset.
+
+
 %Malicious RPs colluding with malicious users, attempt to link logins of honest users across these malicious RPs. We prove that UPPRESSO prevents RP-based identity linkage, by showing that,  the colluding adversaries cannot distinguish a login by $U'$ to any of other $c$ malicious RP from the logins by any honest users to the $c$ malicious RPs.
 
 Let us investigate the knowledge that an RP obtains from each login. In \usso, an RP receives a random number $t$ and an identity token enclosing $PID_{RP}$ and $PID_U$ in each login. Meanwhile, it knows its own identity $ID_{RP}$ and derives the user's account $Acct$.
