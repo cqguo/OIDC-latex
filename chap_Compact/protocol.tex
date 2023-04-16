@@ -93,7 +93,7 @@ Similarly, if the RP selects $t$ and calculates $PID_{RP}$,
  the user needs to check whether the received $PID_{RP}$ equals $[t]ID_{RP}$ before requesting an identity token.
 Otherwise, malicious users could impersonate a victim user at some honest RP by colluding with another malicious RP.
 That is, when receiving $PID_{RP}=[t']ID_{RP}$ from the honest RP, the malicious user forwards it to $RP'$, which sends it to the victim user in another login.
-If the victim does not check the received $PID_{RP}$, he would request from the IdP an identity token that binds $PID_U$ and the wrong $PID_{RP}$ and presents the token to the malicious RP.
+If the victim does not check the received $PID_{RP}$, she would request from the IdP an identity token that binds $PID_U$ and the wrong $PID_{RP}$ and presents the token to the malicious RP.
 This token would allow the malicious user to log into the honest RP under the victim user's account.
 
 \oldc
@@ -139,7 +139,7 @@ an IdP needs to know the visited RP to ensure the \emph{confidentiality} of iden
 However, in \usso, the IdP does not know about the visited RPs, requiring the user agents to calculate $PID_{RP}$ and send the identity tokens to the RP's endpoint.
 %In UPPRESSO, the IdP is not aware of visited RPs, so user agents (or browsers) are responsible for forwarding the identity token to the intended RP and computing $PID_{RP}$. On the contrary, in commonly-used SSO protocols \cite{OpenIDConnect,rfc6749,SAML,SAMLIdentifier}, the IdP requires this information to ensure the \emph{confidentiality} of identity tokens. For instance, in OIDC services, an RP's endpoint URL is set as the \verb+redirect_uri+ parameter \cite{OpenIDConnect} during registration to receive tokens. When transmitting identity tokens to an RP, the IdP employs HTTP 302 redirection. This endpoint is the target URL in HTTP responses, allowing the browser to forward it to the designated RP.
 
-\usso~supports commercial-off-the-shelf (COTS) browsers to work as the user agent and implements the user-agent functions using web scripts in browsers. The scripts are responsible for communications with the origin web servers,
+\usso\ supports commercial-off-the-shelf (COTS) browsers to work as the user agent and implements the user-agent functions using web scripts in browsers. The scripts are responsible for communications with the origin web servers,
  and downloaded from the IdP and the visited RP, respectively. It is worth noting that a script downloaded from an honest entity is considered \emph{honest}.
 
 The IdP script is necessary because the RP script could leak its origin to the IdP web server due to the automatic inclusion of an HTTP \verb+referer+ header in all HTTP requests it sends.
@@ -149,7 +149,7 @@ Besides, the IdP script is trusted to interact with the users for attribute auth
 
 The RP script is responsible for preparing $ID_{RP}$ and $Enpt_{RP}$ for the IdP script through an RP certificate issued by the IdP. %It binds the RP's identity and endpoint. %(i.e., $ID_{RP}$ and $Enpt_{RP}$).
 In a login, the RP script sends the certificate to the IdP script, which then verifies it and extracts $ID_{RP}$ and $Enpt_{RP}$.
-The same as in widely-adopted SSO systems \cite{OpenIDConnect, rfc6749, SAML, SAMLIdentifier}, in \usso~a user does not need to configure anything locally as the IdP's public key is already set in the IdP script.
+The same as in widely-adopted SSO systems \cite{OpenIDConnect, rfc6749, SAML, SAMLIdentifier}, in \usso\ a user does not need to configure anything locally as the IdP's public key is already set in the IdP script.
 
 After receiving an identity token from the IdP, the IdP script needs to ensure the RP script will forward the token to $Enpt_{RP}$ %, which is bound with $ID_{RP}$
 specified in the RP certificate.
@@ -180,7 +180,7 @@ This approach is specified by W3C \cite{referer_policy} and widely supported. We
 
 
 
-\subsection{The \usso~protocol}
+\subsection{The \usso\ protocol}
 \label{implementations}
 
 \noindent \textbf{System Initialization.}
@@ -327,18 +327,18 @@ The IdP rejects an identity-token request in Step 3.3 if the received $PID_{RP}$
 \subsection{Compatibility with OIDC}
 \label{subsec:compatible}
 
-Both \usso~and OIDC work with COTS browsers. %Among the four steps of the login flow
+Both \usso\ and OIDC work with COTS browsers. %Among the four steps of the login flow
 In \usso, the \emph{script downloading} step prepares the user agent, which assists the communications between the IdP and RP. UPPRESSO employs the web scripts to hide the RP's endpoint from the IdP, while securely forwarding identity tokens to the RP through $Enpt_{RP}$ extracted from the RP certificate.
 % that protects the identity token from being sent to adversaries. 这句话与Compatibility无关
 Therefore, the IdP does not set \verb+redirect_uri+ in the HTTP responses, which is different from OIDC where HTTP redirections are used to implement these communications. Most operations in the \emph{RP identity transformation} step take place within browsers. The RP only receives $t$ to generate an RP pseudo-identity and responds with $Cert_{RP}$,
 %The calculation of $PID_{RP}$ is viewed as the operation to prepare an RP identity in OIDC,
 which is viewed as a supplementary message to users.
 %The operations in the $PID_{RP}$ registration are almost identical to those in the RP Dynamic Registration of OIDC \cite{DynamicRegistration}, except that in OIDC the IdP assigns the RP's identity  while in UPPRESSO this (pseudo-)identity is generated by the registered entity. Besides, the $PID_{RP}$ registration has a validity period.
-Consequently, compared to the original OIDC protocol, \usso~simplifies the IdP's operations in these two steps, while allowing RPs to customize their ``dynamic'' pseudo-identity.
+Consequently, compared to the original OIDC protocol, \usso\ simplifies the IdP's operations in these two steps, while allowing RPs to customize their ``dynamic'' pseudo-identity.
 
-The operations of \emph{identity-token generation} and \emph{$Acct$ calculation} in \usso~are \emph{identical} to those in OIDC,
- because (\emph{a}) the calculation of $PID_U$ in \usso~can be viewed as a method to generate PPIDs in OIDC and (\emph{b}) the calculation of $Acct$ can be viewed as a mapping from the user identity in tokens to an account at the RP.
+The operations of \emph{identity-token generation} and \emph{$Acct$ calculation} in \usso\ are \emph{identical} to those in OIDC,
+ because (\emph{a}) the calculation of $PID_U$ in \usso\ can be viewed as a method to generate PPIDs in OIDC and (\emph{b}) the calculation of $Acct$ can be viewed as a mapping from the user identity in tokens to an account at the RP.
 
-The compatibility is experimentally confirmed through our prototype implementation, which modifies only 23 lines of Java code in MITREid Connect \cite{MITREid}, an open-source OIDC system, to build an IdP in \usso~(see Section \ref{subsec:proto-imple}).
+The compatibility is experimentally confirmed through our prototype implementation, which modifies only 23 lines of Java code in MITREid Connect \cite{MITREid}, an open-source OIDC system, to build an IdP in \usso\ (see Section \ref{subsec:proto-imple}).
 %It will help the adoption and deployment of UPPRESSO.
 
