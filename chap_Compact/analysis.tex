@@ -293,9 +293,9 @@ The IdP cannot (\emph{a}) associate multiple logins with different $PID_{RP}$s t
 \vspace{0.75mm}
 \noindent \textsc{Proof.}
 Consider a finite cyclic group $\mathbb{E}$ where the number of points on $\mathbb{E}$ is $n$.
-Because $G$ is a generator of order $n$, $ID_{RP} = [r]G$ is also a generator on $\mathbb{E}$ of order $n$. According to the DYU model, $t$ is randomly chosen in $\mathbb{Z}_n$ and kept unknown to the IdP. Therefore, $PID_{RP} = [t]ID_{RP}$ is \emph{indistinguishable} from a point $Q$ that is randomly chosen on $\mathbb{E}$ \cite{oprf-proved,strong-oprf,voprf-proved}.\footnote{This property has been actually proved in OPRFs \cite{oprf-proved,strong-oprf,voprf-proved}, where the OPRF server works similarly to the IdP and learns \emph{nothing}.} \hfill $\square$
+Because $G$ is a generator of order $n$, $ID_{RP} = [r]G$ is also a generator on $\mathbb{E}$ of order $n$. According to the DYU model, $t$ is randomly chosen in $\mathbb{Z}_n$ and kept unknown to the IdP. Therefore, $PID_{RP} = [t]ID_{RP}$ is \emph{indistinguishable} from a point $Q$ that is randomly chosen on $\mathbb{E}$ \cite{oprf-proved,strong-oprf,voprf-proved}.\footnote{This property has been actually proved in OPRFs \cite{oprf-proved,strong-oprf,voprf-proved}, where the OPRF server works similarly to the IdP and learns \emph{nothing} about a client's inputs to the evaluated pseudorandom function.} \hfill $\square$
 
-%In order to receive $[k]Q$ for any given $Q$ on $\mathbb{E}$, 
+%In order to receive $[k]Q$ for any given $Q$ on $\mathbb{E}$,
 %    an OPRF client first generates a random number $e$, converts $Q$ to $[e]Q$,
 %        and sends $[e]Q$ to the server.
 %Then, the OPRF server returns $[ek]Q$, and the client obtains $[k]Q$ by using $e$.
@@ -320,11 +320,15 @@ Because $G$ is a generator of order $n$, $ID_{RP} = [r]G$ is also a generator on
 
 \vspace{2mm}
 
-In the third adversarial scenario, $c+1$ malicious RPs collude with malicious users. They attempt to link the logins of honest users across these colluding RPs. Let us consider an honest user $U'$ who initiates a login $\mathcal{L'}$ to  one malicious RP. All the colluding entities, including this RP, aim to associate $\mathcal{L'}$ with any other logins from this user $U'$ to any of the $c$ colluding RPs. 
-%That is, %when $c+1$ malicious RPs and users collude in \usso, 
+In the third adversarial scenario, $c+1$ malicious RPs collude with malicious users.
+First of all,
+    in a login an RP with $ID_{RP}$ learns nothing about $ID_U$ from $Acct = [ID_U]ID_{RP}$ due to the ECDLP problem,
+so they attempt to link the logins of honest users across colluding RPs.
+Let us consider an honest user $U'$ who initiates a login $\mathcal{L'}$ to  one malicious RP. All the colluding entities, including this RP, aim to associate $\mathcal{L'}$ with any other logins from this user $U'$ to any of the $c$ colluding RPs.
+%That is, %when $c+1$ malicious RPs and users collude in \usso,
 %given any login $\mathcal{L'}$ initiated by an honest user $U'$ to one of the malicious RPs, this RP, along with all the other colluding entities, aims to link $\mathcal{L'}$ to other logins from $U'$ to the other $c$ colluding RPs.
 To show that \usso~prevents such linkage, we prove in Theorem 7 that the colluding adversaries cannot {\em distinguish} logins initiated by $U'$ to one of the $c$ colluding RPs from the ones initiated by any other honest users to these colluding RPs. %a login initiated by $U'$ to some of the $c$ malicious RPs from the ones initiated by any other honest users to the $c$ malicious RPs.
-As the logins are indistinguishable from each other, given $\mathcal{L'}$ and a shared view of all the logins to the colluding RPs, the adversaries have no clue to link $\mathcal{L'}$ to one login instead of another. They even cannot link $\mathcal{L'}$ to one %|$w$| 
+As the logins are \emph{indistinguishable} from each other, given $\mathcal{L'}$ and a shared view of all the logins to the $c$ colluding RPs, the adversaries have no clue to link $\mathcal{L'}$ to one login instead of another. They even cannot link $\mathcal{L'}$ to one %|$w$|
 subset of the shared logins instead of another subset.
 
 
@@ -341,7 +345,7 @@ Since $PID_{RP}$ and $PID_U$ can be deduced from $ID_{RP}$ and $Acct$ with $t$, 
 %The colluding RPs share $\mathbb{V}_j$s and $\mathbb{L}_j$s in RP-based linkage attacks, where a malicious RP aims to link an honest user logged in to itself (e.g., $PID_a$ and $L_{a,j}$) to another user authenticated to a colluding RP (e.g., $PID_b$ and $L_{b,k}$ for any $k \neq j$) by finding a relationship between $L_{a,j}$ and $L_{b,k}$.
 
 \vspace{3mm}
-\noindent \textsc{Theorem 7. (Privacy against Colluding RPs)} {Given a login initiated by any honest user to any malicious RP, this RP, even colluding with other $c$ malicious RPs and $v$ malicious users, cannot distinguish if a login to any of the other $c$ malicious RPs is initiated by this user or another honest user.}
+\noindent \textsc{Theorem 7. (Privacy against Colluding RPs)} {Given a login initiated by an honest user to a malicious RP, this RP, colluding with other $c$ malicious RPs and $v$ malicious users, cannot distinguish if a login to any of the $c$ malicious RPs is initiated by this user or another honest user.}
 
 %{When $c+1$ malicious RPs and $v$ malicious users collude in \usso, given any login $\mathcal{L'}$ initiated by an honest user $U'$ to a malicious RP, the adversaries cannot distinguish a login initiated by $U'$ to any of the other $c$ malicious RP from the logins initiated by any honest users to these $c$ colluding RPs.}
 
@@ -352,11 +356,11 @@ Since $PID_{RP}$ and $PID_U$ can be deduced from $ID_{RP}$ and $Acct$ with $t$, 
 
 \vspace{0.75mm}
 \noindent\textsc{Proof.}
-When a malicious RP, denoted as $RP'$, receives and verifies an identity token from an honest user, denoted as $U'$, it obtains $L' = (ID_{RP'}, t', [ID_{U'}]ID_{RP'})$. Suppose another malicious RP, denoted as $RP_j$, colludes with $RP'$ and shares the knowledge of its logins, i.e., $\mathbb{L} = \{{L_{i}}\}$ and $1 \leq i \leq w$. We denote the users who initiate these $w$ logins as $\mathcal{U}_j=\mathcal{U}_{j,H}\cup \mathcal{U}_{j,M}$, where $\mathcal{U}_{j,H}$ and $\mathcal{U}_{j,M}$ represent the set of honest and malicious users, respectively. 
+When a malicious RP, denoted as $RP'$, receives and verifies an identity token from an honest user, denoted as $U'$, it obtains $L' = (ID_{RP'}, t', [ID_{U'}]ID_{RP'})$. Suppose another malicious RP, denoted as $RP_j$, colludes with $RP'$ and shares the knowledge of its logins, i.e., $\mathbb{L} = \{{L_{i}}\}$ and $1 \leq i \leq w$. We denote the users who initiate these $w$ logins as $\mathcal{U}_j=\mathcal{U}_{j,H}\cup \mathcal{U}_{j,M}$, where $\mathcal{U}_{j,H}$ and $\mathcal{U}_{j,M}$ represent the set of honest and malicious users, respectively.
 
 %It can obtain the knowledge of the $w$ logins to $RP_j$, denoted as $\mathbb{L} = \{{L_{i}}\}$ and $1 \leq i \leq w$. These logins are initiated by a set of users, denoted as $\mathcal{U}_j$, including a set of honest users $\mathcal{U}_{j,H} \subseteq \mathcal{U}_{j}$ and a subset of malicious users $\mathcal{U}_{j,M} \subseteq \mathcal{U}_j$. $\mathcal{U}_j = \mathcal{U}_{j,H} \cup \mathcal{U}_{j,M}$.
 
-Let us first assume that malicious users do not collude with malicious RPs. So, the colluding RPs cannot associate the logins initiated by the same malicious user. %so they do not reveal their accounts. As a result, even if $RP_j$ and $RP'$ collude, they are not told if some of the logins are initiated by the same malicious user. 
+Let us first assume that malicious users do not collude with malicious RPs. So, the colluding RPs cannot associate the logins initiated by the same malicious user. %so they do not reveal their accounts. As a result, even if $RP_j$ and $RP'$ collude, they are not told if some of the logins are initiated by the same malicious user.
 According to Lemma 2, given $L'$ and any arbitrary subset of $\mathbb{L}$, $RP'$ cannot decide if $U'$ is one of the users in the corresponding subset of $\mathcal{U}_j$.
 %Therefore, they cannot determine if a login in $\mathbb{L}$ is initiated by $U'$ or by any other users. %which means they cannot link the $PID_U$ of $L'$ to the $PID_U$ of any login in $\mathbb{L}$. % 不需要专门谈PID_U, colluding user合作之后，就是account就连起来了、不必专门谈PID_U。
 This indicates any login in $\mathbb{L}$ is \emph{indistinguishable} from other logins in $\mathbb{L}$, to be associated with a given $\mathcal{L}'$.
@@ -523,7 +527,7 @@ The adversary succeeds in the game with $\mathbf{Adv}_{A}$:
 
 Based on $\mathcal{G}_r$, we design a PPT algorithm $\mathcal{D}^*_r$ %as shown in Figure \ref{fig:dalgorithm},
 to solve the ECDDH problem: given $(G, [x]G$, $[y]G$, $[z]G)$, decide whether $z$ equals to $xy$ or is randomly chosen in $\mathbb{Z}_n$.
-Thus, 
+Thus,
     $|{\rm Pr}^*_1 - {\rm Pr}^*_2| = \epsilon_{r}(\lambda)$ becomes negligible when $\lambda$ is sufficiently large,
         where
 \begin{align*}
