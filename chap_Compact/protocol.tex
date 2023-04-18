@@ -104,11 +104,14 @@ From Equations \ref{equ:PIDRP}, \ref{equ:PIDU}, and \ref{equ:Account}, it is der
 %%See Section \ref{sec:analysis} for the detailed proofs of security and privacy.
 %
 
-With the help of $t$, for a given user, the RP derives an \emph{identical} account from identity tokens for different logins. It is the user's \emph{permanent} account at this RP, which is \emph{unique} among all accounts at the same RP. Meanwhile, the user's accounts at different RPs are inherently different and unlinkable (see Section \ref{sec:analysis} for detailed proof).
+With the help of $t$, for a given user, the RP derives an \emph{identical} account from identity tokens for different logins. It is the user's \emph{permanent} account at this RP, which is \emph{unique} among all accounts at the same RP. Meanwhile, the user's accounts at different RPs are inherently different and unlinkable (see Section \ref{sec:analysis} for the detailed proof).
 
 \newc
-In this process, the RP needs to check if $PID_{RP} = [t]ID_{RP}$ holds after extracting $PID_{RP}$ from a received identity token. Otherwise, a malicious user with $ID_{U'} = u'$ could randomly select $t'$ and $u$ and set the malicious $PID_{RP}$ as $[t'u'^{-1}][u]ID_{RP}$. Then, the malicious user requests an identity token from the IdP, in which $PID_{U'} = [ID_{U'}]PID_{RP}=[u'][t'u'^{-1}][u]ID_{RP} = [t'u]ID_{RP}$. 
-If the RP does not validate the received $PID_{RP}$, it would use the received $PID_{U'}$ to compute the account as $Acct = [t'^{-1}]PID_{U'}=[u]ID_{RP}$, which is the account of the victim user with $ID_{U} = u$. The malicious user can try many random $u$ until the attack succeeds.
+In this process, the RP needs to check if $PID_{RP} = [t]ID_{RP}$ holds after extracting $PID_{RP}$ from a received identity token. Otherwise, a malicious user with $ID_{U'} = u'$ could randomly select $t'$ and $u$, and set $PID_{RP}$ as $[t'u'^{-1}][u]ID_{RP}$. Then, the malicious user requests a token from the IdP, in which $PID_{U'} = [ID_{U'}]PID_{RP}=[u'][t'u'^{-1}][u]ID_{RP} = [t'u]ID_{RP}$.
+If the RP does not validate the received $PID_{RP}$, it would use the received $PID_{U'}$ to calculate an account as $Acct = [t'^{-1}]PID_{U'}=[u]ID_{RP}$, which is the account of a potential victim user with $ID_{U} = u$.
+The malicious user could repeat the above attacks with random $u \in \mathbb{Z}_n$,
+     until the account of some target victim user is calculated by the RP.\footnote{In this attack case,
+     if it does not derive an account of some honest user, the RP will consider the token holder as a newly-registered user.}
 
 %Otherwise, a malicious user with $ID_{U'} = u'$ could impersonate a victim user by setting $PID_{RP}$ to $[t'u'^{-1}]Acct$ but sending $t'$ to an RP, where $Acct$ belongs to the victim with $ID_{U} = u$ at this RP.
 %Then, the malicious user could request an identity token, and the IdP would calculate $PID_{U'} = [u'][t'u'^{-1}]Acct = [t']Acct$.
@@ -253,7 +256,7 @@ The user and the RP negotiate $PID_{RP} = [t]{ID_{RP}}$.
 \setlength{\parsep}{0pt}
 \setlength{\parskip}{0pt}
 \item[2.1] The IdP script chooses a random number $t \in [1, n)$ and sends it to the RP script through \verb+postMessage+. The RP script then forwards $t$ to the RP.
-\item[2.2] The RP verifies if the received $t$ is an integer between 1 and $n$ and 
+\item[2.2] The RP verifies if the received $t$ is an integer between 1 and $n$ and
 %Upon receiving $t$, the RP verifies $1 \leq t < n$ and %calculates $PID_{RP}$.
 %To acknowledge the negotiation of $PID_{RP}$, The RP
 replies with $Cert_{RP}$ and the scope of the requested user attributes. The reply is transmitted through the RP script to the IdP script.  % through \verb+postMessage+.
@@ -282,9 +285,9 @@ The IdP script sends an identity-token request for $PID_{RP}$ on behalf of the u
 \item[3.2] The IdP authenticates the user, if not authenticated yet.
 
 \item [3.3]
-The IdP script obtains the user's authorization for the requested attributes and sends the scope of the authorized attributes. 
+The IdP script obtains the user's authorization for the requested attributes and sends the scope of the authorized attributes.
 \newc
-Then, the IdP checks if the received $PID_{RP}$ is a point on $\mathbb{E}$, 
+Then, the IdP checks if the received $PID_{RP}$ is a point on $\mathbb{E}$,
 \oldc
 calculates $PID_U = [ID_U]{PID_{RP}}$, and signs $[PID_{RP}, PID_U, Issuer, Validity, Attr]_{SK}$, where $Issuer$ is the IdP, $Validity$ indicates the validity period, and $Attr$ contains the authorized user attributes.
 \item[3.4] The IdP replies with the identity token to the IdP script.
