@@ -6,6 +6,32 @@ We design identity-transformation algorithms %  $\mathcal{F}_{PID_{RP}}$, $\math
 on an elliptic curve $\mathbb{E}$.
 Table \ref{tbl:notations-protocol} lists the notations. The subscript $j$ and/or superscript $i$ may be omitted if there is no ambiguity.
 
+
+\begin{table}[tb]
+\footnotesize
+    \caption{The notations in the UPPRESSO protocol}
+    \centering
+%    \begin{tabular}{|c|c|c|}
+    \begin{tabular}{|p{1.0cm}|p{6.60cm}|} \hline
+    {\textbf{Notation}} & {\textbf{Description}} \\ \hline
+    {$\mathbb{E}$, $G$, $n$} & {$\mathbb{E}$ is an elliptic curve over a finite field $\mathbb{F}_q$. $G$ is a base point (or generator) on $\mathbb{E}$, and the order of $G$ is a prime number $n$.} \\ \hline
+    {$ID_U$} & {$ID_U = u \in [1, n)$ is the user's unique identity at the IdP, \newc{which is known only to the user and the IdP. %$u$ is kept unknown to RPs.
+    }} \\ \hline
+   {$ID_{RP_j}$} & {$ID_{RP} = [r]G$ is the $j$-th RP's unique identity, which is publicly known; $r \in [1, n)$ \newc{is known only to the IdP.}} \\ \hline
+    {$t$} & {$t \in [1, n)$ is a user-selected random integer in each login; \newc{$t$ is shared with the target RP and kept secret to the IdP.
+    }} \\ \hline
+    {$PID_{RP_j}^i$} & {$PID_{RP} = [t]{ID_{RP}} = [tr]G$ is the $j$-th RP's pseudo-identity, in the user's $i$-th login to this RP.} \\ \hline
+    {$PID_{U,j}^i$} & {$PID_U = [{ID_U}]{PID_{RP}} = [utr]G$ is the user's pseudo-identity, in the user's $i$-th login to the $j$-th RP.} \\ \hline
+     {$Acct_j$} & {$Acct = [t^{-1}\bmod n]PID_{U} = [ID_U]ID_{RP} = [ur]G$ is the user's account at the $j$-th RP.} \\ \hline
+    {$SK$, $PK$} & {The IdP's private key and public key, which are used to sign and verify identity tokens and RP certificates.} \\ \hline
+%    {$T$} & {The trapdoor to derive $Account$: $T=N_U^{-1} \bmod n$.} \\ \hline
+    {$Enpt_{RP_j}$} & {The $j$-th RP's endpoint for receiving the identity tokens.} \\ \hline
+    {$Cert_{RP_j}$} & {The IdP-signed RP certificate binding $ID_{RP_j}$ and $Enpt_{RP_j}$.} \\ \hline
+%    {$PEnpt_{U,j}^i$} & {A user-generated random "pseudo-endpoint'', in the user's $i$-th login to the $j$-th RP.} \\ \hline
+    \end{tabular}
+    \label{tbl:notations-protocol}
+\end{table}
+
 The IdP assigns a unique random integer $u$ to a user (i.e., $ID_U = u$),
  while selecting a random integer $r$ and assigning $ID_{RP} = [r]G$ to the RP if it is a unique point on $\mathbb{E}$.
 Here, $G$ is a point on $\mathbb{E}$ of order $n$, and $[r]G$ denotes the addition of $G$ on the curve $r$ times.
@@ -104,32 +130,6 @@ In the meantime, a user's identity $u$ is kept secret to RPs; otherwise, colludi
 %The RP cannot derive $ID_U$ from either $PID_U$ or $Acct$ due to the elliptic curve discrete logarithm problem (ECDLP). Since $t$ is random in $\mathbb{Z}_n$ and unknown to the IdP, from the IdP's view, $PID_{RP}$ is indistinguishable from a random variable on $\mathbb{E}$. So, the IdP cannot learn anything about $ID_{RP}$ from $PID_{RP}$.
 %Section \ref{sec:analysis} presents more detailed analyses.
 
-
-
-\begin{table}[tb]
-\footnotesize
-    \caption{The notations in the UPPRESSO protocol}
-    \centering
-%    \begin{tabular}{|c|c|c|}
-    \begin{tabular}{|p{1.0cm}|p{6.60cm}|} \hline
-    {\textbf{Notation}} & {\textbf{Description}} \\ \hline
-    {$\mathbb{E}$, $G$, $n$} & {$\mathbb{E}$ is an elliptic curve over a finite field $\mathbb{F}_q$. $G$ is a base point (or generator) on $\mathbb{E}$, and the order of $G$ is a prime number $n$.} \\ \hline
-    {$ID_U$} & {$ID_U = u \in [1, n)$ is the user's unique identity at the IdP, \newc{which is known only to the user and the IdP. %$u$ is kept unknown to RPs.
-    }} \\ \hline
-   {$ID_{RP_j}$} & {$ID_{RP} = [r]G$ is the $j$-th RP's unique identity, which is publicly known; $r \in [1, n)$ \newc{is known only to the IdP.}} \\ \hline
-    {$t$} & {$t \in [1, n)$ is a user-selected random integer in each login; \newc{$t$ is shared with the target RP and kept secret to the IdP.
-    }} \\ \hline
-    {$PID_{RP_j}^i$} & {$PID_{RP} = [t]{ID_{RP}} = [tr]G$ is the $j$-th RP's pseudo-identity, in the user's $i$-th login to this RP.} \\ \hline
-    {$PID_{U,j}^i$} & {$PID_U = [{ID_U}]{PID_{RP}} = [utr]G$ is the user's pseudo-identity, in the user's $i$-th login to the $j$-th RP.} \\ \hline
-     {$Acct_j$} & {$Acct = [t^{-1}\bmod n]PID_{U} = [ID_U]ID_{RP} = [ur]G$ is the user's account at the $j$-th RP.} \\ \hline
-    {$SK$, $PK$} & {The IdP's private key and public key, which are used to sign and verify identity tokens and RP certificates.} \\ \hline
-%    {$T$} & {The trapdoor to derive $Account$: $T=N_U^{-1} \bmod n$.} \\ \hline
-    {$Enpt_{RP_j}$} & {The $j$-th RP's endpoint for receiving the identity tokens.} \\ \hline
-    {$Cert_{RP_j}$} & {The IdP-signed RP certificate binding $ID_{RP_j}$ and $Enpt_{RP_j}$.} \\ \hline
-%    {$PEnpt_{U,j}^i$} & {A user-generated random "pseudo-endpoint'', in the user's $i$-th login to the $j$-th RP.} \\ \hline
-    \end{tabular}
-    \label{tbl:notations-protocol}
-\end{table}
 
 \subsection{The Design Specifics for Web Applications}
 \label{sec:web-design}
