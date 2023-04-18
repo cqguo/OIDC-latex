@@ -363,18 +363,19 @@ As depicted in Figure \ref{fig:dalgorithm},
  given $(G, [x]G$, $[y]G$, $[z]G)$, decide whether $z$ equals to $xy$ or is randomly chosen in $\mathbb{Z}_n$,
     where $G$ is a point on an elliptic curve $\mathbb{E}$ of order $n$, and $x$ and $y$ are integers randomly and independently chosen in $\mathbb{Z}_n$.
 
-Therefore, according to the ECDDH assumption,
-    the advantage of using $\mathcal{D}^*_r$ to decide whether $z$ equals to $xy$ or not,
-    i.e., $\mathbf{Adv}^*_{A} = |{\rm Pr}^*_1 - {\rm Pr}^*_2| = \epsilon_{r}(\lambda)$, becomes negligible when the security parameter $\lambda$ is sufficiently large,
-        where
-\begin{align*}
-&{\rm Pr}^*_1 =  {\rm Pr}\{\mathcal{D}^*(G, [x]G, [y]G, [xy]G)=1\} \\
-&{\rm Pr}^*_2 =  {\rm Pr}\{\mathcal{D}^*(G, [x]G, [y]G, [z]G)=1\}
-\end{align*}
+%Therefore, according to the ECDDH assumption,
+%    the advantage of using $\mathcal{D}^*_r$ to decide whether $z$ equals to $xy$ or not,
+%    i.e., $\mathbf{Adv}^*_{A} = |{\rm Pr}^*_1 - {\rm Pr}^*_2| = \epsilon_{r}(\lambda)$, becomes negligible when the security parameter $\lambda$ is sufficiently large,
+%        where
+%\begin{align*}
+%&{\rm Pr}^*_1 =  {\rm Pr}\{\mathcal{D}^*(G, [x]G, [y]G, [xy]G)=1\} \\
+%&{\rm Pr}^*_2 =  {\rm Pr}\{\mathcal{D}^*(G, [x]G, [y]G, [z]G)=1\}
+%\end{align*}
+%
 
-The input of $\mathcal{D}^*_r$ is in the form of $(G, Q_1=[x]G, Q_2=[y]G, Q_3=[z]G)$.
-Upon receiving an input, the challenger chooses
- $\{u_1, u_2, \cdots, u_v\}$, $\{r_1, r_2, \cdots, r_c\}$, $\{t_{1, 1}, t_{1, 2}, \cdots, t_{v, c}\}$ randomly in $\mathbb{Z}_n$ for $1 \le i \le v$ and $1 \le j \le c$,
+Upon receiving an input $(G, Q_1=[x]G, Q_2=[y]G, Q_3=[z]G)$ of $\mathcal{D}^*_r$,
+ the challenger randomly chooses
+ $\{u_1, u_2, \cdots, u_v\}$, $\{r_1, r_2, \cdots, r_c\}$, $\{t_{1, 1}, t_{1, 2}, \cdots, t_{v, c}\}$ in $\mathbb{Z}_n$ for $1 \le i \le v$ and $1 \le j \le c$,
   where $[r_{j}]G \neq Q_2$ (i.e., $r_j \neq y$),  
   to construct $L_{i, j}=([r_j]G, t_{i,j}, [u_ir_j]G)$.
 Then,
@@ -392,19 +393,17 @@ the challenger randomly chooses $d \in [1, w]$, and replaces $L''_d$ with $(Q_2,
 Here, $\mathbb{L}'' = \{L''_k\}$ represents the knowledge of the logins
         visiting the $j''$-th RP with $[y]G$ by
     $w$ users with $\{u''_1, u''_2, \cdots, u''_{d-1}, z/y, u''_{d+1}, \cdots, u''_w\}$.
- 
-
 When the adversary receives $\mathfrak{L}$, $L'$, and $\mathbb{L}''$,
  it outputs $s$ which is returned as the output of $\mathcal{D}^*_r$.
 
-According to the construction of $\mathfrak{L}$, $L'$, and $\mathbb{L}''$, 
- $x$ is embedded as $ID_{U'}$ in $L'$ visiting $RP_{j'}$,
- and $z/y$ is embedded as $ID_{U''_d}$ into $\mathbb{L}''$ visiting $[y]G$ with $\{u''_1, u''_2, \cdots, u''_{d-1}, u''_{d+1}, \cdots, u''_w\}$, where $u''_k \neq x$.
-Meanwhile, $[r_{j'}]G$ and $[y]G$ two different malicious RPs, 
+According to the above construction, % of $\mathfrak{L}$, $L'$ and $\mathbb{L}''$, 
+ $x$ is embedded as $ID_{U'}$ in $L'$ for $ID_{RP} = [r_{j'}]G$,
+ and $z/y$ is embedded as $ID_{U''_d}$ in $\mathbb{L}''$ for $ID_{RP} = [y]G$ together with $\{u''_1, u''_2, \cdots, u''_{d-1}, u''_{d+1}, \cdots, u''_w\}$.
+Meanwhile, $[r_{j'}]G$ and $[y]G$ are two RP identities in $\mathfrak{L}$,
     and $x$ is not in $\{u''_1, u''_2, \cdots, u''_{d-1}, u''_{d+1}, \cdots, u''_w\}$.
+So the adversary outputs $s=1$ only it decides $x = z/y$.
     
-Thus, if $z = xy$, then $z/y = x$ and $u' \in \{u''_1, u''_2, \cdots, u''_w\}$; otherwise, $u' \in \mathbb{Z}_n$.
-The advantage $\mathbf{Adv}^*_{A}=|{\rm Pr}^*_1 - {\rm Pr}^*_2|$ of solving the ECDDH problem using $\mathcal{D}^*_r$ is deduced as:
+The advantage $\mathbf{Adv}^*_{A}=|{\rm Pr}^*_1 - {\rm Pr}^*_2|$ of solving the ECDDH problem using $\mathcal{D}^*_r$ is deduced as below:
 \begin{align*}
 &{\rm Pr}^*_1 =  {\rm Pr}\{\mathcal{D}^*_r(G, [x]G, [y]G, [xy]G)=1\} \\
 =&{\rm Pr}\{\mathcal{G}_r(\mathfrak{L}, L', \mathbb{L}'' | u' \in \{{u''_1}, {u''_2}, \cdots, {u''_w}\})=1\} = {\rm Pr}_1 \\
@@ -421,10 +420,10 @@ The advantage $\mathbf{Adv}^*_{A}=|{\rm Pr}^*_1 - {\rm Pr}^*_2|$ of solving the 
 \end{figure}
 
 
-If the adversary has advantages in $\mathcal{G}_r$ to decide whether $L'$ is initiated by $U'$ in \{${U''_1}, {U''_2}, \cdots, {U''_w}$\} or randomly from the universal user set,
-    then $\mathbf{Adv}^*_{A}={\mathbf{Adv}}_{A}$ is \emph{non-negligible} regardless of $\lambda$.
+If in $\mathcal{G}_r$ the adversary has non-negligible advantages,
+    then $\mathbf{Adv}^*_{A}={\mathbf{Adv}}_{A}$ is also non-negligible regardless of the security parameter $\lambda$.
 This violates the ECDDH assumption.
-Thus, the adversaries cannot decide whether $L'$ is initiated by a user in \{${U''_1}, {U''_2}, \cdots, {U''_w}$\} or not.
+Therefore, the adversaries cannot decide whether $L'$ is initiated by a user in \{${U''_1}, {U''_2}, \cdots, {U''_w}$\} or not.
 \hfill $\square$
 \oldc
 
