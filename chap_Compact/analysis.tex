@@ -318,7 +318,7 @@ First of all,
 Thus,
 given a shared view of the logins to the colluding RPs by malicious users,
     the adversaries attempt to link logins by an honest user but visiting different malicious RPs.
-To show that \usso\ prevents such linkage, we prove in Theorem 7 that the adversaries cannot decide whether two logins visiting different malicious RPs are initiated by one honest user or not. %a login initiated by $U'$ to some of the $c$ malicious RPs 
+To show that \usso\ prevents such linkage, we prove in Theorem 7 that the adversaries cannot decide whether two logins visiting different malicious RPs are initiated by one honest user or not. %a login initiated by $U'$ to some of the $c$ malicious RPs
 They cannot even associate a login visiting some malicious RP by an honest user with a subset of logins visiting another RP.
 
 Let us investigate the knowledge that an RP obtains from each login. In \usso, an RP receives a random number $t$ and an identity token enclosing $PID_{RP}$ and $PID_U$ in each login. Meanwhile, it knows its own identity $ID_{RP}$ and derives the user's account $Acct$.
@@ -335,7 +335,7 @@ L_{2,1},& L_{2,2},&\cdots,&L_{2,c}\\
 L_{v,1},&L_{v,2},&\cdots,&L_{v,c}
 \end{matrix}\right\}$, where
  $L_{i, j}=([r_j]G, t_{i,j}, [u_ir_j]G)$ for $1 \le i \le v$ and $1 \le j \le c$,
-the colluding adversaries cannot link a login visiting a malicious RP by some honest user 
+the colluding adversaries cannot link a login visiting a malicious RP by some honest user
     to any subset of logins visiting another one,
   i.e., cannot decide whether $U'$ is in $\{{U''_1}, {U''_2}, \cdots, {U''_w}\}$ or randomly chosen from the universal user set,
     when a login visiting some malicious RP by a honest user $U'$ is denoted as $L'$,
@@ -357,7 +357,7 @@ Thus, the adversary succeeds in $\mathcal{G}_r$ with an advantage $\mathbf{Adv}_
 &{\mathbf{Adv}}_{A}=|{\rm Pr}_1-{\rm Pr}_2|
 \end{align*}
 
-As depicted in Figure \ref{fig:dalgorithm}, 
+As depicted in Figure \ref{fig:dalgorithm},
     we design a PPT algorithm $\mathcal{D}^*_r$ based on $\mathcal{G}_r$,
      to solve the elliptic curve decisional Diffie-Hellman (ECDDH) problem:
  given $(G, [x]G$, $[y]G$, $[z]G)$, decide whether $z$ equals to $xy$ or is randomly chosen in $\mathbb{Z}_n$,
@@ -376,7 +376,7 @@ As depicted in Figure \ref{fig:dalgorithm},
 Upon receiving an input $(G, Q_1=[x]G, Q_2=[y]G, Q_3=[z]G)$ of $\mathcal{D}^*_r$,
  the challenger randomly chooses
  $\{u_1, u_2, \cdots, u_v\}$, $\{r_1, r_2, \cdots, r_c\}$, $\{t_{1, 1}, t_{1, 2}, \cdots, t_{v, c}\}$ in $\mathbb{Z}_n$ for $1 \le i \le v$ and $1 \le j \le c$,
-  where $[r_{j}]G \neq Q_2$ (i.e., $r_j \neq y$),  
+  where $[r_{j}]G \neq Q_2$ (i.e., $r_j \neq y$),
   to construct $L_{i, j}=([r_j]G, t_{i,j}, [u_ir_j]G)$.
 Then,
  it randomly chooses $j' \in [1, c]$ and $t'$ in $\mathbb{Z}_n$, to construct $L' = ([r_{j'}]G, t', [r_{j'}]Q_1) = ([r_{j'}]G, t', [xr_{j'}]G)$.
@@ -396,13 +396,12 @@ Here, $\mathbb{L}'' = \{L''_k\}$ represents the knowledge of the logins
 When the adversary receives $\mathfrak{L}$, $L'$, and $\mathbb{L}''$,
  it outputs $s$ which is returned as the output of $\mathcal{D}^*_r$.
 
-According to the above construction, % of $\mathfrak{L}$, $L'$ and $\mathbb{L}''$, 
+According to the above construction, % of $\mathfrak{L}$, $L'$ and $\mathbb{L}''$,
  $x$ is embedded as $ID_{U'}$ in $L'$ for $ID_{RP} = [r_{j'}]G$,
- and $z/y$ is embedded as $ID_{U''_d}$ in $\mathbb{L}''$ for $ID_{RP} = [y]G$ together with $\{u''_1, u''_2, \cdots, u''_{d-1}, u''_{d+1}, \cdots, u''_w\}$.
-Meanwhile, $[r_{j'}]G$ and $[y]G$ are two RP identities in $\mathfrak{L}$,
-    and $x$ is not in $\{u''_1, u''_2, \cdots, u''_{d-1}, u''_{d+1}, \cdots, u''_w\}$.
-So the adversary outputs $s=1$ only it decides $x = z/y$.
-    
+ $z/y$ is embedded as $ID_{U''_d}$ in $\mathbb{L}''$ for $ID_{RP} = [y]G$ together with $\{u''_1, u''_2, \cdots, u''_{d-1}, u''_{d+1}, \cdots, u''_w\}$, and $[r_{j'}]G$ and $[y]G$ are two RP identities in $\mathfrak{L}$.
+Because $x$ is not in $\{u''_1, u''_2, \cdots, u''_{d-1}, u''_{d+1}, \cdots, u''_w\}$,
+    the adversary outputs $s=1$ only it decides $x = z/y$.
+
 The advantage $\mathbf{Adv}^*_{A}=|{\rm Pr}^*_1 - {\rm Pr}^*_2|$ of solving the ECDDH problem using $\mathcal{D}^*_r$ is deduced as below:
 \begin{align*}
 &{\rm Pr}^*_1 =  {\rm Pr}\{\mathcal{D}^*_r(G, [x]G, [y]G, [xy]G)=1\} \\
@@ -414,7 +413,7 @@ The advantage $\mathbf{Adv}^*_{A}=|{\rm Pr}^*_1 - {\rm Pr}^*_2|$ of solving the 
 
 \begin{figure}[tb]
   \centering
-  \includegraphics[width=0.99\linewidth]{fig/dalgorithm-lemma2.pdf}
+  \includegraphics[width=1.0\linewidth]{fig/rp-linkage-game.pdf}
   \caption{The PPT algorithm $\mathcal{D}^*_r$ constructed based on the RP-based identity linkage game, to solve the ECDDH problem.}
   \label{fig:dalgorithm}
 \end{figure}
