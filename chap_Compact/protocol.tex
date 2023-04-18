@@ -81,11 +81,12 @@ From Equations \ref{equ:PIDRP}, \ref{equ:PIDU}, and \ref{equ:Account}, it is der
 With the help of $t$, for a given user, the RP derives an \emph{identical} account from identity tokens for different logins. It is the user's \emph{permanent} account at this RP, which is \emph{unique} among all accounts at the same RP. Meanwhile, the user's accounts at different RPs are inherently different and unlinkable (see Section \ref{sec:analysis} for detailed proof).
 
 \newc
-In this process, the RP needs to check whether $PID_{RP} = [t]ID_{RP}$ holds when extracting $PID_{RP}$ from a received identity token.
-Otherwise, a malicious user with $ID_{U'} = u'$ could impersonate a victim user by setting $PID_{RP}$ to $[t'u'^{-1}]Acct$ but sending $t'$ to an RP, where $Acct$ belongs to the victim with $ID_{U} = u$ at this RP.
-Then, the malicious user could request an identity token,
- and the IdP would calculate $PID_{U'} = [u'][t'u'^{-1}]Acct = [t']Acct$.
-Finally, the RP would accept the malicious user under $Acct$. %In particular, when one party selects $t$ and computes $PID_{RP} = [t]ID_{RP}$, the other party should check if the received $t$ and $PID_{RP}$ satisfies $PID_{RP} = [t]ID_{RP}$.
+In this process, the RP needs to check if $PID_{RP} = [t]ID_{RP}$ holds after extracting $PID_{RP}$ from a received identity token. Otherwise, a malicious user with $ID_{U'} = u'$ could randomly select $t'$ and $u$ and set the malicious $PID_{RP}$ as $[t'u'^{-1}][u]ID_{RP}$. Then, the malicious user requests an identity token from the IdP, in which $PID_{U'} = [ID_{U'}]PID_{RP}=[u'][t'u'^{-1}][u]ID_{RP} = [t'u]ID_{RP}$. 
+If the RP does not validate the received $PID_{RP}$, it would use the received $PID_{U'}$ to compute the account as $Acct = [t'^{-1}]PID_{U'}=[u]ID_{RP}$, which is the account of the victim user with $ID_{U} = u$. The malicious user can try many random $u$ until the attack succeeds.
+
+%Otherwise, a malicious user with $ID_{U'} = u'$ could impersonate a victim user by setting $PID_{RP}$ to $[t'u'^{-1}]Acct$ but sending $t'$ to an RP, where $Acct$ belongs to the victim with $ID_{U} = u$ at this RP.
+%Then, the malicious user could request an identity token, and the IdP would calculate $PID_{U'} = [u'][t'u'^{-1}]Acct = [t']Acct$.
+%Finally, the RP would accept the malicious user under $Acct$. %In particular, when one party selects $t$ and computes $PID_{RP} = [t]ID_{RP}$, the other party should check if the received $t$ and $PID_{RP}$ satisfies $PID_{RP} = [t]ID_{RP}$.
 %In the above descriptions, the user generates $t$, calculates $PID_{RP} = [t]ID_{RP}$ and sends $t$ to the RP. After receiving $t$ from the user and extracting $PID_{RP}$ from a token, the RP checks that $PID_{RP} = [t]ID_{RP}$, because the correct account $[ID_U]ID_{RP}$ is derived \emph{only if} this equation holds (i.e., $PID_{RP} = [t]ID_{RP}$); otherwise, attacks happen as below.
 %The RP should compute $[t]ID_{RP}$ by itself and verify if it equals the received $PID_{RP}$.
 
