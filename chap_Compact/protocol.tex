@@ -110,9 +110,8 @@ With the help of $t$, for a given user, the RP derives an \emph{identical} accou
 In this process, the RP needs to check if $PID_{RP} = [t]ID_{RP}$ holds after extracting $PID_{RP}$ from a received identity token. Otherwise, a malicious user with $ID_{U'} = u'$ could randomly select $t'$ and $u$, and set $PID_{RP}$ as $[t'u'^{-1}][u]ID_{RP}$. Then, the malicious user requests a token from the IdP, in which $PID_{U'} = [ID_{U'}]PID_{RP}=[u'][t'u'^{-1}][u]ID_{RP} = [t'u]ID_{RP}$.
 If the RP does not check the received $PID_{RP}$, it would use the received $PID_{U'}$ to calculate an account as $Acct = [t'^{-1}]PID_{U'}=[u]ID_{RP}$, which is the account of a potential victim user with $ID_{U} = u$.
 The malicious user could repeat the above attacks with random $u \in \mathbb{Z}_n$,
-     until the account of some target victim user is calculated by the RP.\footnote{In this attack scenario,
-     if it does not derive an existing account of some honest user,
-      the RP will deal with the adversary as a newly-registered user.}
+     until the account of some target victim user is calculated by the RP.\footnote{If it does not derive an existing account of some honest user,
+      the RP will deal with the adversary as a newly-registered user without any alerts.}
 
 %Otherwise, a malicious user with $ID_{U'} = u'$ could impersonate a victim user by setting $PID_{RP}$ to $[t'u'^{-1}]Acct$ but sending $t'$ to an RP, where $Acct$ belongs to the victim with $ID_{U} = u$ at this RP.
 %Then, the malicious user could request an identity token, and the IdP would calculate $PID_{U'} = [u'][t'u'^{-1}]Acct = [t']Acct$.

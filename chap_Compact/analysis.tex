@@ -94,10 +94,10 @@ Malicious RPs could collude with each other or with malicious users, attempting 
 
 We develop a Dolev-Yao style model \cite{BrowserID, SPRESSO, FettKS16, FettKS17} for \usso, referred to as the \dyu\ model, to formalize the login flow of \usso.
 % Dolev-Yao style models abstract cryptographic concepts into an algebra of symbolic messages to discover structural flaws using simple formal logic. % which has been used in the formal analysis of SSO protocols such as OAuth 2.0 \cite{FettKS16} and OIDC \cite{FettKS17}.
-The model abstracts the entities in a web system, such as web servers and browsers, as \emph{atomic processes}, %which communicate with each other through events. % such as HTTPS requests and responses.
-and defines \emph{script processes} to formulate client-side scripts.
+The model abstracts the entities in a web system, such as web servers and browsers, as atomic processes, %which communicate with each other through events. % such as HTTPS requests and responses.
+and defines script processes to formulate client-side scripts.
 %The script is dependently invoked by the browser to process the server-defined logic.%such as verifying $Certificate_{RP}$. %postmessage events; %atomic process <-> script process, communication. %Other events change self-trigger.
-The atomic processes of \usso\ include an {\em IdP process}, a finite set of {\em web servers} for honest RPs, a finite set of honest {\em browsers}, and a finite set of {\em attacker processes} that model malicious RPs and malicious users.
+The atomic processes of \usso\ include an IdP process, a finite set of web servers for honest RPs, a finite set of honest browsers, and a finite set of attacker processes that model malicious RPs and malicious users.
 A browser may invoke an honest IdP script and multiple RP scripts that could be honest or malicious.
 The processes communicate with each other through events such as HTTPS requests and responses,
 %Although the scripts coexist in the same browser, they are strictly separated.
@@ -163,7 +163,7 @@ where $Q$ is a point on $\mathbb{E}$ and $G$ is a generator on $\mathbb{E}$ of o
 %where $k$ denotes the security parameter and $\epsilon_{c}(k)$ becomes negligible when $k$ is sufficiently large.
 %For any sufficiently large $k$, $m \ll 2^k$ since $m$ is a finite integer.
 
-
+The algorithm $\mathcal{D}^*_c$ works as below.
 The input of $\mathcal{D}^*_c$ is in the form of ($G, Q$). Upon receiving an input ($G$, $Q$), the challenger first randomly chooses $r_1, \cdots, r_m$ in $\mathbb{Z}_n$ to calculate $[r_1]G, \cdots, [r_m]G$.
 Then, it randomly chooses $j \in [1,m]$, and replaces $[r_j]G$ with $Q$, and sends $m$ RP identities to the adversary, which then returns the result ($a$, $b$, $t$, $t'$). Finally, the challenger calculates $s = t^{-1}t'r_b \bmod n$ and returns $s$ as the output of $\mathcal{D}^*_c$.
 
@@ -205,7 +205,7 @@ This violates the ECDLP assumption. Therefore, the probability of finding $t$ an
 To issue an identity token requested for $PID_{RP}$, the honest IdP calculates $PID_U = [ID_U]PID_{RP}$ following Equation \ref{equ:PIDU} after authenticating the user with $ID_U$. The designated RP then calculates $Acct = [t^{-1}]PID_{U} = [ID_U]ID_{RP}$ following Equation \ref{equ:AccountNotChanged}.
 $Acct = [ID_U]ID_{RP}$ is a \emph{permanent} identifier that is determined once the RP and the user have registered at the IdP. Therefore, $PID_U$ in $TK$ always identifies an $Acct$ at the designated RP, and $Acct$ is mapped to a user with $ID_U$.
 
-Next, we prove that it \emph{uniquely} identifies one user in the system and one account at the RP. Since $\mathbb{E}$ is a finite cyclic group, $ID_{RP} = [r]G$ is also a generator on $\mathbb{E}$ of order $n$. Given a user with $ID_U$, $Acct = [ID_U]ID_{RP}$ is a unique point on $\mathbb{E}$ for $1 \leq u < n$, which is uniquely associated to $ID_U=u$. \hfill $\square$
+Next, we prove that it \emph{uniquely} identifies one user in the system and one account at the RP. Since $\mathbb{E}$ is a finite cyclic group, $ID_{RP} = [r]G$ is also a generator on $\mathbb{E}$ of order $n$. Given a user with $ID_U$, $Acct = [ID_U]ID_{RP}$ is a unique point on $\mathbb{E}$ for any $u \in [1, n)$, which is uniquely associated to $ID_U=u$. \hfill $\square$
 
 %According to the \dy~model, the RP may receive a $TK$ issued for another RP from a malicious RP script. However, if $PID_{RP} = [t]ID_{RP}$ holds, the RP can verify its designation by $PID_{RP}$ based on Theorem 1 and associates both $t$ and $TK$ with the current login.
 %Then, the RP can calculate $Acct$ using $t$ and $PID_U$ following Eq.~\ref{equ:Account}. $Acct$ is determined only by $ID_U$ and $ID_{RP}$ based on Eq.~\ref{equ:AccountNotChanged}, which are permanent identifiers issued by the IdP during registration. Hence, $Acct$ cannot be manipulated by adversaries and is independent of logins. Therefore, in a user's multiple logins to the same RP, $PID_U$s are always mapped to one and only one $Acct$ at that RP.
@@ -294,7 +294,7 @@ The IdP cannot (\emph{a}) associate multiple logins with different $PID_{RP}$s t
 \vspace{0.75mm}
 \noindent \textsc{Proof.}
 Consider a finite cyclic group $\mathbb{E}$ where the number of points on $\mathbb{E}$ is $n$.
-Because $G$ is a generator of order $n$, $ID_{RP} = [r]G$ is also a generator on $\mathbb{E}$ of order $n$. According to the \dyu\ model, $t$ is randomly chosen in $\mathbb{Z}_n$ and kept unknown to the IdP. Therefore, $PID_{RP} = [t]ID_{RP}$ is \emph{indistinguishable} from a point $Q$ that is randomly chosen on $\mathbb{E}$ \cite{oprf-proved,strong-oprf,voprf-proved}.\footnote{This property has been actually proved in OPRFs \cite{oprf-proved,strong-oprf,voprf-proved}, where the OPRF server works similarly to the IdP and learns \emph{nothing} about a client's inputs or outputs of the evaluated pseudorandom function.} \hfill $\square$
+Because $G$ is a generator of order $n$, $ID_{RP} = [r]G$ is also a generator on $\mathbb{E}$ of order $n$. According to the \dyu\ model, $t$ is randomly chosen in $\mathbb{Z}_n$ and kept unknown to the IdP. Therefore, $PID_{RP} = [t]ID_{RP}$ is \emph{indistinguishable} from a point $Q$ that is randomly chosen on $\mathbb{E}$ \cite{oprf-proved,voprf-proved}.\footnote{This property has been actually proved in OPRFs \cite{oprf-proved,voprf-proved}, where the OPRF server works similarly to the IdP and learns \emph{nothing} about a client's inputs or outputs of the evaluated pseudorandom function.} \hfill $\square$
 
 %In order to receive $[k]Q$ for any given $Q$ on $\mathbb{E}$,
 %    an OPRF client first generates a random number $e$, converts $Q$ to $[e]Q$,
@@ -372,35 +372,36 @@ As depicted in Figure \ref{fig:dalgorithm},
 %&{\rm Pr}^*_2 =  {\rm Pr}\{\mathcal{D}^*(G, [x]G, [y]G, [z]G)=1\}
 %\end{align*}
 %
-
+The algorithm $\mathcal{D}^*_r$ works as below.
 Upon receiving an input $(G, Q_1=[x]G, Q_2=[y]G, Q_3=[z]G)$ of $\mathcal{D}^*_r$,
- the challenger randomly chooses
- $\{u_1, u_2, \cdots, u_v\}$, $\{r_1, r_2, \cdots, r_c\}$, $\{t_{1, 1}, t_{1, 2}, \cdots, t_{v, c}\}$ in $\mathbb{Z}_n$ for $1 \le i \le v$ and $1 \le j \le c$,
+ the challenger chooses
+ $\{u_1, u_2, \cdots, u_v\}$, $\{r_1, r_2, \cdots, r_c\}$, $\{t_{1, 1}, t_{1, 2}, \cdots, t_{v, c}\}$ randomly in $\mathbb{Z}_n$ for $1 \le i \le v$ and $1 \le j \le c$,
   where $[r_{j}]G \neq Q_2$ (i.e., $r_j \neq y$),
   to construct $L_{i, j}=([r_j]G, t_{i,j}, [u_ir_j]G)$.
 Then,
- it randomly chooses $j' \in [1, c]$ and $t'$ in $\mathbb{Z}_n$, to construct $L' = ([r_{j'}]G, t', [r_{j'}]Q_1) = ([r_{j'}]G, t', [xr_{j'}]G)$.
+ it also randomly chooses $j' \in [1, c]$ and $t'$ in $\mathbb{Z}_n$, to construct $L' = ([r_{j'}]G, t', [r_{j'}]Q_1) = ([r_{j'}]G, t', [xr_{j'}]G)$.
 % Here, $L'$ represents the knowledge of the login visiting $RP_{j'}$ by a user with $ID_U = x$.
 
-Next, the challenger randomly chooses $j'' \in [1, c]$, where $j'' \neq j'$.
-For $1 \leq i \leq v$, it replace $L_{i, j''}$ with $(Q_2, t_{i,j''}, [u_i]Q_2) = ([y]G, t_{i,j''}, [u_iy]G)$;
-that is, $ID_{RP_{j''}} = Q_2 = [y]G$.
-It chooses $\{u''_1, u''_2, \cdots, u''_w\}$, $\{t''_1, t''_2, \cdots, t''_w\}$ randomly in $\mathbb{Z}_n$,
+Next, the challenger randomly chooses $j'' \in [1, c]$ but $j'' \neq j'$.
+It replace $L_{i, j''}$ with $(Q_2, t_{i,j''}, [u_i]Q_2) = ([y]G, t_{i,j''}, [u_iy]G)$ for $1 \leq i \leq v$;
+that is, $ID_{RP_{j''}} = Q_2 = [y]G$ in $\mathfrak{L}$.
+It also chooses $\{u''_1, u''_2, \cdots, u''_w\}$, $\{t''_1, t''_2, \cdots, t''_w\}$ randomly in $\mathbb{Z}_n$,
     where $[u''_k]G \neq Q_1$ (i.e., $u''_k \neq x$) and $u''_k \neq u_i$ for $1 \leq k \leq w$,
     to construct $L''_k = (Q_2, t''_k, [u''_k]Q_2) = ([y]G, t''_k, [u''_ky]G)$.
 Finally,
 the challenger randomly chooses $d \in [1, w]$, and replaces $L''_d$ with $(Q_2, t''_d, Q_3) = ([y]G, t''_d, [z]G)$.
-Here, $\mathbb{L}'' = \{L''_k\}$ represents the knowledge of the logins
-        visiting the $j''$-th RP with $[y]G$ by
+Here, $\mathbb{L}'' = \{L''_{k; 1 \leq k \leq w}\}$ represents the knowledge of the logins
+        visiting the $j''$-th RP %with $[y]G$
+         by
     $w$ users with $\{u''_1, u''_2, \cdots, u''_{d-1}, z/y, u''_{d+1}, \cdots, u''_w\}$.
 When the adversary receives $\mathfrak{L}$, $L'$, and $\mathbb{L}''$,
  it outputs $s$ which is returned as the output of $\mathcal{D}^*_r$.
 
 According to the above construction, % of $\mathfrak{L}$, $L'$ and $\mathbb{L}''$,
- $x$ is embedded as $ID_{U'}$ in $L'$ for $ID_{RP} = [r_{j'}]G$,
- $z/y$ is embedded as $ID_{U''_d}$ in $\mathbb{L}''$ for $ID_{RP} = [y]G$ together with $\{u''_1, u''_2, \cdots, u''_{d-1}, u''_{d+1}, \cdots, u''_w\}$, and $[r_{j'}]G$ and $[y]G$ are two RP identities in $\mathfrak{L}$.
+ $x$ is embedded as $ID_{U'}$ in $L'$ for $ID_{RP_{j'}} = [r_{j'}]G$,
+ $z/y$ is embedded as $ID_{U''_d}$ in $\mathbb{L}''$ for $ID_{RP_{j''}} = [y]G$ together with $\{u''_1, u''_2, \cdots, u''_{d-1}, u''_{d+1}, \cdots, u''_w\}$, and $[r_{j'}]G$ and $[y]G$ are two RP identities in $\mathfrak{L}$.
 Because $x$ is not in $\{u''_1, u''_2, \cdots, u''_{d-1}, u''_{d+1}, \cdots, u''_w\}$,
-    the adversary outputs $s=1$ only it decides $x = z/y$.
+    the adversary outputs $s=1$ if and only if it decides $x = z/y$.
 
 The advantage $\mathbf{Adv}^*_{A}=|{\rm Pr}^*_1 - {\rm Pr}^*_2|$ of solving the ECDDH problem using $\mathcal{D}^*_r$ is deduced as below:
 \begin{align*}
@@ -422,7 +423,7 @@ The advantage $\mathbf{Adv}^*_{A}=|{\rm Pr}^*_1 - {\rm Pr}^*_2|$ of solving the 
 If in $\mathcal{G}_r$ the adversary has non-negligible advantages,
     then $\mathbf{Adv}^*_{A}={\mathbf{Adv}}_{A}$ is also non-negligible regardless of the security parameter $\lambda$.
 This violates the ECDDH assumption.
-Therefore, the adversaries cannot decide whether $L'$ is initiated by a user in \{${U''_1}, {U''_2}, \cdots, {U''_w}$\} or not.
+Therefore, the adversary has no advantages in $\mathcal{G}_r$ and cannot decide whether $L'$ is initiated by a user in \{${U''_1}, {U''_2}, \cdots, {U''_w}$\} or the universal user set.
 \hfill $\square$
 \oldc
 
