@@ -31,26 +31,8 @@ In addition, stronger elliptic curves accommodate more RPs and users, e.g., $n$ 
 
 
 %\vspace{0.75mm}
-\noindent \textbf{Support for the authorization code flow.} In OIDC authorization code flow \cite{OpenIDConnect},
- the IdP does not directly provide identity tokens.
- Instead, it sends an authorization code to the RP, which uses this code to request identity tokens.
- The identity-transformation algorithms, namely $\mathcal{F}_{PID_{U}}$, $\mathcal{F}_{PID_{RP}}$, and $\mathcal{F}_{Acct}$,
-  can be integrated into this flow as below. %similar with the login flow introduced in Section \ref{implementations},
-
-The IdP script can forward an authorization code to the RP script,
- and then to the RP. %that binds $PID_U$ and $PID_{RP}$.
- An authorization code only serves as an index to retrieve identity tokens from the IdP
-  and does not reveal any information about the authenticated user.
-After receiving an authorization code,
- an RP uses it along with a secret credential issued by the IdP during the initial registration \cite{OpenIDConnect}
-  to retrieve identity tokens from the IdP.
-  However, to protect the RP identities from the IdP, privacy-preserving tokens
-   (e.g., ring or group signatures \cite{ring-sig,chaum1991group} and TrustToken \cite{trusttoken})
-   and anonymous networks (e.g., Tor \cite{tor}) need to be adopted for RPs in the retrieval of identity tokens.
-
-%\vspace{0.75mm}
 \noindent \textbf{Alternative methods for generating $ID_{RP}$ and binding $Enpt_{RP}$.}
-\usso\ generates random $ID_{RP}$ and uses an RP certificate to bind $ID_{RP}$ and $Enpt_{RP}$, which is verified by the IdP script.
+In \usso\ the IdP generates random $ID_{RP}$ and uses an RP certificate to bind $ID_{RP}$ and $Enpt_{RP}$, which is verified by the IdP script.
 This ensures the target RP has already registered itself at the IdP and prevents unauthorized RPs from accessing the IdP's services.
 
 An alternative method for binding $ID_{RP}$ and $Enpt_{RP}$ is
@@ -84,6 +66,24 @@ Since browsers control access to web resources with the same-origin policy (SOP)
     such as stealing cookies using the script \verb+window.open('https://RP.com/honest').document.cookie+,
 even if it restricts that only HTTP requests to specific paths carry its cookies.
  This risk actually arises from the SOP design of browsers. %and is not related to the \usso\ protocol.
+
+%\vspace{0.75mm}
+\noindent \textbf{Support for the authorization code flow.} In OIDC authorization code flow \cite{OpenIDConnect},
+ the IdP does not directly provide identity tokens.
+ Instead, it sends an authorization code to the RP, which uses this code to request identity tokens.
+ The identity-transformation algorithms, namely $\mathcal{F}_{PID_{U}}$, $\mathcal{F}_{PID_{RP}}$, and $\mathcal{F}_{Acct}$,
+  can be integrated into this flow as below. %similar with the login flow introduced in Section \ref{implementations},
+
+The IdP script can forward an authorization code to the RP script,
+ and then to the RP. %that binds $PID_U$ and $PID_{RP}$.
+ An authorization code only serves as an index to retrieve identity tokens from the IdP
+  and does not reveal any information about the authenticated user.
+After receiving an authorization code,
+ an RP uses it along with a secret credential issued by the IdP during the initial registration \cite{OpenIDConnect}
+  to retrieve identity tokens from the IdP.
+  However, to protect the RP identities from the IdP, privacy-preserving tokens
+   (e.g., ring or group signatures \cite{ring-sig,chaum1991group} and TrustToken \cite{trusttoken})
+   and anonymous networks (e.g., Tor \cite{tor}) need to be adopted for RPs in the retrieval of identity tokens.
 
 
 
