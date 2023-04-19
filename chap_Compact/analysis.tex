@@ -92,7 +92,7 @@ Malicious RPs could collude with each other or with malicious users, attempting 
 \subsection{The Dolev-Yao-Style Model for \usso}
 \label{dy-model}
 
-We develop a Dolev-Yao style model \cite{BrowserID, SPRESSO, FettKS16, FettKS17} for \usso, referred to as the \dyu\ model, to formalize the login flow of \usso.
+We develop a Dolev-Yao style model \cite{BrowserID, SPRESSO, FettKS16, FettKS17} for \usso, referred to as the \emph{\dyu\ model}, to formalize the login flow of \usso.
 % Dolev-Yao style models abstract cryptographic concepts into an algebra of symbolic messages to discover structural flaws using simple formal logic. % which has been used in the formal analysis of SSO protocols such as OAuth 2.0 \cite{FettKS16} and OIDC \cite{FettKS17}.
 The model abstracts the entities in a web system, such as web servers and browsers, as atomic processes, %which communicate with each other through events. % such as HTTPS requests and responses.
 and defines script processes to formulate client-side scripts.
@@ -222,7 +222,7 @@ Next, we prove that it \emph{uniquely} identifies one user in the system and one
 %An honest RP accepts only identity tokens binding its pseudo-identity $PID_{RP}$ and the authenticated user's pseudo-identity $PID_U$, and actually binding $ID_{RP}$ and $Acct=[ID_U]ID_{RP}$, when $SK$ is held by only the IdP.
 
 \vspace{0.85mm}
-\noindent \textsc{Proof.} Identity tokens are generated and signed by the honest IdP using its private key, which is sufficiently protected at the IdP against adversaries.
+\noindent \textsc{Proof.} Identity tokens are generated and signed by the honest IdP using its private key, which is sufficiently protected at the IdP against the adversaries.
 %Meanwhile, the IdP's public key $PK$ is sent from the IdP to the RPs.
 %and $PK$ which is pre-installed by an RP cannot be manipulated by adversaries.
 With the pre-installed public key, an RP verifies the identity tokens it receives and rejects any forged or manipulated identity tokens. \hfill $\square$
@@ -328,7 +328,7 @@ Because $PID_{RP}$ and $PID_U$ can be deduced from $ID_{RP}$ and $Acct$ with $t$
 
 \vspace{2mm}
 \noindent \textsc{\textbf{Theorem 7.} (Privacy against Colluding RPs)} { Given
-    the logins visiting $c$ malicious RPs by $v$ colluding users, denoted as
+    the logins visiting $c$ malicious RPs by $v$ colluding users in \usso, denoted as
  $\mathfrak{L}=\left \{ \begin{matrix}
 L_{1,1},&L_{1,2},&\cdots,&L_{1,c}\\
 L_{2,1},& L_{2,2},&\cdots,&L_{2,c}\\
@@ -337,9 +337,9 @@ L_{v,1},&L_{v,2},&\cdots,&L_{v,c}
 \end{matrix}\right\}$, where
  $L_{i, j}=([r_j]G, t_{i,j}, [u_ir_j]G)$ for $1 \le i \le v$ and $1 \le j \le c$,
 the colluding adversaries cannot link a login visiting a malicious RP by some honest user
-    to any subset of logins visiting another one,
+    to any subset of logins visiting another one by honest users,
   i.e., cannot decide whether $U'$ is in $\{{U''_1}, {U''_2}, \cdots, {U''_w}\}$ or randomly chosen from the universal user set,
-    when a login visiting some malicious RP by a honest user $U'$ is denoted as $L'$,
+    when a login visiting some malicious RP by an honest user $U'$ is denoted as $L'$,
      and the logins visiting another RP by some honest users $\{{U''_1}, {U''_2}, \cdots, {U''_w}\}$ are denoted as $\mathbb{L}'' = \{L''_k\}$ for $1 \leq k \leq w$,
      where $L' = ([r_{j'}]G, t', [u'r_{j'}]G)$, $L''_k = ([r_{j''}]G, t''_k, [u''_kr_{j''}]G)$, $u' \neq u_i$, $u''_k \neq u_i$,
      $j' \in [1,c]$, $j'' \in [1,c]$ and $j' \neq j''$.}
@@ -351,7 +351,7 @@ We define an RP-based linkage game $\mathcal{G}_r$ between an adversary and a ch
  the adversary receives $\mathfrak{L}$, $L'$ and $\mathbb{L}''$ from the challenger,
  and outputs the result $s = 1$ if it decides $U'$ is in $\{{U''_1}, {U''_2}, \cdots, {U''_w}\}$
   or $s=0$ if $U'$ is randomly chosen from the universal user set.
-Thus, the adversary succeeds in $\mathcal{G}_r$ with an advantage $\mathbf{Adv}_{A}$ as below:
+Thus, the adversary succeeds in $\mathcal{G}_r$ with an advantage $\mathbf{Adv}_{A}$:
 \begin{align*}
 &{\rm Pr}_1={\rm Pr}\{\mathcal{G}_r(\mathfrak{L}, L', \mathbb{L}'' | u' \in \{{u''_1}, {u''_2}, \cdots, {u''_w}\})=1\} \\
 &{\rm Pr}_2={\rm Pr}\{\mathcal{G}_r(\mathfrak{L}, L', \mathbb{L}'' | u' \in \mathbb{Z}_n)=1\}\\
@@ -383,7 +383,7 @@ Then,
  it randomly chooses $j' \in [1, c]$ and $t'$ in $\mathbb{Z}_n$, to assign $L' = ([r_{j'}]G, t', [r_{j'}]Q_1) = ([r_{j'}]G, t', [xr_{j'}]G)$.
 % Here, $L'$ represents the knowledge of the login visiting $RP_{j'}$ by a user with $ID_U = x$.
 
-Next, the challenger randomly chooses $j'' \in [1, c]$ but $j'' \neq j'$.
+Next, the challenger randomly chooses $j'' \in [1, c]$ and $j'' \neq j'$.
 It replaces $L_{i, j''}$ with $(Q_2, t_{i,j''}, [u_i]Q_2) = ([y]G, t_{i,j''}, [u_iy]G)$ for $1 \leq i \leq v$;
 that is, $ID_{RP_{j''}} = Q_2 = [y]G$ in $\mathfrak{L}$.
 It also chooses $\{u''_1, u''_2, \cdots, u''_w\}$, $\{t''_1, t''_2, \cdots, t''_w\}$ randomly in $\mathbb{Z}_n$,
@@ -405,7 +405,7 @@ Because $x$ is not in $\{u''_1, u''_2, \cdots, u''_{d-1}, u''_{d+1}, \cdots, u''
     the adversary succeeds with an output of $s=1$
      \emph{only if} $x = z/y$ holds.
 
-The advantage $\mathbf{Adv}^*_{A}=|{\rm Pr}^*_1 - {\rm Pr}^*_2|$ of solving the ECDDH problem using $\mathcal{D}^*_r$ is deduced as below:
+So the advantage $\mathbf{Adv}^*_{A}=|{\rm Pr}^*_1 - {\rm Pr}^*_2|$ of solving the ECDDH problem using $\mathcal{D}^*_r$ is deduced as below:
 \begin{align*}
 &{\rm Pr}^*_1 =  {\rm Pr}\{\mathcal{D}^*_r(G, [x]G, [y]G, [xy]G)=1\} \\
 =&{\rm Pr}\{\mathcal{G}_r(\mathfrak{L}, L', \mathbb{L}'' | u' \in \{{u''_1}, {u''_2}, \cdots, {u''_w}\})=1\} = {\rm Pr}_1 \\
@@ -417,7 +417,7 @@ The advantage $\mathbf{Adv}^*_{A}=|{\rm Pr}^*_1 - {\rm Pr}^*_2|$ of solving the 
 \begin{figure}[tb]
   \centering
   \includegraphics[width=1.0\linewidth]{fig/rp-linkage-game.pdf}
-  \caption{The PPT algorithm $\mathcal{D}^*_r$ constructed based on the RP-based identity linkage game, to solve the ECDDH problem.}
+  \caption{The PPT algorithm $\mathcal{D}^*_r$ constructed based on the RP-based linkage game, to solve the ECDDH problem.}
   \label{fig:dalgorithm}
 \end{figure}
 
