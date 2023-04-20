@@ -293,7 +293,7 @@ The IdP cannot (\emph{a}) associate multiple logins with different $PID_{RP}$s t
 \vspace{0.85mm}
 \noindent \textsc{Proof.}
 Consider a finite cyclic group $\mathbb{E}$ where the number of points on $\mathbb{E}$ is $n$.
-Because $G$ is a generator of order $n$, $ID_{RP} = [r]G$ is also a generator on $\mathbb{E}$ of order $n$. According to the \dyu\ model, $t$ is randomly chosen in $\mathbb{Z}_n$ and kept unknown to the IdP. Therefore, $PID_{RP} = [t]ID_{RP}$ is \emph{indistinguishable} from a point $Q$ that is randomly chosen on $\mathbb{E}$ \cite{oprf-proved,voprf-proved}.\footnote{\newc This property has been actually proved in OPRFs \cite{oprf-proved,voprf-proved}, where the OPRF server works similarly to the IdP and learns \emph{nothing} about a client's inputs or outputs of the evaluated pseudorandom function.} \hfill $\square$
+Because $G$ is a generator of order $n$, $ID_{RP} = [r]G$ is also a generator on $\mathbb{E}$ of order $n$. According to the \dyu\ model, $t$ is randomly chosen in $\mathbb{Z}_n$ and kept unknown to the IdP. Therefore, $PID_{RP} = [t]ID_{RP}$ is \emph{indistinguishable} from a point $Q$ that is randomly chosen on $\mathbb{E}$ \cite{oprf-proved,voprf-proved,oprf-bitcoin-wallet}.\footnote{\newc This property has been actually proved in OPRFs \cite{oprf-proved,voprf-proved,oprf-bitcoin-wallet}, where the OPRF server works similarly to the IdP and learns \emph{nothing} about a client's inputs or outputs of the evaluated pseudorandom function.} \hfill $\square$
 
 %In order to receive $[k]Q$ for any given $Q$ on $\mathbb{E}$,
 %    an OPRF client first generates a random number $e$, converts $Q$ to $[e]Q$,
@@ -311,14 +311,14 @@ Because $G$ is a generator of order $n$, $ID_{RP} = [r]G$ is also a generator on
 
 \vspace{2mm}
 
-In the third adversarial scenario, malicious RPs collude with malicious users, attempting to link the logins from an honest user to different colluding RPs. From each login request, an RP learns an ephemeral identifier $PID_{U}$ and a permanent identifier $Acct = [ID_U]ID_{RP}$ of the user, but it cannot derive $ID_U$ from $Acct$ due to the ECDLP problem. 
-Therefore, the colluding adversaries attempt to share information about the logins to malicious RPs or initiated by malicious users to link multiple logins (and the corresponding $PID_{U}$s) initiated by the same honest user to multiple malicious RPs. 
+In the third adversarial scenario, malicious RPs collude with malicious users, attempting to link the logins from an honest user to different colluding RPs. From each login request, an RP learns an ephemeral identifier $PID_{U}$ and a permanent identifier $Acct = [ID_U]ID_{RP}$ of the user, but it cannot derive $ID_U$ from $Acct$ due to the ECDLP problem.
+Therefore, the colluding adversaries attempt to share information about the logins to malicious RPs or initiated by malicious users to link multiple logins (and the corresponding $PID_{U}$s) initiated by the same honest user to multiple malicious RPs.
 
 %Let us investigate the knowledge that an RP obtains from each login. In \usso, an RP receives a random number $t$ and an identity token enclosing $PID_{RP}$ and $PID_U$ in each login. Meanwhile, it knows its own identity $ID_{RP}$ and derives the user's account $Acct$. Because $PID_{RP}$ and $PID_U$ can be deduced from $ID_{RP}$ and $Acct$ with $t$, respectively, we ignore duplicated elements and define an RP's knowledge about a login as $L =(ID_{RP}, t, Acct)=(ID_{RP}, t, [ID_{U}]ID_{RP})$.
 
 In \usso, an RP receives a random number $t$ and an identity token enclosing $PID_{RP}$ and $PID_U$ in each login. %Meanwhile, it knows its own identity $ID_{RP}$, from which it also derives the user's account $Acct$.
-With the trapdoor $t$, $PID_{RP}$ and $PID_U$ can be easily transformed into $ID_{RP}$ and $Acct$, respectively, and vice versa. Therefore, we can simply denote the information that an RP learns from a login by a tuple $L$, where $L =(ID_{RP}, t, Acct)=(ID_{RP}, t, [ID_{U}]ID_{RP})=([r]G, t, [ur]G)$. 
-Hence, an $RP_j$ with $w$ logins knows $\{L_{1,j},...,L_{w,j}\}$. 
+With the trapdoor $t$, $PID_{RP}$ and $PID_U$ can be easily transformed into $ID_{RP}$ and $Acct$, respectively, and vice versa. Therefore, we can simply denote the information that an RP learns from a login by a tuple $L$, where $L =(ID_{RP}, t, Acct)=(ID_{RP}, t, [ID_{U}]ID_{RP})=([r]G, t, [ur]G)$.
+Hence, an $RP_j$ with $w$ logins knows $\{L_{1,j},...,L_{w,j}\}$.
 
 When $c$ malicious RPs in a system of $m$ RPs collude ($c \le m$), they create a shared view of all their logins, denoted as $\mathbb{L}$. When $v$ malicious users collude with these RPs, their logins can be further linked together as:
 
@@ -329,7 +329,7 @@ L_{2,1},& L_{2,2},&\cdots,&L_{2,c}\\
 L_{v,1},&L_{v,2},&\cdots,&L_{v,c}
 \end{matrix}\right\}\]
 
-\noindent where $L_{i, j}=([r_j]G, t_{i,j}, [u_ir_j]G)$ for $1 \le i \le v$ and $1 \le j \le c$, and $\mathfrak{L} \subseteq \mathbb{L}$. Any login in $\mathbb{L}$ but not in $\mathfrak{L}$ is initiated by an honest user to a malicious RP. 
+\noindent where $L_{i, j}=([r_j]G, t_{i,j}, [u_ir_j]G)$ for $1 \le i \le v$ and $1 \le j \le c$, and $\mathfrak{L} \subseteq \mathbb{L}$. Any login in $\mathbb{L}$ but not in $\mathfrak{L}$ is initiated by an honest user to a malicious RP.
 
 
 % To show that \usso\ prevents such linkage, we prove in Theorem 7 that the adversaries cannot decide whether two logins visiting different malicious RPs are initiated by one honest user or not. %a login initiated by $U'$ to some of the $c$ malicious RPs
@@ -339,18 +339,18 @@ L_{v,1},&L_{v,2},&\cdots,&L_{v,c}
 \vspace{3mm}
 \noindent \textsc{Theorem 7. (Privacy against Colluding RPs)} {In \usso, given $\mathbb{L}$ and $\mathfrak{L}$, $c$ malicious RPs and $v$ malicious users cannot link any login from an honest user to a malicious RP to any subset of logins from any honest user to any malicious RP.}
 
-% {Given the logins visiting $c$ malicious RPs by $v$ colluding users, denoted as 
+% {Given the logins visiting $c$ malicious RPs by $v$ colluding users, denoted as
 % $\mathfrak{L}=\left \{ \begin{matrix}
 % L_{1,1},&L_{1,2},&\cdots,&L_{1,c}\\
 % L_{2,1},& L_{2,2},&\cdots,&L_{2,c}\\
 % \cdots,&\cdots,&L_{i,j},&\cdots\\
 % L_{v,1},&L_{v,2},&\cdots,&L_{v,c}
-% \end{matrix}\right\}$, 
+% \end{matrix}\right\}$,
 % where  $L_{i, j}=([r_j]G, t_{i,j}, [u_ir_j]G)$ for $1 \le i \le v$ and $1 \le j \le c$,
 % the colluding adversaries cannot link a login visiting a malicious RP by some honest user to any subset of logins visiting another one, i.e., cannot decide whether $U'$ is in $\{{U''_1}, {U''_2}, \cdots, {U''_w}\}$ or randomly chosen from the universal user set when a login visiting some malicious RP by an honest user $U'$ is denoted as $L'$, and the logins visiting another RP by some honest users $\{{U''_1}, {U''_2}, \cdots, {U''_w}\}$ are denoted as $\mathbb{L}'' = \{L''_k\}$ for $1 \leq k \leq w$, where $L' = ([r_{j'}]G, t', [u'r_{j'}]G)$, $L''_k = ([r_{j''}]G, t''_k, [u''_kr_{j''}]G)$, $u' \neq u_i$, $u''_k \neq u_i$, $j' \in [1,c]$, $j'' \in [1,c]$ and $j' \neq j''$.}
 
 \vspace{0.75mm}
-\noindent\textsc{Proof.} From logins in $\mathbb{L}$ but not in $\mathfrak{L}$, we randomly select a login $L'$ to a malicious $RP_{j'}$, which is from an (unknown) honest user $U'$, and another malicious $RP_{j''}$ and its logins $\mathbb{L}'' = \{L''_k\}$, which are from (unknown) honest users $\{U''_k\}$, for $j', j'' \in [1,c]$ and $j' \neq j''$. Next, we prove that the colluding adversaries cannot decide if $U'$ is in any subset of $\{U''_k\}$, denoted as $\{{U''_1}, {U''_2}, \cdots, {U''_w}\}$, or not (i.e., $U'$ is randomly selected from the universal user set). This indicates that the colluding adversaries cannot link $L'$ to another login or any subset of logins in $\mathbb{L}''$. 
+\noindent\textsc{Proof.} From logins in $\mathbb{L}$ but not in $\mathfrak{L}$, we randomly select a login $L'$ to a malicious $RP_{j'}$, which is from an (unknown) honest user $U'$, and another malicious $RP_{j''}$ and its logins $\mathbb{L}'' = \{L''_k\}$, which are from (unknown) honest users $\{U''_k\}$, for $j', j'' \in [1,c]$ and $j' \neq j''$. Next, we prove that the colluding adversaries cannot decide if $U'$ is in any subset of $\{U''_k\}$, denoted as $\{{U''_1}, {U''_2}, \cdots, {U''_w}\}$, or not (i.e., $U'$ is randomly selected from the universal user set). This indicates that the colluding adversaries cannot link $L'$ to another login or any subset of logins in $\mathbb{L}''$.
 
 To prove this, we first define an RP-based linkage game $\mathcal{G}_r$ between an adversary and a challenger, which describes the RP-based login linkage privacy threat: the adversary receives $\mathfrak{L}$, $L'$ and $\mathbb{L}''$ from the challenger, and then outputs the result $s$, where $s = 1$ if it decides $U'$ is in $\{{U''_1}, {U''_2}, \cdots, {U''_w}\}$ or $s=0$ if it believes $U'$ is randomly chosen from the universal user set.
 Thus, the adversary succeeds in $\mathcal{G}_r$ with an advantage $\mathbf{Adv}_{A}$:
