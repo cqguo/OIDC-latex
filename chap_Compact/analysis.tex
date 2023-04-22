@@ -106,11 +106,11 @@ except that the script processes communicate with each other through \verb+postM
 
 \newc
 Applying the \dyu\ model, we trace the lifecycle of an identity token from its generation at the IdP to its acceptance at an RP, locate the places where $PID_U$, $PID_{RP}$, and other elements related to the identity token such as $t$ and $u$ are processed, and locate the places where $PK$ is transmitted and used in the IdP script.
-We confirm the following conclusions in the \dyu\ model: 
-(\emph{a}) an identity token binding pseudo-identities of honest entities, cannot be leaked to any malicious process; 
-(\emph{b}) pseudo-identities and other elements in verified identity tokens cannot be manipulated by any malicious process; 
-(\emph{c}) the IdP's public key set in the IdP script cannot be replaced or tampered with by any malicious process, within an honest browser; 
-(\emph{d}) the IdP receives nothing about $t$ shared between two honest processes; 
+We confirm the following conclusions in the \dyu\ model:
+(\emph{a}) an identity token binding pseudo-identities of honest entities, cannot be leaked to any malicious process;
+(\emph{b}) pseudo-identities and other elements in verified identity tokens cannot be manipulated by any malicious process;
+(\emph{c}) the IdP's public key set in the IdP script cannot be replaced or tampered with by any malicious process, within an honest browser;
+(\emph{d}) the IdP receives nothing about $t$ shared between two honest processes;
 (\emph{e}) $r$ is not leaked to any malicious process as it never leaves the IdP;
 and (\emph{f}) the RPs cannot receive anything about $u$ shared between two honest processes.
 
@@ -308,9 +308,10 @@ Because $G$ is a generator of order $n$, $ID_{RP} = [r]G$ is also a generator on
 
 In the third adversarial scenario, malicious RPs collude with malicious users,
  attempting to link the logins from an honest user to different colluding RPs.
-From each login request, an RP learns an ephemeral identifier $PID_{U}$ and a permanent identifier $Acct = [ID_U]ID_{RP}$ of the user, but it cannot derive $ID_U$ from $Acct$ due to the ECDLP problem.
-Therefore, the colluding adversaries share information about the logins to malicious RPs {\bf and/or initiated by malicious users,} % not clear.
-{\bf attempting to link multiple logins initiated by some honest user to multiple malicious RPs.} % repeated, said in the first sentence
+In each login an RP learns an ephemeral identifier $PID_{U} = [{ID_U}]{PID_{RP}}$ and a permanent identifier $Acct = [ID_U]ID_{RP}$ of the user, but it cannot derive $ID_U$ from $PID_{U}$ or $Acct$ due to the ECDLP problem.
+Therefore, the colluding adversaries share information about the logins to malicious RPs,
+    and attempt to leverage the logins initiated by malicious users to link the logins by honest users.
+
 
 %Let us investigate the knowledge that an RP obtains from each login. In \usso, an RP receives a random number $t$ and an identity token enclosing $PID_{RP}$ and $PID_U$ in each login. Meanwhile, it knows its own identity $ID_{RP}$ and derives the user's account $Acct$. Because $PID_{RP}$ and $PID_U$ can be deduced from $ID_{RP}$ and $Acct$ with $t$, respectively, we ignore duplicated elements and define an RP's knowledge about a login as $L =(ID_{RP}, t, Acct)=(ID_{RP}, t, [ID_{U}]ID_{RP})$.
 
@@ -322,14 +323,14 @@ With the trapdoor $t$, $PID_{RP}$ and $PID_U$ can be easily transformed into $ID
 
 When $c$ malicious RPs collude with each other, they create a shared view of all their logins, denoted as $\mathbb{L}$.
 %some of which are initiated by honest users and denoted as $\mathbb{L}^h$, and the others by $v$ malicious users  are $\mathbb{L}^m = \mathbb{L} \setminus \mathbb{L}^h$.
-When they collude further with $v$ malicious users, the logins initiated by these malicious users are picked out and linked together as:
-\[\mathfrak{L}^m=\left \{ \begin{matrix}
+When they collude further with $v$ malicious users, the logins initiated by these malicious users are picked out and linked together as
+$\mathfrak{L}^m=\left \{ \begin{matrix}
 L^m_{1,1},&L^m_{1,2},&\cdots,&L^m_{1,c}\\
 L^m_{2,1},& L^m_{2,2},&\cdots,&L^m_{2,c}\\
 \cdots,&\cdots,&L^m_{i,j},&\cdots\\
 L^m_{v,1},&L^m_{v,2},&\cdots,&L^m_{v,c}
-\end{matrix}\right\}\]
-\noindent where $L^m_{i, j}=([r_j]G, t_{i,j}, [u_ir_j]G)$ for $1 \le i \le v$ and $1 \le j \le c$, and $L^m_{i,j} \in \mathbb{L}$. Any login in $\mathbb{L}$ but not linked in $\mathfrak{L}^m$ is initiated by an honest user to one of the $c$ malicious RPs.
+\end{matrix}\right\}$,
+where $L^m_{i, j}=([r_j]G, t_{i,j}, [u_ir_j]G)$ for $1 \le i \le v$ and $1 \le j \le c$, and $L^m_{i,j} \in \mathbb{L}$. Any login in $\mathbb{L}$ but not linked in $\mathfrak{L}^m$ is initiated by an honest user to one of the $c$ malicious RPs.
 
 
 % To show that \usso\ prevents such linkage, we prove in Theorem 7 that the adversaries cannot decide whether two logins visiting different malicious RPs are initiated by one honest user or not. %a login initiated by $U'$ to some of the $c$ malicious RPs
@@ -352,12 +353,13 @@ L^m_{v,1},&L^m_{v,2},&\cdots,&L^m_{v,c}
 \vspace{0.75mm}
 \noindent\textsc{Proof.} From the logins in $\mathbb{L}$,
  we randomly choose one login $L' \neq L^m_{i,j}$,
- which is from an (unknown) honest user with $ID_{U'}=u'$ to a malicious $RP_a$, $a \in [1,c]$.
-Then, we randomly choose another malicious $RP_b$, $b \in [1,c]$ and $b \neq a$.
-Consider any subset $\mathbb{L}''$ of $w$ logins visiting $RP_b$ by unknown honest users, we denote the corresponding honest users who initiate these logins as $\mathbf{u}_w=\{{u''_1}, {u''_2}, \cdots, {u''_w}\}$.
-Next, we prove that the colluding adversaries cannot decide if $u'$ is in $\mathbf{u}_w$ or not (i.e., $u'$ is randomly selected from the universal user set). This indicates that the colluding adversaries cannot link $L'$ to another login in $\mathbb{L}''$ or even link $L'$ to  any subset of $\mathbb{L}''$.
+ which is from an (unknown) honest user with $ID_{U'}=u'$ to a malicious $RP_a$ and $a \in [1,c]$.
+Then, we randomly choose another malicious $RP_b$, where $b \in [1,c]$ and $b \neq a$.
+Consider any subset $\mathbb{L}''$ of $w$ logins visiting $RP_b$ by unknown honest users, we denote the honest users who initiate these logins as $\mathbf{u}_w=\{{u''_1}, {u''_2}, \cdots, {u''_w}\}$.
+Next, we prove that the colluding adversaries cannot decide if $u'$ is in $\mathbf{u}_w$ or randomly selected from the universal user set.
+This indicates that the colluding adversaries cannot link $L'$ to another login in $\mathbb{L}''$ or link $L'$ to  any subset of $\mathbb{L}''$.
 
-We first define an RP-based linkage game $\mathcal{G}_r$ between an adversary and a challenger, which describes this RP-based login linkage privacy threat: the adversary receives $\mathfrak{L}^m$, $L'$, and $\mathbb{L}''$ from the challenger and outputs $s$, where $s = 1$ if it decides $u'$ is in $\mathbf{u}_w$ %$\{{U''_1}, {U''_2}, \cdots, {U''_w}\}$
+We first define an RP-based linkage game $\mathcal{G}_r$ between an adversary and a challenger, which describes this login linkage threat: the adversary receives $\mathfrak{L}^m$, $L'$, and $\mathbb{L}''$ from the challenger and outputs $s$, where $s = 1$ if it decides $u'$ is in $\mathbf{u}_w$ %$\{{U''_1}, {U''_2}, \cdots, {U''_w}\}$
 and $s=0$ if it believes $u'$ is randomly chosen from the universal user set.
 Thus, the adversary succeeds in $\mathcal{G}_r$ with an advantage $\mathbf{Adv}_{A}$:
 \begin{align*}
@@ -379,28 +381,32 @@ As depicted in Figure \ref{fig:dalgorithm}, we design a PPT algorithm $\mathcal{
 %&{\rm Pr}^*_2 =  {\rm Pr}\{\mathcal{D}^*(G, [x]G, [y]G, [z]G)=1\}
 %\end{align*}
 %
-The algorithm $\mathcal{D}^*_r$ works as follows: (1) upon receiving an input $(G, Q_1=[x]G, Q_2=[y]G, Q_3=[z]G)$%of $\mathcal{D}^*_r$
-, the challenger randomly chooses $a \in [1, c]$ and $t' \in \mathbb{Z}_n$ to assemble $L' = ([r_{a}]G, t', [r_{a}]Q_1) = ([r_{a}]G, t', [xr_{a}]G)$.
-(2) It chooses random numbers in $\mathbb{Z}_n$ to construct $\{u_i\}$, $\{r_j\}$, and $\{t_{i, j}\}$, for $1 \le i \le v$ and $1 \le j \le c$, with which it assembles $L^m_{i, j}=([r_j]G, t_{i,j}, [u_ir_j]G)$.
+The algorithm $\mathcal{D}^*_r$ works as below. (1) Upon receiving an input $(G, Q_1=[x]G, Q_2=[y]G, Q_3=[z]G)$, %of $\mathcal{D}^*_r$
+the challenger 
+chooses random numbers in $\mathbb{Z}_n$ to construct $\{u_i\}$, $\{r_j\}$, and $\{t_{i, j}\}$ for $1 \le i \le v$ and $1 \le j \le c$, with which it assembles $L^m_{i, j}=([r_j]G, t_{i,j}, [u_ir_j]G)$.
 In this process, it ensures $[r_{j}]G \neq Q_2$ so that $r_j \neq y$.  % 这个应该反过来讲；因为y是离散对数。
+(2) It randomly chooses $a \in [1, c]$ and $t' \in \mathbb{Z}_n$ to assemble $L' = ([r_{a}]G, t', [r_{a}]Q_1) = ([r_{a}]G, t', [xr_{a}]G)$.
+(3) 
 % Here, $L'$ represents the knowledge of the login visiting $RP_{j'}$ by a user with $ID_U = x$.
-Next, the challenger randomly chooses $b \in [1, c]$ and $b \neq a$ and replaces $ID_{RP_b}$ with $Q_2 = [y]G$.
-Hence, for $1 \le i \le v$, the challenger replaces $L_{i, b}=([r_b]G, t_{i,b}, [u_ir_b]G)$ with $(Q_2, t_{i,b}, [u_i]Q_2) = ([y]G, t_{i,b}, [u_iy]G)$ and constructs $\mathfrak{L}^m$.
-(3) The challenger chooses random numbers in $\mathbb{Z}_n$ to construct $\{u''_k\}$ and $\{t''_k\}$ for $1 \leq k \leq w$,
- from which it assembles $\mathbb{L}'' = \{L''_{k}\} = \{(Q_2, t''_k, [u''_k]Q_2) = ([y]G, t''_k, [u''_ky]G)\}$.
-In this process, the challenger ensures that $[u''_k]G \neq Q_1$ (i.e., $u''_k \neq x$) and $u''_k \neq u_i$ for any $1 \le i \le v$.
-Then, it randomly chooses $d \in [1, w]$ and replaces $L''_{d}$ with $(Q_2, t''_d, Q_3) = ([y]G, t''_d, [z]G)$. Finally, it constructs $\mathbb{L}'' = \{L_{k;1\leq k \leq w}\}$, representing the logins from $w$ users, i.e., $\mathbf{u}_w=\{u''_1, u''_2, \cdots, u''_{d-1}, z/y, u''_{d+1}, \cdots, u''_w\}$. (4) When the adversary receives $\mathfrak{L}^m$, $L'$, and $\mathbb{L}''$, it returns $s$ as the output of $\mathcal{D}^*_r$.
+Next, the challenger randomly chooses $b \in [1, c]$ and $b \neq a$, and replaces $ID_{RP_b}$ with $Q_2 = [y]G$.
+Hence, for $1 \le i \le v$, the challenger replaces $L^m_{i, b}=([r_b]G, t_{i,b}, [u_ir_b]G)$ with $(Q_2, t_{i,b}, [u_i]Q_2) = ([y]G, t_{i,b}, [u_iy]G)$, and constructs final $\mathfrak{L}^m$.
+(4) The challenger chooses random numbers in $\mathbb{Z}_n$ to construct $\{u''_k\}$ and $\{t''_k\}$ for $1 \leq k \leq w$,
+ with which it assembles $\mathbb{L}'' = \{L''_{k; 1\leq k \leq w}\} = \{(Q_2, t''_k, [u''_k]Q_2)\} = \{([y]G, t''_k, [u''_ky]G)\}$.
+In this process, it ensures that $[u''_k]G \neq Q_1$ (i.e., $u''_k \neq x$) and $u''_k \neq u_i$,
+ for $1 \le i \le v$ and $1 \le k \le w$.
+Then, the challenger randomly chooses $d \in [1, w]$ and replaces $L''_{d}$ with $(Q_2, t''_d, Q_3) = ([y]G, t''_d, [z]G)$.
+$\mathbb{L}'' = \{L''_{k;1\leq k \leq w}\}$ represents the logins from $w$ honest users, i.e., $\mathbf{u}_w=\{u''_1, u''_2, \cdots, u''_{d-1}, z/y, u''_{d+1}, \cdots, u''_w\}$. (5) When the adversary receives $\mathfrak{L}^m$, $L'$, and $\mathbb{L}''$, it returns $s$ as the output of $\mathcal{D}^*_r$.
 
 According to the above construction, % of $\mathfrak{L}$, $L'$ and $\mathbb{L}''$,
 $x$ is embedded as $ID_{U'}$ in the login $L'$ to the RP with $ID_{RP_{a}} = [r_{a}]G$,
 while $z/y$ is embedded as $ID_{U''_d}$ in $\mathbb{L}''$ to the RP with $ID_{RP_{b}}=[y]G$,
 together with $\{u''_1, \cdots, u''_{d-1}, u''_{d+1}, \cdots, u''_w\}$.
 Meanwhile, $[r_{a}]G$ and $[y]G$ represent two malicious RPs in $\mathfrak{L}^m$.
-Because $x$ is not in $\{u''_1, \cdots, u''_{d-1}, u''_{d+1}, \cdots, u''_w\}$ (i.e., $x \neq u''_{k; 1\leq k \leq w, k \neq d}$), the adversary outputs $s=1$ and succeeds in the game \emph{only if} $x = z/y$.
+Because $x$ is not in $\{u''_1, \cdots, u''_{d-1}, u''_{d+1}, \cdots, u''_w\}$, i.e., $x \neq u''_{k; 1\leq k \leq w, k \neq d}$, the adversary outputs $s=1$ and succeeds in the game \emph{only if} $x = z/y$.
 % 这里不是if and only if. "if, 就变成了the adversary必胜了；并不是，而是“有显著的概率”"
 % 当“the adversary outputs s=1 且 succeeds in the game”，=> "x = z/y"
 % 但是，"x = z/y"  => 不能推导得到“the adversary outputs s=1 且 succeeds in the game”。因为adversary有时候fail、不总是succeed
- Therefore, using $\mathcal{D}^*_r$ to solve the ECDDH problem, the adversary has an $\mathbf{Adv}^*_{A}=|{\rm Pr}^*_1 - {\rm Pr}^*_2|$, where
+ Therefore, using $\mathcal{D}^*_r$ to solve the ECDDH problem, we have an advantage $\mathbf{Adv}^*_{A}=|{\rm Pr}^*_1 - {\rm Pr}^*_2|$, where
 %So the advantage $\mathbf{Adv}^*_{A}=|{\rm Pr}^*_1 - {\rm Pr}^*_2|$ of solving the ECDDH problem using $\mathcal{D}^*_r$ is deduced as below:
 % \begin{align*}
 % &{\rm Pr}^*_1 =  {\rm Pr}\{\mathcal{D}^*_r(G, [x]G, [y]G, [xy]G)=1\} \\
@@ -425,7 +431,7 @@ Because $x$ is not in $\{u''_1, \cdots, u''_{d-1}, u''_{d+1}, \cdots, u''_w\}$ (
 \end{figure}
 
 If the adversary has non-negligible advantage in $\mathcal{G}_r$, then $\mathbf{Adv}^*_{A}={\mathbf{Adv}}_{A}$ is non-negligible regardless of the security parameter $\lambda$. This violates the ECDDH assumption. Therefore, the adversary has no advantage in $\mathcal{G}_r$ and cannot decide whether $L'$ is initiated by a user in $\mathbf{u}_w$ or by a user in the universal user set.
-Because $RP_b$ is any malicious RP, this proof can be easily extended from $RP_b$ to more malicious RPs.
+Moreover, because $RP_b$ is any malicious RP, this proof can be easily extended from $RP_b$ to more colluding malicious RPs.
 \hfill $\square$
 
 \oldc
