@@ -10,7 +10,13 @@
 %  but not adopted to comprehensively transform the five (pseudo-)identities in SSO services.
 
 \newc
-\noindent\textbf{Privacy-preserving cryptographic technique.}
+\noindent\textbf{Privacy-preserving cryptographic techniques.}
+Several cryptographic primitives have been used for protecting user privacy. For example, PrivacyPass and TrustToken \cite{privacypass,trusttoken} adapted the oblivious pseudorandom function (OPRF) protocol~\cite{oprf-proved,voprf-proved,oprf-bitcoin-wallet} to generate anonymous tokens, which grant anonymous access to authorized users. Anonymous token generation typically involves three steps: (1) {\em token blinding}, where a user selects a random number $e_i$ to blind a token $T_i$ into $T_i^{e_i}$; (2) {\em token signing}, where the token server signs ($T_i^{e_i}, T_i^{e_i k}$) with its private key $k$ after authenticating the user; and (3) {\em token unblinding}, where the user uses $e_i$ to convert $T_i^{e_i k}$ to $T_i^k$. An unused anonymous token ($T_i, T_i^k$) can be redeemed later to access resources on the server. Therefore, PrivacyPass and TrustToken could be used to support a kind of privacy-preserving SSO service, in which the user authenticates once to a token server and redeems anonymous tokens at the server later without further authentication. However, we need to point out that PrivacyPass, TrustToken, and other OPRF protocols are two-party protocols that are not designed for SSO. Anonymous tokens are generated (partially) by and redeemed at the token server, using the server's secret $k$. On the contrary, SSO involves three parties, where the tokens should be generated (partially) by the IdP but redeemed at the RP, but the IdP and the RP do not share any secret directly. Simply extending a two-party OPRF to a three-party OPRF generates anonymous tokens that are completely indistinguishable and therefore cannot support RP designation. Therefore, it requires a non-trivial effort to extend OPRF to a three-party protocol that supports SSO features. 
+
+
+
+
+\begin{comment}
 PrivacyPass and TrustToken \cite{privacypass,trusttoken} design anonymous tokens for applications that grant anonymous access to authorized users, using a cryptographic technique that was originally proposed for oblivious pseudorandom functions (OPRFs) \cite{oprf-proved,voprf-proved,oprf-bitcoin-wallet}.
 A user generates a random number $e_i$ for each unsigned token $T_i$ and blinds $T_i$ into $T_i^{e_i}$. After the user is authenticated, a token server signs ($T_i^{e_i}, T_i^{e_i k}$) with a private key $k$. Then, the user converts $T_i^{e_i k}$ to $T_i^k$ using $e_i$, and redeems the token ($T_i, T_i^k$) to access resources.
 %the token server blindly binds user-selected secrets $t_i$ and access tokens ($T_i, T_i^{k{r_i}}$) and signs them with its secret key $k$, where $T_i=H(t_i)$ and $H$ is a hash function.
@@ -47,6 +53,8 @@ The sharing of random numbers enables the derivation of permanent accounts in \u
 %      were adopted to design anonymous SSO \cite{WangWS13,HanCSTW18,Lee18,HanCSTWW20}.
 % Anonymous SSO schemes work for some special applications,
 %     but are unapplicable in most systems that require user identification for customized services.
+
+\end{comment}
 
 \oldc
 Cryptographic primitives are used for protecting user privacy.
