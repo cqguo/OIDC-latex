@@ -37,7 +37,7 @@ It uses the \emph{obliviousness} property to prevent the IdP from learning any i
 %Last but not least, \usso\ requires \emph{RP designation}, which is ensured by another property of this cryptographic technique: there is no $PID_{RP}$ collision in the \usso\ protocol. This property is proved in Lemma 1. However, this property is \emph{not} considered even in OPRF protocols; i.e., the OPRF protocol \cite{oprf-proved,voprf-proved,oprf-bitcoin-wallet} does not require no collision of the blinded inputs to the OPRF server. An OPRF protocol does not always result in a variation of the \usso\ protocol, unless the additional property of input-collisionlessness is proved.
 
 %    \footnote{Due to the extension of three parties and the requirement of input-collisionlessness, we did not realize this cryptographic technique has been published in OPRFs
-%        until anonymous reviewers pointed out it.}
+%        until anonymous reviewers pointed it out.}
 
 %It shares a random number $t$ between the user and the RP to transform $ID_{RP}$ to $PID_{RP} = [t]ID_{RP}$ so that $PID_{RP}$ is related to $ID_{RP}$ but ``oblivious'' to the IdP to achieve IdP-untraceability. Then, the IdP transforms $PID_{RP}$ further to construct $PID_U=[ut]ID_{RP}$, which is ``pseudo-random'' to the RP and achieves RP-unlinkability. Finally, $PID_U$s of the same user at the same RP are associated by $[u]ID_{RP}$, which can be derived using the trapdoor $t$.
 %Besides, the SSO service also requires $PID_{RP}$ to be unique (i.e., RP designation), which is not required in the original OPRF \cite{oprf-proved,voprf-proved,oprf-bitcoin-wallet}. We support this property in \usso~and prove it in Section~\ref{analysis-security}.
@@ -70,16 +70,17 @@ The sharing of random numbers enables the derivation of permanent accounts in \u
 %     without revealing their identities.
 % Anonymous SSO was proposed for GSM communications \cite{ElmuftiWRR08},
 %     and formalized \cite{WangWS13}.
-% Privacy-preserving primitives, such as group signature, zero-knowledge proof, Chebyshev Chaotic Maps and proxy re-verification,
+% Privacy-preserving primitives, such as group signature, zero-knowledge proof, Chebyshev Chaotic Maps, and proxy re-verification,
 %      were adopted to design anonymous SSO \cite{WangWS13,HanCSTW18,Lee18,HanCSTWW20}.
 % Anonymous SSO schemes work for some special applications,
-%     but are unapplicable in most systems that require user identification for customized services.
+%     but are inapplicable in most systems that require user identification for customized services.
 
 \end{comment}
 
 \oldc
 %Cryptographic primitives are used for protecting user privacy.
-Other cryptographic primitives such as zero-knowledge proofs are used in ZKlaims \cite{zklaim} to allow users to prove statements on the credentials issued by a trusted server without revealing the credential contents. Crypto-Book \cite{crypto-book} adopts distributed key generation to generate linkable-ring-signature private keys for users, and each key pair is used as an untraceable pseudonym. Tandem \cite{tandem} generates one-time-use key-share tokens for a two-party threshold cryptographic scheme implemented with a central server, to protect the privacy of key-usage patterns.
+Other cryptographic primitives such as zero-knowledge proofs and distributed key generation are used to prove users' statements about their credentials without revealing the credential content (e.g., ZKlaims \cite{zklaim}) or generate ring-signature private keys as untraceable pseudonyms~\cite{crypto-book}. Two-party threshold cryptography is also used~\cite{tandem} to generate one-time key-share tokens to protect key-usage patterns.
+%Other cryptographic primitives such as zero-knowledge proofs are used in ZKlaims \cite{zklaim} to allow users to prove statements on the credentials issued by a trusted server without revealing the credentials' content. Crypto-Book \cite{crypto-book} adopts distributed key generation to generate linkable-ring-signature private keys for users, and each key pair is used as an untraceable pseudonym. Tandem \cite{tandem} generates one-time-use key-share tokens for a two-party threshold cryptographic scheme implemented with a central server, to protect the privacy of key-usage patterns.
 
 
 %two-party threshold cryptographic scheme implemented with a central server, to protect user private keys \cite{mRSA,ss-rsa}: to sign/decrypt a message, a user needs a token from the server.
@@ -88,8 +89,8 @@ Other cryptographic primitives such as zero-knowledge proofs are used in ZKlaims
 %\vspace{0.5mm}
 \noindent\textbf{Formal analysis of SSO protocols.}
 A formal analysis on SAML-based SSO \cite{ArmandoCCCT08} found that a Google-implemented variant does not bind RP identities correctly in the identity tokens.
-Fett et al. \cite{FettKS16, FettKS17} formally analyzed OIDC and OAuth 2.0 using a Dolev-Yao-style model \cite{FettKS14} and reported the 307 redirection and IdP mix-up attacks.
-In this paper, we also developed a Dolev-Yao-style model for \usso, helping to prove its security and privacy (see Section~\ref{dy-model}).
+Fett et al.~\cite{FettKS16, FettKS17} formally analyzed OIDC and OAuth 2.0 using a Dolev-Yao style model \cite{FettKS14} and reported the 307 redirection and IdP mix-up attacks.
+In this paper, we also developed a Dolev-Yao style model for \usso, helping to prove its security and privacy (see Section~\ref{dy-model}).
 
 
 %\vspace{0.5mm}
@@ -113,7 +114,7 @@ Similar vulnerabilities have been found in Android Apps that break the confident
 %      due to the implicit but unsuitable assumptions of these SDKs.
 
 
-%Furthermore, if a user is compromised, the attacker can login to RPs on his behalf. So, we consider malicious users, malicious RPs, and colluding users and RPs in our threat model (see Section~\ref{subsec:threatmodel}).
+%Furthermore, if a user is compromised, the attacker can log in to RPs on his behalf. So, we consider malicious users, malicious RPs, and colluding users and RPs in our threat model (see Section~\ref{subsec:threatmodel}).
 
 
 
@@ -131,9 +132,9 @@ Similar vulnerabilities have been found in Android Apps that break the confident
 % A flaw was found in Google Apps \cite{ArmandoCCCPS13}, allowing a malicious RP to hijack a user's authentication attempt and inject a payload to steal the cookie or identity token belonging to another RP.
 
 % If a user is compromised,
-%     attackers will login to RPs on behalf of him.
+%     attackers will log in to RPs on his behalf.
 % Single sign-off helps the victim user
-%  to revoke all his tokens accepted and logout from the RPs  \cite{GhasemisharifRC18}.
+%  to revoke all his tokens accepted and log out from the RPs  \cite{GhasemisharifRC18}.
 % FedCM \cite{FedCM} attempts to disable iframe and third-party cookies in SSO, which could be exploited to track users.
 % %UPRRSSO protects privacy in SSO through ID transformations and our prototype does NOT use either iframe or third-party cookies.
 
