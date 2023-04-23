@@ -11,69 +11,31 @@
 
 \newc
 \noindent\textbf{Privacy-preserving cryptographic techniques.}
-PrivacyPass and TrustToken \cite{privacypass,trusttoken} design anonymous tokens for applications that grant anonymous access to authorized users, using a cryptographic technique that was originally proposed for oblivious pseudo-random functions (OPRFs) \cite{oprf-proved,voprf-proved,oprf-bitcoin-wallet}.
-A user generates a random number $e_i$ for each unsigned token $T_i$ and blinds $T_i$ into $[e_i]T_i$.
-After the user is authenticated, a token server signs ($[e_i]T_i, [k e_i]T_i$) with a private key $k$. Then, the user converts $[ke_i]T_i$ to $[k]T_i$ using $e_i$, and redeems the token ($T_i, T_i^k$) to access resources.
-In \usso, the identity transformations are implemented using a similar cryptographic technique.
-In particular, a user transforms $ID_{RP}$ to $PID_{RP} = [t]ID_{RP}$ using a random number $t$,
- and then the IdP calculates $PID_U = [u]PID_{RP} = [ut]ID_{RP}$ from $PID_{RP}$.
- The visited RP finally calculates $Acct = [u]ID_{RP}$ from $PID_{U}$ by using the shared $t$.
+PrivacyPass and TrustToken \cite{privacypass,trusttoken} designed anonymous tokens to grant anonymous access to applications to authorized users. They adopted the oblivious pseudo-random function (OPRF) protocol \cite{oprf-proved,voprf-proved,oprf-bitcoin-wallet} to generate anonymous tokens: a user generates a random $e_i$ for each unsigned token $T_i$ and blinds $T_i$ into $[e_i]T_i$.
+Once the user is authenticated, a token server signs $[e_i]T_i$ with a private key $k$ as $[k e_i]T_i$. Then, the user converts $[ke_i]T_i$ to $[k]T_i$ and redeems the token ($T_i, T_i^k$) to access resources.
+\usso~applies a similar cryptographic skill to design identity transformations: a user transforms $ID_{RP}$ to $PID_{RP} = [t_i]ID_{RP}$ using a random $t_i$. Then, the IdP calculates $PID_U = [u]PID_{RP}$ %= [ut]ID_{RP}$ 
+from $PID_{RP}$ using a random $u$.
+Finally, the visited RP calculates $Acct = [t_i^{-1}]PID_{U}$ from $PID_{U}$ using the shared $t_i$. If we directly compare the two approaches, the IdP-untraceability property in \usso, i.e., $[t_i]ID_{RP}$ and $ID_{RP}$ cannot be linked by an IdP, roughly corresponds to 
+the unlinkability between token signing and redemption in PrivacyPass and TrustToken, i.e., ($[e_i]T_i, [ke_i]T_i$) and  ($T_i, [k]T_i$) cannot be linked by a server.
 
-Anonymous tokens \cite{privacypass,trusttoken} do not identify each user at any visited RP,
-    while \usso\ provides non-anonymous but privacy-preserving SSO services because we leverage the cryptographic technique in a very different way.
-The OPRF protocol designed between a server and a user \cite{oprf-proved,voprf-proved,oprf-bitcoin-wallet},
-    is straightforwardly adopted in PrivacyPass/TrustToken to sign anonymous tokens by a token server for users
-        (i.e., the token server calculates the pseudo-random number, based on an input from users).
-On the contrary, \usso\ extends the original two-party protocol to work for three parties in SSO:
-        the random number $t$ to protect $ID_{RP}$ is shared between the user and the visited RP,
-            which shall be held only by the user in the original OPRF protocol,
-                and the sharing of $t$ enables the RP to derive the user's permanent account at this RP.
-%        and the scalar $u$ plays as the user's identity known to the user and the IdP.
-This extension requires an in-depth understanding of the variables in the OPRF protocol and the (pseudo-)identities of users and RPs in SSO identity tokens.
-Compared with the original OPRFs, we use $k$ key (they are always as private key) as a user identity.
+However, PrivacyPass and TrustToken directly adopted the OPRF design for their token generation, i.e., the token server calculates a pseudo-random number for a given user input, so that the anonymous tokens are completely indistinguishable. When they are used to realize SSO, the RPs cannot identify each user. In contrast, \usso~leverages the cryptographic technique in a greater depth than anonymous tokens to provide a non-anonymous but privacy-preserving SSO service. First, it extends the original two-party protocol to work for three parties in SSO. It lets the user and the visited RP share the random number $t$, which is used for protecting $ID_{RP}$, and thus enables the RP to derive the user's permanent account at this RP. This sharing is reasonable in \usso~as it designs oblivious pseudo-random functions for identity transformations, but less practical in OPFRs where $k$ is typically the private key of the server.
+%This extension requires an in-depth understanding of the variables in the OPRF protocol and the (pseudo-)identities of users and RPs in SSO identity tokens. Compared with the original OPRFs, we use the $k$ key (they are always private keys) as a user identity.
 % 第一段：说明2个点：
 % 1. 2 party -> 3 party: user把随机数分享给RP。
 % 2. 把key用作uid，在SSO中。把prf的输入输出，用作PID和account。
-
 % 他们的token，与uid/account无关
-
-
-
-
-In addition to the extension to three parties,
-    \usso\ leverages the OPRF cryptographic technique in greater depth than existing anonymous tokens \cite{privacypass,trusttoken}.
-\usso\ leverages more properties of the technique than PrivacyPass/TrustToken.
-The unlinkability between token signing and redemption, or ($[e_i]T_i, [ke_i]T_i$) and  ($T_i, [k]T_i$), roughly corresponds to only the IdP-untraceability in UPPRESSO: an IdP cannot link any pair of $[t_i]ID_{RP}$ and $ID_{RP}$.  % $i = 1, 2, \cdots$.
-Moreover,
-    we prove the additional unlinkability across colluding RPs by showing that their knowledge about any two users $u$ and $u'$, i.e., ($ID_{RP}, t, [u]ID_{RP}$) and ($ID_{RP'}, t', [u']ID_{RP'}$), obtained from different logins, is indistinguishable.
-This property is not considered or supported in anonymous tokens \cite{privacypass,trusttoken}.
+Second, we leverage properties of oblivious random functions to prove an additional property for SSO, called RP unlinkability, which is not considered or supported by anonymous tokens. It ensures that colluding RPs cannot link any two logins even if they share the knowledge about the pseudo-identities and permanent accounts of the users who initiate these logins.
+%In addition to the extension to three parties, \usso\ leverages the OPRF cryptographic technique in greater depth than existing anonymous tokens \cite{privacypass,trusttoken}. \usso\ leverages more properties of the technique than PrivacyPass/TrustToken. The unlinkability between token signing and redemption, or ($[e_i]T_i, [ke_i]T_i$) and  ($T_i, [k]T_i$), roughly corresponds to only the IdP-untraceability in UPPRESSO: an IdP cannot link any pair of $[t_i]ID_{RP}$ and $ID_{RP}$.  % $i = 1, 2, \cdots$. 
+%Moreover, we prove the additional unlinkability across colluding RPs by showing that their knowledge about any two users $u$ and $u'$, i.e., ($ID_{RP}, t, [u]ID_{RP}$) and ($ID_{RP'}, t', [u']ID_{RP'}$), obtained from different logins, is indistinguishable. This property is not considered or supported in anonymous tokens \cite{privacypass,trusttoken}.
 % 相比PP/TT，我们把OPRF用得更彻底，有一个新的属性。
 
-%Several cryptographic primitives have been used for protecting user privacy. For example, PrivacyPass and TrustToken \cite{privacypass,trusttoken} adapted the oblivious pseudorandom function (OPRF) protocol~\cite{oprf-proved,voprf-proved,oprf-bitcoin-wallet} to generate anonymous tokens, which grant anonymous access to authenticated users. Anonymous token generation typically involves three steps: (1) {\em token blinding}, where a user selects a random number $e_i$ to blind a token $T_i$ into $T_i^{e_i}$; (2) {\em token signing}, where the token server signs ($T_i^{e_i}, T_i^{e_i k}$) with its private key $k$ after authenticating the user; and (3) {\em token unblinding}, where the user uses $e_i$ to convert $T_i^{e_i k}$ to $T_i^k$. An unused anonymous token ($T_i, T_i^k$) can be redeemed later to access resources on the token server.
+\usso~leverages three properties of oblivious pseudo-random functions, which are also utilized by other OPRF-based designs~\cite{oprf-proved, voprf-proved, oprf-bitcoin-wallet, privacypass, trusttoken}, to prove its security. %and privacy in Theorems 4, 6, and 7. 
+It uses the \emph{obliviousness} property to prevent the IdP from learning any information about $ID_{RP}$ when receiving a token request for $[t_i]ID_{RP}$, the \emph{deterministicness} property of \emph{pseudo-random functions} to enable the RP to derive the permanent account for a given $t$, and the \emph{randomness} property to prevent colluding RPs from linking the users' permanent accounts when $u$ or $k$ are unknown. Last but not least, \usso~requires an additional property, called \emph{RP designation}, and proves in Lemma 1 that no collision exists in RPs' pseudo-identities, which are the input of the pseudo-random function. This property is not required in other OPRF-based approaches and therefore may not be supported by all OPRF protocols. So, an OPRF protocol cannot be directly applied to implement \usso~unless this additional property is proved.
 
-%Hence, PrivacyPass and TrustToken could be adapted to support an SSO-like service, in which the user authenticates once to a token server and redeems anonymous tokens at the server later without further authentication. However, we need to point out that PrivacyPass, TrustToken, and other OPRF protocols are two-party protocols that are not designed for SSO. The anonymous tokens are signed by and redeemed at the token server, using the server's long-term private key $k$.
+%More importantly, \usso\ even leverages more properties of this cryptographic technique than the OPRF protocols \cite{oprf-proved,voprf-proved,oprf-bitcoin-wallet}. We prove that \usso\ satisfies three requirements of privacy-preserving SSO (i.e., IdP ) in Theorems 6, 4, and 7. The 1st feature of the cryptographic technique used in OPRFs, provides the \emph{obliviousness} property of OPRFs, also prevents the IdP from learning anything about $ID_{RP}$ when receiving a token request for $[t]ID_{RP}$, the \emph{deterministicness} property of \emph{pseudo-random functions} used in OPRFs, enables the derivation of permanent accounts at the RP for a random $t$, while the \emph{randomness} property used in OPRFs in the case of unknown $u$ or $k$, prevents colluding RPs from linking $Acct = [u]ID_{RP}$ across different RPs.
 
-%On the contrary, SSO involves three parties, where the tokens signed by the IdP are redeemed at the RPs. The IdP and the RPs cannot directly share any secrets due to the privacy requirement, therefore, applying OPRF protocols (including PrivacyPass and TrustToken) for privacy-preserving SSO requires extending the protocols from two-party to three-party, which is non-trivial. First, it requires the user to coordinate the token signing process such that the IdP uses an RP-relevant secret $k$ to sign the token without knowing the RP's identity. Besides, it requires the RPs to be able to recognize the same user in her multiple logins. Existing OPRF protocols cannot satisfy this requirement as the anonymous tokens are completely indistinguishable from each other.
+%Last but not least, \usso\ requires \emph{RP designation}, which is ensured by another property of this cryptographic technique: there is no $PID_{RP}$ collision in the \usso\ protocol. This property is proved in Lemma 1. However, this property is \emph{not} considered even in OPRF protocols; i.e., the OPRF protocol \cite{oprf-proved,voprf-proved,oprf-bitcoin-wallet} does not require no collision of the blinded inputs to the OPRF server. An OPRF protocol does not always result in a variation of the \usso\ protocol, unless the additional property of input-collisionlessness is proved.
 
-More importantly, \usso\ even leverages more properties of this cryptographic technique than the OPRF protocols \cite{oprf-proved,voprf-proved,oprf-bitcoin-wallet}.
-We prove that \usso\ satisfies three requirements of privacy-preserving SSO (i.e., IdP ) in
-    Theorems 6, 4, and 7.
-The 1st feature of the cryptographic technique used in OPRFs,
-        provides the \emph{obliviousness} property of OPRFs,
-    also prevents the IdP from learning anything about $ID_{RP}$ when receiving a token request for $[t]ID_{RP}$,
-the \emph{deterministicness} property of \emph{pseudo-random functions} used in OPRFs,
-    enables the derivation of permanent accounts at the RP for a random $t$,
-while the \emph{randomness} property used in OPRFs in the case of unknown $u$ or $k$,
-    prevents colluding RPs from linking $Acct = [u]ID_{RP}$ across different RPs.
-Last but not least,
-    \usso\ requires \emph{RP designation},
-        which is ensured by another property of this cryptographic technique:
-        there is no $PID_{RP}$ collision in the \usso\ protocol.
-This property is proved in Lemma 1.
-However, this property is \emph{not} considered even in OPRF protocols;
-    i.e., the OPRF protocol \cite{oprf-proved,voprf-proved,oprf-bitcoin-wallet} does not require no collision of the blinded inputs to the OPRF server.
-An OPRF protocol does not always result in a variation of the \usso\ protocol,
-    unless the additional property of input-collisionlessness is proved.
 %    \footnote{Due to the extension of three parties and the requirement of input-collisionlessness, we did not realize this cryptographic technique has been published in OPRFs
 %        until anonymous reviewers pointed out it.}
 
