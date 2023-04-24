@@ -18,8 +18,9 @@ so that the anonymous tokens are completely indistinguishable.
 If they are used to realize SSO, the RPs cannot identify each user.
 In contrast, \usso\ leverages this cryptographic technique in a greater depth than anonymous tokens,
  to provide a non-anonymous but privacy-preserving SSO service. First, it extends the original two-party OPRF protocol to work for three parties in SSO services.
-In \usso\ a user shares the random number $t$ with an RP, which is used for protecting $ID_{RP}$ and thus enables the RP to derive the user's account at this RP.
-Moreover, \usso\ applies pseudo-random functions but uses the \emph{secret key} of pseudo-random functions as a \emph{user identity} (i.e., $u$ in identity transformations),
+In \usso\ a user shares the random number $t$ with an RP, which is used for protecting $ID_{RP}$ and thus enables the RP to derive the user's account at this RP,
+    while the IdP ``obliviously'' calculates the user's account based on the user identity and the RP's pseudo-identity (or ``blinded'' identity).
+In this process, \usso\ applies pseudo-random functions but uses the \emph{secret key} of pseudo-random functions as a \emph{user identity} (i.e., $u$ in identity transformations),
     but not as a \emph{secret key} in other OPRF applications \cite{privacypass,trusttoken,strong-oprf,oprf-bitcoin-wallet,pesto,oprf-ot-si,pp-ss,Private-Contact-Discovery,o-kms,oprf-deduplication}.
 %This extension is unlikely to occur in OPFRs that consider $k$ as the private key of the server, but it is reasonable in \usso\ as it uses random numbers as identities and trapdoors to design oblivious pseudo-random functions for identity transformations.
 %This extension requires an in-depth understanding of the variables in the OPRF protocol and the (pseudo-)identities of users and RPs in SSO identity tokens. Compared with the original OPRFs, we use the $k$ key (they are always private keys) as a user identity.
@@ -27,7 +28,7 @@ Moreover, \usso\ applies pseudo-random functions but uses the \emph{secret key} 
 % 1. 2 party -> 3 party: user把随机数分享给RP。
 % 2. 把key用作uid，在SSO中。把prf的输入输出，用作PID和account。
 % 他们的token，与uid/account无关
-Second, we leverage the properties of OPRFs
+Moreover, we leverage the properties of OPRFs
  to provide an additional privacy property for SSO, called \emph{RP unlinkability}, which is not considered or supported in PrivacyPass/TrustToken.
  It ensures that colluding RPs cannot link any two logins,
   even if they share the knowledge about the pseudo-identities and permanent accounts of the users who initiate these logins.
@@ -42,7 +43,7 @@ It uses the \emph{obliviousness} property to prevent the IdP from learning any i
 and the \emph{randomness} property to prevent colluding RPs from linking the users' permanent accounts these across RPs.
  %when user identities (i.e., the key secret $k$ of pseudo-random functions) are unknown.
 Last but not least, \usso\ requires an additional property in SSO services, called \emph{RP designation},
- and it is ensured only if no collision exists in RPs' pseudo-identities (see Lemma 1), which are actually the blinded inputs of the pseudo-random function.
+ and it is ensured only if no collision exists in RPs' pseudo-identities (see Theorem 1 and Lemma 1), which are actually the blinded inputs of the pseudo-random function.
 This property is not required in other OPRF-based approaches and therefore may not be supported by all OPRF protocols.
 Thus, an OPRF protocol cannot be directly applied to implement identity transformations in \usso, unless no collision exists in the blinded inputs of the pseudo-random function.
 
