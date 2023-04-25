@@ -2,7 +2,7 @@
 \label{sec:related}
 
 \newc
-PrivacyPass and TrustToken \cite{privacypass,trusttoken} 
+PrivacyPass and TrustToken \cite{privacypass,trusttoken}
 adopted the oblivious pseudo-random function (OPRF) protocol \cite{oprf-proved,voprf-proved,oprf-bitcoin-wallet} to generate anonymous tokens for authorized users to access resources.
  A user generates a random number $e_i$ for each unsigned token $T_i$ and blinds $T_i$ into $[e_i]T_i$.
 Once the user is authenticated, a token server signs $[e_i]T_i$ with a private key $k$ as $[k e_i]T_i$. Then, the user converts $[ke_i]T_i$ to $[k]T_i$ using $e_i$ and redeems the token ($T_i, T_i^k$) to anonymously access resources.
@@ -44,8 +44,8 @@ It ensures that colluding RPs cannot link any two logins across RPs,
 It uses the \emph{obliviousness} property to prevent the IdP from learning any information about $ID_{RP}$ when receiving a token request for $[t_i]ID_{RP}$, the \emph{deterministicness} property of \emph{pseudo-random functions} to enable the RP to derive the permanent account for any $t$,
 and the \emph{randomness} property to provide RP unlinkability.
  %when user identities (i.e., the key secret $k$ of pseudo-random functions) are unknown.
-Last but not least, \usso\ requires an additional property in SSO services, called \emph{RP designation},
- and it is ensured only if no collision exists in RPs' pseudo-identities (see Theorem 1 and Lemma 1), which are actually the blinded inputs of the evaluated pseudo-random function.
+Last but not least, \usso\ requires an additional property in SSO services, called \emph{RP designation}.
+It is satisfied (see Lemma 1) only if no collision exists in RPs' pseudo-identities, which are actually the blinded inputs of the evaluated pseudo-random function.
 This property is not required in other OPRF-based approaches and therefore may not be supported by all OPRF protocols.
 Thus, an OPRF protocol cannot always be ready to implement identity transformations in \usso, unless no collision exists in the blinded inputs of the pseudo-random function.
 
