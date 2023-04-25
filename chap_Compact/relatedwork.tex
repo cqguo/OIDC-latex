@@ -21,9 +21,10 @@ In contrast, \usso\ leverages this cryptographic technique in a greater depth th
 In \usso\ a user shares the random number $t$ with an RP, which is used for protecting $ID_{RP}$ and thus enables the RP to derive the user's account at this RP,
     while the IdP ``obliviously'' calculates the user's account based on the user identity and the RP's pseudo-identity (or ``blinded'' identity).
 In this process, \usso\ applies pseudo-random functions but uses the \emph{secret key} of pseudo-random functions as a \emph{user identity} (i.e., $u$ in identity transformations),
-    but not as a \emph{secret key} in other OPRF applications \cite{privacypass,trusttoken,strong-oprf,oprf-bitcoin-wallet,pesto,oprf-ot-si,pp-ss,Private-Contact-Discovery,o-kms,oprf-deduplication}.
+    while it is used as \emph{secret keys} in other OPRF-based applications \cite{privacypass,trusttoken,strong-oprf,oprf-bitcoin-wallet,pesto,oprf-ot-si,pp-ss,Private-Contact-Discovery,o-kms,oprf-deduplication}.
+This application requires an in-depth understanding of the variables in OPRFs and the (pseudo-)identities in SSO services.
 %This extension is unlikely to occur in OPFRs that consider $k$ as the private key of the server, but it is reasonable in \usso\ as it uses random numbers as identities and trapdoors to design oblivious pseudo-random functions for identity transformations.
-%This extension requires an in-depth understanding of the variables in the OPRF protocol and the (pseudo-)identities of users and RPs in SSO identity tokens. Compared with the original OPRFs, we use the $k$ key (they are always private keys) as a user identity.
+%Compared with the original OPRFs, we use the $k$ key (they are always private keys) as a user identity.
 % 第一段：说明2个点：
 % 1. 2 party -> 3 party: user把随机数分享给RP。
 % 2. 把key用作uid，在SSO中。把prf的输入输出，用作PID和account。
@@ -38,9 +39,9 @@ Moreover, we leverage the properties of OPRFs
 
 
 \usso\ leverages three properties of OPRFs \cite{oprf-proved,voprf-proved}, %which are also utilized by other OPRF-based designs~\cite{oprf-proved, voprf-proved, oprf-bitcoin-wallet, privacypass, trusttoken},
- to ensure (parts of) its security and privacy. % in Theorems 4, 6, and 7.
+ to prove (parts of) its security and privacy. % in Theorems 4, 6, and 7.
 It uses the \emph{obliviousness} property to prevent the IdP from learning any information about $ID_{RP}$ when receiving a token request for $[t_i]ID_{RP}$, the \emph{deterministicness} property of \emph{pseudo-random functions} to enable the RP to derive the permanent account for any $t$,
-and the \emph{randomness} property to prevent colluding RPs from linking the users' permanent accounts these across RPs.
+and the \emph{randomness} property to provide RP unlinkability.
  %when user identities (i.e., the key secret $k$ of pseudo-random functions) are unknown.
 Last but not least, \usso\ requires an additional property in SSO services, called \emph{RP designation},
  and it is ensured only if no collision exists in RPs' pseudo-identities (see Theorem 1 and Lemma 1), which are actually the blinded inputs of the pseudo-random function.
@@ -97,7 +98,11 @@ The sharing of random numbers enables the derivation of permanent accounts in \u
 \subsection{Extended Related Work}
 %Cryptographic primitives are used for protecting user privacy.
 \noindent\textbf{Cryptographic primitives for privacy.}
-Zero-knowledge proofs and distributed key generation are used to prove users' statements about their credentials without revealing the credential content (e.g., ZKlaims \cite{zklaim}) or generate ring-signature private keys as untraceable pseudonyms~\cite{crypto-book}. Two-party threshold cryptography is also used~\cite{tandem} to generate one-time key-share tokens to protect key-usage patterns.
+Zero-knowledge proofs and distributed key generation are used to prove users' statements about their credentials without revealing the credential content (e.g., ZKlaims \cite{zklaim}) or generate ring-signature private keys as untraceable pseudonyms~\cite{crypto-book}.
+Two-party threshold cryptography is also used~\cite{tandem} to generate one-time key-share tokens to protect key-usage patterns.
+PESTO \cite{pesto} combines distributed partially-oblivious PRFs and distribution signatures,
+    and applies proactive security to build a proactively-secure distributed SSO system;
+    moreover, it proposes to sign a commitment of an identity token (but not the token itself) to increase user privacy.
 %Other cryptographic primitives such as zero-knowledge proofs are used in ZKlaims \cite{zklaim} to allow users to prove statements on the credentials issued by a trusted server without revealing the credentials' content. Crypto-Book \cite{crypto-book} adopts distributed key generation to generate linkable-ring-signature private keys for users, and each key pair is used as an untraceable pseudonym. Tandem \cite{tandem} generates one-time-use key-share tokens for a two-party threshold cryptographic scheme implemented with a central server, to protect the privacy of key-usage patterns.
 
 
