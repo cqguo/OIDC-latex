@@ -14,7 +14,7 @@ This threat model is in line with widely-used SSO services \cite{OpenIDConnect,r
  while remaining interested in learning about user profiles.
 For example, it may store all received messages to infer the relationship between $ID_U$, $ID_{RP}$, $PID_{U}$, and $PID_{RP}$.
  % to track a user's login activities.
-It never actively violates the protocols, so any script downloaded from the IdP also strictly follows the protocols (see Section \ref{sec:web-design} for specific designs for web applications).
+It never actively violates the protocols, so a script downloaded from the IdP also strictly follows the protocols (see Section \ref{sec:web-design} for specific designs for web applications).
 The IdP maintains the private key well for signing identity tokens and RP certificates, %(see Section \ref{implementations} for details)
 which prevents adversaries from forging such messages.
 
@@ -22,7 +22,7 @@ which prevents adversaries from forging such messages.
 \noindent \textbf{Malicious users.} Adversaries could control a set of users by stealing their credentials or registering Sybil users in the system.
  Their objective is to (\emph{a}) impersonate a victim user at honest RPs or (\emph{b}) entice an honest user to log into an honest RP under another user's account.
 %To achieve this, they could behave arbitrarily \cite{WangCW12, SomorovskyMSKJ12}.
-A malicious user could modify, insert, drop, or replay messages or behave arbitrarily in login flows.
+A malicious user could modify, insert, drop, or replay messages or even behave arbitrarily in login flows.
 
 \noindent \textbf{Malicious RPs.}
 Adversaries could control a set of RPs by registering at the IdP as an RP or exploiting vulnerabilities to compromise some RPs. Malicious RPs could behave arbitrarily to compromise the security or privacy guarantees of \usso.
@@ -39,14 +39,14 @@ If the IdP were to collude with some RPs, a user would complete login flows enti
 In principle, it would require a long-term user secret to protect (or transform) permanent accounts across these RPs.
 This secret should be held \emph{only} by the user; otherwise, the colluding IdP and RPs could always link these accounts.
 %Note that we aim to design a solution for SSO users without any non-ephemeral secret verified by the RPs.
-However, accounts derived from the user secret would need to be updated if the secret was lost or leaked (see discussions in Section \ref{sec:discussion}).
+However, the accounts derived from the user secret would need to be updated if the secret was lost or leaked (see discussions in Section \ref{sec:discussion}).
 
 
 \subsection{Assumptions}
 %\noindent \textbf{Other assumptions.}
 We assume HTTPS is used to secure communications between honest entities, and the cryptographic primitives are secure. The software stack of an honest entity is correctly implemented to transmit messages to receivers as expected.
 
-\usso\ is designed for users who value privacy. We assume a user never authorizes the IdP to enclose any \emph{distinctive} attributes, such as telephone number, Email address, etc., in identity tokens or sets any distinctive attributes at any RP. Hence, privacy leakages due to re-identification by distinctive attributes across RPs are out of our scope.
+\usso\ is designed for users who value privacy. We assume a user never authorizes the IdP to enclose any \emph{distinctive} attributes, such as telephone number, Email address, etc., in identity tokens or sets such attributes at any RP. Hence, privacy leakages due to re-identification by distinctive attributes across RPs are out of our scope.
 In addition, we do not consider the tracking of a user's network activities by network traffic analysis or crafted web pages, as they can be prevented by existing defenses. \newc
 For example, FedCM \cite{FedCM} attempts to disable iframe and third-party cookies in SSO, which could be exploited to track users. This work focuses only on privacy threats introduced by SSO protocols.
 
