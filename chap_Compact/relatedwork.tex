@@ -28,7 +28,7 @@ In \usso\ a user shares the random number $t$ with an RP, which is used for prot
     while the IdP ``obliviously'' determines the user's account based on the user identity and the RP's pseudo-identity (or ``blinded'' identity).
 In this process, we actually apply pseudo-random functions but uses the \emph{secret key} of pseudo-random functions as a \emph{user identity} (i.e., $u$ in identity transformations),
     while it always is used as \emph{secret keys} in PrivacyPass/TrustToken and other OPRF-based applications \cite{privacypass,trusttoken,strong-oprf,oprf-bitcoin-wallet,pesto,oprf-ot-si,pp-ss,Private-Contact-Discovery,o-kms,oprf-deduplication}.
-This unusual application requires different understandings of the variables in OPRFs and the (pseudo-)identities in SSO services.
+This unusual application requires special understandings of the variables in OPRFs and the (pseudo-)identities in SSO services.
 %This extension is unlikely to occur in OPFRs that consider $k$ as the private key of the server, but it is reasonable in \usso\ as it uses random numbers as identities and trapdoors to design oblivious pseudo-random functions for identity transformations.
 %Compared with the original OPRFs, we use the $k$ key (they are always private keys) as a user identity.
 % 第一段：说明2个点：
@@ -36,10 +36,10 @@ This unusual application requires different understandings of the variables in O
 % 2. 把key用作uid，在SSO中。把prf的输入输出，用作PID和account。
 % 他们的token，与uid/account无关
 Moreover, \usso\ actually leverages the randomness property of OPRFs
- to provide \emph{RP unlinkability}, while this property is not discussed in PrivacyPass/TrustToken.
-It ensures colluding RPs cannot link any two logins across RPs, i.e., ($ID_{RP}, t, [u]ID_{RP}$) and ($ID_{RP'}, t', [u']ID_{RP'}$),
+ to provide \emph{RP unlinkability}, while this property is not needed in PrivacyPass/TrustToken.
+It ensures colluding RPs cannot link any two logins across RPs, i.e., ($ID_{RP}, t, [u]ID_{RP}$) and ($ID_{RP'}, t', [u']ID_{RP'}$).
   even if they share the knowledge about the pseudo-identities and permanent accounts of the users initiating these logins.
-This property results in the \emph{indistinguishability} of different users for RPs in \usso,
+In \usso\ this property results in the indistinguishability of different users in colluding RPs' view,
     therefore corresponding to different keys for signing anonymous tokens,
     which is not considered in PrivacyPass/TrustToken.
 % but they intentionally distinguish different keys by configuring a unique public key at each user to verify the signed tokens.
