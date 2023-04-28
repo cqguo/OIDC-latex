@@ -14,8 +14,7 @@ Based on our design goals (i.e., the desired security and privacy guarantees) an
 The honest-but-curious IdP tries to infer the identities of the RPs that a user requests to access. %or link multiple logins to any RP initiated by a user.
 
 \noindent\textbf{Adversaries against RP unlinkability.}
-Malicious RPs could collude with each other or with malicious users, attempting to link logins across these RPs that are initiated by a user.
-\oldc
+Malicious RPs could collude with each other or with malicious users, attempting to link logins across these RPs that are initiated by honest users. \oldc
 
 % \textcolor{blue}{Based on the threat model and assumptions proposed in Section \ref{sec:UPPRESSO},
 %     different types of adversaries are considered in the analysis of security and privacy.
@@ -141,7 +140,7 @@ The target RP with $ID_{RP}$ receives $t$, and it will also calculate $PID_{RP}=
 Thus, $PID_{RP}$ always specifies an RP, i.e., %$PID_{RP}$ sent by a user in her identity-token request is calculated as $PID_{RP} = [t]ID_{RP}$, where $ID_{RP}$ is the target RP's identity and $t$ is a random number selected by the user and shared with this RP.
 designates the target RP that knows $t$.
 
-Next, according to Lemma 1, given $PID_{RP} = [t]ID_{RP}$, the probability that $PID_{RP}$ designates another RP with $ID_{RP'}$ is negligible. %This means that $PID_{RP}$ cannot be associated with any other RPs in the system.
+Next, according to Lemma 1, given $PID_{RP} = [t]ID_{RP}$, the probability that $PID_{RP}$ designates another RP with $ID_{RP'}$ is \emph{negligible}. %This means that $PID_{RP}$ cannot be associated with any other RPs in the system.
 Therefore, $PID_{RP}$ designates only the target RP with $ID_{RP}$ in the system.  \hfill $\square$
 
 \vspace{2mm}
@@ -161,16 +160,16 @@ As depicted in Figure \ref{fig:ecdlp_algorithm}, we design a probabilistic polyn
 %where $k$ denotes the security parameter and $\epsilon_{c}(k)$ becomes negligible when $k$ is sufficiently large.
 %For any sufficiently large $k$, $m \ll 2^k$ since $m$ is a finite integer.
 
-The algorithm $\mathcal{D}^*_c$ works as below.
-The input of $\mathcal{D}^*_c$ is in the form of ($G, Q$). Upon receiving an input ($G$, $Q$), the challenger first randomly chooses $r_1, \cdots, r_m$ in $\mathbb{Z}_n$ to calculate $[r_1]G, \cdots, [r_m]G$.
-Then, it randomly chooses $j \in [1,m]$, replaces $[r_j]G$ with $Q$, and sends $m$ RP identities to the adversary, which then returns the result ($a$, $b$, $t$, $t'$). Finally, the challenger calculates $s = t^{-1}t'r_b \bmod n$ and returns $s$ as the output of $\mathcal{D}^*_c$.
-
-\begin{figure}[tb]
+\begin{figure}[b]
   \centering
   \includegraphics[width=0.96\linewidth]{fig/ecdlp_algorithm.pdf}
   \caption{The PPT algorithm $\mathcal{D}^*_c$ constructed based on the $PID_{RP}$ collision game, to solve the ECDLP problem.}
   \label{fig:ecdlp_algorithm}
 \end{figure}
+
+The algorithm $\mathcal{D}^*_c$ works as below.
+The input of $\mathcal{D}^*_c$ is in the form of ($G, Q$). Upon receiving an input ($G$, $Q$), the challenger first randomly chooses $r_1, \cdots, r_m$ in $\mathbb{Z}_n$ to calculate $[r_1]G, \cdots, [r_m]G$.
+Then, it randomly chooses $j \in [1,m]$, replaces $[r_j]G$ with $Q$, and sends $m$ RP identities to the adversary, which then returns the result ($a$, $b$, $t$, $t'$). Finally, the challenger calculates $s = t^{-1}t'r_b \bmod n$ and returns $s$ as the output of $\mathcal{D}^*_c$.
 
 If the adversary succeeds in $\mathcal{G}_c$ and $[r_a]G$ happens to be replaced with $Q$, then $\mathcal{D}^*_c$ outputs $s=t^{-1}t'r_b =x$ because $[tr_a]G = [t]Q = [t'r_b]G$. For the adversary, $Q$ is indistinguishable from any other RP identities in the input set, as $[r_j]G$ is randomly replaced by the challenger.
 Hence, the probability of solving the ECDLP using $\mathcal{D}^*_c$ is formulated as:
@@ -199,9 +198,9 @@ This violates the ECDLP assumption. Therefore, the probability of finding $t$ an
 \vspace{0.85mm}
 \noindent\textsc{Proof.}
 To issue an identity token requested for $PID_{RP}$, the honest IdP calculates $PID_U = [ID_U]PID_{RP}$ following Equation \ref{equ:PIDU} after authenticating the user with $ID_U$. The designated RP then calculates $Acct = [t^{-1}]PID_{U} = [ID_U]ID_{RP}$ following Equation \ref{equ:AccountNotChanged}.
-$Acct = [ID_U]ID_{RP}$ is a \emph{permanent} identifier that is determined once the RP and the user have registered at the IdP. Therefore, $PID_U$ in $TK$ always identifies an $Acct$ at the designated RP and $Acct$ is mapped to a user with $ID_U$.
+$Acct = [ID_U]ID_{RP}$ is a \emph{permanent} identifier that is determined once the RP and the user have registered at the IdP. Therefore, $PID_U$ in $TK$ always identifies an account at the designated RP and $Acct$ is mapped to a user with $ID_U$.
 
-Next, we prove that $PID_{U}$ \emph{uniquely} identifies one user in the system and one account at the RP. Since $\mathbb{E}$ is a finite cyclic group, $ID_{RP} = [r]G$ is also a generator on $\mathbb{E}$ of order $n$. Given a user with $ID_U$, $Acct = [ID_U]ID_{RP}$ is a unique point on $\mathbb{E}$ for any $u \in [1, n)$, which is uniquely associated to $ID_U=u$. \hfill $\square$
+Next, we prove that $PID_{U}$ \emph{uniquely} identifies one user in the system and one account at the RP. Since $\mathbb{E}$ is a finite cyclic group, $ID_{RP} = [r]G$ is also a generator on $\mathbb{E}$ of order $n$. Given a user with $ID_U$, $Acct = [ID_U]ID_{RP}$ is a \emph{unique} point on $\mathbb{E}$ for any $u \in [1, n)$, which is \emph{uniquely} associated to $ID_U=u$. \hfill $\square$
 
 %According to the \dy~model, the RP may receive a $TK$ issued for another RP from a malicious RP script. However, if $PID_{RP} = [t]ID_{RP}$ holds, the RP can verify its designation by $PID_{RP}$ based on Theorem 1 and associates both $t$ and $TK$ with the current login.
 %Then, the RP can calculate $Acct$ using $t$ and $PID_U$ following Eq.~\ref{equ:Account}. $Acct$ is determined only by $ID_U$ and $ID_{RP}$ based on Eq.~\ref{equ:AccountNotChanged}, which are permanent identifiers issued by the IdP during registration. Hence, $Acct$ cannot be manipulated by adversaries and is independent of logins. Therefore, in a user's multiple logins to the same RP, $PID_U$s are always mapped to one and only one $Acct$ at that RP.
@@ -250,19 +249,19 @@ As all the communications between the IdP, RPs, and users are protected by HTTPS
 \vspace{0.85mm}
 \noindent\textsc{Proof.}
 According to the formal analysis on SSO security \cite{SPRESSO, FettKS14},
-    an SSO system satisfying the following two requirements is considered security in the first adversarial scenario: (\emph{a}) an adversary never obtains a valid identity token of an honest user and presents it to an honest RP, and (\emph{b}) an honest user never presents a valid identity token that is not issued for herself to an honest RP.
+    an SSO system satisfying the following two requirements provides secure authentication services in the first adversarial scenario: (\emph{a}) an adversary never obtains a valid identity token for an honest user and presents it to an honest RP, and (\emph{b}) an honest user never presents a valid identity token that is not issued for herself to an honest RP.
 %(\emph{a}) an adversary never presents an identity token that is accepted by an honest RP to derive an honest user's account at this RP and (\emph{b}) an honest user never presents an identity token that is accepted by an honest RP to derive another user's account at this RP.
 
 
 %In a secure SSO that is robust against impersonation attacks, an honest user should be able to prove her identity to the target RP with an identity token issued by the IdP. As pseudo-identities are used in \usso, an RP needs to verify that ({\em a}) $PID_{RP}$ in the received identity token is a transformation from its own $ID_{RP}$ and tied to the current login, which requires {\em RP designation}; and ({\em b}) $PID_U$ included in the identity token can be associated with a unique, long-term user account it maintains, which requires {\em user identification}. Besides, the identity token for an honest RP should not be intercepted by malicious users or RPs, requiring the {\em confidentiality of identity tokens}, nor be forged or tampered with to include a fake $PID_U$ or $PID_{RP}$, requiring the {\em integrity of identity tokens}.
 
-Following the login flow of \usso, since the confidentiality and integrity of identity tokens are satisfied, no adversary could obtain a valid identity token that is issued to an honest user for accessing an honest RP. %and accepted by an honest RP.
-Meanwhile, if an adversary presents an identity token to an honest RP, which may be issued to the adversary for accessing another RP or to an honest user for accessing a colluding RP, RP designation and user identification ensure that from this identity token, the honest RP does not derive an honest user's account.
+Following the login flow of \usso, because the confidentiality and integrity of identity tokens are satisfied, no adversary could obtain a valid identity token that is issued to an honest user for accessing an honest RP. %and accepted by an honest RP.
+Meanwhile, if an adversary presents an identity token to an honest RP, which may be issued to the adversary for accessing another RP or to an honest user for accessing a colluding RP, RP designation and user identification ensure that, from this identity token, the honest RP does not derive an honest user's account.
 %Meanwhile, $PID_U$ can only be calculated by the IdP and the user, since no one else knows or could intercept $u$ according to the DYU model. \oldc
 
-According to the login flow and the \dyu\ model, an honest user always obtains identity tokens issued to herself, because $PID_U$ is calculated based on her own identity.
+According to the login flow and the \dyu\ model, an honest user always obtains identity tokens issued to herself, because $PID_U$ is calculated based on her identity.
   %% which is protected against adversaries. 这一句，对于security没有用，protecting u是用于privacy。
-The confidentiality and integrity of identity tokens ensure that an honest user never presents any token issued to someone else to an honest RP. Finally, with user identification,\footnote{\newc RP designation is a precondition of user identification in \usso, but this may not always be necessary for other SSO systems.} her identity tokens are always associated with her account at the target RP.
+The confidentiality and integrity of identity tokens ensure that an honest user never presents any token issued for someone else to an honest RP. Finally, with user identification,\footnote{\newc RP designation is a precondition of user identification in \usso, but this may not always be necessary for other SSO systems.} her identity tokens are always associated with her account at the target RP.
 %According to the conclusions of the DYU model, $PID_U$ is calculated based on the user when the IdP issues an identity token for an authenticated user.
 %Moreover, because the confidentiality and integrity of identity tokens are satisfied, an honest user never presents a valid token that is issued to other users.
 %When the user identification is satisfied, this token always derives this honest user's account.
@@ -310,7 +309,7 @@ Because $G$ is a generator of order $n$, $ID_{RP} = [r]G$ is also a generator on
 \vspace{2mm}
 
 In the third adversarial scenario, malicious RPs collude with malicious users,
- attempting to link the logins from an honest user to different colluding RPs.
+ attempting to link the logins initiated by an honest user but visiting different colluding RPs.
 In each login an RP learns an ephemeral identifier $PID_{U} = [{ID_U}]{PID_{RP}}$ and a permanent identifier $Acct = [ID_U]ID_{RP}$ of the user, but it cannot derive $ID_U$ from $PID_{U}$ or $Acct$ due to the ECDLP problem.
 Therefore, the colluding adversaries share all logins to malicious RPs,
     and attempt to leverage the logins initiated by malicious users to link the other logins by honest users.
@@ -437,7 +436,7 @@ Because $x$ is not in $\{u''_1, \cdots, u''_{d-1}, u''_{d+1}, \cdots, u''_w\}$, 
 &\mathbf{Adv}^*_{A}=|{\rm Pr}^*_1-{\rm Pr}^*_2|=|{\rm Pr}_1-{\rm Pr}_2|={\mathbf{Adv}}_{A}
 \end{align*}
 
-If the adversary has non-negligible advantage in $\mathcal{G}_r$, then $\mathbf{Adv}^*_{A}={\mathbf{Adv}}_{A}$ is non-negligible regardless of the security parameter $\lambda$. This violates the ECDDH assumption. Therefore, the adversary has no advantage in $\mathcal{G}_r$ and cannot decide whether $L'$ is initiated by some user with an identity in $\mathbf{u}_w$ or by a user in the universal user set.
+If the adversary has non-negligible advantage in $\mathcal{G}_r$, then $\mathbf{Adv}^*_{A}={\mathbf{Adv}}_{A}$ is also non-negligible regardless of the security parameter $\lambda$. This violates the ECDDH assumption. Therefore, the adversary has no advantage in $\mathcal{G}_r$ and cannot decide whether $L'$ is initiated by some user with an identity in $\mathbf{u}_w$ or by a user in the universal user set.
 Moreover, because $RP_b$ is any malicious RP, this proof can be easily extended from $RP_b$ to more colluding malicious RPs.
 \hfill $\square$
 

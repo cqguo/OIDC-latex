@@ -5,9 +5,9 @@
 Privacy-preserving identity federation solutions \cite{ELPASSO, UnlimitID, idemix, PseudoID, Opaak, uprov}
  prevent collusive attacks by an IdP and RPs,
  but require (\emph{a}) a long-term secret held by a user and verified by RPs
-  and (\emph{b}) user-managed accounts \cite{PseudoID} for different RPs.
+  and (\emph{b}) user-managed accounts for different RPs.
 These accounts may be derived from an RP's domain and the user's secret \cite{ELPASSO, UnlimitID, Opaak, uprov,idemix},
- but still bring inconvenience to users.
+ but still bring inconvenience to users as below.
 For web applications, users need to install a browser extension to handle this long-term secret.
 If it is lost or leaked, the user must notify all RPs to update her accounts derived from this secret.
 Note that if the accounts are not masked by the user secret, the colluding IdP and RPs can eventually link them.
@@ -39,16 +39,27 @@ An alternative method for binding $ID_{RP}$ and $Enpt_{RP}$ is
  to \emph{deterministically} calculate $ID_{RP}$ based on the RP's unambiguous name such as its domain.
  This can be achieved by encoding the domain using a hashing-to-elliptic-curves function \cite{irtf-cfrg-hash-to-curve-16},
   to generate a point on the elliptic curve $\mathbb{E}$ as $ID_{RP}$.
-This function \cite{irtf-cfrg-hash-to-curve-16} provides collision resistance
- and does not reveal the discrete logarithm of the output,
-  ensuring the \emph{uniqueness} of $ID_{RP} = [r]G$ while keeping $r$ \emph{unknown}. %For example, using a hash function $Hs()$ to encode an RP's domain or the RP script's origin, e.g., verb+https://RP.com+)
+This function provides collision resistance
+ and does not reveal the discrete logarithm of the output \cite{irtf-cfrg-hash-to-curve-16},
+  ensuring the \emph{uniqueness} of $ID_{RP} = [r]G$ while keeping $r$ unknown. %For example, using a hash function $Hs()$ to encode an RP's domain or the RP script's origin, e.g., verb+https://RP.com+)
 
 In this case, the RP script sends only the endpoint but not its RP certificate in Step 2.2, and the IdP script calculates $ID_{RP}$ by itself. %This elimination of RP certificates improves the downloading of scripts, and on average \textcolor[rgb]{1,0,0}{xxx} ms are saved.
 However, if the RP changes its domain, such as from \verb+https://RP.com+ to \verb+https://theRP.com+,
 $Acct = [ID_U]ID_{RP}$ will inevitably change.
-This requires users to perform special operations to migrate their accounts to the updated RP system
- as failure to migrate accounts could allow colluding RPs to link a user's accounts across RPs.
- However, account migration requires extra operations by each user.
+This requires each user to explicitly perform special operations to migrate her account to the updated RP system.
+It is worth noting that the user operations cannot be eliminated in the migration from an RP to the updated one;
+otherwise, it implies two colluding RPs could link a user's accounts across these RPs.
+
+\vspace{0.75mm}
+\noindent \textbf{Quantum-resistance.}
+To build quantum-secure SSO services with the \usso\ protocol,
+    an IdP needs to generate a key pair of quantum-resistant public-key algorithms,
+        for signing identity tokens and RP certificates.
+Moreover, as discussed in Section \ref{sec:related},
+    \usso\ leverages the OPRF design \cite{oprf-proved,voprf-proved} in identity transformations of privacy-preserving SSO
+        but RP designation requires no collision exists in the blinded inputs of the evaluated pseudo-random function.
+So we plan to analyze this property of existing quantum-secure ORPF protocols \cite{ideal-lattice-oprf,isogency-oprf} in the future,
+ to find out whether they work for the quantum-secure identity transformations in \usso.
 
 \vspace{0.75mm}
 \noindent \textbf{Restriction of the RP script's origin.}
@@ -65,7 +76,7 @@ Since browsers control access to web resources with the same-origin policy (SOP)
    an RP's resources in browsers could still be accessed maliciously by the other RP running on the same domain,
     such as stealing cookies using the script \verb+window.open('https://RP.com/honest').document.cookie+,
 even if it restricts that only HTTP requests to specific paths carry its cookies.
- This risk actually arises from the SOP design of browsers. %and is not related to the \usso\ protocol.
+ This risk actually arises from the SOP design of browsers, but not the \usso\ protocol.
 
 \vspace{0.75mm}
 \noindent \textbf{Support for the authorization code flow.} In OIDC authorization code flow \cite{OpenIDConnect},
@@ -92,17 +103,6 @@ After receiving an authorization code,
 The proposed identity-transformation algorithms %i.e., $\mathcal{F}_{PID_{RP}}()$, $\mathcal{F}_{PID_U}()$, and $\mathcal{F}_{Acct}()$,
 can be applied to a wide range of SSO scenarios, including web applications, mobile Apps, and native software.
 These algorithms follow the common model of popular SSO protocols and do not depend on any specific implementation or runtime.%, making them highly versatile and adaptable to different use cases.
-
-\vspace{0.75mm}
-\noindent \textbf{Quantum-resistance.}
-To build quantum-secure SSO services with the \usso\ protocol,
-    an IdP needs to generate a key pair of quantum-resistant public-key algorithms,
-        for signing identity tokens and RP certificates.
-Moreover, as discussed in Section \ref{sec:related},
-    \usso\ leverages the OPRF design \cite{oprf-proved,voprf-proved} in identity transformations of privacy-preserving SSO
-        but RP designation requires no collision exists in the blinded inputs of the evaluated pseudo-random function.
-So we plan to analyze this property of existing quantum-secure ORPF protocols \cite{ideal-lattice-oprf,isogency-oprf} in the future,
- to find out whether they work for the quantum-secure identity transformations in \usso.
 
 %%%%%%%%%%%%%%%%%%%%% 几个方面的扩展
 % 1. 解决IdP数据泄露
