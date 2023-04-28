@@ -3,26 +3,21 @@
 
 \newc
 PrivacyPass and TrustToken \cite{privacypass,trusttoken}
-adopted the oblivious pseudo-random function (OPRF) protocol \cite{oprf-proved,voprf-proved,oprf-bitcoin-wallet} to generate anonymous tokens for authorized users to access resources.
- A user generates a random number $e_i$ for each unsigned token $T_i$ and blinds $T_i$ into $[e_i]T_i$.
-Once the user is authenticated, a token server signs $[e_i]T_i$ with a private key $k$ as $[k e_i]T_i$. Then, the user converts $[ke_i]T_i$ to $[k]T_i$ using $e_i$ and redeems the token ($T_i, T_i^k$) to anonymously access resources.
-\usso\ applies a similar cryptographic skill to design identity transformations. A user transforms $ID_{RP}$ to $PID_{RP} = [t_i]ID_{RP}$ using a random number $t_i$.
-Then, the IdP calculates $PID_U = [u]PID_{RP}$ %= [ut]ID_{RP}$
-from $PID_{RP}$ using the user's identity $u$.
-Finally, the visited RP calculates $Acct = [t_i^{-1}]PID_{U}$ from $PID_{U}$ using the shared $t_i$.
-%If we compare the two approaches,
-The \emph{IdP-untraceability} property in \usso, i.e., $[t_i]ID_{RP}$ and $ID_{RP}$ cannot be linked by an IdP, roughly corresponds to
-the unlinkability between token signing and redemption in PrivacyPass/TrustToken, i.e., ($[e_i]T_i, [ke_i]T_i$) and  ($T_i, [k]T_i$) cannot be linked by the token server.
+adopted the oblivious pseudo-random function (OPRF) protocol \cite{oprf-proved,voprf-proved,oprf-bitcoin-wallet} to generate anonymous tokens with which authorized users could access the server's resources anonymously.
+To do so, a user generates a random number $e_i$ to blind an unsigned token $T_i$ into $[e_i]T_i$. After authenticating the user, the token server signs $[e_i]T_i$ with its private key $k$ and returns $[k e_i]T_i$ to the user, who converts it into an anonymous token  ($T_i, [k]T_i$) using $e_i$. In this process, the server obliviously calculates the pseudo-random output (i.e., anonymous token). However, as the tokens are completely indistinguishable. If they are used to realize SSO, the RPs cannot identify each user.
 
-PrivacyPass/TrustToken adopted the OPRF protocol for token generation, i.e., the server obliviously calculates a pseudo-random output for any user input as tokens,
-and the anonymous tokens are completely indistinguishable.
-If they are used to realize SSO, the RPs cannot identify each user.
-In contrast, \usso\ leverages this cryptographic technique in a greater depth than anonymous tokens,
- to provide a non-anonymous but privacy-preserving SSO service. First, it extends the two-party OPRF protocol to work for three parties in SSO services.
-In \usso\ a user shares the random number $t$ with an RP, which is used for protecting $ID_{RP}$ and enables the RP to derive the user's account, %at this RP,
-    while the IdP ``obliviously'' determines the user's account based on the user identity and the RP's pseudo-identity (or ``blinded'' identity).
-In this process, we actually apply pseudo-random functions but uses the \emph{secret key} of pseudo-random functions as a \emph{user identity} (i.e., $u$ in identity transformations),
-    while it always is used as \emph{secret keys} in PrivacyPass/TrustToken and other OPRF-based applications \cite{privacypass,trusttoken,strong-oprf,oprf-bitcoin-wallet,pesto,oprf-ot-si,pp-ss,Private-Contact-Discovery,o-kms,oprf-deduplication}.
+\usso\ applies a similar cryptographic skill to design identity transformations. A user selects a random number $t_i$ to transform $ID_{RP}$ to $PID_{RP} = [t_i]ID_{RP}$, which blinds the IdP from knowing $ID_{RP}$. Then, the IdP uses the user's permanent identity $u$ to compute $PID_U = [u]PID_{RP}$. %= [ut]ID_{RP}$
+This is similar to the ``token signing'' process taken by the token server in PrivacyPass/TrustToken. Hence, \usso~provides the \emph{IdP-untraceability} property, i.e., the IdP cannot link $[t_i]ID_{RP}$ and $ID_{RP}$, which roughly corresponds to the {\em token signing and redemption unlinkability} in PrivacyPass/TrustToken, i.e., the token server cannot link ($[e_i]T_i, [ke_i]T_i$) and  ($T_i, [k]T_i$).
+
+%Finally, the visited RP calculates $Acct = [t_i^{-1}]PID_{U}$ using the same $t_i$ shared by the user.
+
+%PrivacyPass/TrustToken adopted the OPRF protocol for token generation. Given a user input, the server obliviously calculates the pseudo-random output (i.e., anonymous token). The tokens are completely indistinguishable. So, if they are used to realize SSO, the RPs cannot identify each user.
+
+On the other hand, \usso\ presents a new design that leverages this cryptographic skill to provide a non-anonymous but privacy-preserving SSO service, unlike the completely anonymous service in PrivacyPass/TrustToken. This also requires extending the two-party OPRF protocol to work for three parties in SSO services. To achieve this goal, the random number $t_i$ selected by the user is shared with the target RP to enable it to independently derive the user's permanent account at itself, i.e., $Acct = [t_i^{-1}]PID_{U}$. Furthermore, this account is ``obliviously'' determined by the IdP when it generates the user's pseudo-identity 
+
+This enables the IdP to ``obliviously'' determine the user's account at an RP based on the user's identity and the RP's pseudo-identity (i.e., the ``blinded'' identity).
+
+Moreover, the blind parameter (i.e., input to the pseudo-random functions) is utilized as the \emph{user identity} (i.e., $u$ in identity transformations) to provide sufficient flexibility required by the design. This is different from PrivacyPass/TrustToken and other OPRF-based applications \cite{privacypass,trusttoken,strong-oprf,oprf-bitcoin-wallet,pesto,oprf-ot-si,pp-ss,Private-Contact-Discovery,o-kms,oprf-deduplication} that always use it as the \emph{secret key} of the token server.%In this process, we apply pseudo-random functions but use the \emph{secret key} of pseudo-random functions as a \emph{user identity} (i.e., $u$ in identity transformations), while it always is used as \emph{secret keys} in PrivacyPass/TrustToken and other OPRF-based applications \cite{privacypass,trusttoken,strong-oprf,oprf-bitcoin-wallet,pesto,oprf-ot-si,pp-ss,Private-Contact-Discovery,o-kms,oprf-deduplication}.
 This unusual application requires an in-depth understanding of the variables in OPRFs and the (pseudo-)identities in SSO services.
 %This extension is unlikely to occur in OPFRs that consider $k$ as the private key of the server, but it is reasonable in \usso\ as it uses random numbers as identities and trapdoors to design oblivious pseudo-random functions for identity transformations.
 %Compared with the original OPRFs, we use the $k$ key (they are always private keys) as a user identity.
