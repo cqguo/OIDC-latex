@@ -6,7 +6,7 @@ SSO allows a user to log into a website,
     %%%% other big-4 papers use "login"
     %%%% "login" is a noun, but not a verb
  known as the \emph{relying party} (RP), using her account registered at a trusted web service, known as the \emph{identity provider} (IdP).
-An RP delegates user identification and authentication to the IdP, which issues an \emph{identity token} (such as id token in OIDC or identity assertion in SAML) for a user to visit the RP. %after authenticating this user.
+An RP delegates user identification and authentication to the IdP, which issues an \emph{identity token} (such as ``id token'' in OIDC and ``identity assertion'' in SAML) for a user to visit the RP. %after authenticating this user.
 For instance, in an OIDC system, the user sends a login request to an RP,
 which constructs an identity-token request with its identity (denoted as $ID_{RP}$) and redirects it to a trusted IdP. After authenticating the user, the IdP issues an identity token that binds the identities of both the user and the RP (i.e., $ID_U$ and $ID_{RP}$), which is returned to the user and then forwarded to the RP.
 Finally, the RP verifies the identity token to determine if the token holder is authorized to log in. Thus, a user keeps only one credential for the IdP, instead of multiple credentials for different RPs.
@@ -16,8 +16,7 @@ SSO services provide a comprehensive solution for identity management and authen
 These attributes (e.g., age, hobby, education, and nationality) are maintained at the IdP and can be enclosed in identity tokens with user authorization \cite{OpenIDConnect,rfc6749}.
 
 The wide adoption of SSO raises concerns about user privacy because it facilitates the tracking of a user's login activities by interested parties \cite{NIST2017draft, SPRESSO, BrowserID, maler2008venn}.
-To issue identity tokens, %in each login,
- an IdP is aware of the RP which a user is attempting to log into and the time of this login.
+To issue identity tokens, an IdP should know the RP to be accessed by the user and the login time. 
 Thus, an honest-but-curious IdP could potentially track a user's login activities over time \cite{BrowserID, SPRESSO},
 % This data can be further analyzed to profile users' online activities, as in other web tracking attacks.
 called {\em IdP-based login tracing} in this paper.
@@ -27,18 +26,17 @@ to learn the user's online profile \cite{maler2008venn}.
 This risk is called {\em RP-based identity linkage}.
 
 
-Privacy-preserving SSO schemes aim to support comprehensive identity management and authentication
- while protecting user privacy \cite{maler2008venn, NIST2017draft, BrowserID, SPRESSO}.
+Privacy-preserving SSO schemes aim to support comprehensive identity management and authentication while protecting user privacy \cite{maler2008venn, NIST2017draft, BrowserID, SPRESSO}.
 They typically offer the following features:
 (\emph{a}) \emph{unique user identification at each RP}, which is provided through SSO identity tokens,
-(\emph{b}) \emph{user authentication only to a trusted IdP},
- which eliminates the need for authentication between a user and an RP and requires maintaining only the credential for the IdP,
+(\emph{b}) \emph{user authentication only to a trusted IdP}, 
+which eliminates the need for authentication between a user and an RP and requires maintaining only the credential for the IdP,
 %only the user's secret credential to authenticate herself to the IdP,
 %    different types of credentials are supported in the authentication between the IdP and users,
 and (\emph{c}) \emph{provision of IdP-confirmed user attributes},
  where a user's attributes are maintained at a trusted IdP and provided to RPs with the user's authorization.
 %It is also important to consider the privacy threats posed by different types of adversaries:
- Meanwhile, the privacy threats posed by different types of adversaries are considered, including \emph{an honest-but-curious IdP}, \emph{colluding RPs}, and \emph{the honest-but-curious IdP colluding with some RPs}.
+Meanwhile, the privacy threats posed by different types of adversaries are considered, including \emph{an honest-but-curious IdP}, \emph{colluding RPs}, and \emph{the honest-but-curious IdP colluding with some RPs}.
 In Section \ref{subsec-solutions}, we analyze existing privacy-preserving solutions for SSO and also identity federation in light of these privacy threats.
 
 
