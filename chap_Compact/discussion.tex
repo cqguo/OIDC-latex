@@ -2,16 +2,31 @@
 \label{sec:discussion}
 
 \noindent{\textbf{IdP-RP collusive attacks.}}
-Privacy-preserving identity federation approaches \cite{ELPASSO, UnlimitID, idemix, PseudoID, Opaak, uprov} can prevent collusive attacks between a malicious IdP and malicious RPs. However, they require (\emph{a}) a long-term secret that is held by each user and verified by the RPs and (\emph{b}) user-managed accounts for each user at different RPs. While these accounts can be derived from an RP's domain and the user's secret \cite{ELPASSO, UnlimitID, Opaak, uprov,idemix}, they still cause inconvenience to users. For example, in web applications, the users need to install a browser extension to handle the long-term secret. If it is lost or leaked, the user must notify all the RPs to update her accounts derived from the secret. Note that if the accounts are not masked by the user secret, the colluding IdP and RPs can find a way to link them. Unlike these approaches, \usso\ is not designed to prevent such collusive attacks, because a user is authenticated only \emph{once} in the login flow. The user's identity at the IdP is obliviously transformed into accounts at RPs, which are not related to any user credentials such as passwords, one-time passwords, smart cards, or FIDO devices.
+Privacy-preserving identity federation approaches \cite{ELPASSO, UnlimitID, idemix, PseudoID, Opaak, uprov} can prevent collusive attacks by a malicious IdP and malicious RPs.
+However, they require (\emph{a}) a long-term secret that is held by each user and verified by the RPs and (\emph{b}) user-managed accounts for each user at different RPs.
+While these accounts can be derived from an RP's domain and the user's secret \cite{ELPASSO, UnlimitID, Opaak, uprov,idemix},
+ they still cause inconvenience to users.
+For example, in web applications, the users need to install a browser extension to handle the long-term secret.
+If it is lost or leaked, the user must notify all the RPs to update her accounts derived from the secret.
+Note that if the accounts are not masked by the user secret,
+ the colluding IdP and RPs can eventually find a way to link them.
+Unlike these approaches, \usso\ is not designed to prevent such collusive attacks,
+ because a user is authenticated only \emph{once} in the login flow.
+In \usso\ the user's identity at the IdP is obliviously transformed into accounts at RPs,
+ which are not related to any user credentials such as passwords, one-time passwords, smart cards, or FIDO devices.
 
 %\vspace{0.75mm}
 \noindent \textbf{Scalability.}
 $ID_{RP}$ is generated uniquely during the initial registration of an RP with a capacity of $n$, which is the order of $G$. For the NIST P256 elliptic curve, $n$ is approximately $2^{256}$.
 $PID_{RP}$ is ensured to be unique in unexpired tokens.
 The probability of having at least two identical $PID_{RP}$s among $\sigma$ unexpired tokens is $1-\prod_{i=0}^{\sigma-1}(1-i/n)$.
-If the system serves $10^{8}$ requests per second and has a validity period of 10 minutes, $\sigma$ is less than $2^{36}$. So, the $PID_{RP}$-collision probability is negligible, i.e., less than $2^{-183}$ for the NIST P256 curve.
+If the system serves $10^{8}$ requests per second and each token has a validity period of 10 minutes, $\sigma$ is less than $2^{36}$. So, the $PID_{RP}$-collision probability is negligible, i.e., less than $2^{-183}$ for the NIST P256 curve.
 
-The capacity of accounts at any RP is the same as the capacity of user identities at the IdP, which is also $n$. Since $\mathbb{E}$ is a finite cyclic group, $ID_{RP} = [r]G$ is also a generator of order $n$. Therefore, for any RP, a unique account is automatically assigned to every user because $Acct =  [ID_U]ID_{RP} = [u]ID_{RP}$. In addition, stronger elliptic curves can accommodate more RPs and users, e.g., $n$ is about $2^{384}$ for the NIST P384 curve.
+The capacity of accounts at any RP is the same as the capacity of user identities at the IdP,
+ which is also $n$.
+Since $\mathbb{E}$ is a finite cyclic group, $ID_{RP} = [r]G$ is also a generator of order $n$.
+Therefore, for any RP, a unique account is automatically assigned to every user because $Acct =  [ID_U]ID_{RP} = [u]ID_{RP}$.
+In addition, stronger elliptic curves accommodate more RPs and users, e.g., $n$ is about $2^{384}$ for the NIST P384 curve.
 
 
 %\vspace{0.75mm}
@@ -46,11 +61,23 @@ As discussed in Section \ref{sec:related}, such OPRF designs can be utilized to 
 When the IdP script forwards identity tokens to the RP script, the \verb+postMessage+ targetOrigin mechanism \cite{postm-targeto} is used to restrict the recipient of the tokens, to ensure that the tokens will be sent to the intended $Enpt_{RP}$, as specified in the RP certificate. The targetOrigin is specified as a combination of protocol, port (if not present, 80 for \verb+http+ and 443 for \verb+https+), and domain (e.g., \verb+RP.com+).
 The RP script's origin must accurately match the targetOrigin to receive the tokens.
 
-The targetOrigin mechanism does not check the URL path in $Enpt_{RP}$, but it introduces no {\em additional} risk.
+The targetOrigin mechanism does not check the URL path in $Enpt_{RP}$, but it introduces {\em no additional} risk.
 %This assumes only one RP runs on a domain.
-Consider two RPs in the same domain but receiving tokens from two different endpoints, e.g., \verb+https://RP.com/honest/tk+ and \verb+https://RP.com/malicious/tk+. Following the same-origin policy (SOP) \cite{sop} for browser access control, the IdP script sends tokens to both endpoints using \verb+postMessage+. As a result, the honest RP's resources in browsers can be accessed by the malicious RP. For example, it can steal cookies using \verb+window.open('https://RP.com/honest').document.co+ \verb+okie+, even if the honest RP restricts only the HTTP requests to specific paths are allowed to access its cookies. So, this risk is due to the SOP model but not the \usso\ protocol.
-
-%Since browsers control access to web resources with the same-origin policy (SOP) \cite{sop}, an RP's resources in browsers could still be accessed maliciously by the other RP running on the same domain, such as stealing cookies using the script \verb+window.open('https://RP.com/honest').document.cookie+, even if it restricts that only HTTP requests to specific paths carry its cookies. This risk arises from the SOP design of browsers, but not the \usso\ protocol.
+Consider two RPs in the same domain but receiving tokens through two different endpoints,
+ e.g., \verb+https://RP.com/honest/tk+ and \verb+https://RP.com/malicious/tk+.
+%
+% Following the same-origin policy (SOP) \cite{sop} for browser access control, the IdP script sends tokens to both endpoints using \verb+postMessage+.
+%
+For browsers control access to web resources with the same-origin policy (SOP) \cite{sop},
+    a user's resources in the honest RP server is always accessible to  the malicious one.
+ For example, it could steal cookies using \verb+window.open('https://RP.com/honest').document.cookie+,
+ even if the honest RP restricts only the HTTP requests to specific paths are allowed to access its cookies.
+%
+% an RP's resources in browsers could still be accessed maliciously by the other RP running on the same domain,
+%  such as stealing cookies using the script \verb+window.open('https://RP.com/honest').document.cookie+,
+%  even if it restricts that only HTTP requests to specific paths carry its cookies.
+%
+ So, this risk is due to the SOP model but not the \usso\ protocol.
 
 %\vspace{0.75mm}
 \noindent \textbf{Support for the authorization code flow.} In OIDC authorization code flow \cite{OpenIDConnect}, the IdP does not directly provide identity tokens.

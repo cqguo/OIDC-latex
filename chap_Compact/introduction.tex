@@ -16,20 +16,20 @@ SSO services provide a comprehensive solution for identity management and authen
 These attributes (e.g., age, hobby, education, and nationality) are maintained at the IdP and can be enclosed in identity tokens with user authorization \cite{OpenIDConnect,rfc6749}.
 
 The wide adoption of SSO raises concerns about user privacy because it facilitates the tracking of a user's login activities by interested parties \cite{NIST2017draft, SPRESSO, BrowserID, maler2008venn}.
-To issue identity tokens, an IdP should know the RP to be accessed by the user and the login time. 
+To issue identity tokens, an IdP should know the RP to be accessed by a user and the login time.
 Thus, an honest-but-curious IdP could potentially track a user's login activities over time \cite{BrowserID, SPRESSO},
 % This data can be further analyzed to profile users' online activities, as in other web tracking attacks.
 called {\em IdP-based login tracing} in this paper.
 Another privacy risk arises from the fact that RPs learn the user's identity from the identity tokens they receive.
 If the same user identity is enclosed in tokens for the visits to different RPs \cite{maler2008venn, Google, FirefoxAccount}, colluding RPs could link these logins across different RPs %and track the user's activities
 to learn the user's online profile \cite{maler2008venn}.
-This risk is called {\em RP-based identity linkage}.
+This risk is called {\em RP-based identity linkage} in this paper.
 
 
 Privacy-preserving SSO schemes aim to support comprehensive identity management and authentication while protecting user privacy \cite{maler2008venn, NIST2017draft, BrowserID, SPRESSO}.
 They typically offer the following features:
 (\emph{a}) \emph{unique user identification at each RP}, which is provided through SSO identity tokens,
-(\emph{b}) \emph{user authentication only to a trusted IdP}, 
+(\emph{b}) \emph{user authentication only to a trusted IdP},
 which eliminates the need for authentication between a user and an RP and requires maintaining only the credential for the IdP,
 %only the user's secret credential to authenticate herself to the IdP,
 %    different types of credentials are supported in the authentication between the IdP and users,
@@ -44,7 +44,7 @@ In Section \ref{subsec-solutions}, we analyze existing privacy-preserving soluti
 This paper presents \usso, an Untraceable and Unlinkable Privacy-PREserving Single Sign-On protocol.
  %for privacy-preserving SSO services. % 注释这几个词，一下子减少不少篇幅
 It proposes {\em identity transformations} and integrates them into the SSO login flow.
-In \usso, an RP and a user first transform $ID_{RP}$ into an ephemeral identity $PID_{RP}$, which is then sent to a trusted IdP to transform $ID_U$ into an ephemeral user identity $PID_U$.
+In \usso, an RP and a user first transform $ID_{RP}$ into an ephemeral identifier $PID_{RP}$, which is then sent to a trusted IdP to transform $ID_U$ into an ephemeral user pseudo-identity $PID_U$.
 The identity token issued by the IdP then binds only $PID_U$ and $PID_{RP}$, instead of $ID_U$ and $ID_{RP}$. When the RP receives the identity token with a matching $PID_{RP}$, it transforms $PID_U$ into an account that is unique at each RP but identical across multiple logins to this RP.
 
 

@@ -11,7 +11,7 @@ This threat model is in line with widely-used SSO services \cite{OpenIDConnect,r
 %\vspace{0.5mm}
 \noindent \textbf{Honest-but-curious IdP.} The IdP strictly follows the protocols,
  while remaining interested in learning about user profiles.
-For example, it may store all received messages to infer the relationship between $ID_U$, $ID_{RP}$, $PID_{U}$, and $PID_{RP}$.
+For example, it could store all received messages to infer the relationship between $ID_U$, $ID_{RP}$, $PID_{U}$, and $PID_{RP}$.
  % to track a user's login activities.
 It never actively violates the protocols, so a script downloaded from the IdP also strictly follows the protocols (see Section \ref{sec:web-design} for specific designs for web applications).
 The IdP maintains the private key well for signing identity tokens and RP certificates, %(see Section \ref{implementations} for details)
@@ -19,7 +19,7 @@ which prevents adversaries from forging such messages.
 
 %\vspace{0.5mm}
 \noindent \textbf{Malicious users.} Adversaries could control a set of users by stealing their credentials or registering Sybil users in the system.
- Their objective is to (\emph{a}) impersonate a victim user at honest RPs or (\emph{b}) entice an honest user to log into an honest RP under another user's account.
+ Their objective \cite{SPRESSO, FettKS14} is to (\emph{a}) impersonate a victim user at honest RPs or (\emph{b}) entice an honest user to log into an honest RP under another user's account.
 %To achieve this, they could behave arbitrarily \cite{WangCW12, SomorovskyMSKJ12}.
 A malicious user could modify, insert, drop, or replay messages or even behave arbitrarily in login flows.
 
@@ -38,7 +38,7 @@ If the IdP were to collude with some RPs, a user would complete login flows enti
 In principle, it would require a long-term user secret to protect (or transform) permanent accounts across these RPs.
 This secret should be held \emph{only} by the user; otherwise, the colluding IdP and RPs could always link these accounts.
 %Note that we aim to design a solution for SSO users without any non-ephemeral secret verified by the RPs.
-However, the accounts derived from the user secret would need to be updated if the secret was lost or leaked (see discussions in Section \ref{sec:discussion}).
+However, the accounts derived from the user secret would need to be updated if the secret was lost or leaked (see more discussions in Section \ref{sec:discussion}).
 
 
 \subsection{Assumptions}
