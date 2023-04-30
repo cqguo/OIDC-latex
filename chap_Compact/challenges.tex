@@ -7,14 +7,14 @@ We discuss the security requirements of privacy-preserving SSO and present the i
 \subsection{Security Requirements for SSO Services}
 \label{subsec:basicrequirements}
 
-Non-anonymous SSO Services \cite{OpenIDConnect,rfc6749,SAML,SAMLIdentifier,NIST2017draft} are designed to allow a \emph{legitimate} user to log into an \emph{honest} RP with her account at this RP, %correlating multiple logins,
+Non-anonymous SSO services \cite{OpenIDConnect,rfc6749,SAML,SAMLIdentifier,NIST2017draft} are designed to allow a \emph{legitimate} user to log into an \emph{honest} RP with her account at this RP, %correlating multiple logins,
 by presenting \emph{identity tokens} issued by a \emph{trusted} IdP.
 To achieve this goal, the trusted IdP issues an identity token that specifies the RP being accessed (i.e., \emph{RP designation}) and the authenticated user's identity or pseudo-identity (i.e., \emph{user identification}).
 An honest RP verifies the RP's (pseudo-)identity in the identity token before accepting it and authorizes the token holder to log in as the specified user. This prevents malicious RPs from replaying any received identity tokens to gain unauthorized access to other honest RPs as victim users.
 The \emph{confidentiality} and \emph{integrity} of identity tokens are also necessary to prevent eavesdropping and tampering. Identity tokens are forwarded to the target RPs by the authenticated user and should not be revealed to any other parties. %Otherwise, an eavesdropper who possesses the token could successfully log in to the designated RP. Maintaining integrity is also critical to prevent adversaries from tampering with a token. So,
 So they are usually signed by the trusted IdP and transmitted over HTTPS \cite{OpenIDConnect, rfc6749, SAML}.
 
-The requirements for secure SSO services, i.e., the RP designation, user identification, integrity, and confidentiality of identity tokens, have been extensively studied in the literature \cite{ArmandoCCCT08, SPRESSO, FettKS14, FettKS16, FettKS17}.
+The requirements for secure SSO services, i.e., RP designation, user identification, integrity, and confidentiality of identity tokens, have been extensively studied in the literature \cite{ArmandoCCCT08, SPRESSO, FettKS14, FettKS16, FettKS17}.
 Any vulnerabilities that undermine these properties result in various attacks \cite{SomorovskyMSKJ12, WangCW12, ArmandoCCCPS13, ZhouE14, WangZLLYLG15, WangZLG16, YangLLZH16, MainkaMS16, MainkaMSW17, YangLCZ18, YangLS17, ShiWL19, ChenPCTKT14, ccsSunB12, DiscoveringJCS, dimvaLiM16, CaoSBKVC14, TowardsShehabM14}.
 \newc
 In Section \ref{analysis-security}, we prove that an SSO system satisfying these four properties is secure.
@@ -24,7 +24,7 @@ In Section \ref{analysis-security}, we prove that an SSO system satisfying these
 %\label{subsec:challenges}
 \begin{table}
 \footnotesize
-    \caption{The (pseudo-)identities in privacy-preserving SSO}
+    \caption{Definitions of the (pseudo-)identities in \usso}
     \centering
 %    \begin{tabular}{|l|l|l|}
     \begin{tabular}{|p{1.0cm}|p{5.1cm}|p{1.13cm}|} \hline
@@ -104,7 +104,7 @@ That is, in a user's two different logins to the RP,
 \begin{figure}[bt]
   \centering
   \includegraphics[width=0.99\linewidth]{fig/IDCorrelation.pdf}
-  \caption{Identity transformations in privacy-preserving SSO}
+  \caption{Identity transformations in \usso} %privacy-preserving SSO}
   \label{fig:IDCorrelation}
 \end{figure}
 
