@@ -33,13 +33,15 @@ In addition, stronger elliptic curves accommodate more RPs and users, e.g., $n$ 
 \noindent \textbf{Alternative methods for generating $ID_{RP}$ and binding $Enpt_{RP}$.}
 In \usso, the IdP generates random $ID_{RP}$ and uses an RP certificate to bind $ID_{RP}$ and $Enpt_{RP}$, which is verified by the IdP script. This ensures that the target RP has already registered itself at the IdP and prevents unauthorized RPs from accessing the IdP's services.
 
-An alternative method for binding $ID_{RP}$ and $Enpt_{RP}$ is to design a \emph{deterministic} scheme to calculate $ID_{RP}$ based on the RP's unambiguous name such as its domain. This can be achieved by encoding the domain with a hashing-to-elliptic-curves function \cite{irtf-cfrg-hash-to-curve-16}, which provides collision resistance while not revealing the discrete logarithm of the output. It generates a point on the elliptic curve $\mathbb{E}$ as $ID_{RP}$ to ensure the \emph{uniqueness} of $ID_{RP} = [r]G$ while keeping $r$ unknown. %For example, using a hash function $Hs()$ to encode an RP's domain or the RP script's origin, e.g., verb+https://RP.com+)
+An alternative method for binding $ID_{RP}$ and $Enpt_{RP}$ is
+ to design a \emph{deterministic} scheme to calculate unique $ID_{RP}$ based on the RP's unambiguous name such as its domain.
+This can be achieved by encoding the domain with a hashing-to-elliptic-curves function \cite{irtf-cfrg-hash-to-curve-16}, which provides collision resistance while not revealing the discrete logarithm of the output. It generates a point on the elliptic curve $\mathbb{E}$ as $ID_{RP}$ to ensure the \emph{uniqueness} of $ID_{RP} = [r]G$ while keeping $r$ unknown. %For example, using a hash function $Hs()$ to encode an RP's domain or the RP script's origin, e.g., verb+https://RP.com+)
 
 In this case, the RP script sends only the endpoint but not its RP certificate in Step 2.2, and the IdP script calculates $ID_{RP}$ by itself. %This elimination of RP certificates improves the downloading of scripts, and on average \textcolor[rgb]{1,0,0}{xxx} ms are saved.
 However, if the RP changes its domain, such as from \verb+https://RP.com+ to \verb+https://theRP.com+, the account (i.e., $Acct = [ID_U]ID_{RP}$) will inevitably change.
 As a result, the user is required to perform special operations to migrate her account to the updated RP system.
 It is worth noting that the user operations cannot be eliminated in the migration from an RP to the updated one;
-otherwise, two colluding RPs could link a user's accounts across these RPs.
+otherwise, it implies two colluding RPs could link a user's accounts across these RPs.
 
 \newc
 %\vspace{0.75mm}
@@ -65,10 +67,11 @@ The targetOrigin mechanism does not check the URL path in $Enpt_{RP}$, but it in
 %This assumes only one RP runs on a domain.
 Consider two RPs in the same domain but receiving tokens through two different endpoints,
  e.g., \verb+https://RP.com/honest/tk+ and \verb+https://RP.com/malicious/tk+.
+The IdP script cannot distinguish them. 
 %
 % Following the same-origin policy (SOP) \cite{sop} for browser access control, the IdP script sends tokens to both endpoints using \verb+postMessage+.
 %
-For browsers control access to web resources with the same-origin policy (SOP) \cite{sop},
+Because a COTS browser controls access to web resources with the same-origin policy (SOP) \cite{sop},
     a user's resources in the honest RP server is always accessible to  the malicious one.
  For example, it could steal cookies using \verb+window.open('https://RP.com/honest').document.cookie+,
  even if the honest RP restricts only the HTTP requests to specific paths are allowed to access its cookies.
@@ -84,7 +87,7 @@ For browsers control access to web resources with the same-origin policy (SOP) \
 Instead, it sends an authorization code to the RP, which uses this code to request identity tokens. The identity-transformation algorithms, namely $\mathcal{F}_{PID_{U}}$, $\mathcal{F}_{PID_{RP}}$, and $\mathcal{F}_{Acct}$, can be integrated into this flow as below. %similar to the login flow introduced in Section \ref{implementations},
 
 The IdP script can forward an authorization code to the RP script, and then to the RP. %that binds $PID_U$ and $PID_{RP}$.
-An authorization code only serves as an index to retrieve identity tokens from the IdP and does not reveal any information about the authenticated user.
+An authorization code only serves as an index to retrieve identity tokens from the IdP and does not reveal any more information about the authenticated user.
 After receiving an authorization code, an RP uses it along with a secret credential issued by the IdP during the initial registration \cite{OpenIDConnect} to retrieve identity tokens from the IdP. However, to protect the RP identities from the IdP, privacy-preserving tokens (e.g., ring or group signatures \cite{ring-sig,chaum1991group} and TrustToken \cite{trusttoken}) and anonymous networks (e.g., Tor \cite{tor}) need to be adopted for RPs in the retrieval of identity tokens.
 
 

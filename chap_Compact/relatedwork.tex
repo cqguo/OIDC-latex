@@ -3,11 +3,11 @@
 
 \newc
 
-PrivacyPass and TrustToken \cite{privacypass,trusttoken} adopted the oblivious pseudo-random function (OPRF) protocol \cite{oprf-proved,voprf-proved,oprf-bitcoin-wallet} to generate anonymous tokens with which authorized users could access resources anonymously as below.
+PrivacyPass and TrustToken \cite{privacypass,trusttoken} adopted the oblivious pseudo-random function (OPRF) protocol \cite{oprf-proved,voprf-proved,oprf-bitcoin-wallet} to generate anonymous tokens with which authorized users could access resources anonymously.
 A user generates a random number $e_i$ to blind an unsigned token $T_i$ into $[e_i]T_i$. After authenticating the user, a token server signs $[e_i]T_i$ with its private key $k$ and returns $[k e_i]T_i$ to the user, who converts it into an anonymous token  ($T_i, [k]T_i$) using $e_i$. In this process, the server obliviously calculates the pseudo-random output (i.e., anonymous token).
-However, if we use these tokens to realize an SSO service, the RPs cannot identify each user, because these tokens are completely indistinguishable.
+The RPs do not identify each user if we use these tokens to realize an SSO service, because these tokens are completely indistinguishable.
 
-\usso\ applies a similar cryptographic skill to design identity transformations. % (see details in Section \ref{sec:UPPRESSO}).
+\usso\ applies a similar cryptographic skill in identity transformations  (see details in Section \ref{sec:UPPRESSO}).
  A user selects a random number $t_i$ to transform $ID_{RP}$ to $PID_{RP} = [t_i]ID_{RP}$, which hides $ID_{RP}$ from the IdP.
 Then, the IdP uses the user's permanent identity $u$ to calculate $PID_U = [u]PID_{RP} = [ut_i]ID_{RP}$.
 This is similar to the ``token signing'' action of the token server in PrivacyPass/TrustToken. Hence, \usso\ provides the \emph{IdP-untraceability} property, i.e., the IdP cannot link $ID_{RP}$ and $[t_i]ID_{RP}$, which roughly corresponds to the {\em token signing-redemption unlinkability} in PrivacyPass/TrustToken, i.e., the token server cannot link $T_i$ and $[e_i]T_i$ (or $[k]T_i$ and $[ke_i]T_i$). %($[e_i]T_i, [ke_i]T_i$) and  ($T_i, [k]T_i$).
@@ -21,7 +21,7 @@ This is different from existing OPRF-based systems that always use $k$ as the se
 The integration of SSO (pseudo-)identities  and OPRF variables requires a deep understanding of both SSO and OPRF protocols.
 Finally, \usso\ leverages the OPRF's randomness property to prove \emph{RP unlinkability}, which is not needed in PrivacyPass/TrustToken.
 It ensures that colluding RPs cannot link any two logins, %i.e., ($ID_{RP}, t, [u]ID_{RP}$) and ($ID_{RP'}, t', [u']ID_{RP'}$),
-by sharing their knowledge about pseudo-identities and permanent accounts related to the logins.
+even by sharing their knowledge about pseudo-identities and permanent accounts related to the logins.
 This property offers desirable indistinguishability of \emph{different users} logging into the colluding RPs.
 It corresponds to the indistinguishability of \emph{different keys} for signing anonymous tokens, which is not considered in PrivacyPass/TrustToken. % but they intentionally distinguish different keys by configuring a unique public key for each user to verify the signed tokens.
 
@@ -80,7 +80,7 @@ is not explicitly required in other OPRF-based solutions and therefore may not b
 Distributed key generation and zero-knowledge proofs are used to generate ring-signature private keys as untraceable pseudonyms \cite{crypto-book} or prove users' statements about their credentials without revealing the credential contents \cite{zklaim}.
 One-time key-share tokens \cite{tandem} are generated in two-party threshold cryptography systems to protect users' key-usage patterns.
 \newc
-PESTO \cite{pesto} combines distributed partially-oblivious PRFs and distribution signatures to build proactive-secure SSO services, and proposes to sign a commitment of an identity token (but not the token itself) for better user privacy.
+PESTO \cite{pesto} combines distributed partially-oblivious PRFs and distributed signatures to build proactive-secure SSO services, and proposes to sign a commitment of an identity token (but not the token itself) for better user privacy.
 %Other cryptographic primitives such as zero-knowledge proofs are used in ZKlaims \cite{zklaim} to allow users to prove statements on the credentials issued by a trusted server without revealing the credentials' content. Crypto-Book \cite{crypto-book} adopts distributed key generation to generate linkable-ring-signature private keys for users, and each key pair is used as an untraceable pseudonym. Tandem \cite{tandem} generates one-time-use key-share tokens for a two-party threshold cryptographic scheme implemented with a central server, to protect the privacy of key-usage patterns.
 
 

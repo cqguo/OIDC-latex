@@ -18,16 +18,17 @@
 \noindent {\bf Experiment setting.} We compared \usso\ comprehensively with MITREid Connect and SPRESSO.
 MITREid Connect supports the implicit flow of OIDC, while SPRESSO follows a similar approach to forward the identity token from a user to the RP.
 SPRESSO encrypts the RP's domain in identity tokens and keeps the symmetric key known only to the RP and the user. Both systems employ RSA-2048 and SHA-256 for token generation.
-SPRESSO implements all entities by JavaScript based on node.js, while MITREid Connect provides Java implementations of IdP and RP SDKs.
+SPRESSO implements all entities by JavaScript based on node.js, while MITREid Connect provides Java implementations of IdP and RP SDK.
 Thus, for \usso\ and MITREid Connect, we implemented RPs based on Spring Boot by integrating the respective SDKs. In all three schemes, the RPs provide the same function of obtaining the user's account from verified identity tokens.
 
-The IdP and RP servers were deployed on Alibaba Cloud Elastic Compute Service, each running Windows 10 with 8 vCPUs and 32 GB memory. The forwarder of SPRESSO ran Ubuntu 20.04.4 with 16 vCPUs and 16 GB memory, also on Alibaba Cloud.
+The IdP and RP servers were deployed on Alibaba Cloud Elastic Compute Service,
+ each of which ran Windows 10 with 8 vCPUs and 32 GB memory. The forwarder of SPRESSO ran Ubuntu 20.04.4 with 16 vCPUs and 16 GB memory, also on Alibaba Cloud.
 
 We conducted experiments in two scenarios: (\emph{a}) a browser, Chrome 104.0.5112.81, ran on a virtual machine on Alibaba Cloud with 8 vCPUs and 32 GB memory, and (\emph{b}) a browser running locally on a PC with Core i7-8700 CPU and 32 GB memory, remotely accessed the servers.
 In the cloud scenario, all entities were deployed in the same virtual private cloud and connected to one vSwitch, which minimized the impact of network delays. In both scenarios, the IdP server never directly communicated with the RPs.
 
 \noindent {\bf Comparisons.} We split the login flow into three phases for detailed comparisons: (1)
-{\em identity-token requesting} (Steps 1 and 2 of the \usso\ protocol), to construct an identity-token request and send it to the IdP server; (2) {\em identity-token generation} (Step 3), to generate an identity token at the IdP server, while the user authentication and the user-attribute authorization are excluded; and (3) {\em identity-token acceptance} (Step 4), where the RP receives, verifies, and parses the identity token.
+{\em identity-token requesting} (Steps 1 and 2 of the \usso\ protocol), to construct an identity-token request and send it to the IdP server; (2) {\em identity-token generation} (Step 3 of \usso), to generate an identity token at the IdP server, while the user authentication and the user-attribute authorization are excluded; and (3) {\em identity-token acceptance} (Step 4), where the RP receives, verifies, and parses the identity token.
 
 
 We compared the average time required for an SSO login in three schemes based on 1,000 measurements. As shown in Figure \ref{fig:evaluation},

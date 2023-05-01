@@ -108,7 +108,7 @@ With the help of $t$, for a given user, the RP derives an \emph{identical} accou
 \newc
 In this process, the RP needs to check if $PID_{RP} = [t]ID_{RP}$ holds after extracting $PID_{RP}$ from a received identity token. Otherwise, a malicious user with $ID_{U'} = u'$ could randomly select $t'$ and $u$, and set $PID_{RP}$ as $[t'u'^{-1}][u]ID_{RP}$. Then, the malicious user requests a token from the IdP, in which $PID_{U'} = [ID_{U'}]PID_{RP}=[u'][t'u'^{-1}][u]ID_{RP} = [t'u]ID_{RP}$.
 If the RP does not check the received $PID_{RP}$, it would use the received $PID_{U'}$ to calculate an account as $Acct = [t'^{-1}]PID_{U'}=[u]ID_{RP}$, which is the account of a potential victim user with $ID_{U} = u$.
-The malicious user could repeat the above attacks with random $u \in \mathbb{Z}_n$ until the account of some victim user is calculated by the RP.\footnote{\newc If it does not derive an existing account of some honest user, the RP will treat the adversary as a newly-registered user without alerts.}
+The malicious user could repeat the above attacks with random $u \in \mathbb{Z}_n$ until the account of some victim user is calculated by the RP.\footnote{\newc If it does not derive an existing account of some honest user, the RP will treat the adversary as a newly-registered user without any alerts.}
 
 %Otherwise, a malicious user with $ID_{U'} = u'$ could impersonate a victim user by setting $PID_{RP}$ to $[t'u'^{-1}]Acct$ but sending $t'$ to an RP, where $Acct$ belongs to the victim with $ID_{U} = u$ at this RP.
 %Then, the malicious user could request an identity token, and the IdP would calculate $PID_{U'} = [u'][t'u'^{-1}]Acct = [t']Acct$.
@@ -137,15 +137,20 @@ In the meantime, a user's identity $u$ is kept secret to RPs; otherwise, colludi
 \label{sec:web-design}
 
 In commonly-used SSO protocols \cite{OpenIDConnect,rfc6749, SAML, SAMLIdentifier},
-an IdP needs to know the visited RP to ensure the \emph{confidentiality} of identity tokens. For instance, in OIDC services, an RP's endpoint to receive tokens is stored as the \verb+redirect_uri+ parameter at the IdP. The IdP employs HTTP 302 redirection to send identity tokens to the RP, by setting this parameter as the target URL in HTTP responses to a user's identity-token request \cite{OpenIDConnect}, so the user agent forwards it to the designated RP.
-However, in \usso, the IdP does not know about the visited RPs, requiring a user agent by itself to calculate $PID_{RP}$ and send the identity tokens to the RP's endpoint.
+an IdP needs to know the visited RP to ensure the \emph{confidentiality} of identity tokens. For instance, in OIDC services, an RP's endpoint to receive tokens is stored as the \verb+redirect_uri+ parameter at the IdP.
+The IdP employs HTTP 302 redirection to send identity tokens to the RP, by setting this parameter as the target URL in the HTTP responses to a user's identity-token request \cite{OpenIDConnect}, so the user agent forwards it to the designated RP.
+However, in \usso, the IdP does not know about the visited RPs, requiring a user agent by itself to calculate $PID_{RP}$ and send identity tokens to the RP's endpoint.
 %In UPPRESSO, the IdP is not aware of visited RPs, so user agents (or browsers) are responsible for forwarding the identity token to the intended RP and computing $PID_{RP}$. On the contrary, in commonly-used SSO protocols \cite{OpenIDConnect,rfc6749,SAML,SAMLIdentifier}, the IdP requires this information to ensure the \emph{confidentiality} of identity tokens. For instance, in OIDC services, an RP's endpoint URL is set as the \verb+redirect_uri+ parameter \cite{OpenIDConnect} during registration to receive tokens. When transmitting identity tokens to an RP, the IdP employs HTTP 302 redirection. This endpoint is the target URL in HTTP responses, allowing the browser to forward it to the designated RP.
 
 \usso\ supports commercial-off-the-shelf (COTS) browsers to work as the user agent and implements the user-agent functions using web scripts in browsers. The scripts are responsible for communications with the origin web servers,
  and downloaded from the IdP and the visited RP, respectively. It is worth noting that a script downloaded from an honest entity is considered \emph{honest}.
 
 The IdP script is necessary because the RP script could leak its origin to the IdP web server due to the automatic inclusion of an HTTP \verb+referer+ header in all HTTP requests it sends.
-Besides, the IdP script is trusted to interact with the users for attribute authorization and ensure the confidentiality of identity tokens, i.e., a token is sent to only the designated RP, while the RP (and its script) could be malicious. Thus, on receiving an identity-token request, the IdP checks the \verb+referer+ header to ensure it is sent by the IdP script.
+Besides, the IdP script is trusted to interact with the users for attribute authorization,
+ %and ensure the confidentiality of identity tokens, i.e., a token is sent to only the designated RP,
+%% 机密性这一句没有必要写，因为“如果RP是malicious，则RP总是可以将token泄露出去”。
+  while the RP (and its script) could be malicious.
+Thus, on receiving an identity-token request, the IdP web server checks the \verb+referer+ header to ensure it is sent by the IdP script.
 
 %Section \ref{sec:discussion} discusses more efficient but less portable implementations with browser extensions.
 
@@ -190,8 +195,8 @@ This approach is specified by W3C \cite{referer_policy} and widely supported. We
 An IdP generates a key pair ($SK$, $PK$) to sign and verify identity tokens and RP certificates.
 %The IdP keeps $SK$ secret, and $PK$ is publicly known.
 
-\vspace{0.85mm}
-\noindent\textbf{RP Initial Registration.}
+\vspace{1.5mm}
+\noindent\textbf{RP Registration.}
 %Each RP launches an initial registration operation to finish configurations.
 Each RP registers itself at the IdP to obtain $ID_{RP}$ and its RP certificate $Cert_{RP}$ as follows:
 \vspace{-\topsep}\begin{enumerate}
@@ -201,7 +206,7 @@ Each RP registers itself at the IdP to obtain $ID_{RP}$ and its RP certificate $
 \setlength{\parsep}{0pt}
 \setlength{\parskip}{0pt}
 \item
-An RP pre-installs $PK$ in by trusted means.
+An RP pre-installs $PK$ by trusted means.
 It sends a registration request, including the endpoint to receive identity tokens and other information.
 \item
 The IdP selects a random number $r \in [1,n)$ until $ID_{RP} = [r]G$ is unique.
@@ -219,10 +224,10 @@ Each user registers once at the IdP. She sets up a unique random identity $ID_U 
 %This is similar to the steps in existing SSO systems.
 
 
-\vspace{0.85mm}
+\vspace{1.5mm}
 \noindent\textbf{SSO Login.} A login %is typically launched through a browser,
 %when a user attempts to visit an RP. It
-involves four steps: script downloading, RP identity transformation, identity-token generation, and $Acct$ calculation. In Figure \ref{fig:process}, the IdP's and RP's operations are connected by two vertical lines, respectively. The user operations are split into two groups (i.e., two browser windows) by two vertical lines, one communicating with the IdP and the other with the RP. Solid horizontal lines indicate messages exchanged between the user and the IdP (or the RP), while dotted lines represent a \verb+postMessage+ invocation between two scripts (or browser windows) within the browser.
+involves four steps: script downloading, RP identity transformation, identity-token generation, and $Acct$ calculation. In Figure \ref{fig:process}, the IdP's and RP's operations are connected by two vertical lines, respectively. The user operations are split into two groups in different browser windows by two vertical lines, one communicating with the IdP and the other with the RP. Solid horizontal lines indicate messages exchanged between the user and the IdP (or the RP), while dotted lines represent a \verb+postMessage+ invocation between two scripts (or browser windows) within the browser.
 
 
 \vspace{0.85mm}
@@ -285,7 +290,7 @@ The IdP script sends an identity-token request for $PID_{RP}$ on behalf of the u
 \item[3.2] The IdP authenticates the user, if not authenticated yet.
 
 \item [3.3]
-The IdP script obtains the user's authorization for the requested attributes and sends the scope of the authorized attributes.
+The IdP script obtains the user's authorization for the requested attributes locally and then sends the scope of the authorized attributes.
 \newc
 Then, the IdP checks if the received $PID_{RP}$ is a point on $\mathbb{E}$,
 \oldc
@@ -328,7 +333,7 @@ The IdP rejects an identity-token request in Step 3.3 if the received $PID_{RP}$
 \label{subsec:compatible}
 
 Both \usso\ and OIDC work with COTS browsers. %Among the four steps of the login flow
-In \usso, the \emph{script downloading} step prepares the user agent, which assists the communications between the IdP and RP. \usso\ employs the web scripts to hide the RP's endpoint from the IdP, while securely forwarding identity tokens to the RP through $Enpt_{RP}$ extracted from the RP certificate.
+In \usso, the \emph{script downloading} step prepares the user agent, which assists the communications with the IdP and RP servers. \usso\ employs web scripts to hide the RP's endpoint from the IdP, while securely forwarding identity tokens to the RP through $Enpt_{RP}$ extracted from the signed RP certificate.
 % that protects the identity token from being sent to adversaries. 这句话与Compatibility无关
 Therefore, the IdP does not set \verb+redirect_uri+ in the HTTP responses, which is different from OIDC where HTTP redirections are used to implement these communications. Most operations in the \emph{RP identity transformation} step take place within browsers. The RP only receives $t$ to generate an RP pseudo-identity and responds with $Cert_{RP}$,
 %The calculation of $PID_{RP}$ is viewed as the operation to prepare an RP identity in OIDC,

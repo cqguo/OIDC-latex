@@ -176,7 +176,7 @@ As depicted in Figure \ref{fig:ecdlp_algorithm}, we design a probabilistic polyn
 \begin{figure}[tb]
   \centering
   \includegraphics[width=0.96\linewidth]{fig/ecdlp_algorithm.pdf}
-  \caption{The PPT algorithm $\mathcal{D}^*_c$ constructed based on the $PID_{RP}$ collision game to solve the ECDLP problem.}
+  \caption{The PPT algorithm $\mathcal{D}^*_c$ constructed based on the $PID_{RP}$ collision game to solve the ECDLP.}
   \label{fig:ecdlp_algorithm}
 \end{figure}
 
@@ -195,7 +195,7 @@ Hence, the probability of solving the ECDLP using $\mathcal{D}^*_c$ is formulate
 %    ${\rm Pr}\{\mathcal{D}^*_c(G, [x]G)=x\} = \epsilon_{c}(\lambda)$ becomes negligible when the security parameter $\lambda$ is sufficiently large.
 
 If the probability of finding $t$ and $t'$ satisfying $[t]ID_{RP_j} = [t']ID_{RP_{j'}}$ is non-negligible, the adversary would have advantages  in $\mathcal{G}_c$ and ${\rm Pr}_s$ is non-negligible regardless of the security parameter $\lambda$.
-Thus, we would find that ${\rm Pr}\{\mathcal{D}^*_c(G, [x]G)=x\}$ also becomes non-negligible  when $\lambda$ is sufficiently large, because $m$ is a finite integer and $m \ll 2^\lambda$.
+Thus, we would find that ${\rm Pr}\{\mathcal{D}^*_c(G, [x]G)=x\}$ also becomes non-negligible even when $\lambda$ is sufficiently large, because $m$ is a finite integer and $m \ll 2^\lambda$.
 \oldc
 This violates the ECDLP assumption. Therefore, the probability of finding $t$ and $t'$ that satisfy $[t]ID_{RP_j} = [t']ID_{RP_{j'}}$ is negligible. \hfill $\square$
 
@@ -242,7 +242,8 @@ Next, we prove that $PID_{U}$ \emph{uniquely} identifies one user in the system 
 \noindent \textsc{Proof.} Identity tokens are generated and signed by the honest IdP using its private key, which is sufficiently protected at the IdP against adversaries.
 %Meanwhile, the IdP's public key $PK$ is sent from the IdP to the RPs.
 %and $PK$ which are pre-installed by an RP cannot be manipulated by adversaries.
-With the pre-installed public key, an RP verifies the identity tokens it receives and rejects any forged or manipulated identity tokens. \hfill $\square$
+With the pre-installed public key, an RP verifies the identity tokens it receives and rejects any forged or manipulated identity tokens. Finally, according to the conclusions of the DYU model, the elements in a verified token cannot be manipulated by malicious entities.
+\hfill $\square$
 
 %Due to the one-to-one mapping between (\emph{a}) the pair of $Acct$ and $PID_{RP}$ and (\emph{b}) the triple ($PID_U$, $PID_{RP}$, $t$), $TK$ binds $ID_{RP}$ and $Acct$ implicitly. \hfill $\square$
 
@@ -280,7 +281,7 @@ As all the communications between the IdP, RPs, and users are protected by HTTPS
 %\vspace{0.85mm}
 \noindent\textsc{Proof.}
 According to the formal analysis on SSO security \cite{SPRESSO, FettKS14},
-    an SSO system satisfying the following two requirements provides secure authentication services in the first adversarial scenario: (\emph{a}) an adversary never obtains a valid identity token for an honest user and presents it to an honest RP, and (\emph{b}) an honest user never presents a valid identity token that is not issued for herself to an honest RP.
+    an SSO system satisfying the following two requirements provides \emph{secure} authentication services in the first adversarial scenario: (\emph{a}) an adversary never obtains a valid identity token issued for an honest user and presents it to an honest RP, and (\emph{b}) an honest user never presents a valid identity token that is not issued for herself to an honest RP.
 %(\emph{a}) an adversary never presents an identity token that is accepted by an honest RP to derive an honest user's account at this RP and (\emph{b}) an honest user never presents an identity token that is accepted by an honest RP to derive another user's account at this RP.
 
 
@@ -306,12 +307,13 @@ Thus, \usso\ is a secure SSO system.
 
 \subsection{Privacy}
 \label{sec-:analysis}
-\usso\ effectively prevents privacy threats introduced by IdP-based login tracing and RP-based identity linkage in the second and third adversarial scenarios, respectively.
+\usso\ effectively prevents the privacy threats of IdP-based login tracing and RP-based identity linkage in the second and third adversarial scenarios, respectively.
 
 \newc
-First, we show that an honest-but-curious IdP cannot trace a user's login activities. In \usso, a user sends an identity-token request in each login to the IdP, %(Step 3.1 in Section \ref{implementations})
+First, we show that an honest-but-curious IdP cannot trace a user's login activities. In each login, a user sends an identity-token request to the IdP, %(Step 3.1 in Section \ref{implementations})
 which reveals only the target RP's \emph{ephemeral} pseudo-identity $PID_{RP}$ along with the user's identity $ID_U$.
-The IdP cannot (\emph{a}) associate multiple logins with different $PID_{RP}$s to a given RP, or (\emph{b}) distinguish a login to one RP from other logins to another RP based on their $PID_{RP}$s, because to the IdP, $PID_{RP}$ is \emph{indistinguishable} from random variables. We prove this in Theorem \ref{thm-idp-untraceability}.
+The IdP cannot (\emph{a}) associate multiple logins with different $PID_{RP}$s to a given RP, or (\emph{b}) distinguish a login to one RP from other logins to another RP based on their $PID_{RP}$s, because $PID_{RP}$ is \emph{indistinguishable} from random variables to the IdP.
+We prove this in Theorem \ref{thm-idp-untraceability}.
 
 %\vspace{2mm}
 
@@ -344,7 +346,7 @@ Because $G$ is a generator of order $n$, $ID_{RP} = [r]G$ is also a generator on
 
 In the third adversarial scenario, malicious RPs collude with malicious users,
  attempting to link the logins initiated by an honest user but visiting different colluding RPs.
-In each login an RP learns an ephemeral identifier $PID_{U} = [{ID_U}]{PID_{RP}}$ and a permanent identifier $Acct = [ID_U]ID_{RP}$ of the user, but it cannot derive $ID_U$ from $PID_{U}$ or $Acct$ due to the ECDLP problem.
+In each login an RP learns an ephemeral identifier $PID_{U} = [{ID_U}]{PID_{RP}}$ and a permanent identifier $Acct = [ID_U]ID_{RP}$ of the user, but it cannot derive $ID_U$ from $PID_{U}$ or $Acct$ due to the ECDLP.
 Therefore, the colluding adversaries share all logins to malicious RPs,
     and attempt to leverage the logins initiated by malicious users to link the other logins by honest users.
 
@@ -472,7 +474,7 @@ Because $x$ is not in $\{u''_1, \cdots, u''_{d-1}, u''_{d+1}, \cdots, u''_w\}$, 
 &\mathbf{Adv}^*_{A}=|{\rm Pr}^*_1-{\rm Pr}^*_2|=|{\rm Pr}_1-{\rm Pr}_2|={\mathbf{Adv}}_{A}
 \end{align*}
 
-If the adversary has non-negligible advantage in $\mathcal{G}_r$, then $\mathbf{Adv}^*_{A}={\mathbf{Adv}}_{A}$ is also non-negligible regardless of the security parameter $\lambda$. This violates the ECDDH assumption. Therefore, the adversary has no advantage in $\mathcal{G}_r$ and cannot decide whether $L'$ is initiated by some user with an identity in $\mathbf{u}_w$ or by a user in the universal user set.
+If the adversary has a non-negligible advantage in $\mathcal{G}_r$, then $\mathbf{Adv}^*_{A}={\mathbf{Adv}}_{A}$ is also non-negligible regardless of the security parameter $\lambda$. This violates the ECDDH assumption. Therefore, the adversary has no advantage in $\mathcal{G}_r$ and cannot decide whether $L'$ is initiated by some user with an identity in $\mathbf{u}_w$ or by a user in the universal user set.
 Moreover, because $RP_b$ is any malicious RP, this proof can be easily extended from $RP_b$ to more colluding malicious RPs.
 \hfill $\square$
 
