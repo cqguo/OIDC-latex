@@ -64,24 +64,15 @@ An RP recognizes each user by a \emph{unique} identity or account at the RP to p
 Such a non-anonymous SSO system is much more desirable in various scenarios than anonymous services.
 
 \noindent\textbf{User authentication {\em only} to the IdP.}
-%A widely-adopted SSO protocol  usually does not include authentication steps.
-%In widely-used SSO protocols \cite{OpenIDConnect, rfc6749, SAML},
 RPs only verify the identity tokens issued by an IdP, and the authentication between a user and the IdP is typically conducted \emph{independently} of the steps that deal with identity tokens.
 This design offers advantages. First, the IdP authenticates users by any appropriate means such as passwords, one-time passwords, or multi-factor authentication.
-%It eliminates the authentication steps between users and an RP,
 Meanwhile, a user only maintains her credential at the IdP; and if it is lost or leaked, the user only needs to renew it at the IdP.
 However, if a user proves a \emph{non-ephemeral} secret to RPs that is valid across multiple logins, she will have to notify each RP in the events of loss or leakage, or additional revocation checking will be needed \cite{ELPASSO, UnlimitID}.
-
-%. %(or even the user logins from another computer).
 
 \noindent\textbf{Selective IdP-confirmed attribute provision.}
 An IdP usually includes user attributes in identity tokens \cite{OpenIDConnect,rfc6749} along with user (pseudo-)identities.
 A user maintains these attributes at the trusted IdP,
-%    for example,
-%        when Facebook provides social networking services,
-%         it also issues identity tokens enclosing user identities and various attributes.
 which obtains the user's authorization before enclosing attributes or provides only pre-selected attributes.
-%So no distinctive attributes such as telephone number and Email address are enclosed in the identity tokens of privacy-preserving SSO systems.
 
 \subsection{Privacy-Preserving SSO and Identity Federation}
 \label{subsec-solutions}
@@ -106,15 +97,12 @@ Other privacy-preserving SSO schemes prevent IdP-based login tracing but leave u
 For example, in BrowserID \cite{BrowserID} %(formerly known as Firefox Accounts \cite{FirefoxAccount} and Mozilla Persona \cite{persona}),
 the IdP %(called the primary identity authority in BrowserID)
 issues a ``user certificate'' token that binds a user identity to an \emph{ephemeral} public key. The user then signs a subsidiary ``identity assertion'' token that binds the target RP's identity and sends both tokens to the RP. In SPRESSO \cite{SPRESSO} the RP creates a one-time pseudo-identity in each login, which is enclosed in identity tokens along with the user's unique identity.
-%However, colluding RPs can link a user using the unique identity in the tokens or credentials.
 
 \newc
 \noindent\textbf{Privacy-preserving identity federation.}
 \oldc
 In PRIMA \cite{prima}, the IdP signs a credential
-%\footnote{For the message signed by the IdP works with a user secret verified by an RP, it is usually called a credential in the identity federation instead of a token.}
-that binds user attributes and a verification key. Using the signing key, the user selectively provides attributes to the RPs. %\cite{Oblivion}.
-This verification key works as the user's identity but exposes her to RP-based identity linkage.
+that binds user attributes and a verification key. Using the signing key, the user selectively provides attributes to the RPs. This verification key works as the user's identity but exposes her to RP-based identity linkage.
 
 To protect user privacy against more threats, PseudoID \cite{PseudoID} introduces a service in addition to the IdP,
  to blindly sign \cite{blind-sign}
@@ -125,7 +113,6 @@ The users prove ownership of the anonymous credentials using the secrets and dis
 
 These approaches prevent both IdP-based tracing and RP-based identity linkage for (\emph{a}) the RP's identity is not enclosed in the anonymous credentials and (\emph{b}) the user selects different pseudonyms when visiting different RPs.
 Furthermore, they protect user privacy against collusive attacks by the IdP and RPs, as \emph{user-managed} pseudonyms cannot be linked through anonymous credentials \cite{anon-credential-2001, idemix, anon-credential} even when the ownership of these credentials is proved to RPs using one secret.
-%This approach can prevent both privacy threats since (\emph{a}) the RP's identity is not included in the tokens and (\emph{b}) the user can select different pseudonyms when visiting different RPs. Furthermore, PseudoID prevents collusive attacks by the IdP and RPs because they cannot link two blindly-signed tokens.
 \newc
 However, this privacy protection results in additional user operations in identity federation, compared with widely-used SSO.
 Users are required to maintain not only the authentication credentials for the IdP but also the long-term secrets that are verified by RPs.
@@ -133,11 +120,6 @@ Users are required to maintain not only the authentication credentials for the I
 For example, EL PASSO \cite{ELPASSO} requires users to store the secrets securely on their devices and coordinate the credential revocation process \cite{ELPASSO, UnlimitID}.
 Besides, the users need to locally manage their accounts at different RPs. This actually involves authentication steps between the user and RPs, which is usually referred to as asynchronous authentication \cite{ELPASSO}.
 
-%EL PASSO \cite{ELPASSO} is an identity federation solution that uses anonymous credentials to protect user privacy. After a user is authenticated, the IdP signs an anonymous credential \cite{anon-credential} binding a secret, which is securely kept on the user's device. When logging in to an RP, the user proves ownership of the credential using the secret and discloses selective attributes in the credential. Although one credential is proved to multiple RPs, the use of \emph{user-managed pseudonyms} and \emph{anonymous credentials} prevents RPs, which may collude with the IdP, from linking a user across different RPs.
-
-%Similarly, UnlimitID \cite{UnlimitID} uses anonymous credentials \cite{anon-credential} to prevent collusive attacks by the IdP and RPs, and NEXTLEAP \cite{nextleap} builds on top of UnlimitID to provide anonymous messaging.
-
-%Anonymous credentials \cite{anon-credential-2001,anon-credential} have been proposed for flexible uses.
 
 \newc
 \noindent\textbf{Anonymous identity federation.}
