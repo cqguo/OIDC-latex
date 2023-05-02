@@ -90,8 +90,8 @@ As depicted in Figure \ref{fig:ecdlp_algorithm}, we design a probabilistic polyn
 \end{figure}
 
 The algorithm $\mathcal{D}^*_c$ works as below.
-The input of $\mathcal{D}^*_c$ is in the form of ($G, Q$). Upon receiving an input ($G$, $Q$), the challenger first randomly chooses $r_1, \cdots, r_m$ in $\mathbb{Z}_n$ to calculate $[r_1]G, \cdots, [r_m]G$.
-Then, it randomly chooses $j \in [1,m]$, replaces $[r_j]G$ with $Q$, and sends $m$ RP identities to the adversary, which then returns the result ($a$, $b$, $t$, $t'$). Finally, the challenger calculates $s = t^{-1}t'r_b \bmod n$ and returns $s$ as the output of $\mathcal{D}^*_c$.
+The input of $\mathcal{D}^*_c$ is in the form of ($G, Q$). On receiving an input ($G$, $Q$), the challenger first randomly chooses $r_1, \cdots, r_m$ in $\mathbb{Z}_n$ to calculate $[r_1]G, \cdots, [r_m]G$.
+Then, it randomly chooses $j \in [1,m]$, replaces $[r_j]G$ with $Q$, and sends $m$ RP identities to the adversary, which returns the result ($a$, $b$, $t$, $t'$). Finally, the challenger calculates $s = t^{-1}t'r_b \bmod n$ and returns $s$ as the output of $\mathcal{D}^*_c$.
 
 If the adversary succeeds in $\mathcal{G}_c$ and $[r_a]G$ happens to be replaced with $Q$, then $\mathcal{D}^*_c$ outputs $s=t^{-1}t'r_b =x$ because $[tr_a]G = [t]Q = [t'r_b]G$. For the adversary, $Q$ is indistinguishable from any other RP identities in the input set, as $[r_j]G$ is randomly replaced by the challenger.
 Hence, the probability of solving the ECDLP using $\mathcal{D}^*_c$ is formulated as:
@@ -109,6 +109,7 @@ This violates the ECDLP assumption. Therefore, the probability of finding $t$ an
 
 \begin{thm}
 \textsc{(User Identification of $TK$)} \emph{$PID_U= [ID_U]PID_{RP}$ in $TK$ uniquely identifies an account at the RP designated by $PID_{RP}$, and this account is uniquely mapped to a user with $ID_U$.}
+\label{thm-user-id}
 \end{thm}
 
 \noindent\textsc{Proof.}
@@ -146,7 +147,7 @@ As all the communications between the IdP, RPs, and users are protected by HTTPS
 
 
 \begin{thm}
-\textsc{(Security)} \emph{\usso\ is secure.}
+\textsc{(Security)} \emph{\usso\ provides secure authentication services.}
 \end{thm}
 
 \noindent\textsc{Proof.}
@@ -155,7 +156,7 @@ According to the formal analysis on SSO security \cite{SPRESSO, FettKS14},
 
 Following the login flow of \usso, because the integrity and confidentiality of identity tokens are satisfied in Theorems \ref{thm-integrity} and \ref{thm-confidentiality},
  no adversary could obtain a valid identity token that is issued to an honest user for accessing an honest RP. %and accepted by an honest RP.
-Meanwhile, if an adversary presents an identity token to an honest RP, which may be issued to the adversary for accessing another RP or to an honest user for accessing a colluding RP, RP designation and user identification ensure that, from this identity token, the honest RP does not derive an honest user's account.
+Meanwhile, if an adversary presents an identity token to an honest RP, which may be issued to the adversary for accessing another RP or to an honest user for accessing a colluding RP, RP designation and user identification, proved in Theorems \ref{thm-rp-designation} and \ref{thm-user-id}, ensure that the honest RP does not derive an honest user's account from this identity token.
 %Meanwhile, $PID_U$ can only be calculated by the IdP and the user, since no one else knows or could intercept $u$ according to the DYU model. \oldc
 
 According to the login flow and the \dyu\ model, an honest user always obtains identity tokens issued to herself, because $PID_U$ is calculated based on her identity.
