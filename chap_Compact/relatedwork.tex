@@ -8,9 +8,9 @@ A user generates a random number $e_i$ to blind an unsigned token $T_i$ into $[e
 The RPs do not identify each user if we use these tokens to realize an SSO service, because these tokens are completely indistinguishable.
 
 \usso\ applies a similar cryptographic skill in identity transformations  (see details in Section \ref{sec:UPPRESSO}).
- A user selects a random number $t_i$ to transform $ID_{RP}$ to $PID_{RP} = [t_i]ID_{RP}$, which hides $ID_{RP}$ from the IdP.
-Then, the IdP uses the user's permanent identity $u$ to calculate $PID_U = [u]PID_{RP} = [ut_i]ID_{RP}$.
-This is similar to the ``token signing'' action of the token server in PrivacyPass/TrustToken. Hence, \usso\ provides the \emph{IdP-untraceability} property, i.e., the IdP cannot link $ID_{RP}$ and $[t_i]ID_{RP}$, which roughly corresponds to the {\em token signing-redemption unlinkability} in PrivacyPass/TrustToken, i.e., the token server cannot link $T_i$ and $[e_i]T_i$ (or $[k]T_i$ and $[ke_i]T_i$). %($[e_i]T_i, [ke_i]T_i$) and  ($T_i, [k]T_i$).
+ A user selects a random number $t_i$ to transform $ID_{RP}$ to $PID_{RP} = [t_i]ID_{RP}$, protecting $ID_{RP}$ from the IdP.
+Then, the IdP uses the user's permanent identity $u$ to calculate $PID_U = [u]PID_{RP} = [ut_i]ID_{RP}$,
+which is similar to the token signing by the token server in PrivacyPass/TrustToken. Hence, \usso\ provides the \emph{IdP-untraceability} property, i.e., the IdP cannot link $ID_{RP}$ and $[t_i]ID_{RP}$, which roughly corresponds to the {\em token signing-redemption unlinkability} in PrivacyPass/TrustToken, i.e., the token server cannot link $T_i$ and $[e_i]T_i$ (or $[k]T_i$ and $[ke_i]T_i$). %($[e_i]T_i, [ke_i]T_i$) and  ($T_i, [k]T_i$).
 
 Furthermore, to support SSO services, \usso\ is required to work among three parties, unlike two-party OPRF and PrivacyPass/TrustToken protocols.
 It leverages this cryptographic skill in different ways, offering a non-anonymous but privacy-preserving SSO service. %, unlike the completely anonymous service in PrivacyPass/TrustToken.
@@ -26,10 +26,10 @@ This property offers desirable indistinguishability of \emph{different users} lo
 It corresponds to the indistinguishability of \emph{different keys} for signing anonymous tokens, which is not considered in PrivacyPass/TrustToken. % but they intentionally distinguish different keys by configuring a unique public key for each user to verify the signed tokens.
 
 Although \usso\ mathematically employs the same algorithms in its identity transformations as the OPRF protocol \cite{oprf-proved,voprf-proved}, we prove more properties of these algorithms to ensure security and privacy. % in Theorems 4, 6, and 7.
-\usso\ depends on the \emph{obliviousness} property to ensure IdP untraceability, %prevent the IdP from learning any information about $ID_{RP}$ when receiving a token request for $[t_i]ID_{RP}$,
+\usso\ essentially depends on the \emph{obliviousness} property to ensure IdP untraceability, %prevent the IdP from learning any information about $ID_{RP}$ when receiving a token request for $[t_i]ID_{RP}$,
 the \emph{deterministicness} property of \emph{pseudo-random} functions to enable the RP to derive a permanent account for any $t$, and the \emph{randomness} property to provide RP unlinkability. %when user identities (i.e., the key secret $k$ of pseudo-random functions) are unknown.
 Last but not least, \usso\ requires an additional property for SSO services, called \emph{RP designation}.
-It is satisfied \emph{only if} no collision exists in RPs' pseudo-identities (see Lemma \ref{lemma-rp}), which are actually the blinded inputs of the evaluated pseudo-random function \cite{oprf-proved,voprf-proved}.
+It is satisfied \emph{only if} no collision exists in RPs' pseudo-identities (see Lemma \ref{lemma-rp}), which correspond to the blinded inputs of the evaluated pseudo-random function \cite{oprf-proved,voprf-proved}.
 This property %, i.e., \emph{collision-freeness of blinded inputs},
 is not explicitly required in other OPRF-based solutions and therefore may not be supported by all OPRF protocols. Thus, an OPRF protocol is not always ready to implement identity transformations in \usso, unless no collision exists in the blinded inputs.
 
@@ -80,7 +80,7 @@ is not explicitly required in other OPRF-based solutions and therefore may not b
 Distributed key generation and zero-knowledge proofs are used to generate ring-signature private keys as untraceable pseudonyms \cite{crypto-book} or prove users' statements about their credentials without revealing the credential contents \cite{zklaim}.
 One-time key-share tokens \cite{tandem} are generated in two-party threshold cryptography systems to protect users' key-usage patterns.
 \newc
-PESTO \cite{pesto} combines distributed partially-oblivious PRFs and distributed signatures to build proactive-secure SSO services, and proposes to sign a commitment of an identity token (but not the token itself) for better user privacy.
+PESTO \cite{pesto} combines distributed partially-oblivious pseudo-random functions (dpOPRFs) and distributed signatures in proactively-secure SSO services, and signs a commitment of an identity token (but not the token itself) for better user privacy.
 
 %\vspace{0.5mm}
  \oldc\noindent\textbf{Formal analysis of SSO protocols.}
