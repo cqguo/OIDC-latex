@@ -8,7 +8,7 @@ Table \ref{tbl:notations-protocol} lists the notations. The subscript $j$ and/or
 
 \begin{table}[tb]
 \footnotesize
-    \caption{Notations used in the \usso protocol}
+    \caption{Notations used in the \usso\ protocol}
     \centering
 %    \begin{tabular}{|c|c|c|}
     \begin{tabular}{|p{0.93cm}|p{6.71cm}|} \hline
@@ -42,11 +42,11 @@ PID_{RP} = \mathcal{F}_{PID_{RP}}(ID_{RP}) = [t]{ID_{RP}} = [tr]G
 \end{equation}
 \newc
 In each login, the user selects $t$ and shares it with the RP to negotiate $PID_{RP}$.
-It makes no difference if the RP selects $t$ randomly and sends it to the user, as long as both of them calculate $PID_{RP}$ independently and check if the received $PID_{RP}$ is equal to the calculated one.
+It makes no difference if the RP selects $t$ randomly and sends it to the user, as long as both of them calculate $PID_{RP}$ \emph{independently} and check if the received $PID_{RP}$ is equal to the calculated one.
 
 \oldc
 \noindent {\bf $\boldsymbol{ID_U}$-$\boldsymbol{PID_U}$ Transformation.}
-On receiving an identity-token request with $ID_U$ and $PID_{RP}$, the IdP calculates $PID_{U}$.
+On receiving an identity-token request for $PID_{RP}$ from a user with $ID_U$, the IdP calculates $PID_{U}$.
 \begin{equation}
 PID_{U} = \mathcal{F}_{PID_U}(ID_U, PID_{RP}) =
   [{ID_U}]{PID_{RP}} = [utr]G
@@ -73,11 +73,11 @@ With the help of $t$, for a given user, the RP derives an \emph{identical} accou
 \newc
 In this process, the RP needs to check if $PID_{RP} = [t]ID_{RP}$ holds after extracting $PID_{RP}$ from a received identity token. Otherwise, a malicious user with $ID_{U'} = u'$ could randomly select $t'$ and $u$, and set $PID_{RP}$ as $[t'u'^{-1}][u]ID_{RP}$. Then, the malicious user requests a token from the IdP, in which $PID_{U'} = [ID_{U'}]PID_{RP}=[u'][t'u'^{-1}][u]ID_{RP} = [t'u]ID_{RP}$.
 If the RP does not check the received $PID_{RP}$, it would use the received $PID_{U'}$ to calculate an account as $Acct = [t'^{-1}]PID_{U'}=[u]ID_{RP}$, which is the account of a potential victim user with $ID_{U} = u$.
-The malicious user could repeat the above attacks with random $u \in \mathbb{Z}_n$ until the account of some victim user is calculated by the RP.\footnote{\newc If it does not derive an existing account of some honest user, the RP will treat the adversary as a newly-registered user without any alerts.}
+The malicious user could repeat the above attacks with random $u \in \mathbb{Z}_n$ until the account of some victim user is calculated by the RP. {\newc If it does not derive an existing account of some honest user, the RP will treat the adversary as a newly-registered user without any alerts.}
 
 Similarly, if the RP selects $t$ and calculates $PID_{RP}$, the user needs to check whether the received $PID_{RP}$ equals $[t]ID_{RP}$ before requesting an identity token.
 Otherwise, malicious users could impersonate a victim user at some honest RP by colluding with another malicious RP.
-That is, when receiving $PID_{RP}=[t']ID_{RP}$ from the honest RP, the malicious user forwards it to $RP'$, which sends it to the victim user in another login.
+That is, when receiving $PID_{RP}=[t']ID_{RP}$ from the honest RP, the malicious user forwards it to colluding $RP'$, which sends it to the victim user in another login.
 If the victim does not check the received $PID_{RP}$, she would request from the IdP an identity token that binds $PID_U$ and the manipulated $PID_{RP}$ and present the token to the malicious RP.
 This token would allow the malicious user to log into the honest RP under the victim user's account.
 
@@ -107,13 +107,13 @@ Besides, the IdP script is trusted to interact with the users for attribute auth
   while the RP (and its script) could be malicious.
 Thus, on receiving an identity-token request, the IdP web server checks the \verb+referer+ header to ensure it is sent by the IdP script.
 
-The RP script is responsible for preparing $ID_{RP}$ and $Enpt_{RP}$ for the IdP script through an RP certificate issued by the IdP. %It binds the RP's identity and endpoint. %(i.e., $ID_{RP}$ and $Enpt_{RP}$).
+The RP script is responsible for preparing $ID_{RP}$ and $Enpt_{RP}$ for the IdP script, through an RP certificate issued by the IdP. %It binds the RP's identity and endpoint. %(i.e., $ID_{RP}$ and $Enpt_{RP}$).
 In each login, the RP script sends the certificate to the IdP script, which then verifies it and extracts $ID_{RP}$ and $Enpt_{RP}$.
 The same as in widely-adopted SSO systems \cite{OpenIDConnect, rfc6749, SAML, SAMLIdentifier}, in \usso\ a user does not need to configure anything locally as the IdP's public key is already set in the IdP script.
 
 After receiving an identity token from the IdP, the IdP script needs to ensure the RP script will forward the token to $Enpt_{RP}$ %, which is bound with $ID_{RP}$
 specified in the RP certificate.
-As the communication between the scripts occurs within the browser using the \verb+postMessage+ HTML5 API, %To avoid the honest user sending the identity token to an adversary,
+As the communication between the scripts occurs within the COTS browser using the \verb+postMessage+ HTML5 API, %To avoid the honest user sending the identity token to an adversary,
 we use the \verb+postMessage+ targetOrigin mechanism \cite{postm-targeto} to restrict the recipient. %(i.e., the RP script).
  When the IdP script sends messages, the recipient's origin is set as a parameter, such as \verb+postMessage(tk, 'https://RP.com')+, which includes the protocol (e.g., \verb+https+), the domain (e.g., \verb+RP.com+), and a port if applicable.
 Only the script downloaded from this targetOrigin is considered a legitimate recipient.
@@ -128,13 +128,13 @@ To mitigate this risk, we can implement the user agent with trusted browser exte
 
 \begin{figure*}[htb]
   \centering
-  \includegraphics[height=0.55\textheight]{fig/process-js.pdf}
+  \includegraphics[height=0.572\textheight]{fig/process-js.pdf}
   \caption{The SSO login flow of \usso}
   \label{fig:process}
 \end{figure*}
 
-When a user is visiting an RP, the browser downloads the RP script, which in turn opens a new window to download the IdP script. To prevent referer leakage during the download of the IdP script, we need to ensure that the HTTP request does not automatically carry a \verb+referer+ header, which reveals the visited RP's domain to the IdP. %Generally, when a browser window visits another website not belonging to its opener's origin, the HTTP request to this website automatically carries a \verb+referer+ header (i.e., the opener's origin). Such an HTTP header leaks the visited RP's domain to the IdP.
-In \usso, this new window is a \emph{redirection} from the RP to the IdP (Figure \ref{fig:process}, Steps 1.2-1.3), not a direct visit by the browser.
+When a user is visiting an RP, the browser downloads the RP script, which in turn opens a new window to download the IdP script. To prevent referer leakage during the download of the IdP script, we need to ensure the HTTP request does not automatically carry a \verb+referer+ header, which reveals the visited RP's domain to the IdP. %Generally, when a browser window visits another website not belonging to its opener's origin, the HTTP request to this website automatically carries a \verb+referer+ header (i.e., the opener's origin). Such an HTTP header leaks the visited RP's domain to the IdP.
+In \usso, this new window is a \emph{redirection} from the RP to the IdP (Steps 1.2-1.3 in Figure \ref{fig:process}), but not a direct visit by the browser.
 The HTTP response from the RP includes a \verb+referrer-policy=no-referrer+ header, which ensures that the HTTP request to download the IdP script carries no \verb+referer+ header.
 This approach is specified by W3C \cite{referer_policy} and widely supported. We have tested it in various browsers such as Chrome, Safari, Edge, Opera, and Firefox, and confirmed that no referer leakage occurs.
 
@@ -167,7 +167,7 @@ The IdP selects a random number $r \in [1,n)$ until $ID_{RP} = [r]G$ is unique.
 It signs $Cert_{RP} = [ID_{RP}, Enpt_{RP}, *]_{SK}$,
      where $[\cdot]_{SK}$ is a message signed using $SK$ and $*$ is supplementary information such as the RP's common name.
 \item
-The RP verifies $Cert_{RP}$ using $PK$ and accepts $ID_{RP}$ and $Cert_{RP}$ if they are valid.
+The RP verifies $Cert_{RP}$ using $PK$, and accepts $ID_{RP}$ and $Cert_{RP}$ if they are valid.
 \end{enumerate}
 
 
@@ -217,7 +217,7 @@ The user and the RP negotiate $PID_{RP} = [t]{ID_{RP}}$.
 \item[2.2] The RP verifies if the received $t$ is an integer in $[1, n)$ and
 %Upon receiving $t$, the RP verifies $1 \leq t < n$ and %calculates $PID_{RP}$.
 %To acknowledge the negotiation of $PID_{RP}$, The RP
-replies with $Cert_{RP}$ and the scope of the requested user attributes. The reply is transmitted through the RP script to the IdP script.  % through \verb+postMessage+.
+replies with $Cert_{RP}$ and the scope of the requested user attributes. The reply is then transmitted through the RP script to the IdP script.  % through \verb+postMessage+.
 \item[2.3] The IdP script verifies $Cert_{RP}$, extracts $ID_{RP}$ and $Enpt_{RP}$ from $Cert_{RP}$, and calculates $PID_{RP}=[t]{ID_{RP}}$.
 %It then creates a random endpoint $PEnpt_{U}$ for this login,
  %   to receive identity tokens from the IdP.
@@ -263,7 +263,7 @@ The RP receives the identity token and authorizes the user to log in.
 \setlength{\parskip}{0pt}
 \item [4.1]
 The IdP script forwards the identity token to the RP script,
-    which sends it to the RP through $Enpt_{RP}$.
+    which then sends it to the RP through $Enpt_{RP}$.
 \item[4.2] The RP verifies the identity token by checking the IdP's signature and its validity period.
 Then, \newc
 the RP extracts $PID_{RP}$ from the token, checks if it equals $[t]ID_{RP}$,
@@ -297,6 +297,6 @@ Consequently, compared to the original OIDC protocol, \usso\ simplifies the IdP'
 The operations of \emph{identity-token generation} and \emph{$Acct$ calculation} in \usso\ are \emph{identical} to those in OIDC,
  because (\emph{a}) the calculation of $PID_U$ in \usso\ can be viewed as a method to generate PPIDs in OIDC and (\emph{b}) the calculation of $Acct$ can be viewed as a mapping from the user identity in tokens to an account at the RP.
 
-The compatibility is experimentally confirmed through our prototype implementation, which modifies only 23 lines of Java code in MITREid Connect \cite{MITREid}, an open-source OIDC system, to build an IdP in \usso\ (see Section \ref{subsec:proto-imple}).
+The compatibility is experimentally confirmed through our prototype implementation, which modifies only 23 lines of Java code in MITREid Connect \cite{MITREid}, an open-source OIDC system, to build an IdP of \usso\ (see Section \ref{subsec:proto-imple}).
 %It will help the adoption and deployment of UPPRESSO.
 

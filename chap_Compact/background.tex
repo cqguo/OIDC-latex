@@ -6,7 +6,7 @@ typical SSO services and discuss existing privacy-preserving solutions and other
 
 \subsection{OpenID Connect and SSO Services}
 \label{subsec:OIDC}
-OIDC is one of the most popular SSO protocols. It supports three login flows: implicit flow, authorization code flow, and hybrid flow (a mix of the other two). These flows differ in the steps for requesting and receiving identity tokens but have common security requirements for identity tokens. We present our designs in the implicit flow and discuss the support for the authorization code flow in Section \ref{sec:discussion}.
+OIDC is one of the most popular SSO protocols. It supports different login flows: implicit flow, authorization code flow, and hybrid flow (a mix of the other two). These flows differ in the steps for requesting and receiving identity tokens but have common security requirements for identity tokens. We present our designs in the implicit flow and discuss the support for the authorization code flow in Section \ref{sec:discussion}.
 
 In OIDC, users and RPs register at a trusted IdP with their identities
 and other information such as user credentials %(e.g., passwords)
@@ -23,7 +23,7 @@ This request is redirected to the IdP. Once the IdP authenticates the user, it i
 
 \begin{table*}[tb]
 \footnotesize
-    \caption{Privacy-Preserving Solutions for SSO and Identity Federation}
+    \caption{Privacy-preserving solutions for SSO and identity federation}
     \centering
     \begin{tabular}{|c|c|c|c|c|c|c|}
   \hline
@@ -52,8 +52,8 @@ also verified by the RP.\\
 2. SPRESSO can be extended to provide selective user attributes in the tokens, while the prototype does not implement this feature.\\
 3. Blindly-signed user attributes can be selectively provided using zero-knowledge proofs but not implemented in the prototype.\\
 4. Opaak supports two exclusive pseudonym options: (\emph{a}) linkable within an RP but unlinkable across multiple RPs and (\emph{b}) unlinkable for any pair of actions.\\
-5. A U-Prove credential may contain attributes that are \emph{invisible} to the IdP in addition to the ones confirmed by the IdP. \\
-6. In the original design of Idemix \cite{idemix}, every user logs in to an RP with a unique account, but Fabric Idemix implements completely-anonymous services.
+5. A U-Prove credential may contain attributes that are \emph{invisible} to the IdP, in addition to the ones confirmed by the IdP. \\
+6. In the original design of Idemix \cite{idemix}, every user logs into an RP with a unique account, but Fabric Idemix implements completely-anonymous services.
 }
 \end{table*}
 
@@ -81,7 +81,7 @@ which obtains the user's authorization before enclosing attributes or provides o
 Privacy-preserving SSO is expected to offer the desired features listed in Section \ref{subsec:OIDC} while addressing different types of privacy threats.
 In contrast, privacy-preserving identity federation offers more privacy protections but introduces extra complexity in the user authentication process.
 Identity federation enables a user registered at a trusted IdP to be accepted by other parties, potentially with different accounts,
-but \emph{additional user operations for the authentication steps between the user and RPs} are involved.\footnote{\newc SSO protocols \cite{OpenIDConnect,rfc6749, SAML, SAMLIdentifier} allow a user to log into an RP without by herself maintaining an account at the RP or holding a permanent secret to be verified by the RP. Although the term ``single sign-on (SSO)'' was used in several schemes \cite{PseudoID, Opaak, ELPASSO, WangWS13, HanCSTW18, HanCSTWW20}, they are very different from the widely-used SSO protocols, where a user needs to maintain the accounts at different RPs and/or hold a permanent secret verified by the RPs. In this paper, we refer to them as \emph{identity federation} to emphasize this difference.}
+but \emph{additional user operations for the authentication steps between the user and RPs} are involved.\footnote{\newc SSO protocols \cite{OpenIDConnect,rfc6749, SAML, SAMLIdentifier} allow a user to log into an RP \emph{without} by herself maintaining an account at the RP or holding a permanent secret to be verified by the RP. Although the term ``single sign-on (SSO)'' was used in several schemes \cite{PseudoID, Opaak, ELPASSO, WangWS13, HanCSTW18, HanCSTWW20}, they are very different from the widely-used SSO protocols, because a user needs to maintain the accounts at different RPs and/or hold a permanent secret verified by the RPs. In this paper, we refer to them as \emph{identity federation} to emphasize this difference.}
 As shown in Table \ref{tbl:comparison-protocol}, none of the existing solutions satisfies all expectations.
 
 
