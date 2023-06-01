@@ -4,51 +4,104 @@ We define three adversarial scenarios under the threat model in Section \ref{sub
  and then integrate its conclusions to formally prove the security and privacy guarantees provided by \usso.
 
 
-\newc
-\subsection{Adversarial Scenarios}
+% \newc
+% \subsection{Adversarial Scenarios}
 
-Based on our design goals (i.e., the desired security and privacy guarantees) and the potential adversaries discussed in Section \ref{subsec:threatmodel}, we consider three adversarial scenarios as below.
+% Based on our design goals (i.e., the desired security and privacy guarantees) and the potential adversaries discussed in Section \ref{subsec:threatmodel}, we consider three adversarial scenarios as below.
 
-\noindent\textbf{Adversaries against security.} Malicious users could collude with each other and even with malicious RPs, attempting to (\emph{a}) impersonate an honest user to log into an honest RP or (\emph{b}) entice an honest user to log into an honest RP under a malicious user's account.
+% \noindent\textbf{Adversaries against security.} Malicious users could collude with each other and even with malicious RPs, attempting to (\emph{a}) impersonate an honest user to log into an honest RP or (\emph{b}) entice an honest user to log into an honest RP under a malicious user's account.
 
-\noindent\textbf{Adversaries against IdP untraceability.}
-The honest-but-curious IdP tries to infer the identities of the RPs that a user requests to access. %or link multiple logins to any RP initiated by a user.
+% \noindent\textbf{Adversaries against IdP untraceability.}
+% The honest-but-curious IdP tries to infer the identities of the RPs that a user requests to access. %or link multiple logins to any RP initiated by a user.
 
-\noindent\textbf{Adversaries against RP unlinkability.}
-Malicious RPs could collude with each other and even with malicious users, attempting to link logins across these RPs that are initiated by honest users. \oldc
+% \noindent\textbf{Adversaries against RP unlinkability.}
+% Malicious RPs could collude with each other and even with malicious users, attempting to link logins across these RPs that are initiated by honest users. 
+%\oldc
 
 
-\subsection{The Dolev-Yao Style Model for \usso}
-\label{dy-model}
+% \subsection{The Dolev-Yao Style Model for \usso}
+% \label{dy-model}
 
-We develop a Dolev-Yao style model \cite{BrowserID, SPRESSO, FettKS16, FettKS17} for \usso, referred to as the \emph{\dyu\ model}, to formalize the login flow of \usso.
-% Dolev-Yao style models abstract cryptographic concepts into an algebra of symbolic messages to discover structural flaws using simple formal logic. % which has been used in the formal analysis of SSO protocols such as OAuth 2.0 \cite{FettKS16} and OIDC \cite{FettKS17}.
-The model abstracts the entities in a web system, such as web servers and browsers, as atomic processes, %which communicate with each other through events. % such as HTTPS requests and responses.
-and defines script processes to formulate client-side scripts.
-%The script is dependently invoked by the browser to process the server-defined logic.%such as verifying $Certificate_{RP}$. %postmessage events; %atomic process <-> script process, communication. %Other events change self-trigger.
-The atomic processes of \usso\ include an IdP process, a finite set of web servers for honest RPs, a finite set of honest browsers, and a finite set of attacker processes that model malicious RPs and malicious users.
-A browser may invoke an honest IdP script and multiple RP scripts that could be honest or malicious.
-The processes communicate with each other through events such as HTTPS requests and responses,
-%Although the scripts coexist in the same browser, they are strictly separated.
-except that the script processes communicate with each other through \verb+postMessage+ which are modeled as transmitted-to-itself events of a browser process.
-%To clearly indicate the action of postMessage communication, we define it as the transmitting-to-itself event of the browser (which is not defined in SPRESSO).
+% We develop a Dolev-Yao style model \cite{BrowserID, SPRESSO, FettKS16, FettKS17} for \usso, referred to as the \emph{\dyu\ model}, to formalize the login flow of \usso.
+% % Dolev-Yao style models abstract cryptographic concepts into an algebra of symbolic messages to discover structural flaws using simple formal logic. % which has been used in the formal analysis of SSO protocols such as OAuth 2.0 \cite{FettKS16} and OIDC \cite{FettKS17}.
+% The model abstracts the entities in a web system, such as web servers and browsers, as atomic processes, %which communicate with each other through events. % such as HTTPS requests and responses.
+% and defines script processes to formulate client-side scripts.
+% %The script is dependently invoked by the browser to process the server-defined logic.%such as verifying $Certificate_{RP}$. %postmessage events; %atomic process <-> script process, communication. %Other events change self-trigger.
+% The atomic processes of \usso\ include an IdP process, a finite set of web servers for honest RPs, a finite set of honest browsers, and a finite set of attacker processes that model malicious RPs and malicious users.
+% A browser may invoke an honest IdP script and multiple RP scripts that could be honest or malicious.
+% The processes communicate with each other through events such as HTTPS requests and responses,
+% %Although the scripts coexist in the same browser, they are strictly separated.
+% except that the script processes communicate with each other through \verb+postMessage+ which are modeled as transmitted-to-itself events of a browser process.
+% %To clearly indicate the action of postMessage communication, we define it as the transmitting-to-itself event of the browser (which is not defined in SPRESSO).
 
-\newc
-Applying the \dyu\ model, we trace the lifecycle of an identity token from its generation at the IdP to its acceptance at an RP, locate the places where $PID_U$, $PID_{RP}$, and other elements related to the identity token such as $t$ and $u$ are processed, and locate the places where $PK$ is transmitted and used in the IdP script.
-We confirm the following conclusions in the \dyu\ model:
-(\emph{a}) an identity token binding pseudo-identities of honest entities, cannot be leaked to any malicious process;
-(\emph{b}) pseudo-identities and other elements in verified identity tokens cannot be manipulated by any malicious process;
-(\emph{c}) the IdP's public key set in the IdP script cannot be replaced or tampered with by any malicious process, within an honest browser;
-(\emph{d}) the IdP receives nothing about $t$ shared between two honest processes;
-(\emph{e}) $r$ is not leaked to any malicious process as it never leaves the IdP;
-and (\emph{f}) the RPs cannot receive anything about $u$ shared between two honest processes.
+% \newc
+% Applying the \dyu\ model, we trace the lifecycle of an identity token from its generation at the IdP to its acceptance at an RP, locate the places where $PID_U$, $PID_{RP}$, and other elements related to the identity token such as $t$ and $u$ are processed, and locate the places where $PK$ is transmitted and used in the IdP script.
+% We confirm the following conclusions in the \dyu\ model:
+% (\emph{a}) an identity token binding pseudo-identities of honest entities, cannot be leaked to any malicious process;
+% (\emph{b}) pseudo-identities and other elements in verified identity tokens cannot be manipulated by any malicious process;
+% (\emph{c}) the IdP's public key set in the IdP script cannot be replaced or tampered with by any malicious process, within an honest browser;
+% (\emph{d}) the IdP receives nothing about $t$ shared between two honest processes;
+% (\emph{e}) $r$ is not leaked to any malicious process as it never leaves the IdP;
+% and (\emph{f}) the RPs cannot receive anything about $u$ shared between two honest processes.
 
 
 \subsection{Security}
 \label{analysis-security}
 
-We prove that identity tokens in \usso\ and the enclosed pseudo-identities satisfy four properties, namely, \emph{RP designation}, \emph{user identification}, \emph{token confidentiality}, and \emph{token integrity}, which together ensure the security of \usso\ in the first adversarial scenario.
-Let us consider an identity token $TK$ binding $PID_{RP}$ and $PID_U$, which is generated by the IdP upon a request from an authenticated user with $ID_U$.
+\newc
+For the security analysis (w.r.t. authentication), we consider the formal model of \usso\ web systems (denoted as $\mathcal{U\!W\!S}^{auth}$), which is defined in Appendix~\ref{appendix-model}. It contains an IdP, a finite set of RPs, a finite set of users (i.e., browsers), and a network attacker. The attacker subsumes all web attackers, who can corrupt user browsers and RPs. As described in the threat model in Section \ref{subsec:threatmodel}, a malicious user, by colluding with malicious RPs, attempts to (\emph{a}) log in to an honest RP without a valid authentication token issued for herself and the target RP; or (\emph{b}) impersonate an honest user to log into an honest RP.
+
+%could collude with each other and even with malicious RPs, attempting to (\emph{a}) impersonate an honest user to log into an honest RP or (\emph{b}) entice an honest user to log into an honest RP under a malicious user's account.
+
+
+%------- new Theorem 5, move to the beginning of the proof ---------
+\begin{thm}
+\textsc{(Security)} \emph{\usso\ provides a secure SSO service (w.r.t. authentication)}.
+\end{thm}
+
+\noindent\textbf{\textsc{Proof.}} Every SSO system should satisfy two fundamental properties that were deduced from \cite{FettKS14} and informally summarized in \cite{BrowserID,SPRESSO}: {\bf (A)} the attacker should not be able to use a service of an
+honest RP as an honest user; and {\bf (B)} the attacker should not be able to authenticate an honest user to an honest RP on behalf of another user (identity injection). For proof, we demonstrate that both properties are fulfilled for every \usso\ web system. 
+
+To prove property (A), we show that the attacker cannot obtain an identity token issued by an honest IdP for an honest user and an honest RP. In particular, we first show three properties of $\mathcal{U\!W\!S}^{auth}$, i.e., a network attacker cannot alter: (1) communications between an honest user and an honest RP through restricted \verb+postMessage+ messages between the honest IdP script and RP script (within the user's browser) and obtain or manipulate the secret element $t$; (2) encrypted communications between an honest IdP and an honest user, which means $PID_{RP}$ in the token request cannot be intercepted or forged; (3) encrypted communications between an honest IdP and an honest RP, which means a valid identity token cannot be intercepted or forged (i.e., {\em ID token confidentiality and integrity}). We adopted the general web system properties shown in the full version of \cite{FettKS14} and followed the approaches in \cite{BrowserID,SPRESSO}, which are based on a Dolev-Yao-like model, to prove the above three properties. The full proof is provide in Appendix~\ref{appendix-security}.
+
+Meanwhile, we prove that a malicious user $U$ cannot replay her identity token for an honest $RP$ to authenticate herself to another honest $RP'$ with Theorem 2. This is because $PID_{RP}$ in the identity token is associated with $t$, which is randomly selected in each login instance, and therefore uniquely specifies the RP that the token is issued to (i.e., {\em RP Designation}). 
+
+To prove property (B), we show that: (1) the identity token with pseudo-identity of the user uniquely identifies a user account at the designated RP (i.e., {\em User Identification} proved in Theorem 3); and (2) if a collusive $RP$ shares an identity token issued for an honest user $U$ and itself with a malicious user $U'$, she cannot log in to any other honest $RP'$ on behalf of $U$ by replaying this token. This is proved in Lemma 1, that is, knowing $t$ and $[t]ID_{RP}$, the collusive RP cannot find a $t'$ satisfying $[t']ID_{RP'}=[t]ID_{RP}$. Otherwise, the malicious user could use this token and $t'$ to log in to $RP'$ on behalf of $U$. \hfill $\square$
+
+%------- old Theorem 5 ---------
+\begin{comment}
+\begin{thm}
+\textsc{(Security)} \emph{\usso\ provides secure authentication services.}
+\end{thm}
+
+\noindent\textbf{\textsc{Proof.}}
+According to the formal analysis on SSO security \cite{SPRESSO, FettKS14},
+    an SSO system satisfying the following two requirements provides \emph{secure} authentication services in the first adversarial scenario: (\emph{a}) an adversary never obtains a valid identity token issued for an honest user and presents it to an honest RP, and (\emph{b}) an honest user never presents a valid identity token that is not issued for herself to an honest RP.
+
+Following the login flow of \usso, because the integrity and confidentiality of identity tokens are satisfied in Theorems \ref{thm-integrity} and \ref{thm-confidentiality},
+ no adversary could obtain a valid identity token that is issued to an honest user for accessing an honest RP. %and accepted by an honest RP.
+Meanwhile, if an adversary presents an identity token to an honest RP, which may be issued to the adversary for accessing another RP or to an honest user for accessing a colluding RP, RP designation and user identification, proved in Theorems \ref{thm-rp-designation} and \ref{thm-user-id}, ensure that the honest RP does not derive an honest user's account from this identity token.
+%Meanwhile, $PID_U$ can only be calculated by the IdP and the user, since no one else knows or could intercept $u$ according to the DYU model. \oldc
+
+According to the login flow and the \dyu\ model, an honest user always obtains identity tokens issued to herself, because $PID_U$ is calculated based on her identity. 
+%% which is protected against adversaries. 这一句，对于security没有用，protecting u是用于privacy。
+The confidentiality and integrity of identity tokens ensure that an honest user never presents any token issued for someone else to an honest RP. Finally, with user identification,\footnote{\newc RP designation is a precondition of user identification in \usso, but this is not always necessary for other SSO systems.} her identity tokens are always associated with her account at the target RP.
+%According to the conclusions of the DYU model, $PID_U$ is calculated based on the user when the IdP issues an identity token for an authenticated user.
+%Moreover, because the confidentiality and integrity of identity tokens are satisfied, an honest user never presents a valid token that is issued to other users.
+%When the user identification is satisfied, this token always derives this honest user's account.
+%So, an honest user never presents an identity token that is accepted by an honest RP to derive another user’s account at this RP.
+
+Thus, \usso\ is a secure SSO system.
+\hfill $\square$
+
+%Finally, according to Theorems 1, 2, 3, 4, and 5, UPPRESSO is secure.
+
+\end{comment}
+
+
+%We prove that identity tokens in \usso\ and the enclosed pseudo-identities satisfy four properties, namely, \emph{RP designation}, \emph{user identification}, \emph{token confidentiality}, and \emph{token integrity}, which together ensure the security of \usso\ in the first adversarial scenario.
+
+Next, we prove that \usso\ provides the ``RP designation'' and ``user identification'' properties used in Theorem 1 to prove its security. First, let us consider an identity token $TK$ binding $PID_{RP}$ and $PID_U$, which is generated by the IdP upon a request from an authenticated user with $ID_U$.
 
 \begin{thm}
 \textsc{(RP Designation of $TK$)}  \emph{$PID_{RP}$ in $TK$ uniquely designates an RP with $ID_{RP}$, where $PID_{RP}= [t]ID_{RP}$, $t \in [1,n)$, $ID_{RP} = [r]G$, $r$ is a random number known only to the IdP, and $G$ is a generator on $\mathbb{E}$ of order $n$.}
@@ -120,73 +173,31 @@ $Acct = [ID_U]ID_{RP}$ is a \emph{permanent} identifier that is determined once 
 Next, we prove that $PID_{U}$ \emph{uniquely} identifies one user in the system and one account at the RP. Since $\mathbb{E}$ is a finite cyclic group, $ID_{RP} = [r]G$ is also a generator on $\mathbb{E}$ of order $n$. Given a user with $ID_U$, $Acct = [ID_U]ID_{RP}$ is a \emph{unique} point on $\mathbb{E}$ for any $u \in [1, n)$, which is \emph{uniquely} associated to $ID_U=u$. \hfill $\square$
 
 
-\newc
+%---- remove Theorem 4 and 5 and move the proofs to Appendix
+% \newc
+% \begin{thm}
+% \textsc{(Token Integrity)} \emph{An identity token issued by the IdP cannot be forged or manipulated.}
+% \label{thm-integrity}
+% \end{thm}
 
-\begin{thm}
-\textsc{(Token Integrity)} \emph{An identity token issued by the IdP cannot be forged or manipulated.}
-\label{thm-integrity}
-\end{thm}
-
-
-\noindent\textbf{\textsc{Proof.}} Identity tokens are generated and signed by the honest IdP using its private key, which is sufficiently protected at the IdP against adversaries.
-%Meanwhile, the IdP's public key $PK$ is sent from the IdP to the RPs.
-%and $PK$ which are pre-installed by an RP cannot be manipulated by adversaries.
-With the pre-installed public key, an RP verifies the identity tokens it receives and rejects any forged or manipulated identity tokens. Finally, according to the conclusions of the DYU model, the elements in a verified token cannot be manipulated by malicious entities.
-\hfill $\square$
-
-
-\begin{thm}
-\textsc{(Token Confidentiality)} \emph{An identity token is accessible only to its designated RP, besides the requesting user and the IdP.}
-\label{thm-confidentiality}
-\end{thm}
-
-\noindent\textbf{\textsc{Proof.}}
-An identity token is generated by the IdP and then sent to the requesting user (i.e., its IdP script).
-The IdP script verifies if $ID_{RP}$ specified in a verified RP certificate is designated by $PID_{RP}$ in the identity token and forwards the token to the correct RP script, which is downloaded from the origin of $Enpt_{RP}$ specified also in the RP certificate. %Because the IdP script calculates $PID_{RP} =[t]ID_{RP}$ based on $ID_{RP}$ in this verified RP certificate, this RP is designated in the identity token and will receive the token from the RP script.
-As all the communications between the IdP, RPs, and users are protected by HTTPS and two scripts communicate with each other through restricted \verb+postMessage+ HTML5 channels, according to the conclusions of the \dyu\ model, the identity tokens cannot be leaked to any other entities. \hfill $\square$
-
-%------- new Theorem 5 ---------
-According to Theorems 1-4, \usso\ satisfies four properties for secure SSO services. 
-
-\begin{thm}
-\textsc{(Security)} \emph{\usso\ provides a secure SSO service (w.r.t. authentication)}.
-\end{thm}
-
-\noindent\textbf{\textsc{Proof.}} Every SSO system should satisfy two fundamental properties that were deduced from \cite{FettKS14} and informally summarized in \cite{FettKS16,FettKS17} as: {\bf (A)} The attacker should not be able to use a service of an
-honest RP as an honest user; and {\bf (B)} The attacker should not be able to authenticate an honest browser to an honest RP with an ID that is not owned by the browser (identity injection). For proof, we demonstrate that both authentication properties are fulfilled for every \usso\ web system. 
+% \noindent\textbf{\textsc{Proof.}} Identity tokens are generated and signed by the honest IdP using its private key, which is sufficiently protected at the IdP against adversaries.
+% %Meanwhile, the IdP's public key $PK$ is sent from the IdP to the RPs.
+% %and $PK$ which are pre-installed by an RP cannot be manipulated by adversaries.
+% With the pre-installed public key, an RP verifies the identity tokens it receives and rejects any forged or manipulated identity tokens. Finally, according to the conclusions of the DYU model, the elements in a verified token cannot be manipulated by malicious entities.
+% \hfill $\square$
 
 
+% \begin{thm}
+% \textsc{(Token Confidentiality)} \emph{An identity token is accessible only to its designated RP, besides the requesting user and the IdP.}
+% \label{thm-confidentiality}
+% \end{thm}
 
-%------- old Theorem 5 ---------
-\begin{comment}
-\begin{thm}
-\textsc{(Security)} \emph{\usso\ provides secure authentication services.}
-\end{thm}
+% \noindent\textbf{\textsc{Proof.}}
+% An identity token is generated by the IdP and then sent to the requesting user (i.e., its IdP script).
+% The IdP script verifies if $ID_{RP}$ specified in a verified RP certificate is designated by $PID_{RP}$ in the identity token and forwards the token to the correct RP script, which is downloaded from the origin of $Enpt_{RP}$ specified also in the RP certificate. %Because the IdP script calculates $PID_{RP} =[t]ID_{RP}$ based on $ID_{RP}$ in this verified RP certificate, this RP is designated in the identity token and will receive the token from the RP script.
+% As all the communications between the IdP, RPs, and users are protected by HTTPS and two scripts communicate with each other through restricted \verb+postMessage+ HTML5 channels, according to the conclusions of the \dyu\ model, the identity tokens cannot be leaked to any other entities. \hfill $\square$
 
-\noindent\textbf{\textsc{Proof.}}
-According to the formal analysis on SSO security \cite{SPRESSO, FettKS14},
-    an SSO system satisfying the following two requirements provides \emph{secure} authentication services in the first adversarial scenario: (\emph{a}) an adversary never obtains a valid identity token issued for an honest user and presents it to an honest RP, and (\emph{b}) an honest user never presents a valid identity token that is not issued for herself to an honest RP.
-
-Following the login flow of \usso, because the integrity and confidentiality of identity tokens are satisfied in Theorems \ref{thm-integrity} and \ref{thm-confidentiality},
- no adversary could obtain a valid identity token that is issued to an honest user for accessing an honest RP. %and accepted by an honest RP.
-Meanwhile, if an adversary presents an identity token to an honest RP, which may be issued to the adversary for accessing another RP or to an honest user for accessing a colluding RP, RP designation and user identification, proved in Theorems \ref{thm-rp-designation} and \ref{thm-user-id}, ensure that the honest RP does not derive an honest user's account from this identity token.
-%Meanwhile, $PID_U$ can only be calculated by the IdP and the user, since no one else knows or could intercept $u$ according to the DYU model. \oldc
-
-According to the login flow and the \dyu\ model, an honest user always obtains identity tokens issued to herself, because $PID_U$ is calculated based on her identity. 
-%% which is protected against adversaries. 这一句，对于security没有用，protecting u是用于privacy。
-The confidentiality and integrity of identity tokens ensure that an honest user never presents any token issued for someone else to an honest RP. Finally, with user identification,\footnote{\newc RP designation is a precondition of user identification in \usso, but this is not always necessary for other SSO systems.} her identity tokens are always associated with her account at the target RP.
-%According to the conclusions of the DYU model, $PID_U$ is calculated based on the user when the IdP issues an identity token for an authenticated user.
-%Moreover, because the confidentiality and integrity of identity tokens are satisfied, an honest user never presents a valid token that is issued to other users.
-%When the user identification is satisfied, this token always derives this honest user's account.
-%So, an honest user never presents an identity token that is accepted by an honest RP to derive another user’s account at this RP.
-
-Thus, \usso\ is a secure SSO system.
-\hfill $\square$
-
-%Finally, according to Theorems 1, 2, 3, 4, and 5, UPPRESSO is secure.
-
-\end{comment}
-
+%--- End of Theorem 4 and 5
 
 \subsection{Privacy}
 \label{sec-:analysis}
