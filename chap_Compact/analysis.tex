@@ -212,8 +212,9 @@ This violates the ECDLP assumption. Therefore, the probability of finding $t$ an
 
 %--- End of Theorem 4 and 5
 
-\subsection{Privacy}
-\label{sec-:analysis}
+\subsection{IdP Privacy}
+\label{subsec:IdP-privacy}
+
 \usso\ effectively prevents the privacy threats of IdP-based login tracing and RP-based identity linkage in the second and third adversarial scenarios, respectively.
 
 \newc
@@ -232,14 +233,12 @@ Consider a finite cyclic group $\mathbb{E}$ where the number of points on $\math
 Because $G$ is a generator of order $n$, $ID_{RP} = [r]G$ is also a generator on $\mathbb{E}$ of order $n$. According to the \dyu\ model, $t$ is randomly chosen in $\mathbb{Z}_n$ and kept unknown to the IdP. Therefore, $PID_{RP} = [t]ID_{RP}$ is \emph{indistinguishable} from a point $Q$ that is randomly chosen on $\mathbb{E}$ \cite{oprf-proved,voprf-proved}.\footnote{\newc This property has been actually proved in OPRFs \cite{oprf-proved,voprf-proved}, where the OPRF server works similarly to the IdP and learns \emph{nothing} about a client's inputs or outputs of the evaluated pseudo-random function.} \hfill $\square$
 
 
-\vspace{2mm}
+\subsection{RP Privacy}
+\label{subsec:RP-privacy}
 
-In the third adversarial scenario, malicious RPs collude with malicious users,
- attempting to link the logins initiated by an honest user but visiting different colluding RPs.
+In the third adversarial scenario, malicious RPs collude with malicious users, attempting to link the logins initiated by an honest user but visiting different colluding RPs. 
 In each login an RP learns an ephemeral identifier $PID_{U} = [{ID_U}]{PID_{RP}}$ and a permanent identifier $Acct = [ID_U]ID_{RP}$ of the user, but it cannot derive $ID_U$ from $PID_{U}$ or $Acct$ due to the ECDLP.
-Therefore, the colluding adversaries share all logins to malicious RPs,
-    and attempt to leverage the logins initiated by malicious users to link the other logins by honest users.
-
+Therefore, the colluding adversaries share all logins to malicious RPs, and attempt to leverage the logins initiated by malicious users to link the other logins by honest users.
 
 In \usso, an RP receives a random number $t$ and an identity token enclosing $PID_{RP}$ and $PID_U$ in each login. %Meanwhile, it knows its own identity $ID_{RP}$, from which it also derives the user's account $Acct$.
 With the trapdoor $t$, $PID_{RP}$ and $PID_U$ can be easily transformed into $ID_{RP}$ and $Acct$, respectively, and vice versa. Therefore, we denote the information that an RP learns from a login as a tuple $L$, where $L =(ID_{RP}, t, Acct)=(ID_{RP}, t, [ID_{U}]ID_{RP})=([r]G, t, [ur]G)$.
