@@ -52,7 +52,7 @@ In this section, we formally prove the security and privacy guarantees provided 
 \newc
 For the security analysis (w.r.t. authentication), we consider the formal model of \usso\ web systems (denoted as $\mathcal{U\!W\!S}^{auth}$), which is defined in Appendix~\ref{appendix-model}. It contains an IdP, a finite set of RPs, a finite set of users (i.e., browsers), and a network attacker. The attacker subsumes all web attackers, who can corrupt user browsers and RPs. 
 
-As described in the threat model in Section \ref{subsec:threatmodel}, a malicious user, by colluding with malicious RPs, attempts to (\emph{a}) impersonate an honest user to log into an honest RP; (\emph{b}) tamper with the login session of an honest user to an honest RP such that the honest user is authenticated as another user. 
+As described in the threat model in Section \ref{subsec:threatmodel}, a malicious user, by colluding with malicious RPs, attempts to (\emph{a}) impersonate an honest user to log into an honest RP (impersonation); (\emph{b}) tamper with the login session of an honest user to an honest RP such that the honest user is authenticated as another user (identity injection). 
 
 %could collude with each other and even with malicious RPs, attempting to (\emph{a}) impersonate an honest user to log into an honest RP or (\emph{b}) entice an honest user to log into an honest RP under a malicious user's account.
 
@@ -63,18 +63,21 @@ As described in the threat model in Section \ref{subsec:threatmodel}, a maliciou
 \end{thm}
 
 \noindent\textbf{\textsc{Proof.}} Every SSO system should satisfy two fundamental properties that were deduced from \cite{FettKS14} and informally summarized in \cite{BrowserID,SPRESSO}: {\bf (A)} the attacker should not be able to use a service of an
-honest RP as an honest user; and {\bf (B)} the attacker should not be able to authenticate an honest user to an honest RP on behalf of another user (identity injection). For proof, we demonstrate that both properties are fulfilled for every $\mathcal{U\!W\!S}^{auth}$. 
+honest RP as an honest user; and {\bf (B)} the attacker should not be able to authenticate an honest user to an honest RP on behalf of another user. For proof, we demonstrate that both properties are fulfilled for every $\mathcal{U\!W\!S}^{auth}$. 
 
-To prove property (A), we first show that the attacker cannot manipulate the login session of any honest user to any honest RP, or steal any useful information from such login to impersonate the honest user at an honest RP. In particular, we show two properties of $\mathcal{U\!W\!S}^{auth}$ that a network attacker cannot alter (A1) encrypted communications between an honest user and an honest IdP over HTTPS; and (A2) encrypted communications between an honest IdP and an honest RP over HTTPS. The former means that $PID_{RP}$ in the identity token request cannot be intercepted or forged, while the latter indicates that a valid identity token cannot be intercepted or forged (i.e., {\em ID token confidentiality and integrity}). We adopted the general web system properties shown in the full version of \cite{FettKS14} and followed the approaches in \cite{BrowserID,SPRESSO}, which are based on a Dolev-Yao-style model, to prove the these two properties. The full proof is provide in Appendix~\ref{appendix-security}.
+To prove property {\bf (A)}, we first show that the attacker cannot steal any useful information from any login session of an honest user to an honest RP, which allows him to impersonate the honest user at the honest RP. In particular, we show two properties of $\mathcal{U\!W\!S}^{auth}$, i.e., a network attacker cannot alter encrypted communications over HTTPS between {\bf (A1)} the honest IdP and an honest user; and {\bf (A2)} the honest IdP and an honest RP, where the former indicates that $PID_{RP}$ in the identity token request of the honest user cannot be intercepted by the attacker and the latter indicates that a valid identity token of the honest user cannot be intercepted (i.e., {\em ID token confidentiality and integrity}). We adopted the general web system properties shown in the full version of \cite{FettKS14} and followed the approaches in \cite{BrowserID,SPRESSO}, which are based on a Dolev-Yao-style model, to prove properties {\bf (A1)} and {\bf (A2)}. The full proof is provide in Appendix~\ref{appendix-security}.
 
-Meanwhile, when an honest user $U$ logs in to a malicious RP, it could share $U$'s identity token with a malicious user $U'$. If the malicious RP is able to find a $t'$ satisfying $[t']ID_{RP'}=[t]ID_{RP}$, the malicious user could log in to the honest $RP'$ on behalf of $U$ by using $t'$ and $U$'s identity token. However, as proved in Lemma 1 and Theorem 3,  the malicious RP knowing $t$ and $[t]ID_{RP}$ cannot find such a $t'$ and therefore $PID_{RP}$ in the identity token uniquely designates the RP associated with the login session with $t$ (i.e., {\em RP Designation}).
+Meanwhile, we prove that the property {\bf (A)} is still fulfilled in two adversarial scenarios. First, when a malicious user initiates a login session to an honest $RP$, where he selects a random $t$ to share with $RP$ and then manipulates $PID_{RP}$ to be $[t']ID_{RP}$ instead of $[t]ID_{RP}$ when requesting for an identity token, we prove in Theorem 3 that by showing the identity token with a manipulated $PID_{RP}$ to the honest $RP$, the malicious user cannot be recognized under the account of any existing honest users at that RP (i.e., {\em User Identification}). 
+
+Secondly, when a malicious $RP$ shares with a malicious user $U'$ the identity token $TK$ that it received from an honest user $U$. With $TK$, if the malicious $RP$ is able to find a $t'$ satisfying $[t']ID_{RP'}=[t]ID_{RP}$ for any honest $RP'$, it could share $TK$ and $t'$ with the malicious user, enabling him to log into $RP'$ on behalf of $U$. We prove in Lemma 1 and Theorem 2 that a malicious RP knowing $t$ and $[t]ID_{RP}$ from $U$'s login session cannot find such a $t'$, and $PID_{RP}$ in $TK$ is associated with $t$ for the login session to the designated $RP$ (i.e., {\em RP Designation}).
 
 %a network attacker cannot alter: (1) communications between an honest user and an honest RP through restricted \verb+postMessage+ messages between the honest IdP script and RP script (within the user's browser) and obtain or manipulate the secret element $t$;  
 
+To prove property {\bf (B)}, we first prove in Theorem 3: when an honest user logs in to an honest RP, the identity token $TK$ that binds $PID_U$ and $PID_{RP}$ uniquely identifies a user account for this user at the designated RP (i.e., {\em User Identification}). Therefore, an honest user will not be authenticated by an honest RP as any other users in the system.
 
-To prove property (B), we first show that the attacker cannot manipulate the login session of an honest user to an honest RP. We show a property of $\mathcal{U\!W\!S}^{auth}$ that a network attacker cannot tamper with $ID_{RP}$ that is extracted from the RP's certificate. Then, we show that the attacker cannot manipulate $PID_{RP}$ in the identity token request based on the property (A1) nor the identity token issued by the IdP to the honest user and the target RP based on the property (A2).
-
-Meanwhile, we show that the identity token with pseudo-identity of the user uniquely identifies a user account at the designated RP, as proved in Theorem 2 (i.e., {\em User Identification}).  \hfill $\square$
+Meanwhile, we show that the attacker cannot manipulate any login session of an honest user to an honest RP in a way that the honest user is mistakenly authenticated as another user. 
+In particular, we show a property of $\mathcal{U\!W\!S}^{auth}$, i.e., a network attacker cannot tamper with $ID_{RP}$ extracted from the RP's certificate. 
+Then, we show that the attacker cannot manipulate $PID_{RP}$ in the identity token request of the honest user based on the property {\bf (A1)}, nor the identity token $TK$ issued by the IdP to the honest user and the target honest RP based on the property {\bf (A2)}. \hfill $\square$
 
 %------- old Theorem 5 ---------
 \begin{comment}
@@ -110,52 +113,7 @@ Thus, \usso\ is a secure SSO system.
 %We prove that identity tokens in \usso\ and the enclosed pseudo-identities satisfy four properties, namely, \emph{RP designation}, \emph{user identification}, \emph{token confidentiality}, and \emph{token integrity}, which together ensure the security of \usso\ in the first adversarial scenario.
 
 \vspace{2mm}
-Next, we prove that \usso\ provides the ``user identification'' and ``RP designation'' properties that are used in Theorem 1. First, let us consider an identity token $TK$ binding $PID_{RP}$ and $PID_U$, which is generated by the IdP upon a request from an authenticated user with $ID_U$.
-
-
-\newc
-
-\begin{thm}
-\textsc{(User Identification of $TK$)} \emph{$PID_U= [ID_U]PID_{RP}$ in $TK$ uniquely identifies an account at the RP designated by $PID_{RP}$, and this account is uniquely mapped to a user with $ID_U$.}
-\label{thm-user-id}
-\end{thm}
-
-\noindent\textbf{\textsc{Proof.}}
-To the RP designated (Theorem 2),
-To issue an identity token requested for $PID_{RP}$, the honest IdP calculates $PID_U = [ID_U]PID_{RP}$ following Equation \ref{equ:PIDU} after authenticating the user with $ID_U$. The designated RP then calculates $Acct = [t^{-1}]PID_{U} = [ID_U]ID_{RP}$ following Equation \ref{equ:AccountNotChanged}.
-$Acct = [ID_U]ID_{RP}$ is a \emph{permanent} identifier that is determined once the RP and the user have registered at the IdP. Therefore, $PID_U$ in $TK$ always identifies an account at the designated RP and $Acct$ is mapped to a user with $ID_U$.
-
-Next, we prove that $PID_{U}$ \emph{uniquely} identifies one user in the system and one account at the RP. Since $\mathbb{E}$ is a finite cyclic group, $ID_{RP} = [r]G$ is also a generator on $\mathbb{E}$ of order $n$. Given a user with $ID_U$, $Acct = [ID_U]ID_{RP}$ is a \emph{unique} point on $\mathbb{E}$ for any $u \in [1, n)$, which is \emph{uniquely} associated to $ID_U=u$.
-
-For other RP not designated, xxx
-\hfill $\square$
-
-
-%---- remove Theorem 4 and 5 and move the proofs to Appendix
-% \newc
-% \begin{thm}
-% \textsc{(Token Integrity)} \emph{An identity token issued by the IdP cannot be forged or manipulated.}
-% \label{thm-integrity}
-% \end{thm}
-
-% \noindent\textbf{\textsc{Proof.}} Identity tokens are generated and signed by the honest IdP using its private key, which is sufficiently protected at the IdP against adversaries.
-% %Meanwhile, the IdP's public key $PK$ is sent from the IdP to the RPs.
-% %and $PK$ which are pre-installed by an RP cannot be manipulated by adversaries.
-% With the pre-installed public key, an RP verifies the identity tokens it receives and rejects any forged or manipulated identity tokens. Finally, according to the conclusions of the DYU model, the elements in a verified token cannot be manipulated by malicious entities.
-% \hfill $\square$
-
-
-% \begin{thm}
-% \textsc{(Token Confidentiality)} \emph{An identity token is accessible only to its designated RP, besides the requesting user and the IdP.}
-% \label{thm-confidentiality}
-% \end{thm}
-
-% \noindent\textbf{\textsc{Proof.}}
-% An identity token is generated by the IdP and then sent to the requesting user (i.e., its IdP script).
-% The IdP script verifies if $ID_{RP}$ specified in a verified RP certificate is designated by $PID_{RP}$ in the identity token and forwards the token to the correct RP script, which is downloaded from the origin of $Enpt_{RP}$ specified also in the RP certificate. %Because the IdP script calculates $PID_{RP} =[t]ID_{RP}$ based on $ID_{RP}$ in this verified RP certificate, this RP is designated in the identity token and will receive the token from the RP script.
-% As all the communications between the IdP, RPs, and users are protected by HTTPS and two scripts communicate with each other through restricted \verb+postMessage+ HTML5 channels, according to the conclusions of the \dyu\ model, the identity tokens cannot be leaked to any other entities. \hfill $\square$
-
-
+Next, we prove that \usso\ provides the ``RP designation'' and ``user identification'' properties that are used in Theorem 1. Let us consider an identity token $TK$ binding $PID_{RP}$ and $PID_U$, which is generated by the IdP upon a request from an authenticated user with $ID_U$.
 
 \begin{thm}
 \textsc{(RP Designation of $TK$)}  \emph{$PID_{RP}$ in $TK$ uniquely designates an RP with $ID_{RP}$, where $PID_{RP}= [t]ID_{RP}$, $t \in [1,n)$, $ID_{RP} = [r]G$, $r$ is a random number known only to the IdP, and $G$ is a generator on $\mathbb{E}$ of order $n$.}
@@ -231,6 +189,47 @@ We prove this in Theorem \ref{thm-idp-untraceability}.
 \noindent\textbf{\textsc{Proof.}}
 Consider a finite cyclic group $\mathbb{E}$ where the number of points on $\mathbb{E}$ is $n$.
 Because $G$ is a generator of order $n$, $ID_{RP} = [r]G$ is also a generator on $\mathbb{E}$ of order $n$. According to the \dyu\ model, $t$ is randomly chosen in $\mathbb{Z}_n$ and kept unknown to the IdP. Therefore, $PID_{RP} = [t]ID_{RP}$ is \emph{indistinguishable} from a point $Q$ that is randomly chosen on $\mathbb{E}$ \cite{oprf-proved,voprf-proved}.\footnote{\newc This property has been actually proved in OPRFs \cite{oprf-proved,voprf-proved}, where the OPRF server works similarly to the IdP and learns \emph{nothing} about a client's inputs or outputs of the evaluated pseudo-random function.} \hfill $\square$
+
+\newc
+\begin{thm}
+\textsc{(User Identification of $TK$)} \emph{$PID_U= [ID_U]PID_{RP}$ in $TK$ uniquely identifies an account at the RP designated by $PID_{RP}$, and this account is uniquely mapped to a user with $ID_U$.}
+\label{thm-user-id}
+\end{thm}
+
+\noindent\textbf{\textsc{Proof.}}
+To the RP designated (Theorem 2),
+To issue an identity token requested for $PID_{RP}$, the honest IdP calculates $PID_U = [ID_U]PID_{RP}$ following Equation \ref{equ:PIDU} after authenticating the user with $ID_U$. The designated RP then calculates $Acct = [t^{-1}]PID_{U} = [ID_U]ID_{RP}$ following Equation \ref{equ:AccountNotChanged}.
+$Acct = [ID_U]ID_{RP}$ is a \emph{permanent} identifier that is determined once the RP and the user have registered at the IdP. Therefore, $PID_U$ in $TK$ always identifies an account at the designated RP and $Acct$ is mapped to a user with $ID_U$.
+
+Next, we prove that $PID_{U}$ \emph{uniquely} identifies one user in the system and one account at the RP. Since $\mathbb{E}$ is a finite cyclic group, $ID_{RP} = [r]G$ is also a generator on $\mathbb{E}$ of order $n$. Given a user with $ID_U$, $Acct = [ID_U]ID_{RP}$ is a \emph{unique} point on $\mathbb{E}$ for any $u \in [1, n)$, which is \emph{uniquely} associated to $ID_U=u$.
+
+For other RP not designated, xxx
+\hfill $\square$
+
+
+%---- remove Theorem 4 and 5 and move the proofs to Appendix
+% \newc
+% \begin{thm}
+% \textsc{(Token Integrity)} \emph{An identity token issued by the IdP cannot be forged or manipulated.}
+% \label{thm-integrity}
+% \end{thm}
+
+% \noindent\textbf{\textsc{Proof.}} Identity tokens are generated and signed by the honest IdP using its private key, which is sufficiently protected at the IdP against adversaries.
+% %Meanwhile, the IdP's public key $PK$ is sent from the IdP to the RPs.
+% %and $PK$ which are pre-installed by an RP cannot be manipulated by adversaries.
+% With the pre-installed public key, an RP verifies the identity tokens it receives and rejects any forged or manipulated identity tokens. Finally, according to the conclusions of the DYU model, the elements in a verified token cannot be manipulated by malicious entities.
+% \hfill $\square$
+
+
+% \begin{thm}
+% \textsc{(Token Confidentiality)} \emph{An identity token is accessible only to its designated RP, besides the requesting user and the IdP.}
+% \label{thm-confidentiality}
+% \end{thm}
+
+% \noindent\textbf{\textsc{Proof.}}
+% An identity token is generated by the IdP and then sent to the requesting user (i.e., its IdP script).
+% The IdP script verifies if $ID_{RP}$ specified in a verified RP certificate is designated by $PID_{RP}$ in the identity token and forwards the token to the correct RP script, which is downloaded from the origin of $Enpt_{RP}$ specified also in the RP certificate. %Because the IdP script calculates $PID_{RP} =[t]ID_{RP}$ based on $ID_{RP}$ in this verified RP certificate, this RP is designated in the identity token and will receive the token from the RP script.
+% As all the communications between the IdP, RPs, and users are protected by HTTPS and two scripts communicate with each other through restricted \verb+postMessage+ HTML5 channels, according to the conclusions of the \dyu\ model, the identity tokens cannot be leaked to any other entities. \hfill $\square$
 
 
 \subsection{RP Privacy}
