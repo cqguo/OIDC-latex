@@ -16,7 +16,7 @@ Table \ref{tbl:notations-protocol} lists the notations. The subscript $j$ and/or
     {$\mathbb{E}$, $G$, $n$} & {$\mathbb{E}$ is an elliptic curve over a finite field $\mathbb{F}_q$. $G$ is a base point (or generator) on $\mathbb{E}$, and the order of $G$ is a prime number $n$.} \\ \hline
     {$ID_U$} & {$ID_U = u \in [1, n)$ is the user's unique identity at the IdP, \newc{which is known only to the user and the IdP.}} \\ \hline
    {$ID_{RP_j}$} & {$ID_{RP} = [r]G$ is the $j$-th RP's unique identity, which is publicly known; $r \in [1, n)$ \newc{is known only to the IdP but not the RP.}} \\ \hline
-    {$t$} & {$t \in [1, n)$ is a user-selected random integer in each login; \newc{$t$ is shared with the target RP and kept secret to the IdP.
+    {$t$} & {$t \in [1, n)$ is a user-selected random integer in each login; \newc{$t$ is shared with the target RP and kept unknown to the IdP.
     }} \\ \hline
     {$PID_{RP_j}^i$} & {$PID_{RP} = [t]{ID_{RP}} = [tr]G$ is the $j$-th RP's pseudo-identity, in the user's $i$-th login to this RP.} \\ \hline
     {$PID_{U,j}^i$} & {$PID_U = [{ID_U}]{PID_{RP}} = [utr]G$ is the user's pseudo-identity, in the user's $i$-th login to the $j$-th RP.} \\ \hline
@@ -68,23 +68,26 @@ From Equations \ref{equ:PIDRP}, \ref{equ:PIDU}, and \ref{equ:Account}, it is der
 \end{equation}
 
 
-With the help of $t$, for a given user, the RP derives an \emph{identical} account from identity tokens for different logins. It is the user's \emph{permanent} account at this RP, which is \emph{unique} among all accounts at the same RP. Meanwhile, the user's accounts at different RPs are inherently different and unlinkable (see Section \ref{sec:analysis} for the detailed proof).
+With the help of $t$, the RP derives a \emph{unique} account from different identity tokens for the same user in her different logins. It is the user's \emph{permanent} account at this RP. %, which is \emph{unique} among all accounts at the same RP. 
+Meanwhile, the user's accounts at different RPs are inherently different and unlinkable (see Section \ref{sec:analysis} for a detailed proof).
 
-\newc
-In this process, the RP needs to check if $PID_{RP} = [t]ID_{RP}$ holds after extracting $PID_{RP}$ from a received identity token. Otherwise, a malicious user with $ID_{U'} = u'$ could randomly select $t'$ and $u$, and set $PID_{RP}$ as $[t'u'^{-1}][u]ID_{RP}$. Then, the malicious user requests a token from the IdP, in which $PID_{U'} = [ID_{U'}]PID_{RP}=[u'][t'u'^{-1}][u]ID_{RP} = [t'u]ID_{RP}$.
-If the RP does not check the received $PID_{RP}$, it would use the received $PID_{U'}$ to calculate an account as $Acct = [t'^{-1}]PID_{U'}=[u]ID_{RP}$, which is the account of a potential victim user with $ID_{U} = u$.
-The malicious user could repeat the above attacks with random $u \in \mathbb{Z}_n$ until the account of some victim user is calculated by the RP. {\newc If it does not derive an existing account of some honest user, the RP will treat the adversary as a newly-registered user without any alerts.}
+%--- remove following the shepherd's comment
+% \newc
+% In this process, the RP needs to check if $PID_{RP} = [t]ID_{RP}$ holds after extracting $PID_{RP}$ from a received identity token. Otherwise, a malicious user with $ID_{U'} = u'$ could randomly select $t'$ and $u$, and set $PID_{RP}$ as $[t'u'^{-1}][u]ID_{RP}$. Then, the malicious user requests a token from the IdP, in which $PID_{U'} = [ID_{U'}]PID_{RP}=[u'][t'u'^{-1}][u]ID_{RP} = [t'u]ID_{RP}$.
+% If the RP does not check the received $PID_{RP}$, it would use the received $PID_{U'}$ to calculate an account as $Acct = [t'^{-1}]PID_{U'}=[u]ID_{RP}$, which is the account of a potential victim user with $ID_{U} = u$.
+% The malicious user could repeat the above attacks with random $u \in \mathbb{Z}_n$ until the account of some victim user is calculated by the RP. {\newc If it does not derive an existing account of some honest user, the RP will treat the adversary as a newly-registered user without any alerts.}
 
-Similarly, if the RP selects $t$ and calculates $PID_{RP}$, the user needs to check whether the received $PID_{RP}$ equals $[t]ID_{RP}$ before requesting an identity token.
-Otherwise, malicious users could impersonate a victim user at some honest RP by colluding with another malicious RP.
-That is, when receiving $PID_{RP}=[t']ID_{RP}$ from the honest RP, the malicious user forwards it to colluding $RP'$, which sends it to the victim user in another login.
-If the victim does not check the received $PID_{RP}$, she would request from the IdP an identity token that binds $PID_U$ and the manipulated $PID_{RP}$ and present the token to the malicious RP.
-This token would allow the malicious user to log into the honest RP under the victim user's account.
+% Similarly, if the RP selects $t$ and calculates $PID_{RP}$, the user needs to check whether the received $PID_{RP}$ equals $[t]ID_{RP}$ before requesting an identity token.
+% Otherwise, malicious users could impersonate a victim user at some honest RP by colluding with another malicious RP.
+% That is, when receiving $PID_{RP}=[t']ID_{RP}$ from the honest RP, the malicious user forwards it to colluding $RP'$, which sends it to the victim user in another login.
+% If the victim does not check the received $PID_{RP}$, she would request from the IdP an identity token that binds $PID_U$ and the manipulated $PID_{RP}$ and present the token to the malicious RP.
+% This token would allow the malicious user to log into the honest RP under the victim user's account.
 
 \oldc
-The IdP never discloses $r$ to RPs; otherwise, two colluding RPs with $ID_{RP_j} = [r]G$ and $ID_{RP_{j'}} = [r']G$ could link a user's accounts by checking whether $[r']Acct_j = [r]Acct_{j'}$ holds.
+The IdP never discloses $r$ to RPs. Otherwise, two colluding RPs with $ID_{RP_j} = [r]G$ and $ID_{RP_{j'}} = [r']G$ could link a user's accounts by checking whether $[r']Acct_j = [r]Acct_{j'}$ holds.
 \newc
-In the meantime, a user's identity $u$ is kept secret to RPs; otherwise, colluding RPs could enumerate the user's accounts by calculating $[u]ID_{RP_j}$ and then link them.
+Meanwhile, a user's identity $u$ is kept secret from the RPs. Otherwise, colluding RPs could calculate $[u]ID_{RP_j}$ for the known $u$s and link them.
+%enumerate the user's accounts by calculating  and link them.
 \oldc
 
 
@@ -122,7 +125,7 @@ Only the script downloaded from this targetOrigin is considered a legitimate rec
 %That is, the IdP script derives the RP's $ID_{RP}$ and origin from the RP certificate, while the $PID_{RP}$ is generated with this $ID_{RP}$. Thus, the IdP script always knows the targeting RP of identity proof, therefore, the \verb+postMessage+ mechanism can guarantee that the identity proof would not be sent to the adversary.
 
 \newc
-As discussed in Section \ref{subsec:overview}, a user needs to by herself calculate $PID_{RP} = [t]ID_{RP}$ based on $ID_{RP}$ extracted from the RP certificate. Thus, this function should be implemented by an \emph{honest} script that does not leak $t$ to the IdP, from which it could calculate $ID_{RP} = [t^{-1}\bmod n]PID_{RP}$. In \usso, we consider the IdP script honest; otherwise, it could directly leak the RP's domain to the IdP.
+As discussed in Section \ref{subsec:overview}, a user needs to calculate $PID_{RP} = [t]ID_{RP}$ based on $ID_{RP}$ extracted from the RP certificate. Thus, this function should be implemented by an \emph{honest} script that does not leak $t$ to the IdP, from which it could calculate $ID_{RP} = [t^{-1}\bmod n]PID_{RP}$. In \usso, we consider the IdP script honest; otherwise, it could directly leak the RP's domain to the IdP.
 To mitigate this risk, we can implement the user agent with trusted browser extensions, which need to be installed by users before visiting RPs.
 \oldc
 
@@ -264,10 +267,10 @@ The RP receives the identity token and authorizes the user to log in.
 \item [4.1]
 The IdP script forwards the identity token to the RP script,
     which then sends it to the RP through $Enpt_{RP}$.
-\item[4.2] The RP verifies the identity token by checking the IdP's signature and its validity period.
-Then, \newc
-the RP extracts $PID_{RP}$ from the token, checks if it equals $[t]ID_{RP}$,
-\oldc
+\item[4.2] The RP verifies the signature and the validity period of the identity token 
+%\newc
+%Then, the RP extracts $PID_{RP}$ from the token, checks if it equals $[t]ID_{RP}$,
+%\oldc
 and calculates $Acct = [t^{-1}]{PID_U}$.
 
 \item [4.3] The RP authorizes the user to log in as $Acct$.
@@ -278,7 +281,7 @@ and calculates $Acct = [t^{-1}]{PID_U}$.
 If any verification fails, this flow will be terminated immediately.
 For example, the user halts it when receiving an invalid $Cert_{RP}$.
 \newc
-The IdP rejects an identity-token request in Step 3.3 if the received $PID_{RP}$ is not a point on $\mathbb{E}$, and the RP rejects an identity token in Step 4.2 if the signature is invalid or the enclosed $PID_{RP}$ is not equal to $[t]ID_{RP}$.
+The IdP rejects an identity-token request in Step 3.3 if the received $PID_{RP}$ is not a point on $\mathbb{E}$, and the RP rejects an identity token in Step 4.2 if the signature is invalid. %or the enclosed $PID_{RP}$ is not equal to $[t]ID_{RP}$.
 \oldc
 
 
