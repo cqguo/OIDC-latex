@@ -3,7 +3,24 @@
 \section{Formal Model of \usso}
 \label{appendix-model}
 
-In this section, we present a formal model for \usso, which closely follows the description in Section~\ref{implementations} and the implementation of the protocol. This model provides a foundation for the security and privacy 
+In this section, we present a formal model for \usso, which closely follows the description in Section~\ref{implementations} and the implementation of the protocol. This model provides a basis for the formal analysis of the security w.r.t. authentication and privacy properties presented in Section~\ref{sec:analysis}.
 
-\section{Proof}
+\vspace{1mm} \noindent {\bf Web Model. } We followed the formal analysis for the BrowerID~\cite{BrowserID} and SPRESSO~\cite{SPRESSO} protocols to define the web system based on the general Dolev-Yao web model. 
+
+Similar to SPRESSO~\cite{SPRESSO}, we simplified the handling of nonces, removed non-deterministic choices wherever possible, and added the HTTP Referer header and the HTML5 noreferrer attribute for links. Therefore, we adopted the same definitions presented in Section 3 of \cite{SPRESSO} for the web model, which define the communication model (i.e., messages, terms, events, atomic processes, a system consisting of atomic processes, runs, and scripting processes), web system in a tuple of $(\mathcal{W}, \mathcal{S}, \mathsf{script}, E^0)$, and web browsers modeled as Dolev-Yao processes denoted as $(I^p, Z^p, R^p, s_0^p)$. We do not include the full details here due to the space limit and refer interested readers to read Section 3 and Appendix A-C in \cite{SPRESSO}.
+
+\vspace{1mm} \noindent {\bf Formal Model of \usso.} We model \usso\ as a web system denoted as $\mathcal{UWS}=(\mathcal{W}, \mathcal{S}, \mathsf{script}, E^0)$ if is is of the form described as below.
+
+The set $\mathcal{W} = \mathsf{Hon} \cup \mathsf{Web} \cup \mathsf{Net}$ consists of an $\mathsf{IDP}$ for the web server of the identity provider, a finite set of web servers $\mathsf{RP}$ for the relying parties, 
+a finite set of web browsers $\mathsf{B}$, a finite set $\mathsf{DNS}$ of DNS servers, a finite set of web attacker processes (in $\mathsf{Web}$), and a network attacker process (in $\mathsf{Net}$), with $\mathsf{Hon}:=\mathsf{IDP}\cup\mathsf{RP}\cup\mathsf{B}\cup\mathsf{DNS}$. $\mathcal{S}$ denotes the set of scripts, which consists of an RP script $script_{rp}$ and an IdP script $script_{idp}$. Their respective string representations are defined by the mapping script, denoted as $\mathsf{script_{rp}}$ and $\mathsf{script_{idp}}$, respectively. Finally, the set $E^0$ only the trigger events of the form $<a,a,\mathsf{TRIGGER}>$ for every IP address $a$ in the web system.
+
+We briefly sketch the processes and the scripts in $\mathcal{W}$ and $\mathcal{S}$: (1) Browsers $\mathsf{B}$ as defined in the web model; (2) $\mathsf{RP}$ is a web server that knows two distinct paths: /, which serves the index web page to download $\mathsf{script_{rp}}$ and $\mathsf{/rpLogin}$, which is the endpoint of RP accepting POST requests, issuing a fresh RP nonce, and accepting POST requests with login data obtained from $\mathsf{script_{rp}}$ running in the browser; (3) $\mathsf{IDP}$ is a web server that knows one distinct path $\mathsf{/idpLogin}$, which serves the login dialog web page to download $\mathsf{script_{idp}}$ and the public key of the IdP and issues the signed identity token. And (4) each DNS server $\mathsf{DNS}$ contains the assignment of domain names to IP addresses and answers DNS requests
+accordingly. 
+
+The browsers and RPs can become corrupted. If they receive the message $\mathsf{CORRUPT}$, they will 
+collect all incoming messages in their state and send out messages derivable from their state, like any attacker process.
+
+
+\section{Security of \usso\ w.r.t. Authentication}
 \label{appendix-security}
+
