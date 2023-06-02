@@ -168,28 +168,6 @@ Thus, we would find that ${\rm Pr}\{\mathcal{D}^*_c(G, [x]G)=x\}$ also becomes n
 \oldc
 This violates the ECDLP assumption. Therefore, the probability of finding $t$ and $t'$ that satisfy $[t]ID_{RP_j} = [t']ID_{RP_{j'}}$ is negligible. \hfill $\square$
 
-%--- End of Theorem 4 and 5
-
-\subsection{IdP Privacy}
-\label{subsec:IdP-privacy}
-
-\usso\ effectively prevents the privacy threats of IdP-based login tracing and RP-based identity linkage in the second and third adversarial scenarios, respectively.
-
-\newc
-First, we show that an honest-but-curious IdP cannot trace a user's login activities. In each login, a user sends an identity-token request to the IdP, %(Step 3.1 in Section \ref{implementations})
-which reveals only the target RP's \emph{ephemeral} pseudo-identity $PID_{RP}$ along with the user's identity $ID_U$.
-The IdP cannot (\emph{a}) associate multiple logins with different $PID_{RP}$s to a given RP, or (\emph{b}) distinguish a login to one RP from other logins to another RP based on their $PID_{RP}$s, because $PID_{RP}$ is \emph{indistinguishable} from random variables to the IdP.
-We prove this in Theorem \ref{thm-idp-untraceability}.
-
-\begin{thm}
-\textsc{(IdP Untraceability)} \emph{In \usso, the IdP cannot distinguish $PID_{RP} = [t]ID_{RP}$ from a random variable on $\mathbb{E}$, where $t$ is random in $\mathbb{Z}_n$.}
-\label{thm-idp-untraceability}
-\end{thm}
-
-\noindent\textbf{\textsc{Proof.}}
-Consider a finite cyclic group $\mathbb{E}$ where the number of points on $\mathbb{E}$ is $n$.
-Because $G$ is a generator of order $n$, $ID_{RP} = [r]G$ is also a generator on $\mathbb{E}$ of order $n$. According to the \dyu\ model, $t$ is randomly chosen in $\mathbb{Z}_n$ and kept unknown to the IdP. Therefore, $PID_{RP} = [t]ID_{RP}$ is \emph{indistinguishable} from a point $Q$ that is randomly chosen on $\mathbb{E}$ \cite{oprf-proved,voprf-proved}.\footnote{\newc This property has been actually proved in OPRFs \cite{oprf-proved,voprf-proved}, where the OPRF server works similarly to the IdP and learns \emph{nothing} about a client's inputs or outputs of the evaluated pseudo-random function.} \hfill $\square$
-
 \newc
 \begin{thm}
 \textsc{(User Identification of $TK$)} \emph{$PID_U= [ID_U]PID_{RP}$ in $TK$ uniquely identifies an account at the RP designated by $PID_{RP}$, and this account is uniquely mapped to a user with $ID_U$.}
@@ -231,6 +209,27 @@ For other RP not designated, xxx
 % The IdP script verifies if $ID_{RP}$ specified in a verified RP certificate is designated by $PID_{RP}$ in the identity token and forwards the token to the correct RP script, which is downloaded from the origin of $Enpt_{RP}$ specified also in the RP certificate. %Because the IdP script calculates $PID_{RP} =[t]ID_{RP}$ based on $ID_{RP}$ in this verified RP certificate, this RP is designated in the identity token and will receive the token from the RP script.
 % As all the communications between the IdP, RPs, and users are protected by HTTPS and two scripts communicate with each other through restricted \verb+postMessage+ HTML5 channels, according to the conclusions of the \dyu\ model, the identity tokens cannot be leaked to any other entities. \hfill $\square$
 
+%--- End of Theorem 4 and 5
+
+\subsection{IdP Privacy}
+\label{subsec:IdP-privacy}
+
+\usso\ effectively prevents the privacy threats of IdP-based login tracing and RP-based identity linkage in the second and third adversarial scenarios, respectively.
+
+\newc
+First, we show that an honest-but-curious IdP cannot trace a user's login activities. In each login, a user sends an identity-token request to the IdP, %(Step 3.1 in Section \ref{implementations})
+which reveals only the target RP's \emph{ephemeral} pseudo-identity $PID_{RP}$ along with the user's identity $ID_U$.
+The IdP cannot (\emph{a}) associate multiple logins with different $PID_{RP}$s to a given RP, or (\emph{b}) distinguish a login to one RP from other logins to another RP based on their $PID_{RP}$s, because $PID_{RP}$ is \emph{indistinguishable} from random variables to the IdP.
+We prove this in Theorem \ref{thm-idp-untraceability}.
+
+\begin{thm}
+\textsc{(IdP Untraceability)} \emph{In \usso, the IdP cannot distinguish $PID_{RP} = [t]ID_{RP}$ from a random variable on $\mathbb{E}$, where $t$ is random in $\mathbb{Z}_n$.}
+\label{thm-idp-untraceability}
+\end{thm}
+
+\noindent\textbf{\textsc{Proof.}}
+Consider a finite cyclic group $\mathbb{E}$ where the number of points on $\mathbb{E}$ is $n$.
+Because $G$ is a generator of order $n$, $ID_{RP} = [r]G$ is also a generator on $\mathbb{E}$ of order $n$. According to the \dyu\ model, $t$ is randomly chosen in $\mathbb{Z}_n$ and kept unknown to the IdP. Therefore, $PID_{RP} = [t]ID_{RP}$ is \emph{indistinguishable} from a point $Q$ that is randomly chosen on $\mathbb{E}$ \cite{oprf-proved,voprf-proved}.\footnote{\newc This property has been actually proved in OPRFs \cite{oprf-proved,voprf-proved}, where the OPRF server works similarly to the IdP and learns \emph{nothing} about a client's inputs or outputs of the evaluated pseudo-random function.} \hfill $\square$
 
 \subsection{RP Privacy}
 \label{subsec:RP-privacy}
