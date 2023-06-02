@@ -49,6 +49,80 @@
 %\usepackage{algcompatible}
 %\usepackage[compatible]{algpseudocode}
 
+\usepackage{amsmath}
+\usepackage{bm}
+\usepackage{filecontents}
+\usepackage{wasysym}
+\usepackage[small]{titlesec}
+\usepackage{lipsum,mwe,cuted}
+\usepackage{float}%%%%Ìá¹©ž¡¶¯ÌåµÄ[H]Ñ¡Ïî£¬œø¶øÈ¡Ïûž¡¶¯
+\usepackage{caption}%%Ìá¹©\captionofÃüÁî
+\pagestyle{plain}
+\usepackage{graphicx}
+\usepackage{verbatim}
+\usepackage{caption}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{graphicx}
+\usepackage{url}
+\usepackage{multirow}
+\usepackage{listings}
+\usepackage{cite}
+\usepackage{array}
+\usepackage{enumerate}
+\usepackage{booktabs}
+\usepackage{amsthm}
+\usepackage{color}
+\usepackage{soul}
+\usepackage{multicol}
+\usepackage[algo2e]{algorithm2e}
+\usepackage{algorithm}
+\usepackage{algorithmic}
+
+\makeatletter
+\newenvironment{breakablealgorithm}
+  {% \begin{breakablealgorithm}
+   \begin{center}
+     \refstepcounter{algorithm}% New algorithm
+     \hrule height.8pt depth0pt \kern2pt% \@fs@pre for \@fs@ruled
+     \renewcommand{\caption}[2][\relax]{% Make a new \caption
+     {\raggedright\textbf{\thealgorithm} ##2\par}%
+       \ifx\relax##1\relax % #1 is \relax
+         \addcontentsline{loa}{algorithm}{\protect\numberline{\thealgorithm}##2}%
+       \else % #1 is not \relax
+         \addcontentsline{loa}{algorithm}{\protect\numberline{\thealgorithm}##1}%
+       \fi
+       \kern2pt\hrule\kern2pt
+     }
+  }{% \end{breakablealgorithm}
+     \kern2pt\hrule\relax% \@fs@post for \@fs@ruled
+   \end{center}
+  }
+\makeatother
+
+\renewcommand{\algorithmicrequire}{\textbf{Input:}}
+\newcommand{\deflet}{\textbf{let}}
+\newcommand{\mystate}[1]{\STATE \textbf{let} {{}#1}}
+\newcommand{\mystop}[1]{\STATE \textbf{stop} \myss{\myangle{{{}#1}}, s'}}
+\newcommand{\myss}[1]{${{}#1}$}
+\newcommand{\myangle}[1]{\langle {{}#1} \rangle}
+\newcommand{\myif}[1]{\IF{\myss{{{}#1}}}}
+\newcommand{\myelse}[1]{\ELSIF{\myss{{{}#1}}}}
+
+
+\newcommand{\aaa}[1]{\STATE \textbf{if} #1 \textbf{then} \begin{ALC@g}}
+\newcommand{\bbb}[1]{\end{ALC@g} \STATE \textbf{else if} #1 \textbf{then} \begin{ALC@g}}
+\newcommand{\ccc}{\end{ALC@g} \STATE \textbf{else} \textbf{then} \begin{ALC@g}}
+\newcommand{\ddd}{\end{ALC@g} \STATE \textbf{endif}}
+
+\newcommand{\SWITCH}[1]{\STATE \textbf{switch} #1\ \textbf{do} \begin{ALC@g}}
+\newcommand{\ENDSWITCH}{\end{ALC@g}\STATE \textbf{end switch}}
+\newcommand{\CASE}[1]{\STATE \textbf{case} #1\textbf{:} \begin{ALC@g}}
+\newcommand{\ENDCASE}{\end{ALC@g}}
+\newcommand{\CASELINE}[1]{\STATE \textbf{case} #1\textbf{:} }
+\newcommand{\DEFAULT}{\STATE \textbf{default:} \begin{ALC@g}}
+\newcommand{\ENDDEFAULT}{\end{ALC@g}}
+\newcommand{\DEFAULTLINE}[1]{\STATE \textbf{default:} }
+
 \renewcommand{\thefootnote}{*}
 
 \newcommand\usso{\textsf{UPPRESSO}}
@@ -56,6 +130,12 @@
 
 \newtheorem{thm}{\textsc{Theorem}}
 \newtheorem{lemma}{\textsc{Lemma}}
+%\newtheorem{theorem}{Theorem}
+\newtheorem{definition}{\textsc{Definition}}
+%\newtheorem{lemma}{Lemma}
+
+
+
 
 
 \definecolor{Blue}{RGB}{0,0,255}

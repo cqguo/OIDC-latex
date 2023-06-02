@@ -5,22 +5,341 @@
 
 In this section, we present a formal model for \usso, which closely follows the description in Section~\ref{implementations} and the implementation of the protocol. This model provides a basis for the formal analysis of the security w.r.t. authentication and privacy properties presented in Section~\ref{sec:analysis}.
 
-\vspace{1mm} \noindent {\bf Web Model. } We followed the formal analysis for the BrowerID~\cite{BrowserID} and SPRESSO~\cite{SPRESSO} protocols to define the web system based on the general Dolev-Yao web model. 
+\vspace{1mm} \noindent {\bf Web Model. } We followed the formal analysis for the BrowerID~\cite{BrowserID} and SPRESSO~\cite{SPRESSO} protocols to define the web system based on the general Dolev-Yao (DY) web model. 
 
-Similar to SPRESSO~\cite{SPRESSO}, we simplified the handling of nonces, removed non-deterministic choices wherever possible, and added the HTTP Referer header and the HTML5 noreferrer attribute for links. Therefore, we adopted the same definitions presented in Section 3 of \cite{SPRESSO} for the web model, which define the communication model (i.e., messages, terms, events, atomic processes, a system consisting of atomic processes, runs, and scripting processes), web system in a tuple of $(\mathcal{W}, \mathcal{S}, \mathsf{script}, E^0)$, and web browsers modeled as Dolev-Yao processes denoted as $(I^p, Z^p, R^p, s_0^p)$. We do not include the full details here due to the space limit and refer interested readers to read Section 3 and Appendix A-C in \cite{SPRESSO}.
+Similar to SPRESSO~\cite{SPRESSO}, we simplified the handling of nonces, removed non-deterministic choices wherever possible, and added the HTTP Referer header and the HTML5 noreferrer attribute for links. Besides, we adopted most of the definitions for the web model presented in Section 3 of \cite{SPRESSO} in this proof. Therefore, we do not include and repeat the full details of these definitions here. We refer interested readers to Section 3 and Appendix A-C in \cite{SPRESSO}.
 
-\vspace{1mm} \noindent {\bf Formal Model of \usso.} We model \usso\ as a web system denoted as $\mathcal{UWS}=(\mathcal{W}, \mathcal{S}, \mathsf{script}, E^0)$ if is is of the form described as below.
+In summary, the web model defines the communication model (i.e., messages, terms, events, atomic processes, a system consisting of atomic processes, runs, and scripting processes), web system in a tuple of $(\mathcal{W}, \mathcal{S}, \mathsf{script}, E^0)$, and web browsers modeled as Dolev-Yao processes denoted as $(I^p, Z^p, R^p, s_0^p)$. 
 
-The set $\mathcal{W} = \mathsf{Hon} \cup \mathsf{Web} \cup \mathsf{Net}$ consists of an $\mathsf{IDP}$ for the web server of the identity provider, a finite set of web servers $\mathsf{RP}$ for the relying parties, 
-a finite set of web browsers $\mathsf{B}$, a finite set $\mathsf{DNS}$ of DNS servers, a finite set of web attacker processes (in $\mathsf{Web}$), and a network attacker process (in $\mathsf{Net}$), with $\mathsf{Hon}:=\mathsf{IDP}\cup\mathsf{RP}\cup\mathsf{B}\cup\mathsf{DNS}$. $\mathcal{S}$ denotes the set of scripts, which consists of an RP script $script_{rp}$ and an IdP script $script_{idp}$. Their respective string representations are defined by the mapping script, denoted as $\mathsf{script_{rp}}$ and $\mathsf{script_{idp}}$, respectively. Finally, the set $E^0$ only the trigger events of the form $<a,a,\mathsf{TRIGGER}>$ for every IP address $a$ in the web system.
+\vspace{1mm} \noindent {\bf Formal Model of \usso.} We model \usso\ as a web system $\mathcal{UWS}=(\mathcal{W}, \mathcal{S}, \mathsf{script}, E^0)$. The set $\mathcal{W} = \mathsf{Hon} \cup \mathsf{Web} \cup \mathsf{Net}$ consists of an $\mathsf{IDP}$ for the web server of the identity provider, a finite set of web servers $\mathsf{RP}$ for the relying parties, 
+a finite set of web browsers $\mathsf{B}$, %a finite set $\mathsf{DNS}$ of DNS servers, 
+a finite set of web attacker processes (in $\mathsf{Web}$), and a network attacker process (in $\mathsf{Net}$), with $\mathsf{Hon}:=\mathsf{IDP}\cup\mathsf{RP}\cup\mathsf{B}$. $\mathcal{S}$ denotes the set of scripts with an RP script and an IdP script, whose respective string representations are defined by the mapping script, denoted as $\mathsf{script_{rp}}$ and $\mathsf{script_{idp}}$, respectively. Finally, the set $E^0$ only the trigger events of the form $<a,a,\mathsf{TRIGGER}>$ for every IP address $a$ in the web system.
 
-We briefly sketch the processes and the scripts in $\mathcal{W}$ and $\mathcal{S}$: (1) Browsers $\mathsf{B}$ as defined in the web model; (2) $\mathsf{RP}$ is a web server that knows two distinct paths: /, which serves the index web page to download $\mathsf{script_{rp}}$ and $\mathsf{/rpLogin}$, which is the endpoint of RP accepting POST requests, issuing a fresh RP nonce, and accepting POST requests with login data obtained from $\mathsf{script_{rp}}$ running in the browser; (3) $\mathsf{IDP}$ is a web server that knows one distinct path $\mathsf{/idpLogin}$, which serves the login dialog web page to download $\mathsf{script_{idp}}$ and the public key of the IdP and issues the signed identity token. And (4) each DNS server $\mathsf{DNS}$ contains the assignment of domain names to IP addresses and answers DNS requests
-accordingly. 
+We briefly sketch the processes and the scripts in $\mathcal{W}$ and $\mathcal{S}$: 
+(1) Browsers $\mathsf{B}$ as defined in the web model; 
+(2) $\mathsf{RP}$ is a web server that knows four distinct paths: $\mathsf{/script}$, which returns $\mathsf{script_{rp}}$; $\mathsf{/LoginSSO}$, which redirects the browser to the IdP script; $\mathsf{/stateNegotiation}$, which accepts POST requests with data ($t$) obtained from $\mathsf{script_{rp}}$ running in the browser and returns the RP certificate; and $\mathsf{/uploadToken}$, which accepts login data obtained from $\mathsf{script_{rp}}$. 
+(3) $\mathsf{IDP}$ is a web server that knows four distinct paths: $\mathsf{/script}$, which returns $\mathsf{script_{idp}}$; $\mathsf{/authentication}$, which authenticates the user if he has not been authenticated yet; $\mathsf{/reqToken}$, which requests session cookie if the user has logged in; and $\mathsf{/authorize}$, which verifies $PID_{RP}$, computes $PID_U$, obtains the user's authorization for the request, and returns the scope of the authorized attributes. %And (4) each DNS server $\mathsf{DNS}$ contains the assignment of domain names to IP addresses and answers DNS requests accordingly. 
 
-The browsers and RPs can become corrupted. If they receive the message $\mathsf{CORRUPT}$, they will 
-collect all incoming messages in their state and send out messages derivable from their state, like any attacker process.
+A browser is modeled as an atomic DY process $(I^b, Z^b, R^b, s_0^b)$ for each $b \in \mathsf{B}$. The web browser model of \usso\ is simpler than the one in SPRESSO. So, we adopted several atomic processes of the web browsers defined in SPRESSO (Appendix C.2 in \cite{SPRESSO}) and reused them directly, which includes the atomic processes for ``prepare headers'', ``save message'', ``execute a script'', ``process an HTTP response'', etc. 
 
+The IdP is also modeled as an atomic DY process $(I^i, Z^i, R^i, s_0^i)$ with the address $I_r:=addr(i)$. Its initial state $s_0^i$ contains a list of its domains and (private) TLS keys, a list of users and identities ($u$s), and a private key
+for signing identity tokens. IdP accepts only HTTPS requests and manages the login session of the user. In a login flow, $i$ will receive an HTTP GET request for the path $\mathsf{/script}$, and returns the $\mathsf{script_{idp}}$. We describe the relation $R^i$ as a non-deterministic algorithm (Algorithm 1 in Appendix C). 
 
-\section{Security of \usso\ w.r.t. Authentication}
+Similarly, a relying party in a \usso\ web system is modeled as an atomic DY process $(I^r, Z^r, R^r, s_0^r)$ with the address $I_r:=addr(r)$. Its initial state $s_0^r$ contains its domains and the private keys associated with the domains. RP accepts only HTTPS requests and manages two types of sessions: the login session is used during user login and the service session (identified by a {\em service token}) denotes the phase in which the user uses the RP service. In \usso, the service token is in the form of $\langle IDToken$, $Acct \rangle$. In a login flow, $r$ will receive an HTTP GET request for the path $\mathsf{/script}$, and returns the $\mathsf{script_{rp}}$. We describe the relation $R^r$ as a non-deterministic algorithm (Algorithm 2 in Appendix C). 
+
+The browsers and RPs can become corrupted. If they receive the message $\mathsf{CORRUPT}$, they will collect all incoming messages in their state and send out messages derivable from their state, like any attacker process.
+
+The \usso\ web system also have two scripts, which represent a relation taking a term as input and
+outputting a new term. We describe the relations $\mathsf{script_{idp}}$ and $\mathsf{script_{rp}}$ formally as non-deterministic algorithms, as shown in Algorithms 3 and 4 in Appendix C.
+
+\section{\usso\ Security Proofs}
 \label{appendix-security}
 
+First, we formally define the two security properties {\bf (A)} and {\bf (B)} that \usso\ fulfills as follows. Note that the RP service token should be defined as $\langle IDToken$, $Acct \rangle$.
+
+\begin{definition}
+Let  $\mathcal{U\!W\!S}^{auth}$ be a \usso\ web system for authentication analysis. We say that $\mathcal{U\!W\!S}^{auth}$ is secure if for every run $\rho$ of $\mathcal{U\!W\!S}^{auth}$, every state ($S^j$, $E^j$, $N^j$) in $\rho$, every $r \in$ $\mathtt{RP}$ that is honest, every RP service token of the form $\langle IDToken$, $Acct \rangle$ recorded in $S^j$($r$).$\mathtt{serviceTokens}$, the following two conditions are satisfied:
+
+(A) If $\langle IDToken$, $Acct \rangle$ is derivable from the attacker's knowledge in $S^j$ (i.e., $\langle IDToken$, $Acct \rangle \in d_{\emptyset}$($S^j$($\mathtt{attacker}$))), then it follows that the browser b owning $Acct$ is fully corrupted in $S^j$ (i.e., the value of $isCorrupted$ is $\mathtt{FULLCORRUPT}$) or $\mathtt{governor}$($Acct$) is not an honest IdP (in $S^j$).
+
+(B) If the request corresponding to $\langle IDToken$, $Acct \rangle$ was sent by some $b \in \mathtt{B}$ which is honest in $S^j$, then $b$ owns $ID_U$ which satisfies $Acct=[ID_U]S^j(r).ID_{RP}$.
+\end{definition}
+
+Properties (A) and (B) are proved separately. Following \cite{SPRESSO}, the strategy used to prove either property is by assuming that the respective property is not satisfied and showing that it leads to a contradiction.
+
+\vspace{1mm}\noindent {\bf Proof of Property A.} Based on the above definition and following the formal analysis in \cite{SPRESSO}, we define Property A as follows.
+
+\begin{definition}
+$\mathcal{U\!W\!S}^{auth}$ is secure with respect to Property A if, for every run $\rho$, every state ($S^j$, $E^j$, $N^j$) in $\rho$, every $r \in \mathtt{RP}$ that is honest in $S^j$, every RP service token of the form $\langle IDToken$, $Acct \rangle$ recorded in $S^j$($r$).$\mathtt{serviceTokens}$ and derivable from the attacker's knowledge in $S^j$ (i.e., $\langle IDToken$, $Acct \rangle \in d_{\emptyset}$($S^j$($\mathtt{attacker}$))), it follows that the browser $b$ owning $Acct$ is fully corrupted in $S^j$ (i.e., the value of $isCorrupted$ is $\mathtt{FULLCORRUPT}$) or $\mathtt{governor}$($Acct$) is not an honest IdP (in $S^j$).
+\end{definition}
+
+Similar to \cite{SPRESSO}, we want to show that every \usso\ web system is secure with regard to Property (A) and therefore, we assume that there exists a \usso\ web system that is not secure. We show that it will lead to a contradiction. Thereby, all \usso\ web systems are secure with regard to Property (A).
+
+First, let $I:=\mathtt{governor}$($i$), which is an honest IdP. It never leaks its signing key (see Algorithm 1 in Appendix C%~\ref{alg:idp}
+). Therefore, the signed subterm $Content:= \langle PID_{RP}, PID_U, s'.Issuer, Validity \rangle$, $Sig:= SigSign(Content, s'.SK)$ and $IDToken:= \langle Content, Sig \rangle$ need to be created by the IdP $I$.  An (honest) IdP creates signatures only in Line 48-50 of Algorithm 1.%~\ref{alg:idp}.
+
+%(Same as Lemma 4 in SPRESSO)
+\begin{lemma}
+\label{lemma-user-request}
+Under the assumption above, only browser b can issue a request $req$ that triggers the IdP $I$ to create the signed term $IDToken$. The request was sent by b over HTTPS using I's public HTTPS key.
+\end{lemma}
+
+%The proof is same as the Lemma 4's proof in SPRESSO.
+\begin{proof}
+We consider two cases for $req$: first, if the user is not logged in with the identity $i$ at $I$, where the browser does not have any session cookie for $i$, then the request has to carry the password matching the identity $i$, which is known only to $b$. If $b$ is honest in $s_j$, it should have not sent the password to any party except $I$ over HTTP. It can be proved that $IDToken$ only contains the $PID_U:=[ID_U]PID_{RP}$, while $PID_U$ is provided by $b$ and $b$ owns the password of $ID_U$.
+\end{proof}
+
+
+
+
+
+
+
+
+% \section{Algorithms}
+% \label{appendix-algorithm}
+
+% \begin{breakablealgorithm}
+%   \caption{\textbf{Algorithm idp}}
+%   \label{alg:idp}
+%   \begin{algorithmic}[1]
+%   \REQUIRE \myss{\myangle{a, b, m}, s}
+%   \mystate{\myss{s':=s}}
+%   \mystate{\myss{n, method, path, parameters, headers, body} \textbf{such that}}\\
+%   \ \ \myss{\myangle{\mathtt{HTTPReq},n,method,path,parameters,headers,body} \equiv m}\\
+%   \ \ \textbf{if} \myss{possible}; \textbf{otherwise} stop \myss{\myangle{}, s'}
+%   \myif{path \equiv /script}
+%   \mystate{\myss{m':=\myangle{\mathtt{HTTPResp},n,200, \myangle{}, \mathtt{IdPScript}}}}
+%   \mystop{b, a, m'}
+%   \myelse{path \equiv /authentication}
+%   \mystate{\myss{cookie := headers[Cookie]}}
+%   \mystate{\myss{session := s'.SessionList[cookie]}}
+%   \mystate{\myss{username:=body[username]}}
+%   \mystate{\myss{password:=body[password]}}
+%   \myif{password \not\equiv \mathtt{PasswordOfUser(username)}}
+%   \mystate{\myss{m' :=\myangle{\mathtt{HTTPResp},n,200,\myangle{},\mathtt{LoginFailure}}}}
+%   \mystop{b, a,m'}
+%   \ENDIF
+%   \mystate{\myss{session[uid] := \mathtt{UIDOfUser}(username)}}
+%   \mystate{\myss{m' :=\myangle{\mathtt{HTTPResp},n,200,\myangle{},\mathtt{LoginSucess}}}}
+%   \mystop{b, a,m'}
+%   \myelse{path \equiv /reqToken}
+%   \mystate{\myss{cookie := headers[Cookie]}}
+%   \mystate{\myss{session := s'.SessionList[cookie]}}
+%   \mystate{\myss{IDTokens := session[IDTokens]}}
+%   \myif{IDTokens[body[PID_{RP}]] \not\equiv \mathtt{null}}
+%   \mystate{\myss{m' := \myangle{\mathtt{HTTPResp},n,200,\myangle{}, IDTokens[body[PID_{RP}]]}}}
+%   \mystop{b, a,m'}
+%   \ENDIF
+%   \mystate{\myss{m' := \myangle{\mathtt{HTTPResp},n,200,\myangle{},\mathtt{Unauthenticated}}}}
+%   \mystop{b, a,m'}
+%   \myelse{path \equiv /authorize}
+%   \mystate{\myss{cookie := headers[Cookie]}}
+%   \mystate{\myss{session := s'.SessionList[cookie]}}
+%   \mystate{\myss{uid := session[uid]}}
+%   \myif{uid \equiv \mathtt{null}}
+%   \mystate{\myss{m' := \myangle{\mathtt{HTTPResp}, n, 200, \myangle{}, \mathtt{Fail}}}}
+%   \mystop{b, a,m'}
+%   \ENDIF
+%   \mystate{\myss{PID_{RP} := parameters[PID_{RP}]}}
+%  \myif{\mathtt{IsValid}(PID_{RP}) \equiv \mathtt{FALSE}}
+%   \mystate{\myss{m' := \myangle{\mathtt{HTTPResp}, n, 200, \myangle{}, \mathtt{Fail}}}}
+%   \mystop{b, a,m'}
+%   \ENDIF
+%   \myif{\mathtt{IsInScope}(uid, body[Attr]) \equiv \mathtt{FALSE}}
+%   \mystate{\myss{m' := \myangle{\mathtt{HTTPResp}, n, 200, \myangle{}, \mathtt{Fail}}}}
+%   \mystop{b, a,m'}
+%   \ENDIF
+%   \mystate{\myss{ID_U := session[uid]}}
+%   \mystate{\myss{PID_U := \mathtt{Multiply}(PID_{RP}, ID_U)}}
+%   \mystate{\myss{Validity := \mathtt{CurrentTime} ()+ s'.Validity}}
+%   \mystate{\myss{Content := \myangle{PID_{RP}, PID_U, s'.Issuer, Validity}}}
+%   \mystate{\myss{Sig := \mathtt{SigSign}(Content, s'.SK)}}
+%   \mystate{\myss{IDToken := \myangle{Content, Sig}}}
+%   \mystate{\myss{session[IDTokens] := session[IDTokens]  + ^{\myangle{}}\myangle{PID_{RP}, IDToken}}}
+%   \mystate{\myss{m' := \myangle{\mathtt{HTTPResp}, n, 200, \myangle{}, Token}}}
+%   \mystop{b, a, m'}
+%   \ENDIF
+%   \mystop{}
+%   \end{algorithmic}
+% \end{breakablealgorithm}
+
+
+
+% \begin{breakablealgorithm}
+%   \caption{\textbf{Algorithm rp}}
+%   \label{alg:rp}
+%   \begin{algorithmic}[1]
+%   \REQUIRE \myss{\myangle{a, b, m}, s}
+%   \mystate{\myss{s':=s}}
+%   \mystate{\myss{n, method, path, parameters, headers, body} \textbf{such that}}\\
+%   \ \ \myss{\myangle{\mathtt{HTTPReq},n,method,path,parameters,headers,body} \equiv m}\\
+%   \ \ \textbf{if} \myss{possible}; \textbf{otherwise} stop \myss{\myangle{}, s'}
+%   \myif{path \equiv /script}
+% \mystate{\myss{m':=\myangle{\mathtt{HTTPResp},n,200, \myangle{}, \mathtt{RPScript}}}}
+%   \mystop{b, a, m'}
+%   \myelse{path \equiv /loginSSO}
+%   \mystate{\myss{m'  := \myangle{\mathtt{HTTPResp},n,302,\myangle{\myangle{\mathtt{Location}, s'.IdP.ScriptUrl}}, \myangle{}}}}
+%   \mystop{b, a, m'}
+%   \myelse{path \equiv /startNegotiation}
+%   \mystate{\myss{cookie := headers[Cookie]}}
+%   \mystate{\myss{session := s'.SessionList[cookie]}}
+%   \mystate{\myss{t := body[t]}}
+%   \mystate{\myss{t^{-1}:= \mathtt{Inverse}(t)}}
+%  % \mystate{\myss{session[t] := t}}
+%   \mystate{\myss{session[t^{-1}] := t^{-1}}}
+%   \mystate{\myss{session[state] := expectToken}}
+%   \mystate{\myss{m' := \myangle{\mathtt{HTTPResp}, n, 200, \myangle{}, \myangle{\mathtt{Cert_{RP}}, s'.Cert_{RP}}}}}
+%  \mystop{b, a, m'}
+%   \myelse{path \equiv /uploadToken}
+%  \mystate{\myss{cookie := headers[Cookie]}}
+%   \mystate{\myss{session := s'.SessionList[cookie]}}
+%   \myif{session[state] \not\equiv expectToken}
+%   \mystate{\myss{m' := \myangle{\mathtt{HTTPResp}, n, 200, \myangle{}, \mathtt{Fail}}}}
+%   \mystop{b, a, m'}
+%   \ENDIF
+%   \mystate{\myss{IDToken := body[IDToken]}}
+%   \myif{\mathtt{checksig}(IDToken.Content, IDToken.Sig, s'.IdP.PK) \equiv \mathtt{FALSE}}
+%   \mystate{\myss{m' := \myangle{\mathtt{HTTPResp}, n, 200, \myangle{}, \mathtt{Fail}}}}
+%   \mystop{b, a, m'}
+%   \ENDIF
+%   \mystate{\myss{Time := \mathtt{CurrentTime}()}}
+%  % \mystate{\myss{PIDValidity := session[PIDValidity]}}
+%   \mystate{\myss{Content := Token.Content}}
+%   \myif{Time>Content.Validity}
+%   \mystate{\myss{m' := \myangle{\mathtt{HTTPResp}, n, 200, \myangle{}, \mathtt{Fail}}}}
+%   \mystop{b, a, m'}
+%   \ENDIF
+%   \mystate{\myss{PID_U := Content.PID_U}}
+%   \mystate{\myss{t^{-1} := session[t^{-1}]}}
+%   \mystate{\myss{Acct := \mathtt{Multiply}(PID_U, t^{-1})}}
+%   \myif{Acct \not\in \mathtt{ListOfUser}()}
+%   \mystate{\myss{\mathtt{AddUser}(Acct)}}
+%   \ENDIF
+%   \mystate{\myss{session[user] := Acct}}
+%   \mystate{\myss{s'.serviceTokens := s'.serviceTokens + ^{\myangle{}}\myangle{IDToken, Acct}}}
+%   \mystate{\myss{m' := \myangle{\mathtt{HTTPResp}, n, 200, \myangle{}, \mathtt{LoginSuccess}}}}
+%   \mystop{b, a, m'}
+%   \ENDIF
+%   \mystop{}
+%   \end{algorithmic}
+% \end{breakablealgorithm}
+
+
+
+% \begin{breakablealgorithm}
+%   \caption{\textbf{Algorithm script\_idp}}
+%   \label{alg:script_idp}
+%   \begin{algorithmic}[1]
+%   \REQUIRE \myss{\myangle{tree, docID, scriptstate, scriptinputs, cookies, ids, secret}}
+%   \mystate{\myss{ s' := scriptstate}}
+%   \mystate{\myss{command := \myangle{}}}
+%   \mystate{\myss{target := \mathtt{PARENTWINDOW}(tree,docID)}}
+%   \mystate{\myss{IdPDomain := s'.IdPDomain}}
+%   \SWITCH{\myss{s'.phsae}}
+%     \CASE{\myss{start}}
+%       \mystate{\myss{t := \mathtt{Random}()}}
+%       \mystate{\myss{command := \myangle{\mathtt{POSTMESSAGE}, target, \myangle{\mathtt{t}, t}, \mathtt{null}}}}
+%       \mystate{\myss{s'.Parameters[t] := t}}
+%       \mystate{\myss{s'.phase := expectCert}}
+%     \ENDCASE
+%     \CASE{\myss{expectCert}}
+%       \mystate{\myss{pattern := \myangle{\mathtt{POSTMESSAGE}, target, *, \myangle{Cert_{RP}, *}}}}
+%       \mystate{\myss{input := \mathtt{CHOOSEINPUT}(scriptinputs,pattern)}}
+%       \myif{input \not\equiv \mathtt{null}}
+%       \mystate{\myss{Cert_{RP} := \pi_2(\pi_4(input))}}
+%       \myif{\mathtt{checksig}(Cert.Content, Cert.Sig, s'.PubKey) \equiv \mathtt{null}}
+%       \mystate{\myss{\textbf{stop}\ \myangle{}}}
+%       \ENDIF
+%        \mystate{\myss{s'.Parameters[Cert] := Cert_{RP}}}
+%       \mystate{\myss{t := s'.Parameters[t]}}
+%       \mystate{\myss{PID_{RP} := \mathtt{Multiply}(Cert_{RP}.ID_{RP}, t)}}
+%       \mystate{\myss{s'.Parameters[PID_{RP}] := PID_{RP}}}
+%       \mystate{\myss{Url := \myangle{\mathtt{URL}, \mathtt{S}, IdPDomain, /reqToken, \myangle{\myangle{\mathtt{PID_{RP}}, PID_{RP}}}}}}
+%       \mystate{\myss{command : = \myangle{\mathtt{XMLHTTPREQUEST}, Url, \mathtt{GET},\myangle{}, s'.refXHR}}}
+%       \mystate{\myss{s'.phase := expectLoginState}}
+%       \ENDIF
+%       \ENDCASE
+%       \CASE{expectReqToken}
+%       \mystate{\myss{pattern := \myangle{\mathtt{XMLHTTPREQUEST},Body,s'.refXHR}}}
+%       \mystate{\myss{input := \mathtt{CHOOSEINPUT}(scriptinputs,pattern) }}
+%       \myif{input \not\equiv \mathtt{null}}
+%       \myif{\pi_2(input) \equiv \mathtt{Unanthenticated}}
+%       \mystate{\myss{user \in ids}}
+%       \mystate{\myss{Url := \myangle{\mathtt{URL}, \mathtt{S}, IdPDomain, /authentication, \myangle{}}}}
+%       \mystate{\myss{command : = \myangle{\mathtt{XMLHTTPREQUEST}, Url, \mathtt{POST}, \myangle{\myangle{\mathtt{username}, username}, \myangle{\mathtt{password}, password}}, s'.refXHR}}}
+%       \mystate{\myss{s'.phase := expectLoginResult}}
+%       \ENDIF
+%       \mystate{\myss{IDToken := \pi_2(input)[\mathtt{IDToken}]}}
+%       \mystate{\myss{RPOringin := \myangle{s'.Parameters[Cert].Enpt, \mathtt{S}}}}
+%       \mystate{\myss{command := \myangle{\mathtt{POSTMESSAGE},target,\myangle{\mathtt{IDToken},IDToken},RPOrigin}}}
+%       \mystate{\myss{s .phase := stop}}
+%       \ENDIF
+%       \ENDCASE
+%       \CASE{expectLoginResult}
+%       \mystate{\myss{pattern := \myangle{\mathtt{XMLHTTPREQUEST},Body,s'.refXHR}}}
+%       \mystate{\myss{input := \mathtt{CHOOSEINPUT}(scriptinputs,pattern) }}
+%       \myif{input \not\equiv \mathtt{null}}
+%       \myif{\pi_2(input) \not\equiv \mathtt{LoginSuccess}}
+%       \mystate{\myss{\textbf{stop}\ \myangle{}}}
+%       \ENDIF
+%       \mystate{\myss{PID_{RP} := s'.Parameters[PID_{RP}]}}
+%       \mystate{\myss{Url := \langle \mathtt{URL}, \mathtt{S}, IdPDomain, /authorize,}  \myss{\myangle{\myangle{\mathtt{PID_{RP}}, PID_{RP}} , \myangle{\mathtt{Attr}, Attr} \rangle}}}
+%       \mystate{\myss{command : = \myangle{\mathtt{XMLHTTPREQUEST}, Url, \mathtt{GET},\myangle{}, s'.refXHR}}}
+%       \mystate{\myss{s'.phase := expectToken}}
+%       \ENDIF
+%       \ENDCASE
+%       \CASE{expectToken}
+%       \mystate{\myss{pattern := \myangle{\mathtt{XMLHTTPREQUEST},Body,s'.refXHR}}}
+%       \mystate{\myss{input := \mathtt{CHOOSEINPUT}(scriptinputs,pattern) }}
+%       \myif{input \not\equiv \mathtt{null}}
+%       \mystate{\myss{IDToken := \pi_2(input)[\mathtt{IDToken}]}}
+%       \mystate{\myss{RPOringin := \myangle{s'.Parameters[Cert].Enpt, \mathtt{S}}}}
+%       \mystate{\myss{command := \myangle{\mathtt{POSTMESSAGE},target,\myangle{\mathtt{IDToken},IDToken},RPOrigin}}}
+%       \mystate{\myss{s .phase := stop}}
+%      \ENDIF
+%     \ENDCASE
+%   \ENDSWITCH
+% \mystate{\myss{\textbf{stop}\ \myangle{s',cookies,localStorage,sessionStorage,command}}}
+%     \end{algorithmic}
+% \end{breakablealgorithm}
+
+
+% \begin{breakablealgorithm}
+%   \caption{\textbf{Algorithm script\_rp}}
+%   \label{alg:script_rp}
+%   \begin{algorithmic}[1]
+% \REQUIRE \myss{\myangle{tree, docID, scriptstate, scriptinputs, cookies, ids, secret}}
+% \mystate{\myss{ s' := scriptstate}}
+%   \mystate{\myss{command := \myangle{}}}
+%   \mystate{\myss{IdPWindow := \mathtt{SUBWINDOW}(tree,docnonce).winID}}
+%   \mystate{\myss{RPDomain := s'.RPDomain}}
+%   \mystate{\myss{IdPOringin := \myangle{s'.IdPDomian, \mathtt{S}}}}
+%   \SWITCH{\myss{s'.phase}}
+%     \CASE{\myss{start}}
+%     \mystate{\myss{Url := \myangle{\mathtt{URL}, \mathtt{S}, RPDomain, /loginSSO, \myangle{}}}}
+%     \mystate{\myss{command := \myangle{\mathtt{IFRAME}, Url, \_SELF}}}
+%     \mystate{\myss{s'.phase := expectt}}
+%     \ENDCASE
+%     \CASE{\myss{expectt}}
+%     \mystate{\myss{pattern := \myangle{\mathtt{POSTMESSAGE}, target, *, \myangle{\mathtt{t}, *}}}}
+%       \mystate{\myss{input := \mathtt{CHOOSEINPUT}(scriptinputs,pattern)}}
+%       \myif{input \not\equiv \mathtt{null}}
+%       \mystate{\myss{t := \pi_2(\pi_4(input))[t]}}
+%       \mystate{\myss{Url := \myangle{\mathtt{URL}, \mathtt{S}, RPDomain, /startNegotiation, \myangle{}}}}
+%       \mystate{\myss{command : = \myangle{\mathtt{XMLHTTPREQUEST}, Url, \mathtt{POST},\myangle{\myangle{t, t}}, s'.refXHR}}}
+%       \mystate{\myss{s'.phase := expectCert}}
+%       \ENDIF
+%       \ENDCASE
+%       \CASE{\myss{expectCert}}
+%       \mystate{\myss{pattern := \myangle{\mathtt{XMLHTTPREQUEST},Body,s'.refXHR}}}
+%       \mystate{\myss{input := \mathtt{CHOOSEINPUT}(scriptinputs,pattern) }}
+%       \myif{input \not\equiv \mathtt{null}}
+%       \mystate{\myss{Cert_{RP} := \pi_2(input)[Cert_{RP}]}}
+%       \mystate{\myss{command := \myangle{\mathtt{POSTMESSAGE}, IdPWindow, \myangle{\myangle{\mathtt{Cert}, Cert}}, IdPOringin}}}
+%       \mystate{\myss{s'.phase := expectToken}}
+%       \ENDIF
+%       \ENDCASE
+%       \CASE{\myss{expectToken}}
+%       \mystate{\myss{pattern := \myangle{\mathtt{POSTMESSAGE}, target, *, \myangle{\mathtt{IDToken}, *}}}}
+%       \mystate{\myss{input := \mathtt{CHOOSEINPUT}(scriptinputs,pattern)}}
+%       \myif{input \not\equiv \mathtt{null}}
+%       \mystate{\myss{IDToken := \pi_2(input)[IDToken]}}
+%       \mystate{\myss{Url := \myangle{\mathtt{URL}, \mathtt{S}, RPDomain, /uploadToken, \myangle{}}}}
+%       \mystate{\myss{command : = \myangle{\mathtt{XMLHTTPREQUEST}, Url, \mathtt{POST},\myangle{\myangle{\mathtt{IDToken}, IDToken}}, s'.refXHR}}}
+%       \mystate{\myss{s'.phase := expectLoginResult}}
+%       \ENDIF
+%       \ENDCASE
+%       \CASE{\myss{expectLoginResult}}
+%       \mystate{\myss{pattern := \myangle{\mathtt{XMLHTTPREQUEST},Body,s'.refXHR}}}
+%       \mystate{\myss{input := \mathtt{CHOOSEINPUT}(scriptinputs,pattern) }}
+%       \myif{input \not\equiv \mathtt{null}}
+%       \myif{\pi_2(input) \equiv \mathtt{LoginSuccess}}
+%       \mystate{Load Homepage}
+%       \ENDIF
+%       \ENDIF
+%     \ENDCASE
+%     \ENDSWITCH
+%     \mystate{\myss{\textbf{stop}\ \myangle{s',cookies,localStorage,sessionStorage,command}}}
+% \end{algorithmic}
+% \end{breakablealgorithm}
