@@ -15,34 +15,42 @@ In summary, the web model defines the communication model (i.e., messages, terms
 a finite set of web browsers $\mathsf{B}$, %a finite set $\mathsf{DNS}$ of DNS servers, 
 a finite set of web attacker processes (in $\mathsf{Web}$), and a network attacker process (in $\mathsf{Net}$), with $\mathsf{Hon}:=\mathsf{IDP}\cup\mathsf{RP}\cup\mathsf{B}$. $\mathcal{S}$ denotes the set of scripts with an RP script and an IdP script, whose respective string representations are defined by the mapping script, denoted as $\mathsf{script_{rp}}$ and $\mathsf{script_{idp}}$, respectively. Finally, the set $E^0$ only the trigger events of the form $<a,a,\mathsf{TRIGGER}>$ for every IP address $a$ in the web system.
 
-We briefly sketch the processes and the scripts in $\mathcal{W}$ and $\mathcal{S}$: 
+\vspace{1mm}\noindent \underline{\em Overview of the Processes.} We briefly sketch the processes and the scripts in $\mathcal{W}$ and $\mathcal{S}$: 
 (1) Browsers $\mathsf{B}$ as defined in the web model; 
 (2) $\mathsf{RP}$ is a web server that knows four distinct paths: $\mathsf{/script}$, which returns $\mathsf{script_{rp}}$; $\mathsf{/LoginSSO}$, which redirects the browser to the IdP script; $\mathsf{/stateNegotiation}$, which accepts POST requests with data ($t$) obtained from $\mathsf{script_{rp}}$ running in the browser and returns the RP certificate; and $\mathsf{/uploadToken}$, which accepts login data obtained from $\mathsf{script_{rp}}$. 
 (3) $\mathsf{IDP}$ is a web server that knows four distinct paths: $\mathsf{/script}$, which returns $\mathsf{script_{idp}}$; $\mathsf{/authentication}$, which authenticates the user if he has not been authenticated yet; $\mathsf{/reqToken}$, which requests session cookie if the user has logged in; and $\mathsf{/authorize}$, which verifies $PID_{RP}$, computes $PID_U$, obtains the user's authorization for the request, and returns the scope of the authorized attributes. %And (4) each DNS server $\mathsf{DNS}$ contains the assignment of domain names to IP addresses and answers DNS requests accordingly. 
 
-A browser is modeled as an atomic DY process $(I^b, Z^b, R^b, s_0^b)$ for each $b \in \mathsf{B}$. The web browser model of \usso\ is simpler than the one in SPRESSO. So, we adopted several atomic processes of the web browsers defined in SPRESSO (Appendix C.2 in \cite{SPRESSO}) and reused them directly, which includes the atomic processes for ``prepare headers'', ``save message'', ``execute a script'', ``process an HTTP response'', etc. 
+\vspace{1mm}\noindent \underline{\em Web Browsers.} A browser is modeled as an atomic DY process $(I^b, Z^b, R^b, s_0^b)$ for each $b \in \mathsf{B}$. The web browser model of \usso\ is simpler than the one in SPRESSO. So, we adopted several atomic processes of the web browsers defined in SPRESSO (Appendix C.2 in \cite{SPRESSO}) and reused them directly, which includes the atomic processes for ``prepare headers'', ``save message'', ``execute a script'', ``process an HTTP response'', etc. 
 
-The IdP is also modeled as an atomic DY process $(I^i, Z^i, R^i, s_0^i)$ with the address $I_r:=addr(i)$. Its initial state $s_0^i$ contains a list of its domains and (private) TLS keys, a list of users and identities ($u$s), and a private key
+\vspace{1mm}\noindent \underline{\em Identity Provider.} The IdP is also modeled as an atomic DY process $(I^i, Z^i, R^i, s_0^i)$ with the address $I_r:=addr(i)$. Its initial state $s_0^i$ contains a list of its domains and (private) TLS keys, a list of users and identities ($u$s), and a private key
 for signing identity tokens. IdP accepts only HTTPS requests and manages the login session of the user. In a login flow, $i$ will receive an HTTP GET request for the path $\mathsf{/script}$, and returns the $\mathsf{script_{idp}}$. We describe the relation $R^i$ as a non-deterministic algorithm (Algorithm 1 in Appendix C). 
 
-Similarly, a relying party in a \usso\ web system is modeled as an atomic DY process $(I^r, Z^r, R^r, s_0^r)$ with the address $I_r:=addr(r)$. Its initial state $s_0^r$ contains its domains and the private keys associated with the domains. RP accepts only HTTPS requests and manages two types of sessions: the login session is used during user login and the service session (identified by a {\em service token}) denotes the phase in which the user uses the RP service. In \usso, the service token is in the form of $\langle IDToken$, $Acct \rangle$. In a login flow, $r$ will receive an HTTP GET request for the path $\mathsf{/script}$, and returns the $\mathsf{script_{rp}}$. We describe the relation $R^r$ as a non-deterministic algorithm (Algorithm 2 in Appendix C). 
+\vspace{1mm}\noindent \underline{\em Relying Parties.} Similarly, a relying party in a \usso\ web system is modeled as an atomic DY process $(I^r, Z^r, R^r, s_0^r)$ with the address $I_r:=addr(r)$. Its initial state $s_0^r$ contains its domains and the private keys associated with the domains. RP accepts only HTTPS requests and manages two types of sessions: the login session is used during user login and the service session (identified by a {\em service token}) denotes the phase in which the user uses the RP service. In \usso, the service token is in the form of $\langle IDToken, Acct \rangle$. In a login flow, $r$ will receive an HTTP GET request for the path $\mathsf{/script}$ and return the $\mathsf{script_{rp}}$. We describe the relation $R^r$ as a non-deterministic algorithm (Algorithm 2 in Appendix C). 
 
-The browsers and RPs can become corrupted. If they receive the message $\mathsf{CORRUPT}$, they will collect all incoming messages in their state and send out messages derivable from their state, like any attacker process.
-
-The \usso\ web system also have two scripts, which represent a relation taking a term as input and
+\vspace{1mm}\noindent \underline{\em Scripts.} The \usso\ web system also have two scripts, which represent a relation taking a term as input and
 outputting a new term. We describe the relations $\mathsf{script_{idp}}$ and $\mathsf{script_{rp}}$ formally as non-deterministic algorithms, as shown in Algorithms 3 and 4 in Appendix C.
+
+\vspace{1mm}\noindent \underline{\em Web Attackers.} A web attacker, i.e., $wa \in \textsf{Web}$, is an attacker process that uses only his own addresses for sending and listening. It cannot listen to traffic intended for other processes. 
+
+\vspace{1mm}\noindent \underline{\em Network Attackers.} A network attacker, i.e., $na \in \textsf{Net}$, is an attacker process that uses all addresses for sending and listening. 
+A web attacker does not spoof sender addresses, while a network attacker may spoof all addresses. 
+
+Finally, the browsers and RPs can become corrupted. The states $Z^p$ of a web browser atomic process $p$ is defined in {\bf Definition 35} in \cite{SPRESSO}, which includes a term $isCorrupted$. For an honest entity, the state $s.isCorrupted=\perp$. Otherwise, it could be $\textsf{FULLCORRUPT}$ or $\textsf{CLOSECORRUPT}$ (i.e., a closed browser later used by a malicious user). When receiving a special message $\mathsf{CORRUPT}$, they will collect all incoming messages in their state and send out messages derivable from their state, like any attacker process.
 
 \section{\usso\ Security Proofs}
 \label{appendix-security}
 
-First, we formally define the two security properties {\bf (A)} and {\bf (B)} that \usso\ fulfills as follows. Note that the RP service token should be defined as $\langle IDToken$, $Acct \rangle$.
+Let  $\mathcal{UWS}^{auth}$ denote a \usso\ web system for authentication analysis. As $\mathcal{UWS}^{auth}$ adopted the fundamental atomic processes of the web browsers defined in \cite{SPRESSO}, it also offers the general properties provided by these processes in a SPPRESSO web system, which are presented in Definitions 53-63 in Appendix F1 of \cite{SPRESSO}. So, we will use them directly in following proofs without further elaboration.
+
+Based on the web model presented in Appendix~\ref{appendix-model}, we formally define the two security properties {\bf (A)} and {\bf (B)} that \usso\ fulfills as follows. 
+%Note that the RP service token should be defined as $\langle IDToken$, $Acct \rangle$.
 
 \begin{definition}
-Let  $\mathcal{U\!W\!S}^{auth}$ be a \usso\ web system for authentication analysis. We say that $\mathcal{U\!W\!S}^{auth}$ is secure if for every run $\rho$ of $\mathcal{U\!W\!S}^{auth}$, every state ($S^j$, $E^j$, $N^j$) in $\rho$, every $r \in$ $\mathtt{RP}$ that is honest, every RP service token of the form $\langle IDToken$, $Acct \rangle$ recorded in $S^j$($r$).$\mathtt{serviceTokens}$, the following two conditions are satisfied:
+$\mathcal{UWS}^{auth}$ is considered secure if for every run $\rho$ of $\mathcal{UWS}^{auth}$, every state ($S^j$, $E^j$, $N^j$) in $\rho$, every $r \in$ $\mathtt{RP}$ that is honest, every RP service token of the form $\langle IDToken, Acct \rangle$ recorded in $S^j$($r$).$\mathtt{serviceTokens}$, the following two conditions are satisfied:
 
-(A) If $\langle IDToken$, $Acct \rangle$ is derivable from the attacker's knowledge in $S^j$ (i.e., $\langle IDToken$, $Acct \rangle \in d_{\emptyset}$($S^j$($\mathtt{attacker}$))), then it follows that the browser b owning $Acct$ is fully corrupted in $S^j$ (i.e., the value of $isCorrupted$ is $\mathtt{FULLCORRUPT}$) or $\mathtt{governor}$($Acct$) is not an honest IdP (in $S^j$).
+(A) If $\langle IDToken, Acct\rangle$ is derivable from the attacker's knowledge in $S^j$, i.e., $\langle IDToken, PID_U \rangle \in d_{\emptyset}$($S^j$($\mathtt{attacker}$)), then it follows that the browser b owning $Acct$ is fully corrupted in $S^j$, i.e., the value of $isCorrupted$ is $\mathtt{FULLCORRUPT}$, or $\mathtt{governor}$($ID_U$), where $Acct=[ID_U]S^j(r).ID_{RP}$, is not an honest IdP in $S^j$.
 
-(B) If the request corresponding to $\langle IDToken$, $Acct \rangle$ was sent by some $b \in \mathtt{B}$ which is honest in $S^j$, then $b$ owns $ID_U$ which satisfies $Acct=[ID_U]S^j(r).ID_{RP}$.
+(B) If the request corresponding to $\langle IDToken, Acct \rangle$ was sent by some $b \in \mathtt{B}$ that is honest in $S^j$, then $b$ owns $ID_U$ that satisfies $Acct=[ID_U]S^j(r).ID_{RP}$.
 \end{definition}
 
 Properties (A) and (B) are proved separately. Following \cite{SPRESSO}, the strategy used to prove either property is by assuming that the respective property is not satisfied and showing that it leads to a contradiction.
@@ -50,7 +58,7 @@ Properties (A) and (B) are proved separately. Following \cite{SPRESSO}, the stra
 \vspace{1mm}\noindent {\bf Proof of Property A.} Based on the above definition and following the formal analysis in \cite{SPRESSO}, we define Property A as follows.
 
 \begin{definition}
-$\mathcal{U\!W\!S}^{auth}$ is secure with respect to Property A if, for every run $\rho$, every state ($S^j$, $E^j$, $N^j$) in $\rho$, every $r \in \mathtt{RP}$ that is honest in $S^j$, every RP service token of the form $\langle IDToken$, $Acct \rangle$ recorded in $S^j$($r$).$\mathtt{serviceTokens}$ and derivable from the attacker's knowledge in $S^j$ (i.e., $\langle IDToken$, $Acct \rangle \in d_{\emptyset}$($S^j$($\mathtt{attacker}$))), it follows that the browser $b$ owning $Acct$ is fully corrupted in $S^j$ (i.e., the value of $isCorrupted$ is $\mathtt{FULLCORRUPT}$) or $\mathtt{governor}$($Acct$) is not an honest IdP (in $S^j$).
+$\mathcal{UWS}^{auth}$ is secure with respect to Property A if, for every run $\rho$, every state ($S^j$, $E^j$, $N^j$) in $\rho$, every $r \in \mathtt{RP}$ that is honest in $S^j$, every RP service token of the form $\langle IDToken$, $Acct \rangle$ recorded in $S^j$($r$).$\mathtt{serviceTokens}$ and derivable from the attacker's knowledge in $S^j$ (i.e., $\langle IDToken$, $Acct \rangle \in d_{\emptyset}$($S^j$($\mathtt{attacker}$))), it follows that the browser $b$ owning $Acct$ is fully corrupted in $S^j$, i.e., the value of $isCorrupted$ is $\mathtt{FULLCORRUPT}$, or $\mathtt{governor}(Acct)$ is not an honest IdP in $S^j$.
 \end{definition}
 
 Similar to \cite{SPRESSO}, we want to show that every \usso\ web system is secure with regard to Property (A) and therefore, we assume that there exists a \usso\ web system that is not secure. We show that it will lead to a contradiction. Thereby, all \usso\ web systems are secure with regard to Property (A).
