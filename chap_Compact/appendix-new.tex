@@ -1,17 +1,19 @@
 \appendix
 
-\section{Formal Model of \usso}
+\section{The Formal Model of \usso}
 \label{appendix-model}
 
-In this section, we present a formal model for \usso, which closely follows the description in Section~\ref{implementations} and the implementation of the protocol. This model provides a basis for the formal analysis of the security w.r.t. authentication and privacy properties presented in Section~\ref{sec:analysis}.
+In this section, we present a formal model for \usso, which closely follows the description in Section \ref{implementations} and the implementation of \usso.
+This model provides a basis for the formal analysis of the security (w.r.t. authentication) and privacy properties presented in Section \ref{sec:analysis}.
 
 \vspace{1mm} \noindent {\bf Web Model. } We followed the formal analysis for the BrowerID~\cite{BrowserID} and SPRESSO~\cite{SPRESSO} protocols to define the web system based on the general Dolev-Yao (DY) web model. 
 
-Similar to SPRESSO~\cite{SPRESSO}, we simplified the handling of nonces, removed non-deterministic choices wherever possible, and added the HTTP Referer header and the HTML5 noreferrer attribute for links. Besides, we adopted most of the definitions for the web model presented in Section 3 of \cite{SPRESSO} in this proof. Therefore, we do not include and repeat the full details of these definitions here. We refer interested readers to Section 3 and Appendix A-C in \cite{SPRESSO}.
+Similar to SPRESSO~\cite{SPRESSO}, we simplified the handling of nonces, removed non-deterministic choices wherever possible, and added the HTTP referer header and the HTML5 noreferrer attribute for links.
+Besides, we adopted most of the definitions for the web model presented in Section 3 of \cite{SPRESSO}. Therefore, we do not include and repeat the full details of these definitions here. We refer interested readers to Section 3 and Appendix A-C in \cite{SPRESSO}.
 
-In summary, the web model defines the communication model (i.e., messages, terms, events, atomic processes, a system consisting of atomic processes, runs, and scripting processes), web system in a tuple of $(\mathcal{W}, \mathcal{S}, \mathsf{script}, E^0)$, and web browsers modeled as Dolev-Yao processes denoted as $(I^p, Z^p, R^p, s_0^p)$. 
+In summary, the web model defines the communication model (i.e., messages, terms, events, atomic processes, and a system consisting of atomic processes, runs, and scripting processes), web system in a tuple of $(\mathcal{W}, \mathcal{S}, \mathsf{script}, E^0)$, and web browsers modeled as Dolev-Yao processes denoted as $(I^p, Z^p, R^p, s_0^p)$. 
 
-\vspace{1mm} \noindent {\bf Formal Model of \usso.} We model \usso\ as a web system $\mathcal{UWS}=(\mathcal{W}, \mathcal{S}, \mathsf{script}, E^0)$. The set $\mathcal{W} = \mathsf{Hon} \cup \mathsf{Web} \cup \mathsf{Net}$ consists of an $\mathsf{IDP}$ for the web server of the identity provider, a finite set of web servers $\mathsf{RP}$ for the relying parties, 
+\vspace{1mm} \noindent {\bf Formal Model of \usso.} We model \usso\ as a web system $\mathcal{U\!W\!S}=(\mathcal{W}, \mathcal{S}, \mathsf{script}, E^0)$. The set $\mathcal{W} = \mathsf{Hon} \cup \mathsf{Web} \cup \mathsf{Net}$ consists of an $\mathsf{IDP}$ for the web server of the identity provider, a finite set of web servers $\mathsf{RP}$ for the relying parties, 
 a finite set of web browsers $\mathsf{B}$, %a finite set $\mathsf{DNS}$ of DNS servers, 
 a finite set of web attacker processes (in $\mathsf{Web}$), and a network attacker process (in $\mathsf{Net}$), with $\mathsf{Hon}:=\mathsf{IDP}\cup\mathsf{RP}\cup\mathsf{B}$. $\mathcal{S}$ denotes the set of scripts with an RP script and an IdP script, whose respective string representations are defined by the mapping script, denoted as $\mathsf{script_{rp}}$ and $\mathsf{script_{idp}}$, respectively. Finally, the set $E^0$ only the trigger events of the form $<a,a,\mathsf{TRIGGER}>$ for every IP address $a$ in the web system.
 
@@ -37,16 +39,16 @@ A web attacker does not spoof sender addresses, while a network attacker may spo
 
 Finally, the browsers and RPs can become corrupted. The states $Z^p$ of a web browser atomic process $p$ is defined in {\bf Definition 35} in \cite{SPRESSO}, which includes a term $isCorrupted$. For an honest entity, the state $s.isCorrupted=\perp$. Otherwise, it could be $\textsf{FULLCORRUPT}$ or $\textsf{CLOSECORRUPT}$ (i.e., a closed browser later used by a malicious user). When receiving a special message $\mathsf{CORRUPT}$, they will collect all incoming messages in their state and send out messages derivable from their state, like any attacker process.
 
-\section{\usso\ Security Proofs}
+\section{Security Proofs of \usso}
 \label{appendix-security}
 
-Let  $\mathcal{UWS}^{auth}$ denote a \usso\ web system for authentication analysis. As $\mathcal{UWS}^{auth}$ adopted the fundamental atomic processes of the web browsers defined in \cite{SPRESSO}, it also offers the general properties provided by these processes in a SPPRESSO web system, which are presented in Definitions 53-63 in Appendix F1 of \cite{SPRESSO}. So, we will use them directly in following proofs without further elaboration.
+Let  $\mathcal{U\!W\!S}^{Auth}$ denote a \usso\ web system for authentication analysis. As $\mathcal{U\!W\!S}^{Auth}$ adopted the fundamental atomic processes of the web browsers defined in \cite{SPRESSO}, it also offers the general properties provided by these processes in a SPPRESSO web system, which are presented in Definitions 53-63 in Appendix F1 of \cite{SPRESSO}. So, we will use them directly in following proofs without further elaboration.
 
-Based on the web model presented in Appendix~\ref{appendix-model}, we formally define the two security properties {\bf (A)} and {\bf (B)} that \usso\ fulfills as follows. 
+Based on the web model presented in Appendix \ref{appendix-model}, we formally define the two security properties {\bf (A)} and {\bf (B)} that \usso\ fulfills as follows. 
 %Note that the RP service token should be defined as $\langle IDToken$, $Acct \rangle$.
 
 \begin{definition}
-$\mathcal{UWS}^{auth}$ is considered secure if for every run $\rho$ of $\mathcal{UWS}^{auth}$, every state ($S^j$, $E^j$, $N^j$) in $\rho$, every $r \in$ $\mathtt{RP}$ that is honest, every RP service token of the form $\langle IDToken, Acct \rangle$ recorded in $S^j$($r$).$\mathtt{serviceTokens}$, the following two conditions are satisfied:
+$\mathcal{U\!W\!S}^{Auth}$ is considered secure if for every run $\rho$ of $\mathcal{U\!W\!S}^{Auth}$, every state ($S^j$, $E^j$, $N^j$) in $\rho$, every $r \in$ $\mathtt{RP}$ that is honest, every RP service token of the form $\langle IDToken, Acct \rangle$ recorded in $S^j$($r$).$\mathtt{serviceTokens}$, the following two conditions are satisfied:
 
 (A) If $\langle IDToken, Acct\rangle$ is derivable from the attacker's knowledge in $S^j$, i.e., $\langle IDToken, PID_U \rangle \in d_{\emptyset}$($S^j$($\mathtt{attacker}$)), then it follows that the browser b owning $Acct$ is fully corrupted in $S^j$, i.e., the value of $isCorrupted$ is $\mathtt{FULLCORRUPT}$, or $\mathtt{governor}$($ID_U$), where $Acct=[ID_U]S^j(r).ID_{RP}$, is not an honest IdP in $S^j$.
 
@@ -56,16 +58,16 @@ $\mathcal{UWS}^{auth}$ is considered secure if for every run $\rho$ of $\mathcal
 Properties (A) and (B) are proved separately. Following \cite{SPRESSO}, the strategy used to prove either property is by assuming that the respective property is not satisfied and showing that it leads to a contradiction.
 
 \vspace{1mm}\noindent {\bf Proof of Property A.} 
-Similar to \cite{SPRESSO}, we first assume that there exists a $\mathcal{UWS}^{auth}$ that is not secure, and then show that it will lead to a contradiction. Thereby, all \usso\ web systems are secure with regard to Property (A), which is defined as follows.
+Similar to \cite{SPRESSO}, we first assume that there exists a $\mathcal{U\!W\!S}^{Auth}$ that is not secure, and then show that it will lead to a contradiction. Thereby, all \usso\ web systems are secure with regard to Property (A), which is defined as follows.
 
 % Based on the above definition and following the formal analysis in \cite{SPRESSO}, we define Property A as follows.
 
 \begin{definition}
-$\mathcal{UWS}^{auth}$ is secure with respect to Property A if, for every run $\rho$, every state ($S^j$, $E^j$, $N^j$) in $\rho$, every $r \in \mathtt{RP}$ that is honest in $S^j$, every RP service token of the form $\langle IDToken$, $Acct \rangle$ recorded in $S^j$($r$).$\mathtt{serviceTokens}$ and derivable from the attacker's knowledge in $S^j$ (i.e., $\langle IDToken$, $Acct \rangle \in d_{\emptyset}$($S^j$($\mathtt{attacker}$))), it follows that the browser $b$ owning $Acct$ is fully corrupted in $S^j$, i.e., the value of $isCorrupted$ is $\mathtt{FULLCORRUPT}$, or $\mathtt{governor}$($ID_U$), where $Acct=[ID_U]S^j(r).ID_{RP}$, is not an honest IdP in $S^j$.
+$\mathcal{U\!W\!S}^{Auth}$ is secure with respect to Property A if, for every run $\rho$, every state ($S^j$, $E^j$, $N^j$) in $\rho$, every $r \in \mathtt{RP}$ that is honest in $S^j$, every RP service token of the form $\langle IDToken$, $Acct \rangle$ recorded in $S^j$($r$).$\mathtt{serviceTokens}$ and derivable from the attacker's knowledge in $S^j$ (i.e., $\langle IDToken$, $Acct \rangle \in d_{\emptyset}$($S^j$($\mathtt{attacker}$))), it follows that the browser $b$ owning $Acct$ is fully corrupted in $S^j$, i.e., the value of $isCorrupted$ is $\mathtt{FULLCORRUPT}$, or $\mathtt{governor}$($ID_U$), where $Acct=[ID_U]S^j(r).ID_{RP}$, is not an honest IdP in $S^j$.
 \end{definition}
 
-First, let $I:=\mathtt{governor}$($i$), which is an honest IdP and never leaks its signing key (see Algorithm 1 in Appendix C%~\ref{alg:idp}
-). Therefore, the signed subterm $Content:= \langle PID_{RP}, PID_U, s'.Issuer, Validity \rangle$, $Sig:= SigSign(Content, s'.SK)$ and $IDToken:= \langle Content, Sig \rangle$ is created by the IdP $I$.  The honest IdP creates signatures only in Algorithm 1 (Line 48-50).%~\ref{alg:idp}.
+First, let $I:=\mathtt{governor}$($i$), which is an honest IdP and never leaks its signing key (see Algorithm 1 in Appendix C% \ref{alg:idp}
+). Therefore, the signed subterm $Content:= \langle PID_{RP}, PID_U, s'.Issuer, Validity \rangle$, $Sig:= SigSign(Content, s'.SK)$ and $IDToken:= \langle Content, Sig \rangle$ is created by the IdP $I$.  The honest IdP creates signatures only in Algorithm 1 (Line 48-50).% \ref{alg:idp}.
 
 %(Same as Lemma 4 in SPRESSO)
 \begin{lemma}
@@ -110,7 +112,7 @@ The script script\_idp forwards IDToken only to the script script\_rp loaded fro
 
 \begin{proof}
 We adapted the proof for Lemma 8 in SPRESSO. 
-The honest $script\_idp$ that runs in the honest browser $b$ forwards $IDToken$ only to the origin $\langle Cert_{RP}.Enpt_{RP}, S \rangle$, as shown in Algorithm 3%~\ref{alg:script_idp}
+The honest $script\_idp$ that runs in the honest browser $b$ forwards $IDToken$ only to the origin $\langle Cert_{RP}.Enpt_{RP}, S \rangle$, as shown in Algorithm 3% \ref{alg:script_idp}
 (Lines 9, 16, 19, 21, 38, 39, 59, and 60). 
 $IDToken$ holds $PID_{RP} \equiv [t]Cert_{RP}.ID_{RP}$ and $t$ that is a one-time random number. The relation of $ID_RP$ and $Enpt$ is guaranteed by the signature generated by the IdP $I$. 
 \end{proof}
@@ -122,18 +124,18 @@ From the RP document, IDToken is sent only to the RP r and over HTTPS.
 
 \begin{proof}
 We adapted the proof for Lemma 9 in SPRESSO. 
-From the definition of the RP script and as also shown in Algorithm 4, %~\ref{alg:script_rp}.
+From the definition of the RP script and as also shown in Algorithm 4, % \ref{alg:script_rp}.
 $script\_rp$ of the origin $\langle Cert_{RP}.Enpt_{RP}, S \rangle$ would send $IDToken$ only to the corresponding RP $r$. 
 \end{proof}
 
 \vspace{2mm}
 
-With Lemmas 2 and 3, we show that only the honest browser and the honest IdP script can trigger an identity token request and $PID_{RP}$ in the request cannot be leaked or altered by the attacker (Property A1). 
-With Lemmas 4-6, we show that $IDToken$, once it was signed by the IdP $I$, would be transferred to the honest browser $b$, the IdP script, the RP script, and the target RP, which do not leak it to any attacker. Therefore, it cannot be known to ({\em ID Token Confidentiality}) or altered by ({\em ID Token Integrity}) the attacker, which is denoted as Property A2.
+With Lemmas 2 and 3, we show that only the honest browser and the honest IdP script can trigger an identity token request and $PID_{RP}$ in the request cannot be leaked or altered by the attacker (Property C1). 
+With Lemmas 4-6, we show that $IDToken$, once it was signed by the IdP $I$, would be transferred to the honest browser $b$, the IdP script, the RP script, and the target RP, which do not leak it to any attacker. Therefore, it cannot be known to ({\em ID Token Confidentiality}) or altered by ({\em ID Token Integrity}) the attacker, which is denoted as Property C2.
 
 Now, for $\langle IDToken$, $Acct \rangle$ to be created and recorded in $S^j(r)$, an identity toke request $req$ has to be created and sent, which can be done only by $I$, the IdP script, and $b$. None of them will leak the response token to the attacker. This is a contradiction to the assumption, where we assumed that $\langle IDToken$, $Acct \rangle \in d_{\emptyset}$($S^j$($\mathtt{attacker}$)). 
 
-If collusive attackers are not considered, we could prove that every $\mathcal{UWS}^{auth}$ is secure in the sense of Property A. However, in \usso, a malicious RP could share a valid $IDToken$ it received with a malicious user, who replays it to another honest RP, if $t^{adversary}$ would satisfy $IDToken.PID_{RP} \equiv [t^{adversary}]ID_{RP}^{honest}$. Therefore, we need to further prove Theorems 2 and 3 in Section 5.1.
+If collusive attackers are not considered, we could prove that every $\mathcal{U\!W\!S}^{Auth}$ is secure in the sense of Property A. However, in \usso, a malicious RP could share a valid $IDToken$ it received with a malicious user, who replays it to another honest RP, if $t^{adversary}$ would satisfy $IDToken.PID_{RP} \equiv [t^{adversary}]ID_{RP}^{honest}$. Therefore, we need to further prove Theorems 2 and 3 in Section 5.1.
 
 %The proofs show that the $IDToken$ is only sent to the honest browser (Lemma 1-7) and  target RP (Lemma 8-9). Above proofs can be reduced to the {\color{blue}Confidentiality and Integrity Properties}, simply described as the {\color{blue} Theorem 3 and 4} in section 5.2.
 %---- we may not need Lemma 7
@@ -149,11 +151,11 @@ If collusive attackers are not considered, we could prove that every $\mathcal{U
 % \end{proof}
 
 
-\vspace{3mm}\noindent {\bf Proof of Property B.} This property is formally defined for a \usso\ web system $\mathcal{UWS}^{auth}$ as follows. 
+\vspace{3mm}\noindent {\bf Proof of Property B.} This property is formally defined for a \usso\ web system $\mathcal{U\!W\!S}^{Auth}$ as follows. 
 
 \begin{definition}
 \label{def:B}
-$\mathcal{UWS}^{auth}$ is considered secure (with respect to Property B) if for every run $rho$ of $\mathcal{UWS}^{auth}$, every state ($S^j$, $E^j$, $N^j$) in $rho$, every $r \in \mathtt{RP}$ that is honest in $S^j$, every RP service token of the form $\langle IDToken$, $Acct \rangle$ recorded in $S^j$($r$).$\mathtt{serviceTokens}$, with the request corresponding to $\langle IDToken$, $Acct \rangle$ sent by some $b \in B$ that is honest in $S^j$, b owns Acct.
+$\mathcal{U\!W\!S}^{Auth}$ is considered secure (with respect to Property B) if for every run $rho$ of $\mathcal{U\!W\!S}^{Auth}$, every state ($S^j$, $E^j$, $N^j$) in $rho$, every $r \in \mathtt{RP}$ that is honest in $S^j$, every RP service token of the form $\langle IDToken$, $Acct \rangle$ recorded in $S^j$($r$).$\mathtt{serviceTokens}$, with the request corresponding to $\langle IDToken$, $Acct \rangle$ sent by some $b \in B$ that is honest in $S^j$, b owns Acct.
 \end{definition}
 
 To prove Property (B), we first adapted Lemma 10 in SPRESSO to show that the request corresponding to $\langle IDToken$, $Acct \rangle$ sent by honest $b$ is loaded from $script\_rp$. 
@@ -168,17 +170,18 @@ Then, we prove that $IDToken$ uploaded by an honest $b$ can only be associated w
 % The RP accepts the user's identity (Line 43 in Algorithm 2), 
 % And the identity is generated at Line 38, based on the $PID_U$ retrieved from the $IDTpken$ and the trapdoor $t^{-1}$.
 % The $t^{-1}$ is generated in Line 13 and set in Line 14. It is never changed, as the multiplicative inverse of $t$.
-% The $IDToken$ is issued at Line 50 in Algorithm~\ref{alg:idp}.
+% The $IDToken$ is issued at Line 50 in Algorithm \ref{alg:idp}.
 % The IdP generates the $PID_U$ based on the $PID_{RP}$ and $ID_U$ related to $b \ in \mathtt{Browser}$.
 
 % An attacker may allure the honest user to upload the $IDToken \in d_{\emptyset}$($S^j$($\mathtt{attacker}$)) to honest $r \in \mathtt{RP}$, so that there may be $Acct \in d_{\emptyset}$($S^j$($\mathtt{attacker}$)).
 % However, while $b$ has already negotiated the $PID_{RP}$ with $r$, the opener of the $script\_idp$ must be the $script\_rp$.
 
-% As the $t$ generated at Line 7, Algorithm~\ref{alg:script_idp}, and $PID_{RP}$ generated at Line 21 in Algorithm~\ref{alg:script_idp}.
-% The $t$ is only sent to $script\_rp$ at Line 8 in Algorithm~\ref{alg:script_idp}, and the $script\_rp$ receives it at Line 18 in Algorithm~\ref{alg:script_rp}.
-% The $PID_{RP}$ is sent to the honest IdP at Lines 23 and 50 in Algorithm~\ref{alg:script_idp}, which is used for generating the $IDToken$.
+% As the $t$ generated at Line 7, Algorithm \ref{alg:script_idp}, and $PID_{RP}$ generated at Line 21 in Algorithm \ref{alg:script_idp}.
+% The $t$ is only sent to $script\_rp$ at Line 8 in Algorithm \ref{alg:script_idp}, and the $script\_rp$ receives it at Line 18 in Algorithm \ref{alg:script_rp}.
+% The $PID_{RP}$ is sent to the honest IdP at Lines 23 and 50 in Algorithm \ref{alg:script_idp}, which is used for generating the $IDToken$.
 
 % For every $IDToken$ sent by honest $b$ and honest $r$, there must be $IDToken.PID_{RP} \equiv [t]Cert_{RP}.ID_{RP}$, $IDToken.PID_U \equiv [ID_U]IDToken.PID_U$ and $Acct \equiv [t^{-1}]IDToken.PID_U$. According to the proof of {\color{blue}Theorem 2} in section 5.2, the $Acct$ must be owned by honest $b$ ($Acct \equiv [ID_U]S^j(r).ID_{RP}$, where $ID_U$ is related to $b$), which can be define as the  {\color{blue} User Identification Property} .
 % \end{proof}
 
-%With the above proofs, we now can guarantee that every $\mathcal{UWS}^{auth}$ system satisfies the requirements in Definition~\ref{def:B}, therefore $\mathcal{UWS}$ must be secure of Property B.
+%With the above proofs, we now can guarantee that every $\mathcal{UWS}^{auth}$ system satisfies the requirements in Definition \ref{def:B}, therefore $\mathcal{UWS}$ must be secure of Property B.
+
