@@ -53,21 +53,21 @@ It is worth noting that these guarantees are proved against different adversarie
 \label{analysis-security}
 
 \newc
-Based on the threat model in Section \ref{subsec:threatmodel}, the adversary against security (w.r.t. authentication) \cite{FettKS14,BrowserID,SPRESSO} considers a malicious user, by colluding with malicious RPs, attempts to (\emph{a}) impersonate an honest user to log into an honest RP (i.e., \emph{impersonation}), and (\emph{b}) intrude the login of an honest user to an honest RP so that the honest user is authenticated as another user (i.e., \emph{identity injection}). 
+Based on the threat model in Section \ref{subsec:threatmodel}, the adversary against security w.r.t. authentication \cite{FettKS14,BrowserID,SPRESSO} compromises some users, colludes with malicious RPs, and attempts to (\emph{a}) impersonate an honest user to log into an honest RP (i.e., \emph{impersonation}), and (\emph{b}) intrude the login of an honest user to an honest RP so that the honest user is authenticated as another user (i.e., \emph{identity injection}). 
 
 %could collude with each other and even with malicious RPs, attempting to (\emph{a}) impersonate an honest user to log into an honest RP or (\emph{b}) entice an honest user to log into an honest RP under a malicious user's account.
 
-For the analysis of security (w.r.t. authentication), we develop a formal model of \usso\ web systems (denoted as $\mathcal{U\!W\!S}^{Auth}$), which is defined in Appendix \ref{appendix-model}. It contains an IdP, a finite set of RPs, a finite set of users (i.e., browsers), and a network attacker. The attacker subsumes all web attackers and is assumed to be able to  corrupt a set of users and RPs.
+For the analysis of security w.r.t. authentication, we develop a formal model of \usso\ web systems (denoted as $\mathcal{U\!W\!S}^{Auth}$), which is defined in Appendix \ref{appendix-model}. It contains an IdP, a finite set of RPs, a finite set of users (i.e., browsers), and a network attacker. The attacker subsumes all web attackers and is assumed to be able to  corrupt a set of users and RPs.
 
 
 %------- new Theorem 5, move to the beginning of the proof ---------
 \begin{thm}
-\textsc{(Security)} \emph{\usso\ provides a secure SSO service (w.r.t. authentication)}.
+\textsc{(Security)} \emph{\usso\ provides a secure SSO service w.r.t. authentication}.
 \label{thm-security}
 \end{thm}
 
 \noindent\textbf{\textsc{Proof.}} Every SSO system should satisfy two fundamental properties that are deduced from \cite{FettKS14} and summarized in \cite{BrowserID,SPRESSO}: {\bf (A)} the attacker should not be able to access services of an honest RP as an honest user, and {\bf (B)} the attacker should not be able to authenticate an honest user to an honest RP on behalf of another user.
-For the proofs, we demonstrate that both properties (formally defined in Definition 1 in Appendix \ref{appendix-security}) are fulfilled for every $\mathcal{UWS}^{Auth}$.
+For the proofs, we demonstrate that both properties (formally defined in Definitions 2 and 3 in Appendix \ref{appendix-security}) are fulfilled for every $\mathcal{UWS}^{Auth}$.
 
 To prove Property {\bf A}, we first show that the attacker cannot obtain any useful information, which allows him to impersonate an honest user at some honest RP, from any login of an honest user to an honest RP. 
 %In particular, we show two properties of $\mathcal{UWS}^{Auth}$, i.e., a network attacker cannot break secure communications over HTTPS between {\bf (C1)} the honest IdP and an honest user (proved in Lemmas 2 and 3 in Appendix \ref{appendix-security}); and {\bf (C2)} the honest IdP and an honest RP (proved in Lemmas 4, 5, and 6 in Appendix \ref{appendix-security}). 
@@ -188,9 +188,9 @@ To issue an identity token requested for $PID_{RP}$, the honest IdP authenticate
 %We first prove that $PID_{U}$ \emph{uniquely} identifies one account at the designated RP and one user in the system. 
 This proves that $PID_U$ in $TK$ identifies an account $Acct$ at the designated RP, which is uniquely mapped to a user with $ID_U$ in the system.
 
-Next, we consider two adversarial scenarios where the attacker replays a token $TK$ for another user to (1) the designated RP ($t'\neq t$ for this login session), and (2) any honest RP in the system ($\tilde{t}\neq t$ for this login session). In the first case, the designated RP would calculate an account as $[t'^{-1}]PID_U = [t'^{-1}ut]ID_{RP}$.
+Next, we consider two adversarial scenarios where the attacker replays a token $TK$ for another user to (1) the designated RP but receiving $t'\neq t$ in this login, and (2) any other honest RP with $ID_{RP'} = [r']G \neq [r]G$ (i.e., $r' \neq r$). In the first case, the designated RP would calculate an account as $[t'^{-1}]PID_U = [t'^{-1}ut]ID_{RP}$.
 Because a user's identity is randomly selected by the IdP in $\mathbb{Z}_n$ and known only to the user (and the honest IdP), the probability that $t'^{-1}ut$ happens to be the identity of another user is negligible, when $n$ is sufficiently large. As a result, $[t'^{-1}]PID_U$ is likely not to identify any known account at the RP and therefore would be treated as a new account by the RP. 
-Secondly, the attacker presents $TK$ to an $RP'$ in the system, where $ID_{RP'} = [r']G \neq [r]G$. $RP'$ would calculate the account as $Acct' = [\tilde{t}^{-1}]PID_{U} = [\tilde{t}^{-1}utrr'^{-1}][r']G = [\tilde{t}^{-1}utrr'^{-1}]ID_{RP'}$. The probability that $\tilde{t}^{-1}utrr'^{-1}$ happens to be the identity of another user at $RP'$ is also negligible, when $n$ is sufficiently large. 
+Secondly, the attacker presents $TK$ to $RP'$ in the system, where $ID_{RP'} = [r']G \neq [r]G$. $RP'$ would calculate the account as $Acct' = [\tilde{t}^{-1}]PID_{U} = [\tilde{t}^{-1}utrr'^{-1}][r']G = [\tilde{t}^{-1}utrr'^{-1}]ID_{RP'}$. The probability that $\tilde{t}^{-1}utrr'^{-1}$ happens to be the identity of another user at $RP'$ is also negligible, when $n$ is sufficiently large. 
 %it identifies no account mapped to a user, at any RP not designated by $PID_{RP}$.
 \hfill $\square$
 
