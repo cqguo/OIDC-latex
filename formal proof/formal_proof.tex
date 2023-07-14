@@ -2,6 +2,7 @@
 
 \usepackage{amsmath}
 \usepackage{bm}
+\usepackage{color}
 \usepackage{filecontents}
 \usepackage{wasysym}
 \usepackage[small]{titlesec}
@@ -28,6 +29,9 @@
 \usepackage[algo2e]{algorithm2e}
 \usepackage{algorithm}
 \usepackage{algorithmic}
+\usepackage{macros}
+\usepackage{todonotes}
+\usepackage[backref]{hyperref} 
 \newtheorem{theorem}{Theorem}
 \newtheorem{definition}{Definition}
 \newtheorem{lemma}{Lemma}
@@ -69,11 +73,11 @@
 \newcommand{\deflet}{\textbf{let}}
 \newcommand{\mystate}[1]{\STATE \textbf{let} {{}#1}}
 \newcommand{\mystop}[1]{\STATE \textbf{stop} \myss{\myangle{{{}#1}}, s'}}
+\newcommand{\mystopp}[1]{\STATE \textbf{stop} \myss{\myangle{{{}#1}}}}
 \newcommand{\myss}[1]{${{}#1}$}
 \newcommand{\myangle}[1]{\langle {{}#1} \rangle}
 \newcommand{\myif}[1]{\IF{\myss{{{}#1}}}}
 \newcommand{\myelse}[1]{\ELSIF{\myss{{{}#1}}}}
-
 
 \newcommand{\aaa}[1]{\STATE \textbf{if} #1 \textbf{then} \begin{ALC@g}}
 \newcommand{\bbb}[1]{\end{ALC@g} \STATE \textbf{else if} #1 \textbf{then} \begin{ALC@g}}
@@ -90,276 +94,751 @@
 \newcommand{\DEFAULTLINE}[1]{\STATE \textbf{default:} }
 
 
-\section{Algorithms}
-\begin{breakablealgorithm}
-  \caption{\textbf{Algorithm idp}}
-  \label{alg:idp}
-  \begin{algorithmic}[1]
+\renewcommand{\thesection}{\Alph{section}} 
+
+
+\section{Preparation}
+
+Our formal security analysis of UPPRESSO is based on the general Dolev-Yao web model
+in SPRESSO.  To facilitate the definition of UPPRESSO, we change some details in
+model. In particular, we add some extra function symbols for asymmetric encryption/decryption.
+
+Since our model is using ECC(Elliptic Curve Cryptography) to encrypt/decrypt the data,
+we add the following symbols to the signature $\Sigma$ for the terms and messages:
+
+\begin{itemize}
+  \item $\mathbb{E}$ is an elliptic curve over a finite field $\mathbb{F}_q$, $G$ is a base point(or generator) of $\mathbb{E}$ and the order of $G$ is a prime number n.
+  \item $[t]P$ means using asymmetric key $t$ to encrypt the point $P=[p]G$ on the elliptic curve where $p$ is the actual plaintext.
+  \item $[t^{-1}]C$ means using the reverse of $t$ to decrypt the point $C=[c]G=[tm]G$ on the elliptic curve where $c$ is the cipertext.  
+  \item $\str{isValid}(P)$ checks whether $P$ is a valid point on the elliptic curve. That is to say whether $P=[m]G$ for the base point $G$ and some nonce $m$.
+\end{itemize}
+
+\section{Formal Model of UPPRESSO}
+\label{app:model-uppresso}
+We here present the full details of our formal model of UPPRESSO. For our analysis regarding our authentication and privacy properties below, we will further restrict this generic model to suit the setting of respective analysis.\par
+We model UPPRESSO as a web system. We call a web system $\uppressowebsystem=(\bidsystem, \scriptset, \mathsf{script}, E^0)$ an UPPRESSO web system if it is of the form described in what follows.
+
+\subsection{Outline}\label{app:outlineuppressomodel}
+The system $\bidsystem=\mathsf{Hon}\cup \mathsf{Web} \cup \mathsf{Net}$ consists of web attacker processes (in $\mathsf{Web}$), network attacker processes (in $\mathsf{Net}$), a finite set $\fAP{B}$ of web browsers, a finite set $\fAP{RP}$ of web servers for the relying parties, a finite set $\fAP{IDP}$ of web servers for the identity providers, and a finite set $\fAP{DNS}$ of DNS servers, 
+with $\mathsf{Hon} := \fAP{B} \cup \fAP{RP} \cup \fAP{IDP} \cup \fAP{DNS}$. More details on the processes in $\mathpzc{W}$ are provided below. 
+%
+Figure~\ref{fig:scripts-in-w} shows the set of scripts $\scriptset$ 
+and their respectice string representations that are defined by the 
+mapping $\mathsf{script}$. 
+%
+The set $E^0$ contains only the trigger events.
+
+\begin{figure}[htb]
+  \centering
+  \begin{tabular}{|@{\hspace{1ex}}l@{\hspace{1ex}}|@{\hspace{1ex}}l@{\hspace{1ex}}|}\hline 
+    \hfill $s \in \scriptset$\hfill  &\hfill $\mathsf{script}(s)$\hfill  \\\hline\hline
+    $\Rasp$ & $\str{att\_script}$  \\\hline
+    $\mi{script\_rp}$ & $\str{script\_rp}$  \\\hline
+    $\mi{script\_idp}$ &  $\str{script\_idp}$  \\\hline
+  \end{tabular}
+  
+  \caption{List of scripts in $\scriptset$ and their respective string
+    representations.}
+  \label{fig:scripts-in-w}
+\end{figure}
+
+This outlines $\uppressowebsystem$. We will define the DY processes in 
+$\uppressowebsystem$ and their addresses, domain names, and secrets in more detail. 
+The scripts are defined in detail in Appendix~\ref{app:uppresso-scripts}
+
+\subsection{Addresses and Domain Names}
+The set $\addresses$ contains for every web attacker in $\fAP{Web}$, every network attacker in $\fAP{Net}$, every relying
+party in $\fAP{RP}$, every identity provider in $\fAP{IDP}$, 
+every DNS server in $\fAP{DNS}$, and every browser in $\fAP{B}$ a finite set
+of addresses each. By $\mapAddresstoAP$ we denote the corresponding
+assignment from a process to its address. The set $\dns$ contains a
+finite set of domains for every relying party in $\fAP{RP}$, 
+every identity provider in $\fAP{IDP}$, every web attacker in $\fAP{Web}$, 
+and every network attacker in $\fAP{Net}$. Browsers (in $\fAP{B})$ and DNS servers (in $\fAP{DNS}$) do not have a domain.
+
+By $\mapAddresstoAP$ and $\mapDomain$ we denote the assignments from
+atomic processes to sets of $\addresses$ and $\dns$, respectively.
+
+\subsection{Keys and Secrets} The set $\nonces$ of nonces is
+partitioned into four sets, an infinite sequence $N$, an infinite set
+$K_\text{SSL}$, an infinite set $K_\text{sign}$, an infinite set $K_\text{id}$ and a finite set
+$\RPSecrets$. We thus have
+\begin{align*}
+\def\hereMaxHeightPhantom{\vphantom{K_{\text{p}}^\bidsystem}}
+\nonces = 
+\underbrace{N\hereMaxHeightPhantom}_{\text{infinite sequence}} 
+\dot\cup \underbrace{K_{\text{SSL}}\hereMaxHeightPhantom}_{\text{finite}} 
+\dot\cup \underbrace{K_{\text{sign}}\hereMaxHeightPhantom}_{\text{finite}}
+\dot\cup \underbrace{K_{\text{id}}\hereMaxHeightPhantom}_{\text{finite}}  
+\dot\cup \underbrace{\RPSecrets\hereMaxHeightPhantom}_{\text{finite}}\ .
+\end{align*}
+The set $N$ contains the nonces that are available for each DY process
+in $\bidsystem$ (it can be used to create a run of $\bidsystem$). 
+
+The set $K_\text{SSL}$ contains the keys that will be used for SSL
+encryption. Let $\mapSSLKey\colon \dns \to K_\text{SSL}$ be an injective
+mapping that assigns a (different) private key to every domain.
+
+The set $K_\text{sign}$ contains the keys that will be used by IdPs
+for signing IAs. Let $\mapSignKey\colon \fAP{IdPs} \to K_\text{sign}$
+be an injective mapping that assigns a (different) private key to every identity
+provider.
+
+The set $K_\text{id}$ contains all numbers $x\in[1,n)$ in which n is a prime number up to $2^{256}$
+The set $K_\text{id}$ will be used to generate identities of $\fAP{B}$ and $\fAP{RP}$.
+
+The set $\RPSecrets$ is the
+set of passwords (secrets) the browsers share with the identity
+providers. 
+
+\subsection{Identities}\label{app:uppresso-identities}
+Identities are alike email addresses, which consist of a number, a user name 
+and a domain part. For our model, this is defined as follows:
+\begin{definition}
+  An \emph{identity} $u$ is a term of the form $\an{\mi{id},\mi{name},\mi{domain}}$ 
+  with $\mi{id}\in K_\text{id}$, $\mi{name}\in \mathbb{S}$ and $\mi{domain} \in \dns$.
+
+  Let $\IDs$ be the finite set of identities. By $\IDs^y$ we denote
+  the set $\{ \an{\mi{id},\mi{name},\mi{domain}} \in \IDs\,|\, \mi{domain}
+  \in \mapDomain(y) \}$.
+
+  We say that an ID is \emph{governed} by the DY process to which the
+  domain of the ID belongs. Formally, we define the mapping $\mapGovernor:
+  \IDs \to \bidsystem$, $\an{\mi{id},\mi{name},\mi{domain}} \mapsto
+  \mapDomain^{-1}(\mi{domain})$.
+\end{definition}
+
+The governor of an ID will usually be an IdP, but could also be the
+attacker. 
+
+By $\mapIDtoPLI:\IDs \to \RPSecrets$ we denote the bijective mapping
+that assigns secrets to all identities. 
+
+Let $\mapPLItoOwner: \RPSecrets \to \fAP{B}$ denote the mapping that
+assigns to each secret a browser that \emph{owns} this secret. Now, we
+define the mapping $\mapIDtoOwner: \IDs \to \fAP{B}$, $i \mapsto
+\mapPLItoOwner(\mapIDtoPLI(i))$, which assigns to each identity the
+browser that owns this identity (we say that the identity belongs to
+the browser).
+
+It should be pointed out that in UPPRESSO, the relying parties also have 
+identities referred to as $r$ which is important for privacy analysis. 
+The form of $r$ is the same as $u$. To be concise, we usually use $u$ and $r$ to
+refer to $u.id$ and $r.id$ if we don't say they are identities or $u,r\in\IDs$
+
+\subsection{Tags, Identity Tokens and Service Tokens}\label{app:identity-assertions}
+
+\begin{definition}\label{def:tag}
+  A \emph{tag} is a term of the form $\mi{PID_{rp}}=[t]ID_{rp}=[tr]G$ for a nonce 
+  (here used as a asymmetric key) $t$.
+\end{definition}
+\begin{definition}
+  An \emph{identity Tokens (IDToken)} is a term of the form 
+  $\an{PID_{rp}, PID_u, ver}$ for a tag $PID_{rp}$, an encrypted identity 
+  $PID_u=[u]PID_{rp}=[utr]G$ and a signature $ver=\sig{\an{PID_{rp},PID_u}}{k}$ 
+  for a nonce $k$.
+\end{definition}
+\begin{definition}
+  A \emph{service token} is a term of the form $\mi{Acct} = [t^{-1}]PID_u=[t^{-1}][utr]G=[ur]G$ 
+  for a nonce $t\in K_\text{id}$.
+\end{definition}
+
+\subsection{Corruption}\gs{DNS servers may not be corrupted?}
+RPs and IdPs can become corrupted: If they receive the message
+$\corrupt$, they start collecting all incoming messages in their state
+and (upon triggering) send out all messages that are derivable from
+their state and collected input messages, just like the attacker
+process. We say that an RP or an IdP is \emph{honest} if the according
+part of their state ($s.\str{corrupt}$) is $\bot$, and that they are
+corrupted otherwise.
+
+We are now ready to define the processes in $\websystem$ as well as
+the scripts in $\scriptset$ in more detail. 
+
+\subsection{Processes in $\bidsystem$ (Overview)}
+
+We first provide an overview of the processes in $\bidsystem$. All
+processes in $\websystem$ (except for DNS servers) contain in their initial states all public
+keys and the private keys of their respective domains (if any). We
+define $I^p=\mapAddresstoAP(p)$ for all $p\in \mathsf{Hon} \cup \mathsf{Web}$.
+
+\subsubsection{Web Attackers.}  Each $\mi{wa} \in \mathsf{Web}$  is a
+web attacker who uses only his own addresses for sending and listening. 
+
+\subsubsection{Network Attackers.}  Each $\mi{na} \in \mathsf{Net}$  is a
+network attacker who uses all addresses for sending and listening. 
+
+\subsubsection{Browsers.} Each $b \in \fAP{B}$ is a web browser. 
+The initial state contains all secrets owned by $b$, stored under the origin of the
+respective IdP. See Appendix~\ref{app:browsers-uppresso} for details.
+
+\subsubsection{Relying Parties.} 
+A relying party $r \in \fAP{RP}$ is a web server. RP knows four distinct paths: 
+$\mathtt{/script}$, where it serves $\str{script\_rp}$ to open a new window 
+and facilitate the login flow.
+$\mathtt{/loginSSO}$, where it only accepts GET requests and sends 
+redirect response to redirect the browser to the IdP to download $\str{script\_IdP}$
+$\mathtt{/startNegotiation}$, where it only accepts POST requests logically sent 
+from $\str{script\_rp}$ using postMessge and checks whether the data $t\in K_\text{id}$.
+If the request valid, it send back a certificate.
+$\mathtt{/uploadToken}$ running in the browser. It checks the ID token and, 
+if the data is deemed ``valid'', it issues a service token (again, for details, see below). 
+Intuitively, a client having such a token can use the service of the RP 
+(for a specific identity record along with the token). 
+Just like IdPs, RPs can become corrupted.
+
+\subsubsection{Identity Providers.} Each IdP is a web server, 
+users can authenticate to the IdP with their credentials. 
+IdP tracks the state of the users with sessions. 
+Authenticated users can receive IDTokens from the IdP. 
+When receiving a special message ($\corrupt$) IdPs can become corrupted. 
+Similar to the definition of corruption for the browser,
+IdPs then start sending out all messages that are derivable from their state.
+
+\subsubsection{DNS.} Each $\mi{dns} \in \fAP{DNS}$ is a DNS server.
+Their state contains the allocation of domain names to IP addresses.
+
+\subsection{SSL Key Mapping}\label{app:common-data-structures}
+Before we define the atomic DY processes in more detail, we first
+define the common data structure that holds the mapping of domain
+names to public SSL keys: For an atomic DY process $p$ we define
+\[\mi{sslkeys}^p = \an{\left\{\an{d, \mapSSLKey(d)} \mid d \in \mapDomain(p)\right\}}.\]
+
+\subsection{Web Attackers}\label{app:webattackers-uppresso}
+Each $\mi{wa} \in \fAP{Web}$ is a web attacker. The initial state of each $\mi{wa}$ is $s_0^\mi{wa} =
+\an{\mi{attdoms}, \mi{sslkeys}, \mi{signkeys}}$, where $\mi{attdoms}$
+is a sequence of all domains along with the corresponding private keys
+owned by $\mi{wa}$, $\mi{sslkeys}$ is a sequence of all domains and
+the corresponding public keys, and $\mi{signkeys}$ is a sequence
+containing all public signing keys for all IdPs. All other parties use
+the attacker as a DNS server.
+
+\subsection{Network Attackers}\label{app:networkattackers-uppresso}
+As mentioned, each network attacker $\mi{na}$ is modeled to be a network attacker. 
+We allow it to listen to/spoof all available IP addresses, and hence, 
+define $I^\mi{na} = \addresses$. The initial state is $s_0^\mi{na} =
+\an{\mi{attdoms}, \mi{sslkeys}, \mi{signkeys}}$, where $\mi{attdoms}$
+is a sequence of all domains along with the corresponding private keys
+owned by the attacker $\mi{na}$, $\mi{sslkeys}$ is a sequence of all domains 
+and the corresponding public keys, and $\mi{signkeys}$ is a sequence
+containing all public signing keys for all IdPs.
+
+\subsection{Browsers}\label{app:browsers-uppresso} 
+Each $b \in \fAP{B}$ is a web browser with $I^b := \mapAddresstoAP(b)$ being its addresses.
+
+To define the inital state, first let $\mi{ID}^b := \mapIDtoOwner^{-1}(b)$ be 
+the set of all IDs of $b$, $\mi{ID}^{b,d} := 
+\{i \mid \exists\, x,n:\ i = \an{id, n, d} \in \mi{ID}^b\}$ be the set of
+IDs of $b$ for a domain $d$, and $\mi{SecretDomains}^b := \{d \mid
+\mi{ID}^{b,d} \neq \emptyset \}$ be the set of all domains that $b$
+owns identities for.
+
+Then, the initial state $s_0^b$ is defined as follows: the key mapping
+maps every domain to its public (ssl) key, according to the mapping
+$\mapSSLKey$; the DNS address is $\mapAddresstoAP(p)$ with $p \in \bidsystem$;
+the list of secrets contains an entry $\an{\an{d,\https}, s}$ for each
+$d \in \mi{SecretDomains}^b$ and $s = \mapIDtoPLI(i)$ for some $i \in
+\mi{ID}^{b,d}$ ($s$ is the same for all $i$); $\mi{ids}$ is
+$\an{\mi{ID}^b}$; $\mi{sts}$ is empty.
+
+\subsection{Relying Parties} \label{app:relying-parties-uppresso}
+
+A relying party $r \in \fAP{RP}$ is a web server modeled as an atomic
+DY process $(I^r, Z^r, R^r, s^r_0)$ with the addresses $I^r :=
+\mapAddresstoAP(r)$. Its initial state $s^r_0$ contains its domains,
+the private keys associated with its domains and the DNS server address.
+The full state additionally contains the sets of service tokens and login 
+session identifiers the RP has issued. RP only accepts HTTPS requests.
+
+RP manages two kinds of sessions: The \emph{login sessions}, which are
+only used during the login phase of a user, and the \emph{service
+  sessions} (we call the session identifier of a service session a
+\emph{service token}). Service sessions allow a user to use RP's
+services. The ultimate goal of a login flow is to establish such a
+service session.
+
+In a typical flow with one client, $r$ will first receive an HTTP GET
+request for the path $\str{/script}$. In this case, $r$ returns the script
+$\str{script\_rp}$ (see below).
+
+After the user loaded the script in his browser, $r$ will receive an 
+HTTP GET request for the path $\str{/loginSSO}$ sent from the new window opened
+by $\str{script\_rp}$. In this request, $r$ will send back a redirect response  
+for downloading $\str{script\_IdP}$ from IdP.
+
+When the IdP document in the browser generates a number $t\in K_\text{id}$,
+$r$ will receive the third request for the path $\str{/startNegotiate}$.
+$r$ will verify $t$ and if valid, $r$ will create the corresponding 
+login session with a $\mi{loginSessionToken}$ as the identifier. After that,
+$r$ will use $t$ to generate $PID_{rp}$ and bind it with the login session.
+After all these are down, $r$ send its certificate signed by the specific IdP that browser selected.
+
+Finally, $r$ receives a last request in the login flow. This POST request 
+contains the IDToken. To conclude the login, $r$ looks up the user's login session, 
+compare the $\mi{IDToken}.\str{PID_{rp}}$ with the $\mi{PID_{rp}}$ in the login session, and checks 
+whether $\mi{IDToken}.\str{PID_{ver}}$ is a correct signature. If successful, $r$ calculates the 
+service token and returns it, which is also stored in the state of $r$.
+
+If $r$ receives a corrupt message, it becomes corrupt and acts like
+the attacker from then on.
+
+We now provide the formal definition of $r$ as an atomic DY process
+$(I^r, Z^r, R^r, s^r_0)$. As mentioned, we define $I^r =
+\mapAddresstoAP(r)$. Next, we define the set $Z^r$ of states of
+$r$ and the initial state $s^r_0$ of $r$.
+
+\begin{definition}
+  A \emph{login session record} is a term of the form $\an{\mi{t},
+    \mi{PID_{rp}}}$ with $\mi{t}, \mi{PID_{rp}}=[tr]G(t,r\in K_{\text{id}})$.
+\end{definition}
+
+\begin{sloppypar}
+  \begin{definition}\label{def:relying-parties}
+    A \emph{state $s\in Z^r$ of an RP $r$} is a term of the form
+    $\langle\mi{DNSAddress}$, $\mi{keyMapping}$,
+    $\mi{sslkeys}$, $\mi{pendingDNS}$, $\mi{pendingRequests}$,
+    $\mi{loginSessions}$, $\mi{serviceTokens}$, $\mi{wkCache}$,
+    $\mi{corrupt}$, $\mi{IdPConfig}$, $\mi{rp}\rangle$ where $\mi{DNSAddress} \in \addresses$,
+    $\mi{keyMapping} \in \dict{\mathbb{S}}{\nonces}$,
+    $\mi{sslkeys}=\mi{sslkeys}^r$,
+    $\mi{pendingDNS} \in \dict{\nonces}{\terms}$,
+    $\mi{pendingRequests} \in \dict{\nonces}{\terms}$,
+    $\mi{serviceTokens} \in \nonces$,
+    $\mi{loginSessions} \in \dict{\nonces}{\terms}$ is a dictionary of
+    login session records,
+    $\mi{wkCache} \in \dict{\mathbb{S}}{\terms}$,
+    $\mi{corrupt} \in \terms$,
+    $\mi{IdPConfig} \in \terms$ is the configuration retrieved from IdP server,
+    $\mi{rp} \in \IDs$ is the identity of the RP, see details in Appendix~\ref{app:uppresso-identities}.
+
+    The \emph{initial state $s^r_0$ of $r$} is a state of $r$ with
+    $s^r_0.\str{serviceTokens} = s^r_0.\str{loginSessions} =
+    s^r_0.\str{wkCache} = \an{}$,
+    $s^r_0.\str{corrupt} = \bot$, $s^r_0.\str{keyMapping}$ is the
+    same as the keymapping for browsers above,
+    $s^r_0.\str{IdPConfig} = \an{\mi{pubkey},\mi{scriptUrl},\mi{Cert_{rp}}}$ and
+    $s^r_0.\str{rp} = \an{\mi{id},\mi{name},\mi{domain}}$.
+  \end{definition}
+\end{sloppypar}
+
+We now specify the relation $R^r$. We describe this relation by a non-deterministic algorithm. 
+
+\captionof{algorithm}{\label{alg:rp} Relation of a Relying Party $R^r$}
+\begin{algorithmic}[1]
   \REQUIRE \myss{\myangle{a, b, m}, s}
   \mystate{\myss{s':=s}}
-  \mystate{\myss{n, method, path, parameters, headers, body} \textbf{such that}}\\
-  \ \ \myss{\myangle{\mathtt{HTTPReq},n,method,path,parameters,headers,body} \equiv m}\\
-  \ \ \textbf{if} \myss{possible}; \textbf{otherwise} stop \myss{\myangle{}, s'}
+  \myif{s'.\str{corrupt} \not\equiv \bot \vee m \equiv \corrupt}
+    \mystate{\myss{s'.\str{corrupt} := \an{\an{a, f, m}, s'.\str{corrupt}}}}
+    \mystate{\myss{m' := d_{V}(s')}\label{line:usage-of-signkey-corrupt-uppresso}}
+    \mystate{\myss{a' := \addresses}}
+    \mystop{a',a,m'}
+  \ENDIF
+  \mystate{\myss{m_{dec},k,k',\mi{inDomain}} \textbf{such that} \breakalgohook{0}
+    \myss{\an{m_{\text{dec}}, k} \equiv \dec{m}{k'} \wedge \an{inDomain,k'} \in s'.\str{sslkeys}}\breakalgohook{0}
+    \textbf{if possible; otherwise stop} \myss{\myangle{}, s'}}
+  \mystate{\myss{n, method, path, parameters, headers, body} \textbf{such that} \breakalgohook{0}
+    \myss{\myangle{\mathtt{HTTPReq},n,method,path,parameters,headers,body} \equiv m_{dec}}\breakalgohook{0}
+    \textbf{if possible; otherwise stop} \myss{\myangle{}, s'}}
   \myif{path \equiv /script}
-  \mystate{\myss{m':=\myangle{\mathtt{HTTPResp},n,200, \myangle{}, \mathtt{IdPScript}}}}
-  \mystop{b, a, m'}
-  \myelse{path \equiv /authentication}
-  \mystate{\myss{cookie := headers[Cookie]}}
-  \mystate{\myss{session := s'.SessionList[cookie]}}
-  \mystate{\myss{username:=body[username]}}
-  \mystate{\myss{password:=body[password]}}
-  \myif{password \not\equiv \mathtt{PasswordOfUser(username)}}
-  \mystate{\myss{m' :=\myangle{\mathtt{HTTPResp},n,200,\myangle{},\mathtt{LoginFailure}}}}
-  \mystop{b, a,m'}
-  \ENDIF
-  \mystate{\myss{session[uid] := \mathtt{UIDOfUser}(username)}}
-  \mystate{\myss{m' :=\myangle{\mathtt{HTTPResp},n,200,\myangle{},\mathtt{LoginSucess}}}}
-  \mystop{b, a,m'}
-  \myelse{path \equiv /reqToken}
-  \mystate{\myss{cookie := headers[Cookie]}}
-  \mystate{\myss{session := s'.SessionList[cookie]}}
-  \mystate{\myss{IDTokens := session[IDTokens]}}
-  \myif{IDTokens[body[PID_{RP}]] \not\equiv \mathtt{null}}
-  \mystate{\myss{m' := \myangle{\mathtt{HTTPResp},n,200,\myangle{}, IDTokens[body[PID_{RP}]]}}}
-  \mystop{b, a,m'}
-  \ENDIF
-  \mystate{\myss{m' := \myangle{\mathtt{HTTPResp},n,200,\myangle{},\mathtt{Unauthenticated}}}}
-  \mystop{b, a,m'}
-  \myelse{path \equiv /authorize}
-  \mystate{\myss{cookie := headers[Cookie]}}
-  \mystate{\myss{session := s'.SessionList[cookie]}}
-  \mystate{\myss{uid := session[uid]}}
-  \myif{uid \equiv \mathtt{null}}
-  \mystate{\myss{m' := \myangle{\mathtt{HTTPResp}, n, 200, \myangle{}, \mathtt{Fail}}}}
-  \mystop{b, a,m'}
-  \ENDIF
-  \mystate{\myss{PID_{RP} := parameters[PID_{RP}]}}
- \myif{\mathtt{IsValid}(PID_{RP}) \equiv \mathtt{FALSE}}
-  \mystate{\myss{m' := \myangle{\mathtt{HTTPResp}, n, 200, \myangle{}, \mathtt{Fail}}}}
-  \mystop{b, a,m'}
-  \ENDIF
-  \myif{\mathtt{IsInScope}(uid, body[Attr]) \equiv \mathtt{FALSE}}
-  \mystate{\myss{m' := \myangle{\mathtt{HTTPResp}, n, 200, \myangle{}, \mathtt{Fail}}}}
-  \mystop{b, a,m'}
-  \ENDIF
-  \mystate{\myss{ID_U := session[uid]}}
-  \mystate{\myss{PID_U := \mathtt{Multiply}(PID_{RP}, ID_U)}}
-  \mystate{\myss{Validity := \mathtt{CurrentTime} ()+ s'.Validity}}
-  \mystate{\myss{Content := \myangle{PID_{RP}, PID_U, s'.Issuer, Validity}}}
-  \mystate{\myss{Sig := \mathtt{SigSign}(Content, s'.SK)}}
-  \mystate{\myss{IDToken := \myangle{Content, Sig}}}
-  \mystate{\myss{session[IDTokens] := session[IDTokens]  + ^{\myangle{}}\myangle{PID_{RP}, IDToken}}}
-  \mystate{\myss{m' := \myangle{\mathtt{HTTPResp}, n, 200, \myangle{}, Token}}}
-  \mystop{b, a, m'}
-  \ENDIF
-  \mystop{}
-  \end{algorithmic}
-\end{breakablealgorithm}
-
-
-
-\begin{breakablealgorithm}
-  \caption{\textbf{Algorithm rp}}
-  \label{alg:rp}
-  \begin{algorithmic}[1]
-  \REQUIRE \myss{\myangle{a, b, m}, s}
-  \mystate{\myss{s':=s}}
-  \mystate{\myss{n, method, path, parameters, headers, body} \textbf{such that}}\\
-  \ \ \myss{\myangle{\mathtt{HTTPReq},n,method,path,parameters,headers,body} \equiv m}\\
-  \ \ \textbf{if} \myss{possible}; \textbf{otherwise} stop \myss{\myangle{}, s'}
-  \myif{path \equiv /script}
-\mystate{\myss{m':=\myangle{\mathtt{HTTPResp},n,200, \myangle{}, \mathtt{RPScript}}}}
-  \mystop{b, a, m'}
+    \mystate{\myss{m':=\encs{\myangle{\mathtt{HTTPResp},n,200, \myangle{}, \str{script\_rp}}}{k}}}
+    \mystop{b, a, m'}
   \myelse{path \equiv /loginSSO}
-  \mystate{\myss{m'  := \myangle{\mathtt{HTTPResp},n,302,\myangle{\myangle{\mathtt{Location}, s'.IdP.ScriptUrl}}, \myangle{}}}}
-  \mystop{b, a, m'}
+    \mystate{\myss{m':=\encs{\myangle{\mathtt{HTTPResp},n,302,\myangle{\myangle{\mathtt{Location}, s'.\str{IdPConfig}.\mi{scriptUrl}}}, \myangle{}}}{k}}}
+    \mystop{b, a, m'}
   \myelse{path \equiv /startNegotiation}
-  \mystate{\myss{cookie := headers[Cookie]}}
-  \mystate{\myss{session := s'.SessionList[cookie]}}
-  \mystate{\myss{t := body[t]}}
-  \mystate{\myss{t^{-1}:= \mathtt{Inverse}(t)}}
- % \mystate{\myss{session[t] := t}}
-  \mystate{\myss{session[t^{-1}] := t^{-1}}}
-  \mystate{\myss{session[state] := expectToken}}
-  \mystate{\myss{m' := \myangle{\mathtt{HTTPResp}, n, 200, \myangle{}, \myangle{\mathtt{Cert_{RP}}, s'.Cert_{RP}}}}}
- \mystop{b, a, m'}
+    \mystate{\myss{\mi{loginSessionToken} := \nu_1}}
+   %\mystate{\myss{cookie := headers[Cookie]}}
+   %\mystate{\myss{session := s'.SessionList[cookie]}}
+    \mystate{\myss{\mi{t} := body[t]}}
+   %\mystate{\myss{t^{-1}:= \mathtt{Inverse}(t)}}
+    \mystate{\myss{\mi{ID_{rp}} := [s'.\str{rp}.\mi{id}]G}}
+    \mystate{\myss{\mi{PID_{rp}} := [\mi{t}]\mi{ID_{rp}}}}
+    \mystate{\myss{\mi{state} := \str{expectToken}}}
+    \mystate{\myss{s'.\str{loginSessions}[\mi{loginSessionToken}] := \an{\mi{t}, \mi{PID_{rp}}, \mi{state}}}}
+   %\mystate{\myss{session[t] := t}}
+   %\mystate{\myss{session[t^{-1}] := t^{-1}}}
+   %\mystate{\myss{session[state] := expectToken}}
+    \mystate{\myss{m' := \encs{\myangle{\mathtt{HTTPResp}, n, 200, \myangle{}, \myangle{\mathtt{Cert_{RP}}, s'.\str{IdPConfig}.\mi{Cert_{RP}}}}}{k}}}
+    \mystop{b, a, m'}
   \myelse{path \equiv /uploadToken}
- \mystate{\myss{cookie := headers[Cookie]}}
-  \mystate{\myss{session := s'.SessionList[cookie]}}
-  \myif{session[state] \not\equiv expectToken}
-  \mystate{\myss{m' := \myangle{\mathtt{HTTPResp}, n, 200, \myangle{}, \mathtt{Fail}}}}
-  \mystop{b, a, m'}
-  \ENDIF
-  \mystate{\myss{IDToken := body[IDToken]}}
-  \myif{\mathtt{checksig}(IDToken.Content, IDToken.Sig, s'.IdP.PK) \equiv \mathtt{FALSE}}
-  \mystate{\myss{m' := \myangle{\mathtt{HTTPResp}, n, 200, \myangle{}, \mathtt{Fail}}}}
-  \mystop{b, a, m'}
-  \ENDIF
-  \mystate{\myss{Time := \mathtt{CurrentTime}()}}
- % \mystate{\myss{PIDValidity := session[PIDValidity]}}
-  \mystate{\myss{Content := Token.Content}}
-  \myif{Time>Content.Validity}
-  \mystate{\myss{m' := \myangle{\mathtt{HTTPResp}, n, 200, \myangle{}, \mathtt{Fail}}}}
-  \mystop{b, a, m'}
-  \ENDIF
-  \mystate{\myss{PID_U := Content.PID_U}}
-  \mystate{\myss{t^{-1} := session[t^{-1}]}}
-  \mystate{\myss{Acct := \mathtt{Multiply}(PID_U, t^{-1})}}
-  \myif{Acct \not\in \mathtt{ListOfUser}()}
-  \mystate{\myss{\mathtt{AddUser}(Acct)}}
-  \ENDIF
-  \mystate{\myss{session[user] := Acct}}
-  \mystate{\myss{s'.serviceTokens := s'.serviceTokens + ^{\myangle{}}\myangle{IDToken, Acct}}}
-  \mystate{\myss{m' := \myangle{\mathtt{HTTPResp}, n, 200, \myangle{}, \mathtt{LoginSuccess}}}}
-  \mystop{b, a, m'}
+    \mystate{\myss{\mi{loginSessions} := s'.\str{loginSessions}[body[\str{loginSessionToken}]]}}
+   %\mystate{\myss{cookie := headers[Cookie]}}
+    \myif{\mi{loginSessions} \equiv \an{}}
+      \mystop{}
+    \ENDIF
+   %\mystate{\myss{session := s'.SessionList[cookie]}}
+   %\myif{session[state] \not\equiv expectToken}
+    \myif{\mi{loginSessions}.\str{state} \not\equiv expectToken}
+      \mystate{\myss{m' := \encs{\myangle{\mathtt{HTTPResp}, n, 200, \myangle{}, \mathtt{Fail}}}{k}}}
+      \mystop{b, a, m'}
+    \ENDIF
+    \mystate{\myss{s'.\str{loginSessions} := s'.\str{loginSessions} - body[\mi{loginSessionToken}]}}
+    \mystate{\myss{\mi{IDToken} := body[\str{IDToken}]}}
+    \myif{\mi{IDToken}.\str{PID_{rp}} \not\equiv \mi{loginSessions}.\str{PID_{rp}}}
+      \mystate{\myss{m' := \encs{\myangle{\mathtt{HTTPResp}, n, 200, \myangle{}, \mathtt{Fail}}}{k}}}
+      \mystop{b, a, m'}
+    \ENDIF
+    \myif{\checksigThree{\mi{IDToken}.\str{ver}}{\an{\mi{IDToken}.\str{PID_{rp}}, \mi{IDToken}.\str{PID_{u}}}}{s'.\str{IdPConfig}.\mi{pubkey}} \equiv \bot}
+      \mystate{\myss{m' := \encs{\myangle{\mathtt{HTTPResp}, n, 200, \myangle{}, \mathtt{Fail}}}{k}}}
+      \mystop{b, a, m'}
+    \ENDIF
+   %\mystate{\myss{Time := \mathtt{CurrentTime}()}}
+   %\mystate{\myss{PIDValidity := session[PIDValidity]}}
+   %\mystate{\myss{Content := Token.Content}}
+   %\myif{Time>Content.Validity}
+     %\mystate{\myss{m' := \myangle{\mathtt{HTTPResp}, n, 200, \myangle{}, \mathtt{Fail}}}}
+     %\mystop{b, a, m'}
+   %\ENDIF
+    \mystate{\myss{\mi{PID_u} := \mi{IDToken}.\str{PID_{u}}}}
+    \mystate{\myss{\mi{Acct} := [\mi{loginSessions}.\str{t}]\mi{PID_u}}}
+   %\mystate{\myss{Acct := \mathtt{Multiply}(PID_U, t^{-1})}}
+   %\myif{Acct \not\in \mathtt{ListOfUser}()}
+     %\mystate{\myss{\mathtt{AddUser}(Acct)}}
+   %\ENDIF
+   %\mystate{\myss{session[user] := Acct}}
+    \mystate{\myss{s'.\str{serviceTokens} := s'.\str{serviceTokens} + ^{\myangle{}}\mi{Acct}}}
+   %\mystate{\myss{s'.serviceTokens := s'.serviceTokens + ^{\myangle{}}\myangle{IDToken, Acct}}}
+    \mystate{\myss{m' := \encs{\myangle{\mathtt{HTTPResp}, n, 200, \myangle{}, \mathtt{LoginSuccess}}}{k}}}
+    \mystop{b, a, m'}
   \ENDIF
   \mystop{}
-  \end{algorithmic}
-\end{breakablealgorithm}
+\end{algorithmic}\setlength{\parindent}{1em}
 
+\subsection{Identity Providers} \label{app:idps}
 
+An identity provider $i \in \mathsf{IdPs}$ is a web server modeled as
+an atomic process $(I^i, Z^i, R^i, s_0^i)$ with the addresses 
+$I^i := \mapAddresstoAP(i)$. Its initial state $s^i_0$ contains a list of its 
+domains and (private) SSL keys, a list of users and identites, and a private key 
+for signing IDTokens. Besides this, the full state of $i$ further contains a list 
+of used nonces, and information about active sessions.
 
-\begin{breakablealgorithm}
-  \caption{\textbf{Algorithm script\_idp}}
-  \label{alg:script_idp}
-  \begin{algorithmic}[1]
-  \REQUIRE \myss{\myangle{tree, docID, scriptstate, scriptinputs, cookies, ids, secret}}
-  \mystate{\myss{ s' := scriptstate}}
-  \mystate{\myss{command := \myangle{}}}
-  \mystate{\myss{target := \mathtt{PARENTWINDOW}(tree,docID)}}
-  \mystate{\myss{IdPDomain := s'.IdPDomain}}
-  \SWITCH{\myss{s'.phsae}}
-    \CASE{\myss{start}}
-      \mystate{\myss{t := \mathtt{Random}()}}
-      \mystate{\myss{command := \myangle{\mathtt{POSTMESSAGE}, target, \myangle{\mathtt{t}, t}, \mathtt{null}}}}
-      \mystate{\myss{s'.Parameters[t] := t}}
-      \mystate{\myss{s'.phase := expectCert}}
-    \ENDCASE
-    \CASE{\myss{expectCert}}
-      \mystate{\myss{pattern := \myangle{\mathtt{POSTMESSAGE}, target, *, \myangle{Cert_{RP}, *}}}}
-      \mystate{\myss{input := \mathtt{CHOOSEINPUT}(scriptinputs,pattern)}}
-      \myif{input \not\equiv \mathtt{null}}
-      \mystate{\myss{Cert_{RP} := \pi_2(\pi_4(input))}}
-      \myif{\mathtt{checksig}(Cert.Content, Cert.Sig, s'.PubKey) \equiv \mathtt{null}}
-      \mystate{\myss{\textbf{stop}\ \myangle{}}}
-      \ENDIF
-       \mystate{\myss{s'.Parameters[Cert] := Cert_{RP}}}
-      \mystate{\myss{t := s'.Parameters[t]}}
-      \mystate{\myss{PID_{RP} := \mathtt{Multiply}(Cert_{RP}.ID_{RP}, t)}}
-      \mystate{\myss{s'.Parameters[PID_{RP}] := PID_{RP}}}
-      \mystate{\myss{Url := \myangle{\mathtt{URL}, \mathtt{S}, IdPDomain, /reqToken, \myangle{\myangle{\mathtt{PID_{RP}}, PID_{RP}}}}}}
-      \mystate{\myss{command : = \myangle{\mathtt{XMLHTTPREQUEST}, Url, \mathtt{GET},\myangle{}, s'.refXHR}}}
-      \mystate{\myss{s'.phase := expectLoginState}}
-      \ENDIF
-      \ENDCASE
-      \CASE{expectReqToken}
-      \mystate{\myss{pattern := \myangle{\mathtt{XMLHTTPREQUEST},Body,s'.refXHR}}}
-      \mystate{\myss{input := \mathtt{CHOOSEINPUT}(scriptinputs,pattern) }}
-      \myif{input \not\equiv \mathtt{null}}
-      \myif{\pi_2(input) \equiv \mathtt{Unanthenticated}}
-      \mystate{\myss{user \in ids}}
-      \mystate{\myss{Url := \myangle{\mathtt{URL}, \mathtt{S}, IdPDomain, /authentication, \myangle{}}}}
-      \mystate{\myss{command : = \myangle{\mathtt{XMLHTTPREQUEST}, Url, \mathtt{POST}, \myangle{\myangle{\mathtt{username}, username}, \myangle{\mathtt{password}, password}}, s'.refXHR}}}
-      \mystate{\myss{s'.phase := expectLoginResult}}
-      \ENDIF
-      \mystate{\myss{IDToken := \pi_2(input)[\mathtt{IDToken}]}}
-      \mystate{\myss{RPOringin := \myangle{s'.Parameters[Cert].Enpt, \mathtt{S}}}}
-      \mystate{\myss{command := \myangle{\mathtt{POSTMESSAGE},target,\myangle{\mathtt{IDToken},IDToken},RPOrigin}}}
-      \mystate{\myss{s .phase := stop}}
-      \ENDIF
-      \ENDCASE
-      \CASE{expectLoginResult}
-      \mystate{\myss{pattern := \myangle{\mathtt{XMLHTTPREQUEST},Body,s'.refXHR}}}
-      \mystate{\myss{input := \mathtt{CHOOSEINPUT}(scriptinputs,pattern) }}
-      \myif{input \not\equiv \mathtt{null}}
-      \myif{\pi_2(input) \not\equiv \mathtt{LoginSuccess}}
-      \mystate{\myss{\textbf{stop}\ \myangle{}}}
-      \ENDIF
-      \mystate{\myss{PID_{RP} := s'.Parameters[PID_{RP}]}}
-      \mystate{\myss{Url := \langle \mathtt{URL}, \mathtt{S}, IdPDomain, /authorize,}  \myss{\myangle{\myangle{\mathtt{PID_{RP}}, PID_{RP}} , \myangle{\mathtt{Attr}, Attr} \rangle}}}
-      \mystate{\myss{command : = \myangle{\mathtt{XMLHTTPREQUEST}, Url, \mathtt{GET},\myangle{}, s'.refXHR}}}
-      \mystate{\myss{s'.phase := expectToken}}
-      \ENDIF
-      \ENDCASE
-      \CASE{expectToken}
-      \mystate{\myss{pattern := \myangle{\mathtt{XMLHTTPREQUEST},Body,s'.refXHR}}}
-      \mystate{\myss{input := \mathtt{CHOOSEINPUT}(scriptinputs,pattern) }}
-      \myif{input \not\equiv \mathtt{null}}
-      \mystate{\myss{IDToken := \pi_2(input)[\mathtt{IDToken}]}}
-      \mystate{\myss{RPOringin := \myangle{s'.Parameters[Cert].Enpt, \mathtt{S}}}}
-      \mystate{\myss{command := \myangle{\mathtt{POSTMESSAGE},target,\myangle{\mathtt{IDToken},IDToken},RPOrigin}}}
-      \mystate{\myss{s .phase := stop}}
-     \ENDIF
-    \ENDCASE
-  \ENDSWITCH
-\mystate{\myss{\textbf{stop}\ \myangle{s',cookies,localStorage,sessionStorage,command}}}
-    \end{algorithmic}
-\end{breakablealgorithm}
+IdPs react to four types of requests:
 
+First, they provide the $\str{script\_idp}$, where a $t\in K_\text{id}$ will 
+be chosen and following requests to IdPs will be sent. IdP will transfer the data
+to RP by the communicating between two scripts $\str{script\_idp}$ and $\str{script\_rp}$
+using $\tPostMessage$.
 
-\begin{breakablealgorithm}
-  \caption{\textbf{Algorithm script\_rp}}
-  \label{alg:script_rp}
-  \begin{algorithmic}[1]
-\REQUIRE \myss{\myangle{tree, docID, scriptstate, scriptinputs, cookies, ids, secret}}
-\mystate{\myss{ s' := scriptstate}}
-  \mystate{\myss{command := \myangle{}}}
-  \mystate{\myss{IdPWindow := \mathtt{SUBWINDOW}(tree,docnonce).winID}}
-  \mystate{\myss{RPDomain := s'.RPDomain}}
-  \mystate{\myss{IdPOringin := \myangle{s'.IdPDomian, \mathtt{S}}}}
-  \SWITCH{\myss{s'.phase}}
-    \CASE{\myss{start}}
-    \mystate{\myss{Url := \myangle{\mathtt{URL}, \mathtt{S}, RPDomain, /loginSSO, \myangle{}}}}
-    \mystate{\myss{command := \myangle{\mathtt{IFRAME}, Url, \_SELF}}}
-    \mystate{\myss{s'.phase := expectt}}
-    \ENDCASE
-    \CASE{\myss{expectt}}
-    \mystate{\myss{pattern := \myangle{\mathtt{POSTMESSAGE}, target, *, \myangle{\mathtt{t}, *}}}}
-      \mystate{\myss{input := \mathtt{CHOOSEINPUT}(scriptinputs,pattern)}}
-      \myif{input \not\equiv \mathtt{null}}
-      \mystate{\myss{t := \pi_2(\pi_4(input))[t]}}
-      \mystate{\myss{Url := \myangle{\mathtt{URL}, \mathtt{S}, RPDomain, /startNegotiation, \myangle{}}}}
-      \mystate{\myss{command : = \myangle{\mathtt{XMLHTTPREQUEST}, Url, \mathtt{POST},\myangle{\myangle{t, t}}, s'.refXHR}}}
-      \mystate{\myss{s'.phase := expectCert}}
-      \ENDIF
-      \ENDCASE
-      \CASE{\myss{expectCert}}
-      \mystate{\myss{pattern := \myangle{\mathtt{XMLHTTPREQUEST},Body,s'.refXHR}}}
-      \mystate{\myss{input := \mathtt{CHOOSEINPUT}(scriptinputs,pattern) }}
-      \myif{input \not\equiv \mathtt{null}}
-      \mystate{\myss{Cert_{RP} := \pi_2(input)[Cert_{RP}]}}
-      \mystate{\myss{command := \myangle{\mathtt{POSTMESSAGE}, IdPWindow, \myangle{\myangle{\mathtt{Cert}, Cert}}, IdPOringin}}}
-      \mystate{\myss{s'.phase := expectToken}}
-      \ENDIF
-      \ENDCASE
-      \CASE{\myss{expectToken}}
-      \mystate{\myss{pattern := \myangle{\mathtt{POSTMESSAGE}, target, *, \myangle{\mathtt{IDToken}, *}}}}
-      \mystate{\myss{input := \mathtt{CHOOSEINPUT}(scriptinputs,pattern)}}
-      \myif{input \not\equiv \mathtt{null}}
-      \mystate{\myss{IDToken := \pi_2(input)[IDToken]}}
-      \mystate{\myss{Url := \myangle{\mathtt{URL}, \mathtt{S}, RPDomain, /uploadToken, \myangle{}}}}
-      \mystate{\myss{command : = \myangle{\mathtt{XMLHTTPREQUEST}, Url, \mathtt{POST},\myangle{\myangle{\mathtt{IDToken}, IDToken}}, s'.refXHR}}}
-      \mystate{\myss{s'.phase := expectLoginResult}}
-      \ENDIF
-      \ENDCASE
-      \CASE{\myss{expectLoginResult}}
-      \mystate{\myss{pattern := \myangle{\mathtt{XMLHTTPREQUEST},Body,s'.refXHR}}}
-      \mystate{\myss{input := \mathtt{CHOOSEINPUT}(scriptinputs,pattern) }}
-      \myif{input \not\equiv \mathtt{null}}
-      \myif{\pi_2(input) \equiv \mathtt{LoginSuccess}}
-      \mystate{Load Homepage}
-      \ENDIF
-      \ENDIF
-    \ENDCASE
-    \ENDSWITCH
-    \mystate{\myss{\textbf{stop}\ \myangle{s',cookies,localStorage,sessionStorage,command}}}
-\end{algorithmic}
-\end{breakablealgorithm}
+Second, they provide $\mi{IDToken}$ when receiving $\mi{PID_{rp}}$ and this 
+$\mi{PID_{rp}}$ has already first. If not, IdPs will redirect to the login dialog.
+
+After the user enter his username and password(secret) in the login dialog, a login
+request will send to $\str{/authentication}$. IdPs will check the parameters and 
+set the login session.
+
+The last type of requests IdPs react to is authorize requests with $\mi{PID_{rp}}$ and attribute
+scopes as parameters. After receving consent from browsers, IdPs will calculate 
+$\mi{PID_{u}}$ and construct $\mi{IDToken}$.
+
+\subsubsection{Formal description.} In the following, we will first
+define the (initial) state of $i$ formally and afterwards present the
+definition of the relation $R^i$.
+
+To define the initial state, we will need a term that represents the
+``user database'' of the IdP $i$. We will call this term
+$\mi{userset}^i$. This database defines, which secret is valid for
+which identity. It is encoded as a mapping of identities to secrets.
+For example, if the secret $\mi{secret}_1$ is valid for the identites
+$\mi{id}_1$and the secret $\mi{secret}_2$ is valid for the identity
+$\mi{id}_2$, the $\mi{userset}^i$ looks as follows:
+\begin{align*}
+\mi{userset}^i = [\mi{id}_1.\str{username}{:}\myangle{\mi{id}_1, \mi{secret}_1}, 
+  \mi{id}_2.\str{username}{:}\myangle{\mi{id}_2, \mi{secret}_2}]
+\end{align*}
+
+We define $\mi{userset}^i$ as $\mi{userset}^i = \an{\{\an{u.\str{username},
+    \myangle{u, \mi{secret} = \mapIDtoPLI(u)}}\, |\, u \in \IDs^i\}}$.
+
+\begin{definition}\label{def:initial-state-idp}
+  A \emph{state $s\in Z^i$ of an IdP $i$} is a term of the form
+  $\langle\mi{sslkeys}$, $\mi{users}$, $\mi{signkey}$,
+  $\mi{sessions}$, $\mi{corrupt}\rangle$ where $\mi{sslkeys} =
+  \mi{sslkeys}^i $, $\mi{users} = \mi{userset}^i$, $\mi{signkey} \in
+  \nonces$ (the key used by the IdP $i$ to sign IDTokens),
+  $\mi{sessions}\in\dict{\nonces}{\terms}$, $\mi{corrupt} \in \terms$.
+
+  An \emph{initial state $s^i_0$ of $i$} is a state of the form $\an{
+    \mi{sslkeys}^i, \mi{userset}^i, \mapSignKey(i), \an{},
+    \bot}$.
+\end{definition}
+
+The relation $R^i$ that defines the behavior of the IdP $i$ is defined as follows:
+
+\captionof{algorithm}{\label{alg:idp} Relation of IdP $R^r$}
+\begin{algorithmic}[1]
+  \REQUIRE \myss{\myangle{a, b, m}, s}
+  \mystate{\myss{s':=s}}
+  \myif{s'.\str{corrupt} \not\equiv \bot \vee m \equiv \corrupt}
+    \mystate{\myss{s'.\str{corrupt} := \an{\an{a, f, m}, s'.\str{corrupt}}}}
+    \mystate{\myss{m' := d_{V}(s')}\label{line:usage-of-signkey-corrupt-uppresso}}
+    \mystate{\myss{a' := \addresses}}
+    \mystop{a', a, m'}
+  \ENDIF
+  \mystate{\myss{m_{dec},k,k',\mi{inDomain}} \textbf{such that} \breakalgohook{0}
+    \myss{\an{m_{\text{dec}}, k} \equiv \dec{m}{k'} \wedge \an{inDomain,k'} \in s'.\str{sslkeys}}\breakalgohook{0}
+    \textbf{if possible; otherwise stop} \myss{\myangle{}, s'}}
+  \mystate{\myss{n, method, path, parameters, headers, body} \textbf{such that} \breakalgohook{0}
+    \myss{\myangle{\mathtt{HTTPReq},n,method,path,parameters,headers,body} \equiv m_{dec}}\breakalgohook{0}
+    \textbf{if possible; otherwise stop} \myss{\myangle{}, s'}}
+  \myif{path \equiv /script}
+    \mystate{\myss{m':=\encs{\myangle{\mathtt{HTTPResp},n,200, \myangle{}, \str{script\_idp}}}{k}}}
+    \mystop{b, a, m'}
+  \myelse{path \equiv /authentication}
+    \mystate{\myss{\mi{username} := \mi{body}[\str{username}]}}
+    \mystate{\myss{\mi{password} := \mi{body}[\str{password}]}}
+    \myif{\mi{password} \not\equiv s'.\str{userset}[\mi{username}].\mi{secret}}
+      \mystate{\myss{m':=\encs{\myangle{\mathtt{HTTPResp},n,200,\myangle{},\mathtt{LoginFailure}}}{k}}}
+      \mystop{b, a, m'}
+    \ENDIF
+    \mystate{\myss{\mi{sessionid} := \nu_2}}
+    \mystate{\myss{s'.\str{sessions}[\mi{sessionid}] := \mi{username}}}
+    \mystate{\myss{\mi{setCookie} := \myangle{\cSetCookie, \myangle{\myangle{\str{sessionid}, \mi{sessionid}, \True, \True, \True}}}}}
+    \mystate{\myss{m' :=\myangle{\mathtt{HTTPResp},n,200,\myangle{\mi{setCookie}},\mathtt{LoginSucess}}}}
+    \mystop{b, a, m'}
+  \myelse{path \equiv /reqToken}
+    \mystate{\myss{\mi{cookie} := headers[\str{Cookie}]}}
+    \myif{\mi{cookie}[\str{sessionid}] \equiv \myangle{}}
+      \mystate{\myss{m' := \encs{\myangle{\mathtt{HTTPResp},n,200,\myangle{},\mathtt{Unauthenticated}}}{k}}}
+      \mystop{b, a, m'}
+    \ENDIF
+    \mystate{\myss{\mi{sessionid} := \mi{cookie}[\str{sessionid}]}}
+    \mystate{\myss{\mi{PID_{rp}} := \mi{parameters}[\str{PID_{rp}}]}}
+    \myif{s'.\str{sessions}[\mi{sessionid}].\mi{IDToken}[\mi{PID_{rp}}] \equiv \myangle{}}
+      \mystate{\myss{m' := \encs{\myangle{\mathtt{HTTPResp},n,200,\myangle{},\mathtt{Unauthorized}}}{k}}}
+      \mystop{b, a, m'}
+    \ENDIF
+    \mystate{\myss{\mi{IDToken} := s'.\str{sessions}[\mi{sessionid}].\mi{IDToken}[\mi{PID_{rp}}]}}
+    \mystate{\myss{m' := \encs{\myangle{\mathtt{HTTPResp},n,200,\myangle{}, \mi{IDToken}}}{k}}}
+    \mystop{b, a, m'}
+  \myelse{path \equiv /authorize}
+    \mystate{\myss{\mi{cookie} := headers[\str{Cookie}]}}
+    \myif{\mi{cookie}[\str{sessionid}] \equiv \myangle{}}
+      \mystate{\myss{m' := \encs{\myangle{\mathtt{HTTPResp},n,200,\myangle{},\mathtt{Unauthenticated}}}{k}}}
+      \mystop{b, a, m'}
+    \ENDIF
+    \mystate{\myss{\mi{sessionid} := \mi{cookie}[\str{sessionid}]}}
+    \mystate{\myss{\mi{PID_{RP}} := \mi{parameters}[\str{PID_{RP}}]}}
+    \myif{\mathtt{IsValid}(PID_{RP}) \equiv \bot}
+      \mystate{\myss{m' := \encs{\myangle{\mathtt{HTTPResp}, n, 200, \myangle{}, \mathtt{Fail}}}{k}}}
+      \mystop{b, a, m'}
+    \ENDIF
+    \myif{\mathtt{IsInScope}(uid, \mi{body}[\str{Attr}]) \equiv \bot}
+      \mystate{\myss{m' := \encs{\myangle{\mathtt{HTTPResp}, n, 200, \myangle{}, \mathtt{Fail}}}{k}}}
+      \mystop{b, a, m'}
+    \ENDIF
+    \mystate{\myss{u := s'.\str{sessions}[\mi{sessionid}].u}}
+    \mystate{\myss{\mi{ID_u} := u.\str{id}}}
+    \mystate{\myss{\mi{PID_u} := [\mi{ID_u}]\mi{PID_{rp}}}}
+    %\mystate{\myss{Validity := \mathtt{CurrentTime} ()+ s'.Validity}}
+    %\mystate{\myss{Content := \myangle{PID_{RP}, PID_U, s'.Issuer, Validity}}}
+    \mystate{\myss{\mi{content} := \myangle{PID_{rp}, PID_u}}}
+    \mystate{\myss{\mi{ver} := \sig{\mi{content}}{s'.\str{signkey}}}}
+    \mystate{\myss{\mi{IDToken} := \myangle{\mi{content}, \mi{ver}}}}
+    \mystate{\myss{s'.\str{sessions}[\mi{IDTokens}]:=s'.\str{sessions}[\mi{IDTokens}]+^{\myangle{}}\myangle{PID_{rp}, IDToken}}}
+    \mystate{\myss{m':=\encs{\myangle{\mathtt{HTTPResp}, n, 200, \myangle{}, \mi{IDToken}}}{k}}}
+    \mystop{b, a, m'}
+  \ENDIF
+  \mystop{}
+\end{algorithmic}\setlength{\parindent}{1em}
+
+\subsection{UPPRESSO Scripts}\label{app:uppresso-scripts}
+As already mentioned in Appendix~\ref{app:outlineuppressomodel}, the set $\scriptset$ 
+of the web system $\uppressowebsystem=(\bidsystem, \scriptset, \mathsf{script}, E^0)$ 
+consists of the scripts $\Rasp$, $\mi{script\_rp}$, $\mi{script\_idp}$, and with their 
+string representations being $\str{att\_script}$, $\str{script\_rp}$, $\str{script\_idp}$, 
+and (defined by $\mathsf{script}$). 
+
+In what follows, the scripts $\mi{script\_rp}$ and $\mi{script\_idp}$ are
+defined formally.
+
+\subsubsection{Relying Party Page (script\_rp).}\label{app:uppresso-script-rp}
+As defined in SPRESSO, a script is a relation that takes a termas input and outputs 
+a new term. The input term is provided by the browser. It contains the current 
+internal state of the script (which we call \emph{scriptstate} in what follows) and
+additional information containing all browser state information the
+script has access to, such as the input the script has obtained so far
+via \xhrs and \pms, information about windows, etc. The browser
+expects the output term to contain, among other information, the new internal \emph{scriptstate}.
+
+We first describe the structure of the internal scriptstate
+of the script $\mi{script\_rp}$.
+
+\begin{definition} \label{def:scriptstaterp} 
+A \emph{scriptstate $s$ of $\mi{script\_rp}$} is a term of the form $\langle 
+\mi{phase}$, 
+%$\mi{loginSessionToken}$, 
+$\mi{refXHR}\rangle$, 
+where $phase \in \mathbb{S}$, 
+%$\mi{loginSessionToken}$,
+$\mi{refXHR}\in \nonces \cup \{\bot\}$. 
+
+The \emph{initial scriptstate $\mi{initState_{rp}}$} of $\mi{script\_rp}$ is 
+$\an{\str{start},
+%\bot,
+\bot}$.
+\end{definition}
+
+We now specify the relation $\mi{script\_rp}$ formally. We describe this relation
+by a non-deterministic algorithm.
+
+\captionof{algorithm}{\label{alg:uppresso-script-rp} Relation of $\mi{script\_rp}$}
+\begin{algorithmic}[1]
+\REQUIRE \myss{\langle\mi{tree},\mi{docnonce},\mi{scriptstate},\mi{scriptinputs},\mi{cookies},\mi{localStorage},\mi{sessionStorage},}
+\breakalgohook{-1}\myss{\mi{ids},\mi{secret}\rangle}
+\mystate{\myss{ s' := \mi{scriptstate}}}
+\mystate{\myss{\mi{command} := \myangle{}}}
+\mystate{\myss{\mi{origin} := \mathsf{GETORIGIN}(\mi{tree},\mi{docnonce})}}
+\mystate{\myss{\mi{RPDomain} := \mi{origin}.\str{host}}}
+\SWITCH{\myss{s'.\str{phase}}}
+\CASE{\myss{\str{start}}}
+  \mystate{\myss{\mi{url} := \an{\tUrl, \https, \mi{RPDomain}, \str{/loginSSO}, \myangle{}}}}
+  \mystate{\myss{\mi{command} := \an{\tHref,\mi{url},\wBlank,\an{}}}}
+  \mystate{\myss{s'.\str{phase} := \str{expectt}}}
+\ENDCASE
+\CASE{\myss{\str{expectt}}}
+  \mystate{\myss{\mi{pattern} := \myangle{\tPostMessage, target, *, \myangle{\str{t}, *}}}}
+  \mystate{\myss{\mi{input} := \textsf{CHOOSEINPUT}(\mi{scriptinputs}, \mi{pattern})}}
+  \myif{\mi{input} \not\equiv \bot}
+    \mystate{\myss{t := \pi_2(\pi_4(\mi{input}))}}
+    %\mystate{\myss{\mi{url} := \myangle{\tUrl, \https, \mi{RPDomain}, \str{/startNegotiation}, \myangle{}}}}
+    \mystate{\myss{\mi{body} := \myangle{\myangle{\str{t},t}}}}
+    \mystate{\myss{\mi{command} := \langle\tXMLHTTPRequest,\textsf{URL}^{\mi{RPDomain}}_\str{/startNegotiation},\mPost,\mi{body},}\breakalgohook{0}\myss{s'.\str{refXHR}\rangle}}
+    \mystate{\myss{s'.\str{phase} := \str{expectCert}}}
+  \ENDIF
+\ENDCASE
+\CASE{\myss{\str{expectCert}}}
+  \mystate{\myss{pattern := \myangle{\tXMLHTTPRequest,*,s'.\str{refXHR}}}}
+  \mystate{\myss{\mi{input} := \textsf{CHOOSEINPUT}(\mi{scriptinputs}, \mi{pattern})}}
+  \myif{\mi{input} \not\equiv \bot}
+    \mystate{\myss{\mi{Cert_{rp}} := \pi_2(\mi{input}).\str{Cert_{rp}}}}
+    \mystate{\myss{\mi{IdPWindowNonce} := \pi_1(\textsf{SUBWINDOWS}(\mi{tree},\mi{docnonce})).\str{nonce}}}
+    \mystate{\myss{\mi{IdPOrigin} := \mathsf{GETORIGIN}(\mi{tree}, \mi{IdPWindowNonce})}}
+    \mystate{\myss{\mi{command} := \langle\tPostMessage, \mi{IdPWindowNonce}, \myangle{\str{Cert}, \mi{Cert_{rp}}},}\breakalgohook{0}\myss{\mi{IdPOrigin}\rangle}}
+    \mystate{\myss{s'.\str{phase} := \str{expectToken}}}
+  \ENDIF
+\ENDCASE
+\CASE{\myss{\str{expectToken}}}
+  \mystate{\myss{\mi{pattern} := \myangle{\tPostMessage, target, *, \myangle{\str{IDToken}, *}}}}
+  \mystate{\myss{\mi{input} := \textsf{CHOOSEINPUT}(\mi{scriptinputs}, \mi{pattern})}}
+  \myif{input \not\equiv \bot}
+    \mystate{\myss{\mi{IDToken} := \pi_2(\pi_4(\mi{input}))}}
+    %\mystate{\myss{\mi{url} := \myangle{\tUrl, \https, \mi{RPDomain}, \str{/uploadToken}, \myangle{}}}}
+    \mystate{\myss{\mi{body} := \myangle{\myangle{\str{IDToken},\mi{IDToken}}}}}
+    \mystate{\myss{\mi{command} := \langle\tXMLHTTPRequest,\textsf{URL}^{\mi{RPDomain}}_\str{/uploadToken},\mPost,\mi{body},}\breakalgohook{0}\myss{s'.\str{refXHR}\rangle}}
+    \mystate{\myss{s'.\str{phase} := \str{expectLoginResult}}}
+  \ENDIF
+\ENDCASE
+\CASE{\myss{\str{expectLoginResult}}}
+  \mystate{\myss{pattern := \myangle{\tXMLHTTPRequest,*,s'.\str{refXHR}}}}
+  \mystate{\myss{\mi{input} := \textsf{CHOOSEINPUT}(\mi{scriptinputs}, \mi{pattern})}}
+  \myif{input \not\equiv \bot}
+    \myif{\pi_2(input) \equiv \str{LoginSuccess}}
+    \mystate{Load Homepage}
+    \ENDIF
+  \ENDIF
+\ENDCASE
+\ENDSWITCH\\
+\mystopp{s',\mi{cookies},\mi{localStorage},\mi{sessionStorage},\mi{command}}
+\end{algorithmic}\setlength{\parindent}{1em}
+
+\subsubsection{Identity Provider Page (script\_idp).}\label{app:uppresso-script-Idp}
+
+\begin{definition}\label{def:scriptstateidp}
+  A \emph{scriptstate $s$ of $\mi{script\_idp}$} is a term of the form
+  $\langle \mi{phase}$, $\mi{user}$, $\mi{parameters} \rangle$ with $\mi{phase} \in
+  \mathbb{S}$, $\mi{user} \in \IDs \cup \{\an{}\} \in \gterms$ and $\mi{parameters} \in \dict{\mathbb{S}}{\terms}$,. The 
+  \emph{initial scriptstate} of $\mi{script\_idp}$ is $\an{\str{start},*,\myangle}$.
+\end{definition}
+
+We now formally specify the relation of $\mi{script\_idp}$
+
+\captionof{algorithm}{\label{alg:uppresso-script-idp} Relation of $\mi{script\_idp}$ }
+\begin{algorithmic}[1]
+\REQUIRE \myss{\langle\mi{tree},\mi{docnonce},\mi{scriptstate},\mi{scriptinputs},\mi{cookies},\mi{localStorage},\mi{sessionStorage},}
+\breakalgohook{-1}\myss{\mi{ids},\mi{secret}\rangle}
+\mystate{\myss{s' := scriptstate}}
+\mystate{\myss{\mi{command} := \myangle{}}}
+\mystate{\myss{\mi{target} := \textsf{OPENERWINDOW}(\mi{tree},\mi{docnonce})}}
+\mystate{\myss{\mi{origin} := \mathsf{GETORIGIN}(\mi{tree},\mi{docnonce})}}
+\mystate{\myss{\mi{IdPDomain} := \mi{origin}.\str{host}}}
+\SWITCH{\myss{s'.\str{phase}}}
+\CASE{\myss{start}}
+  \mystate{\myss{t := \str{random}()}}
+  \mystate{\myss{\mi{command} := \myangle{\tPostMessage, \mi{target}, \myangle{\str{t}, t}, \myangle{}}}}
+  \mystate{\myss{s'.\str{parameters}[t] := t}}
+  \mystate{\myss{s'.\str{phase} := \str{expectCert}}}
+\ENDCASE
+\CASE{\myss{\str{expectCert}}}
+  \mystate{\myss{\mi{pattern} := \myangle{\tPostMessage, target, *, \myangle{\str{Cert}, *}}}}
+  \mystate{\myss{\mi{input} := \textsf{CHOOSEINPUT}(\mi{scriptinputs}, \mi{pattern})}}
+  \myif{input \not\equiv \bot}
+    \mystate{\myss{\mi{Cert_{rp}} := \pi_2(\pi_4(input))}}
+    \myif{\checksigThree{\mi{Cert_{rp}}.\str{ver}}{\mi{Cert_{rp}}.\str{content}}{s'.\str{IdPConfig}.\mi{pubkey}} \equiv \True}
+      \mystate{\myss{s'.\str{parameters}[\mi{cert}] := \mi{Cert_{rp}}}}
+      \mystate{\myss{t := s'.\str{parameters}[t]}}
+      \mystate{\myss{\mi{PID_{rp}} := [t]\mi{Cert_{rp}}.\str{content}[\mi{ID_{rp}}]}}
+      \mystate{\myss{s'.\str{parameters}[\mi{PID_{rp}}] := \mi{PID_{rp}}}}
+      \mystate{\myss{\mi{body} := \myangle{\myangle{\str{PID_{rp}},\mi{PID_{rp}}}}}}
+      \mystate{\myss{\mi{command} := \langle\tXMLHTTPRequest,\textsf{URL}^{\mi{IdPDomain}}_\str{/reqToken},\mPost,\mi{body},}\breakalgohook{0}\myss{s'.\str{refXHR}\rangle}}
+      \mystate{\myss{s'.\str{phase} := \str{expectReqToken}}}
+    \ENDIF
+  \ENDIF
+\ENDCASE
+\CASE{\myss{\str{expectReqToken}}}
+  \mystate{\myss{pattern := \myangle{\tXMLHTTPRequest,*,s'.\str{refXHR}}}}
+  \mystate{\myss{\mi{input} := \textsf{CHOOSEINPUT}(\mi{scriptinputs}, \mi{pattern})}}
+  \myif{input \not\equiv \bot}
+    \myif{\pi_2(input) \equiv \str{Unanthenticated}}
+      \mystate{\myss{s'.\str{user} \gets \mi{ids}}}
+      \mystate{\myss{\mi{username} := s'.\str{user}.\mi{name}}}
+      \mystate{\myss{\mi{password} := \textsf{secretOfID}(s'.\str{user})}}
+      \mystate{\myss{\mi{body} := \myangle{\myangle{\str{username}, \mi{username}}, \myangle{\str{password}, \mi{password}}}}}
+      \mystate{\myss{\mi{command} := \langle\tXMLHTTPRequest,\textsf{URL}^{\mi{IdPDomain}}_\str{/authentication},\mPost,\mi{body},}\breakalgohook{0}\myss{s'.\str{refXHR}\rangle}}
+      \mystate{\myss{s'.\str{phase} := \str{expectLoginResult}}}
+    \myelse{\pi_2(input) \equiv \str{Unauthorized}}
+      \mystate{\myss{\mi{PID_{rp}} := s'.\str{parameters}[\mi{PID_{rp}}]}}
+      \mystate{\myss{\mi{Attr} := \textsf{GETPARAMETERS}(\mi{tree}, \mi{docnonce})[\str{iaKey}]}}
+      \mystate{\myss{\mi{body} := \myangle{\myangle{\str{PID_{rp}}, \mi{PID_{rp}}}, \myangle{\str{Attr}, \mi{Attr}}}}}
+      \mystate{\myss{\mi{command} := \langle\tXMLHTTPRequest,\textsf{URL}^{\mi{IdPDomain}}_\str{/authorize},\mPost,\mi{body},}\breakalgohook{0}\myss{s'.\str{refXHR}\rangle}}
+      \mystate{\myss{s'.\str{phase} := \str{expectToken}}}
+    \myelse{}
+      \mystate{\myss{IDToken := \pi_2(input)[\str{IDToken}]}}
+      \mystate{\myss{RPOringin := \myangle{s'.\str{parameters}[\mi{cert}].\mi{Content}[\str{Enpt}], \mathtt{S}}}}
+      \mystate{\myss{\mi{command} := \myangle{\tPostMessage, \mi{target}, \myangle{\str{IDToken},\mi{IDToken}}, RPOrigin}}}
+      \mystate{\myss{s'.\str{phase} := \str{stop}}}
+    \ENDIF
+  \ENDIF
+\ENDCASE
+\CASE{\myss{\str{expectLoginResult}}}
+  \mystate{\myss{pattern := \myangle{\tXMLHTTPRequest,*,s'.\str{refXHR}}}}
+  \mystate{\myss{\mi{input} := \textsf{CHOOSEINPUT}(\mi{scriptinputs}, \mi{pattern})}}
+  \myif{input \not\equiv \bot}
+    \myif{\pi_2(input) \equiv \str{LoginSuccess}}
+      \mystate{\myss{\mi{PID_{rp}} := s'.\str{parameters}[\mi{PID_{rp}}]}}
+      \mystate{\myss{\mi{Attr} := \textsf{GETPARAMETERS}(\mi{tree}, \mi{docnonce})[\str{iaKey}]}}
+      \mystate{\myss{\mi{body} := \myangle{\myangle{\str{PID_{rp}}, \mi{PID_{rp}}}, \myangle{\str{Attr}, \mi{Attr}}}}}
+      \mystate{\myss{\mi{command} := \langle\tXMLHTTPRequest,\textsf{URL}^{\mi{IdPDomain}}_\str{/authorize},\mPost,\mi{body},}\breakalgohook{0}\myss{s'.\str{refXHR}\rangle}}
+      \mystate{\myss{s'.\str{phase} := \str{expectToken}}}
+    \ENDIF
+  \ENDIF
+\ENDCASE
+\CASE{\myss{\str{expectToken}}}
+  \mystate{\myss{pattern := \myangle{\tXMLHTTPRequest,*,s'.\str{refXHR}}}}
+  \mystate{\myss{\mi{input} := \textsf{CHOOSEINPUT}(\mi{scriptinputs}, \mi{pattern})}}
+  \myif{input \not\equiv \bot}
+    \mystate{\myss{IDToken := \pi_2(input)[\str{IDToken}]}}
+    \mystate{\myss{RPOringin := \myangle{s'.\str{parameters}[\mi{cert}].\mi{Content}[\str{Enpt}], \mathtt{S}}}}
+    \mystate{\myss{\mi{command} := \myangle{\tPostMessage, \mi{target}, \myangle{\str{IDToken},\mi{IDToken}}, RPOrigin}}}
+    \mystate{\myss{s'.\str{phase} := \str{stop}}}
+  \ENDIF
+\ENDCASE
+\ENDSWITCH
+\mystopp{s',\mi{cookies},\mi{localStorage},\mi{sessionStorage},\mi{command}}
+\end{algorithmic}\setlength{\parindent}{1em}
 
 
 \section{Proof of Security}
-
-
 
 We define  the similar security properties as the definition 53 in SPRESSO. 
 First note that the RP service token should be defined as $\langle IDToken$, $Acct \rangle$ which is $\langle n$, $i \rangle$ in SPRESSO.

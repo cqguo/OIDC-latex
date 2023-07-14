@@ -1,0 +1,374 @@
+%%% PREVIOUSLY IN MACROS
+
+% Remarks:
+\def\rk#1{\todo{\textcolor{red}{RK:[{\small\sf\bf\itshape#1}\,]}}}
+\def\df#1{\todo{\textcolor{DarkGreen}{DF:[{\small\sf\bf\itshape#1}\,]}}}
+%\def\dfr#1{\todo{\textcolor{DarkGreen}{\sout{\small\sf\itshape#1}}}}
+\def\gs#1{\todo{\textcolor{blue}{GS:[{\small\sf\bf\itshape#1}\,]}}}
+
+\def\done{\checkmark\xspace}
+
+%\newcommand{\myparagraph}[1]{\vspace{.15cm}\noindent \textbf{#1}}
+\renewcommand{\paragraph}[1]{\vspace{0.6ex plus 0.2ex minus 0.1ex}\noindent \textit{#1}}
+\renewcommand{\subsubsection}[1]{\vspace{1.5ex plus 0.2ex minus 0.1ex}\noindent \textbf{#1}}
+%\newcommand{\mypar}[1]{\vspace{.15cm}\noindent \textit{#1}}
+
+
+%%% OWN COUNTERS AND REFERENCE COMMANDS
+
+\newcommand\footnoteref[1]{\protected@xdef\@thefnmark{\ref{#1}}\@footnotemark}
+
+
+%\newcommand{\circled}[1]{{\normalsize\textcircled{{\scriptsize \texttt{#1}}}}}
+%\newcommand{\circled}[1]{\fboxsep 0.5ex \ovalbox{\texttt{#1}}}
+%\newcommand{\romannumberbox}[1]{\fboxsep 0.5ex \ovalbox{\uppercase\expandafter{\romannumeral#1}}}
+
+% invisible fill element for boxes
+\newcommand*{\mystrut}{\rule[-0.05\baselineskip]{0pt}{0.7\baselineskip}}
+
+\newcounter{bigprotophase}[figure]
+\renewcommand{\thebigprotophase}{\Roman{bigprotophase}}
+\def\bigprotophase#1{\begin{tikzpicture} \node [rounded corners,fill=OliveGreen]{\parbox{1.4em}{\color{white}\centering\textbf{\refstepcounter{bigprotophase}\thebigprotophase\label{bigprotophase:#1}}}};\end{tikzpicture}}
+\def\refbigprotophase#1{\resizebox{!}{0.6\baselineskip}{\begin{tikzpicture}[baseline={([yshift=-1.5pt]O.base)}] \node (O) [draw,rounded corners]{\parbox{1.2em}{\centering\ref{bigprotophase:#1}}};\end{tikzpicture}}}
+
+\newcounter{protophase}[figure]
+\renewcommand{\theprotophase}{\roman{protophase}}
+\def\protophase#1{\begin{tikzpicture} \node [rounded corners,fill=OliveGreen]{\parbox{1.2em}{\color{white}\centering\textbf{\refstepcounter{protophase}\theprotophase\label{protophase:#1}}}};\end{tikzpicture}}
+\def\refprotophase#1{\resizebox{!}{0.6\baselineskip}{\begin{tikzpicture}[baseline={([yshift=-1.5pt]O.base)}] \node (O) [draw,rounded corners]{\parbox{1.1em}{\centering\ref{protophase:#1}}};\end{tikzpicture}}}
+
+\newcounter{alphprotostep}[figure]
+\renewcommand{\thealphprotostep}{\Alph{alphprotostep}}
+\def\alphprotostep#1{\resizebox{!}{0.8\baselineskip}{\begin{tikzpicture}[baseline={([yshift=-0.5pt]O.base)}] \node (O) [sharp corners,fill=.]{\color{white}\textbf{\refstepcounter{alphprotostep}\thealphprotostep\label{alphprotostep:#1}}};\end{tikzpicture}}}
+\def\refalphprotostep#1{\resizebox{!}{0.6\baselineskip}{\begin{tikzpicture}[baseline={([yshift=-1.5pt]O.base)}] \node (O) [draw,sharp corners]{\ref{alphprotostep:#1}};\end{tikzpicture}}}
+
+\newcounter{protostep}[figure]
+\renewcommand{\theprotostep}{\arabic{protostep}}
+\def\protostep#1{\ifdraft{{\tiny[#1] }}{}\resizebox{!}{0.8\baselineskip}{\begin{tikzpicture}[baseline={([yshift=-0.5pt]O.base)}] \node (O) [sharp corners,fill=.]{\color{white}\textbf{\refstepcounter{protostep}\theprotostep\label{protostep:#1}}};\end{tikzpicture}}}
+\def\refprotostep#1{\resizebox{!}{0.6\baselineskip}{\begin{tikzpicture}[baseline={([yshift=-1.5pt]O.base)}] \node (O) [draw,sharp corners]{\ref{protostep:#1}};\end{tikzpicture}}}
+
+\newcounter{attackstep}[figure]
+\renewcommand{\theattackstep}{\alph{attackstep}}
+\def\attackstep#1{\resizebox{!}{0.8\baselineskip}{\begin{tikzpicture}[baseline={([yshift=-0.5pt]O.base)}] \node (O) [draw,sharp corners]{\mystrut\textbf{\refstepcounter{attackstep}\theattackstep\label{attackstep:#1}}};\end{tikzpicture}}}
+\def\refattackstep#1{\resizebox{!}{0.6\baselineskip}{\begin{tikzpicture}[baseline={([yshift=-1.5pt]O.base)}] \node (O) [draw,sharp corners]{\mystrut\ref{attackstep:#1}};\end{tikzpicture}}}
+
+
+%%% FONTS
+
+% Declare mathpzc font
+\DeclareFontFamily{OT1}{pzc}{}
+\DeclareFontShape{OT1}{pzc}{m}{it}{<-> s * [1.10] pzcmi7t}{}
+\DeclareMathAlphabet{\mathpzc}{OT1}{pzc}{m}{it}
+
+%%% SHORTCUTS (TEXT)
+
+% Some shortcuts for the text mode   
+\def\adyp{atomic Dolev-Yao process\xspace}
+%\def\adyp{AYDP\xspace}
+\def\adyps{atomic Dolev-Yao processes\xspace}
+\def\Adyps{Atomic Dolev-Yao processes\xspace}
+\def\ap{atomic process\xspace}
+\def\aps{atomic processes\xspace}
+\def\gap{generic atomic process\xspace}
+\def\gaps{generic atomic processes\xspace}
+
+\def\javascript{JavaScript\xspace}
+\def\javascripts{JavaScripts\xspace}
+
+\def\pm{postMessage\xspace}
+\def\pms{postMessages\xspace}
+%\def\pm{PM\xspace}
+%\def\pms{PMs\xspace}
+\def\Pm{PostMessage\xspace}
+\def\Pms{PostMessages\xspace}
+
+\def\iframe{iframe\xspace}
+\def\iframes{iframes\xspace}
+
+\def\ls{localStorage\xspace}
+\def\Ls{LocalStorage\xspace}
+
+\def\xhr{XHR\xspace}
+\def\xhrs{XHRs\xspace}
+
+\def\sp{scripting process\xspace}
+\def\sps{scripting processes\xspace}   
+%\def\sp{SP\xspace}
+%\def\sps{SPs\xspace}   
+\def\SPS{Scripting Processes\xspace}
+
+\def\hlExp#1{\boldmath#1\unboldmath}
+
+\def\xsrf{XSRF\xspace}
+
+%%% CONSTANTS
+ 
+% \c... to define terms
+\def\cHttpReq{\str{HTTPReq}}
+\def\cHttpResp{\str{HTTPResp}}
+\def\cDNSresolve{\str{DNSResolve}}
+\def\cDNSresolved{\str{DNSResolved}}
+\def\tUrl{\str{URL}} % this should actually be \cUrl...
+\def\cUrl{\str{URL}} % TODO: Remove \tUrl from all files entirely.
+
+% Shortcuts for HTTP(s)
+\def\https{\str{S}}
+\def\http{\str{P}}
+
+% Constants for sets
+\def\dns{\mathsf{Doms}}
+\def\addresses{\mathsf{IPs}}
+\def\origins{\mathsf{Origins}}
+\def\scripts{\mathsf{Scripts}}
+\def\documents{\mathsf{Documents}}
+\def\windows{\mathsf{Windows}}
+\def\httprequests{\mathsf{HTTPRequests}}
+\def\httpresponses{\mathsf{HTTPResponses}}
+\def\httpsrequests{\mathsf{HTTPSRequests}}
+\def\httpsresponses{\mathsf{HTTPSResponses}}
+\def\dnsrequests{\mathsf{DNSRequests}}
+\def\dnsresponses{\mathsf{DNSResponses}}
+\def\urls{\mathsf{URLs}}
+\def\pendingRequests{\mathsf{PendingRequests}}
+\def\cookies{\mathsf{Cookies}}
+\def\methods{\mathsf{Methods}}
+
+\def\uppresso{UPPRESSO\xspace}
+
+% ...and now some with mathpzc notation
+\def\nonces{\mathpzc{N}}
+\def\messages{\mathpzc{M}} % Messages
+\def\events{\mathpzc{E}} % Events
+\def\process{\mathpzc{P}} % Process
+\def\gterms{\mathpzc{T}} % generalized terms
+\def\terms{\gterms_\nonces}
+\def\websystem{\mathpzc{W\!}} % a web system
+\def\completewebsystem{\mathpzc{W\!\!S}} % complete web system
+\def\scriptset{\mathpzc{S}} % a set of scripting processes
+\def\bidsystem{\mathpzc{W}} % our incarnation of a web system
+\def\uppressowebsystem{\mathpzc{U\!W\!S}} % our incarnation of a web system
+\def\spressoauthwebsystem{\mathpzc{S\!\!W\!\!S}^{auth}} % our incarnation of a web system
+\def\spressoprivwebsystem{\mathpzc{S\!\!W\!\!S}^{priv}} % our incarnation of a web system
+
+\newcommand{\QED}{\hfill$\blacksquare$}
+
+\def\prototagequiv#1{\rightleftharpoons_{#1}}
+%\def\prototagequiv#1{\overset{#1}{\curlywedge}} % Alternativvorschlag
+%\def\prototagdomequiv#1{\underline{\rightleftharpoons_{#1}}}
+%\def\prototagdomequiv#1{\hat{\rightleftharpoons}_{#1}}
+\def\logsessminus#1#2#3#4#5{#1 \unrhd^{#3}_{#4} (#2,#5)}
+%\def\httptagequiv#1{\underset{\text{HTTP}}{\overset{#1}{\rightleftharpoons}}}
+\def\httptagequiv#1{\bumpeq_{#1}}
+\def\Rasp{R^\text{att}}
+
+% HTTP Methods
+\def\mGet{\str{GET}}
+\def\mOptions{\str{OPTIONS}}
+\def\mHead{\str{HEAD}}
+\def\mPost{\str{POST}}
+\def\mPut{\str{PUT}}
+\def\mDelete{\str{DELETE}}
+\def\mTrace{\str{TRACE}}
+\def\mConnect{\str{CONNECT}}
+\def\mTrack{\str{TRACK}}
+
+% Angular braces and breakpoints for them
+%\def\an#1{\left\langle#1\right\rangle}
+\def\an#1{\langle#1\rangle}
+%\def\anbrktwo{\right. \right. \notag\\ \left. \left.}
+%\def\anbrk{\right. \notag\\ \left.}
+\def\anbrktwo{}
+\def\anbrk{}
+
+% Constants for JavaScript commands
+\def\tHref{\str{HREF}}
+\def\tMetaRefresh{\str{METAREFRESH}}
+\def\tHrefBlank{\str{HREFBLANK}}
+\def\tIframe{\str{IFRAME}}
+\def\tForm{\str{FORM}}
+\def\tSetScript{\str{SETSCRIPT}}
+\def\tSetScriptState{\str{SETSCRIPTSTATE}}
+\def\tXMLHTTPRequest{\str{XMLHTTPREQUEST}}
+\def\tBack{\str{BACK}}
+\def\tForward{\str{FORWARD}}
+\def\tPostMessage{\str{POSTMESSAGE}}
+\def\tClose{\str{CLOSE}}
+
+% Sets of commands
+\def\setOfCommands{\tHref, \linebreak[1] \tIframe, \tForm,
+  \linebreak[1] \tSetScript, \tSetScriptState, \linebreak[1]
+  \tXMLHTTPRequest, \linebreak[1] \tBack, \linebreak[1] \tForward,
+  \tPostMessage, \linebreak[1] \closecorrupt, \fullcorrupt, \trigger}
+\def\setOfConstants{\{\True, \bot, \cHttpReq,\cHttpResp, \linebreak[1]
+  \cDNSresolve, \cDNSresolved, \linebreak[1] \https,\http,
+  \linebreak[1] \tUrl, \wBlank, \linebreak[1] \setOfCommands\}}
+
+% Special constant
+\def\closecorrupt{\str{CLOSECORRUPT}}
+\def\fullcorrupt{\str{FULLCORRUPT}}
+\def\corrupt{\str{CORRUPT}}
+\def\trigger{\str{TRIGGER}}
+
+% More math fonts
+\def\fIP#1{\mathfrak{#1}}
+\def\fAP#1{\mathsf{#1}}
+
+\def\str#1{\mathtt{#1}}
+
+% Constants for window targets
+\def\wBlank{\str{\_BLANK}}
+\def\wSelf{\str{\_SELF}}
+
+% Encryption, Decryption, Projection, etc.
+\def\enc#1#2{\mathsf{enc}_\mathsf{a}(#1,#2)}
+\def\encs#1#2{\mathsf{enc}_\mathsf{s}(#1,#2)}
+\def\dec#1#2{\mathsf{dec}_\mathsf{a}(#1,#2)}
+\def\decs#1#2{\mathsf{dec}_\mathsf{s}(#1,#2)}
+\def\proj#1#2{\pi_{#1}({#2})}
+\def\sig#1#2{\mathsf{sig}({#1},{#2})}
+\def\checksig#1#2{\mathsf{checksig}(#1,#2)}
+\def\checksigThree#1#2#3{\mathsf{checksig}(#1,#2,#3)}
+\def\unsig#1{\mathsf{extractmsg}(#1)}
+\def\True{\top}
+\def\notdef{\Diamond}
+\def\pub{\mathsf{pub}}
+
+% Operators
+\def\inPairing{\in^{\an{}}}
+\def\subsetPairing{\subset^{\an{}}}
+\def\plusPairing{+^{\an{}}}
+
+% Shortcuts for the algorithms
+\def\comp#1#2{{#1}.\T{#2}}
+\def\compn#1#2{{#1}.#2}
+\def\ptr#1{\overline{#1}}
+
+% More shortcuts for the math stuff
+\def\mi#1{\mathit{#1}}
+\def\childof{ \xrightarrow{\text{childof}^*} }
+\def\terms{\mathpzc{T}_\nonces}
+\def\nf{{\downarrow}}
+\def\httpmatches#1#2#3#4#5{\hspace{0.6ex}{^{#1}_{#3}}\hspace{-1ex}\underset{#5}{\leadsto}{^{#2}_{#4}}}
+\def\windowChildOf{\xrightarrow{\text{childof}}}
+\def\windowChildOfX{\xrightarrow{\text{childof}^+}}
+% Is this still in use? TODO: Check that.
+\def\T#1{\str{#1}}
+
+\newcommand{\dict}[2]{
+    \left[#1 \times #2\right]
+}
+
+\def\mapDomain{\mathsf{dom}}
+\def\domTP{\mapDomain(\fAP{TP})}
+\def\TP{\fAP{TP}}
+\def\mapKey{\mathsf{key}}
+\def\mapSSLKey{\mathsf{sslkey}}
+\def\mapSignKey{\mathsf{signkey}}
+\def\mapPLItoOwner{\mathsf{ownerOfSecret}}
+\def\mapIDtoPLI{\mathsf{secretOfID}}
+\def\PLISecrets{\mathsf{Secrets}}
+\def\RPSecrets{\mathsf{Secrets}}
+\def\TPSessionCTXs{\mathsf{TPSessionCTXs}}
+\def\IDs{\mathsf{ID}}
+\def\mapAddresstoAP{\mathsf{addr}}
+\def\mapIDtoOwner{\mathsf{ownerOfID}}
+\def\mapGovernor{\mathsf{governor}}
+% Using the keyval package here to define shortcuts for HTTP
+% requests/responses
+\define@key{hreq}{protocol}[\http]{#1,\linebreak[1]}
+\define@key{hreq}{method}[\mGet]{#1,\linebreak[1]}
+\define@key{hreq}{host}{\str{#1},\linebreak[1]}
+\define@key{hreq}{xhost}{#1,\linebreak[1]}
+\define@key{hreq}{nonce}{\cHttpReq, #1,\linebreak[1]}
+\define@key{hreq}{path}{\str{#1},\linebreak[1]}
+\define@key{hreq}{xpath}{#1,\linebreak[1]}
+\define@key{hreq}{headers}{#1,\linebreak[1]}
+\define@key{hreq}{parameters}{#1,\linebreak[1]}
+\define@key{hreq}{body}{\str{#1}}
+\define@key{hreq}{xbody}{#1}
+\define@key{hreq}{brk}{}
+%
+\define@key{hresp}{protocol}[\http]{#1,\linebreak[1]}
+\define@key{hresp}{nonce}{\cHttpResp, #1,\linebreak[1]}
+\define@key{hresp}{status}[200]{\str{#1},\linebreak[1]}
+\define@key{hresp}{headers}{#1,\linebreak[1]}
+\define@key{hresp}{body}{\str{#1}}
+\define@key{hresp}{xbody}{#1}
+\define@key{hresp}{brk}{\nonumber\\}
+%
+\newcommand{\hreq}[1]{ \langle\setkeys{hreq}{#1}\rangle }
+\newcommand{\ehreqWithVariable}[3]{ \enc{\an{#1, #2}}{#3} }
+\newcommand{\ehreq}[3]{ \ehreqWithVariable{\hreq{#1}}{#2}{#3}}
+\newcommand{\hresp}[1]{ \an{\setkeys{hresp}{#1}} }
+\newcommand{\ehrespWithVariable}[2]{ \encs{#1}{#2} }
+\newcommand{\ehresp}[2]{ \ehrespWithVariable{\hresp{#1}}{#2}}
+
+
+% \usepackage[noend]{algpseudocode}
+% \usepackage{caption}
+% \newcommand*\LetND[2]{\State \textbf{let} #1 $\gets$ #2}
+% \newcommand*\Let[2]{\State \textbf{let} #1 $:=$ #2}
+% \newcommand*\Append[2]{\State \textbf{let} #2 := #2 + #1}
+% % New definitions
+% \algnewcommand\algorithmicswitch{\textbf{switch}}
+% \algnewcommand\algorithmiccase{\textbf{case}}
+% \algdef{SE}[SWITCH]{Switch}{EndSwitch}[1]{\algorithmicswitch\ #1\ \algorithmicdo}{\algorithmicend\ \algorithmicswitch}%
+% \algdef{SE}[CASE]{Case}{EndCase}[1]{\algorithmiccase\ #1}{\algorithmicend\ \algorithmiccase}%
+% \algtext*{EndSwitch}%
+% \algtext*{EndCase}%
+% \usepackage{etoolbox} 
+% \AtBeginEnvironment{algorithmic}{\small}
+% % For the caption
+% \DeclareCaptionFormat{algor}{%
+%   \hrulefill\par\offinterlineskip\vskip1pt%
+%     \textbf{#1#2}#3\offinterlineskip\hrulefill}
+% \DeclareCaptionStyle{algori}{singlelinecheck=off,format=algor,labelsep=space}
+% \captionsetup[algorithm]{style=algori}
+
+
+
+%%% OTHER STUFF
+
+% We need that for the minus in Set-Cookie
+\mathchardef\mhyphen="2D
+\def\cSTS{\str{Strict\mhyphen{}Transport\mhyphen{}Security}}
+\def\cSetCookie{\str{Set\mhyphen{}Cookie}}
+
+% Create new theorems
+%\newtheorem{definition}{Definition}
+%\newtheorem{theorem}{Theorem}
+%\newtheorem{lemma}{Lemma}
+%\newtheorem{proof}{Proof}
+
+% For the algorithms:
+
+% New definitions
+\usepackage{etoolbox} 
+\AtBeginEnvironment{algorithmic}{\small}
+% For the caption
+\DeclareCaptionFormat{algor}{%
+  \hrulefill\par\offinterlineskip\vskip1pt%
+    \textbf{#1#2}#3\offinterlineskip\hrulefill}
+\DeclareCaptionStyle{algori}{singlelinecheck=off,format=algor,labelsep=space}
+\captionsetup[algorithm]{style=algori}
+
+
+
+
+
+\makeatletter
+\newcommand{\breakalgo}[1]{%
+  \setlength\@tempdima{\algorithmicindent}%
+  \hfill{} \linebreak[4]\hspace*{\dimexpr#1\@tempdima}\relax
+}
+\makeatother
+
+\newcommand{\breakalgohook}[1]{%
+  \breakalgo{#1}\hspace{1ex}${\color{gray}\hookrightarrow}$\hspace{0.5ex}
+}
+
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: "main"
+%%% fill-column: 59
+%%% End:
