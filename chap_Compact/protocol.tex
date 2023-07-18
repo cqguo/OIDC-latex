@@ -14,8 +14,8 @@ Table \ref{tbl:notations-protocol} lists the notations. The subscript $j$ and/or
     \begin{tabular}{|p{0.93cm}|p{6.71cm}|} \hline
     {\textbf{Notation}} & {\textbf{Description}} \\ \hline
     {$\mathbb{E}$, $G$, $n$} & {$\mathbb{E}$ is an elliptic curve over a finite field $\mathbb{F}_q$. $G$ is a base point (or generator) on $\mathbb{E}$, and the order of $G$ is a prime number $n$.} \\ \hline
-    {$ID_U$} & {$ID_U = u \in [1, n)$ is a user's unique identity at the IdP, \newc{which is known only to this user and the IdP.}} \\ \hline
-   {$ID_{RP_j}$} & {$ID_{RP} = [r]G$ is the $j$-th RP's unique identity, which is publicly known; $r \in [1, n)$ \newc{is known only to the IdP but not the RP.}} \\ \hline
+    {$ID_U$} & {$ID_U = u \in [1, n)$ is a user's unique identity at the IdP, \newc{which is known only to the IdP.}} \\ \hline
+   {$ID_{RP_j}$} & {$ID_{RP} = [r]G$ is the $j$-th RP's unique identity, which is publicly known; $r \in [1, n)$ \newc{is known to \emph{nobody}.}} \\ \hline
     {$t$} & {$t \in [1, n)$ is a user-selected random integer in each login; \newc{$t$ is shared with the target RP and kept unknown to the IdP.
     }} \\ \hline
     {$PID_{RP_j}^i$} & {$PID_{RP} = [t]{ID_{RP}} = [tr]G$ is the $j$-th RP's pseudo-identity, in the user's $i$-th login to this RP.} \\ \hline
@@ -168,9 +168,12 @@ Each RP registers itself at the IdP to obtain $ID_{RP}$ and its RP certificate $
 An RP pre-installs $PK$ by trusted means.
 It sends a registration request, including the endpoint to receive identity tokens and other information.
 \item
-The IdP selects a random number $r \in [1,n)$ until $ID_{RP} = [r]G$ is unique.
+The IdP randomly selects a \emph{unique} point on $\mathbb{E}$,
+        and assigns it to $ID_{RP}$.
+Thus, $ID_{RP} = [r]G$ but $r$ is known to \emph{nobody} due to the elliptic curve discrete logarithm problem (ECDLP).
+%random number $r \in [1,n)$ until $ID_{RP} = [r]G$ is unique.
  %   but $r$ is kept unknown to the RP.
-It signs $Cert_{RP} = [ID_{RP}, Enpt_{RP}, *]_{SK}$,
+It then signs $Cert_{RP} = [ID_{RP}, Enpt_{RP}, *]_{SK}$,
      where $[\cdot]_{SK}$ is a message signed using $SK$ and $*$ is supplementary information such as the RP's common name.
 \item
 The RP verifies $Cert_{RP}$ using $PK$, and accepts $ID_{RP}$ and $Cert_{RP}$ if they are valid.
@@ -179,7 +182,10 @@ The RP verifies $Cert_{RP}$ using $PK$, and accepts $ID_{RP}$ and $Cert_{RP}$ if
 
 %\vspace{0.5mm}
 \noindent\textbf{User Registration.}
-Each user registers once at the IdP. She sets up a unique random identity $ID_U = u \in [1, n)$ and the corresponding credential. $ID_U$ is kept unknown to RPs.
+Each user registers once at the IdP. She sets up her unique username and the corresponding credential.
+The IdP will then assign
+a unique random identity $ID_U = u \in [1, n)$ to the user.
+$ID_U$ is known only to the IdP.
 %This is similar to the steps in existing SSO systems.
 
 
