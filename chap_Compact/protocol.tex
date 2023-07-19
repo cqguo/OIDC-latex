@@ -14,10 +14,9 @@ Table \ref{tbl:notations-protocol} lists the notations. The subscript $j$ and/or
     \begin{tabular}{|p{0.93cm}|p{6.71cm}|} \hline
     {\textbf{Notation}} & {\textbf{Description}} \\ \hline
     {$\mathbb{E}$, $G$, $n$} & {$\mathbb{E}$ is an elliptic curve over a finite field $\mathbb{F}_q$. $G$ is a base point (or generator) on $\mathbb{E}$, and the order of $G$ is a prime number $n$.} \\ \hline
-    {$ID_U$} & {$ID_U = u \in [1, n)$ is a user's unique identity at the IdP, \newc{which is known only to this user and the IdP.}} \\ \hline
-   {$ID_{RP_j}$} & {$ID_{RP} = [r]G$ is the $j$-th RP's unique identity, which is publicly known; $r \in [1, n)$ \newc{is known only to the IdP but not the RP.}} \\ \hline
-    {$t$} & {$t \in [1, n)$ is a user-selected random integer in each login; \newc{$t$ is shared with the target RP and kept unknown to the IdP.
-    }} \\ \hline
+    {$ID_U$} & {$ID_U = u \in [1, n)$ is a user's unique identity at the IdP, which is known only to the IdP.} \\ \hline
+   {$ID_{RP_j}$} & {$ID_{RP} = [r]G$ is the $j$-th RP's unique identity, which is publicly known; $r \in [1, n)$ is known to \emph{nobody}.} \\ \hline
+    {$t$} & {$t \in [1, n)$ is a user-selected random integer in each login; $t$ is shared with the target RP and kept unknown to the IdP.} \\ \hline
     {$PID_{RP_j}^i$} & {$PID_{RP} = [t]{ID_{RP}} = [tr]G$ is the $j$-th RP's pseudo-identity, in the user's $i$-th login to this RP.} \\ \hline
     {$PID_{U,j}^i$} & {$PID_U = [{ID_U}]{PID_{RP}} = [utr]G$ is the user's pseudo-identity, in the user's $i$-th login to the $j$-th RP.} \\ \hline
      {$Acct_j$} & {$Acct = [t^{-1}\bmod n]PID_{U} = [ID_U]ID_{RP} = [ur]G$ is the user's account at the $j$-th RP.} \\ \hline
@@ -31,7 +30,7 @@ Table \ref{tbl:notations-protocol} lists the notations. The subscript $j$ and/or
 \end{table}
 
 The IdP assigns a unique random integer $u$ to a user (i.e., $ID_U = u$),
- while selecting a random integer $r$ and assigning $ID_{RP} = [r]G$ to the RP if it is a unique point on $\mathbb{E}$.
+ while randomly selecting $ID_{RP} = [r]G$ for the RP if it is a unique point on $\mathbb{E}$.
 Here, $G$ is a point on $\mathbb{E}$ of order $n$, and $[r]G$ denotes the addition of $G$ on the curve $r$ times.
 
 
@@ -42,14 +41,12 @@ PID_{RP} = \mathcal{F}_{PID_{RP}}(ID_{RP}) = [t]{ID_{RP}} = [tr]G
 \end{equation}
 
 
-\newc
 In each login, the user selects $t$ and shares it with the RP to negotiate $PID_{RP}$. 
 %--removed due to double-check discussion
 %It makes no difference if the RP selects $t$ randomly and sends it to the user, as long as both of them calculate $PID_{RP}$ \emph{independently} and check if the received $PID_{RP}$ is equal to the calculated one.
 
-\oldc
 \noindent {\bf $\boldsymbol{ID_U}$-$\boldsymbol{PID_U}$ Transformation.}
-On receiving an identity-token request for $PID_{RP}$ from a user with $ID_U$, the IdP calculates $PID_{U}$ as below.
+On receiving an identity-token request for $PID_{RP}$ from a user identified as $ID_U$, the IdP calculates $PID_{U}$ as below.
 \begin{equation}
 PID_{U} = \mathcal{F}_{PID_U}(ID_U, PID_{RP}) =
   [{ID_U}]{PID_{RP}} = [utr]G
@@ -87,11 +84,11 @@ Meanwhile, the user's accounts at different RPs are inherently different and unl
 % This token would allow the malicious user to log into the honest RP under the victim user's account.
 
 \oldc
-The IdP never discloses $r$ to RPs. Otherwise, two colluding RPs with $ID_{RP_j} = [r]G$ and $ID_{RP_{j'}} = [r']G$ could link a user's accounts by checking whether $[r']Acct_j = [r]Acct_{j'}$ holds.
-\newc
-Meanwhile, a user's identity $u$ is kept secret from RPs. Otherwise, colluding RPs could calculate $[u]ID_{RP_j}$ for the known $u$s and link them.
+A user's identity $u$ is kept secret from RPs. Otherwise, colluding RPs could calculate $[u]ID_{RP_j}$s for any known $u$ and link them.
+Meanwhile, $ID_{RP} = [r]G$ is publicly-known but $r$ is unknown to RPs.
+%The IdP never discloses $r$ to RPs.
+Otherwise, two colluding RPs with $ID_{RP_j} = [r]G$ and $ID_{RP_{j'}} = [r']G$ could link a user's accounts by checking whether $[r']Acct_j = [r]Acct_{j'}$ holds.
 %enumerate the user's accounts by calculating  and link them.
-\oldc
 
 
 \subsection{The Design Specifics for Web Applications}
@@ -127,10 +124,8 @@ Only the script downloaded from this targetOrigin is considered a legitimate rec
 %The \emph{RP certificates} deals with the problem of mapping an identity proof with its targeting RP.
 %That is, the IdP script derives the RP's $ID_{RP}$ and origin from the RP certificate, while the $PID_{RP}$ is generated with this $ID_{RP}$. Thus, the IdP script always knows the targeting RP of identity proof, therefore, the \verb+postMessage+ mechanism can guarantee that the identity proof would not be sent to the adversary.
 
-\newc
 As discussed in Section \ref{subsec:overview}, a user needs to calculate $PID_{RP} = [t]ID_{RP}$ based on $ID_{RP}$ extracted from the RP certificate. Thus, this function should be implemented by an \emph{honest} script that does not leak $t$ to the IdP, from which it could calculate $ID_{RP} = [t^{-1}\bmod n]PID_{RP}$. In \usso, we consider the IdP script honest; otherwise, it could directly leak the RP's domain to the IdP.
 To mitigate this risk, we can implement the user agent with trusted browser extensions, which need to be installed by users before visiting RPs.
-\oldc
 
 \begin{figure*}[htb]
   \centering
@@ -168,9 +163,12 @@ Each RP registers itself at the IdP to obtain $ID_{RP}$ and its RP certificate $
 An RP pre-installs $PK$ by trusted means.
 It sends a registration request, including the endpoint to receive identity tokens and other information.
 \item
-The IdP selects a random number $r \in [1,n)$ until $ID_{RP} = [r]G$ is unique.
+The IdP randomly selects a \emph{unique} point on $\mathbb{E}$,
+        and assigns it to $ID_{RP}$.
+Thus, $ID_{RP} = [r]G$ but $r$ is known to \emph{nobody} due to the elliptic curve discrete logarithm problem (ECDLP).
+%random number $r \in [1,n)$ until $ID_{RP} = [r]G$ is unique.
  %   but $r$ is kept unknown to the RP.
-It signs $Cert_{RP} = [ID_{RP}, Enpt_{RP}, *]_{SK}$,
+It then signs $Cert_{RP} = [ID_{RP}, Enpt_{RP}, *]_{SK}$,
      where $[\cdot]_{SK}$ is a message signed using $SK$ and $*$ is supplementary information such as the RP's common name.
 \item
 The RP verifies $Cert_{RP}$ using $PK$, and accepts $ID_{RP}$ and $Cert_{RP}$ if they are valid.
@@ -179,7 +177,10 @@ The RP verifies $Cert_{RP}$ using $PK$, and accepts $ID_{RP}$ and $Cert_{RP}$ if
 
 %\vspace{0.5mm}
 \noindent\textbf{User Registration.}
-Each user registers once at the IdP. She sets up a unique random identity $ID_U = u \in [1, n)$ and the corresponding credential. $ID_U$ is kept unknown to RPs.
+Each user registers once at the IdP. She sets up her unique username and the corresponding credential.
+The IdP will then assign
+a unique random identity $ID_U = u \in [1, n)$ to the user.
+$ID_U$ is known only to the IdP.
 %This is similar to the steps in existing SSO systems.
 
 
@@ -250,9 +251,7 @@ The IdP script sends an identity-token request for $PID_{RP}$ on behalf of the u
 
 \item [3.3]
 The IdP script obtains the user's authorization for the requested attributes locally and then sends the scope of the authorized attributes.
-\newc
 Then, the IdP checks if the received $PID_{RP}$ is a point on $\mathbb{E}$,
-\oldc
 calculates $PID_U = [ID_U]{PID_{RP}}$, and signs $[PID_{RP}, PID_U, Issuer, Validity, Attr]_{SK}$, where $Issuer$ is the IdP, $Validity$ indicates the validity period, and $Attr$ contains the authorized user attributes.
 \item[3.4] The IdP replies with the identity token to the IdP script.
 \end{itemize}
@@ -283,10 +282,20 @@ and calculates $Acct = [t^{-1}]{PID_U}$.
 
 If any verification fails, this flow will be terminated immediately.
 For example, the user halts it when receiving an invalid $Cert_{RP}$.
-\newc
-The IdP rejects an identity-token request in Step 3.3 if the received $PID_{RP}$ is not a point on $\mathbb{E}$, and the RP rejects an identity token in Step 4.2 if the signature is invalid. %or the enclosed $PID_{RP}$ is not equal to $[t]ID_{RP}$.
-\oldc
-
+The IdP rejects an identity-token request in Step 3.3 if the received $PID_{RP}$ is not a point on $\mathbb{E}$, and the RP rejects an identity token in Step 4.2 if the signature is invalid. 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% u泄露，则RP有必要比较！否则，就会伤害security。
+%or the enclosed $PID_{RP}$ is not equal to $[t]ID_{RP}$.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% 分析结论是：
+% 现有的简化协议（RP不比较$PID_{RP}$是否相等），则：
+% 当u不泄露，u的security和privacy都没有问题；
+% 当u泄露，u的security和privacy都没有问题。
+%
+% 改进协议（RP比较$PID_{RP}$是否相等），则：
+% 当u不泄露，u的security和privacy都没有问题；
+% 当u泄露，u的security没有问题，u的privacy有问题。
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \subsection{Compatibility with OIDC}
 \label{subsec:compatible}
