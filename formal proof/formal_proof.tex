@@ -119,7 +119,7 @@ We here present the full details of our formal model of UPPRESSO. For our analys
 We model UPPRESSO as a web system. We call a web system $\uppressowebsystem=(\bidsystem, \scriptset, \mathsf{script}, E^0)$ an UPPRESSO web system if it is of the form described in what follows.
 
 \subsection{Outline}\label{app:outlineuppressomodel}
-The system $\bidsystem=\mathsf{Hon}\cup \mathsf{Web} \cup \mathsf{Net}$ consists of web attacker processes (in $\mathsf{Web}$), network attacker processes (in $\mathsf{Net}$), a finite set $\fAP{B}$ of web browsers, a finite set $\fAP{RP}$ of web servers for the relying parties, a finite set $\fAP{IDP}$ of web servers for the identity providers, and a finite set $\fAP{DNS}$ of DNS servers, 
+The system $\bidsystem=\mathsf{Hon}\cup \mathsf{Web} \cup \mathsf{Net}$ consists of web attacker processes (in $\mathsf{Web}$), network attacker processes (in $\mathsf{Net}$), a finite set $\fAP{B}$ of web browsers, a finite set $\fAP{RP}$ of web servers for the relying parties, a finite set $\fAP{IDP}$ of web servers containing only one identity provider, and a finite set $\fAP{DNS}$ of DNS servers, 
 with $\mathsf{Hon} := \fAP{B} \cup \fAP{RP} \cup \fAP{IDP} \cup \fAP{DNS}$. More details on the processes in $\mathpzc{W}$ are provided below. 
 %
 Figure~\ref{fig:scripts-in-w} shows the set of scripts $\scriptset$ 
@@ -449,7 +449,7 @@ We now specify the relation $R^r$. We describe this relation by a non-determinis
     \mystate{\myss{\mi{loginSessionToken} := \nu_1}}
    %\mystate{\myss{cookie := headers[Cookie]}}
    %\mystate{\myss{session := s'.SessionList[cookie]}}
-    \mystate{\myss{\mi{t} := body[t]}}
+    \mystate{\myss{\mi{t} := body[t]}}\label{line:gen-t}
    %\mystate{\myss{t^{-1}:= \mathtt{Inverse}(t)}}
     \mystate{\myss{\mi{ID_{rp}} := [s'.\str{rp}.\mi{id}]G}}
     \mystate{\myss{\mi{PID_{rp}} := [\mi{t}]\mi{ID_{rp}}}}
@@ -490,13 +490,13 @@ We now specify the relation $R^r$. We describe this relation by a non-determinis
      %\mystop{b, a, m'}
    %\ENDIF
     \mystate{\myss{\mi{PID_u} := \mi{IDToken}.\str{PID_{u}}}}
-    \mystate{\myss{\mi{Acct} := [\mi{loginSessions}.\str{t}]\mi{PID_u}}}
+    \mystate{\myss{\mi{Acct} := [\mi{loginSessions}.\str{t}]\mi{PID_u}}}\label{line:gen-acct}
    %\mystate{\myss{Acct := \mathtt{Multiply}(PID_U, t^{-1})}}
    %\myif{Acct \not\in \mathtt{ListOfUser}()}
      %\mystate{\myss{\mathtt{AddUser}(Acct)}}
    %\ENDIF
    %\mystate{\myss{session[user] := Acct}}
-    \mystate{\myss{s'.\str{serviceTokens} := s'.\str{serviceTokens} + ^{\myangle{}}\mi{Acct}}}
+    \mystate{\myss{s'.\str{serviceTokens} := s'.\str{serviceTokens} + ^{\myangle{}}\mi{Acct}}}\label{line:add-service-token}
    %\mystate{\myss{s'.serviceTokens := s'.serviceTokens + ^{\myangle{}}\myangle{IDToken, Acct}}}
     \mystate{\myss{m' := \encs{\myangle{\mathtt{HTTPResp}, n, 200, \myangle{}, \mathtt{LoginSuccess}}}{k}}}
     \mystop{b, a, m'}
@@ -613,7 +613,7 @@ The relation $R^i$ that defines the behavior of the IdP $i$ is defined as follow
     \mystop{b, a, m'}
   \myelse{path \equiv /authorize}
     \mystate{\myss{\mi{cookie} := headers[\str{Cookie}]}}
-    \myif{\mi{cookie}[\str{sessionid}] \equiv \myangle{}}
+    \myif{\mi{cookie}[\str{sessionid}] \equiv \myangle{}}\label{line:uppresso-idp-check-login-state}
       \mystate{\myss{m' := \encs{\myangle{\mathtt{HTTPResp},n,200,\myangle{},\mathtt{Unauthenticated}}}{k}}}
       \mystop{b, a, m'}
     \ENDIF
@@ -633,7 +633,7 @@ The relation $R^i$ that defines the behavior of the IdP $i$ is defined as follow
     %\mystate{\myss{Validity := \mathtt{CurrentTime} ()+ s'.Validity}}
     %\mystate{\myss{Content := \myangle{PID_{RP}, PID_U, s'.Issuer, Validity}}}
     \mystate{\myss{\mi{content} := \myangle{PID_{rp}, PID_u}}}
-    \mystate{\myss{\mi{ver} := \sig{\mi{content}}{s'.\str{signkey}}}}
+    \mystate{\myss{\mi{ver} := \sig{\mi{content}}{s'.\str{signkey}}}}\label{line:sign-token}
     \mystate{\myss{\mi{IDToken} := \myangle{\mi{content}, \mi{ver}}}}
     \mystate{\myss{s'.\str{sessions}[\mi{IDTokens}]:=s'.\str{sessions}[\mi{IDTokens}]+^{\myangle{}}\myangle{PID_{rp}, IDToken}}}
     \mystate{\myss{m':=\encs{\myangle{\mathtt{HTTPResp}, n, 200, \myangle{}, \mi{IDToken}}}{k}}}
@@ -700,7 +700,7 @@ by a non-deterministic algorithm.
   \mystate{\myss{\mi{pattern} := \myangle{\tPostMessage, target, *, \myangle{\str{t}, *}}}}
   \mystate{\myss{\mi{input} := \textsf{CHOOSEINPUT}(\mi{scriptinputs}, \mi{pattern})}}
   \myif{\mi{input} \not\equiv \bot}
-    \mystate{\myss{t := \pi_2(\pi_4(\mi{input}))}}
+    \mystate{\myss{t := \pi_2(\pi_4(\mi{input}))}}\label{line:receive-t}
     %\mystate{\myss{\mi{url} := \myangle{\tUrl, \https, \mi{RPDomain}, \str{/startNegotiation}, \myangle{}}}}
     \mystate{\myss{\mi{body} := \myangle{\myangle{\str{t},t}}}}
     \mystate{\myss{\mi{command} := \langle\tXMLHTTPRequest,\textsf{URL}^{\mi{RPDomain}}_\str{/startNegotiation},\mPost,\mi{body},}\breakalgohook{0}\myss{s'.\str{refXHR}\rangle}}
@@ -765,7 +765,7 @@ We now formally specify the relation of $\mi{script\_idp}$
 \SWITCH{\myss{s'.\str{phase}}}
 \CASE{\myss{start}}
   \mystate{\myss{t := \str{random}()}}
-  \mystate{\myss{\mi{command} := \myangle{\tPostMessage, \mi{target}, \myangle{\str{t}, t}, \myangle{}}}}
+  \mystate{\myss{\mi{command} := \myangle{\tPostMessage, \mi{target}, \myangle{\str{t}, t}, \myangle{}}}}\label{line:send-t}
   \mystate{\myss{s'.\str{parameters}[t] := t}}
   \mystate{\myss{s'.\str{phase} := \str{expectCert}}}
 \ENDCASE
@@ -777,7 +777,7 @@ We now formally specify the relation of $\mi{script\_idp}$
     \myif{\checksigThree{\mi{Cert_{rp}}.\str{ver}}{\mi{Cert_{rp}}.\str{content}}{s'.\str{IdPConfig}.\mi{pubkey}} \equiv \True}
       \mystate{\myss{s'.\str{parameters}[\mi{cert}] := \mi{Cert_{rp}}}}
       \mystate{\myss{t := s'.\str{parameters}[t]}}
-      \mystate{\myss{\mi{PID_{rp}} := [t]\mi{Cert_{rp}}.\str{content}[\mi{ID_{rp}}]}}
+      \mystate{\myss{\mi{PID_{rp}} := [t]\mi{Cert_{rp}}.\str{content}[\mi{ID_{rp}}]}}\label{line:gen-pidrp}
       \mystate{\myss{s'.\str{parameters}[\mi{PID_{rp}}] := \mi{PID_{rp}}}}
       \mystate{\myss{\mi{body} := \myangle{\myangle{\str{PID_{rp}},\mi{PID_{rp}}}}}}
       \mystate{\myss{\mi{command} := \langle\tXMLHTTPRequest,\textsf{URL}^{\mi{IdPDomain}}_\str{/reqToken},\mPost,\mi{body},}\breakalgohook{0}\myss{s'.\str{refXHR}\rangle}}
@@ -817,7 +817,7 @@ We now formally specify the relation of $\mi{script\_idp}$
     \myif{\pi_2(input) \equiv \str{LoginSuccess}}
       \mystate{\myss{\mi{PID_{rp}} := s'.\str{parameters}[\mi{PID_{rp}}]}}
       \mystate{\myss{\mi{Attr} := \textsf{GETPARAMETERS}(\mi{tree}, \mi{docnonce})[\str{iaKey}]}}
-      \mystate{\myss{\mi{body} := \myangle{\myangle{\str{PID_{rp}}, \mi{PID_{rp}}}, \myangle{\str{Attr}, \mi{Attr}}}}}
+      \mystate{\myss{\mi{body} := \myangle{\myangle{\str{PID_{rp}}, \mi{PID_{rp}}}, \myangle{\str{Attr}, \mi{Attr}}}}}\label{line:send-pidrp}
       \mystate{\myss{\mi{command} := \langle\tXMLHTTPRequest,\textsf{URL}^{\mi{IdPDomain}}_\str{/authorize},\mPost,\mi{body},}\breakalgohook{0}\myss{s'.\str{refXHR}\rangle}}
       \mystate{\myss{s'.\str{phase} := \str{expectToken}}}
     \ENDIF
@@ -829,7 +829,7 @@ We now formally specify the relation of $\mi{script\_idp}$
   \myif{input \not\equiv \bot}
     \mystate{\myss{IDToken := \pi_2(input)[\str{IDToken}]}}
     \mystate{\myss{RPOringin := \myangle{s'.\str{parameters}[\mi{cert}].\mi{Content}[\str{Enpt}], \mathtt{S}}}}
-    \mystate{\myss{\mi{command} := \myangle{\tPostMessage, \mi{target}, \myangle{\str{IDToken},\mi{IDToken}}, RPOrigin}}}
+    \mystate{\myss{\mi{command} := \myangle{\tPostMessage, \mi{target}, \myangle{\str{IDToken},\mi{IDToken}}, RPOrigin}}}\label{line:token-send}
     \mystate{\myss{s'.\str{phase} := \str{stop}}}
   \ENDIF
 \ENDCASE
@@ -840,172 +840,545 @@ We now formally specify the relation of $\mi{script\_idp}$
 
 \section{Proof of Security}
 
-We define  the similar security properties as the definition 53 in SPRESSO. 
-First note that the RP service token should be defined as $\langle IDToken$, $Acct \rangle$ which is $\langle n$, $i \rangle$ in SPRESSO.
-That is,  
+To state the security properties for \uppresso, we first
+define an \emph{\uppresso web system for authentication analysis}. This
+web system is based on the \uppresso web system and only considers one
+network attacker (which subsumes all web attackers and further network
+attackers).
+
 \begin{definition}
-let  $\mathcal{U\!W\!S}^{auth}$ be an UPPRESSO web system for authentication analysis. We say that $\mathcal{U\!W\!S}^{auth}$ is secure if for every run $\rho$ of $\mathcal{U\!W\!S}^{auth}$, every state ($S^j$, $E^j$, $N^j$) in $\rho$, every $r \in$ $\mathtt{RP}$ that is honest, every RP service token of the form $\langle IDToken$, $Acct \rangle$ recorded in $S^j$($r$).$\mathtt{serviceTokens}$, the following two conditions are satisfied:
-
-(A) If $\langle IDToken$, $Acct \rangle$ is derivable from the attackers knowledge in $S^j$ (i.e., $\langle IDToken$, $Acct \rangle \in d_{\emptyset}$($S^j$($\mathtt{attacker}$))), then it follows that the browser b owning $Acct$ is fully corrupted in $S^j$ (i.e., the value of $isCorrupted$ is $\mathtt{FULLCORRUPT}$) or $\mathtt{governor}$($Acct$) is not an honest IdP (in $S^j$).
-
-(B) If the request corresponding to $\langle IDToken$, $Acct \rangle$ was sent by some $b \in \mathtt{B}$ which is honest in $S^j$, then b owns the $ID_U$ which satisfies $Acct=[ID_U]S^j(r).ID_{RP}$.
+  Let $\uppressoauthwebsystem = (\bidsystem, \scriptset, \mathsf{script}, E^0)$
+  an \uppresso web system. We call $\uppressoauthwebsystem$ an
+  \emph{\uppresso web system for authentication analysis} iff
+  $\bidsystem$ contains only one network attacker process
+  $\fAP{attacker}$ and no other attacker processes (i.e.,
+  $\mathsf{Net} = \{\fAP{attacker}\}$, $\mathsf{Web} = \emptyset$).
+  Further, $\bidsystem$ contains no DNS servers. DNS servers are
+  assumed to be dishonest, and hence, are subsumed by
+  $\fAP{attacker}$. In the initial state $s_0^b$ of each browser $b$
+  in $\bidsystem$, the DNS address is
+  $\mapAddresstoAP(\fAP{attacker})$. Also, in the initial state
+  $s_0^r$ of each relying party $r$, the DNS address is
+  $\mapAddresstoAP(\fAP{attacker})$.
 \end{definition}
 
-To prove Theorem 5 in section 5.2, we are going to prove the following Lemmas.
-First we follows the Lemma 1, 2 and 3 in SPRESSO, which prove that the data transmitted through HTTPS is secure and the IdP's public key used for generating identity proof is secure. 
-In UPPRESSO, only the single IdP is trusted, so that the public key is guaranteed to be always trusted.
-Therefore, we can also follow the proofs for Lemma 1, 2 and 3 in SPRESSO.
+The security properties for \uppresso are formally defined as follows.
+First note that every RP service token $Acct$ recorded in RP was
+created by RP as the result of an HTTPS $\mPost$ request $m$. We refer
+to $m$ as the \emph{request corresponding to $Acct$}. 
 
+In the following definition, when we say a browser $b\in \fAP{B}$ owns the service 
+token $Acct$, we holds that for some RP $r\in \fAP{RP}$ that records this token and 
+an identity $u\in \fAP{ID}$ with $\mapIDtoOwner(u) = b$.
+\[\mi{Acct}=[u.id]\mi{ID_{rp}}=[u.id][r.id]G=[ur]G\]
+
+We now define the similar security properties as the definition 52 in SPRESSO. 
+
+\begin{definition}\label{def:uppresso-security-property} 
+  Let $\uppressoauthwebsystem$ be an \uppresso web system for authentication analysis. 
+  We say that \emph{$\uppressoauthwebsystem$ is secure} if for every run $\rho$ of
+  $\uppressoauthwebsystem$, every state $(S^j, E^j, N^j)$ in $\rho$,
+  every $r\in \fAP{RP}$ that is honest in $S^j$, every RP service token of the form 
+  $Acct$ recorded in $S^j(r).\str{serviceTokens}$, the following two conditions are
+  satisfied:
+
+  \textbf{(A)} If $Acct$ is derivable from the attackers knowledge
+  in $S^j$ (i.e., $Acct \in d_{\emptyset}(S^j(\fAP{attacker}))$),
+  then it follows that the browser $b$ owning $Acct$ is fully corrupted
+  in $S^j$ (i.e., the value of $\mi{isCorrupted}$ is $\fullcorrupt$)
+  or the only IdP is dishonest (in $S^j$).
+
+  \textbf{(B)} If the request corresponding to $Acct$ was sent by
+  some $b\in \fAP{B}$ which is honest in $S^j$, then $b$ owns $Acct$.
+\end{definition}
+
+%First note that the RP service token should be defined as $\langle IDToken$, $Acct \rangle$ 
+%which is $\langle n$, $i \rangle$ in SPRESSO. That is,  
+
+%let  $\mathcal{U\!W\!S}^{auth}$ be an UPPRESSO web system for authentication analysis. We say that $\mathcal{U\!W\!S}^{auth}$ is secure if for every run $\rho$ of $\mathcal{U\!W\!S}^{auth}$, every state ($S^j$, $E^j$, $N^j$) in $\rho$, every $r \in$ $\mathtt{RP}$ that is honest, every RP service token of the form $\langle IDToken$, $Acct \rangle$ recorded in $S^j$($r$).$\mathtt{serviceTokens}$, the following two conditions are satisfied:
+
+%(A) If $\langle IDToken$, $Acct \rangle$ is derivable from the attackers knowledge in $S^j$ (i.e., $\langle IDToken$, $Acct \rangle \in d_{\emptyset}$($S^j$($\mathtt{attacker}$))), then it follows that the browser b owning $Acct$ is fully corrupted in $S^j$ (i.e., the value of $isCorrupted$ is $\mathtt{FULLCORRUPT}$) or $\mathtt{governor}$($Acct$) is not an honest IdP (in $S^j$).
+
+%(B) If the request corresponding to $\langle IDToken$, $Acct \rangle$ was sent by some $b \in \mathtt{B}$ which is honest in $S^j$, then b owns the $ID_U$ which satisfies $Acct=[ID_U]S^j(r).ID_{RP}$.
+
+To prove Theorem 5 in section 5.2, we are going to prove the following Lemmas.
+
+\begin{lemma}\label{lemma:k-does-not-leak-from-honest-rp} 
+  If in the processing step $s_i \rightarrow s_{i+1}$ of a run $\rho$
+  of $\uppressoauthwebsystem$ an honest relying party $r$ (I) emits an HTTPS
+  request of the form
+
+  \[ m = \ehreqWithVariable{\mi{req}}{k}{\pub(k')} \]
+%
+  (where $\mi{req}$ is an HTTP request, $k$ is a nonce (symmetric
+  key), and $k'$ is the private key of some other DY process $u$), and (II) in the
+  initial state $s_0$ the private key $k'$ is only known to $u$, and
+  (III) $u$ never leaks $k'$, then all of the following
+  statements are true:
+  \begin{enumerate}
+  \item There is no state of $\uppressoauthwebsystem$ where any party except
+    for $u$ knows $k'$, thus no one except for $u$ can
+    decrypt $\mi{req}$.
+    \label{prop:attacker-cannot-decrypt-spresso}
+  \item If there is a processing step $s_j \rightarrow s_{j+1}$ where
+    the RP $r$ leaks $k$ to $\bidsystem \setminus \{u, r\}$ there
+    is a processing step $s_h \rightarrow s_{h+1}$ with $h < j$
+    where $u$ leaks the symmetric key $k$ to $\bidsystem \setminus
+    \{u,r\}$ or $r$ is corrupted in
+    $s_j$. \label{prop:k-doesnt-leak-spresso}
+  \item The value of the host header in $\mi{req}$ is the domain that
+    is assigned the public key $\pub(k')$ in RP's keymapping
+    $s_0.\str{keyMapping}$ (in its initial
+    state). \label{prop:host-header-matches-spresso}
+  \item If $r$ accepts a response (say, $m'$) to $m$ in a processing step $s_j
+    \rightarrow s_{j+1}$ and $r$ is honest in $s_j$ and $u$ did not
+    leak the symmetric key $k$ to $\bidsystem \setminus \{u,r\}$ prior
+    to $s_j$, then $u$ created the HTTPS response $m'$ to the HTTPS
+    request $m$, i.e., the nonce of the HTTP request $\mi{req}$ is not known to
+    any atomic process $p$, except for the atomic DY processes $r$ and
+    $u$.\label{prop:only-owner-answers-spresso}
+  \end{enumerate}
+\end{lemma}
+
+\begin{lemma}\label{lemma:wkcache-never-lies}
+  For every honest relying party $r \in \fAP{RP}$, every $s \in \rho$, every
+  $\an{\mi{host}, \mi{wkDoc}} \inPairing S(r).\str{wkCache}$ it holds
+  that $\mi{wkDoc}[\str{signkey}] \equiv
+  \pub(\mathsf{signkey}(\mapDomain^{-1}(\mi{host})))$ if
+  $\mapDomain^{-1}(\mi{host})$ is an honest IdP.
+\end{lemma}
+
+\begin{lemma}\label{lemma:uppresso-request-exists}
+  In a run $\rho$ of $\uppressoauthwebsystem$, for every state $s_j \in
+  \rho$, every RP $r \in \fAP{RP}$ that is honest in $s_j$, every
+  $Acct \inPairing S^j(r).\str{serviceTokens}$, the following
+  properties hold:
+
+  \begin{enumerate}
+  \item There exists exactly one $l' < j$ such that there exists a
+    processing step in $\rho$ of the form
+    \[ s_{l'} \xrightarrow[r \rightarrow \an{\an{a',f',m'}}]{e'
+      \rightarrow r} s_{l'+1}\]
+    with $e'$ being some events, $a'$ and $f'$
+    being addresses and $m'$ being a service token response for $Acct$.
+
+  \item There exists exactly one $l < j$ such that there exists a
+    processing step in $\rho$ of the form 
+    \[ s_{l} \xrightarrow[r \rightarrow e]{\an{a,f,m} \rightarrow r}
+    s_{l+1} \] with $e$ being some events, $a$ and $f$ being
+    addresses and $m$ being a service token request for $Acct$.
+
+  \item The processing steps from (1) and (2) are the same, i.e., $l = l'$.
+
+  \item The service token request for $Acct$, $m$ in (2), is an HTTPS message of the following form:
+    \[ \mathsf{enc}_\mathsf{a}(\langle \hreq{ 
+      nonce=n_\text{req}, 
+      method=\mPost,
+      xhost=d_r, 
+      path=\str{/authorize}, 
+      parameters=x, 
+      headers=h,
+      xbody=b}, k\rangle, \pub(\mapSSLKey(d_r))) \]
+    for $d_r \in \mapDomain(r)$, some terms $x$, $h$, $n_\text{req}$, and a dictionary $b$ such that 
+    \[ b[\str{IDToken}] \equiv \myangle{\mi{PID_{rp}, \mi{PID_u}, ver}} \]
+    with 
+    \[ \mi{PID_{rp}} \equiv [S^l(r).\str{loginSessions}[t]][S^l(r).\str{rp}.\mi{id}]G, \]
+    \[ \mi{PID_{u}} \equiv [u]\mi{PID_{rp}}, \]
+    \[ \mi{ver} \equiv \sig{\an{PID_{rp},PID_u}}{k_{sign}} \]
+    for some nonces $u$, and $k_\text{sign}$.
+  \item If the IdP $i$ is honest, we have that $k_\text{sign} = S^l(i).\str{signkey}$.
+  \end{enumerate}
+\end{lemma}
+
+We define the Lemma 1, 2 and 3 the same as SPRESSO, which prove that the data transmitted 
+through HTTPS is secure and the IdP's public key used for generating IDToken is secure. 
+In UPPRESSO, only the single IdP is trusted, so that the public key is guaranteed to 
+be always trusted. Therefore, we can also follow the proofs in SPRESSO.
 
 \subsection{Proof of Property A}
 Then we prove the Property $A$ is satisfied in UPPRESSO.
 As stated above, the Property $A$ is defined as follows:
-\begin{definition}
-Let $\mathcal{U\!W\!S}^{auth}$  be an UPPRESSO web system for authentication analysis. We say that $\mathcal{U\!W\!S}^{auth}$  is secure (with respect to Property A) if for every run $rho$ of $\mathcal{U\!W\!S}^{auth}$ , every state ($S^j$, $E^j$, $N^j$) in $rho$, every $r \in \mathtt{RP}$ that is honest in
-$S^j$, every RP service token of the form $\langle IDToken$, $Acct \rangle$ recorded in $S^j$($r$).$\mathtt{serviceTokens}$ and derivable from the attackers knowledge in $S^j$ (i.e., $\langle IDToken$, $Acct \rangle \in d_{\emptyset}$($S^j$($\mathtt{attacker}$))), it follows that the browser b owning $Acct$ is fully corrupted in $S^j$ (i.e., the value of $isCorrupted$ is $\mathtt{FULLCORRUPT}$) or $\mathtt{governor}$($Acct$) is not an honest IdP (in $S^j$).
+\begin{definition}\label{def:uppresso-security-property} Let $\uppressoauthwebsystem$ 
+  be an \uppresso web system for authentication analysis. We say that 
+  \emph{$\uppressoauthwebsystem$ is secure (with respect to Property A)} if for every
+  run $\rho$ of $\uppressoauthwebsystem$, every state $(S^j, E^j, N^j)$ in $\rho$,
+  every $r\in \fAP{RP}$ that is honest in $S^j$, every RP service token of the form 
+  $Acct$ recorded in $S^j(r).\str{serviceTokens}$ and derivable from the attackers
+  knowledge in $S^j$ (i.e., $Acct \in d_{\emptyset}(S^j(\fAP{attacker}))$), it 
+  follows that the browser $b$ owning $Acct$ is fully corrupted in $S^j$ (i.e., the 
+  value of $\mi{isCorrupted}$ is $\fullcorrupt$) or the IdP is dishonest. 
 \end{definition}
+
+%\begin{definition}
+%Let $\mathcal{U\!W\!S}^{auth}$  be an UPPRESSO web system for authentication analysis. We say that $\mathcal{U\!W\!S}^{auth}$  is secure (with respect to Property A) if for every run $rho$ of $\mathcal{U\!W\!S}^{auth}$ , every state ($S^j$, $E^j$, $N^j$) in $rho$, every $r \in \mathtt{RP}$ that is honest in
+%$S^j$, every RP service token of the form $\langle IDToken$, $Acct \rangle$ recorded in $S^j$($r$).$\mathtt{serviceTokens}$ and derivable from the attackers knowledge in $S^j$ (i.e., $\langle IDToken$, $Acct \rangle \in d_{\emptyset}$($S^j$($\mathtt{attacker}$))), it follows that the browser b owning $Acct$ is fully corrupted in $S^j$ (i.e., the value of $isCorrupted$ is $\mathtt{FULLCORRUPT}$) or $\mathtt{governor}$($Acct$) is not an honest IdP (in $S^j$).
+%\end{definition}
 
 
 Same as the proof in SPRESSO, we want to show that every UPPRESSO web system is secure with regard to Property A and therefore assume that there exists an UPPRESSO web system that is not secure. We will lead this to a contradication and thereby show that all UPPRESSO web systems are secure (with regard to Property A).
 
- In detail, we assume: \emph{There is an UPPRESSO web system for authentication analysis $\mathcal{U\!W\!S}^{auth}$. We say that $\mathcal{U\!W\!S}^{auth}$  is secure (with respect to Property A) if for every run $rho$ of $\mathcal{U\!W\!S}^{auth}$ , every state ($S^j$, $E^j$, $N^j$) in $rho$, every $r \in \mathtt{RP}$ that is honest in
-$S^j$, every RP service token of the form $\langle IDToken$, $Acct \rangle$ recorded in $S^j$($r$).$\mathtt{serviceTokens}$ and derivable from the attackers knowledge in $S^j$ (i.e., $\langle IDToken$, $Acct \rangle \in d_{\emptyset}$($S^j$($\mathtt{attacker}$))), it follows that the browser b owning $Acct$ is not fully corrupted in $S^j$ and $\mathtt{governor}$($Acct$) is an honest IdP (in $S^j$).}
+%In detail, we assume: \emph{There is an UPPRESSO web system for authentication analysis $\mathcal{U\!W\!S}^{auth}$. We say that $\mathcal{U\!W\!S}^{auth}$  is secure (with respect to Property A) if for every run $rho$ of $\mathcal{U\!W\!S}^{auth}$ , every state ($S^j$, $E^j$, $N^j$) in $rho$, every $r \in \mathtt{RP}$ that is honest in
+%$S^j$, every RP service token of the form $\langle IDToken$, $Acct \rangle$ recorded in $S^j$($r$).$\mathtt{serviceTokens}$ and derivable from the attackers knowledge in $S^j$ (i.e., $\langle IDToken$, $Acct \rangle \in d_{\emptyset}$($S^j$($\mathtt{attacker}$))), it follows that the browser b owning $Acct$ is not fully corrupted in $S^j$ and $\mathtt{governor}$($Acct$) is an honest IdP (in $S^j$).}
 
-We now proceed to to proof that this is a contradiction. Let $I := \mathtt{governor}$($i$). We know that $I$ is an honest IdP. As such, it never leaks its signing key (see Algorithm~\ref{alg:idp}). Therefore, the signed subterm $Content := \langle PID_{RP}, PID_U, s'.Issuer, Validity \rangle$, $Sig := SigSign(Content, s'.SK)$ and $IDToken := \langle Content, Sig \rangle$ had to be created by the IdP $I$.  An (honest) IdP creates signatures only in Line 48-50 of Algorithm~\ref{alg:idp}.
+In detail, we assume: \emph{There exists an \uppresso web system
+$\uppressoauthwebsystem$, a run $\rho$ of $\uppressoauthwebsystem$, a
+state $s_j = (S^j, E^j, N^j)$ in $\rho$, a RP $r\in \fAP{RP}$ that is
+honest in $S^j$, an RP service token of the form $Acct$
+recorded in $S^j(r).\str{serviceTokens}$ and derivable from the
+attackers knowledge in $S^j$ (i.e., $Acct \in
+d_{\emptyset}(S^j(\fAP{attacker}))$), and the browser $b$ owning $i$
+is not fully corrupted and IdP is honest (in $S^j$).}
 
-\begin{lemma}
-(Same as Lemma 4 in SPRESSO) Under the assumption above, only the browser b can issue a request $req$ that triggers the IdP I to create the signed term IDToken. The request was sent by b over HTTPS using I's public HTTPS key.
+We now proceed to proof that this is a contradiction. Let $I$ be the honest IdP. 
+As such, it never leaks its signing key (see Algorithm~\ref{alg:idp}). Therefore, 
+the signed subterm $\mi{Content} := \myangle{PID_{rp}, PID_u}$, 
+$\mi{ver} := \sig{\an{PID_{rp},PID_u}}{k_{sign}}$ and 
+$\mi{IDToken} := \myangle{\mi{Content}, \mi{ver}}$ had to be created by the IdP $I$.  
+An (honest) IdP creates signatures only in Line~\ref{line:sign-token} of Algorithm~\ref{alg:idp}.
+
+\begin{lemma} %(Same as Lemma 4 in SPRESSO) 
+  Under the assumption above, only the browser b can issue a request $req$
+  (say, $m_{attr}$)that triggers the IdP I to create the signed term IDToken. The 
+  request was sent by b over HTTPS using I's public HTTPS key.
 \end{lemma}
 \begin{proof}
-The proof is same as the Lemma 4's proof in SPRESSO.
-It can be proved that the $IDToken$ only contains the $PID_U:=[ID_U]PID_{RP}$ while $PID_U$ is provided by $b$, and $b$ owns the password of $ID_U$.
+  We have to consider two cases for the request $m_{attr}$:
+
+  \textbf{(A).} First, if the user is not logged in with the identity $u$ at $I$
+  (i.e., the browser $b$ has no session cookie that carries a nonce
+  which is a session id at $I$ for which the identitiy $u$ is marked
+  as being logged in, compare Line~\ref{line:uppresso-idp-check-login-state} of
+  Algorithm~\ref{alg:idp}), then the request has to carry (in
+  the request body) the password matching the identity $u$ ($\mapIDtoPLI(u)$) to the 
+  path $\str{/authentication}$ to retrieve the session cookie. This secret is only 
+  known to $b$ initially. Depending on the corruption status of $b$, we can now have two
+  cases:
+  \begin{enumerate}
+  \item[a)] If $b$ is honest in $s_j$, it has not sent the secret to
+    any party except over HTTPS to $I$ (as defined in the definition
+    of browsers). 
+  \item[b)] If $b$ is close-corrupted, it has not sent it to any other
+    party while it was honest (case a). When becoming close-corrupted,
+    it discarded the secret.
+  \end{enumerate}
+
+  I.e., the secret has been sent only to $I$ over HTTPS or to nobody
+  at all. The IdP $I$ cannot send it to any other party. Therefore we
+  know that only the browser $b$ can send the request $m_\text{attr}$
+  in this case.
+
+  \textbf{(B).} Second, if the user is logged in for the identity $i$
+  at $I$, the browser provides a session id to $I$ that refers to a
+  logged in session at $I$. This session id can only be retrieved from
+  $I$ by logging in, i.e., case (A) applies, in particular, $b$ has to
+  provide the proper secret, which only itself and $I$ know (see
+  above). The session id is sent to $b$ in the form of a cookie, which
+  is set to secure (i.e., it is only sent back to $I$ over HTTPS, and
+  therefore not derivable by the attacker) and httpOnly (i.e., it is 
+  not accessible by any scripts). The browser $b$ sends the cookie only 
+  to $I$. The IdP $I$ never sends the session id to any other party than 
+  $b$. The session id therefore only leaks to $b$ and $I$, and never to 
+  the attacker. Hence, the browser $b$ is the only atomic DY process which 
+  can send the request $m_\text{attr}$ in this case.
+
+  We can see that in both cases, the request was sent by $b$ using
+  HTTPS and $I$'s public key: If the browser would intend to sent the
+  request without encryption, the request would not contain the
+  password in case (A) or the cookie in case (B). The browser always
+  uses the ``correct'' encryption key for any domain (as defined in
+  $\uppressoauthwebsystem$).
+%The proof is same as the Lemma 4's proof in SPRESSO.
+%It can be proved that the $IDToken$ only contains the $PID_U:=[ID_U]PID_{RP}$ while $PID_U$ is provided by $b$, and $b$ owns the password of $ID_U$.
 \end{proof}
 
-\begin{lemma}
-(Same as Lemma 5 in SPRESSO) In the browser $b$, the request $req$ was triggered by script\_idp loaded from the origin $\langle d, S \rangle$ for some $d \in \mathtt{dom}(I)$.
+\begin{lemma} %(Same as Lemma 5 in SPRESSO) 
+  In the browser $b$, the request $m_{attr}$ was triggered by $\mi{script\_idp}$ 
+  loaded from the origin $\myangle{d, S}$ for some $d \in \mathtt{dom}(I)$.
 \end{lemma}
 \begin{proof}
-The proof follows the Lemma 5's proof in SPRESSO.
-It can be proved that only the IdP's script $script\_idp$ owns the password of $ID_U$ can request the $IDToken$ from $I$.
+  First, $\an{d,\https}$ for some $d \in \mapDomain(I)$ is the only
+  origin that has access to the secret $\mapIDtoPLI(u)$ for the
+  identity $u$ (as defined in Appendix~\ref{app:browsers-uppresso}).
+
+  With the general properties defined in~\cite{fett2015analyzing} and the
+  definition of Identity Providers in Appendix~\ref{app:idps}, in
+  particular their property that they only send out one script,
+  $\mi{script\_idp}$, we can see that this is the only script that can
+  trigger a request containing the secret.
+%The proof follows the Lemma 5's proof in SPRESSO.
+%It can be proved that only the IdP's script $script\_idp$ owns the password of $ID_U$ can request the $IDToken$ from $I$.
 \end{proof}
 
-\begin{lemma}
-(Same as Lemma 6 in SPRESSO) In the browser b, the script script\_idp receives the response to the request req (and no other script), and at this point, the browser is still honest.
+\begin{lemma} \label{lemma:idp-to-script-idp} %(Same as Lemma 6 in SPRESSO)
+  In the browser $b$, the script $\mi{script\_idp}$ receives the response to the 
+  request $m_{attr}$ (and no other script), and at this point, the browser is still 
+  honest.
 \end{lemma}
 \begin{proof}
-The proof follows Lemma 6's proof in SPRESSO.
-It is proved that only the closed-corrupted browser cannot receive the $IDToken$ responding to the $req$ started by the honest browser $b$.
+  From the definition of browser corruption, we can see that the
+  browser $b$ discards any information about pending requests in its
+  state when it becomes close-corrupted, in particular any SSL keys.
+  It can therefore not decrypt the response if it becomes
+  close-corrupted before receiving the response.
+
+  The rest follows from the general properties defined
+  in~\cite{fett2015analyzing}.
+%The proof follows Lemma 6's proof in SPRESSO.
+%It is proved that only the closed-corrupted browser cannot receive the $IDToken$ responding to the $req$ started by the honest browser $b$.
 \end{proof}
 
-Lemma 7 in SPRESSO is not useful here because there is no FWD server in UPPRESSO.
+We now know that only the script $\mi{script\_idp}$ received the
+response containing the IDToken. For the following lemmas, we will assume
+that the browser $b$ is honest. In the other case (the browser is
+close-corrupted), the IA $\mi{ia}$ and any information about pending
+HTTPS requests (in particular, any decryption keys) would be discarded
+from the browser's state (as seen in the proof for 
+Lemma~\ref{lemma:idp-to-script-idp}). This would be a contradiction to
+the assumption (which requires that the IDToken arrived at the RP).
 
-\begin{lemma}
-(Same as Lemma 8 in SPRESSO) The script script\_idp forwards the IDToken only to the script script\_rp loaded from the origin $\langle d_r, S \rangle$.
+%Lemma 7 in SPRESSO is not useful here because there is no FWD server in UPPRESSO.
+
+\begin{lemma} %(Same as Lemma 8 in SPRESSO) 
+  The script $\mi{script\_idp}$ forwards the IDToken only to the script 
+  $\mi{script\_rp}$ loaded from the origin $\langle d_r, \https\rangle$.
 \end{lemma}
 \begin{proof}
-The proof is same as proof of Lemma 8 in SPRESSO.
-It can be proved that, the $IDToken$ held by the honest $script\_idp$ is only sent to the origin $\langle Cert_{RP}.Enpt_{RP}, S \rangle$, while the $IDToken.PID_{RP} \equiv [t]Cert_{RP}.ID_{RP}$, and $t$ is the one-time random number.  The relation of $ID_RP$ and $Enpt$ is guaranteed by the signature generated by IdP $I$. The process is shown at Line 9, 16, 19, 21, 38, 39, 59, 60  in Algorithm~\ref{alg:script_idp}.
+  It is clear that, the IDToken held by the honest $script\_idp$ is only 
+  sent to the origin $\langle Cert_{rp}.Enpt_{rp}, \https\rangle$, 
+  while the $IDToken.PID_{rp} \equiv [t]Cert_{rp}.ID_{rp}$, and $t$ is the 
+  one-time random number. The relation of $Cert_{rp}.ID_{rp}$ and 
+  $Cert_{rp}.Enpt_{rp}$ is guaranteed by the signature $Cert_{rp}.ver$ generated 
+  by IdP $I$. The process is shown at Line~\ref{line:token-send}
+  Algorithm~\ref{alg:uppresso-script-idp}.
+%The proof is same as proof of Lemma 8 in SPRESSO.
+%It can be proved that, the $IDToken$ held by the honest $script\_idp$ is only sent to the origin $\langle Cert_{RP}.Enpt_{RP}, S \rangle$, while the $IDToken.PID_{RP} \equiv [t]Cert_{RP}.ID_{RP}$, and $t$ is the one-time random number.  The relation of $ID_RP$ and $Enpt$ is guaranteed by the signature generated by IdP $I$. The process is shown at Line 9, 16, 19, 21, 38, 39, 59, 60  in Algorithm~\ref{alg:script_idp}.
 \end{proof}
 
-\begin{lemma}
-(Same as Lemma 9 in SPRESSO) From the RP document, the IDToken is only sent to the RP r and over HTTPS
+\begin{lemma} %(Same as Lemma 9 in SPRESSO) 
+  From the RP document, the IDToken is only sent to the RP r and over HTTPS
 \end{lemma}
 \begin{proof}
-The proof follows the proof of Lemma 9 in SPRESSO.
-It is proved that $script\_rp$ of the origin $\langle Cert_{RP}.Enpt_{RP}, S \rangle$ would only sent to the corresponding RP $r$, which is shown in Algorithm~\ref{alg:script_rp}.
+%The proof follows the proof of Lemma 9 in SPRESSO.
+It is proved that $script\_rp$ of the origin $\langle Cert_{rp}.Enpt_{rp}, \https\rangle$ 
+would only sent to the corresponding RP $r$, which is shown in Algorithm~\ref{alg:uppresso-script-rp}.
 \end{proof}
 
+The proofs show that the IDToken is only sent to the honest browser and target RP.
+It cannot be known to the attacker or any corrupted party, as none of the listed 
+parties leak it to any corrupted party or the attacker. 
+Above proofs can be reduced to the {\color{blue}Confidentiality and Integrity 
+Properties}, simply described as the {\color{blue} Theorem 3 and 4} in section 5.2.
 
-The proofs show that the $IDToken$ is only sent to the honest browser (Lemma 1-7) and  target RP (Lemma 8-9). 
-Above proofs can be reduced to the {\color{blue}Confidentiality and Integrity Properties}, simply described as the {\color{blue} Theorem 3 and 4} in section 5.2.
-These proofs are enough for SPRESSO system to show its security, however, they are not enough for UPPRESSO.
-So far, the proofs only guarantee that the $IDToken$ must be sent to the target RP.
-In SPRESSO, as the $tag$ can be only decrypted to unique $Domain$, the target RP must be the honest RP (the target of an adversary).
-However, in UPPRESSO, while an RP receives an $IDToken$, he may try to use this token to login another honest RP, as long as he can find the $t^{adversary}$ satisfied $IDToken.PID_{RP} \equiv [t^{adversary}]ID_{RP}^{honest}$.
-Therefore, the following Lemma should be proved.
+Now we need also guarantee that $\fAP{attacker} \in \mathsf{Net}$ has no other way
+to generate the IDToken. This can be simply proved by the {\color{blue} Theorem 1} 
+in section 5.2, as the {\color{blue} RP Designation Property}.
 
-\begin{lemma}
-The $t^{adversary}$ is not derivable from the attackers knowledge in $S^j$ (i.e., $\langle IDToken$, $Acct \rangle \in d_{\emptyset}$($S^j$($\mathtt{attacker}$))), which satisfies that $IDToken.PID_{RP} \equiv [t^{adversary}]ID_{RP}^{honest}$.
-\end{lemma}
-\begin{proof}
-This Lemma can be proved by the {\color{blue} Theorem 1} in section 5.2, as the {\color{blue} RP Designation Property}.
-\end{proof}
+%These proofs are enough for SPRESSO system to show its security, however, they are not enough for UPPRESSO.
+%So far, the proofs only guarantee that the $IDToken$ must be sent to the target RP.
+%In SPRESSO, as the $tag$ can be only decrypted to unique $Domain$, the target RP must be the honest RP (the target of an adversary).
+%However, in UPPRESSO, while an RP receives an $IDToken$, he may try to use this token to login another honest RP, as long as he can find the $t^{adversary}$ satisfied $IDToken.PID_{RP} \equiv [t^{adversary}]ID_{RP}^{honest}$.
+%Therefore, the following Lemma should be proved.
 
-Therefore, there is a contradication to the assumption, where we assumed that $\langle IDToken$, $Acct \rangle \in d_{\emptyset}$($S^j$($\mathtt{attacker}$)). This shows every $\mathcal{U\!W\!S}^{auth}$ is secure in the sense of Property A.
+%\begin{lemma}
+%The $t^{adversary}$ is not derivable from the attackers knowledge in $S^j$ (i.e., $\langle IDToken$, $Acct \rangle \in d_{\emptyset}$($S^j$($\mathtt{attacker}$))), which satisfies that $IDToken.PID_{RP} \equiv [t^{adversary}]ID_{RP}^{honest}$.
+%\end{lemma}
+%\begin{proof}
+%This Lemma can be proved by the {\color{blue} Theorem 1} in section 5.2, as the {\color{blue} RP Designation Property}.
+%\end{proof}
+
+Therefore, there is a contradication to the assumption, where we assumed that 
+$Acct \in d_{\emptyset}(S^j(\fAP{attacker}))$. 
+This shows every $\mathcal{U\!W\!S}^{auth}$ is secure in the sense of Property A.
 
 \subsection{Proof of Property B}
 As stated above, Property B is defined as follows:
-\begin{definition}
-\label{def:B}
-Let $\mathcal{U\!W\!S}^{auth}$  be an UPPRESSO web system for authentication analysis. We say that $\mathcal{U\!W\!S}^{auth}$  is secure (with respect to Property A) if for every run $rho$ of $\mathcal{U\!W\!S}^{auth}$ , every state ($S^j$, $E^j$, $N^j$) in $rho$, every $r \in \mathtt{RP}$ that is honest in
-$S^j$, every RP service token of the form $\langle IDToken$, $Acct \rangle$ recorded in $S^j$($r$).$\mathtt{serviceTokens}$, with the request corresponding to $\langle IDToken$, $Acct \rangle$ sent by some $b \in B$ which is honest in $S^j$, b owns Acct.
+\begin{definition}\label{def:B}
+  Let $\uppressoauthwebsystem$ be an \uppresso web system. We say that
+  \emph{$\uppressoauthwebsystem$ is secure (with respect to Property B)} if
+  for every run $\rho$ of $\uppressoauthwebsystem$, every state $(S^j, E^j, N^j)$
+  in $\rho$, every $r\in \fAP{RP}$ that is honest in $S^j$, 
+  every RP service token of the form $Acct$ recorded in
+  $S^j(r).\str{serviceTokens}$, with the request corresponding to
+  $Acct$ sent by some $b\in \fAP{B}$ which is honest in $S^j$, $b$ owns $Acct$.
+%Let $\mathcal{U\!W\!S}^{auth}$  be an UPPRESSO web system for authentication analysis. We say that $\mathcal{U\!W\!S}^{auth}$  is secure (with respect to Property A) if for every run $rho$ of $\mathcal{U\!W\!S}^{auth}$ , every state ($S^j$, $E^j$, $N^j$) in $rho$, every $r \in \mathtt{RP}$ that is honest in
+%$S^j$, every RP service token of the form $\langle IDToken$, $Acct \rangle$ recorded in $S^j$($r$).$\mathtt{serviceTokens}$, with the request corresponding to $\langle IDToken$, $Acct \rangle$ sent by some $b \in B$ which is honest in $S^j$, b owns Acct.
 \end{definition}
 
-First we follows the Lemma 10 and its proof in SPRESSO, which guarantees that the request corresponding to $\langle IDToken$, $Acct \rangle$ sent by honest $b$ is loaded from $script\_rp$. 
-Then we are going to prove the $IDToken$ uploaded by honest $b$ can only be related with the $Acct$ owned by $b$ (which is quite different from SPRESSO).
+First we call the request corresponding to $Acct$ (or service token request) $m$ and
+its response $m'$, and we refer to the state of $\uppressoauthwebsystem$ in the run 
+$\rho$ where $r$ processes $m$ by $s_l$. We are going to prove the $IDToken$ uploaded 
+by honest $b$ can only be related with the $Acct$ owned by $b$.
+
+%we follows the Lemma 10 and its proof in SPRESSO, which guarantees that the request corresponding to $\langle IDToken$, $Acct \rangle$ sent by honest $b$ is loaded from $script\_rp$. 
+%Then we are going to prove the $IDToken$ uploaded by honest $b$ can only be related with the $Acct$ owned by $b$ (which is quite different from SPRESSO).
 
 \begin{lemma}
 For every $IDToken$ uploaded by honest $b$ during authentication, the honest $r \in RP$ can always derive the service token of the form $\langle IDToken$, $Acct \rangle$ recorded in $S^j$($r$).$\mathtt{serviceTokens}$, where b owns Acct. 
 \end{lemma}
 \begin{proof}
-The RP accepts the user's identity at Line 43 in Algorithm~\ref{alg:rp}.
-And the identity is generated at Line 38, based on the $PID_U$ retrieved from the $IDTpken$ and the trapdoor $t^{-1}$.
-The $t^{-1}$ is generated at Line 13, set at Line 14, and never changed, as the multiplicative inverse of $t$.
-The $IDToken$ is issued at Line 50 in Algorithm~\ref{alg:idp}.
-The IdP generates the $PID_U$ based on the $PID_{RP}$ and $ID_U$ related to $b \ in \mathtt{Browser}$.
+  Following the definiton of browser scripts, we know that $m$ was sent by $script\_rp$. 
+  The RP accepts the user's identity at line~\ref{line:add-service-token} in Algorithm~\ref{alg:rp}.
+  And the identity is generated at Line~\ref{line:gen-acct}, based on the $PID_u$ retrieved 
+  from the IDToken and the trapdoor $t^{-1}$. The $t^{-1}$ is generated and set at 
+  Line~\ref{line:gen-t} which is never changed. 
+  The IDToken is issued at Line~\ref{line:sign-token} in Algorithm~\ref{alg:idp}.
+  The IdP generates the $PID_u$ based on the $PID_{rp}$ and $ID_u$ related to $b \in \fAP{B}$.
 
-An attacker may allure the honest user to upload the $IDToken \in d_{\emptyset}$($S^j$($\mathtt{attacker}$)) to honest $r \in \mathtt{RP}$, so that there may be $Acct \in d_{\emptyset}$($S^j$($\mathtt{attacker}$)).
-However, while $b$ has already negotiated the $PID_{RP}$ with $r$, the opener of the $script\_idp$ must be the $script\_rp$.
-    As the $t$ generated at Line 7, Algorithm~\ref{alg:script_idp}, and $PID_{RP}$ generated at Line 21 in Algorithm~\ref{alg:script_idp}.
-The $t$ is only sent to $script\_rp$ at Line 8 in Algorithm~\ref{alg:script_idp}, and the $script\_rp$ receives it at Line 18 in Algorithm~\ref{alg:script_rp}.
-The $PID_{RP}$ is sent to the honest IdP at Lines 23 and 50 in Algorithm~\ref{alg:script_idp}, which is used for generating the $IDToken$.
+  An attacker may allure the honest user to upload the $\text{IDToken} \in d_{\emptyset}$($S^j$($\mathtt{attacker}$)) 
+  to honest $r\in\fAP{RP}$, so that there may be $Acct \in d_{\emptyset}$($S^j$($\mathtt{attacker}$)).
+  However, while $b$ has already negotiated the $PID_{rp}$ with $r$, the opener of 
+  the $script\_idp$ must be the $script\_rp$. As the $t$ generated at Line~\ref{line:gen-t}, 
+  Algorithm~\ref{alg:uppresso-script-idp}, and $PID_{RP}$ generated at Line~\ref{line:gen-pidrp} 
+  in Algorithm~\ref{alg:uppresso-script-idp}.
+  The $t$ is only sent to $script\_rp$ at Line~\ref{line:send-t} in 
+  Algorithm~\ref{alg:uppresso-script-idp}, 
+  and the $script\_rp$ receives it at Line~\ref{line:receive-t} in 
+  Algorithm~\ref{alg:uppresso-script-rp}.
+  The $PID_{RP}$ is sent to the honest IdP at Lines~\ref{line:send-pidrp} in 
+  Algorithm~\ref{alg:uppresso-script-idp},  which is used for generating the $IDToken$.
 
-For every $IDToken$ sent by honest $b$ and honest $r$, there must be $IDToken.PID_{RP} \equiv [t]Cert_{RP}.ID_{RP}$, $IDToken.PID_U \equiv [ID_U]IDToken.PID_U$ and $Acct \equiv [t^{-1}]IDToken.PID_U$. According to the proof of {\color{blue}Theorem 2} in section 5.2, the $Acct$ must be owned by honest $b$ ($Acct \equiv [ID_U]S^j(r).ID_{RP}$, where $ID_U$ is related to $b$), which can be define as the  {\color{blue} User Identification Property} .
+  For every IDToken sent by honest $b$ and honest $r$, there must be 
+  $IDToken.PID_{rp} \equiv [t]Cert_{rp}.ID_{rp}$, 
+  $IDToken.PID_u \equiv [ID_u]IDToken.PID_u$ and 
+  $Acct \equiv [t^{-1}]IDToken.PID_u$. 
+  According to the proof of {\color{blue}Theorem 2} in section 5.2, 
+  the $Acct$ must be owned by honest $b$ ($Acct \equiv [ID_U]S^j(r).ID_{RP}$, 
+  where $ID_U$ owned by $b$), which can be define as the  
+  {\color{blue} User Identification Property}.
 \end{proof}
 
-With the above proofs, we now can guarantee that every $\mathcal{U\!W\!S}^{auth}$ system satisfies the requirements in Definition~\ref{def:B}, therefore $\mathcal{U\!W\!S}$ must be secure of Property B.
+With the above proofs, we now can guarantee that every $\uppressoauthwebsystem$ system satisfies the requirements in Definition~\ref{def:B}, therefore $\uppressoauthwebsystem$ must be secure of Property B.
 
 \section{Proof of Privacy}
 
-In our privacy analysis, we show that an identity provider in UPPRESSO cannot learn where its users log in. We formalize this property as an indistinguishability property: an identity provider (modeled as a web attacker) cannot distinguish between a user logging in at one relying party and the same user logging in at a different relying party.
+In our privacy analysis, we show that an identity provider in UPPRESSO cannot learn 
+where its users log in. We formalize this property as an indistinguishability 
+property: an identity provider (modeled as a web attacker) cannot distinguish 
+between a user logging in at one relying party and the same user logging in at 
+a different relying party.
+
+We will here first describe the precise model that we use for privacy.
+After that, we define an equivalence relation between configurations,
+which we will then use in the proof of privacy.
 
 \subsection{Formal Model of UPPRESSO for Privacy Analysis}
 
 \begin{definition}[Challenge Browser]
+  Let $\mi{dr}$ some domain and $b(\mi{dr})$ a DY process. We call $b(\mi{dr})$ a \emph{challenge browser} iff $b$
+  is defined exactly the same as a browser with two exceptions: (1) the
+  state contains one more property, namely $\mi{challenge}$, which  initially 
+  contains the term $\top$. The broswer's algorithm is extended by the following 
+  at its very beginning: It is checked if a message $m$ is addressed to the domain
+  $\str{CHALLENGE}$ (which we call the challenger domain). If $m$ is
+  addressed to this domain and no other message $m'$ was addressed to
+  this domain before (i.e., $\mi{challenge} \not\equiv \bot$), then
+  $m$ is changed to be addressed to the domain $\mi{dr}$ and $\mi{challenge}$ is 
+  set to $\bot$ to recorded that a message was addressed to $\str{CHALLENGE}$.
 \end{definition}
 
 \begin{definition}[Deterministic DY Process]
+  We call a DY process $p = (I^p,Z^p,R^p,s_0^p)$ \emph{deterministic} iff 
+  the relation $R^p$ is a (partial) function.
+
+  We call a script $R_\text{script}$ \emph{deterministic} iff the relation 
+  $R_\text{script}$ is a (partial) function.
 \end{definition}
 
-\begin{definition}[UPPRESSO Web System for Privacy Analysis]
-  Let $\mathcal{U\!W\!S}=(\mathcal{W},\mathcal{S},\text{script},E^0)$ be an UPPRESSO web system with $\mathcal{W}=H\!on\cup W\!eb\cup N\!et$, $H\!on=B\cup R\!P\cup I\!D\!P\cup D\!N\!S$.
-  Let $\text{attacker}\in W\!eb$ be some web attacker.
-  Let $dr$ be a domain of $r_1$ or $r_2$ and $b(dr)$ be a challenge browser.
-  Let $H\!on\prime := \{b(dr)\}\cup R\!P\cup D\!N\!S$, $W\!eb\prime := W\!eb$, and $N\!et\prime := \emptyset$.
-  Let $\mathcal{W}\prime := H\!on\prime\cup W\!eb\prime\cup N\!et\prime$.
-  We call $\mathcal{U\!W\!S}^{priv}(dr)=(\mathcal{W}\prime,\mathcal{S}\prime,\text{script}\prime,E^0,\text{attacker})$ an UPPRESSO web system for privacy analysis.
+\begin{definition}[\uppresso Web System for Privacy Analysis]\label{def:uppresso-ws-priv}
+  Let $\uppressowebsystem = (\bidsystem, \scriptset, \mathsf{script}, E^0)$ 
+  be an UPPRESSO web system with 
+  $\bidsystem = \mathsf{Hon} \cup \mathsf{Web} \cup \mathsf{Net}$, 
+  $\mathsf{Hon} = \fAP{B} \cup \fAP{RP} \cup \fAP{IDP} \cup \fAP{DNS}$.
+  (as described in Appendix~\ref{app:outlineuppressomodel}).
+  $\fAP{RP} = \{r_1,r_2\}$, $r_1$ and $r_2$ two (honest) relying parties,
+  $\fAP{dns}$ an honest DNS server. 
+  Let $\fAP{attacker} \in \mathsf{Web}$ be some web attacker.
+  Let $\mi{dr}$ be a domain of $r_1$ or $r_2$ and $b(\mi{dr})$ a challenge browser. 
+  Let $\mathsf{Hon}' := \{ b(\mi{dr}) \} \cup \fAP{RP} \cup \fAP{DNS}$, $\mathsf{Web}' := \mathsf{Web}$, 
+  and $\mathsf{Net}' := \emptyset$ (i.e., there is no network attacker).
+  Let $\bidsystem' := \mathsf{Hon}' \cup \mathsf{Web}' \cup \mathsf{Net}'$.  
+  Let $\scriptset' := \scriptset \setminus \{\str{script\_idp}\}$ and $\mathsf{script}'$ be accordingly.
+  We call $\uppressoprivwebsystem(\mi{dr}) = (\bidsystem', \scriptset', \mathsf{script}', E^0, \fAP{attacker})$ 
+  an \emph{\uppresso web system for privacy analysis} 
+  iff the domain $\mi{dr}_1$ the only domain assigned to $r_1$, and
+  $\mi{dr}_2$ the only domain assigned to $r_2$. The browser
+  $b(\mi{dr})$ owns exactly one identity and this identity
+  is governed by some attacker.  All honest parties (in
+  $\mathsf{Hon}$) are not corruptible, i.e., they ignore any
+  $\str{CORRUPT}$ message. Identity providers are assumed to be
+  dishonest, and hence, are subsumed by the web attackers (which
+  govern all identities). %In the initial state $s_0^b$ of the (only)
+  %browser in $\bidsystem'$ and in the initial states $s_0^{r_1}$,
+  %$s_0^{r_2}$ of both relying parties, the DNS address is
+  %$\mapAddresstoAP(\fAP{dns})$. Further, $\mi{wkCache}$ in the initial
+  %states $s_0^{r_1}$, $s_0^{r_2}$ is equal and contains a public key
+  %for each domain registered in the DNS server (i.e., 
+  the relying
+  parties already know some public key to verify \uppresso identity
+  assertions from all domains known in the system\gs{$\nf$ genauer
+  formulieren} and they do not have to fetch them from IdP.
 \end{definition}
-  
-\begin{definition}[IdP-Privacy] Let
-  \begin{equation}
-    \begin{aligned}
-      \mathcal{U\!W\!S}^{priv}_1:=\mathcal{U\!W\!S}^{priv}(dr_1)=(\mathcal{W}_1,\mathcal{S},\text{script},E^0,\text{attacker}_1)\\
-      \mathcal{U\!W\!S}^{priv}_2:=\mathcal{U\!W\!S}^{priv}(dr_2)=(\mathcal{W}_2,\mathcal{S},\text{script},E^0,\text{attacker}_2)
-    \end{aligned}
-  \end{equation}
-  be UPPRESSO web systems for privacy analysis. 
-  We say that $\mathcal{U\!W\!S}^{priv}$ is IdP-private $i\!f\!f\ \mathcal{U\!W\!S}^{priv}_1 \text{and}\ \mathcal{U\!W\!S}^{priv}_2$ are indistinguishable.
+
+As all parties in an \uppresso web system for privacy analysis are either web 
+attackers, browsers, or deterministic processes and all scripting processes are 
+either the attacker script or deterministic, it is easy to see that in \uppresso 
+web systems for privacy analysis with configuration $(S,E,N)$ a command $\zeta$ 
+induces at most one processing step. We further note that, under a given infinite 
+sequence of nonces $N^0$, all schedules $\sigma$ induce at most one run 
+$\rho = ((S^0,E^0,N^0),\dots,(S^i,E^i,N^i),\dots,(S^{|\sigma|},E^{|\sigma|},N^{|\sigma|}))$ 
+as all of its commands induce at most one processing step for the $i$-th configuration.
+
+We will now define our privacy property for \uppresso:
+
+\begin{definition}[IdP-Privacy]\label{def:idp-privacy}
+  Let 
+  \begin{align*}
+    \uppressoprivwebsystem_1 := \uppressoprivwebsystem(\mi{dr}_1) =
+    (\bidsystem_1, \scriptset, \mathsf{script}, E^0, \fAP{attacker}_1)&\text{ and}\\
+    \uppressoprivwebsystem_2 := \uppressoprivwebsystem(\mi{dr}_2) =
+    (\bidsystem_2, \scriptset, \mathsf{script}, E^0, \fAP{attacker}_2)&
+  \end{align*}
+  be \uppresso web systems for privacy analysis.  Further, we require
+  $\fAP{attacker}_1 = \fAP{attacker}_2 =: \fAP{attacker}$ and for $b_1
+  := b(\mi{dr}_1)$, $b_2 := b(\mi{dr}_2)$ we require $S(b_1) = S(b_2)$
+  and $\bidsystem_1 \setminus \{b_1\} = \bidsystem_2 \setminus
+  \{b_2\}$ (i.e., the web systems are the same up to the parameter of
+  the challenge browsers).  We say that $\uppressoprivwebsystem$ is
+  \emph{IdP-private} iff $\uppressoprivwebsystem_1$ and
+  $\uppressoprivwebsystem_2$ are indistinguishable.
 \end{definition}
 
-\subsection{Definition of Equivalent Configurations}
+\subsection{Definition of Equivalent Configurations}\label{app:defin-equiv-stat}
 
-Let $\mathcal{U\!W\!S}^{priv}_1$ and $\mathcal{U\!W\!S}^{priv}_2$ be UPPRESSO web system for privacy analysis.
-Let $(S_1,E_1,N_1)$ be a configuration of $\mathcal{U\!W\!S}^{priv}_1$ and $(S_2,E_2,N_2)$ accordingly.
+Let $\uppressoprivwebsystem_1 = (\bidsystem_1, \scriptset, \mathsf{script}, E^0, \fAP{attacker})$ 
+and $\uppressoprivwebsystem_2 = (\bidsystem_2, \scriptset, \mathsf{script}, E^0, \fAP{attacker})$ 
+be \uppresso web systems for privacy analysis. Let $(S_1,E_1,N_1)$ 
+be a configuration of $\uppressoprivwebsystem_1$ and $(S_2,E_2,N_2)$ 
+be a configuration of $\uppressoprivwebsystem_2$.
 
-\begin{definition}[Challenge Browser]
+\begin{definition}[Proto-Tags]
+  We call a term of the form $[t]R$ with the variable
+  $R$ as a placeholder for an $ID_{rp}$, and $t$ some nonces a
+  \emph{proto-tag}.
 \end{definition}
 
 \begin{definition}[Term Equivalence up to Proto-Tags]
+  Let $\theta = \{a_1, \ldots, a_l \}$ be a finite set of proto-tags.
+  Let $t$ and $t'$ be terms. We call $t_1$ and $t_2$
+  \emph{term-equivalent under a set of proto-tags $\theta$} iff there
+  exists a term $\tau \in \terms(\{x_1,\dots,x_l\})$ such that
+  $t_1 = (\tau [ a_1 / x_1 , \dots , a_l / x_l ])[ \mi{dr}_1 / y ]$
+  and
+  $t_2 = (\tau [ a_1 / x_1 , \dots , a_l / x_l ])[ \mi{dr}_2 / y ]$.
+  We write $t_1 \prototagequiv{\theta} t_2$.
+
+  We say that two finite sets of terms $D$ and $D'$ are
+  \emph{term-equivalent under a set of proto-tags $\theta$} iff
+  $|D| = |D'|$ and, given a lexicographic ordering of the elements in
+  $D$ of the form $(d_1,\dots,d_{|D|})$ and the elements in $D'$ of
+  the form $(d'_1,\dots,d_{|D'|})$, we have that for all
+  $i \in \{1,\dots,|D|\}$: $d_i \prototagequiv{\theta} d'_i$. We then
+  write $D \prototagequiv{\theta} D'$.
 \end{definition}
 
 \begin{definition}[Equivalence of HTTP Requests]
@@ -1105,6 +1478,8 @@ We now show that if two configurations are $\alpha$-equivalent, then the view of
   \end{itemize}
 \end{proof}
 
+\bibliographystyle{abbrv}
+\bibliography{../ref}
 \end{document}
 
 
