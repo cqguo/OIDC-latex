@@ -4,22 +4,6 @@
 We discuss the security requirements of privacy-preserving SSO and present the identity-transformation approach.
 
 
-\begin{table}[b]
-\footnotesize
-    \caption{The (pseudo-)identities in \usso}
-    \centering
-%    \begin{tabular}{|l|l|l|}
-    \begin{tabular}{|p{1.0cm}|p{5.1cm}|p{1.13cm}|} \hline
-    {\textbf{Notation}} & {\textbf{Description}} & {\textbf{Lifecycle}} \\ \hline
-    {$ID_U$} & {The user's unique identity at the IdP.} & {Permanent} \\ \hline
-    {$ID_{RP_j}$} & {The $j$-th RP's unique identity at the IdP.} & {Permanent} \\ \hline
-    {$PID_{U,j}^i$} & {The user's pseudo-identity in her $i$-th login to the $j$-th RP.} & {Ephemeral} \\ \hline
-    {$PID_{RP_j}^i$} & {The $j$-th RP's pseudo-identity in the user's $i$-th login to this RP.} & {Ephemeral} \\ \hline
-    {$Acct_j$} & {The user's identity (or account) at the $j$-th RP.} & {Permanent} \\ \hline
-    \end{tabular}
-    \label{tbl:notations-dilemma}
-\end{table}
-
 \subsection{Security Requirements for SSO Services}
 \label{subsec:basicrequirements}
 
@@ -40,7 +24,22 @@ We aim to develop a privacy-preserving SSO system that ensures security properti
 In \usso, these requirements are satisfied through \emph{transformed identities} in the identity tokens. Table \ref{tbl:notations-dilemma} lists the notations used in this paper.
 The subscript $j$ and/or the superscript $i$ may be ignored if it does not cause ambiguity.
 
-\newc
+\begin{table}[htb]
+\footnotesize
+    \caption{The (pseudo-)identities in \usso}
+    \centering
+%    \begin{tabular}{|l|l|l|}
+    \begin{tabular}{|p{1.0cm}|p{5.1cm}|p{1.13cm}|} \hline
+    {\textbf{Notation}} & {\textbf{Description}} & {\textbf{Lifecycle}} \\ \hline
+    {$ID_U$} & {The user's unique identity at the IdP.} & {Permanent} \\ \hline
+    {$ID_{RP_j}$} & {The $j$-th RP's unique identity at the IdP.} & {Permanent} \\ \hline
+    {$PID_{U,j}^i$} & {The user's pseudo-identity in her $i$-th login to the $j$-th RP.} & {Ephemeral} \\ \hline
+    {$PID_{RP_j}^i$} & {The $j$-th RP's pseudo-identity in the user's $i$-th login to this RP.} & {Ephemeral} \\ \hline
+    {$Acct_j$} & {The user's identity (or account) at the $j$-th RP.} & {Permanent} \\ \hline
+    \end{tabular}
+    \label{tbl:notations-dilemma}
+\end{table}
+
 In an SSO login flow, a user initiates the process by negotiating an \emph{ephemeral} pseudo-identity $PID_{RP}$  with the target RP and sending an identity-token request that encloses $PID_{RP}$ to the IdP.
 After successfully authenticating the user as $ID_U$, the IdP calculates an \emph{ephemeral} $PID_U$ based on $ID_U$ and $PID_{RP}$ and issues an identity token that binds $PID_U$ and $PID_{RP}$. Upon receiving a token with a matching $PID_{RP}$, the RP calculates the user's \emph{permanent} $Acct$ and authorizes the token holder to log in.
 The relationships among the permanent and ephemeral (pseudo-)identities are depicted in Figure \ref{fig:IDCorrelation}, where the \emph{red} and \emph{green} blocks represent \emph{permanent} and \emph{ephemeral} (pseudo-)identities, respectively, and the labeled arrows denote the transformations of (pseudo-)identities.
@@ -61,7 +60,6 @@ Finally, to prevent RP-based identity linkage,
 %a user pseudo-identity (i.e., $PID_U$) is bound instead:
 %$PID_U$ is bound in identity tokens:
 the RP should not obtain any information about $ID_U$ from any $PID_{U,j}$, which implies that $PID_{U,j}$ for different RPs should also be independent of each other.
-\oldc
 
 \begin{figure}[bt]
   \centering

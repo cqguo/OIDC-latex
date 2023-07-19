@@ -8,7 +8,7 @@ typical SSO services and discuss existing privacy-preserving solutions and other
 \label{subsec:OIDC}
 OIDC is one of the most popular SSO protocols. It supports different login flows: implicit flow, authorization code flow, and hybrid flow (a mix of the other two). These flows differ in the steps for requesting and receiving identity tokens but have common security requirements for identity tokens. We present our designs in the implicit flow and discuss the support for the authorization code flow in Section \ref{sec:discussion}.
 
-In OIDC, users and RPs register at a trusted IdP with their identities
+In OIDC, users and RPs register at an IdP with their identities
 and other information such as user credentials %(e.g., passwords)
 and RP endpoints. %(i.e., the URLs to receive tokens).
 As shown in Figure \ref{fig:OpenID}, when an RP receives a login request, it constructs an identity-token request with its own identity and the scope of requested user attributes.
@@ -16,7 +16,7 @@ This request is redirected to the IdP. Once the IdP authenticates the user, it i
 
 \begin{figure}[t]
   \centering
-  \includegraphics[width=0.99\linewidth]{fig/OIDC.pdf}
+  \includegraphics[width=0.95\linewidth]{fig/OIDC.pdf}
   \caption{The implicit SSO login flow of OIDC}
   \label{fig:OpenID}
 \end{figure}
@@ -33,14 +33,15 @@ This request is redirected to the IdP. Once the IdP authenticates the user, it i
   & at each RP & only to the IdP &  Attribute Provision & Login Tracing & Identity Linkage & Collusion \\\hline\hline
   OIDC w/ PPID \cite{NIST2017draft} & $\CIRCLE$ & $\CIRCLE$ & $\CIRCLE$ & $\Circle$ & $\CIRCLE$ & $\Circle$ \\ \hline
   BrowserID \cite{BrowserID} & $\CIRCLE$ & $\CIRCLE$$^1$ & $\Circle$ & $\CIRCLE$ & $\Circle$ & $\Circle$ \\ \hline
-  SPRESSO \cite{SPRESSO} & $\CIRCLE$ & $\CIRCLE$ & $\LEFTcircle$$^2$ & $\CIRCLE$ & $\Circle$ & $\Circle$ \\ \hline \hline
+  SPRESSO \cite{SPRESSO} & $\CIRCLE$ & $\CIRCLE$ & $\LEFTcircle$$^2$ & $\CIRCLE$ & $\Circle$ & $\Circle$ \\ \hline
+  MISO \cite{miso} & $\CIRCLE$ & $\CIRCLE$ & $\CIRCLE$ & $\CIRCLE$ & $\CIRCLE$ & $\LEFTcircle$$^3$  \\ \hline \hline
   PRIMA \cite{prima} & $\CIRCLE$ & $\Circle$ & $\CIRCLE$ & $\CIRCLE$ & $\Circle$ & $\Circle$ \\ \hline
-  PseudoID \cite{PseudoID} & $\CIRCLE$ & $\Circle$ & $\LEFTcircle$$^3$ & $\CIRCLE$ & $\CIRCLE$ & $\CIRCLE$ \\ \hline
-  Opaak \cite{Opaak} & $\LEFTcircle$$^4$ & $\Circle$ & $\Circle$ & $\CIRCLE$ & $\CIRCLE$ & $\CIRCLE$ \\ \hline
-  U-Prove \cite{uprov} & $\CIRCLE$ & $\Circle$ & $\LEFTcircle$$^5$ & $\CIRCLE$ & $\CIRCLE$ & $\CIRCLE$ \\ \hline
+  PseudoID \cite{PseudoID} & $\CIRCLE$ & $\Circle$ & $\LEFTcircle$$^4$ & $\CIRCLE$ & $\CIRCLE$ & $\CIRCLE$ \\ \hline
+  Opaak \cite{Opaak} & $\LEFTcircle$$^5$ & $\Circle$ & $\Circle$ & $\CIRCLE$ & $\CIRCLE$ & $\CIRCLE$ \\ \hline
+  U-Prove \cite{uprov} & $\CIRCLE$ & $\Circle$ & $\LEFTcircle$$^6$ & $\CIRCLE$ & $\CIRCLE$ & $\CIRCLE$ \\ \hline
   UnlimitID \cite{UnlimitID} & $\CIRCLE$ & $\Circle$ & $\CIRCLE$ & $\CIRCLE$ & $\CIRCLE$ & $\CIRCLE$ \\ \hline
   EL PASSO \cite{ELPASSO} & $\CIRCLE$ & $\Circle$ & $\CIRCLE$ & $\CIRCLE$ & $\CIRCLE$ & $\CIRCLE$ \\ \hline
-  Fabric Idemix \cite{hyperledge-idemix} & $\LEFTcircle$$^6$ & $\Circle$ & $\CIRCLE$ & $\CIRCLE$ & $\CIRCLE$ & $\CIRCLE$ \\ \hline\hline
+  Fabric Idemix \cite{hyperledge-idemix} & $\LEFTcircle$$^7$ & $\Circle$ & $\CIRCLE$ & $\CIRCLE$ & $\CIRCLE$ & $\CIRCLE$ \\ \hline\hline
  % PrivacyPass \cite{privacypass,trusttoken} & $\Circle$ & $\Circle$ & $\Circle$ & $\CIRCLE$ & $\CIRCLE$ & $\Circle$ \\ \hline
   \usso & $\CIRCLE$ & $\CIRCLE$ & $\CIRCLE$ & $\CIRCLE$ & $\CIRCLE$ & $\Circle$ \\ \hline
 \end{tabular}
@@ -50,11 +51,11 @@ This request is redirected to the IdP. Once the IdP authenticates the user, it i
 1. A BrowserID user generates an \emph{ephemeral} private key to sign subsidiary ``identity assertion'' tokens,
 also verified by the RP.\\
 2. SPRESSO can be extended to provide selective user attributes in the tokens, while the prototype does not implement this feature.\\
-3. Blindly-signed user attributes can be selectively provided using zero-knowledge proofs but not implemented in the prototype.\\
-4. Opaak supports two exclusive pseudonym options: (\emph{a}) linkable within an RP but unlinkable across multiple RPs and (\emph{b}) unlinkable for any pair of actions.\\
-5. A U-Prove credential may contain attributes that are \emph{invisible} to the IdP, in addition to the ones confirmed by the IdP. \\
-6. In the original design of Idemix \cite{idemix}, every user logs into an RP with a unique account, but Fabric Idemix implements completely-anonymous services.
-}
+3. MISO is immune to collusive attacks by the IdP and RPs, but another \emph{fully-trusted} server called mixer is involved in the identity-token generation.\\
+4. Blindly-signed user attributes can be selectively provided using zero-knowledge proofs but not implemented in the prototype.\\
+5. Opaak supports two exclusive pseudonym options: (\emph{a}) linkable within an RP but unlinkable across multiple RPs and (\emph{b}) unlinkable for any pair of actions.\\
+6. A U-Prove credential may contain attributes that are \emph{invisible} to the IdP, in addition to the ones confirmed by the IdP. \\
+7. In the original design of Idemix \cite{idemix}, every user logs into an RP with a unique account, but Fabric Idemix implements completely-anonymous services.}
 \end{table*}
 
 The following three features are desired in SSO services and supported by popular SSO systems \cite{NIST2017draft, OpenIDConnect,rfc6749, SAML, SAMLIdentifier}.
@@ -77,17 +78,16 @@ which obtains the user's authorization before enclosing attributes or provides o
 \subsection{Privacy-Preserving SSO and Identity Federation}
 \label{subsec-solutions}
 
-\newc
 Privacy-preserving SSO is expected to offer the desired features listed in Section \ref{subsec:OIDC} while addressing different types of privacy threats.
 In contrast, privacy-preserving identity federation offers more privacy protections but introduces extra complexity in the user authentication process.
 Identity federation enables a user registered at a trusted IdP to be accepted by other parties, potentially with different accounts,
-but \emph{additional user operations for the authentication steps between the user and RPs} are involved.\footnote{\newc SSO protocols \cite{OpenIDConnect,rfc6749, SAML, SAMLIdentifier} allow a user to log into an RP \emph{without} maintaining an account at the RP by herself or holding a permanent secret to be verified by the RP. Although the term ``single sign-on (SSO)'' was used in several schemes \cite{PseudoID, Opaak, ELPASSO, WangWS13, HanCSTW18, HanCSTWW20}, they are very different from the widely-used SSO protocols because a user needs to maintain the accounts at different RPs and/or hold a permanent secret verified by the RPs. In this paper, we refer to them as \emph{identity federation} to emphasize this difference.}
-As shown in Table \ref{tbl:comparison-protocol}, none of the existing solutions satisfies all expectations.
+but \emph{additional user operations for the authentication steps between the user and RPs} are involved.\footnote{SSO protocols \cite{OpenIDConnect,rfc6749, SAML, SAMLIdentifier} allow a user to log into an RP \emph{without} maintaining an account at the RP by herself or holding a permanent secret to be verified by the RP. Although the term ``single sign-on (SSO)'' was used in other schemes \cite{PseudoID, Opaak, ELPASSO, WangWS13, HanCSTW18, HanCSTWW20}, they are different from the widely-used SSO protocols because a user needs to maintain the accounts at different RPs and/or hold a permanent secret verified by the RPs. In this paper, we refer to them as \emph{identity federation} to emphasize this difference.}
+As shown in Table \ref{tbl:comparison-protocol}, none of the existing solutions 
+perfectly satisfies all expectations.
 
 
 \noindent\textbf{Privacy-preserving SSO.}
 Existing privacy-preserving SSO approaches \cite{BrowserID, SPRESSO, NIST2017draft} prevent either IdP-based login tracing or RP-based identity linkage, but not both.
-\oldc
 Pairwise pseudonymous identifiers (PPIDs) are specified \cite{OpenIDConnect, SAMLIdentifier} and recommended \cite{NIST2017draft}
 for protecting user privacy against curious RPs.
 An IdP creates a unique PPID for a user to log into some RP and encloses it in identity tokens, so colluding RPs cannot link the user's identities.
@@ -98,9 +98,20 @@ For example, in BrowserID \cite{BrowserID} %(formerly known as Firefox Accounts 
 the IdP %(called the primary identity authority in BrowserID)
 issues a ``user certificate'' token that binds a user identity to an \emph{ephemeral} public key. The user then signs a subsidiary ``identity assertion'' token that binds the target RP's identity and sends both tokens to the RP. In SPRESSO \cite{SPRESSO} the RP creates a one-time pseudo-identity in each login, which is enclosed in identity tokens along with the user's unique identity.
 
-\newc
+MISO \cite{miso} decouples the calculation of PPIDs from an IdP
+        to a mixer server,
+        which calculates a user's PPID
+    based on the user's identity, the visited RP's identity and a secret key,
+    after the mixer receives an identity token from the IdP.
+MISO prevents RP-based identity linkag for the RPs receives only PPIDs,
+    and IdP-based login tracing because the visited RP is disclosed to the mixer but not the IdP.
+It protects a user's online profile against even collusive attacks by the IdP and RPs,
+    but it requires the extra mixer server to be fully trusted.
+  %      which is ensured by Intel SGX.
+
+% 这个就是扯淡吧？为什么还要网络通信呢？直接把Mixer实现在IdP内部，就行了吧？
+
 \noindent\textbf{Privacy-preserving identity federation.}
-\oldc
 In PRIMA \cite{prima}, the IdP signs a credential
 that binds user attributes and a verification key. Using the signing key, the user selectively provides attributes to the RPs. This verification key works as the user's identity but exposes her to RP-based identity linkage.
 
@@ -113,18 +124,14 @@ The users prove ownership of the anonymous credentials using the secrets and dis
 
 These approaches prevent both IdP-based tracing and RP-based identity linkage for (\emph{a}) the RP's identity is not enclosed in the anonymous credentials and (\emph{b}) the user selects different pseudonyms when visiting different RPs.
 Furthermore, they protect user privacy against collusive attacks by the IdP and RPs, as \emph{user-managed} pseudonyms cannot be linked through anonymous credentials \cite{anon-credential-2001, idemix, anon-credential} even when the ownership of these credentials is proved to RPs using one secret.
-\newc
 However, this privacy protection results in additional user operations in identity federation, compared with widely-used SSO.
 Users are required to maintain not only the authentication credentials for the IdP but also the long-term secrets that are verified by RPs.
-\oldc
 For example, EL PASSO \cite{ELPASSO} requires users to keep the secrets securely on their devices and coordinate the credential revocation process \cite{ELPASSO, UnlimitID}.
 Besides, the users locally manage their accounts at different RPs. This actually involves authentication steps between the user and RPs, which is usually referred to as \emph{asynchronous authentication} \cite{ELPASSO}.
 
 
-\newc
 \noindent\textbf{Anonymous identity federation.}
 Such approaches offer strong user privacy protections. They allow users to access RPs with pseudonyms that cannot be used to link any two access actions.
-\oldc
 Anonymous identity federation was formalized \cite{WangWS13} and implemented using cryptographic primitives such as group signature and zero-knowledge proof \cite{WangWS13, HanCSTWW20, HanCSTW18}. Special features including proxy re-verification \cite{HanCSTWW20} and designated verification \cite{HanCSTW18}, are also supported. %in these schemes.
 %and proposed for different applications such as GSM communications \cite{ElmuftiWRR08},
 However, these completely-anonymous authentication services only work for special scenarios and do not support user identification at an RP, which is a common requirement in most applications.
