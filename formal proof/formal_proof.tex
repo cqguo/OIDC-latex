@@ -99,9 +99,16 @@
 
 \section{Preparation}
 
-Our formal security analysis of UPPRESSO is based on the general Dolev-Yao web model
-in SPRESSO.  To facilitate the definition of UPPRESSO, we change some details in
-model. In particular, we add some extra function symbols for asymmetric encryption/decryption.
+%所有和SPRESSO的不同点放在同一个章节中一起说明。
+
+Our formal security analysis of UPPRESSO is based on 
+the general Dolev-Yao web model in SPRESSO. 
+To facilitate the definition of UPPRESSO, however, 
+we have some difference from SPRESSO. 
+In particular, we remove some processes and 
+add some function symbols for asymmetric encryption/decryption.
+
+\subsection{Functions Symbols}
 
 Since our model is using ECC(Elliptic Curve Cryptography) to encrypt/decrypt the data,
 we add the following symbols to the signature $\Sigma$ for the terms and messages:
@@ -113,14 +120,37 @@ we add the following symbols to the signature $\Sigma$ for the terms and message
   \item $\str{isValid}(P)$ checks whether $P$ is a valid point on the elliptic curve. That is to say whether $P=[m]G$ for the base point $G$ and some nonce $m$.
 \end{itemize}
 
+\subsection{DNS servers}
+
+%如果是自己编写的脚本引入了DNS请求，那就需要在模型中考虑DNS服务器，UPPRESSO可以不需要考虑。
+
+In SPRESSO, when receiving an e-mail address, 
+RP needs to send DNS requests to DNS servers manually 
+to fetch the information of the IdP server. 
+Since there may be various DNS servers in SPRESSO, 
+DNS server security issues need to be given special consideration.
+As a result, DNS servers are added into the formal model of SPRESSO.
+
+In UPPRESSO, however, we only have one centralized IdP server, and 
+all RPs know the relevant information of the IdP in advance.
+So all DNS requests are generated spontaneously by the browser, 
+not introduced by our scripts.
+Therefore, we remove DNS servers from the formal model of UPPRESSO.
+
+
 \section{Formal Model of UPPRESSO}
 \label{app:model-uppresso}
 We here present the full details of our formal model of UPPRESSO. For our analysis regarding our authentication and privacy properties below, we will further restrict this generic model to suit the setting of respective analysis.\par
 We model UPPRESSO as a web system. We call a web system $\uppressowebsystem=(\bidsystem, \scriptset, \mathsf{script}, E^0)$ an UPPRESSO web system if it is of the form described in what follows.
 
 \subsection{Outline}\label{app:outlineuppressomodel}
-The system $\bidsystem=\mathsf{Hon}\cup \mathsf{Web} \cup \mathsf{Net}$ consists of web attacker processes (in $\mathsf{Web}$), network attacker processes (in $\mathsf{Net}$), a finite set $\fAP{B}$ of web browsers, a finite set $\fAP{RP}$ of web servers for the relying parties, a finite set $\fAP{IDP}$ of web servers containing only one identity provider, and a finite set $\fAP{DNS}$ of DNS servers, 
-with $\mathsf{Hon} := \fAP{B} \cup \fAP{RP} \cup \fAP{IDP} \cup \fAP{DNS}$. More details on the processes in $\mathpzc{W}$ are provided below. 
+The system $\bidsystem=\mathsf{Hon}\cup \mathsf{Web} \cup \mathsf{Net}$ consists of 
+web attacker processes (in $\mathsf{Web}$), network attacker processes (in $\mathsf{Net}$), 
+a finite set $\fAP{B}$ of web browsers, 
+a finite set $\fAP{RP}$ of web servers for the relying parties, 
+a finite set $\fAP{IDP}$ of web servers containing only one identity provider 
+with $\mathsf{Hon} := \fAP{B} \cup \fAP{RP} \cup \fAP{IDP}$. 
+More details on the processes in $\mathpzc{W}$ are provided below. 
 %
 Figure~\ref{fig:scripts-in-w} shows the set of scripts $\scriptset$ 
 and their respectice string representations that are defined by the 
@@ -147,36 +177,47 @@ $\uppressowebsystem$ and their addresses, domain names, and secrets in more deta
 The scripts are defined in detail in Appendix~\ref{app:uppresso-scripts}
 
 \subsection{Addresses and Domain Names}
-The set $\addresses$ contains for every web attacker in $\fAP{Web}$, every network attacker in $\fAP{Net}$, every relying
-party in $\fAP{RP}$, every identity provider in $\fAP{IDP}$, 
-every DNS server in $\fAP{DNS}$, and every browser in $\fAP{B}$ a finite set
-of addresses each. By $\mapAddresstoAP$ we denote the corresponding
-assignment from a process to its address. The set $\dns$ contains a
-finite set of domains for every relying party in $\fAP{RP}$, 
-every identity provider in $\fAP{IDP}$, every web attacker in $\fAP{Web}$, 
-and every network attacker in $\fAP{Net}$. Browsers (in $\fAP{B})$ and DNS servers (in $\fAP{DNS}$) do not have a domain.
+The set $\addresses$ contains for every web attacker in $\fAP{Web}$, 
+every network attacker in $\fAP{Net}$, 
+every relying party in $\fAP{RP}$, 
+the only one identity provider in $\fAP{IDP}$, 
+and every browser in $\fAP{B}$ a finite set of addresses each. 
+By $\mapAddresstoAP$ we denote the corresponding
+assignment from a process to its address. 
+The set $\dns$ contains a finite set of domains for 
+every relying party in $\fAP{RP}$, 
+the only one identity provider in $\fAP{IDP}$, 
+every web attacker in $\fAP{Web}$, and 
+every network attacker in $\fAP{Net}$. 
+Browsers (in $\fAP{B})$ do not have a domain.
 
 By $\mapAddresstoAP$ and $\mapDomain$ we denote the assignments from
 atomic processes to sets of $\addresses$ and $\dns$, respectively.
 
-\subsection{Keys and Secrets} The set $\nonces$ of nonces is
-partitioned into four sets, an infinite sequence $N$, an infinite set
-$K_\text{SSL}$, an infinite set $K_\text{sign}$, an infinite set $K_\text{id}$ and a finite set
-$\RPSecrets$. We thus have
+%需不需要为椭圆曲线的点单独设立一个集合？
+\subsection{Keys and Secrets} 
+The set $\nonces$ of nonces is partitioned into four sets, 
+an infinite sequence $N$, 
+an infinite set $K_\text{SSL}$, 
+an infinite set $K_\text{sign}$, 
+an infinite set $K_\text{id}$, 
+an infinite set $K_\text{point}$, 
+and a finite set $\RPSecrets$. 
+We thus have
 \begin{align*}
 \def\hereMaxHeightPhantom{\vphantom{K_{\text{p}}^\bidsystem}}
 \nonces = 
 \underbrace{N\hereMaxHeightPhantom}_{\text{infinite sequence}} 
 \dot\cup \underbrace{K_{\text{SSL}}\hereMaxHeightPhantom}_{\text{finite}} 
 \dot\cup \underbrace{K_{\text{sign}}\hereMaxHeightPhantom}_{\text{finite}}
-\dot\cup \underbrace{K_{\text{id}}\hereMaxHeightPhantom}_{\text{finite}}  
+\dot\cup \underbrace{K_{\text{point}}\hereMaxHeightPhantom}_{\text{finite}}  
 \dot\cup \underbrace{\RPSecrets\hereMaxHeightPhantom}_{\text{finite}}\ .
 \end{align*}
 The set $N$ contains the nonces that are available for each DY process
 in $\bidsystem$ (it can be used to create a run of $\bidsystem$). 
 
 The set $K_\text{SSL}$ contains the keys that will be used for SSL
-encryption. Let $\mapSSLKey\colon \dns \to K_\text{SSL}$ be an injective
+encryption. Let $\mapTLSKey\colon \dns \to K_\text{SSL}$ be an injective
 mapping that assigns a (different) private key to every domain.
 
 The set $K_\text{sign}$ contains the keys that will be used by IdPs
@@ -184,46 +225,66 @@ for signing IAs. Let $\mapSignKey\colon \fAP{IdPs} \to K_\text{sign}$
 be an injective mapping that assigns a (different) private key to every identity
 provider.
 
-The set $K_\text{id}$ contains all numbers $x\in[1,n)$ in which n is a prime number up to $2^{256}$
-The set $K_\text{id}$ will be used to generate identities of $\fAP{B}$ and $\fAP{RP}$.
+The set $K_\text{point}$ contains all valid points on the curve. 
+The set $K_\text{point}$ will be used to generate identities of $\fAP{B}$ and $\fAP{RP}$.
 
-The set $\RPSecrets$ is the
-set of passwords (secrets) the browsers share with the identity
-providers. 
+The set $\RPSecrets$ is the set of passwords (secrets) 
+the browsers share with the identity providers. 
 
 \subsection{Identities}\label{app:uppresso-identities}
-Identities are alike email addresses, which consist of a number, a user name 
-and a domain part. For our model, this is defined as follows:
+There are many different types of identities in UPPRESSO, 
+We denote the identity of the broswer at the IdP with $u$,
+the identity of the relying party at the IdP with $r$ and 
+the identity of the broswer at the relying party with $acct$.
+The details are defined below.
+
+%用户的id表示：<id, username, idp-domain, <acct1, rp1-domain>, <acct2, rp2-domain>, <acct3, rp3-domain>, ...>
+%RP的id表示:，<id, rp-commonname, idp-domain>
+
+%def1.用户的id表示：<id, username, idp-domain>
+%def2.用户的account：<<acct1, rp1-domain>, <acct2, rp2-domain>, <acct3, rp3-domain>, ...>
+%def3.RP的id表示，<id, rp-commonname, idp-domain>
+
 \begin{definition}
-  An \emph{identity} $u$ is a term of the form $\an{\mi{id},\mi{name},\mi{domain}}$ 
-  with $\mi{id}\in K_\text{id}$, $\mi{name}\in \mathbb{S}$ and $\mi{domain} \in \dns$.
+  An \emph{identity} $u$ is a term of the form 
+  $u=\an{\mi{id},\mi{username},\mi{domain_{idp}}}$ 
+  with $\mi{id}\in N$, $\mi{username}\in \mathbb{S}$ and $\mi{domain_{idp}} \in \dns$.
 
-  Let $\IDs$ be the finite set of identities. By $\IDs^y$ we denote
-  the set $\{ \an{\mi{id},\mi{name},\mi{domain}} \in \IDs\,|\, \mi{domain}
-  \in \mapDomain(y) \}$.
+  %Let $\IDs$ be the finite set of identities. By $\IDs^y$ we denote
+  %the set $\{ \an{\mi{id},\mi{name},\mi{domain}} \in \IDs\,|\, \mi{domain}
+  %\in \mapDomain(y) \}$.
 
-  We say that an ID is \emph{governed} by the DY process to which the
-  domain of the ID belongs. Formally, we define the mapping $\mapGovernor:
-  \IDs \to \bidsystem$, $\an{\mi{id},\mi{name},\mi{domain}} \mapsto
-  \mapDomain^{-1}(\mi{domain})$.
+  %We say that an ID is \emph{governed} by the DY process to which the
+  %domain of the ID belongs. Formally, we define the mapping $\mapGovernor:
+  %\IDs \to \bidsystem$, $\an{\mi{id},\mi{name},\mi{domain}} \mapsto
+  %\mapDomain^{-1}(\mi{domain})$.
 \end{definition}
 
-The governor of an ID will usually be an IdP, but could also be the
-attacker. 
+\begin{definition}
+  An \emph{identity} $r$ is a term of the form 
+  $r=\an{\mi{id},\mi{commonname},\mi{domain_{idp}}}$ 
+  with $\mi{id}\in K_{\text{point}}$, $\mi{commonname}\in \mathbb{S}$ and $\mi{domain_{idp}} \in \dns$.
+\end{definition}
 
-By $\mapIDtoPLI:\IDs \to \RPSecrets$ we denote the bijective mapping
+\begin{definition}
+  An \emph{identity} $acct$ is a term of the form 
+  $acct=\langle\an{\mi{acct}_1,\mi{domain_{rp_1}}},\an{\mi{acct}_2,\mi{domain_{rp_2}}}, \ldots\rangle \ .$ 
+  with $\mi{acct}_i\in K_{\text{point}}$, $\mi{domain_{rp_i}}\in \dns$.
+\end{definition}
+
+Let $\IDs^u$ be the finite set of identities u.
+
+By $\mapIDtoPLI:\IDs^u \to \RPSecrets$ we denote the bijective mapping
 that assigns secrets to all identities. 
 
 Let $\mapPLItoOwner: \RPSecrets \to \fAP{B}$ denote the mapping that
 assigns to each secret a browser that \emph{owns} this secret. Now, we
-define the mapping $\mapIDtoOwner: \IDs \to \fAP{B}$, $i \mapsto
+define the mapping $\mapIDtoOwner: \IDs^u \to \fAP{B}$, $i \mapsto
 \mapPLItoOwner(\mapIDtoPLI(i))$, which assigns to each identity the
 browser that owns this identity (we say that the identity belongs to
 the browser).
 
-It should be pointed out that in UPPRESSO, the relying parties also have 
-identities referred to as $r$ which is important for privacy analysis. 
-The form of $r$ is the same as $u$. To be concise, we usually use $u$ and $r$ to
+To be concise, we usually use $u$ and $r$ to
 refer to $u.id$ and $r.id$ if we don't say they are identities or $u,r\in\IDs$
 
 \subsection{Tags, Identity Tokens and Service Tokens}\label{app:identity-assertions}
@@ -238,17 +299,26 @@ refer to $u.id$ and $r.id$ if we don't say they are identities or $u,r\in\IDs$
   $PID_u=[u]PID_{rp}=[utr]G$ and a signature $ver=\sig{\an{PID_{rp},PID_u}}{k}$ 
   for a nonce $k$.
 \end{definition}
+%使用<n,i>来定义 service token;Acct or pidu?
 \begin{definition}
-  A \emph{service token} is a term of the form $\mi{Acct} = [t^{-1}]PID_u=[t^{-1}][utr]G=[ur]G$ 
-  for a nonce $t\in K_\text{id}$.
+  A \emph{service token} is a term of the form 
+  $\myangle{\mi{nonce}, \mi{Acct}}$ with 
+  $\mi{Acct} = [t^{-1}]PID_u=[t^{-1}][utr]G=[ur]G$ 
+  for a nonce $t$.
 \end{definition}
 
+%是否足够描述semi-honest的状态？
+%\subsection{Curiosity}
+%同样，也会有人给idp发送命令，让他进入curiosity状态
+%进入curiosity状态之后，就可以开始把历史上所有的信息，开始用来推导各种事情。
+%或者IdP始终honest-but-curious的状态，在安全性证明时不考虑curious的状态。
+
 \subsection{Corruption}\gs{DNS servers may not be corrupted?}
-RPs and IdPs can become corrupted: If they receive the message
+RPs can become corrupted: If they receive the message
 $\corrupt$, they start collecting all incoming messages in their state
 and (upon triggering) send out all messages that are derivable from
 their state and collected input messages, just like the attacker
-process. We say that an RP or an IdP is \emph{honest} if the according
+process. We say that an RP is \emph{honest} if the according
 part of their state ($s.\str{corrupt}$) is $\bot$, and that they are
 corrupted otherwise.
 
@@ -258,10 +328,11 @@ the scripts in $\scriptset$ in more detail.
 \subsection{Processes in $\bidsystem$ (Overview)}
 
 We first provide an overview of the processes in $\bidsystem$. All
-processes in $\websystem$ (except for DNS servers) contain in their initial states all public
+processes in $\websystem$ contain in their initial states all public
 keys and the private keys of their respective domains (if any). We
 define $I^p=\mapAddresstoAP(p)$ for all $p\in \mathsf{Hon} \cup \mathsf{Web}$.
 
+%两个attacker是否足够描述corrupt的程度?
 \subsubsection{Web Attackers.}  Each $\mi{wa} \in \mathsf{Web}$  is a
 web attacker who uses only his own addresses for sending and listening. 
 
@@ -291,51 +362,58 @@ Just like IdPs, RPs can become corrupted.
 users can authenticate to the IdP with their credentials. 
 IdP tracks the state of the users with sessions. 
 Authenticated users can receive IDTokens from the IdP. 
-When receiving a special message ($\corrupt$) IdPs can become corrupted. 
-Similar to the definition of corruption for the browser,
-IdPs then start sending out all messages that are derivable from their state.
+%When receiving a special message ($\corrupt$) IdPs can become corrupted. 
+%Similar to the definition of corruption for the browser,
+%IdPs then start sending out all messages that are derivable from their state.
 
-\subsubsection{DNS.} Each $\mi{dns} \in \fAP{DNS}$ is a DNS server.
-Their state contains the allocation of domain names to IP addresses.
+%\subsubsection{DNS.} Each $\mi{dns} \in \fAP{DNS}$ is a DNS server.
+%Their state contains the allocation of domain names to IP addresses.
 
-\subsection{SSL Key Mapping}\label{app:common-data-structures}
+\subsection{TLS Key Mapping}\label{app:common-data-structures}
 Before we define the atomic DY processes in more detail, we first
 define the common data structure that holds the mapping of domain
-names to public SSL keys: For an atomic DY process $p$ we define
-\[\mi{sslkeys}^p = \an{\left\{\an{d, \mapSSLKey(d)} \mid d \in \mapDomain(p)\right\}}.\]
+names to public TLS keys: For an atomic DY process $p$ we define
+\[\mi{tlskeys}^p = \an{\left\{\an{d, \mapTLSKey(d)} \mid d \in \mapDomain(p)\right\}}.\]
+%ssl改成tls
 
 \subsection{Web Attackers}\label{app:webattackers-uppresso}
-Each $\mi{wa} \in \fAP{Web}$ is a web attacker. The initial state of each $\mi{wa}$ is $s_0^\mi{wa} =
-\an{\mi{attdoms}, \mi{sslkeys}, \mi{signkeys}}$, where $\mi{attdoms}$
-is a sequence of all domains along with the corresponding private keys
-owned by $\mi{wa}$, $\mi{sslkeys}$ is a sequence of all domains and
-the corresponding public keys, and $\mi{signkeys}$ is a sequence
-containing all public signing keys for all IdPs. All other parties use
-the attacker as a DNS server.
+Each $\mi{wa} \in \fAP{Web}$ is a web attacker. 
+The initial state of each $\mi{wa}$ is 
+$s_0^\mi{wa} = \an{\mi{attdoms}, \mi{tlskeys}, \mi{signkeys}}$, 
+where $\mi{attdoms}$ is a sequence of all domains along with 
+the corresponding private keys owned by $\mi{wa}$, 
+$\mi{tlskeys}$ is a sequence of all domains and 
+the corresponding public keys, and 
+$\mi{signkeys}$ contains the public signing key for the IdP. 
+%All other parties use the attacker as a DNS server.
 
 \subsection{Network Attackers}\label{app:networkattackers-uppresso}
-As mentioned, each network attacker $\mi{na}$ is modeled to be a network attacker. 
-We allow it to listen to/spoof all available IP addresses, and hence, 
-define $I^\mi{na} = \addresses$. The initial state is $s_0^\mi{na} =
-\an{\mi{attdoms}, \mi{sslkeys}, \mi{signkeys}}$, where $\mi{attdoms}$
-is a sequence of all domains along with the corresponding private keys
-owned by the attacker $\mi{na}$, $\mi{sslkeys}$ is a sequence of all domains 
-and the corresponding public keys, and $\mi{signkeys}$ is a sequence
-containing all public signing keys for all IdPs.
+As mentioned, each network attacker $\mi{na}$ is modeled to 
+be a network attacker. We allow it to listen to/spoof all 
+available IP addresses, and hence, define 
+$I^\mi{na} = \addresses$. 
+The initial state is $s_0^\mi{na} = 
+\an{\mi{attdoms}, \mi{tlskeys}, \mi{signkeys}}$, 
+where $\mi{attdoms}$ is a sequence of all domains along with 
+the corresponding private keys owned by the attacker 
+$\mi{na}$, $\mi{tlskeys}$ is a sequence of all domains 
+and the corresponding public keys, and 
+$\mi{signkeys}$ contains the public signing key for the IdP. 
 
+%不用
 \subsection{Browsers}\label{app:browsers-uppresso} 
-Each $b \in \fAP{B}$ is a web browser with $I^b := \mapAddresstoAP(b)$ being its addresses.
+Each $b \in \fAP{B}$ is a web browser with 
+$I^b := \mapAddresstoAP(b)$ being its addresses.
 
-To define the inital state, first let $\mi{ID}^b := \mapIDtoOwner^{-1}(b)$ be 
-the set of all IDs of $b$, $\mi{ID}^{b,d} := 
-\{i \mid \exists\, x,n:\ i = \an{id, n, d} \in \mi{ID}^b\}$ be the set of
-IDs of $b$ for a domain $d$, and $\mi{SecretDomains}^b := \{d \mid
-\mi{ID}^{b,d} \neq \emptyset \}$ be the set of all domains that $b$
-owns identities for.
-
+To define the inital state, first let $\mi{ID}^b := 
+\mapIDtoOwner^{-1}(b)$ be the set of all IDs of $b$, 
+%$\mi{ID}^{b,d} := \{i \mid \exists\, x,n:\ i = \an{id, n, d} \in \mi{ID}^b\}$ 
+%be the set of IDs of $b$ for a domain $d$, and 
+%$\mi{SecretDomains}^b := \{d \mid \mi{ID}^{b,d} \neq \emptyset \}$ 
+%be the set of all domains that $b$ owns identities for.
 Then, the initial state $s_0^b$ is defined as follows: the key mapping
 maps every domain to its public (ssl) key, according to the mapping
-$\mapSSLKey$; the DNS address is $\mapAddresstoAP(p)$ with $p \in \bidsystem$;
+$\mapTLSKey$; the DNS address is $\mapAddresstoAP(p)$ with $p \in \bidsystem$;
 the list of secrets contains an entry $\an{\an{d,\https}, s}$ for each
 $d \in \mi{SecretDomains}^b$ and $s = \mapIDtoPLI(i)$ for some $i \in
 \mi{ID}^{b,d}$ ($s$ is the same for all $i$); $\mi{ids}$ is
@@ -346,7 +424,7 @@ $\an{\mi{ID}^b}$; $\mi{sts}$ is empty.
 A relying party $r \in \fAP{RP}$ is a web server modeled as an atomic
 DY process $(I^r, Z^r, R^r, s^r_0)$ with the addresses $I^r :=
 \mapAddresstoAP(r)$. Its initial state $s^r_0$ contains its domains,
-the private keys associated with its domains and the DNS server address.
+the private keys associated with its domains.
 The full state additionally contains the sets of service tokens and login 
 session identifiers the RP has issued. RP only accepts HTTPS requests.
 
@@ -366,7 +444,7 @@ HTTP GET request for the path $\str{/loginSSO}$ sent from the new window opened
 by $\str{script\_rp}$. In this request, $r$ will send back a redirect response  
 for downloading $\str{script\_IdP}$ from IdP.
 
-When the IdP document in the browser generates a number $t\in K_\text{id}$,
+When the IdP document in the browser generates a number $t$,
 $r$ will receive the third request for the path $\str{/startNegotiate}$.
 $r$ will verify $t$ and if valid, $r$ will create the corresponding 
 login session with a $\mi{loginSessionToken}$ as the identifier. After that,
@@ -387,37 +465,42 @@ $(I^r, Z^r, R^r, s^r_0)$. As mentioned, we define $I^r =
 \mapAddresstoAP(r)$. Next, we define the set $Z^r$ of states of
 $r$ and the initial state $s^r_0$ of $r$.
 
+%和tag是否一致？
 \begin{definition}
-  A \emph{login session record} is a term of the form $\an{\mi{t},
-    \mi{PID_{rp}}}$ with $\mi{t}, \mi{PID_{rp}}=[tr]G(t,r\in K_{\text{id}})$.
+  A \emph{login session record} is a term of the form 
+  $\an{\mi{t}, \mi{PID_{rp}}}$ with 
+  $\mi{t}, \mi{PID_{rp}}=[tr]G(t,r\in K_{\text{id}})$.
 \end{definition}
 
 \begin{sloppypar}
   \begin{definition}\label{def:relying-parties}
     A \emph{state $s\in Z^r$ of an RP $r$} is a term of the form
-    $\langle\mi{DNSAddress}$, $\mi{keyMapping}$,
-    $\mi{sslkeys}$, $\mi{pendingDNS}$, $\mi{pendingRequests}$,
-    $\mi{loginSessions}$, $\mi{serviceTokens}$, $\mi{wkCache}$,
-    $\mi{corrupt}$, $\mi{IdPConfig}$, $\mi{rp}\rangle$ where $\mi{DNSAddress} \in \addresses$,
+    $\langle\mi{keyMapping}$, 
+    $\mi{tlskeys}$, 
+    $\mi{loginSessions}$, 
+    $\mi{serviceTokens}$, 
+    $\mi{corrupt}$, 
+    $\mi{IdPConfig}$, 
+    $\mi{rp}\rangle$ where 
     $\mi{keyMapping} \in \dict{\mathbb{S}}{\nonces}$,
-    $\mi{sslkeys}=\mi{sslkeys}^r$,
-    $\mi{pendingDNS} \in \dict{\nonces}{\terms}$,
-    $\mi{pendingRequests} \in \dict{\nonces}{\terms}$,
+    $\mi{tlskeys}=\mi{tlskeys}^r$,
     $\mi{serviceTokens} \in \nonces$,
-    $\mi{loginSessions} \in \dict{\nonces}{\terms}$ is a dictionary of
-    login session records,
-    $\mi{wkCache} \in \dict{\mathbb{S}}{\terms}$,
+    $\mi{loginSessions} \in \dict{\nonces}{\terms}$ 
+    is a dictionary of login session records,
     $\mi{corrupt} \in \terms$,
-    $\mi{IdPConfig} \in \terms$ is the configuration retrieved from IdP server,
-    $\mi{rp} \in \IDs$ is the identity of the RP, see details in Appendix~\ref{app:uppresso-identities}.
+    $\mi{IdPConfig} \in \terms$ 
+    is the configuration retrieved from IdP server,
+    $\mi{rp} \in \IDs$ is the identity of the RP, 
+    see details in Appendix~\ref{app:uppresso-identities}.
 
-    The \emph{initial state $s^r_0$ of $r$} is a state of $r$ with
-    $s^r_0.\str{serviceTokens} = s^r_0.\str{loginSessions} =
-    s^r_0.\str{wkCache} = \an{}$,
-    $s^r_0.\str{corrupt} = \bot$, $s^r_0.\str{keyMapping}$ is the
-    same as the keymapping for browsers above,
+    The \emph{initial state $s^r_0$ of $r$} is a state of 
+    $r$ with $s^r_0.\str{serviceTokens} = 
+    s^r_0.\str{loginSessions} = \an{}$,
+    $s^r_0.\str{corrupt} = \bot$, 
+    $s^r_0.\str{keyMapping}$ 
+    is the same as the keymapping for browsers above,
     $s^r_0.\str{IdPConfig} = \an{\mi{pubkey},\mi{scriptUrl},\mi{Cert_{rp}}}$ and
-    $s^r_0.\str{rp} = \an{\mi{id},\mi{name},\mi{domain}}$.
+    $s^r_0.\str{rp} = \an{\mi{id},\mi{commonname},\mi{domain_{idp}}}$.
   \end{definition}
 \end{sloppypar}
 
@@ -506,19 +589,23 @@ We now specify the relation $R^r$. We describe this relation by a non-determinis
 
 \subsection{Identity Providers} \label{app:idps}
 
-An identity provider $i \in \mathsf{IdPs}$ is a web server modeled as
-an atomic process $(I^i, Z^i, R^i, s_0^i)$ with the addresses 
-$I^i := \mapAddresstoAP(i)$. Its initial state $s^i_0$ contains a list of its 
-domains and (private) SSL keys, a list of users and identites, and a private key 
-for signing IDTokens. Besides this, the full state of $i$ further contains a list 
+The identity provider $\mathsf{IdP}$ is a web server 
+modeled as an atomic process $(I, Z, R, s_0)$ with 
+the addresses $I := \mapAddresstoAP(\mathsf{IdP})$. 
+Its initial state $s_0$ contains a list of its 
+domains and (private) TLS keys, 
+a list of users and identites, and a private key 
+for signing IDTokens. Besides this, 
+the full state of $\mathsf{IdP}$ further contains a list 
 of used nonces, and information about active sessions.
 
-IdPs react to four types of requests:
+$\mathsf{IdP}$ react to four types of requests:
 
-First, they provide the $\str{script\_idp}$, where a $t\in K_\text{id}$ will 
-be chosen and following requests to IdPs will be sent. IdP will transfer the data
-to RP by the communicating between two scripts $\str{script\_idp}$ and $\str{script\_rp}$
-using $\tPostMessage$.
+First, they provide the $\str{script\_idp}$, where a $t$ 
+will be chosen and following requests to $\mathsf{IdP}$ 
+will be sent. $\mathsf{IdP}$ will transfer the data
+to RP by the communicating between two scripts $\str{script\_idp}$ 
+and $\str{script\_rp}$ using $\tPostMessage$.
 
 Second, they provide $\mi{IDToken}$ when receiving $\mi{PID_{rp}}$ and this 
 $\mi{PID_{rp}}$ has already first. If not, IdPs will redirect to the login dialog.
@@ -531,41 +618,44 @@ The last type of requests IdPs react to is authorize requests with $\mi{PID_{rp}
 scopes as parameters. After receving consent from browsers, IdPs will calculate 
 $\mi{PID_{u}}$ and construct $\mi{IDToken}$.
 
-\subsubsection{Formal description.} In the following, we will first
-define the (initial) state of $i$ formally and afterwards present the
-definition of the relation $R^i$.
+\subsubsection{Formal description.} In the following, we 
+will first define the (initial) state of IdP formally and 
+afterwards present the definition of the relation $R$.
 
-To define the initial state, we will need a term that represents the
-``user database'' of the IdP $i$. We will call this term
-$\mi{userset}^i$. This database defines, which secret is valid for
-which identity. It is encoded as a mapping of identities to secrets.
-For example, if the secret $\mi{secret}_1$ is valid for the identites
-$\mi{id}_1$and the secret $\mi{secret}_2$ is valid for the identity
-$\mi{id}_2$, the $\mi{userset}^i$ looks as follows:
+To define the initial state, we will need a term that 
+represents the ``user database'' of the IdP. We will 
+call this term $\mi{userset}$. This database defines, 
+which secret is valid for which identity. It is encoded as 
+a mapping of identities to secrets. For example, if the 
+secret $\mi{secret}_1$ is valid for the identites
+$\mi{id}_1$and the secret $\mi{secret}_2$ is valid for the 
+identity $\mi{id}_2$, the $\mi{userset}^i$ looks as follows:
 \begin{align*}
-\mi{userset}^i = [\mi{id}_1.\str{username}{:}\myangle{\mi{id}_1, \mi{secret}_1}, 
+\mi{userset} = [\mi{id}_1.\str{username}{:}\myangle{\mi{id}_1, \mi{secret}_1}, 
   \mi{id}_2.\str{username}{:}\myangle{\mi{id}_2, \mi{secret}_2}]
 \end{align*}
 
-We define $\mi{userset}^i$ as $\mi{userset}^i = \an{\{\an{u.\str{username},
-    \myangle{u, \mi{secret} = \mapIDtoPLI(u)}}\, |\, u \in \IDs^i\}}$.
+We define $\mi{userset}$ as $\mi{userset} = \an{\{\an{u.\str{username},
+    \myangle{u, \mi{secret} = \mapIDtoPLI(u)}}\, |\, u \in \IDs^u\}}$.
 
 \begin{definition}\label{def:initial-state-idp}
-  A \emph{state $s\in Z^i$ of an IdP $i$} is a term of the form
-  $\langle\mi{sslkeys}$, $\mi{users}$, $\mi{signkey}$,
-  $\mi{sessions}$, $\mi{corrupt}\rangle$ where $\mi{sslkeys} =
-  \mi{sslkeys}^i $, $\mi{users} = \mi{userset}^i$, $\mi{signkey} \in
-  \nonces$ (the key used by the IdP $i$ to sign IDTokens),
+  A \emph{state $s\in Z$ of the IdP} is a term of the form
+  $\langle\mi{tlskeys}$, $\mi{users}$, $\mi{signkey}$,
+  $\mi{sessions}$, $\mi{corrupt}\rangle$ where 
+  $\mi{tlskeys} = \mi{tlskeys} $, 
+  $\mi{users} = \mi{userset}$, 
+  $\mi{signkey} \in \nonces$ 
+  (the key used by the IdP to sign IDTokens),
   $\mi{sessions}\in\dict{\nonces}{\terms}$, $\mi{corrupt} \in \terms$.
 
-  An \emph{initial state $s^i_0$ of $i$} is a state of the form $\an{
-    \mi{sslkeys}^i, \mi{userset}^i, \mapSignKey(i), \an{},
-    \bot}$.
+  An \emph{initial state $s_0$ of IdP} is a state of the form 
+  $\an{\mi{tlskeys}, \mi{userset}, \mapSignKey(\mathsf{IdP}), \an{}, \bot}$.
 \end{definition}
 
-The relation $R^i$ that defines the behavior of the IdP $i$ is defined as follows:
+The relation $R$ that defines the behavior of the IdP is defined as follows:
 
-\captionof{algorithm}{\label{alg:idp} Relation of IdP $R^r$}
+%和代码基本保持一致
+\captionof{algorithm}{\label{alg:idp} Relation of IdP $R$}
 \begin{algorithmic}[1]
   \REQUIRE \myss{\myangle{a, b, m}, s}
   \mystate{\myss{s':=s}}
@@ -611,7 +701,7 @@ The relation $R^i$ that defines the behavior of the IdP $i$ is defined as follow
     \mystate{\myss{\mi{IDToken} := s'.\str{sessions}[\mi{sessionid}].\mi{IDToken}[\mi{PID_{rp}}]}}
     \mystate{\myss{m' := \encs{\myangle{\mathtt{HTTPResp},n,200,\myangle{}, \mi{IDToken}}}{k}}}
     \mystop{b, a, m'}
-  \myelse{path \equiv /authorize}
+  \myelse{path \equiv /authorize}\label{line:uppresso-idp-set-pidu}
     \mystate{\myss{\mi{cookie} := headers[\str{Cookie}]}}
     \myif{\mi{cookie}[\str{sessionid}] \equiv \myangle{}}\label{line:uppresso-idp-check-login-state}
       \mystate{\myss{m' := \encs{\myangle{\mathtt{HTTPResp},n,200,\myangle{},\mathtt{Unauthenticated}}}{k}}}
@@ -853,24 +943,27 @@ attackers).
   $\bidsystem$ contains only one network attacker process
   $\fAP{attacker}$ and no other attacker processes (i.e.,
   $\mathsf{Net} = \{\fAP{attacker}\}$, $\mathsf{Web} = \emptyset$).
-  Further, $\bidsystem$ contains no DNS servers. DNS servers are
-  assumed to be dishonest, and hence, are subsumed by
-  $\fAP{attacker}$. In the initial state $s_0^b$ of each browser $b$
-  in $\bidsystem$, the DNS address is
-  $\mapAddresstoAP(\fAP{attacker})$. Also, in the initial state
-  $s_0^r$ of each relying party $r$, the DNS address is
-  $\mapAddresstoAP(\fAP{attacker})$.
+  %Further, $\bidsystem$ contains no DNS servers. DNS servers are
+  %assumed to be dishonest, and hence, are subsumed by
+  %$\fAP{attacker}$. In the initial state $s_0^b$ of each browser $b$
+  %in $\bidsystem$, the DNS address is
+  %$\mapAddresstoAP(\fAP{attacker})$. Also, in the initial state
+  %$s_0^r$ of each relying party $r$, the DNS address is
+  %$\mapAddresstoAP(\fAP{attacker})$.
 \end{definition}
 
-The security properties for \uppresso are formally defined as follows.
-First note that every RP service token $Acct$ recorded in RP was
-created by RP as the result of an HTTPS $\mPost$ request $m$. We refer
-to $m$ as the \emph{request corresponding to $Acct$}. 
+The security properties for \uppresso are formally defined 
+as follows. First note that every $Acct$ recorded in RP was
+calculated by RP as the result of an HTTPS $\mPost$ request 
+$m$. We refer to $m$ as the 
+\emph{request corresponding to $Acct$}. 
 
-In the following definition, when we say a browser $b\in \fAP{B}$ owns the service 
-token $Acct$, we holds that for some RP $r\in \fAP{RP}$ that records this token and 
+%讨论acct的唯一性
+In the following definition, when we say a browser 
+$b\in \fAP{B}$ owns $Acct$, we holds that for some RP 
+$r\in \fAP{RP}$ that calculate it and 
 an identity $u\in \fAP{ID}$ with $\mapIDtoOwner(u) = b$.
-\[\mi{Acct}=[u.id]\mi{ID_{rp}}=[u.id][r.id]G=[ur]G\]
+\[\mi{Acct}=\mi{acct}^u[\mapDomain(r)]\]
 
 We now define the similar security properties as the definition 52 in SPRESSO. 
 
@@ -901,7 +994,7 @@ We now define the similar security properties as the definition 52 in SPRESSO.
 
 %(B) If the request corresponding to $\langle IDToken$, $Acct \rangle$ was sent by some $b \in \mathtt{B}$ which is honest in $S^j$, then b owns the $ID_U$ which satisfies $Acct=[ID_U]S^j(r).ID_{RP}$.
 
-To prove Theorem 5 in section 5.2, we are going to prove the following Lemmas.
+To prove Theorem 1 in section 5.1, we are going to prove the following Lemmas.
 
 \begin{lemma}\label{lemma:k-does-not-leak-from-honest-rp} 
   If in the processing step $s_i \rightarrow s_{i+1}$ of a run $\rho$
@@ -940,19 +1033,19 @@ To prove Theorem 5 in section 5.2, we are going to prove the following Lemmas.
   \end{enumerate}
 \end{lemma}
 
-\begin{lemma}\label{lemma:wkcache-never-lies}
-  For every honest relying party $r \in \fAP{RP}$, every $s \in \rho$, every
-  $\an{\mi{host}, \mi{wkDoc}} \inPairing S(r).\str{wkCache}$ it holds
-  that $\mi{wkDoc}[\str{signkey}] \equiv
-  \pub(\mathsf{signkey}(\mapDomain^{-1}(\mi{host})))$ if
-  $\mapDomain^{-1}(\mi{host})$ is an honest IdP.
-\end{lemma}
+%\begin{lemma}\label{lemma:wkcache-never-lies}
+%  For every honest relying party $r \in \fAP{RP}$, every $s \in \rho$, every
+%  $\an{\mi{host}, \mi{wkDoc}} \inPairing S(r).\str{wkCache}$ it holds
+%  that $\mi{wkDoc}[\str{signkey}] \equiv
+%  \pub(\mathsf{signkey}(\mapDomain^{-1}(\mi{host})))$ if
+%  $\mapDomain^{-1}(\mi{host})$ is an honest IdP.
+%\end{lemma}
 
 \begin{lemma}\label{lemma:uppresso-request-exists}
-  In a run $\rho$ of $\uppressoauthwebsystem$, for every state $s_j \in
-  \rho$, every RP $r \in \fAP{RP}$ that is honest in $s_j$, every
-  $Acct \inPairing S^j(r).\str{serviceTokens}$, the following
-  properties hold:
+  In a run $\rho$ of $\uppressoauthwebsystem$, for every 
+  state $s_j \in\rho$, every RP $r \in \fAP{RP}$ that is 
+  honest in $s_j$, every $\myangle{nonce, Acct} \inPairing 
+  S^j(r).\str{serviceTokens}$, the following properties hold:
 
   \begin{enumerate}
   \item There exists exactly one $l' < j$ such that there exists a
@@ -978,7 +1071,7 @@ To prove Theorem 5 in section 5.2, we are going to prove the following Lemmas.
       path=\str{/authorize}, 
       parameters=x, 
       headers=h,
-      xbody=b}, k\rangle, \pub(\mapSSLKey(d_r))) \]
+      xbody=b}, k\rangle, \pub(\mapTLSKey(d_r))) \]
     for $d_r \in \mapDomain(r)$, some terms $x$, $h$, $n_\text{req}$, and a dictionary $b$ such that 
     \[ b[\str{IDToken}] \equiv \myangle{\mi{PID_{rp}, \mi{PID_u}, ver}} \]
     with 
@@ -990,23 +1083,32 @@ To prove Theorem 5 in section 5.2, we are going to prove the following Lemmas.
   \end{enumerate}
 \end{lemma}
 
-We define the Lemma 1, 2 and 3 the same as SPRESSO, which prove that the data transmitted 
-through HTTPS is secure and the IdP's public key used for generating IDToken is secure. 
-In UPPRESSO, only the single IdP is trusted, so that the public key is guaranteed to 
-be always trusted. Therefore, we can also follow the proofs in SPRESSO.
+We define the Lemma~\ref{lemma:k-does-not-leak-from-honest-rp} 
+and ~\ref{lemma:uppresso-request-exists}, which prove 
+that the data transmitted through HTTPS is secure and the 
+IdP's public key used for generating IDToken is secure. 
+In UPPRESSO, only the single IdP is trusted, so that the 
+public key is guaranteed to be always trusted. Therefore, 
+we can also follow the proofs in SPRESSO.
 
 \subsection{Proof of Property A}
 Then we prove the Property $A$ is satisfied in UPPRESSO.
 As stated above, the Property $A$ is defined as follows:
-\begin{definition}\label{def:uppresso-security-property} Let $\uppressoauthwebsystem$ 
-  be an \uppresso web system for authentication analysis. We say that 
-  \emph{$\uppressoauthwebsystem$ is secure (with respect to Property A)} if for every
-  run $\rho$ of $\uppressoauthwebsystem$, every state $(S^j, E^j, N^j)$ in $\rho$,
-  every $r\in \fAP{RP}$ that is honest in $S^j$, every RP service token of the form 
-  $Acct$ recorded in $S^j(r).\str{serviceTokens}$ and derivable from the attackers
-  knowledge in $S^j$ (i.e., $Acct \in d_{\emptyset}(S^j(\fAP{attacker}))$), it 
-  follows that the browser $b$ owning $Acct$ is fully corrupted in $S^j$ (i.e., the 
-  value of $\mi{isCorrupted}$ is $\fullcorrupt$) or the IdP is dishonest. 
+\begin{definition}\label{def:uppresso-security-property} 
+  Let $\uppressoauthwebsystem$ be an \uppresso web system 
+  for authentication analysis. We say that 
+  \emph{$\uppressoauthwebsystem$ is secure 
+  (with respect to Property A)} if for every run $\rho$ of 
+  $\uppressoauthwebsystem$, every state $(S^j, E^j, N^j)$ in 
+  $\rho$, every $r\in \fAP{RP}$ that is honest in $S^j$, 
+  every RP service token of the form $\myangle{nonce, Acct}$ 
+  recorded in $S^j(r).\str{serviceTokens}$ and derivable 
+  from the attackers knowledge in $S^j$ (i.e., 
+  $\myangle{nonce, Acct} \in 
+  d_{\emptyset}(S^j(\fAP{attacker}))$), it follows that the 
+  browser $b$ owning $Acct$ is fully corrupted in $S^j$ 
+  (i.e., the value of $\mi{isCorrupted}$ is $\fullcorrupt$) 
+  or the IdP is dishonest. 
 \end{definition}
 
 %\begin{definition}
@@ -1020,21 +1122,32 @@ Same as the proof in SPRESSO, we want to show that every UPPRESSO web system is 
 %In detail, we assume: \emph{There is an UPPRESSO web system for authentication analysis $\mathcal{U\!W\!S}^{auth}$. We say that $\mathcal{U\!W\!S}^{auth}$  is secure (with respect to Property A) if for every run $rho$ of $\mathcal{U\!W\!S}^{auth}$ , every state ($S^j$, $E^j$, $N^j$) in $rho$, every $r \in \mathtt{RP}$ that is honest in
 %$S^j$, every RP service token of the form $\langle IDToken$, $Acct \rangle$ recorded in $S^j$($r$).$\mathtt{serviceTokens}$ and derivable from the attackers knowledge in $S^j$ (i.e., $\langle IDToken$, $Acct \rangle \in d_{\emptyset}$($S^j$($\mathtt{attacker}$))), it follows that the browser b owning $Acct$ is not fully corrupted in $S^j$ and $\mathtt{governor}$($Acct$) is an honest IdP (in $S^j$).}
 
-In detail, we assume: \emph{There exists an \uppresso web system
-$\uppressoauthwebsystem$, a run $\rho$ of $\uppressoauthwebsystem$, a
-state $s_j = (S^j, E^j, N^j)$ in $\rho$, a RP $r\in \fAP{RP}$ that is
-honest in $S^j$, an RP service token of the form $Acct$
-recorded in $S^j(r).\str{serviceTokens}$ and derivable from the
-attackers knowledge in $S^j$ (i.e., $Acct \in
-d_{\emptyset}(S^j(\fAP{attacker}))$), and the browser $b$ owning $i$
-is not fully corrupted and IdP is honest (in $S^j$).}
+In detail, we assume: \emph{There exists an \uppresso web 
+system $\uppressoauthwebsystem$, a run $\rho$ of 
+$\uppressoauthwebsystem$, a state $s_j = (S^j, E^j, N^j)$ 
+in $\rho$, a RP $r\in \fAP{RP}$ that is honest in $S^j$, 
+an RP service token of the form $\myangle{nonce, Acct}$
+recorded in $S^j(r).\str{serviceTokens}$ and derivable from 
+the attackers knowledge in $S^j$ (i.e., $Acct \in
+d_{\emptyset}(S^j(\fAP{attacker}))$), and the browser $b$ 
+owning $i$ is not fully corrupted and IdP is honest 
+(in $S^j$).}
 
-We now proceed to proof that this is a contradiction. Let $I$ be the honest IdP. 
-As such, it never leaks its signing key (see Algorithm~\ref{alg:idp}). Therefore, 
-the signed subterm $\mi{Content} := \myangle{PID_{rp}, PID_u}$, 
+We now proceed to proof that this is a contradiction. 
+First, we can see that for $\an{n, Acct}$ and $s_j$, 
+the conditions in Lemma~\ref{lemma:uppresso-request-exists} 
+are fulfilled, i.e., a service token request $m$ and a 
+service token response $m'$ to/from $r$ exist, and $m'$ is 
+of form shown in Lemma~\ref{lemma:uppresso-request-exists} (4).
+Let $I := \mapGovernor(Acct)$. 
+We know that $I$ is an honest IdP.
+As such, it never leaks its signing key (see Algorithm~\ref{alg:idp}). 
+Therefore, the signed subterm $\mi{Content} := 
+\myangle{PID_{rp}, PID_u}$, 
 $\mi{ver} := \sig{\an{PID_{rp},PID_u}}{k_{sign}}$ and 
-$\mi{IDToken} := \myangle{\mi{Content}, \mi{ver}}$ had to be created by the IdP $I$.  
-An (honest) IdP creates signatures only in Line~\ref{line:sign-token} of Algorithm~\ref{alg:idp}.
+$\mi{IDToken} := \myangle{\mi{Content}, \mi{ver}}$ had to be 
+created by the IdP $I$. An (honest) IdP creates signatures 
+only in Line~\ref{line:sign-token} of Algorithm~\ref{alg:idp}.
 
 \begin{lemma} %(Same as Lemma 4 in SPRESSO) 
   Under the assumption above, only the browser b can issue a request $req$
@@ -1169,22 +1282,22 @@ parties leak it to any corrupted party or the attacker.
 Above proofs can be reduced to the {\color{blue}Confidentiality and Integrity 
 Properties}, simply described as the {\color{blue} Theorem 3 and 4} in section 5.2.
 
-Now we need also guarantee that $\fAP{attacker} \in \mathsf{Net}$ has no other way
-to generate the IDToken. This can be simply proved by the {\color{blue} Theorem 1} 
-in section 5.2, as the {\color{blue} RP Designation Property}.
+%Now we need also guarantee that $\fAP{attacker} \in \mathsf{Net}$ has no other way
+%to generate the IDToken. This can be simply proved by the {\color{blue} Theorem 1} 
+%in section 5.2, as the {\color{blue} RP Designation Property}.
 
-%These proofs are enough for SPRESSO system to show its security, however, they are not enough for UPPRESSO.
-%So far, the proofs only guarantee that the $IDToken$ must be sent to the target RP.
-%In SPRESSO, as the $tag$ can be only decrypted to unique $Domain$, the target RP must be the honest RP (the target of an adversary).
-%However, in UPPRESSO, while an RP receives an $IDToken$, he may try to use this token to login another honest RP, as long as he can find the $t^{adversary}$ satisfied $IDToken.PID_{RP} \equiv [t^{adversary}]ID_{RP}^{honest}$.
-%Therefore, the following Lemma should be proved.
+These proofs are enough for SPRESSO system to show its security, however, they are not enough for UPPRESSO.
+So far, the proofs only guarantee that the $IDToken$ must be sent to the target RP.
+In SPRESSO, as the $tag$ can be only decrypted to unique $Domain$, the target RP must be the honest RP (the target of an adversary).
+However, in UPPRESSO, while an RP receives an $IDToken$, he may try to use this token to login another honest RP, as long as he can find the $t^{adversary}$ satisfied $IDToken.PID_{RP} \equiv [t^{adversary}]ID_{RP}^{honest}$.
+Therefore, the following Lemma should be proved.
 
-%\begin{lemma}
-%The $t^{adversary}$ is not derivable from the attackers knowledge in $S^j$ (i.e., $\langle IDToken$, $Acct \rangle \in d_{\emptyset}$($S^j$($\mathtt{attacker}$))), which satisfies that $IDToken.PID_{RP} \equiv [t^{adversary}]ID_{RP}^{honest}$.
-%\end{lemma}
-%\begin{proof}
-%This Lemma can be proved by the {\color{blue} Theorem 1} in section 5.2, as the {\color{blue} RP Designation Property}.
-%\end{proof}
+\begin{lemma}
+The $t^{adversary}$ is not derivable from the attackers knowledge in $S^j$ (i.e., $\langle IDToken$, $Acct \rangle \in d_{\emptyset}$($S^j$($\mathtt{attacker}$))), which satisfies that $IDToken.PID_{RP} \equiv [t^{adversary}]ID_{RP}^{honest}$.
+\end{lemma}
+\begin{proof}
+This Lemma can be proved by the {\color{blue} Theorem 1} in section 5.2, as the {\color{blue} RP Designation Property}.
+\end{proof}
 
 Therefore, there is a contradication to the assumption, where we assumed that 
 $Acct \in d_{\emptyset}(S^j(\fAP{attacker}))$. 
@@ -1249,7 +1362,7 @@ For every $IDToken$ uploaded by honest $b$ during authentication, the honest $r 
 
 With the above proofs, we now can guarantee that every $\uppressoauthwebsystem$ system satisfies the requirements in Definition~\ref{def:B}, therefore $\uppressoauthwebsystem$ must be secure of Property B.
 
-\section{Proof of Privacy}
+\section{Proof of Privacy against IdP-based Login Tracing}
 
 In our privacy analysis, we show that an identity provider in UPPRESSO cannot learn 
 where its users log in. We formalize this property as an indistinguishability 
@@ -1367,9 +1480,8 @@ be a configuration of $\uppressoprivwebsystem_2$.
   Let $t$ and $t'$ be terms. We call $t_1$ and $t_2$
   \emph{term-equivalent under a set of proto-tags $\theta$} iff there
   exists a term $\tau \in \terms(\{x_1,\dots,x_l\})$ such that
-  $t_1 = (\tau [ a_1 / x_1 , \dots , a_l / x_l ])[ \mi{dr}_1 / y ]$
-  and
-  $t_2 = (\tau [ a_1 / x_1 , \dots , a_l / x_l ])[ \mi{dr}_2 / y ]$.
+  $t_1 = (\tau [ a_1 / x_1 , \dots , a_l / x_l ])[ ID_{\mi{dr}_1} / R ]$ and
+  $t_2 = (\tau [ a_1 / x_1 , \dots , a_l / x_l ])[ ID_{\mi{dr}_2} / R ]$.
   We write $t_1 \prototagequiv{\theta} t_2$.
 
   We say that two finite sets of terms $D$ and $D'$ are
@@ -1382,17 +1494,151 @@ be a configuration of $\uppressoprivwebsystem_2$.
 \end{definition}
 
 \begin{definition}[Equivalence of HTTP Requests]
+  Let $m_1$ and $m_2$ be (potentially encrypted) HTTP requests and
+  $\theta = \{a_1, \ldots, a_l \}$ be a finite set of proto-tags. 
+  We call $m_1$ and $m_2$ \emph{$\delta$-equivalent under a set of proto-tags $\theta$} 
+  iff $m_1 \prototagequiv{\theta} m_2$ or all subterms are equal with the following exceptions:
+  \begin{enumerate}
+  \item the Host value and the Origin/Referer headers in both requests
+    are the same except that the domain $\mi{dr}_1$ in $m_1$ can be
+    replaced by $\mi{dr}_2$ in $m_2$,
+  \item the HTTP body $g_1$ of $m_1$ and the HTTP body $g_2$ of $m_2$
+    are (I) term-equivalent under $\theta$, (II) for $j\in \{1,2\}$ if
+    $g_j[\str{IDToken}] \sim \myangle{PID_{dr_j}, [*]PID_{dr_j}, 
+    \sig{\myangle{PID_{dr_j}, [*]PID_{dr_j}}}{*}}$
+    and the origin (HTTP header) of HTTP message in $m_j$ is
+    $\an{\mi{dr}_j,\https}$ then the receiver of this message is
+    $r_j$, and (III) if $g_1$ contains a dictionary key
+    $\str{loginSessionToken}$ then there exists an $l' \in L$ such
+    that $g_1[\str{loginSessionToken}] \equiv l'$, and
+  \item if $m_1$ is an encrypted HTTP request then and only then $m_2$
+    is an encrypted HTTP request and the keys used to encrypt the
+    requests have to be the correct keys for $\mi{dr}_1$ and
+    $\mi{dr}_2$ respectively.
+  \end{enumerate}
+  We write $m_1 \httptagequiv{\theta} m_2$.
 \end{definition}
 
 \begin{definition}[Extracting Entries from Login Sessions]
+  Let $t_1$, $t_2$ be dictionaries over $\nonces$ and $\terms$,
+  $\theta$ be a finite set of proto-tags, and $d$ a domain. We call
+  $t_1$ and $t_2$ \emph{$\eta$-equivalent} iff $t_2$ can be
+  constructed from $t_1$ as follows: For every proto-tag
+  $a \in \theta$, we remove the entry identified by the dictionary key
+  $i$ for which it holds that $\proj{4}{t_1[i]} \equiv a[ID_r/ R]$, if
+  any. We denote the set of removed entries by $D$. We write
+  $\logsessminus{t_1}{t_2}{\theta}{r}{D}$.
 \end{definition}
 
-\begin{definition}[Login Session Token]
+\begin{definition}
+  Let $a$ be a proto-tag, $S_1$ and $S_2$ be states of \uppresso web
+  systems for privacy analysis, and $l$ a nonce. We call $l$ a login
+  session token for the proto-tag $a$, written
+  $l \in \mathsf{loginSessionTokens}(a,S_1,S_2)$ iff for any
+  $i \in \{1,2\}$ and any $j \in \{1,2\}$ we have that
+  $\proj{4}{S_i(r_j).\str{loginSessions}[l]} = a[ID_{dr_j}/ R]$.
 \end{definition}
 
-\begin{definition}[Equivalence of States]
-  \label{def:C}
-  Same as Definition 79 in SPRESSO except that the first condition in Definition 79 in SPRESSO is not applicable.
+\begin{definition}[Equivalence of States]\label{def:eq-of-states}
+  Let $\theta$ be a set of proto-tags and $H$ be a set of nonces. 
+  Let $T:=\{t\mid [t]R\in \theta\}$. 
+  We call $S_1$ and $S_2$ \emph{$\gamma$-equivalent under $(\theta, H)$} 
+  iff the following conditions are met:
+  \begin{enumerate}
+  \item\label{eqs:dns} $S_1(\fAP{dns}) = S_2(\fAP{dns})$, and
+  \item\label{eqs:r1} $S_1(\fAP{r_1})$ equals $S_2(\fAP{r_1})$ except
+    for the subterms $\str{loginSessions}$ and $\str{serviceTokens}$, and
+  \item\label{eqs:r2} $S_1(\fAP{r_2})$ equals $S_2(\fAP{r_2})$ except
+    for the subterms $\str{loginSessions}$ and $\str{serviceTokens}$, and
+  \item\label{eqs:logsess} for two sets of terms $D$ and $D'$:
+    $\logsessminus{S_1(\fAP{r_1}).\str{loginSessions}}{S_2(\fAP{r_1}).\str{loginSessions}}{\theta}{\mi{dr}_1}{D}$,
+    $\logsessminus{S_2(\fAP{r_2}).\str{loginSessions}}{S_1(\fAP{r_2}).\str{loginSessions}}{\theta}{\mi{dr}_2}{D'}$,
+    and $D \prototagequiv{\theta} D'$, and
+  \item\label{eqs:att-not-t} $\forall t \in T$:
+    $t \not\in d_\emptyset(\bigcup_{i \in \{1,2\},\ A\, \in\, \mathsf{Web}\, \cup \,
+    \mathsf{Net}\, 
+    %\cup\, \{\mathsf{dns}, \mathsf{fwd}
+    \}}S_i(A))$
+  \item\label{eqs:att} for each attacker $A$:
+    $S_1(A) \prototagequiv{\theta} S_2(A)$, and
+  \item\label{eqs:att-not-l} for all $a\in\theta$ and all attackers $A$ we have that
+    $\nexists\ l \in \mathsf{loginSessionTokens}(a,S_1,S_2)$ such that
+    $l$ is a subterm of $S_1(A)$ or $S_2(A)$.
+  \item\label{eqs:b} $S_1(b_1)$ equals $S_2(b_2)$ except for for the
+    subterms $\str{challenge}$, $\str{windows}$
+    %, $\str{pendingDNS}$, $\str{pendingRequests}$ 
+    and we have that
+    \begin{enumerate}
+    \item \label{eqs:b:challenge}
+      $S_1(b_1).\str{challenge} = \mi{dr}_1 \wedge
+      S_2(b_2).\str{challenge} = \mi{dr}_2$
+      or $S_1(b_1).\str{challenge} = S_2(b_2).\str{challenge} = \bot$,
+      and
+    \item $S_1(b_1).\str{windows}$ equals $S_2(b_2).\str{windows}$ with
+      the exception of the subterms $\str{location}$, $\str{referrer}$,
+      $\str{scriptstate}$, and $\str{scriptinputs}$ of some document terms
+      pointed to by $\mathsf{Docs}^+(S_1(b_1)) = \mathsf{Docs}^+(S_2(b_2)) =: J$. 
+      For all $j \in J$ we have that: \label{eqs:b:w}
+      \begin{enumerate}
+      \item there is no $t \in T$ such that
+        \begin{align*}
+          t \in d_{\nonces \setminus \{t\}}(\{&S_1(b_1).j.\str{location}
+          ,  S_2(b_2).j.\str{location},\\ & S_1(b_1).j.\str{referrer} , 
+          S_2(b_2).j.\str{referrer}\})
+        \end{align*}
+      \item\label{eqs:b:w:script_rp} if
+        $S_1(b_1).j.\str{origin} \in \{\an{\mi{dr}_1, \https},\an{\mi{dr}_2, \https}\}$
+        then $S_1(b_1).j.\str{script} \equiv \str{script\_rp}$ and \
+        \begin{enumerate}
+        \item $S_1(b_1).j.\str{location}$ and $S_2(b_2).j.\str{location}$
+          are term-equivalent under $\theta$ except for the host part,
+          which is either equal or $\mi{dr}_1$ in $b_1$ and $\mi{dr}_2$ in
+          $b_2$, and
+        \item $S_1(b_1).j.\str{referrer}$ and $S_2(b_2).j.\str{referrer}$
+          are term-equivalent under $\theta$ except for the host part,
+          which is either equal or $\mi{dr}_1$ in $b_1$ and $\mi{dr}_2$ in
+          $b_2$, and
+        \item
+          $S_1(b_1).j.\str{scriptstate} \prototagequiv{\theta}
+          S_2(b_2).j.\str{scriptstate}$ and if $\exists\, l \in L$ such that $l$ is a subterm of $S_1(b_1).j.\str{scriptstate}$, then $S_1(b_1).j.\str{location}.\str{host} \equiv \mi{dr}_1$ and $S_2(b_2).j.\str{location}.\str{host} \equiv \mi{dr}_2$, and
+        \item if $\exists\, l \in L$ such that $l$ is a subterm of
+          $S_1(b_1).j.\str{scriptinputs}$, then
+          $S_1(b_1).j.\str{location}.\str{host} \equiv \mi{dr}_1$ and
+          $S_2(b_2).j.\str{location}.\str{host} \equiv \mi{dr}_2$, and
+        \end{enumerate}
+      \item\label{eqs:b:w:att_script} if
+        $S_1(b_1).j.\str{origin} \not\in
+        \{\an{\mi{dr}_1,\https},\an{\mi{dr}_2,\https}\}$
+        then $S_1(b_1).j.\str{script} \equiv \str{script\_idp}$ and \
+        \begin{enumerate}
+        \item
+          $S_1(b_1).j.\str{location} \prototagequiv{\theta}
+          S_2(b_2).j.\str{location}$, and
+        \item
+          $S_1(b_1).j.\str{referrer} \prototagequiv{\theta}
+          S_2(b_2).j.\str{referrer}$, and
+        \item
+          $S_1(b_1).j.\str{scriptstate} \prototagequiv{\theta}
+          S_2(b_2).j.\str{scriptstate}$, and
+        \item
+          $S_1(b_1).j.\str{scriptinputs} \prototagequiv{\theta}
+          S_2(b_2).j.\str{scriptinputs}$, and
+        \item 
+          $\forall t \in T$: $t$ is not contained in any subterm of 
+          $S_1(b_1).j.\str{scriptstate}$ except for 
+          $S_1(b_1).j.\str{scriptstate}.\mi{parameters}[\str{t}]$, and
+        \item $\nexists\, l \in L$ such that $l$ is a subterm of
+          $S_1(b_1).j.\str{scriptstate}$ or of
+          $S_1(b_1).j.\str{scriptinputs}$, and
+        \end{enumerate}
+      \end{enumerate}
+    \item\label{eqs:b:misc} for
+      $x \in \{\str{cookies},\str{localStorage},\str{sessionStorage},\str{sts}\}$
+      we have that $S_1(b_1).x \prototagequiv{\theta} S_2(b_2).x$. For the
+      domains $\mi{dr}_1$ and $\mi{dr}_2$ there are no entries in the
+      subterms $x$.
+    \end{enumerate}
+  \end{enumerate}
 \end{definition}
 
 \begin{definition}[Equivalence of Events]
@@ -1401,6 +1647,13 @@ be a configuration of $\uppressoprivwebsystem_2$.
 \end{definition}
 
 \begin{definition}[Equivalence of Configurations]
+  We call $(S_1,E_1,N_1)$ and $(S_2,E_2,N_2)$
+  \emph{$\alpha$-equivalent} iff there exists a set of proto-tags
+  $\theta$ and a set of nonces $H$ such that $S_1$ and $S_2$ are
+  $\gamma$-equivalent under $(\theta,H)$, $E_1$ and $E_2$ are
+  $\beta$-equivalent under $(\theta,L,H)$ for
+  $L := \bigcup_{a\in\theta} \mathsf{loginSessionTokens}(a,S_1,S_2)$,
+  and $N_1 = N_2$.
 \end{definition}
 
 \subsection{Privacy Proof}
@@ -1478,8 +1731,69 @@ We now show that if two configurations are $\alpha$-equivalent, then the view of
   \end{itemize}
 \end{proof}
 
+\section{Proof of Privacy against RP-based Identity Linkage}
+
+\subsection{Formal Model of UPPRESSO for Privacy Analysis}
+
+\begin{definition}[Challenge IdP]
+  Let $\mi{dr}$ some domain and 
+  $idp(\myangle{\mi{dr}_1, \mi{dr}_2, u})$ a DY process. 
+  We call it a \emph{challenge IdP} iff $b$
+  is defined exactly the same as a identity server with two 
+  exceptions: (1) the state contains one more property, 
+  namely $\mi{challenge}$, which initially contains the term 
+  $\top$. 
+  (2) The IdP's algorithm is modified by the following at 
+  line~\ref{line:uppresso-idp-set-pidu} in 
+  algorithm~\ref{alg:idp}: It is checked if the login 
+  request $m$ is addressed to the domain $\mi{dr}_1$ 
+  If $m$ is addressed to this domain, then the $PID_u$ is 
+  generated using the given $u$.
+  It is also checked if the login request $m$ is addressed 
+  to the domain $\mi{dr}_2$ and no other message $m'$ was 
+  addressed to this domain before (i.e., $\mi{challenge} 
+  \not\equiv \bot$), then the $PID_u$ is generated using 
+  the given $u$ and $\mi{challenge}$ is set to $\bot$ to 
+  recorded that a message was addressed to $\mi{dr}_2$.
+\end{definition}
+
+\begin{definition}[\uppresso Web System for Privacy Analysis]\label{def:uppresso-ws-priv}
+  Let $\uppressowebsystem = (\bidsystem, \scriptset, 
+  \mathsf{script}, E^0)$ be an UPPRESSO web system with 
+  $\bidsystem = \mathsf{Hon} \cup \mathsf{Web} \cup 
+  \mathsf{Net}$, 
+  $\mathsf{Hon} = \fAP{B} \cup \fAP{RP} \cup \fAP{IDP}$.
+  (as described in Appendix~\ref{app:outlineuppressomodel}).
+  $\fAP{B} = \{b_1,b_2\}$, $b_1$ is honest and $b_2$ is 
+  malicious and they both own some identities. 
+  $\fAP{RP} = \{r_1,r_2\}$, $r_1$ and $r_2$ two (malicious) 
+  relying parties, 
+  Let $\fAP{attacker} = \{b_2\} \cup \{r_1,r_2\}$ be some 
+  web attacker.
+  Let $\mi{dr}_1$ be the domain of $r_1$, $\mi{dr}_2$ be the 
+  domain of $r_2$ and $u_{idp}$ be an identity owned only by
+  IdP, then $idp_c = idp(\myangle{\mi{dr}_1, \mi{dr}_2, 
+  u_{idp}})$ is a challenge IdP. 
+  Let $\mathsf{Hon}' := \fAP{B} \cup \{idp_c\}$, 
+  $\mathsf{Web}' := \mathsf{Web}$, 
+  and $\mathsf{Net}' := \emptyset$ 
+  (i.e., there is no network attacker).
+  Let $\bidsystem' := \mathsf{Hon}' \cup \mathsf{Web}' \cup 
+  \mathsf{Net}'$.  
+  Let $\scriptset' := \scriptset \setminus 
+  \{\str{script\_rp}\}$ and $\mathsf{script}'$ be accordingly.
+  We call $\uppressoprivwebsystem(\mi{dr}_1, \mi{dr}_2, 
+  u_{idp}) = (\bidsystem', \scriptset', \mathsf{script}', 
+  E^0, \fAP{attacker})$ an \emph{\uppresso web system for 
+  privacy analysis} 
+  iff the domain $\mi{dr}_1$ the only domain assigned to 
+  $r_1$, and $\mi{dr}_2$ the only domain assigned to $r_2$. 
+  All honest parties (in $\mathsf{Hon}$) are not corruptible, 
+  i.e., they ignore any $\str{CORRUPT}$ message. Relying 
+  Parties and some browsers are assumed to be dishonest, 
+  and hence, are subsumed by the web attackers.
+\end{definition}
+
 \bibliographystyle{abbrv}
 \bibliography{../ref}
 \end{document}
-
-
