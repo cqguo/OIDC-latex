@@ -95,7 +95,7 @@ Otherwise, two colluding RPs with $ID_{RP_j} = [r]G$ and $ID_{RP_{j'}} = [r']G$ 
 \label{sec:web-design}
 
 In commonly-used SSO protocols \cite{OpenIDConnect,rfc6749, SAML, SAMLIdentifier},
-an IdP needs to know the visited RP to ensure the \emph{confidentiality} of identity tokens. For instance, in OIDC services, an RP's endpoint to receive tokens is stored as the \verb+redirect_uri+ parameter at the IdP.
+an IdP needs to know the visited RP to ensure the confidentiality of identity tokens. For instance, in OIDC services, an RP's endpoint to receive tokens is stored as the \verb+redirect_uri+ parameter at the IdP.
 The IdP employs HTTP 302 redirection to send identity tokens to the RP, by setting this parameter as the target URL in the HTTP responses to a user's identity-token request \cite{OpenIDConnect}, so the user agent forwards it to the designated RP.
 However, in \usso, the IdP does not know about the visited RPs, requiring a user agent by itself to calculate $PID_{RP}$ and send identity tokens to the RP's endpoint.
 %In UPPRESSO, the IdP is not aware of visited RPs, so user agents (or browsers) are responsible for forwarding the identity token to the intended RP and computing $PID_{RP}$. On the contrary, in commonly-used SSO protocols \cite{OpenIDConnect,rfc6749,SAML,SAMLIdentifier}, the IdP requires this information to ensure the \emph{confidentiality} of identity tokens. For instance, in OIDC services, an RP's endpoint URL is set as the \verb+redirect_uri+ parameter \cite{OpenIDConnect} during registration to receive tokens. When transmitting identity tokens to an RP, the IdP employs HTTP 302 redirection. This endpoint is the target URL in HTTP responses, allowing the browser to forward it to the designated RP.
@@ -180,7 +180,7 @@ The RP verifies $Cert_{RP}$ using $PK$, and accepts $ID_{RP}$ and $Cert_{RP}$ if
 Each user registers once at the IdP. She sets up her unique username and the corresponding credential.
 The IdP will then assign
 a unique random identity $ID_U = u \in [1, n)$ to the user.
-$ID_U$ is known only to the IdP.
+$ID_U$ is known only to the IdP internally.
 %This is similar to the steps in existing SSO systems.
 
 
@@ -269,7 +269,7 @@ The RP receives the identity token and authorizes the user to log in.
 \item [4.1]
 The IdP script forwards the identity token to the RP script,
     which then sends it to the RP through $Enpt_{RP}$.
-\item[4.2] The RP verifies the signature and the validity period of the identity token 
+\item[4.2] The RP verifies the digital signature and the validity period of the token 
 %\newc
 %Then, the RP extracts $PID_{RP}$ from the token, checks if it equals $[t]ID_{RP}$,
 %\oldc
@@ -282,7 +282,7 @@ and calculates $Acct = [t^{-1}]{PID_U}$.
 
 If any verification fails, this flow will be terminated immediately.
 For example, the user halts it when receiving an invalid $Cert_{RP}$.
-The IdP rejects an identity-token request in Step 3.3 if the received $PID_{RP}$ is not a point on $\mathbb{E}$, and the RP rejects an identity token in Step 4.2 if the signature is invalid. 
+The IdP rejects an identity-token request in Step 3.3 if the received $PID_{RP}$ is not a point on $\mathbb{E}$, and the RP rejects a token in Step 4.2 if the digital signature is invalid. 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % u泄露，则RP有必要比较！否则，就会伤害security。
 %or the enclosed $PID_{RP}$ is not equal to $[t]ID_{RP}$.

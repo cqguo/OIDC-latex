@@ -11,11 +11,17 @@ Non-anonymous SSO services \cite{OpenIDConnect,rfc6749,SAML,SAMLIdentifier,NIST2
 by presenting \emph{identity tokens} issued by a \emph{trusted} IdP.
 To achieve this goal, the trusted IdP issues an identity token that specifies the RP being accessed (i.e., \emph{RP designation}) and the authenticated user's identity or pseudo-identity (i.e., \emph{user identification}).
 An honest RP verifies the RP's identity in the identity token before accepting it and authorizes the token holder to log in as the specified user. This prevents malicious RPs from replaying any received identity tokens to gain unauthorized access to other honest RPs as victim users.
-The \emph{confidentiality} and \emph{integrity} of identity tokens are also necessary to prevent eavesdropping and tampering. Identity tokens are forwarded to the target RPs by the authenticated user and should not be revealed to any other parties. So they are usually signed by the trusted IdP and transmitted over HTTPS \cite{OpenIDConnect, rfc6749, SAML}.
+The confidentiality and integrity of identity tokens are also necessary to prevent eavesdropping and tampering. Identity tokens are forwarded to the target RPs by the authenticated user and should not be revealed to any other parties. So they are usually signed by the trusted IdP and transmitted over HTTPS \cite{OpenIDConnect, rfc6749, SAML}.
 
-The requirements for secure SSO services, i.e., RP designation, user identification, integrity, and confidentiality of identity tokens, have been extensively studied \cite{ArmandoCCCT08, SPRESSO, FettKS14, FettKS16, FettKS17}.
-Any vulnerabilities that undermine these properties result in various attacks \cite{SomorovskyMSKJ12, WangCW12, ArmandoCCCPS13, ZhouE14, WangZLLYLG15, WangZLG16, YangLLZH16, MainkaMS16, MainkaMSW17, YangLCZ18, YangLS17, ShiWL19, ChenPCTKT14, ccsSunB12, DiscoveringJCS, dimvaLiM16, CaoSBKVC14, TowardsShehabM14}.
-%An SSO system satisfying these four properties is secure.
+\begin{figure}[b]
+  \centering
+  \includegraphics[width=0.99\linewidth]{fig/IDCorrelation.pdf}
+  \caption{Identity transformations in \usso} %privacy-preserving SSO}
+  \label{fig:IDCorrelation}
+\end{figure}
+
+%The requirements for secure SSO services, i.e., RP designation, user identification, integrity, and confidentiality of identity tokens, have been extensively studied \cite{ArmandoCCCT08, SPRESSO, FettKS14, FettKS16, FettKS17}.
+%Any vulnerabilities that undermine these properties result in various attacks \cite{SomorovskyMSKJ12, WangCW12, ArmandoCCCPS13, ZhouE14, WangZLLYLG15, WangZLG16, YangLLZH16, MainkaMS16, MainkaMSW17, YangLCZ18, YangLS17, ShiWL19, ChenPCTKT14, ccsSunB12, DiscoveringJCS, dimvaLiM16, CaoSBKVC14, TowardsShehabM14}.
 
 \subsection{Identity Transformation}
 \label{subsec:solutions}
@@ -24,7 +30,7 @@ We aim to develop a privacy-preserving SSO system that ensures security properti
 In \usso, these requirements are satisfied through \emph{transformed identities} in the identity tokens. Table \ref{tbl:notations-dilemma} lists the notations used in this paper.
 The subscript $j$ and/or the superscript $i$ may be ignored if it does not cause ambiguity.
 
-\begin{table}[htb]
+\begin{table}[tb]
 \footnotesize
     \caption{The (pseudo-)identities in \usso}
     \centering
@@ -60,13 +66,6 @@ Finally, to prevent RP-based identity linkage,
 %a user pseudo-identity (i.e., $PID_U$) is bound instead:
 %$PID_U$ is bound in identity tokens:
 the RP should not obtain any information about $ID_U$ from any $PID_{U,j}$, which implies that $PID_{U,j}$ for different RPs should also be independent of each other.
-
-\begin{figure}[bt]
-  \centering
-  \includegraphics[width=0.99\linewidth]{fig/IDCorrelation.pdf}
-  \caption{Identity transformations in \usso} %privacy-preserving SSO}
-  \label{fig:IDCorrelation}
-\end{figure}
 
 We propose three identity transformations as below:
 \vspace{-\topsep}\begin{itemize}

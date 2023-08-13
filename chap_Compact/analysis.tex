@@ -50,11 +50,11 @@ It is worth noting that these guarantees are proved against different adversarie
 \subsection{Security}
 \label{analysis-security}
 
-\newc
-Based on the threat model in Section \ref{subsec:threatmodel}, the adversary against security w.r.t. authentication \cite{FettKS14,BrowserID,SPRESSO} compromises some users, colludes with malicious RPs, and attempts to (\emph{a}) impersonate an honest user to log into an honest RP (i.e., \emph{impersonation}), and (\emph{b}) intrude the login of an honest user to an honest RP so that the honest user is authenticated as another user (i.e., \emph{identity injection}). 
+Based on the threat model in Section \ref{subsec:threatmodel}, the adversary against security w.r.t. authentication \cite{FettKS14,BrowserID,SPRESSO} compromises some users, colluding with malicious RPs, and attempts to (\emph{a}) impersonate an honest user to log into an honest RP (i.e., \emph{impersonation}), or (\emph{b}) break the login of an honest user to an honest RP so that the honest user is authenticated as another user (i.e., \emph{identity injection}). 
 
 %could collude with each other and even with malicious RPs, attempting to (\emph{a}) impersonate an honest user to log into an honest RP or (\emph{b}) entice an honest user to log into an honest RP under a malicious user's account.
 
+\newc
 For the analysis of security w.r.t. authentication, we develop a formal model of \usso\ web systems (denoted as $\mathcal{U\!W\!S}^{Auth}$), which is defined in Appendix \ref{appendix-model}. It contains an IdP, a finite set of RPs, a finite set of users (i.e., browsers), and a network attacker. The attacker subsumes all web attackers and is assumed to be able to  corrupt a set of users and RPs.
 
 
@@ -216,29 +216,42 @@ Secondly, the attacker presents $TK$ to $RP'$ in the system, where $ID_{RP'} = [
 % As all the communications between the IdP, RPs, and users are protected by HTTPS and two scripts communicate with each other through restricted \verb+postMessage+ HTML5 channels, according to the conclusions of the \dyu\ model, the identity tokens cannot be leaked to any other entities. \hfill $\square$
 
 %--- End of Theorem 4 and 5
+\oldc
 
 \subsection{Privacy against IdP-based Login Tracing}
 \label{subsec:IdP-privacy}
 
-As depicted in the threat model in Section \ref{subsec:threatmodel}, the IdP would attempt to infer the RP's identity visited by a user. Since the IdP in \usso\ is considered \emph{honest-but-curious}, it can only collect information from the login requests and/or login sessions to infer the RPs' identities but cannot tamper with the authentication process or deviate from the SSO protocol.
+As depicted in Section \ref{subsec:threatmodel}, the IdP would attempt to infer the RP's identity visited by a user. Since the IdP is considered \emph{honest-but-curious}, it only collects information from the login requests to infer the visited RPs' identities but does not tamper with the authentication process or deviate from the SSO protocol.
+The curious IdP does not collude with others.
 
+\newc
 To show \usso\ preventing such \emph{IdP-based login tracing}, we first prove that in $\mathcal{UWS}^{Auth}$, the IdP cannot obtain any information related to the target RP in each login (e.g., $ID_{RP}$, $t$, RP's $EndPoint$) except its \emph{ephemeral} pseudo-identity $PID_{RP}$ (with Property {\bf C1}). Then, we prove in Theorem \ref{thm-idp-untraceability} that with these $PID_{RP}$s in the identity token requests from the users, the IdP cannot (\emph{a}) associate multiple logins to the same RP, or (\emph{b}) distinguish a login to one RP from other logins to another RP, because $PID_{RP}$ is \emph{indistinguishable} from any random variables to the IdP. So, \usso\ prevents \emph{an honest-but-curious IdP} from tracing a user's login activities.
 
-\begin{thm}
+\begin{lemma}
 \textsc{(IdP Untraceability)} \emph{In \usso, the IdP cannot distinguish $PID_{RP} = [t]ID_{RP}$ from a random variable on $\mathbb{E}$, where $t$ is random in $\mathbb{Z}_n$.}
-\label{thm-idp-untraceability}
-\end{thm}
+\label{lemma-idp-untraceability}
+\end{lemma}
 
 \noindent\textbf{\textsc{Proof.}}
 Consider a finite cyclic group $\mathbb{E}$ where the number of points on $\mathbb{E}$ is $n$.
 Because $G$ is a generator of order $n$, $ID_{RP} = [r]G$ is also a generator on $\mathbb{E}$ of order $n$. %According to the formal model in Appendix \ref{appendix-model}, 
 $t$ is randomly chosen in $\mathbb{Z}_n$ and always kept unknown to the IdP. Therefore, $PID_{RP} = [t]ID_{RP}$ is \emph{indistinguishable} from a point $Q$ that is randomly chosen on $\mathbb{E}$ \cite{oprf-proved,voprf-proved}.\footnote{\newc This property has been actually proved in OPRFs \cite{oprf-proved,voprf-proved}, where the OPRF server works similarly to the IdP and learns \emph{nothing} about a client's inputs or outputs of the evaluated pseudo-random function.} \hfill $\square$
 
+\oldc
+
 \subsection{Privacy against RP-based Identity Linkage}
 \label{subsec:RP-privacy}
 
-As depicted in the threat model, malicious RPs aim to infer the identities of honest users. To do so, they may attempt to (1) steal the user's identity $ID_U$ directly, (2) steal information from or tamper with pseudo-identity transformations in login sessions, or (3) associate the pseudo-identities of an honest user that are used in her logins to multiple malicious RPs. 
+As depicted in the threat model, malicious RPs,
+which could collude with some malicious users,
+aim to infer the identities of honest users
+    or link an honest user's accounts across these RPs.
+They attempt to (1) steal the user's identity $ID_U$ directly,
+% (2) steal information from or tamper with pseudo-identity transformations in login sessions,
+ or (2) link the pseudo-identities of an honest user that are used in her logins to multiple malicious RPs. 
 
+
+\newc
 In each login, an RP obtains \emph{only} a random number $t$ and an identity token enclosing $PID_{RP}$ and $PID_U$. From the token, it learns only an ephemeral pseudo-identifier $PID_{U} = [{ID_U}]{PID_{RP}}$ of the user, from which it deduces a permanent pseudo-identifier $Acct = [ID_U]ID_{RP}$. However, it cannot derive $ID_U$ from $PID_{U}$ or $Acct$ as it is an ECDLP hard problem.
 
 Next, we show that, with Property {\bf C1}, \usso\ prevents malicious RP(s) from reading or altering the identity token request sent by the IdP script that runs in an honest browser to the IdP. Therefore, the RP obtains no knowledge about the user identity $ID_U$. Meanwhile, following the formal model in Appendix \ref{appendix-model}, we see that the RP script running in an honest browser is always honest, no matter if the RP would be corrupted at a later time or not. A script download from a malicious RP would not be installed by an honest user. 
