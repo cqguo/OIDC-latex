@@ -231,13 +231,6 @@ The set $K_\text{point}$ will be used to generate identities of $\fAP{B}$ and $\
 The set $\RPSecrets$ is the set of passwords (secrets) 
 the browsers share with the identity providers. 
 
-\subsection{Identities}\label{app:uppresso-identities}
-There are many different types of identities in UPPRESSO, 
-We denote the identity of the broswer at the IdP with $u$,
-the identity of the relying party at the IdP with $r$ and 
-the identity of the broswer at the relying party with $acct$.
-The details are defined below.
-
 %用户的id表示：<id, username, idp-domain, <acct1, rp1-domain>, <acct2, rp2-domain>, <acct3, rp3-domain>, ...>
 %RP的id表示:，<id, rp-commonname, idp-domain>
 
@@ -245,47 +238,37 @@ The details are defined below.
 %def2.用户的account：<<acct1, rp1-domain>, <acct2, rp2-domain>, <acct3, rp3-domain>, ...>
 %def3.RP的id表示，<id, rp-commonname, idp-domain>
 
-\begin{definition}
-  An \emph{identity} $u$ is a term of the form 
-  $u=\an{\mi{id},\mi{username},\mi{domain_{idp}}}$ 
-  with $\mi{id}\in N$, $\mi{username}\in \mathbb{S}$ and $\mi{domain_{idp}} \in \dns$.
+%直接使用password
+\subsection{Identities}\label{app:uppresso-identities}
+There are many different types of identities in UPPRESSO. 
+The first is browsers' identities at the IdP. Browsers share
+a $username\in\mathbb{S}$ with IdP to identify an user 
+uniquely, and not like SPRESSO, UPPRESSO doesn't need a 
+domain to identify the IdP.
 
-  %Let $\IDs$ be the finite set of identities. By $\IDs^y$ we denote
-  %the set $\{ \an{\mi{id},\mi{name},\mi{domain}} \in \IDs\,|\, \mi{domain}
-  %\in \mapDomain(y) \}$.
+By $\NToS:\mathbb{S} \to \RPSecrets$ we denote the bijective 
+mapping that assigns secrets to all usernames. 
 
-  %We say that an ID is \emph{governed} by the DY process to which the
-  %domain of the ID belongs. Formally, we define the mapping $\mapGovernor:
-  %\IDs \to \bidsystem$, $\an{\mi{id},\mi{name},\mi{domain}} \mapsto
-  %\mapDomain^{-1}(\mi{domain})$.
-\end{definition}
+Let $\mapPLItoOwner: \RPSecrets \to \fAP{B}$ denote the 
+mapping that assigns to each secret a browser that 
+\emph{owns} this secret. Now, we define the mapping 
+$\mapIDtoOwner: \mathbb{S} \to \fAP{B}$, $username \mapsto
+\mapPLItoOwner(\NToS(username))$, which assigns to each 
+identity the browser that owns this identity (we say that the 
+identity belongs to the browser).
 
-\begin{definition}
-  An \emph{identity} $r$ is a term of the form 
-  $r=\an{\mi{id},\mi{commonname},\mi{domain_{idp}}}$ 
-  with $\mi{id}\in K_{\text{point}}$, $\mi{commonname}\in \mathbb{S}$ and $\mi{domain_{idp}} \in \dns$.
-\end{definition}
+Besides, the browsers' identities also have IDs 
+$\mi{ID_u}:=u\in[1,n)$ which is only known to the IdP. By $\NToID:\mathbb{S} \to N$ we denote 
+the bijective mapping that assigns IDs to all usernames. 
 
-\begin{definition}
-  An \emph{identity} $acct$ is a term of the form 
-  $acct=\langle\an{\mi{acct}_1,\mi{domain_{rp_1}}},\an{\mi{acct}_2,\mi{domain_{rp_2}}}, \ldots\rangle \ .$ 
-  with $\mi{acct}_i\in K_{\text{point}}$, $\mi{domain_{rp_i}}\in \dns$.
-\end{definition}
+The second type of identities is relying parties' identities 
+at the IdP, which are IDs 
+$\mi{ID_{rp}}:=[r]G \in K_{\text{point}}$ in which $r\in[1,n)$ 
+is unknown to any party.
 
-Let $\IDs^u$ be the finite set of identities u.
-
-By $\mapIDtoPLI:\IDs^u \to \RPSecrets$ we denote the bijective mapping
-that assigns secrets to all identities. 
-
-Let $\mapPLItoOwner: \RPSecrets \to \fAP{B}$ denote the mapping that
-assigns to each secret a browser that \emph{owns} this secret. Now, we
-define the mapping $\mapIDtoOwner: \IDs^u \to \fAP{B}$, $i \mapsto
-\mapPLItoOwner(\mapIDtoPLI(i))$, which assigns to each identity the
-browser that owns this identity (we say that the identity belongs to
-the browser).
-
-To be concise, we usually use $u$ and $r$ to
-refer to $u.id$ and $r.id$ if we don't say they are identities or $u,r\in\IDs$
+The third type of identities is browsers' identities at the
+Relying Parties which is called $\mi{Acct} := [\mi{ID_u}]
+\mi{ID_{rp}} = [ur]G \in K_{\text{point}}$. 
 
 \subsection{Tags, Identity Tokens and Service Tokens}\label{app:identity-assertions}
 
@@ -297,7 +280,7 @@ refer to $u.id$ and $r.id$ if we don't say they are identities or $u,r\in\IDs$
   An \emph{identity Tokens (IDToken)} is a term of the form 
   $\an{PID_{rp}, PID_u, ver}$ for a tag $PID_{rp}$, an encrypted identity 
   $PID_u=[u]PID_{rp}=[utr]G$ and a signature $ver=\sig{\an{PID_{rp},PID_u}}{k}$ 
-  for a nonce $k$.
+  for a nonce $k\in K_{\text{sign}}$.
 \end{definition}
 %使用<n,i>来定义 service token;Acct or pidu?
 \begin{definition}
@@ -321,6 +304,8 @@ their state and collected input messages, just like the attacker
 process. We say that an RP is \emph{honest} if the according
 part of their state ($s.\str{corrupt}$) is $\bot$, and that they are
 corrupted otherwise.
+
+IdP is always honest-but-curious and never corrupted.
 
 We are now ready to define the processes in $\websystem$ as well as
 the scripts in $\scriptset$ in more detail. 
@@ -405,19 +390,16 @@ $\mi{signkeys}$ contains the public signing key for the IdP.
 Each $b \in \fAP{B}$ is a web browser with 
 $I^b := \mapAddresstoAP(b)$ being its addresses.
 
-To define the inital state, first let $\mi{ID}^b := 
-\mapIDtoOwner^{-1}(b)$ be the set of all IDs of $b$, 
+To define the inital state, first let $U^b := 
+\mapIDtoOwner^{-1}(b)$ be the set of all usernames of $b$, 
 %$\mi{ID}^{b,d} := \{i \mid \exists\, x,n:\ i = \an{id, n, d} \in \mi{ID}^b\}$ 
 %be the set of IDs of $b$ for a domain $d$, and 
 %$\mi{SecretDomains}^b := \{d \mid \mi{ID}^{b,d} \neq \emptyset \}$ 
 %be the set of all domains that $b$ owns identities for.
 Then, the initial state $s_0^b$ is defined as follows: the key mapping
-maps every domain to its public (ssl) key, according to the mapping
+maps every domain to its public (tls) key, according to the mapping
 $\mapTLSKey$; the DNS address is $\mapAddresstoAP(p)$ with $p \in \bidsystem$;
-the list of secrets contains an entry $\an{\an{d,\https}, s}$ for each
-$d \in \mi{SecretDomains}^b$ and $s = \mapIDtoPLI(i)$ for some $i \in
-\mi{ID}^{b,d}$ ($s$ is the same for all $i$); $\mi{ids}$ is
-$\an{\mi{ID}^b}$; $\mi{sts}$ is empty.
+$\mi{ids}$ is $\an{U^b}$; $\mi{sts}$ is empty.
 
 \subsection{Relying Parties} \label{app:relying-parties-uppresso}
 
@@ -469,12 +451,12 @@ $r$ and the initial state $s^r_0$ of $r$.
 \begin{definition}
   A \emph{login session record} is a term of the form 
   $\an{\mi{t}, \mi{PID_{rp}}}$ with 
-  $\mi{t}, \mi{PID_{rp}}=[tr]G(t,r\in K_{\text{id}})$.
+  $\mi{t}\in N, \mi{PID_{rp}}\in K_{\text{point}}$.
 \end{definition}
 
 \begin{sloppypar}
   \begin{definition}\label{def:relying-parties}
-    A \emph{state $s\in Z^r$ of an RP $r$} is a term of the form
+    A \emph{state $s\in Z^r$ of an RP} is a term of the form
     $\langle\mi{keyMapping}$, 
     $\mi{tlskeys}$, 
     $\mi{loginSessions}$, 
@@ -484,13 +466,13 @@ $r$ and the initial state $s^r_0$ of $r$.
     $\mi{rp}\rangle$ where 
     $\mi{keyMapping} \in \dict{\mathbb{S}}{\nonces}$,
     $\mi{tlskeys}=\mi{tlskeys}^r$,
-    $\mi{serviceTokens} \in \nonces$,
+    $\mi{serviceTokens} \in \dict{\nonces}{K_{\text{point}}}$,
     $\mi{loginSessions} \in \dict{\nonces}{\terms}$ 
     is a dictionary of login session records,
     $\mi{corrupt} \in \terms$,
     $\mi{IdPConfig} \in \terms$ 
     is the configuration retrieved from IdP server,
-    $\mi{rp} \in \IDs$ is the identity of the RP, 
+    $\mi{rp} \in K_{\text{point}}$ is the identity of the RP, 
     see details in Appendix~\ref{app:uppresso-identities}.
 
     The \emph{initial state $s^r_0$ of $r$} is a state of 
@@ -500,7 +482,7 @@ $r$ and the initial state $s^r_0$ of $r$.
     $s^r_0.\str{keyMapping}$ 
     is the same as the keymapping for browsers above,
     $s^r_0.\str{IdPConfig} = \an{\mi{pubkey},\mi{scriptUrl},\mi{Cert_{rp}}}$ and
-    $s^r_0.\str{rp} = \an{\mi{id},\mi{commonname},\mi{domain_{idp}}}$.
+    $s^r_0.\str{rp} = [r]G$ with $r\in N$.
   \end{definition}
 \end{sloppypar}
 
@@ -522,48 +504,54 @@ We now specify the relation $R^r$. We describe this relation by a non-determinis
   \mystate{\myss{n, method, path, parameters, headers, body} \textbf{such that} \breakalgohook{0}
     \myss{\myangle{\mathtt{HTTPReq},n,method,path,parameters,headers,body} \equiv m_{dec}}\breakalgohook{0}
     \textbf{if possible; otherwise stop} \myss{\myangle{}, s'}}
-  \myif{path \equiv /script}
+  \myif{path \equiv /script}\label{line:rp-script}
     \mystate{\myss{m':=\encs{\myangle{\mathtt{HTTPResp},n,200, \myangle{}, \str{script\_rp}}}{k}}}
     \mystop{b, a, m'}
-  \myelse{path \equiv /loginSSO}
+  \myelse{path \equiv /loginSSO}\label{line:rp-loginSSO}
     \mystate{\myss{m':=\encs{\myangle{\mathtt{HTTPResp},n,302,\myangle{\myangle{\mathtt{Location}, s'.\str{IdPConfig}.\mi{scriptUrl}}}, \myangle{}}}{k}}}
     \mystop{b, a, m'}
-  \myelse{path \equiv /startNegotiation}
+  \myelse{path \equiv /startNegotiation}\label{line:rp-startNegotiation}
     \mystate{\myss{\mi{loginSessionToken} := \nu_1}}
    %\mystate{\myss{cookie := headers[Cookie]}}
    %\mystate{\myss{session := s'.SessionList[cookie]}}
     \mystate{\myss{\mi{t} := body[t]}}\label{line:gen-t}
    %\mystate{\myss{t^{-1}:= \mathtt{Inverse}(t)}}
-    \mystate{\myss{\mi{ID_{rp}} := [s'.\str{rp}.\mi{id}]G}}
+    \mystate{\myss{\mi{ID_{rp}} := s'.\str{rp}}}
     \mystate{\myss{\mi{PID_{rp}} := [\mi{t}]\mi{ID_{rp}}}}
     \mystate{\myss{\mi{state} := \str{expectToken}}}
+    \mystate{\myss{\mi{Cert_{rp}} := s'.\str{IdPConfig}.\mi{Cert_{RP}}}}
     \mystate{\myss{s'.\str{loginSessions}[\mi{loginSessionToken}] := \an{\mi{t}, \mi{PID_{rp}}, \mi{state}}}}
    %\mystate{\myss{session[t] := t}}
    %\mystate{\myss{session[t^{-1}] := t^{-1}}}
    %\mystate{\myss{session[state] := expectToken}}
-    \mystate{\myss{m' := \encs{\myangle{\mathtt{HTTPResp}, n, 200, \myangle{}, \myangle{\mathtt{Cert_{RP}}, s'.\str{IdPConfig}.\mi{Cert_{RP}}}}}{k}}}
+    \mystate{\myss{\mi{setCookie} := \myangle{\cSetCookie, \myangle{\myangle{\str{sessionid}, \mi{loginSessionToken}, \True, \True, \True}}}}}
+    \mystate{\myss{m' := \encs{\myangle{\mathtt{HTTPResp}, n, 200, \myangle{\mi{setCookie}}, \myangle{\mathtt{Cert_{RP}}, \mi{Cert_{rp}}}}}{k}}}
     \mystop{b, a, m'}
-  \myelse{path \equiv /uploadToken}
-    \mystate{\myss{\mi{loginSessions} := s'.\str{loginSessions}[body[\str{loginSessionToken}]]}}
-   %\mystate{\myss{cookie := headers[Cookie]}}
-    \myif{\mi{loginSessions} \equiv \an{}}
-      \mystop{}
+  \myelse{path \equiv /uploadToken}\label{line:rp-uploadToken}
+    \mystate{\myss{\mi{cookie} := headers[\str{Cookie}]}}
+    \myif{\mi{cookie}[\str{sessionid}] \equiv \myangle{}}
+      \mystop{}\label{line:alg-rp-stop1}
     \ENDIF
-   %\mystate{\myss{session := s'.SessionList[cookie]}}
-   %\myif{session[state] \not\equiv expectToken}
+    \mystate{\myss{\mi{loginSessions} := s'.\str{loginSessions}[\mi{cookie}[\str{sessionid}]]}}
+    %\mystate{\myss{cookie := headers[Cookie]}}
+    %\myif{\mi{loginSessions} \equiv \an{}}
+    %  \mystop{}
+    %\ENDIF
+    %\mystate{\myss{session := s'.SessionList[cookie]}}
+    %\myif{session[state] \not\equiv expectToken}
     \myif{\mi{loginSessions}.\str{state} \not\equiv expectToken}
       \mystate{\myss{m' := \encs{\myangle{\mathtt{HTTPResp}, n, 200, \myangle{}, \mathtt{Fail}}}{k}}}
-      \mystop{b, a, m'}
+      \mystop{b, a, m'}\label{line:alg-rp-stop2}
     \ENDIF
     \mystate{\myss{s'.\str{loginSessions} := s'.\str{loginSessions} - body[\mi{loginSessionToken}]}}
     \mystate{\myss{\mi{IDToken} := body[\str{IDToken}]}}
     \myif{\mi{IDToken}.\str{PID_{rp}} \not\equiv \mi{loginSessions}.\str{PID_{rp}}}
       \mystate{\myss{m' := \encs{\myangle{\mathtt{HTTPResp}, n, 200, \myangle{}, \mathtt{Fail}}}{k}}}
-      \mystop{b, a, m'}
+      \mystop{b, a, m'}\label{line:alg-rp-stop3}
     \ENDIF
     \myif{\checksigThree{\mi{IDToken}.\str{ver}}{\an{\mi{IDToken}.\str{PID_{rp}}, \mi{IDToken}.\str{PID_{u}}}}{s'.\str{IdPConfig}.\mi{pubkey}} \equiv \bot}
       \mystate{\myss{m' := \encs{\myangle{\mathtt{HTTPResp}, n, 200, \myangle{}, \mathtt{Fail}}}{k}}}
-      \mystop{b, a, m'}
+      \mystop{b, a, m'}\label{line:alg-rp-stop4}
     \ENDIF
    %\mystate{\myss{Time := \mathtt{CurrentTime}()}}
    %\mystate{\myss{PIDValidity := session[PIDValidity]}}
@@ -579,9 +567,11 @@ We now specify the relation $R^r$. We describe this relation by a non-determinis
      %\mystate{\myss{\mathtt{AddUser}(Acct)}}
    %\ENDIF
    %\mystate{\myss{session[user] := Acct}}
-    \mystate{\myss{s'.\str{serviceTokens} := s'.\str{serviceTokens} + ^{\myangle{}}\mi{Acct}}}\label{line:add-service-token}
+    \mystate{\myss{\mi{nonce} := \nu_2}}
+    \mystate{\myss{s'.\str{serviceTokens} := s'.\str{serviceTokens} + ^{\myangle{}}\myangle{\mi{nonce}, \mi{Acct}}}}\label{line:add-service-token}
    %\mystate{\myss{s'.serviceTokens := s'.serviceTokens + ^{\myangle{}}\myangle{IDToken, Acct}}}
-    \mystate{\myss{m' := \encs{\myangle{\mathtt{HTTPResp}, n, 200, \myangle{}, \mathtt{LoginSuccess}}}{k}}}
+    \mystate{\myss{\mi{setCookie} := \myangle{\cSetCookie, \myangle{\myangle{\str{sessionid}, \mi{nonce}, \True, \True, \True}}}}}
+    \mystate{\myss{m' := \encs{\myangle{\mathtt{HTTPResp}, n, 200, \myangle{\mi{setCookie}}, \mathtt{LoginSuccess}}}{k}}}
     \mystop{b, a, m'}
   \ENDIF
   \mystop{}
@@ -625,18 +615,18 @@ afterwards present the definition of the relation $R$.
 To define the initial state, we will need a term that 
 represents the ``user database'' of the IdP. We will 
 call this term $\mi{userset}$. This database defines, 
-which secret is valid for which identity. It is encoded as 
-a mapping of identities to secrets. For example, if the 
-secret $\mi{secret}_1$ is valid for the identites
-$\mi{id}_1$and the secret $\mi{secret}_2$ is valid for the 
-identity $\mi{id}_2$, the $\mi{userset}^i$ looks as follows:
+which secret and $\mi{ID_u}$ is valid for which identity. 
+It is encoded as a mapping of username to secrets and $\mi{ID_u}$. 
+For example, if the secret $\mi{secret}_1$ and $\mi{ID_{u_1}}$ is 
+valid for the username $u_1$ and the secret $\mi{secret}_2$ 
+and $\mi{ID_{u_2}}$ is valid for the identity $u_2$, the 
+$\mi{userset}^i$ looks as follows:
 \begin{align*}
-\mi{userset} = [\mi{id}_1.\str{username}{:}\myangle{\mi{id}_1, \mi{secret}_1}, 
-  \mi{id}_2.\str{username}{:}\myangle{\mi{id}_2, \mi{secret}_2}]
+\mi{userset} = [u_1{:}\myangle{\mi{ID_{u_1}}, \mi{secret}_1}, 
+  u_2{:}\myangle{\mi{ID_{u_2}}, \mi{secret}_2}]
 \end{align*}
 
-We define $\mi{userset}$ as $\mi{userset} = \an{\{\an{u.\str{username},
-    \myangle{u, \mi{secret} = \mapIDtoPLI(u)}}\, |\, u \in \IDs^u\}}$.
+We define $\mi{userset}$ as $\mi{userset} = \an{\{\an{\mi{username}, \myangle{\mi{id}=\NToID(\mi{username}), \mi{secret}=\NToS(\mi{username})}}\, |\, username \in \mathbb{S}\}}$.
 
 \begin{definition}\label{def:initial-state-idp}
   A \emph{state $s\in Z$ of the IdP} is a term of the form
@@ -681,7 +671,7 @@ The relation $R$ that defines the behavior of the IdP is defined as follows:
       \mystate{\myss{m':=\encs{\myangle{\mathtt{HTTPResp},n,200,\myangle{},\mathtt{LoginFailure}}}{k}}}
       \mystop{b, a, m'}
     \ENDIF
-    \mystate{\myss{\mi{sessionid} := \nu_2}}
+    \mystate{\myss{\mi{sessionid} := \nu_3}}
     \mystate{\myss{s'.\str{sessions}[\mi{sessionid}] := \mi{username}}}
     \mystate{\myss{\mi{setCookie} := \myangle{\cSetCookie, \myangle{\myangle{\str{sessionid}, \mi{sessionid}, \True, \True, \True}}}}}
     \mystate{\myss{m' :=\myangle{\mathtt{HTTPResp},n,200,\myangle{\mi{setCookie}},\mathtt{LoginSucess}}}}
@@ -717,15 +707,16 @@ The relation $R$ that defines the behavior of the IdP is defined as follows:
       \mystate{\myss{m' := \encs{\myangle{\mathtt{HTTPResp}, n, 200, \myangle{}, \mathtt{Fail}}}{k}}}
       \mystop{b, a, m'}
     \ENDIF
-    \mystate{\myss{u := s'.\str{sessions}[\mi{sessionid}].u}}
-    \mystate{\myss{\mi{ID_u} := u.\str{id}}}
+    
+    \mystate{\myss{\mi{username} := s'.\str{sessions}[\mi{sessionid}].username}}
+    \mystate{\myss{\mi{ID_u} := s'.\str{userset}[\mi{username}].\mi{id}}}
     \mystate{\myss{\mi{PID_u} := [\mi{ID_u}]\mi{PID_{rp}}}}
     %\mystate{\myss{Validity := \mathtt{CurrentTime} ()+ s'.Validity}}
     %\mystate{\myss{Content := \myangle{PID_{RP}, PID_U, s'.Issuer, Validity}}}
     \mystate{\myss{\mi{content} := \myangle{PID_{rp}, PID_u}}}
     \mystate{\myss{\mi{ver} := \sig{\mi{content}}{s'.\str{signkey}}}}\label{line:sign-token}
     \mystate{\myss{\mi{IDToken} := \myangle{\mi{content}, \mi{ver}}}}
-    \mystate{\myss{s'.\str{sessions}[\mi{IDTokens}]:=s'.\str{sessions}[\mi{IDTokens}]+^{\myangle{}}\myangle{PID_{rp}, IDToken}}}
+    \mystate{\myss{s'.\str{sessions}[\mi{IDToken}]:=s'.\str{sessions}[\mi{IDTokens}]+^{\myangle{}}\myangle{PID_{rp}, IDToken}}}
     \mystate{\myss{m':=\encs{\myangle{\mathtt{HTTPResp}, n, 200, \myangle{}, \mi{IDToken}}}{k}}}
     \mystop{b, a, m'}
   \ENDIF
@@ -958,12 +949,11 @@ calculated by RP as the result of an HTTPS $\mPost$ request
 $m$. We refer to $m$ as the 
 \emph{request corresponding to $Acct$}. 
 
-%讨论acct的唯一性
 In the following definition, when we say a browser 
-$b\in \fAP{B}$ owns $Acct$, we holds that for some RP 
-$r\in \fAP{RP}$ that calculate it and 
-an identity $u\in \fAP{ID}$ with $\mapIDtoOwner(u) = b$.
-\[\mi{Acct}=\mi{acct}^u[\mapDomain(r)]\]
+$b\in \fAP{B}$ owns an $Acct$, we holds that for some relying 
+party $rp\in \fAP{RP}$ that calculate it and 
+a $\mi{username} \in \mathbb{S}$ with $\mapIDtoOwner(username) = b$.
+\[\mi{Acct}=[\NToID(username)]ID_r=[ur]G\]
 
 We now define the similar security properties as the definition 52 in SPRESSO. 
 
@@ -972,16 +962,15 @@ We now define the similar security properties as the definition 52 in SPRESSO.
   We say that \emph{$\uppressoauthwebsystem$ is secure} if for every run $\rho$ of
   $\uppressoauthwebsystem$, every state $(S^j, E^j, N^j)$ in $\rho$,
   every $r\in \fAP{RP}$ that is honest in $S^j$, every RP service token of the form 
-  $Acct$ recorded in $S^j(r).\str{serviceTokens}$, the following two conditions are
+  $\myangle{nonce, Acct}$ recorded in $S^j(r).\str{serviceTokens}$, the following two conditions are
   satisfied:
 
-  \textbf{(A)} If $Acct$ is derivable from the attackers knowledge
-  in $S^j$ (i.e., $Acct \in d_{\emptyset}(S^j(\fAP{attacker}))$),
+  \textbf{(A)} If $\myangle{nonce, Acct}$ is derivable from the attackers knowledge
+  in $S^j$ (i.e., $\myangle{nonce, Acct} \in d_{\emptyset}(S^j(\fAP{attacker}))$),
   then it follows that the browser $b$ owning $Acct$ is fully corrupted
-  in $S^j$ (i.e., the value of $\mi{isCorrupted}$ is $\fullcorrupt$)
-  or the only IdP is dishonest (in $S^j$).
+  in $S^j$ (i.e., the value of $\mi{isCorrupted}$ is $\fullcorrupt$).
 
-  \textbf{(B)} If the request corresponding to $Acct$ was sent by
+  \textbf{(B)} If the request corresponding to $\myangle{nonce, Acct}$ was sent by
   some $b\in \fAP{B}$ which is honest in $S^j$, then $b$ owns $Acct$.
 \end{definition}
 
@@ -1075,7 +1064,7 @@ To prove Theorem 1 in section 5.1, we are going to prove the following Lemmas.
     for $d_r \in \mapDomain(r)$, some terms $x$, $h$, $n_\text{req}$, and a dictionary $b$ such that 
     \[ b[\str{IDToken}] \equiv \myangle{\mi{PID_{rp}, \mi{PID_u}, ver}} \]
     with 
-    \[ \mi{PID_{rp}} \equiv [S^l(r).\str{loginSessions}[t]][S^l(r).\str{rp}.\mi{id}]G, \]
+    \[ \mi{PID_{rp}} \equiv [S^l(r).\str{loginSessions}[t]]S^l(r).\str{rp}, \]
     \[ \mi{PID_{u}} \equiv [u]\mi{PID_{rp}}, \]
     \[ \mi{ver} \equiv \sig{\an{PID_{rp},PID_u}}{k_{sign}} \]
     for some nonces $u$, and $k_\text{sign}$.
@@ -1107,8 +1096,7 @@ As stated above, the Property $A$ is defined as follows:
   $\myangle{nonce, Acct} \in 
   d_{\emptyset}(S^j(\fAP{attacker}))$), it follows that the 
   browser $b$ owning $Acct$ is fully corrupted in $S^j$ 
-  (i.e., the value of $\mi{isCorrupted}$ is $\fullcorrupt$) 
-  or the IdP is dishonest. 
+  (i.e., the value of $\mi{isCorrupted}$ is $\fullcorrupt$). 
 \end{definition}
 
 %\begin{definition}
@@ -1149,6 +1137,9 @@ $\mi{IDToken} := \myangle{\mi{Content}, \mi{ver}}$ had to be
 created by the IdP $I$. An (honest) IdP creates signatures 
 only in Line~\ref{line:sign-token} of Algorithm~\ref{alg:idp}.
 
+%nonce从哪些获得？当且仅当对于系统中的任何一个角色获得token，攻击者可以实现攻击。
+%假设获得token，但无法获得，推翻假设。
+%spresso definition
 \begin{lemma} %(Same as Lemma 4 in SPRESSO) 
   Under the assumption above, only the browser b can issue a request $req$
   (say, $m_{attr}$)that triggers the IdP I to create the signed term IDToken. The 
@@ -1278,25 +1269,58 @@ would only sent to the corresponding RP $r$, which is shown in Algorithm~\ref{al
 
 The proofs show that the IDToken is only sent to the honest browser and target RP.
 It cannot be known to the attacker or any corrupted party, as none of the listed 
-parties leak it to any corrupted party or the attacker. 
-Above proofs can be reduced to the {\color{blue}Confidentiality and Integrity 
-Properties}, simply described as the {\color{blue} Theorem 3 and 4} in section 5.2.
-
-%Now we need also guarantee that $\fAP{attacker} \in \mathsf{Net}$ has no other way
-%to generate the IDToken. This can be simply proved by the {\color{blue} Theorem 1} 
-%in section 5.2, as the {\color{blue} RP Designation Property}.
+parties leak it to any corrupted party or the attacker.
 
 These proofs are enough for SPRESSO system to show its security, however, they are not enough for UPPRESSO.
 So far, the proofs only guarantee that the $IDToken$ must be sent to the target RP.
 In SPRESSO, as the $tag$ can be only decrypted to unique $Domain$, the target RP must be the honest RP (the target of an adversary).
 However, in UPPRESSO, while an RP receives an $IDToken$, he may try to use this token to login another honest RP, as long as he can find the $t^{adversary}$ satisfied $IDToken.PID_{RP} \equiv [t^{adversary}]ID_{RP}^{honest}$.
-Therefore, the following Lemma should be proved.
+Therefore, the following Lemmas should be proved.
 
-\begin{lemma}
-The $t^{adversary}$ is not derivable from the attackers knowledge in $S^j$ (i.e., $\langle IDToken$, $Acct \rangle \in d_{\emptyset}$($S^j$($\mathtt{attacker}$))), which satisfies that $IDToken.PID_{RP} \equiv [t^{adversary}]ID_{RP}^{honest}$.
+\begin{lemma}\label{lemma-rp}
+  Given any two RPs in a finite set of RPs in UPPRESSO,
+  the probability that an adversary finds different numbers $t$ and $t' \in [1,n)$ satisfying $[t]ID_{RP_j} = [t']ID_{RP_{j'}}$ is negligible, where $ID_{RP_j}=[r]G$, $ID_{RP_{j'}}=[r']G$, $r$ and $r'$ are different numbers unknown to the adversary, and $G$ is a generator on $\mathbb{E}$ of order $n$.
 \end{lemma}
 \begin{proof}
-This Lemma can be proved by the {\color{blue} Theorem 1} in section 5.2, as the {\color{blue} RP Designation Property}.
+  Finding $t$ and $t'$ that satisfy $[t]ID_{RP_j} = [t']ID_{RP_{j'}}$, can be described as a $PID_{RP}$-collision game $\mathcal{G}_c$ between an adversary and a challenger: the adversary receives from the challenger a finite set of RP identities, i.e., $ID_{RP_1}$, ..., $ID_{RP_m}$, where $m$ is the number of RPs in the system, and outputs $(a, b, t, t')$ where $a \neq b$. If $[t]ID_{RP_a}=[t']ID_{RP_b}$, which occurs with a probability ${\rm Pr}_s$, the adversary succeeds in this game.
+  
+  As depicted in Figure \ref{fig:ecdlp_algorithm}, we design a probabilistic polynomial time (PPT) algorithm $\mathcal{D}^*_c$ based on $\mathcal{G}_c$, to solve the ECDLP: find a number $x \in \mathbb{Z}_n$ satisfying $Q = [x]G$, where $Q$ is a point on $\mathbb{E}$ and $G$ is a generator on $\mathbb{E}$ of order $n$.
+
+  \begin{figure}[tb]
+    \centering
+    \includegraphics[width=0.96\linewidth]{../fig/ecdlp_algorithm.pdf}
+    \caption{The PPT algorithm $\mathcal{D}^*_c$ constructed based on the $PID_{RP}$ collision game to solve the ECDLP.}
+    \label{fig:ecdlp_algorithm}
+  \end{figure}
+
+  The algorithm $\mathcal{D}^*_c$ works as below.
+  The input of $\mathcal{D}^*_c$ is in the form of ($G, Q$). On receiving an input ($G$, $Q$), the challenger first randomly chooses $r_1, \cdots, r_m$ in $\mathbb{Z}_n$ to calculate $[r_1]G, \cdots, [r_m]G$.
+  Then, it randomly chooses $j \in [1,m]$, replaces $[r_j]G$ with $Q$, and sends $m$ RP identities to the adversary, which returns the result ($a$, $b$, $t$, $t'$). Finally, the challenger calculates $s = t^{-1}t'r_b \bmod n$ and returns $s$ as the output of $\mathcal{D}^*_c$.
+
+  If the adversary succeeds in $\mathcal{G}_c$ and $[r_a]G$ happens to be replaced with $Q$, then $\mathcal{D}^*_c$ outputs $s=t^{-1}t'r_b =x$ because $[tr_a]G = [t]Q = [t'r_b]G$. For the adversary, $Q$ is indistinguishable from any other RP identities in the input set, as $[r_j]G$ is randomly replaced by the challenger.
+  Hence, the probability of solving the ECDLP using $\mathcal{D}^*_c$ is formulated as:
+  \begin{equation*}
+    {\rm Pr}\{\mathcal{D}^*_c(G, [x]G)=x\} = {\rm Pr}\{s = x\}={\rm Pr}\{a=j\}{\rm Pr}_s=\frac{1}{m}{\rm Pr}_s
+  \end{equation*}
+
+  If the probability of finding $t$ and $t'$ satisfying $[t]ID_{RP_j} = [t']ID_{RP_{j'}}$ is non-negligible, the adversary would have advantages  in $\mathcal{G}_c$ and ${\rm Pr}_s$ is non-negligible regardless of the security parameter $\lambda$.
+  Thus, we would find that ${\rm Pr}\{\mathcal{D}^*_c(G, [x]G)=x\}$ also becomes non-negligible even when $\lambda$ is sufficiently large, because $m$ is a finite integer and $m \ll 2^\lambda$.
+  \color{black}
+  This violates the ECDLP assumption. Therefore, the probability of finding $t$ and $t'$ that satisfy $[t]ID_{RP_j} = [t']ID_{RP_{j'}}$ is negligible. \hfill
+\end{proof}
+
+\begin{lemma}
+  The $t^{adversary}$ is not derivable from the attackers knowledge in $S^j$ (i.e., $t^{adversary} \in d_{\emptyset}$($S^j$($\mathtt{attacker}$))), which satisfies that $IDToken.PID_{RP} \equiv [t^{adversary}]ID_{RP}^{honest}$.
+\end{lemma}
+\begin{proof}
+  In UPPRESSO, $PID_{RP}=[t]ID_{RP}$ is generated by a user based on the target RP's identity $ID_{RP}$ and a user-selected random number $t \in [1,n)$.
+  %The target RP with $ID_{RP}$ receives $t$, and it will also calculate $PID_{RP}=[t]ID_{RP}$ to match $PID_{RP}$ extracted from a token received.
+  %It is computationally easy for any party who knows $ID_{RP}$ and $t$ to validate the $PID_{RP}$ in an identity token. A valid
+  Thus, $PID_{RP}$ always specifies an RP, i.e., %$PID_{RP}$ sent by a user in her identity-token request is calculated as $PID_{RP} = [t]ID_{RP}$, where $ID_{RP}$ is the target RP's identity and $t$ is a random number selected by the user and shared with this RP.
+  designates the target RP that knows $t$. 
+  Moreover, according to Lemma \ref{lemma-rp}, given $PID_{RP} = [t]ID_{RP}$, the probability that $PID_{RP}$ designates another RP with $ID_{RP'}$ is \emph{negligible}. %This means that $PID_{RP}$ cannot be associated with any other RPs in the system.
+  Therefore, $PID_{RP}$ designates only the target RP with $ID_{RP}$ in the system, 
+  so attacker cannot find a number $t^{adversary}$\hfill
 \end{proof}
 
 Therefore, there is a contradication to the assumption, where we assumed that 
@@ -1312,7 +1336,7 @@ As stated above, Property B is defined as follows:
   in $\rho$, every $r\in \fAP{RP}$ that is honest in $S^j$, 
   every RP service token of the form $Acct$ recorded in
   $S^j(r).\str{serviceTokens}$, with the request corresponding to
-  $Acct$ sent by some $b\in \fAP{B}$ which is honest in $S^j$, $b$ owns $Acct$.
+  $\myangle{nonce, Acct}$ sent by some $b\in \fAP{B}$ which is honest in $S^j$, $b$ owns $Acct$.
 %Let $\mathcal{U\!W\!S}^{auth}$  be an UPPRESSO web system for authentication analysis. We say that $\mathcal{U\!W\!S}^{auth}$  is secure (with respect to Property A) if for every run $rho$ of $\mathcal{U\!W\!S}^{auth}$ , every state ($S^j$, $E^j$, $N^j$) in $rho$, every $r \in \mathtt{RP}$ that is honest in
 %$S^j$, every RP service token of the form $\langle IDToken$, $Acct \rangle$ recorded in $S^j$($r$).$\mathtt{serviceTokens}$, with the request corresponding to $\langle IDToken$, $Acct \rangle$ sent by some $b \in B$ which is honest in $S^j$, b owns Acct.
 \end{definition}
@@ -1324,6 +1348,67 @@ by honest $b$ can only be related with the $Acct$ owned by $b$.
 
 %we follows the Lemma 10 and its proof in SPRESSO, which guarantees that the request corresponding to $\langle IDToken$, $Acct \rangle$ sent by honest $b$ is loaded from $script\_rp$. 
 %Then we are going to prove the $IDToken$ uploaded by honest $b$ can only be related with the $Acct$ owned by $b$ (which is quite different from SPRESSO).
+
+\begin{lemma}\label{user-identification}
+  $PID_u= [ID_u]PID_{rp}$ in IDToken uniquely identifies an 
+  account at the RP designated by $PID_{rp}$ if and only if 
+  it receives $t$ where $PID_{rp} = [t]ID_{rp}$ holds, and 
+  this account is uniquely mapped to a user with $ID_u$.
+\end{lemma}
+\begin{proof}
+  To issue an identity token requested for $PID_{rp}$, the 
+  honest IdP authenticates the user with $ID_u$ and calculates 
+  $PID_u = [ID_u]PID_{rp}$, following Equation \ref{equ:PIDU}. 
+  The RP designated by $PID_{rp}$ should have received a $t$ 
+  from the user. Following Equation \ref{equ:AccountNotChanged}, 
+  it can calculate $Acct = [t^{-1}]PID_{u} = [ID_u]ID_{rp}$, 
+  which is a \emph{permanent} identifier determined by $ID_u$ 
+  and $ID_{rp}$ after the user and the RP register at the IdP. 
+  $ID_{rp} = [r]G$ is a generator on $\mathbb{E}$ of order $n$, 
+  as $\mathbb{E}$ is a finite cyclic group. Therefore, given a 
+  user with $ID_u$, $Acct$ is a \emph{unique} point on 
+  $\mathbb{E}$ for any $u \in [1, n)$, and it is \emph{uniquely} 
+  associated with $ID_u=u$. 
+  %We first prove that $PID_{U}$ \emph{uniquely} identifies one account at the designated RP and one user in the system. 
+  
+  \begin{equation}
+    PID_{U} = [{ID_U}]{PID_{RP}} = [utr]G
+     \label{equ:PIDU}
+  \end{equation}
+
+  \begin{equation}
+    Acct =  [t^{-1}utr \bmod n]G = [ur]G = [ID_U]ID_{RP}
+    \label{equ:AccountNotChanged}
+  \end{equation}
+
+  This proves that $PID_u$ in IDToken identifies an account 
+  $Acct$ at the designated RP, which is uniquely mapped to a 
+  user with $ID_u$ in the system.
+
+  Next, we consider two adversarial scenarios where the 
+  attacker replays a token for another user to (1) the 
+  designated RP but receiving $t'\neq t$ in this login, and 
+  (2) any other honest RP with $ID_{rp'} = [r']G \neq [r]G$ 
+  (i.e., $r' \neq r$). In the first case, the designated RP 
+  would calculate an account as $[t'^{-1}]PID_u = [t'^{-1}ut]ID_{rp}$.
+  Because a user's identity is randomly selected by the IdP 
+  in $\mathbb{Z}_n$ and known only to the user (and the honest 
+  IdP), the probability that $t'^{-1}ut$ happens to be the 
+  identity of another user is negligible, when $n$ is 
+  sufficiently large. As a result, $[t'^{-1}]PID_u$ is likely 
+  not to identify any known account at the RP and therefore 
+  would be treated as a new account by the RP. 
+  Secondly, the attacker presents IDToken to $RP'$ in the 
+  system, where $ID_{rp'} = [r']G \neq [r]G$. $RP'$ would 
+  calculate the account as $Acct' = [\tilde{t}^{-1}]PID_{u} = 
+  [\tilde{t}^{-1}utrr'^{-1}][r']G = 
+  [\tilde{t}^{-1}utrr'^{-1}]ID_{rp'}$. 
+  The probability that $\tilde{t}^{-1}utrr'^{-1}$ happens to 
+  be the identity of another user at $RP'$ is also negligible, 
+  when $n$ is sufficiently large. 
+  %it identifies no account mapped to a user, at any RP not designated by $PID_{RP}$.
+\hfill
+\end{proof}
 
 \begin{lemma}
 For every $IDToken$ uploaded by honest $b$ during authentication, the honest $r \in RP$ can always derive the service token of the form $\langle IDToken$, $Acct \rangle$ recorded in $S^j$($r$).$\mathtt{serviceTokens}$, where b owns Acct. 
@@ -1354,10 +1439,9 @@ For every $IDToken$ uploaded by honest $b$ during authentication, the honest $r 
   $IDToken.PID_{rp} \equiv [t]Cert_{rp}.ID_{rp}$, 
   $IDToken.PID_u \equiv [ID_u]IDToken.PID_u$ and 
   $Acct \equiv [t^{-1}]IDToken.PID_u$. 
-  According to the proof of {\color{blue}Theorem 2} in section 5.2, 
+  According to the proof of lemma~\ref{user-identification}, 
   the $Acct$ must be owned by honest $b$ ($Acct \equiv [ID_U]S^j(r).ID_{RP}$, 
-  where $ID_U$ owned by $b$), which can be define as the  
-  {\color{blue} User Identification Property}.
+  where $ID_U$ owned by $b$).
 \end{proof}
 
 With the above proofs, we now can guarantee that every $\uppressoauthwebsystem$ system satisfies the requirements in Definition~\ref{def:B}, therefore $\uppressoauthwebsystem$ must be secure of Property B.
@@ -1377,16 +1461,20 @@ which we will then use in the proof of privacy.
 \subsection{Formal Model of UPPRESSO for Privacy Analysis}
 
 \begin{definition}[Challenge Browser]
-  Let $\mi{dr}$ some domain and $b(\mi{dr})$ a DY process. We call $b(\mi{dr})$ a \emph{challenge browser} iff $b$
-  is defined exactly the same as a browser with two exceptions: (1) the
-  state contains one more property, namely $\mi{challenge}$, which  initially 
-  contains the term $\top$. The broswer's algorithm is extended by the following 
-  at its very beginning: It is checked if a message $m$ is addressed to the domain
-  $\str{CHALLENGE}$ (which we call the challenger domain). If $m$ is
-  addressed to this domain and no other message $m'$ was addressed to
-  this domain before (i.e., $\mi{challenge} \not\equiv \bot$), then
-  $m$ is changed to be addressed to the domain $\mi{dr}$ and $\mi{challenge}$ is 
-  set to $\bot$ to recorded that a message was addressed to $\str{CHALLENGE}$.
+  Let $\mi{dr}$ some domain and $b(\mi{dr})$ a DY process. 
+  We call $b(\mi{dr})$ a \emph{challenge browser} iff $b$
+  is defined exactly the same as a browser with two exceptions: 
+  (1) the state contains one more property, namely 
+  $\mi{challenge}$, which initially contains the term $\top$. 
+  (2) The broswer's algorithm is extended by the following at 
+  its very beginning: It is checked if a message $m$ is 
+  addressed to the domain $\str{CHALLENGE}$ (which we call the 
+  challenger domain). If $m$ is addressed to this domain and 
+  no other message $m'$ was addressed to this domain before 
+  (i.e., $\mi{challenge} \not\equiv \bot$), then $m$ is changed 
+  to be addressed to the domain $\mi{dr}$ and $\mi{challenge}$ 
+  is set to $\bot$ to recorded that a message was addressed to 
+  $\str{CHALLENGE}$.
 \end{definition}
 
 \begin{definition}[Deterministic DY Process]
@@ -1398,19 +1486,19 @@ which we will then use in the proof of privacy.
 \end{definition}
 
 \begin{definition}[\uppresso Web System for Privacy Analysis]\label{def:uppresso-ws-priv}
-  Let $\uppressowebsystem = (\bidsystem, \scriptset, \mathsf{script}, E^0)$ 
-  be an UPPRESSO web system with 
+  Let $\uppressowebsystem = (\bidsystem, \scriptset, 
+  \mathsf{script}, E^0)$ be an UPPRESSO web system with 
   $\bidsystem = \mathsf{Hon} \cup \mathsf{Web} \cup \mathsf{Net}$, 
-  $\mathsf{Hon} = \fAP{B} \cup \fAP{RP} \cup \fAP{IDP} \cup \fAP{DNS}$.
+  $\mathsf{Hon} = \fAP{B} \cup \fAP{RP} \cup \fAP{IDP}$.
   (as described in Appendix~\ref{app:outlineuppressomodel}).
   $\fAP{RP} = \{r_1,r_2\}$, $r_1$ and $r_2$ two (honest) relying parties,
-  $\fAP{dns}$ an honest DNS server. 
   Let $\fAP{attacker} \in \mathsf{Web}$ be some web attacker.
   Let $\mi{dr}$ be a domain of $r_1$ or $r_2$ and $b(\mi{dr})$ a challenge browser. 
-  Let $\mathsf{Hon}' := \{ b(\mi{dr}) \} \cup \fAP{RP} \cup \fAP{DNS}$, $\mathsf{Web}' := \mathsf{Web}$, 
+  Let $\mathsf{Hon}' := \{ b(\mi{dr}) \} \cup \fAP{RP}$, 
+  $\mathsf{Web}' := \mathsf{Web}$, 
   and $\mathsf{Net}' := \emptyset$ (i.e., there is no network attacker).
   Let $\bidsystem' := \mathsf{Hon}' \cup \mathsf{Web}' \cup \mathsf{Net}'$.  
-  Let $\scriptset' := \scriptset \setminus \{\str{script\_idp}\}$ and $\mathsf{script}'$ be accordingly.
+  Let $\scriptset' := \scriptset$ and $\mathsf{script}'$ be accordingly.
   We call $\uppressoprivwebsystem(\mi{dr}) = (\bidsystem', \scriptset', \mathsf{script}', E^0, \fAP{attacker})$ 
   an \emph{\uppresso web system for privacy analysis} 
   iff the domain $\mi{dr}_1$ the only domain assigned to $r_1$, and
@@ -1477,7 +1565,7 @@ be a configuration of $\uppressoprivwebsystem_2$.
 
 \begin{definition}[Term Equivalence up to Proto-Tags]
   Let $\theta = \{a_1, \ldots, a_l \}$ be a finite set of proto-tags.
-  Let $t$ and $t'$ be terms. We call $t_1$ and $t_2$
+  Let $t_1$ and $t_2$ be terms. We call $t_1$ and $t_2$
   \emph{term-equivalent under a set of proto-tags $\theta$} iff there
   exists a term $\tau \in \terms(\{x_1,\dots,x_l\})$ such that
   $t_1 = (\tau [ a_1 / x_1 , \dots , a_l / x_l ])[ ID_{\mi{dr}_1} / R ]$ and
@@ -1493,8 +1581,10 @@ be a configuration of $\uppressoprivwebsystem_2$.
   write $D \prototagequiv{\theta} D'$.
 \end{definition}
 
+%随机数t的情况
 \begin{definition}[Equivalence of HTTP Requests]
-  Let $m_1$ and $m_2$ be (potentially encrypted) HTTP requests and
+  Let $m_1$ and $m_2$ be (potentially encrypted) HTTP requests, 
+  $L$ be a set of login session tokens and
   $\theta = \{a_1, \ldots, a_l \}$ be a finite set of proto-tags. 
   We call $m_1$ and $m_2$ \emph{$\delta$-equivalent under a set of proto-tags $\theta$} 
   iff $m_1 \prototagequiv{\theta} m_2$ or all subterms are equal with the following exceptions:
@@ -1502,15 +1592,16 @@ be a configuration of $\uppressoprivwebsystem_2$.
   \item the Host value and the Origin/Referer headers in both requests
     are the same except that the domain $\mi{dr}_1$ in $m_1$ can be
     replaced by $\mi{dr}_2$ in $m_2$,
+  \item If the cookie in both requests include $\str{loginSessionToken}$, 
+    then there exists an $l' \in L$ such that $g_1[\str{loginSessionToken}] \equiv l'$, and
   \item the HTTP body $g_1$ of $m_1$ and the HTTP body $g_2$ of $m_2$
-    are (I) term-equivalent under $\theta$, (II) for $j\in \{1,2\}$ if
+    are (I) term-equivalent under $\theta$, 
+    (II) for $j\in \{1,2\}$ if
     $g_j[\str{IDToken}] \sim \myangle{PID_{dr_j}, [*]PID_{dr_j}, 
     \sig{\myangle{PID_{dr_j}, [*]PID_{dr_j}}}{*}}$
     and the origin (HTTP header) of HTTP message in $m_j$ is
     $\an{\mi{dr}_j,\https}$ then the receiver of this message is
-    $r_j$, and (III) if $g_1$ contains a dictionary key
-    $\str{loginSessionToken}$ then there exists an $l' \in L$ such
-    that $g_1[\str{loginSessionToken}] \equiv l'$, and
+    $r_j$, and 
   \item if $m_1$ is an encrypted HTTP request then and only then $m_2$
     is an encrypted HTTP request and the keys used to encrypt the
     requests have to be the correct keys for $\mi{dr}_1$ and
@@ -1519,13 +1610,14 @@ be a configuration of $\uppressoprivwebsystem_2$.
   We write $m_1 \httptagequiv{\theta} m_2$.
 \end{definition}
 
+%loginsessionrecord := <t, tag>
 \begin{definition}[Extracting Entries from Login Sessions]
   Let $t_1$, $t_2$ be dictionaries over $\nonces$ and $\terms$,
   $\theta$ be a finite set of proto-tags, and $d$ a domain. We call
   $t_1$ and $t_2$ \emph{$\eta$-equivalent} iff $t_2$ can be
   constructed from $t_1$ as follows: For every proto-tag
   $a \in \theta$, we remove the entry identified by the dictionary key
-  $i$ for which it holds that $\proj{4}{t_1[i]} \equiv a[ID_r/ R]$, if
+  $i$ for which it holds that $\proj{2}{t_1[i]} \equiv a[ID_r/ R]$, if
   any. We denote the set of removed entries by $D$. We write
   $\logsessminus{t_1}{t_2}{\theta}{r}{D}$.
 \end{definition}
@@ -1536,16 +1628,17 @@ be a configuration of $\uppressoprivwebsystem_2$.
   session token for the proto-tag $a$, written
   $l \in \mathsf{loginSessionTokens}(a,S_1,S_2)$ iff for any
   $i \in \{1,2\}$ and any $j \in \{1,2\}$ we have that
-  $\proj{4}{S_i(r_j).\str{loginSessions}[l]} = a[ID_{dr_j}/ R]$.
+  $\proj{2}{S_i(r_j).\str{loginSessions}[l]} = a[ID_{dr_j}/ R]$.
 \end{definition}
 
 \begin{definition}[Equivalence of States]\label{def:eq-of-states}
-  Let $\theta$ be a set of proto-tags and $H$ be a set of nonces. 
+  Let $\theta$ be a set of proto-tags and 
+  %$H$ be a set of nonces. 
+  $L$ be a set of login session tokens.
   Let $T:=\{t\mid [t]R\in \theta\}$. 
-  We call $S_1$ and $S_2$ \emph{$\gamma$-equivalent under $(\theta, H)$} 
-  iff the following conditions are met:
+  We call $S_1$ and $S_2$ \emph{$\gamma$-equivalent under 
+  $(\theta, L)$} iff the following conditions are met:
   \begin{enumerate}
-  \item\label{eqs:dns} $S_1(\fAP{dns}) = S_2(\fAP{dns})$, and
   \item\label{eqs:r1} $S_1(\fAP{r_1})$ equals $S_2(\fAP{r_1})$ except
     for the subterms $\str{loginSessions}$ and $\str{serviceTokens}$, and
   \item\label{eqs:r2} $S_1(\fAP{r_2})$ equals $S_2(\fAP{r_2})$ except
@@ -1586,6 +1679,16 @@ be a configuration of $\uppressoprivwebsystem_2$.
           ,  S_2(b_2).j.\str{location},\\ & S_1(b_1).j.\str{referrer} , 
           S_2(b_2).j.\str{referrer}\})
         \end{align*}
+      \item for $p \in \{$
+        \begin{align*}
+          & \an{\tXMLHTTPRequest,*,*},\\
+          & \an{\tPostMessage,*,\an{\mapDomain(dr_j), \https},\an{\str{t}, *}},\\
+          %& \an{\tPostMessage,*,\an{\mapDomain(dr_j), \https},\mi{IDToken}}\\
+          & \an{\tPostMessage,*,\an{\mapDomain(idp), \https},\an{\str{Cert}, *}}
+        \end{align*}
+        $\}$ we have
+        $S_1(b_1).j.\str{scriptinputs} |\, p \prototagequiv{\theta}
+        S_2(b_2).j.\str{scriptinputs} |\, p$, and
       \item\label{eqs:b:w:script_rp} if
         $S_1(b_1).j.\str{origin} \in \{\an{\mi{dr}_1, \https},\an{\mi{dr}_2, \https}\}$
         then $S_1(b_1).j.\str{script} \equiv \str{script\_rp}$ and \
@@ -1605,6 +1708,27 @@ be a configuration of $\uppressoprivwebsystem_2$.
           $S_1(b_1).j.\str{scriptinputs}$, then
           $S_1(b_1).j.\str{location}.\str{host} \equiv \mi{dr}_1$ and
           $S_2(b_2).j.\str{location}.\str{host} \equiv \mi{dr}_2$, and
+        %\item $\forall t \in N$: $t$ is not contained in any subterm of
+        %  $S_1(b_1).j.\str{scriptstate}$ except for
+        %  $S_1(b_1).j.\str{scriptstate}.\str{parameters}$, and
+        %  \begin{itemize}
+        %  \item
+        %    $S_1(b_1).j.\str{origin} \not\equiv
+        %    \an{\mi{dr}_1,\https}$\\$\implies
+        %    t \not\equiv S_1(b_1).j.\str{scriptstate}.\str{parameters}$, and
+        %  \item $S_1(b_1).j.\str{origin}
+        %    \not\equiv
+        %    \an{\mi{dr}_1,\https}$\\$\implies t \not\in
+        %    d_\emptyset(S_1(b_1).j.\str{scriptinputs})$, and
+        %  \item
+        %    $S_2(b_2).j.\str{origin} \not\equiv
+        %    \an{\mi{dr}_2,\https}$\\$\implies
+        %    t \not\equiv S_2(b_2).j.\str{scriptstate}.\str{parameters}$, and
+        %  \item $S_2(b_2).j.\str{origin}
+        %    \not\equiv
+        %    \an{\mi{dr}_2,\https}$\\$\implies t \not\in
+        %    d_\emptyset(S_2(b_2).j.\str{scriptinputs})$,
+        %    and \end{itemize}
         \end{enumerate}
       \item\label{eqs:b:w:att_script} if
         $S_1(b_1).j.\str{origin} \not\in
@@ -1617,13 +1741,13 @@ be a configuration of $\uppressoprivwebsystem_2$.
         \item
           $S_1(b_1).j.\str{referrer} \prototagequiv{\theta}
           S_2(b_2).j.\str{referrer}$, and
-        \item
+        \item\label{eqs:b:w:att_script:state}
           $S_1(b_1).j.\str{scriptstate} \prototagequiv{\theta}
           S_2(b_2).j.\str{scriptstate}$, and
         \item
           $S_1(b_1).j.\str{scriptinputs} \prototagequiv{\theta}
           S_2(b_2).j.\str{scriptinputs}$, and
-        \item 
+        \item\label{eqs:b:w:att_script:t}
           $\forall t \in T$: $t$ is not contained in any subterm of 
           $S_1(b_1).j.\str{scriptstate}$ except for 
           $S_1(b_1).j.\str{scriptstate}.\mi{parameters}[\str{t}]$, and
@@ -1641,9 +1765,60 @@ be a configuration of $\uppressoprivwebsystem_2$.
   \end{enumerate}
 \end{definition}
 
-\begin{definition}[Equivalence of Events]
-  \label{def:Events}
-  Same as Definition 80 in SPRESSO except that the forth condition in Definition 80 in SPRESSO is not applicable.
+\begin{definition}[Equivalence of Events]\label{def:Events}
+  Let $\theta$ be a set of proto-tags, 
+  $L$ be a set of login session tokens, 
+  $H$ be a set of nonces, and
+  $T:=\{t\mid [t]R\in \theta\}$. 
+  We call $E_1 = (e_1^{(1)}, e_2^{(1)}\dots)$ and
+  $E_2= (e_1^{(2)}, e_2^{(2)} \dots)$ 
+  \emph{$\beta$-equivalent under $(\theta, L, H)$} 
+  iff all of the following conditions are satisfied for every 
+  $i \in \mathbb{N}$:
+
+  \begin{enumerate}
+    \item\label{eqe:distinction} One of the following conditions holds
+      true:
+      \begin{enumerate}
+      \item\label{eqe:prototagequiv}
+        $e_i^{(1)} \prototagequiv{\theta} e_i^{(2)}$ and if $e_i^{(1)}$
+        contains an HTTP(S) message (i.e., HTTP(S) request or HTTP(S)
+        response), then the HTTP nonce of this HTTP(S) message is not
+        contained in $H$, or
+      \item\label{eqe:http-req} $e_i^{(1)}$ is an HTTP request $m_1$
+        from $b_1$ to $r_1$ and $e_i^{(2)}$ is an HTTP request $m_2$
+        from $b_2$ to $r_2$, $m_1 \httptagequiv{\theta} m_2$, and both
+        requests are unencrypted or encrypted (i.e., $m_1$ and $m_2$ are
+        the content of the encryption) and $m_1.\str{nonce} \in H$, or
+      \item\label{eqe:http-res} $e_i^{(1)}$ is an HTTP(S) response from
+        $r_1$ to $b_1$ and $e_i^{(2)}$ is an HTTP(S) response from $r_2$
+        to $b_2$, and their HTTP messages $m_1$ (contained in
+        $e_i^{(1)}$) and $m_2$ (contained in $e_i^{(1)}$) are the same
+        except for the HTTP body $g_1 := m_1.\str{body}$ and the HTTP
+        body $g_2 := m_2.\str{body}$ which have to be
+        $g_1 \prototagequiv{\theta} g_2$ and $m_1.\str{nonce} \in H$.
+      \end{enumerate}
+    \item\label{eqe:pre:l} If there exists $l \in L$ such that $l$ is a
+      subterm of $e_i^{(1)}$ or $e_i^{(2)}$ then we have that
+      $e_i^{(1)}$ is a message from $b_1$ to $r_1$ and $e_i^{(2)}$ is a
+      message from $b_2$ to $r_2$ or we have that $e_i^{(1)}$ is a
+      message from $r_1$ to $b_1$ and $e_i^{(2)}$ is a message from
+      $r_2$ to $b_2$.
+    \item\label{eqe:pre:t} If there exists $t \in T$ such that
+      $t \in d_{\nonces\setminus\{t\}}(\{e_i^{(1)}, e_i^{(2)}\})$ 
+      then $e_i^{(1)}$ is an HTTP(S) request from $b_1$ to $r_1$ 
+      and $e_i^{q(2)}$ is an HTTP(S) request from $b_2$ to $r_2$ 
+      and the bodies of both HTTP messages are of the form
+      $\an{\an{\str{t}, t}}$.
+    \item\label{eqe:pre:rp-scripts} If $e_i^{(1)}$ or $e_i^{(2)}$ is an
+      HTTP(S) response with body $g$ from a relying party, then it does
+      not contain any $\str{Location}$ or $\cSTS$ header
+      and if $\proj{1}{g}$ is a string representing a script, then
+      $\proj{1}{g}$ is $\str{script\_rp}$.
+    \item\label{eqe:pre:unencrypted-http} If $e_i^{(1)}$ or $e_i^{(2)}$
+      is an unencrypted HTTP response, then the message was sent by some
+      attacker.
+  \end{enumerate}
 \end{definition}
 
 \begin{definition}[Equivalence of Configurations]
@@ -1670,66 +1845,675 @@ We now proceed to show that for all schedules $\sigma=(\zeta _1, \zeta_2,\dots)$
 We now show that if two configurations are $\alpha$-equivalent, then the view of the attacker is statically equivalent.
 
 \begin{lemma}
-  (Same as Lemma 12 in SPRESSO) Let $(S_1,E_1,N_1)$ and $(S_2,E_2,N_2)$ be two $\alpha$-equivalent configurations. Then $S_1(attacker)\approx S_2(attacker)$.
-\end{lemma}
-
-\begin{lemma}
-  (Same as Lemma 13 in SPRESSO) The initial configurations $(S_1^0,E^0,N^0)$ of $\mathcal{U\!W\!S}^{priv}_1$ and $(S_2^0,E^0,N^0)$ of $\mathcal{U\!W\!S}^{priv}_2$ are $\alpha$-equivalent.
+  Let $(S_1,E_1,N_1)$ and $(S_2,E_2,N_2)$ be two 
+  $\alpha$-equivalent configurations. 
+  Then $S_1(attacker)\approx S_2(attacker)$.
 \end{lemma}
 \begin{proof}
-  Let $\theta=H=L=\emptyset$.Obviously, both latter conditions are true. For all parties $p\in\mathcal{W}_1\setminus\{b_1\}$, it is clear that $S^0_1(p)=S^0_2(p)$.
-  Also the states $S^0_1(b_1)=S^0_2(b_2)$ are equal. Therefore, all conditions of Definition \ref{def:C} are fulfilled. Hence, the  initial configurations are $\alpha$-equivalent.
+  From the $\alpha$-equivalence of $(S_1,E_1,N_1)$ and 
+  $(S_2,E_2,N_2)$ it follows that $S_1(\fAP{attacker}) 
+  \prototagequiv{\theta} S_2(\fAP{attacker})$.
+  From Condition~\ref{eqs:att-not-t} for $\gamma$-equivalence 
+  it follows that
+  $t \not\in d_\emptyset(\bigcup_{i \in \{1,2\},\ A\, \in\, 
+  \mathsf{Web}\, \cup \, \mathsf{Net}\, \}}S_i(A))$
+  (i.e., the attacker does not know any keys for the tags 
+  contained in its view), and therefore it is easy to see 
+  that the views are statically equivalent.
 \end{proof}
 
-\begin{lemma}
-  (Same as Lemma 14 in SPRESSO) Let $(S_1,E_1,N_1)$ and $(S_2,E_2,N_2)$ be two $\alpha$-equivalent configurations of $\mathcal{U\!W\!S}^{priv}_1$ and $\mathcal{U\!W\!S}^{priv}_2$, respectively.
-  Let $\zeta\!=\!\left \langle ci,cp,\tau_{process},cmd_{switch},cmd_{window},\tau_{script},url\right \rangle $ be a web system command. Then, $\zeta$ induces a processing step in either both configurations or in none. In the former case, let $(S_1\prime,E_1\prime,N_1\prime)$ and $(S_2\prime,E_2\prime,N_2\prime)$ be configurations induced by $\zeta$ such that
-  \begin{equation}
-    \begin{aligned}
-      (S_1,E_1,N_1)\xrightarrow{\zeta}(S_1\prime,E_1\prime,N_1\prime)\text{and}(S_2,E_2,N_2)\xrightarrow{\zeta}(S_2\prime,E_2\prime,N_2\prime)
-    \end{aligned}
-  \end{equation}
-  Then $(S_1\prime,E_1\prime,N_1\prime)$ and $(S_2\prime,E_2\prime,N_2\prime)$ are $\alpha$-equivalent.
+We now show that $\sigma(\uppressoprivwebsystem_1) \approx
+\sigma(\uppressoprivwebsystem_2)$ by induction over the length 
+of $\sigma$. We first, in Lemma~\ref{lemma:initial-config-private}, 
+show that $\alpha$-equivalence (and therefore, indistinguishability 
+of the views of $\fAP{attacker}$) holds for the initial 
+configurations of $\uppressoprivwebsystem_1$ and 
+$\uppressoprivwebsystem_2$. We then, in 
+Lemma~\ref{lemma:step-config-private}, show that for each 
+configuration induced by a processing step in $\zeta$,
+$\alpha$-equivalence still holds true.
+
+\begin{lemma}\label{lemma:initial-config-private}
+  The initial configurations $(S_1^0,E^0,N^0)$ of 
+  $\mathcal{U\!W\!S}^{priv}_1$ and $(S_2^0,E^0,N^0)$ of 
+  $\mathcal{U\!W\!S}^{priv}_2$ are $\alpha$-equivalent.
 \end{lemma}
 \begin{proof}
-  Let $\theta$ be a set of proto-tags and $H$ be a set of nonces for which $\alpha$-equivalence holds and let $L:=\bigcup_{a\in\theta}\text{loginSessionTokens}(a,S_1,S_2)$,$K:=\{k|\exists n:enc_s(\left \langle y,n\right \rangle,k)\in\theta\}$\par
-  To induce a processing step, the ci-th message from $E_1$ or $E_2$, respectively, is selected.Following Definition \ref{def:Events}, we denote these messages by $e_i^{(1)}$ or $e_i^{(2)}$, respectively. We now differentiate between the receivers of the messages by denoting the induced processing steps by
+  We now have to show that there exists a set of proto-tags $\theta$ and a set of nonces $H$
+  such that $S_1^0$ and $S_2^0$ are $\gamma$-equivalent under
+  $(\theta,H)$, $E_1^0 = E^0$ and $E_2^0 = E^0$ are $\beta$-equivalent
+  under $(\theta,L,H)$ with $L := \bigcup_{a\in\theta} \mathsf{loginSessionTokens}(a,S_1,S_2)$, and $N_1^0 = N_2^0 = N^0$.
+
+  Let $\theta = H = L = \emptyset$. Obviously, both latter conditions are
+  true. For all parties $p \in \bidsystem_1 \setminus \{b_1\}$, it is
+  clear that $S_1^0(p) = S_2^0(p)$. Also the states $S_1^0(b_1)$ and
+  $S_2^0(b_2)$ are equal. Therefore, all conditions
+  of Definition~\ref{def:eq-of-states} are fulfilled. Hence, the
+  initial configurations are $\alpha$-equivalent.
+\end{proof}
+
+\begin{lemma}\label{lemma:step-config-private}
+  Let $(S_1,E_1,N_1)$ and $(S_2,E_2,N_2)$ be two 
+  $\alpha$-equivalent configurations of 
+  $\uppressoprivwebsystem_1$ and $\uppressoprivwebsystem_2$, 
+  respectively. Let $\zeta = \an{\mi{ci},\mi{cp}, 
+  \tau_\text{process}, \mi{cmd}_\text{switch}, 
+  \mi{cmd}_\text{window},\tau_\text{script},\mi{url}}$
+  be a web system command. Then, $\zeta$ induces a processing 
+  step in either both configurations or in none. In the latter 
+  case, let $(S_1',E_1',N_1')$ and $(S_2',E_2',N_2')$ be 
+  configurations induced by $\zeta$ such that
+  \[(S_1,E_1,N_1) \xrightarrow{\zeta} (S_1',E_1',N_1') \quad 
+  \text{and} \quad (S_2,E_2,N_2) \xrightarrow{\zeta} 
+  (S_2',E_2',N_2') \ .\]
+  Then, $(S_1',E_1',N_1')$ and $(S_2',E_2',N_2')$ are
+  $\alpha$-equivalent.  
+\end{lemma}
+\begin{proof}
+  Let $\theta$ be a set of proto-tags and $H$ be a set of 
+  nonces for which $\alpha$-equivalence holds and let 
+  $L:=\bigcup_{a\in\theta}\text{loginSessionTokens}(a,S_1,S_2)$,
+  $T:=\{t\mid [t]R\in \theta\}$.
+  
+  To induce a processing step, the ci-th message from $E_1$ or 
+  $E_2$, respectively, is selected.Following Definition 
+  \ref{def:Events}, we denote these messages by $e_i^{(1)}$ or 
+  $e_i^{(2)}$, respectively. We now differentiate between the 
+  receivers of the messages by denoting the induced processing 
+  steps by
   \begin{equation}
     \begin{aligned}
       (S_1,E_1,N_1)\xrightarrow[p_1\rightarrow E_{out}^{(1)}]{\left \langle a_1,f_1,m_1\right \rangle\rightarrow p_1}(S_1\prime,E_1\prime,N_1\prime)\\
       (S_2,E_2,N_2)\xrightarrow[p_2\rightarrow E_{out}^{(2)}]{\left \langle a_2,f_2,m_2\right \rangle\rightarrow p_2}(S_2\prime,E_2\prime,N_2\prime)
     \end{aligned}
   \end{equation}
-  \underline{Case $p_1=dns$:}
-  In this case, only Cases 1a, 1b and 1c of Definition 80 can apply. Hence, $p_2=dns$.\par
-  (*):As both events are static except for IP addresses, the HTTP nonce, and the HTTPS key, there is no k contained in the input messages(except potentially in tags, from where it cannot be extracted), and the output messages are sent to $f_1$ or $f_2$, respectively, they can not cantian any $l\in L$ or $k\in K$. Hence, Condition 2 of Definition 80 holds true.\par
-  We note that (*) so-called Condition 2 applies analogously in cases 1a, 1b and 1c.
-  In the case 1a, it is easy to see that $E_{out}^{(1)}\rightleftharpoons_\theta E_{out}^{(2)}$.In the case 1c, it is easy to that the DNS server only outputs empty events in both processing steps. In the case 1b, $E_{out}^{(1)}$ and $E_{out}^{(2)}$ are such that Case 1d of Definition 80 applies.\par
-  Therefore, $E_1\prime$ and $E_2\prime$ are $\beta$-equivalent under $(\theta,H,L)$ in all three cases. As there are no changes to any state in all cases, we have that $S_1\prime$ and $S_2\prime$ are $\gamma$-equivalent under $(\theta,H)$. No new nonces are chosen, hence $N_1\prime=N_1=N_2=N_2\prime$.\\
-  \underline{Case $p_1=r_1$:}
+  \paragraph{\underline{Case $p_1=r_1$:}}
   In this case, we only distinct several cases of HTTP(S) requests that can happen. The others are ignored the same as SPRESSO.\par
   There are four possible types of HTTP requests that are accepted by $r_1$ in Algorithm \ref{alg:rp}:
   \begin{itemize}
-    \item path=/script(get the rp-script), Line 3;
-    \item path=/loginSSO(start a login), Line 6;
-    \item path=/startNegotiation(derive a $PID_rp$), Line 9;
-    \item path=/uploadToken(verify ID token, calculate Acct), Line 18.
+    \item path=$\str{/script}$(get the rp-script), Line~\ref{line:rp-script};
+    \item path=$\str{/loginSSO}$(start a login), Line~\ref{line:rp-loginSSO};
+    \item path=$\str{/startNegotiation}$(derive a $PID_{rp}$), Line~\ref{line:rp-startNegotiation};
+    \item path=$\str{/uploadToken}$(verify ID token, calculate Acct), Line~\ref{line:rp-uploadToken}.
   \end{itemize}
-  \par From the cases in Definition \ref{def:Events}, only two can possibly apply here:Case 1a and Case 1e. For both cases, we will now analyze each of the HTTP requests listed above separately.\\
-  Definition \ref{def:Events},Case 1a:$e_i^{(1)}\rightleftharpoons e_i^{(2)}$. This case implies $p_2=r_1=p_1$. As we see below, for the output events $E_{out}^{(1)}$ and $E_{out}^{(2)}$ (if any) only Case 1a of Definition \ref{def:Events} applies. This implies the nonce of both the incoming HTTP requests and HTTP responses cannot be in $H$.
+  \par From the cases in Definition \ref{def:Events}, only two 
+  can possibly apply here:Case~\ref{eqe:prototagequiv} and 
+  Case~\ref{eqe:http-req}. For both cases, we will now analyze 
+  each of the HTTP requests listed above separately.
+
+  \noindent \emph{Definition~\ref{def:Events}, Case~\ref{eqe:prototagequiv}:}
+  $e_i^{(1)}\rightleftharpoons e_i^{(2)}$. This case implies 
+  $p_2=r_1=p_1$. As we see below, for the output events 
+  $E_{out}^{(1)}$ and $E_{out}^{(2)}$ (if any) only 
+  Case~\ref{eqe:prototagequiv} of Definition \ref{def:Events} 
+  applies. This implies the nonce of both the incoming HTTP 
+  requests and HTTP responses cannot be in $H$.
   \begin{itemize}
-    \item path=/script In this case, the same output event is produced whose message is 
+    \item path=$\str{/script}$ In this case, the same output 
+    event is produced whose message is 
     \begin{equation}
       \begin{aligned}
         \left\langle HTTPResp,n,200,\left\langle\right\rangle,RPScript\right\rangle
       \end{aligned}
     \end{equation}
-    We can note that Condition 5 of Definition \ref{def:Events} holds true and, also, (*) applies.The remaining conditions are trivially fulfilled and $E_1\prime$ and $E_2\prime$ are $\beta$-equivalent under $(\theta,H,L)$.As there are no changes to any state, we have that $S_1\prime$ and $S_2\prime$ are $\gamma$-equivalent under $(\theta,H)$. No new nonces are chosen, hence $N_1\prime=N_1=N_2=N_2\prime$.
-    \item path=/loginSSO In this case, the reason for equivalence holding is similar to the case above since the same output event is produced.
-    \item path=/startNegotiation(derive a $PID_rp$), Line 9;
-    \item path=/uploadToken(verify ID token, calculate Acct), Line 18.
+    We can note that Condition~\ref{eqe:pre:rp-scripts} of 
+    Definition \ref{def:Events} 
+    holds true and.The remaining conditions are trivially 
+    fulfilled and $E_1\prime$ and $E_2\prime$ are 
+    $\beta$-equivalent under $(\theta,H,L)$.As there are no 
+    changes to any state, we have that $S_1\prime$ and 
+    $S_2\prime$ are $\gamma$-equivalent under $(\theta,H)$. 
+    No new nonces are chosen, hence $N_1\prime=N_1=N_2=N_2\prime$.
+    \item path=$\str{/loginSSO}$ In this case, the reason for 
+    equivalence holding is similar to the case above since the 
+    same output event is produced.
+    \item path=$\str{/startNegotiation}$
+    \item path=$\str{/uploadToken}$
   \end{itemize}
+
+  \noindent \emph{Definition~\ref{def:Events}, Case~\ref{eqe:http-req}:} 
+  $e_i^{(1)}$ is an HTTP(S) request from $b_1$ to $r_1$ and 
+  $e_i^{(2)}$ is an HTTP(S) request from $b_2$ to $r_2$. 
+  This case implies $p_2 = \fAP{r_2}$.
+
+  We note that Condition~\ref{eqe:pre:rp-scripts} of 
+  Definition~\ref{def:Events} holds for the same reasons as in
+  the previous case. As the response is always addressed to 
+  the IP address of $b_1$ or $b_2$, respectively,
+  Condition~\ref{eqe:pre:rp-scripts} of
+  Definition~\ref{def:Events} is fulfilled. 
+
+  As we see below, for the output events $E^{(1)}_\text{out}$ 
+  and $E^{(2)}_\text{out}$ (if any) only Case~\ref{eqe:http-res} 
+  of Definition~\ref{def:Events} applies. This implies that the
+  output events must contain an HTTP nonce contained in $H$. As 
+  we know that the HTTP nonce of the incoming HTTP requests is 
+  contained in $H$ and the output HTTP responses (if any) of the 
+  RP reuses the same HTTP nonce, the nonce of the HTTP responses 
+  is in $H$.
+
+  \begin{itemize}
+    \item $\mi{path} = \str{/script}$ In this case, 
+      the output events contain no $l\in L$ or $t\in T$ 
+      meaning that $E_1'$ and $E_2'$ being $\beta$-equivalent
+      under $(\theta,H,L)$ according to 
+      Definition~\ref{def:Events}, Case~\ref{eqe:http-res}. As
+      there are no changes to any state, we have that $S_1'$ 
+      and $S_2'$ are $\gamma$-equivalent under $(\theta,H)$. 
+      No new nonces are chosen, hence, 
+      $N_1 = N'_1 = N_2 = N'_2$.
+    \item $\mi{path} = \str{/loginSSO}$ This case is analogue
+      to the case above.
+    \item $\mi{path} = \str{/startNegotiation}$ In this case, 
+      an HTTP response is created. We denote the HTTP response generated by $r_1$ as $m_1'$ and the one
+      generated by $r_2$ as $m_2'$. We then have that
+      \begin{align*}
+        m_1' = \encs{\an{\cHttpResp,n,200,\an{},g_1}}{k} \\
+        m_2' = \encs{\an{\cHttpResp,n,200,\an{},g_2}}{k}
+      \end{align*}
+      with
+      \begin{align*}
+        g_1 = \an{\an{\str{Cert_{RP}},S_1(r_1).\str{IdPConfig}.Cert_{RP}}, \an{\str{loginSessionToken}, \nu_1}} \\
+        g_2 = \an{\an{\str{Cert_{RP}},S_2(r_2).\str{IdPConfig}.Cert_{RP}}, \an{\str{loginSessionToken}, \nu_1}}
+      \end{align*}
+
+      Obviously, $m_1'$ equals $m_2'$. For $N_1 = N_2 = 
+      (n_1, n_2, \dots)$, We set $\theta' = \theta \cup 
+      \{ [t]S_j(r_j).ID_{RP} \}$ for $j\in \{1, 2\}$, 
+      $N_1' = N_2' = (n_2, \dots)$ (as exactly one nonce is 
+      chosen in both processing steps) and 
+      $L' = L \cup \{n_1\}$. 
+      The receiver of both messages is the browser $b_1$ or 
+      $b_2$, respectively. Obviously, it holds that
+      $L' = \bigcup_{a\in\theta'} 
+      \mathsf{loginSessionTokens}(a,S_1',S_2')$
+      and there exists an $l' \in L'$ such that
+      $g_1[\str{loginSessionToken}] \equiv l'$. As
+      Conditions~\ref{eqe:http-res} and~\ref{eqe:pre:t} of
+      Definition~\ref{def:Events} hold, $E_1'$ and $E_2'$ are
+      $\beta$-equivalent under $(\theta',H,L')$. The subterm
+      $\str{loginSessions}$ of $S_1(r_1)$ is extended exactly 
+      the same as the subterm $\str{loginSessions}$ of 
+      $S_2(r_2)$. Thus, we have that $S_1'$ and $S_2'$ are
+      $\gamma$-equivalent under $(\theta',H)$.
+    \item $\mi{path} = \str{/uploadToken}$ In this case, 
+      there are four checks at Algorithm~\ref{alg:rp} in
+      Line~\ref{line:alg-rp-stop1}, \ref{line:alg-rp-stop3}, 
+      \ref{line:alg-rp-stop3} and \ref{line:alg-rp-stop4}.
+      
+      From Condition~\ref{eqs:logsess} of 
+      Definition~\ref{def:eq-of-states} we know that for 
+      $\mi{ls}_1 := S_1(r_1).\str{loginSessions}[l]$ and 
+      $\mi{ls}_2 := S_2(r_2).\str{loginSessions}[l]$, 
+      we have that $\mi{ls}_1 \prototagequiv{\theta} \mi{ls}_2$.
+      Therefore, we have that if the first two checks fail in
+      $r_1$ then and only then they fail in $r_2$.
+
+      As we know that $m_1 \httptagequiv{\theta} m_2$, we have 
+      that if the third check fails in $r_1$ then and only 
+      then it fails in $r_2$. The same holds true for the 
+      fourth check.
+
+      if $r_1$ and $r_2$ both accept the IDToken, they will 
+      generate HTTP responses with service Token.We denote 
+      the HTTP response generated by $r_1$ as $m_1'$ and the
+      one generated by $r_2$ as $m_2'$. We then have that
+      \begin{align*}
+        m_1' = \encs{\an{\cHttpResp,n,200,\an{},g_1}}{k} \\
+        m_2' = \encs{\an{\cHttpResp,n,200,\an{},g_2}}{k}
+      \end{align*}
+      with
+      \begin{align*}
+        g_1 = \an{\an{\str{nonce}, \nu_1}} \\
+        g_2 = \an{\an{\str{nonce}, \nu_1}}
+      \end{align*}
+      Same as above, $m_1'$ equals $m_2'$, $N_1' = N_2' = 
+      (n_2, \dots)$ and $L' = L$. 
+      The receiver of both messages is the browser $b_1$ or 
+      $b_2$, respectively. As Conditions~\ref{eqe:http-res} 
+      and~\ref{eqe:pre:l} of Definition~\ref{def:Events} hold, 
+      $E_1'$ and $E_2'$ are $\beta$-equivalent under 
+      $(\theta,H,L)$. The subterm $\str{loginSessions}$ of 
+      $S_1(r_1)$ is extended exactly the same as the subterm 
+      $\str{loginSessions}$ of $S_2(r_2)$. Thus, we have that 
+      $S_1'$ and $S_2'$ are $\gamma$-equivalent under 
+      $(\theta,H)$.
+  \end{itemize}
+
+  \paragraph{\underline{Case $p_1 = \fAP{r_2}$:}} This case is
+  analogue to the case $p_1 = \fAP{r_1}$ above. Note that the
+  Case~\ref{eqe:http-req} of Definition~\ref{def:Events} 
+  cannot occur by definition.
+
+  \paragraph{\underline{Case $p_1 = \fAP{b_1}$:}} 
+  $\implies p_2 = \fAP{b_2}$ 
+
+  %We now do a case distinction over the types of messages a 
+  %browser can receive.
+
+  \begin{description}
+    %\item[DNS response]
+    %\item[HTTP response]
+    \item[TRIGGER] We now distinguish between the possible 
+      values for $\mi{cmd}_\text{switch}$.
+      \begin{description}
+      \item[1 (trigger script):] In this case, the script in 
+        the window indexed by $\mi{cmd}_\text{window}$ is 
+        triggered. Let $j$ be a pointer to that window.
+
+        We first note that such a window exists in $b_1$ iff 
+        it exists in $b_2$ and that $S_1(b_1).j.\str{script} 
+        \equiv S_2(b_2).j.\str{script}$. We now distinguish 
+        between the following cases, which cover all possible 
+        states of the windows/documents:
+
+        \begin{enumerate}
+        \item
+          $S_1(b_1).j.\str{origin} \in \{\an{\mi{dr}_1, 
+          \https}, \an{\mi{dr}_2, \https}\}$ and 
+          $S_1(b_1).j.\str{script} \equiv \str{script\_rp}$.
+
+          Similar to the following scripts, the main 
+          distinction in this script is between the script's 
+          internal states (named $\str{phase}$). With the 
+          term-equivalence under proto-tags $\theta$ we have 
+          that either 
+          $S_1(b_1).j.\str{scriptstate}.\str{phase} =
+           S_2(b_2).j.\str{scriptstate}.\str{phase}$ or the 
+          script's state contains a tag and is therefore in an 
+          illegal state (in which case the script will stop 
+          without producing output or changing its state).
+
+          We can therefore now distinguish between the 
+          possible values of
+          $S_1(b_1).j.\str{scriptstate}.\str{phase} =
+           S_2(b_2).j.\str{scriptstate}.\str{phase}$:
+          \begin{description}
+          \item[start:] In this case, the script open a blank
+            page addressed to its own origin, which is either 
+            (a) equal and $\an{\mi{dr}_1,\https}$ or 
+            $\an{\mi{dr}_2,\https}$ or it is 
+            (b) $\an{\mi{dr}_1,\https}$ in $b_1$ and
+            $\an{\mi{dr}_2,\https}$ in $b_2$. The path is the 
+            (static) string $\str{/loginSSO}$. The script 
+            saves a (static) value for $\str{phase}$ in its 
+            scriptstate.
+
+            In both Cases, we have that the command is 
+            term-equivalent under proto-tags $\theta$ and 
+            hence, the browser emits a HTTP request which is 
+            term-equivalent.Hence, we have 
+            $\gamma$-equivalence under $(\theta,H)$ for the 
+            new states, $\beta$-equivalence under 
+            $(\theta,H,L)$ for the new events, and 
+            $\alpha$-equivalence for the new configuration.
+          
+          \item[expectt:] In this case, the script retrieves 
+            the result of a \pm from $\mi{scriptinputs}$. As 
+            we know that $S_1(b_1).j.\str{scriptstate} 
+            \prototagequiv{\theta} 
+            S_2(b_2).j.\str{scriptstate}$ and that for all 
+            matching \pms that they also have to be 
+            term-equivalent up to $\theta$ and that the window 
+            structure is equal in both browsers, we have that 
+            either the same \pm is retrieved from 
+            $\mi{scriptinputs}$ or none in both browsers.
+
+            Then the script saves a (static) value for 
+            $\str{phase}$ in its scriptstate, and we set 
+            $H' := H \cup \{n\}$ with $n$ being the nonce 
+            that the browser chooses for $\lambda_1$. 
+            Therefore, we have $\gamma$-equivalence under 
+            $(\theta,H')$ for the new states. We also have
+            $\beta$-equivalence under $(\theta,H',L)$ for the 
+            new events, and $\alpha$-equivalence for the new 
+            configuration.
+          \item[expectCert:] In this case, the script
+            retrieves the result of an \xhr from 
+            $\mi{scriptinputs}$ that matches the reference 
+            contained in $\mi{scriptstate}$. From
+            Condition~\ref{eqs:b:w:script_rp} of
+            Definition~\ref{def:eq-of-states} we know that all 
+            results from \xhr{}s in $\mi{scriptinput}$ are 
+            term-equivalent up to $\theta$ and that 
+            $\mi{scriptstate}$ is term-equivalent up to $\theta$. 
+            Hence, in both browsers, both scripts stop with an 
+            empty command or both continue as they successfully
+            retrieved such an \xhr.
+
+            The script now constructs a \pm that is sent to 
+            exactly the same window in both browsers and that 
+            requires that the receiver origin has to be 
+            $\an{\str{IdPdomain},\https}$ The postMessage is 
+            only sent to this origin, we have that 
+            $\gamma$-equivalence cannot be violated.
+
+            We now have that $S_1'$ and $S_2'$ are 
+            $\gamma$-equivalent under $(\theta,H)$, 
+            $E_1'$ and $E_2'$ are $\beta$-equivalent under 
+            $(\theta,H,L)$, and as exactly none of nonces is 
+            chosen, we have that the new configuration is 
+            $\alpha$-equivalent.
+          \item[expectToken:] This case is the same as
+            $\str{expectt}$ and we have that the new 
+            configuration is $\alpha$-equivalent.
+          \end{description}
+
+        \item $S_1(b_1).j.\str{origin} \not\in 
+          \{\an{\mi{dr}_1,\https},\an{\mi{dr}_2,\https}\}$. 
+          $S_1(b_1).j.\str{script} \equiv \str{script\_idp}$.
+          
+          Unlike SPRESSO, $\str{script_{idp}}$ is trustful in
+          UPPRESSO due to the use of SRI (Subresource Integrity).
+          Because of this check, browsers can control the 
+          content of $\str{script_{idp}}$ downloaded from 
+          the Identity Provider. Hence, we now analyze every 
+          internal state just like in $\str{script_{rp}}$.
+
+          \begin{description}
+          \item[start:] In this case, the script chooses a
+            new nonce for $t$. Since $t$ is only stored in
+            $S_1(b_1).j.\str{scriptstate}.\mi{parameters}$,
+            the condition~\ref{eqs:att-not-t} and 
+            condition~\ref{eqs:b:w:att_script:t} of 
+            Definiton~\ref{def:eq-of-states} hold. Hence, 
+            we have $\gamma$-equivalence under $(\theta,H)$ 
+            for the new states.
+
+            From the equivalence definition of states
+            (Definition~\ref{def:eq-of-states}) we can see 
+            that the window tree has the same structure in 
+            both processing steps. 
+            So the script now constructs a \pm that is sent to 
+            exactly the same window in both browsers and that 
+            requires that the receiver has to be the opener
+            of this window. Since the new tag hasn't been 
+            generated and Condition~\ref{eqe:prototagequiv} 
+            of Definition~\ref{def:Events} holds, we have 
+            $\beta$-equivalence under $(\theta,H,L)$.
+          \item[expectCert:] The same as above, we can have 
+            that either the same \pm is retrieved from 
+            $\mi{scriptinputs}$ or none in both browsers and 
+            the result of $checksig$ is same as well. The 
+            state $Cert_{rp}$ is equal in both 
+            $\str{scriptstate}$ and the state $PID_{rp}$ is
+            term-equivalent under $\theta$. As the 
+            condition~\ref{eqs:b:w:att_script:state} of 
+            Defition~\ref{def:eq-of-states} holds, we have 
+            $\gamma$-equivalence under $(\theta,L)$ for the 
+            new states.
+
+            Obviously, we have $\beta$-equivalence under 
+            $(\theta,H,L)$ as Condition~\ref{eqe:prototagequiv} 
+            of Definition~\ref{def:Events} holds.
+
+          \item[expectReqToken:] In this case, the script
+            retrieves the result of an \xhr from 
+            $\mi{scriptinputs}$ that matches the reference 
+            contained in $\mi{scriptstate}$. From
+            Condition~\ref{eqs:b:w:script_rp} of
+            Definition~\ref{def:eq-of-states} we know that all 
+            results from \xhr{}s in $\mi{scriptinput}$ are 
+            term-equivalent up to $\theta$ and that 
+            $\mi{scriptstate}$ is term-equivalent up to 
+            $\theta$. Hence, in both browsers, both scripts 
+            will reach the same if-else branch.
+
+            Since there aren't any new states stored and the
+            requests' destination are fixed, we can have 
+            $\gamma$-equivalence under $(\theta,L)$ for the 
+            new states and $\beta$-equivalence under 
+            $(\theta,H,L)$. 
+            \item[expectLoginResult:] This case is the same as 
+              the second branch of $\str{expectReqToken}$.
+            \item[expectToken:] This case is the same as 
+              the third branch of $\str{expectReqToken}$.
+          \end{description}
+
+        \item $S_1(b_1).j.\str{origin} \not\in 
+          \{\an{\mi{dr}_1,\https},\an{\mi{dr}_2,\https}\}$. 
+          $S_1(b_1).j.\str{script} \not\equiv \str{script\_idp}$.
+
+          Here, we assumte that the script in this case is the the
+          attacker script $R^\text{att}$, as it subsumes all other
+          scripts. 
+  
+          We first observe, that its ``view'', i.e., the input terms it
+          gets from the browser, is term-equivalent up to proto-tags
+          $\theta$ between (the scripts running in) $S_1(b_1)$ and
+          $S_2(b_2)$. From the equivalence definition of states
+          (Definition~\ref{def:eq-of-states}) we can see that:
+          \begin{itemize}
+          \item The window tree has the same structure in both
+            processing steps. All window terms are equal (up to their
+            $\str{documents}$ subterm). All same-origin documents
+            contain only subterms that are term-equivalent up to $\theta$ (again,
+            up to their $\str{subwindows}$ subterms). All
+            non-same-origin documents become limited documents and
+            therefore are equal (up to the subwindows, limited documents
+            only contain the subwindows and the document nonce).
+          \item The subterms $\str{cookies}$, $\str{localStorage}$,
+            $\str{sessionStorage}$, $\str{scriptstate}$, and
+            $\str{scriptinputs}$ are term-equivalent up to $\theta$.
+          \item The subterms $\str{ids}$ and $\str{secrets}$ are equal.
+          \item There is not $t \in T$ as a subterm (except as keys for
+            tags) in this view. We therefore have that no such term can
+            be contained in the output command of the script, or in the
+            new scriptstate.
+          \end{itemize}
+  
+          As the input of the script as a whole is term-equivalent up to
+          $\theta$, does not contain any placeholders in
+          $V_\text{script}$, and does not contain a key for any tag in
+          $\theta$, we have that the output of the script, i.e.,
+          $\mi{scriptstate}'$, $\mi{cookies}'$, $\mi{localStorage}'$,
+          $\mi{sessionStorage}'$, $\mi{command}'$, must be
+          term-equivalent up to proto-tags $\theta$ (in particular, the
+          same number of nonces is replaced in both output terms in both
+          processing steps). Note that the first element of the command
+          output must be equal between the two browsers (as it must be
+          string) or otherwise the browsers will ignore the command in
+          both processing steps.
+  
+          Analogously, we see that the input does not contain any
+          subterm $l \in L$. \gs{sollte eigentlich als begruendung fuer den rest reichen, dass er nirgendwo ein solches $l$ reinpacken kann.}
+  
+          We can now distinguish the possible commands the script can
+          output (again, all parameters for these commands must be
+          term-equivalent under $\theta$):
+  
+          \begin{enumerate}
+          \item Empty or invalid command: In this case, the browser
+            outputs no message and its state is not changed.
+            $\alpha$-equivalence is therefore trivially given.
+          \item\label{ratt-sends-href-command}
+            $\an{\tHref, \mi{url}, \mi{hrefwindow}, \mi{noreferrer}}$:
+            Here, the browser calls $\mathsf{GETNAVIGABLEWINDOW}$ to
+            determine the window in which the document will be loaded.
+            Due to the synchronous window structure between the two
+            browsers, the result will be the same in both processing
+            steps (which may include creating a new window with a new
+            nonce).
+  
+            Now, a new HTTP(S) request is assembled from the URL. A
+            Referer header is added to the request from the document's
+            current $\str{location}$ (which is term-equivalent under
+            $\theta$) and given to the $\mathsf{SEND}$ function. There,
+            if the $\str{host}$ part of the URL is $\str{CHALLENGE}$, it
+            will be replaced by $\mi{dr}_1$ in $b_1$ and by $\mi{dr}_2$
+            in $b_2$. (In this case, the $\alpha$-equivalence in the
+            following holds for $H' := H \cup \{n\}$, where $n$ is the
+            nonce of the generated HTTP request. Otherwise, it holds for
+            $H' := H$.). Afterwards, for domains that are in the
+            $\str{sts}$ subterm of the browser's state, the request will
+            be rewritten to HTTPS. Any cookies for the domain in the
+            requests are added. Note that both latter steps never apply
+            to requests to $\mi{dr}_1$ or $\mi{dr}_2$ as per definition,
+            there are no entries for these domains in $\mi{sts}$ and
+            $\mi{cookies}$. The same number of nonce
+            is chosen in both processing steps, and therefore
+            $\alpha$-equivalence holds.
+          \item $\an{\tIframe, \mi{url}, \mi{window}}$
+            This case is completely parallel to Case~\ref{ratt-sends-href-command}. 
+          \item\label{ratt-sends-form-command}
+            $\an{\tForm, \mi{url}, \mi{method}, \mi{data},
+              \mi{hrefwindow}}$
+            This case is parallel to Case~\ref{ratt-sends-href-command},
+            except that an Origin header is added. Its properties are
+            the same as those of the Referer header in
+            Case~\ref{ratt-sends-href-command}.
+          \item\label{ratt-sends-setscript-command} $\an{\tSetScript,
+              \mi{window}, \mi{script}}$ In this case, the same document
+            is manipulated in both processing steps in the same
+            way. Note that only same-origin documents, i.e., attacker
+            documents, can be manipulated. No output event is generated,
+            and no nonces are chosen. $\alpha$-equivalence is given
+            trivially.
+          \item $\an{\tSetScriptState, \mi{window}, \mi{scriptstate}}$
+            This case is parallel to
+            Case~\ref{ratt-sends-setscript-command}.
+          \item
+            $\an{\tXMLHTTPRequest, \mi{url}, \mi{method}, \mi{data},
+              \mi{xhrreference}}$
+            This case is parallel to Case~\ref{ratt-sends-href-command}
+            with the addition of the Origin header (see
+            Case~\ref{ratt-sends-form-command}) and the addition of a
+            reference parameter.
+            Therefore, for $\gamma$-equivalence, it is important to note
+            that this reference can only be a nonce (and therefore is
+            equal in both processing steps). Otherwise, the browser
+            stops in both processing steps.
+          \item $\an{\tBack, \mi{window}}$,
+            $\an{\tForward, \mi{window}}$, and
+            $\an{\tClose, \mi{window}}$ If the script outputs one of
+            these commands, in both processing steps, the browsers will
+            be manipulated in exactly the same way. No output events are
+            generated, and no nonces are chosen.
+          \item $\an{\tPostMessage, \mi{window}, \mi{message},
+              \mi{origin}}$ In this case, a term containing
+            $\mi{message}$ (term-equivalent under $\theta$) is added to
+            a document's $\str{scriptinput}$ term. If the $\mi{origin}$
+            is $\bot$, the same term will be added to the same document
+            in both processing steps. Otherwise, the term may only be
+            added to one document (if, for example, the origin is
+            $\an{\mi{dr}_1, \https}$ and the target documents in both
+            browsers have the domain $\mi{dr}_1$ and $\mi{dr}_2$,
+            respectively). In this case, however, the equivalence
+            defined on the scriptinputs is preserved.
+          \end{enumerate}
+        \end{enumerate}
+      \item[2 (navigate to URL):] 
+      In this case, a new window is opened
+      in the browser and a document is loaded from $\mi{url}$.
+
+      The states of both browsers are changed in the same way except
+      if the domain of the URL is $\str{CHALLENGE}$. In both cases, a
+      new (at this point empty) window is created and appended the
+      $\str{windows}$ subterm of the browsers. This subterm is
+      therefore changed in exactly the same way.
+
+      A new HTTP request is created and generated requests in 
+      both processing
+      steps can only differ in the host part iff the domain is
+      $\str{CHALLENGE}$. In this case, in $b_1$ the domain is replaced
+      by $\mi{dr}_1$ and in $b_2$ by $\mi{dr}_2$ and the
+      $\alpha$-equivalence in the following holds for $H' := H \{n\}$,
+      where $n$ is the nonce of the generated HTTP request.
+
+      The request cannot contain any $l \in L$ or $t \in T$.
+      and 
+      
+      the Condition~\ref{eqe:prototagequiv} of 
+      Definition~\ref{def:Events}.
+
+      In both processing steps, three nonces are chosen.
+
+      Therefore, we have $\alpha$-equivalence for $(S_1',E_1',N_1')$
+      and $(S_2',E_2',N_2')$.
+      \item[3 (reload document):]
+      Here, an existing document is
+      retrieved from its original location again. From the definition
+      of $\gamma$-equivalence under $(\theta,L)$ we can see that
+      whatever document is reloaded, its location is either (I)
+      term-equivalent under $\theta$, or (II) it is term-equivalent
+      under $\theta$ except for the domain, which is $\mi{dr}_1$ in
+      $b_1$ and $\mi{dr}_2$ in $b_2$. 
+
+      We note that in either case, the requests are constructed from
+      the location and referrer properties of the document that is to
+      be reloaded, and therefore, cannot contain any $t\in T$.
+
+      In Case~(I), we note that the domain cannot be
+      $\str{CHALLENGE}$. If the document is reloaded, the same 
+      request is issued in both browsers (therefore,
+      $\beta$-equivalence under $(\theta, H, L)$ is given), and 
+      none states are changed such that we have
+      $\gamma$-equivalence under $(\theta, L)$. The same number of
+      nonces is chosen in both runs, and we have
+      $\alpha$-equivalence.
+
+      Case~(II) is similar, but we have $H' := H \cup \{n\}$, where
+      $n$ is the nonce of the HTTP request. 
+      Then we have $\beta$-equivalence under
+      $(\theta,H',L)$. Again, the same number of nonces is chosen and
+      we have $\alpha$-equivalence. 
+      \end{description}
+    \item[Other] Any other message is discarded by the browsers 
+      without any change to state or output events.
+  \end{description}
+
+  \begin{lemma}\label{thm-idp-untraceability}
+    In UPPRESSO, the IdP cannot distinguish 
+    $PID_{RP} = [t]ID_{RP}$ from a random variable on 
+    $\mathbb{E}$, where $t$ is random in $\mathbb{Z}_n$.
+  \end{lemma}
+  \begin{proof}
+    Consider a finite cyclic group $\mathbb{E}$ where the 
+    number of points on $\mathbb{E}$ is $n$. Because $G$ is a 
+    generator of order $n$, $ID_{RP} = [r]G$ is also a 
+    generator on $\mathbb{E}$ of order $n$. $t$ is randomly 
+    chosen in $\mathbb{Z}_n$ and always kept unknown to the 
+    IdP. Therefore, $PID_{RP} = [t]ID_{RP}$ is 
+    \emph{indistinguishable} from a point $Q$ that is randomly 
+    chosen on $\mathbb{E}$.
+  \end{proof}
+
+  \paragraph{\underline{Case $p_1$ is some attacker:}}
+  
+  Here, only Case~\ref{eqe:prototagequiv} from
+  Definition~\ref{def:Events} can apply to the input events,
+  i.e., the input events are term-equivalent under proto-tags
+  $\theta$. This implies that the message was delivered to the 
+  same attacker process in both processing steps. Let $A$ be 
+  that attacker process. With Case~\ref{eqs:att} of 
+  Definition~\ref{def:eq-of-states} we have that 
+  $S_1(A) \prototagequiv\theta S_2(A)$ and with 
+  Case~\ref{eqe:pre:t} and Case~\ref{eqs:att-not-t} of 
+  Definition~\ref{def:Events} and 
+  lemma~\ref{thm-idp-untraceability} 
+  it follows immediately that the 
+  attacker cannot decrypt any of the tags in $\theta$ in its 
+  knowledge. Further, in the attackers state there are no 
+  variables (from $V_\text{process}$). 
+
+  With the output term being a fixed term (with variables)
+  $\tau_{\text{process}} \in \terms(\{x\} \cup V_\text{process})$ 
+  and $x$ being $S_1(A)$ or $S_2(A)$, respectively, and there 
+  is no subterm $l \in L$ contained in either $S_1(A)$ or 
+  $S_2(A)$ (Condition~\ref{eqs:att-not-l} of 
+  Definition~\ref{def:eq-of-states}), it is easy to see that 
+  the output events are $\beta$-equivalent under $\theta$, i.e., 
+  $E ^{(1)}_\text{out} \prototagequiv\theta E^{(2)}_\text{out}$, there
+  are not $t \in T$ contained in the output events and the 
+  used nonces are the same, i.e., $N_1' = N_2'$. The new state 
+  of the attacker in both processing steps consists of the 
+  input events, the output events, and the former state of the 
+  event, and, as such, is $\beta$-equivalent under proto-tags 
+  $\theta$. Therefore we have $\alpha$-equivalence on the
+  new configurations.
 \end{proof}
+
+This proves Theorem~\ref{theorem:A}.\QED
 
 \section{Proof of Privacy against RP-based Identity Linkage}
 
